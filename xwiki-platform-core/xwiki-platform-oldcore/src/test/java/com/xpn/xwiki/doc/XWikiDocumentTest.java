@@ -1136,6 +1136,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testCopyDocument() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
+        doc.setTitle("Some title");
         BaseObject o = new BaseObject();
         o.setClassName(CLASSNAME);
         doc.addObject(CLASSNAME, o);
@@ -1145,6 +1146,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertNotSame(o, newDoc.getObject(CLASSNAME));
         assertFalse(newO.getGuid().equals(o.getGuid()));
+        // Verify that the title is copied
+        assertEquals("Some title", newDoc.getTitle());
+    }
+
+    /**
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-6743">XWIKI-6743</a>
+     */
+    public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki1", "space1", "page1"));
+        doc.setTitle(doc.getDocumentReference().getName());
+
+        XWikiDocument newDoc = doc.copyDocument(new DocumentReference("wiki2", "space2", "page2"), getContext());
+
+        // Verify that the title is modified
+        assertEquals("page2", newDoc.getTitle());
     }
 
     public void testResolveClassReference() throws Exception

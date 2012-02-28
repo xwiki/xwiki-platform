@@ -24,16 +24,17 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.jar.internal.handler.DefaultJarExtensionClassLoader;
 
 /**
- * Override the DefaultJarExtensionClassLoader to prevent access to extension classes available in the classpath
- * of the test and therefore isolate the tested extension properly.
- *
+ * Override the DefaultJarExtensionClassLoader to prevent access to extension classes available in the classpath of the
+ * test and therefore isolate the tested extension properly.
+ * 
  * @version $Id$
  */
 @Component
 public class TestJarExtensionClassLoader extends DefaultJarExtensionClassLoader
 {
     @Override
-    protected ClassLoader getSystemClassLoader() {
+    protected ClassLoader getSystemClassLoader()
+    {
         return new TestExtensionClassLoader();
     }
 }

@@ -28,8 +28,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 @Component
 @Singleton
@@ -40,25 +39,17 @@ public class JarExtensionExecutionContextInitializer implements ExecutionContext
     private JarExtensionClassLoader jarExtensionClassLoader;
 
     @Inject
-    private ModelContext modelContext;
+    @Named("current")
+    private EntityReferenceValueProvider provider;
 
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        String currentWikiId = null;
-
-        EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
-        if (currentEntityReference != null) {
-            EntityReference currentWikiReference =
-                this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-
-            if (currentWikiReference != null) {
-                currentWikiId = currentWikiReference.getName();
-            }
-        }
+        String currentWikiId = this.provider.getDefaultValue(EntityType.WIKI);
 
         ExtensionURLClassLoader extensionClassLoader =
-            this.jarExtensionClassLoader.getURLClassLoader(currentWikiId, false);
+            this.jarExtensionClassLoader.getURLClassLoader(currentWikiId != null ? "wiki:" + currentWikiId : null,
+                false);
 
         if (extensionClassLoader != null) {
             Thread.currentThread().setContextClassLoader(extensionClassLoader);

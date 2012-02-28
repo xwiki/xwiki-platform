@@ -5960,9 +5960,13 @@ public class XWikiDocument implements DocumentModelBridge
         loadArchive(context);
 
         XWikiDocument newdoc = duplicate(newDocumentReference);
+
+        // If the copied document has a title set to the original page name then set the new title to be the new page
+        // name.
         if (StringUtils.equals(newdoc.getTitle(), this.getDocumentReference().getName())) {
             newdoc.setTitle(newDocumentReference.getName());
         }
+
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setDocumentReference(newDocumentReference);

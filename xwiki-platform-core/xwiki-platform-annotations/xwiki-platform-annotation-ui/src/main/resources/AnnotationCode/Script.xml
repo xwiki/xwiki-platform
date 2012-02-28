@@ -680,12 +680,12 @@ XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
-  #if ("$!annotationClass" == 'AnnotationCode.AnnotationClass')
-    annTabname : 'Annotations',
-    annTabTemplate : 'annotationsinline.vm',
-  #else
+  #if ("$!annotationClass" == 'XWiki.XWikiComments')
     annTabname : 'Comments',
     annTabTemplate : 'commentsinline.vm',
+  #else
+    annTabname : 'Annotations',
+    annTabTemplate : 'annotationsinline.vm',
   #end
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,

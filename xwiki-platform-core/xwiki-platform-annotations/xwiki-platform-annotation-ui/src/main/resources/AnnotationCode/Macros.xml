@@ -59,7 +59,7 @@
 #*
  * Display a box for creating an annotation
  *
- * @param $space the space of the annotated document 
+ * @param $space the space of the annotated document
  * @param $page the name of the annotated document
  * @param $annData a map containing the mandatory selection-related fields
  * @param $docWiki the wiki of the annotated document
@@ -82,7 +82,7 @@
 #*
  * Display a box for editing an annotation
  *
- * @param $target the annotated entity identifier 
+ * @param $target the annotated entity identifier
  * @param $id the annotation identifier
  * @param $docWiki the wiki of the annotated document
  * @param $docSpace the space of the annotated document
@@ -106,7 +106,7 @@
 #*
  * Display a box containing the annotation
  *
- * @param $target the annotated entity identifier 
+ * @param $target the annotated entity identifier
  * @param $id the annotation identifier
  * @param $docWiki the wiki of the annotated document
  * @param $docSpace the space of the annotated document
@@ -133,7 +133,7 @@
 #*
  * Display form buttons
  *
- * @param $mode 'create' or 'edit' 
+ * @param $mode 'create' or 'edit'
  *#
 #macro(displayAnnotationBoxButtons $mode)
   &lt;div class="buttons"&gt;
@@ -208,14 +208,17 @@
         &lt;span class="tool accept"&gt;&lt;a class="validate" href="${editURL}" title="$msg.get('annotations.action.validate.tooltip')"&gt;$msg.get('annotations.action.validate.text')&lt;/a&gt;&lt;/span&gt;
       #end
       #if ($mode != 'edit')
-        #set($annDocReference = $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
-        #set($annoDoc = $xwiki.getDocument($annDocReference))
-        #set($xredirect = $!escapetool.xml($request.get('xredirect')))
-        #if("$!xredirect" == '')
-          #set($xredirect = "$annoDoc.getURL('view')?$!request.getQueryString()")
+        ## Comment reply button only for default annotations.
+        #if ("$!annotationClassDocName" == 'XWiki.XWikiComments')
+          #set($annDocReference = $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+          #set($annoDoc = $xwiki.getDocument($annDocReference))
+          #set($xredirect = $!escapetool.xml($request.get('xredirect')))
+          #if("$!xredirect" == '')
+            #set($xredirect = "$annoDoc.getURL('view')?$!request.getQueryString()")
+          #end
+          ## add "comment reply" button
+          &lt;span class="tool annotationReply commenttool commentreply"&gt;&lt;a class="commentreply" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;amp;replyto=${ann.id}#xwikicomment_${ann.id}" title="$msg.get('core.viewers.comments.reply')"&gt;$msg.get('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;
         #end
-        ## add "comment reply" button
-        &lt;span class="tool annotationReply commenttool commentreply"&gt;&lt;a class="commentreply" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;amp;replyto=${ann.id}#xwikicomment_${ann.id}" title="$msg.get('core.viewers.comments.reply')"&gt;$msg.get('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;      
         ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
         &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$msg.get('annotations.action.edit.tooltip')"&gt;$msg.get('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;
       #end
@@ -236,7 +239,7 @@
  * @param $mode view (default), list, create or edit
  *#
 #macro(displayAnnotationBody $ann $mode)
-  #if ($mode == 'list') 
+  #if ($mode == 'list')
       #if ($ann.state == 'ALTERED')
         &lt;div class="annotationOriginalSelection"&gt;$msg.get("annotations.altered.text")&lt;/div&gt;
       #end

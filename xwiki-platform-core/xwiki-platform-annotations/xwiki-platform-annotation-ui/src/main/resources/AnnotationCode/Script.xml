@@ -593,7 +593,18 @@ return XWiki;
 <cache></cache>
 </property>
 <property>
-<code>/**
+<code>## Retrieve the annotation settings from the configuration object
+#set($config = 'AnnotationCode.AnnotationConfig')
+#set($configObj = $xwiki.getDocument($config).getObject($config))
+#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
+#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
+#set($annotationsActivated = $configObj.getProperty('activated').value)
+#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
+#set($annotationClass = $configObj.getProperty('annotationClass').value)
+
+/******************************************************************************************************/
+
+/**
  * Event.simulate(@element, eventName[, options]) -&gt; Element
  *
  * - @element: element to fire event on
@@ -669,7 +680,13 @@ XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
-  annTabname : 'Comments',
+  #if ("$!annotationClass" == 'AnnotationCode.AnnotationClass')
+    annTabname : 'Annotations',
+    annTabTemplate : 'annotationsinline.vm',
+  #else
+    annTabname : 'Comments',
+    annTabTemplate : 'commentsinline.vm',
+  #end
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
   // whether the annotations are being displayed; synchronizes with displayAnnotationsCheckbox if that element exists
@@ -954,8 +971,9 @@ XWiki.Annotation = Class.create({
         }
         // hide message at page bottom
         this._x_notification.hide();
-        // load the received annotated content in the page, along with annotations and annotations markers
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow);
+        // load the received annotated content in the page, along with annotations and annotations markers. Force a content update
+        // in case the last annotation was deleted.
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, true);
         // store the state of the annotations
         this.fetchedAnnotations = true;
         if (this.displayAnnotationsCheckbox) {
@@ -1037,13 +1055,13 @@ XWiki.Annotation = Class.create({
       annotationsPane.addClassName('empty');
       if (!annotationsPane.hasClassName('hidden')) {
         // reload
-        XWiki.displayDocExtra(this.annTabname, 'commentsinline.vm', navigateToPane);
+        XWiki.displayDocExtra(this.annTabname, this.annTabTemplate, navigateToPane);
       }
     }
   },
 
   addDeleteListenersInTab : function() {
-    $$(".annotation a.delete").each(function(item) {
+    $$("#Annotationspane .annotation a.delete").each(function(item) {
       this.addDeleteListener(item);
     }.bind(this));
   },
@@ -1632,14 +1650,16 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-    Handles the refresh of the document content when there are modifications in the annotations tab (comments).
+   * Handles the refresh of the document content when there are modifications in the annotations tab (comments).
    */
   refreshAnnotationsOnCommentDelete : function(event) {
     // if the annotations are currently visible, re-fetch the annotations and display them
-    // TODO: check what happens if annotations are fetched but hidden. Is this refreshed properly?
-    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : false;
+    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault;
     if (visible) {
       this.fetchAnnotations(true);
+    } else {
+      // Mark the loaded annotations as dirty and make sure the next time the annotations checkbox is checked, the annotations will be fetched.
+      this.fetchedAnnotations = false;
     }
   }
 });
@@ -1647,13 +1667,6 @@ XWiki.Annotation = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-## Retrieve the annotation settings from the configuration object
-#set($config = 'AnnotationCode.AnnotationConfig')
-#set($configObj = $xwiki.getDocument($config).getObject($config))
-#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
-#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
-#set($annotationsActivated = $configObj.getProperty('activated').value)
-#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 document.observe('xwiki:dom:loaded', function() {
   // if the action on the current document is not view, don't load annotations
   if (XWiki.contextaction != "view") {

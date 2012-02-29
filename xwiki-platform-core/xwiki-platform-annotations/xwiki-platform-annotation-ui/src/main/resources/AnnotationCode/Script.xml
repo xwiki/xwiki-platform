@@ -602,78 +602,6 @@ return XWiki;
 #set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 #set($annotationClass = $configObj.getProperty('annotationClass').value)
 
-/******************************************************************************************************/
-
-/**
- * Event.simulate(@element, eventName[, options]) -&gt; Element
- *
- * - @element: element to fire event on
- * - eventName: name of event to fire (only MouseEvents and HTMLEvents interfaces are supported)
- * - options: optional object to fine-tune event properties - pointerX, pointerY, ctrlKey, etc.
- *
- *    $('foo').simulate('click'); // =&gt; fires "click" event on an element with id=foo
- *
- * Note: This is taken from https://github.com/kangax/protolicious/blob/master/event.simulate.js which
- * has an MIT license and should be compatible with LGPL.
- * FIXME: Find an alternative to Event.simulate. Maybe use a custom event that is triggered on click.
- **/
-(function(){
-
-  var eventMatchers = {
-    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
-    'MouseEvents': /^(?:click|mouse(?:down|up|over|move|out))$/
-  }
-  var defaultOptions = {
-    pointerX: 0,
-    pointerY: 0,
-    button: 0,
-    ctrlKey: false,
-    altKey: false,
-    shiftKey: false,
-    metaKey: false,
-    bubbles: true,
-    cancelable: true
-  }
-
-  Event.simulate = function(element, eventName) {
-    var options = Object.extend(defaultOptions, arguments[2] || { });
-    var oEvent, eventType = null;
-
-    element = $(element);
-
-    for (var name in eventMatchers) {
-      if (eventMatchers[name].test(eventName)) { eventType = name; break; }
-    }
-
-    if (!eventType)
-      throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
-
-    if (document.createEvent) {
-      oEvent = document.createEvent(eventType);
-      if (eventType == 'HTMLEvents') {
-        oEvent.initEvent(eventName, options.bubbles, options.cancelable);
-      }
-      else {
-        oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
-          options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
-          options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
-      }
-      element.dispatchEvent(oEvent);
-    }
-    else {
-      options.clientX = options.pointerX;
-      options.clientY = options.pointerY;
-      oEvent = Object.extend(document.createEventObject(), options);
-      element.fireEvent('on' + eventName, oEvent);
-    }
-    return element;
-  }
-
-  Element.addMethods({ simulate: Event.simulate });
-})()
-
-/******************************************************************************************************/
-
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Annotation = Class.create({
@@ -1434,16 +1362,22 @@ XWiki.Annotation = Class.create({
     }
     var replyButton = container.down('a.commentreply');
     if (replyButton) {
-      // hack: when a click is done on this button, fire a click on the corresponding button in the comments panel
-      // FIXME: if the comments panel is not visible currently we are le screwed
-      replyButton.observe('click', function(event) {
-        replyButton.blur();
-        event.stop();
-        // locate the button in the comments taaaaab
-        var replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
-        replyButtonInTab.simulate('click');
-        return false;
-      });
+      // When a click is done on this button, fire a click on the corresponding button in the comments tab.
+
+      // Locate the button in the comments tab.
+      var replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+
+      // If the replyButtonInTab is not found, then the comments tab is not visible so we hide the reply button as well, otherwise it just does not work.
+      if (!replyButtonInTab) {
+        replyButton.hide();
+      } else {
+        // Get the click handlers for the reply button from the comments tab.
+        var clickEventHandlers = replyButtonInTab.getStorage().get('prototype_event_registry').get('click');
+        // Register the same event handlers for the bubble reply button.
+        clickEventHandlers.each(function(wrapper){
+          replyButton.observe('click', wrapper.handler);
+        });
+      }
     }
   },
 

@@ -19,10 +19,12 @@
  */
 package org.xwiki.ircbot.test.ui;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.ircbot.test.po.IRCBotPage;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.po.ViewPage;
+
+import junit.framework.Assert;
 
 /**
  * UI tests for the IRC Bot feature.
@@ -32,16 +34,24 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class IRCBotTest extends AbstractTest
 {
-    @Test
-    public void testAddWikiBotListener()
+    @Before
+    public void setUp()
     {
         // Login as superadmin to have delete rights.
         getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
         getUtil().recacheSecretToken();
+    }
 
+    @Test
+    public void testBot()
+    {
         getUtil().deletePage(getTestClassName(), getTestMethodName());
-        String simulationPageName = getTestMethodName() + "-SimulateIRCServer";
-        getUtil().deletePage(getTestClassName(), simulationPageName);
+
+        // Go to the main Bot home page and start the bot
+        IRCBotPage page = IRCBotPage.gotoPage();
+
+        // Verify that the Bot is stopped
+        Assert.assertFalse(page.isBotStarted());
 
         // Add a Bot Listener
         getUtil().addObject(getTestClassName(), getTestMethodName(), "IRC.IRCBotListenerClass",
@@ -50,9 +60,29 @@ public class IRCBotTest extends AbstractTest
             "event", "onMessage",
             "script", "gotcha!");
 
-        // Go to the main Bot home page to start the bot
-        ViewPage botPage = getUtil().gotoPage("IRC", "IRCBot");
+        // Start the Bot
+        page = IRCBotPage.gotoPage();
+        page.clickActionButton();
 
-//        Assert.assertEquals("gotcha!", page.getContent());
+        // Verify that the Bot is started
+        Assert.assertTrue(page.isBotStarted());
+
+        // Verify that our Bot listener is listed and started
+        //TODO
+
+        // Stop the Bot
+        page.clickActionButton();
+
+        // Verify that the Bot is stopped again
+        Assert.assertFalse(page.isBotStarted());
+
+        // Verify that our Bot is listed and stopped
+        //TODO
+
+        // Remove our Bot Listener
+        getUtil().deletePage(getTestClassName(), getTestMethodName());
+
+        // Verify that our Bot is no longer listed
+        //TODO
     }
 }

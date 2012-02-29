@@ -20,7 +20,9 @@
 package org.xwiki.ircbot.internal.wiki;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.context.Execution;
@@ -73,9 +76,6 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     @Named("wiki")
     private ComponentManager componentManager;
 
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
     /**
      * The logger to log.
      */
@@ -89,8 +89,8 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     private QueryManager queryManager;
 
     @Inject
-    @Named("current/reference")
-    private DocumentReferenceResolver<EntityReference> currentDocumentReferenceResolver;
+    @Named("current")
+    private DocumentReferenceResolver<String> currentReferenceResolver;
 
     /**
      * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
@@ -103,12 +103,10 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
 
     @Inject
     @Named("compactwiki")
-    private EntityReferenceSerializer compactWikiSerializer;
+    private EntityReferenceSerializer<String> compactWikiSerializer;
 
-    // TODO: local is deprecated, find out what to replace it with
     @Inject
-    @Named("local")
-    private EntityReferenceSerializer localSerializer;
+    private EntityReferenceSerializer defaultSerializer;
 
     @Override
     public void startBot() throws IRCBotException
@@ -144,14 +142,14 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
             // Join channel
             this.bot.joinChannel(channel);
 
-            registerBotListeners();
+            registerWikiBotListeners();
         }
     }
 
     @Override
     public void stopBot() throws IRCBotException
     {
-        unregisterBotListeners();
+        unregisterWikiBotListeners();
 
         if (this.bot.isConnected()) {
             this.bot.disconnect();
@@ -159,10 +157,10 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     }
 
     @Override
-    public void registerBotListener(DocumentReference reference) throws IRCBotException
+    public void registerWikiBotListener(DocumentReference reference) throws IRCBotException
     {
         // Step 1: Verify if the bot listener is already registered
-        String hint = this.entityReferenceSerializer.serialize(reference);
+        String hint = this.compactWikiSerializer.serialize(reference);
         if (!this.componentManager.hasComponent(IRCBotListener.class, hint)) {
             // Step 2: Create the Wiki Bot Listener component if the document has the correct objects
             if (this.listenerFactory.containsWikiListener(reference)) {
@@ -172,7 +170,7 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
                     DefaultComponentDescriptor<IRCBotListener> componentDescriptor =
                         new DefaultComponentDescriptor<IRCBotListener>();
                     componentDescriptor.setRole(IRCBotListener.class);
-                    componentDescriptor.setRoleHint(this.entityReferenceSerializer.serialize(reference));
+                    componentDescriptor.setRoleHint(this.compactWikiSerializer.serialize(reference));
                     this.componentManager.registerComponent(componentDescriptor, wikiListener);
                 } catch (ComponentRepositoryException e) {
                     throw new IRCBotException(String.format("Unable to register Wiki IRC Bot Listener in document [%s]",
@@ -183,25 +181,27 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     }
 
     @Override
-    public void unregisterBotListener(DocumentReference reference)
+    public void unregisterWikiBotListener(DocumentReference reference)
     {
-        String hint = this.entityReferenceSerializer.serialize(reference);
+        String hint = this.compactWikiSerializer.serialize(reference);
         this.componentManager.unregisterComponent(IRCBotListener.class, hint);
     }
 
     @Override
-    public void registerBotListeners() throws IRCBotException
+    public void registerWikiBotListeners() throws IRCBotException
     {
-        for (DocumentReference reference: getBotListenerDocumentReferences()) {
-            registerBotListener(reference);
+        for (BotListenerData data : getWikiBotListenerData()) {
+            DocumentReference reference = this.currentReferenceResolver.resolve(data.getId());
+            registerWikiBotListener(reference);
         }
     }
 
     @Override
-    public void unregisterBotListeners() throws IRCBotException
+    public void unregisterWikiBotListeners() throws IRCBotException
     {
-        for (DocumentReference reference: getBotListenerDocumentReferences()) {
-            unregisterBotListener(reference);
+        for (BotListenerData data : getWikiBotListenerData()) {
+            DocumentReference reference = this.currentReferenceResolver.resolve(data.getId());
+            unregisterWikiBotListener(reference);
         }
     }
 
@@ -211,33 +211,61 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
         return this.bot.isConnected();
     }
 
+    @Override
+    public List<BotListenerData> getBotListenerData() throws IRCBotException
+    {
+        Map<String, BotListenerData> data = new HashMap<String, BotListenerData>();
+
+        // Step 1: Look for all wiki bot listeners in the wiki
+        for (BotListenerData listenerData : getWikiBotListenerData()) {
+            data.put(listenerData.getId(), listenerData);
+        }
+
+        // Step 2: Look for all registered bot listeners in the component manager but not already in the data structure
+        try {
+            for (Map.Entry<String, IRCBotListener> entry :
+                this.componentManager.lookupMap(IRCBotListener.class).entrySet())
+            {
+                BotListenerData listenerData =
+                    new BotListenerData(entry.getKey(), entry.getValue().getName(), entry.getValue().getDescription());
+                if (!data.containsKey(entry.getKey())) {
+                    data.put(entry.getKey(), listenerData);
+                }
+            }
+        } catch (ComponentLookupException e) {
+            throw new IRCBotException("Failed to lookup IRC Bot Listeners", e);
+        }
+
+        return new ArrayList<BotListenerData>(data.values());
+    }
+
     /**
-     * @return the list of references to documents containing {@link #WIKI_BOT_LISTENER_CLASS} objects in the current
-     *         wiki
+     * @return the Bot Listener data for all documents containing {@link #WIKI_BOT_LISTENER_CLASS} objects in the
+     *         current wiki
      * @throws IRCBotException if we fail in searching the wiki
      */
-    private List<DocumentReference> getBotListenerDocumentReferences() throws IRCBotException
+    private List<BotListenerData> getWikiBotListenerData() throws IRCBotException
     {
         List<Object[]> results;
         try {
             Query query = this.queryManager.createQuery(
-                String.format("select distinct doc.space, doc.name from Document doc, "
-                    + "doc.object(%s) as listener", this.localSerializer.serialize(WIKI_BOT_LISTENER_CLASS)),
-                        Query.XWQL);
+                String.format("select distinct doc.space, doc.name, listener.name, listener.description "
+                    + "from Document doc, doc.object(%s) as listener",
+                        this.defaultSerializer.serialize(WIKI_BOT_LISTENER_CLASS)), Query.XWQL);
             results = query.execute();
         } catch (QueryException e) {
             throw new IRCBotException("Failed to locate IRC Bot listener objects in the wiki", e);
         }
 
-        List<DocumentReference> references = new ArrayList<DocumentReference>();
+        List<BotListenerData> data = new ArrayList<BotListenerData>();
         for (Object[] documentData : results) {
             EntityReference relativeReference = new EntityReference((String) documentData[1], EntityType.DOCUMENT,
                 new EntityReference((String) documentData[0], EntityType.SPACE));
-            DocumentReference reference = this.currentDocumentReferenceResolver.resolve(relativeReference);
-            references.add(reference);
+            data.add(new BotListenerData(this.compactWikiSerializer.serialize(relativeReference),
+                (String) documentData[2], (String) documentData[3], true));
         }
 
-        return references;
+        return data;
     }
 
     /**

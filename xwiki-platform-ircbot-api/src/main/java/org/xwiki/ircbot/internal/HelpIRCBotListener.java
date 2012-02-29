@@ -46,6 +46,12 @@ public class HelpIRCBotListener extends AbstractIRCBotListener
     private IRCBot bot;
 
     @Override
+    public String getName()
+    {
+        return "Help";
+    }
+
+    @Override
     public String getDescription()
     {
         return String.format("%s: List all commands available", COMMAND);

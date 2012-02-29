@@ -19,8 +19,12 @@
  */
 package org.xwiki.ircbot.wiki;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.internal.wiki.BotListenerData;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -44,13 +48,15 @@ public interface WikiIRCBotManager
      */
     void stopBot() throws IRCBotException;
 
-    void registerBotListener(DocumentReference reference) throws IRCBotException;
+    void registerWikiBotListener(DocumentReference reference) throws IRCBotException;
 
-    void unregisterBotListener(DocumentReference reference);
+    void unregisterWikiBotListener(DocumentReference reference);
 
-    void registerBotListeners() throws IRCBotException;
+    void registerWikiBotListeners() throws IRCBotException;
 
-    void unregisterBotListeners() throws IRCBotException;
+    void unregisterWikiBotListeners() throws IRCBotException;
 
     boolean isBotStarted();
+
+    List<BotListenerData> getBotListenerData() throws IRCBotException;
 }

@@ -123,7 +123,7 @@
 ## ------------------
 ## Display Bot Status
 ## ------------------
-#if ($bot.isStarted())
+#if ($botManager.isStarted())
   #set($buttonText = "Stop the IRC Bot")
   #set ($action = "stop")
   Status: (% style='color:green' %)Bot is started.(%%)
@@ -138,8 +138,8 @@
 ## ----------------------------------
 {{html}}
 &lt;form method='get'&gt;
-  &lt;input type='submit' class='button' value='$buttonText'/&gt;
   &lt;input type='hidden' name='action' value='$action'/&gt;
+  &lt;span class='buttonwrapper'&gt;&lt;input type='submit' name='botaction' value='$buttonText' class='button'/&gt;&lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
 {{/velocity}}
@@ -149,7 +149,16 @@
 A Bot listener allows to add features to the IRC channel (such as logging messages in the wiki, searching the wiki directly from IRC, etc).
 
 {{velocity}}
+|=Name|=Description|=Is started?
+#set ($statuses = $botManager.getBotListenerStatuses())
+#foreach ($status in $statuses.keySet())
+  #if ($status.isWikiBotListener())
+    #set ($nameColumn = "[[$status.name>>$status.id]]")
+  #else
+    #set ($nameColumn = $status.name)
+  #end
+|$nameColumn|$status.description|#if ($statuses.get($status) == "true")(/)#else(x)#end
 
+#end
 {{/velocity}}
-
 </content></xwikidoc>

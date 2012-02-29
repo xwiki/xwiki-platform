@@ -136,6 +136,12 @@ public class PircBotIRCBot implements IRCBot
     }
 
     @Override
+    public String getName()
+    {
+        return "Internal Delegator";
+    }
+
+    @Override
     public void onConnect()
     {
         initExecutionContext();

@@ -24,6 +24,7 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface IRCBotListener
 {
+    String getName();
     String getDescription();
 
     void onConnect();

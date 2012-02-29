@@ -39,7 +39,7 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiIRCBotListener.class);
 
-    private String description;
+    private BotListenerData listenerData;
 
     private Map<String, XDOM> events;
 
@@ -51,10 +51,10 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
 
     private IRCBot bot;
 
-    public WikiIRCBotListener(String description, Map<String, XDOM> events, Syntax syntax,
+    public WikiIRCBotListener(BotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
         Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, IRCBot bot)
     {
-        this.description = description;
+        this.listenerData = listenerData;
         this.events = events;
         this.syntax = syntax;
         this.macroTransformation = macroTransformation;
@@ -63,9 +63,15 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
     }
 
     @Override
+    public String getName()
+    {
+        return this.listenerData.getName();
+    }
+
+    @Override
     public String getDescription()
     {
-        return this.description;
+        return this.listenerData.getDescription();
     }
 
     @Override

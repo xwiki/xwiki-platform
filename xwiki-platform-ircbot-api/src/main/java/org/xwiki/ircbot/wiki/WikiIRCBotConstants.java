@@ -39,6 +39,11 @@ public interface WikiIRCBotConstants
         new EntityReference(SPACE, EntityType.SPACE));
 
     /**
+     * Constant for representing a listener name property.
+     */
+    String NAME_PROPERTY = "name";
+
+    /**
      * Constant for representing a listener description property.
      */
     String DESCRIPTION_PROPERTY = "description";

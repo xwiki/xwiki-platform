@@ -62,6 +62,7 @@ public class StubPircBot implements PircBotInterface
     @Override
     public void disconnect()
     {
+        this.hostname = null;
     }
 
     @Override

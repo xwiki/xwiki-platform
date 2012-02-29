@@ -38,6 +38,7 @@ import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.parser.ParseException;
@@ -89,6 +90,10 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     @Inject
     private IRCBot bot;
 
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Override
     public WikiIRCBotListener createWikiListener(DocumentReference documentReference) throws IRCBotException
     {
@@ -115,6 +120,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         BaseObject listenerDefinition = doc.getXObject(WIKI_BOT_LISTENER_CLASS);
 
         // Extract listener definition.
+        String name = listenerDefinition.getStringValue(NAME_PROPERTY);
         String description = listenerDefinition.getStringValue(DESCRIPTION_PROPERTY);
 
         // Extract listener events.
@@ -145,7 +151,11 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             }
         }
 
-        return new WikiIRCBotListener(description, events, doc.getSyntax(), this.macroTransformation,
+
+        BotListenerData botListenerData = new BotListenerData(
+            this.entityReferenceSerializer.serialize(doc.getDocumentReference()), name, description, true);
+
+        return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
             this.plainTextBlockRenderer, this.bot);
     }
 

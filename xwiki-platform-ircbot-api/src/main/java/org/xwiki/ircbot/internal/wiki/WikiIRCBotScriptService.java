@@ -19,16 +19,27 @@
  */
 package org.xwiki.ircbot.internal.wiki;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Allows scripts to easily access IRC Bot APIs.
@@ -58,12 +69,18 @@ public class WikiIRCBotScriptService implements ScriptService
     private WikiIRCBotManager botManager;
 
     @Inject
-    private DocumentAccessBridge bridge;
+    @Named("wiki")
+    private ComponentManager componentManager;
+
+    @Inject
+    private EntityReferenceValueProvider valueProvider;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     public void start()
     {
-        // For protection we're requiring Programming Rights to start the Bot
-        if (this.bridge.hasProgrammingRights()) {
+        if (hasPermission()) {
             try {
                 this.botManager.startBot();
             } catch (IRCBotException e) {
@@ -76,8 +93,7 @@ public class WikiIRCBotScriptService implements ScriptService
 
     public void stop()
     {
-        // For protection we're requiring Programming Rights to start the Bot
-        if (this.bridge.hasProgrammingRights()) {
+        if (hasPermission()) {
             try {
                 this.botManager.stopBot();
             } catch (IRCBotException e) {
@@ -91,6 +107,22 @@ public class WikiIRCBotScriptService implements ScriptService
     public boolean isStarted()
     {
         return this.botManager.isBotStarted();
+    }
+
+    public Map<BotListenerData, Boolean> getBotListenerStatuses()
+    {
+        Map<BotListenerData, Boolean> statuses = new HashMap<BotListenerData, Boolean>();
+
+        try {
+            for (BotListenerData listenerData : this.botManager.getBotListenerData()) {
+                statuses.put(listenerData,
+                    this.componentManager.hasComponent(IRCBotListener.class, listenerData.getId()));
+            }
+        } catch (IRCBotException e) {
+            statuses = null;
+        }
+
+        return statuses;
     }
 
     /**
@@ -112,5 +144,42 @@ public class WikiIRCBotScriptService implements ScriptService
     private void setError(Exception exception)
     {
         this.execution.getContext().setProperty(ERROR_KEY, exception);
+    }
+
+    /**
+     * Utility method for accessing XWikiContext.
+     *
+     * @return the XWikiContext.
+     */
+    private XWikiContext getContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    }
+
+    private boolean hasPermission()
+    {
+        boolean hasPermission = false;
+
+        XWikiContext context = getContext();
+        DocumentReference userReference = context.getUserReference();
+        String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
+
+        // Check if the current user is logged on the main wiki.
+        if (userReference.getWikiReference().getName().equals(mainWiki))
+        {
+            DocumentReference mainXWikiPreferencesReference =
+                new DocumentReference(mainWiki, "XWiki", "XWikiPreferences");
+
+            // Check if the user has Admin rights on the main wiki
+            try {
+                hasPermission = context.getWiki().getRightService().hasAccessLevel("admin",
+                    this.entityReferenceSerializer.serialize(userReference),
+                    this.entityReferenceSerializer.serialize(mainXWikiPreferencesReference), context);
+            } catch (XWikiException e) {
+                // Don't allow access (permission is false by default)
+            }
+        }
+
+        return hasPermission;
     }
 }

@@ -128,7 +128,8 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
                 }
             }
         }
-        return currentBuilder;
+
+        return builder;
     }
 
     /**
@@ -166,7 +167,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
             }
         }
 
-        return currentBuilder;
+        return builder;
     }
 
     /**

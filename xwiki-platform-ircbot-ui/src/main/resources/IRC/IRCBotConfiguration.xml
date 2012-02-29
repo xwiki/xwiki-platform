@@ -106,7 +106,7 @@
 <className>IRC.IRCBot</className>
 <guid>a25f7fa6-02eb-404c-80b1-2a2abfc4c21b</guid>
 <property>
-<botname>XWiki Test Bot</botname>
+<botname>XWikiTestBot</botname>
 </property>
 <property>
 <channel>#xwikitest</channel>

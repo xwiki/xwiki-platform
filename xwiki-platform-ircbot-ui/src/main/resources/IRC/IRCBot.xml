@@ -137,12 +137,24 @@
 ## Display form to start/stop the Bot
 ## ----------------------------------
 {{html}}
-&lt;form method='get'&gt;
+&lt;form method='post'&gt;
   &lt;input type='hidden' name='action' value='$action'/&gt;
   &lt;span class='buttonwrapper'&gt;&lt;input type='submit' name='botaction' value='$buttonText' class='button'/&gt;&lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
 {{/velocity}}
+
+## -------------------------
+## Display Bot Configuration
+## -------------------------
+The following configuration is used:
+#set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCBotConfiguration'))
+#set ($discard = $ircconfigdoc.use($doc.fullName))
+* Server: {{box}}$ircconfigdoc.getValue('server'){{/box}}
+* Channel: {{box}}$ircconfigdoc.getValue('channel'){{/box}}
+* Bot name: {{box}}$ircconfigdoc.getValue('botname'){{/box}}
+
+To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCBotConfiguration]].
 
 = Available Bot Listeners =
 

@@ -50,7 +50,14 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
-      <version>5.0.1.FINAL</version>
+      <version>5.1.1.FINAL</version>
+      <exclusions>
+        <!-- We generally use it for local caches -->
+        <exclusion>
+          <artifactId>jgroups</artifactId>
+          <groupId>org.jgroups</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Test Dependencies -->

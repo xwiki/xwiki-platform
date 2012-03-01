@@ -316,6 +316,8 @@
                 <exclude>**/internal/**</exclude>
                 <!-- Remove the following excludes after we release 3.5 -->
                 <exclude>org/xwiki/container/ContainerFactory</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
                 <!-- Moved to another module -->
                 <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>

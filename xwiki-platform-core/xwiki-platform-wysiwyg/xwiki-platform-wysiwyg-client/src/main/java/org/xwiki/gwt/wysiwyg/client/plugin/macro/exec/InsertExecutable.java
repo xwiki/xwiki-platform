@@ -59,6 +59,10 @@ public class InsertExecutable extends InsertHTMLExecutable
         // Prepare the macro markers.
         DocumentFragment markers = rta.getDocument().createDocumentFragment();
         markers.appendChild(rta.getDocument().createComment(param));
+        // Separate the comment nodes (the macro markers) with an empty element node to prevent them from being
+        // normalized, i.e. merged into a single comment node. Firefox 10.0.2 normalizes the DOM tree for instance if we
+        // insert a document fragment when the BODY element contains only a line break BR.
+        markers.appendChild(rta.getDocument().createSpanElement());
         markers.appendChild(rta.getDocument().createComment("stopmacro"));
         // Note: We refresh the rich text area after inserting the macro without going through the command manager
         // because we don't want to trigger the history mechanism.

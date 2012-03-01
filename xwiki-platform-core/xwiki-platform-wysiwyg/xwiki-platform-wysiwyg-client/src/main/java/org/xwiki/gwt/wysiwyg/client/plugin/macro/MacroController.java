@@ -73,7 +73,7 @@ public class MacroController implements DoubleClickHandler, KeyDownHandler
      */
     public void onDoubleClick(DoubleClickEvent event)
     {
-        if (event.getSource() == plugin.getTextArea() && plugin.getSelector().getMacroCount() == 1) {
+        if (event.getSource() == plugin.getTextArea() && isMacroCurrentlySelected()) {
             plugin.edit();
         }
     }
@@ -85,23 +85,37 @@ public class MacroController implements DoubleClickHandler, KeyDownHandler
      */
     public void onKeyDown(KeyDownEvent event)
     {
-        if (event.getSource() == plugin.getTextArea() && plugin.getSelector().getMacroCount() == 1) {
-            switch (event.getNativeKeyCode()) {
-                case KeyCodes.KEY_ENTER:
-                    plugin.edit();
-                    ((Event) event.getNativeEvent()).xPreventDefault();
-                    break;
-                // Space
-                case 32:
-                    // Toggle between collapsed and expanded state.
-                    boolean expanded = plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.EXPAND);
-                    plugin.getTextArea().getCommandManager().execute(
-                        expanded ? MacroPlugin.COLLAPSE : MacroPlugin.EXPAND);
-                    ((Event) event.getNativeEvent()).xPreventDefault();
-                    break;
-                default:
-                    break;
-            }
+        int keyCode = event.getNativeKeyCode();
+        // Ignore all keys except Enter and Space.
+        if (event.getSource() != plugin.getTextArea() || (keyCode != KeyCodes.KEY_ENTER && keyCode != 32)
+            || !isMacroCurrentlySelected()) {
+            return;
         }
+        if (keyCode == KeyCodes.KEY_ENTER) {
+            plugin.edit();
+        } else {
+            // Space: Toggle between collapsed and expanded state.
+            boolean expanded = plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.EXPAND);
+            plugin.getTextArea().getCommandManager().execute(expanded ? MacroPlugin.COLLAPSE : MacroPlugin.EXPAND);
+        }
+        ((Event) event.getNativeEvent()).xPreventDefault();
+    }
+
+    /**
+     * Note: this method double-checks if the list of selected macro contains exactly one macro by forcing an update.
+     * 
+     * @return {@code true} if there is exactly one macro currently selected, {@code false} otherwise
+     */
+    private boolean isMacroCurrentlySelected()
+    {
+        if (plugin.getSelector().getMacroCount() == 1) {
+            // Force an update of the list of selected macros because the caret position might have been changed since
+            // the last update (by a previous event listener for instance). We do this especially because the ReadOnly
+            // plug-in moves the caret before/after the read-only area when the caret is at the start/end and the user
+            // types printable keys.
+            plugin.getSelector().update();
+            return plugin.getSelector().getMacroCount() == 1;
+        }
+        return false;
     }
 }

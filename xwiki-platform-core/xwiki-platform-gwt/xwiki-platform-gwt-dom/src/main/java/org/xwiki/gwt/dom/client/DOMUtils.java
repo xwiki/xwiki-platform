@@ -452,6 +452,107 @@ public class DOMUtils
     }
 
     /**
+     * Computes the maximal <strong>sub-range</strong> of the given range that satisfies the following two conditions:
+     * <ul>
+     * <li>the start point is before a <strong>leaf</strong> element node that can't have child nodes (e.g. an image) or
+     * inside a leaf node at position 0 (e.g. an empty span or a text node)</li>
+     * <li>the end point is after a leaf element node that can't have child nodes (e.g. an image) or inside a leaf node
+     * at the end (e.g. inside an empty span or at the end of a text node)</li>
+     * </ul>
+     * . If no such sub-range exists (because the given range doesn't wrap any leaf node and none of its end points
+     * satisfies the corresponding condition) then the given range is returned unmodified.
+     * 
+     * @param range a DOM range
+     * @return the maximal sub-range that selects the same content as the given range
+     */
+    public Range shrinkRange(Range range)
+    {
+        if (range == null || range.isCollapsed()) {
+            return range;
+        }
+
+        // Find the start and end points that satisfy the conditions.
+        Range start = getShrunkenRangeStart(range);
+        Range end = getShrunkenRangeEnd(range);
+
+        if (start.compareBoundaryPoints(RangeCompare.START_TO_END, end) <= 0) {
+            Range result = range.cloneRange();
+            result.setStart(start.getEndContainer(), start.getEndOffset());
+            result.setEnd(end.getStartContainer(), end.getStartOffset());
+            return result;
+        }
+        return range;
+    }
+
+    /**
+     * Utility method to get the start point of the shrunken range (obtained with {@link #shrinkRange(Range)}).
+     * 
+     * @param range a DOM range
+     * @return the start point of the range returned by {@link #shrinkRange(Range)}
+     * @see #shrinkRange(Range)
+     */
+    private Range getShrunkenRangeStart(Range range)
+    {
+        Node startContainer = range.getStartContainer();
+        if (startContainer.hasChildNodes()) {
+            if (range.getStartOffset() < startContainer.getChildCount()) {
+                // Before a child node of an element.
+                startContainer = getFirstLeaf(startContainer.getChild(range.getStartOffset()));
+            } else {
+                // After the last child of an element.
+                startContainer = getNextLeaf(startContainer);
+            }
+        } else if (range.getStartOffset() > 0) {
+            // Inside a text node.
+            startContainer = getNextLeaf(startContainer);
+        }
+
+        int startOffset = 0;
+        if (startContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(startContainer)) {
+            startOffset = getNodeIndex(startContainer);
+        }
+
+        Range start = range.cloneRange();
+        start.setEnd(startContainer, startOffset);
+        start.collapse(false);
+        return start;
+    }
+
+    /**
+     * Utility method to get the end point of the shrunken range (obtained with {@link #shrinkRange(Range)}).
+     * 
+     * @param range a DOM range
+     * @return the end point of the range returned by {@link #shrinkRange(Range)}
+     * @see #shrinkRange(Range)
+     */
+    private Range getShrunkenRangeEnd(Range range)
+    {
+        Node endContainer = range.getEndContainer();
+        if (endContainer.hasChildNodes()) {
+            if (range.getEndOffset() > 0) {
+                // After a child node of an element.
+                endContainer = getLastLeaf(endContainer.getChild(range.getEndOffset() - 1));
+            } else {
+                // Before the first child of an element.
+                endContainer = getPreviousLeaf(endContainer);
+            }
+        } else if (range.getEndOffset() < getLength(endContainer)) {
+            // Inside a text node.
+            endContainer = getPreviousLeaf(endContainer);
+        }
+
+        int endOffset = getLength(endContainer);
+        if (endContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(endContainer)) {
+            endOffset = getNodeIndex(endContainer) + 1;
+        }
+
+        Range end = range.cloneRange();
+        end.setStart(endContainer, endOffset);
+        end.collapse(true);
+        return end;
+    }
+
+    /**
      * Creates a copy of a node from an external document that can be inserted into the given document.
      * 
      * @param doc The document in which we want to insert the returned copy.
@@ -1129,7 +1230,7 @@ public class DOMUtils
         List<Node> aliceAncestors = getAncestors(alice);
         List<Node> bobAncestors = getAncestors(bob);
 
-        // Test is the input nodes are disconnected.
+        // Test if the input nodes are disconnected.
         int aliceIndex = aliceAncestors.size() - 1;
         int bobIndex = bobAncestors.size() - 1;
         if (aliceAncestors.get(aliceIndex) != bobAncestors.get(bobIndex)) {

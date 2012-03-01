@@ -191,10 +191,10 @@
 .xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, 
 .xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload,
 .xExternalImage .gwt-TextBox, .xImageConfig .gwt-TextBox,
-.xMacroParameter .textInput, .xTablePanel .gwt-TextBox,
-.xImporterTabPanel .gwt-FileUpload, .xExplorer input, .xSearchForm input {
+.xMacroParameter .textInput, .xMacroParameter textarea,
+.xTablePanel .gwt-TextBox, .xImporterTabPanel .gwt-FileUpload,
+.xExplorer input, .xSearchForm input {
   width: 433px;
-  border: 1px solid #AAA;
   padding: 2px;
 }
 
@@ -205,12 +205,6 @@
 
 .xImageConfig .gwt-RadioButton {
   color: #666;
-}
-
-.xMacroParameter textarea, .xImporterClipboardTabEditor {
-  width: 433px;
-  border: 1px solid #AAA;
-  padding: 2px;
 }
 
 .xMacroParameterLabel-mandatory, .xInfoLabel-mandatory {

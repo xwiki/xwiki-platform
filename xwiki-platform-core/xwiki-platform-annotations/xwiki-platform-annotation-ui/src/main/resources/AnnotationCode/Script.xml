@@ -883,7 +883,11 @@ XWiki.Annotation = Class.create({
     return parametersHash;
   },
 
-  fetchAnnotations : function(andShow) {
+  /*
+   * @param andShow whether the annotations should also be shown (highlighted) on the content
+   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)   
+   */
+  fetchAnnotations : function(andShow, force) {
     var getAnnotationsURL = XWiki.contextPath + '/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent(XWiki.currentPage) + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
       parameters: this.prepareRequestParameters(new Hash()), 
@@ -899,9 +903,8 @@ XWiki.Annotation = Class.create({
         }
         // hide message at page bottom
         this._x_notification.hide();
-        // load the received annotated content in the page, along with annotations and annotations markers. Force a content update
-        // in case the last annotation was deleted.
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, true);
+        // load the received annotated content in the page, along with annotations and annotations markers.
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
         // store the state of the annotations
         this.fetchedAnnotations = true;
         if (this.displayAnnotationsCheckbox) {
@@ -1590,7 +1593,8 @@ XWiki.Annotation = Class.create({
     // if the annotations are currently visible, re-fetch the annotations and display them
     var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault;
     if (visible) {
-      this.fetchAnnotations(true);
+      // Force the reloading in case this annotation was the last one.
+      this.fetchAnnotations(true, true);
     } else {
       // Mark the loaded annotations as dirty and make sure the next time the annotations checkbox is checked, the annotations will be fetched.
       this.fetchedAnnotations = false;

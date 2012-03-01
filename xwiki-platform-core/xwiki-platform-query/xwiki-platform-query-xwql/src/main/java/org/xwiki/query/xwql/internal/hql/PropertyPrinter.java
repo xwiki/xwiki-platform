@@ -19,10 +19,13 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
+import java.text.MessageFormat;
+
 import org.xwiki.query.jpql.node.APath;
 import org.xwiki.query.jpql.node.PPath;
 import org.xwiki.query.jpql.node.PSelectExpression;
 import org.xwiki.query.jpql.node.TId;
+import org.xwiki.query.xwql.internal.InvalidQueryException;
 import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
 
 public class PropertyPrinter
@@ -39,11 +42,10 @@ public class PropertyPrinter
             String className = prop.getType();
             if (className != null) {
                 prop.alias = printer.getContext().getAliasGenerator().generate(prop.object.alias + "_" + prop.name);
-                printer.from.append(", ")
-                    .append(className).append(" as ").append(prop.alias);
-                printer.where.append(" and ")
-                    .append(prop.alias).append(".id.id=").append(prop.object.alias).append(".id").append(" and ")
-                    .append(prop.alias).append(".id.name").append("='").append(prop.name).append("'");
+                printer.from.append(", ").append(className).append(" as ").append(prop.alias);
+                printer.where.append(" and ").append(prop.alias).append(".id.id=").append(prop.object.alias)
+                    .append(".id").append(" and ").append(prop.alias).append(".id.name").append("='").append(prop.name)
+                    .append("'");
                 // rewrite nodes
                 for (PPath p : prop.locations) {
                     String s = prop.alias + "." + prop.getValueField();
@@ -52,6 +54,12 @@ public class PropertyPrinter
                     }
                     p.replaceBy(new APath(new TId(s)));
                 }
+            } else {
+                throw new InvalidQueryException(
+                    MessageFormat
+                        .format(
+                            "Can''t find the type of the property [{0}] of object [{1}]. Generally mean that the class does not exist in the current wiki.",
+                            prop.name, prop.object.className));
             }
         }
     }

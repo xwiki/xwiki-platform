@@ -130,7 +130,7 @@ public class MacroPlugin extends AbstractPlugin
         }
         getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));
         getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
-        getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));
+        getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector, macroService, config));
 
         saveRegistrations(shortcutKeyManager.addHandlers(getTextArea()));
         saveRegistrations(macroControler.addHadlers());

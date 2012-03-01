@@ -20,15 +20,15 @@
 package org.xwiki.ircbot.internal;
 
 import org.jibble.pircbot.PircBot;
-import org.xwiki.ircbot.IRCBotListener;
+import org.xwiki.ircbot.IRCBotMessageHandler;
 
 public class ExtendedPircBot extends PircBot implements PircBotInterface
 {
-    private IRCBotListener ircBotListener;
+    private IRCBotMessageHandler messageHandler;
 
-    public ExtendedPircBot(IRCBotListener ircBotListener)
+    public ExtendedPircBot(IRCBotMessageHandler messageHandler)
     {
-        this.ircBotListener = ircBotListener;
+        this.messageHandler = messageHandler;
     }
 
     public void setBotName(String botName)
@@ -37,44 +37,50 @@ public class ExtendedPircBot extends PircBot implements PircBotInterface
     }
 
     @Override
+    public String[] getConnectedChannels()
+    {
+        return super.getChannels();
+    }
+
+    @Override
     protected void onMessage(String channel, String sender, String login, String hostname, String message)
     {
-        this.ircBotListener.onMessage(channel, sender, login, hostname, message);
+        this.messageHandler.onMessage(channel, sender, login, hostname, message);
     }
 
     @Override
     protected void onDisconnect()
     {
-        this.ircBotListener.onDisconnect();
+        this.messageHandler.onDisconnect();
     }
 
     @Override
     protected void onJoin(String channel, String sender, String login, String hostname)
     {
-        this.ircBotListener.onJoin(channel, sender, login, hostname);
+        this.messageHandler.onJoin(channel, sender, login, hostname);
     }
 
     @Override
     protected void onPart(String channel, String sender, String login, String hostname)
     {
-        this.ircBotListener.onPart(channel, sender, login, hostname);
+        this.messageHandler.onPart(channel, sender, login, hostname);
     }
 
     @Override
     protected void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
     {
-        this.ircBotListener.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
+        this.messageHandler.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
     }
 
     @Override
     protected void onPrivateMessage(String sender, String login, String hostname, String message)
     {
-        this.ircBotListener.onPrivateMessage(sender, login, hostname, message);
+        this.messageHandler.onPrivateMessage(sender, login, hostname, message);
     }
 
     @Override
     protected void onNickChange(String oldNick, String login, String hostname, String newNick)
     {
-        this.ircBotListener.onNickChange(oldNick, login, hostname, newNick);
+        this.messageHandler.onNickChange(oldNick, login, hostname, newNick);
     }
 }

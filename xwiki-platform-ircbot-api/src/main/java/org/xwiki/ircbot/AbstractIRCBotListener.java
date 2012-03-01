@@ -22,50 +22,62 @@ package org.xwiki.ircbot;
 public abstract class AbstractIRCBotListener implements IRCBotListener
 {
     @Override
+    public void onRegistration()
+    {
+        // Do nothing by default
+    }
+
+    @Override
+    public void onUnregistration()
+    {
+        // Do nothing by default
+    }
+
+    @Override
     public void onConnect()
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onDisconnect()
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onJoin(String channel, String sender, String login, String hostname)
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onMessage(String channel, String sender, String login, String hostname, String message)
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onNickChange(String oldNick, String login, String hostname, String newNick)
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onPart(String channel, String sender, String login, String hostname)
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onPrivateMessage(String sender, String login, String hostname, String message)
     {
-        // Do nothing
+        // Do nothing by default
     }
 
     @Override
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
     {
-        // Do nothing
+        // Do nothing by default
     }
 }

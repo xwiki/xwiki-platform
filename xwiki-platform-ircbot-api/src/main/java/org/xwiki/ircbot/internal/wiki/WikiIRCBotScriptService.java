@@ -162,21 +162,24 @@ public class WikiIRCBotScriptService implements ScriptService
 
         XWikiContext context = getContext();
         DocumentReference userReference = context.getUserReference();
-        String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
 
-        // Check if the current user is logged on the main wiki.
-        if (userReference.getWikiReference().getName().equals(mainWiki))
-        {
-            DocumentReference mainXWikiPreferencesReference =
-                new DocumentReference(mainWiki, "XWiki", "XWikiPreferences");
+        if (userReference != null) {
+            String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
 
-            // Check if the user has Admin rights on the main wiki
-            try {
-                hasPermission = context.getWiki().getRightService().hasAccessLevel("admin",
-                    this.entityReferenceSerializer.serialize(userReference),
-                    this.entityReferenceSerializer.serialize(mainXWikiPreferencesReference), context);
-            } catch (XWikiException e) {
-                // Don't allow access (permission is false by default)
+            // Check if the current user is logged on the main wiki.
+            if (userReference.getWikiReference().getName().equals(mainWiki))
+            {
+                DocumentReference mainXWikiPreferencesReference =
+                    new DocumentReference(mainWiki, "XWiki", "XWikiPreferences");
+
+                // Check if the user has Admin rights on the main wiki
+                try {
+                    hasPermission = context.getWiki().getRightService().hasAccessLevel("admin",
+                        this.entityReferenceSerializer.serialize(userReference),
+                        this.entityReferenceSerializer.serialize(mainXWikiPreferencesReference), context);
+                } catch (XWikiException e) {
+                    // Don't allow access (permission is false by default)
+                }
             }
         }
 

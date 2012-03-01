@@ -50,7 +50,7 @@ public interface WikiIRCBotManager
 
     void registerWikiBotListener(DocumentReference reference) throws IRCBotException;
 
-    void unregisterWikiBotListener(DocumentReference reference);
+    void unregisterWikiBotListener(DocumentReference reference) throws IRCBotException;
 
     void registerWikiBotListeners() throws IRCBotException;
 

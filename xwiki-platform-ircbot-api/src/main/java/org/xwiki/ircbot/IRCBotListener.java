@@ -21,27 +21,39 @@ package org.xwiki.ircbot;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * IRC Bot Listeners allows to perform some actions in answer to some IRC channel event. For example you may want to
+ * code a Bot Listener that would do something when a given word is typed on the IRC channel.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 @ComponentRole
-public interface IRCBotListener
+public interface IRCBotListener extends IRCBotMessageHandler
 {
+    /**
+     * @return the human-readable name of the Bot Listener (eg "Displays the list of command available when you type
+     *         '!help'")
+     */
     String getName();
-    String getDescription();
-
-    void onConnect();
-    void onDisconnect();
 
     /**
-     * @param channel the channel to which the message was sent
-     * @param sender the nick of the person who sent the message
-     * @param login the login of the person who sent the message
-     * @param hostname the hostname of the person who sent the message
-     * @param message the actual message sent to the channel
+     * @return the Bot listener's description
      */
-    void onMessage(String channel, String sender, String login, String hostname, String message);
+    String getDescription();
 
-    void onJoin(String channel, String sender, String login, String hostname);
-    void onPart(String channel, String sender, String login, String hostname);
-    void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason);
-    void onPrivateMessage(String sender, String login, String hostname, String message);
-    void onNickChange(String oldNick, String login, String hostname, String newNick);
+    /**
+     * Give the opportunity to the IRC Bot Listener writer to do something when the listener is registered and
+     * thus activated. For example one could get some configuration parameter from some XWiki Class and store them
+     * in the context so that they're available from other events. Another example would be to use some Groovy script
+     * to register some class (such as an Event Listener); an example of this would be to write a Bot Listener that
+     * listens to document change events and send them to the IRC channel.
+     */
+    void onRegistration();
+
+    /**
+     * Give the opportunity to the IRC Bot Listener writer to do something when the listener is unregistered and
+     * thus deactivated.
+     */
+    void onUnregistration();
 }

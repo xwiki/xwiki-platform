@@ -31,22 +31,41 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class BotListenerData
 {
     /**
-     * If the Bot listener is defined in a wiki page then the id is a serialized Reference (in a compact notation, ie
-     * without the wiki part). Otherwise it's the hint of the component.
+     * @see #getId()
      */
     private String id;
 
+    /**
+     * @see #getName()
+     */
     private String name;
 
+    /**
+     * @see #getDescription()
+     */
     private String description;
 
+    /**
+     * @see #isWikiBotListener()
+     */
     private boolean isWikiBotListener;
 
+    /**
+     * @param id see {@link #getId()}
+     * @param name see {@link #getName()}
+     * @param description see {@link #getDescription()}
+     */
     public BotListenerData(String id, String name, String description)
     {
         this(id, name, description, false);
     }
 
+    /**
+     * @param id see {@link #getId()}
+     * @param name see {@link #getName()}
+     * @param description see {@link #getDescription()}
+     * @param isWikiBotListener see {@link #isWikiBotListener()}
+     */
     public BotListenerData(String id, String name, String description, boolean isWikiBotListener)
     {
         this.id = id;
@@ -55,21 +74,34 @@ public class BotListenerData
         this.isWikiBotListener = isWikiBotListener;
     }
 
+    /**
+     * @return true if this Bot Listener is defined in a wiki page, false otherwise.
+     */
     public boolean isWikiBotListener()
     {
         return this.isWikiBotListener;
     }
 
+    /**
+     * @return the id is a serialized Reference (in a compact notation, ie without the wiki part) if the Bot listener
+     *         is defined in a wiki page then, the hint of the component otherwise
+     */
     public String getId()
     {
         return this.id;
     }
 
+    /**
+     * @return see {@link org.xwiki.ircbot.IRCBotListener#getName()}
+     */
     public String getName()
     {
         return this.name;
     }
 
+    /**
+     * @return see {@link org.xwiki.ircbot.IRCBotListener#getDescription()}
+     */
     public String getDescription()
     {
         return this.description;

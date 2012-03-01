@@ -142,7 +142,6 @@
   &lt;span class='buttonwrapper'&gt;&lt;input type='submit' name='botaction' value='$buttonText' class='button'/&gt;&lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
-{{/velocity}}
 
 ## -------------------------
 ## Display Bot Configuration
@@ -155,6 +154,7 @@ The following configuration is used:
 * Bot name: {{box}}$ircconfigdoc.getValue('botname'){{/box}}
 
 To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCBotConfiguration]].
+{{/velocity}}
 
 = Available Bot Listeners =
 

@@ -70,6 +70,9 @@ public interface WikiIRCBotConstants
      */
     String EVENT_SCRIPT_PROPERTY = "script";
 
+    String ON_REGISTRATION_EVENT_NAME = "onRegistration";
+    String ON_UNREGISTRATION_EVENT_NAME = "onUnregistration";
+
     String ON_CONNECT_EVENT_NAME = "onConnect";
     String ON_DISCONNECT_EVENT_NAME = "onDisconnect";
     String ON_JOIN_EVENT_NAME = "onJoin";

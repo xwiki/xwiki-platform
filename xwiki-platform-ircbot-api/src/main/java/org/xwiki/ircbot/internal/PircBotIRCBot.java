@@ -74,6 +74,12 @@ public class PircBotIRCBot implements IRCBot
     protected PircBotInterface pircBot = new ExtendedPircBot(this);
 
     @Override
+    public String[] getConnectedChannels()
+    {
+        return this.pircBot.getConnectedChannels();
+    }
+
+    @Override
     public void connect(String botName, String hostname) throws IRCBotException
     {
         this.pircBot.setBotName(botName);
@@ -127,18 +133,6 @@ public class PircBotIRCBot implements IRCBot
             throw new IRCBotException("Cannot send message to undefined channel. Make sure you've connected to a "
                 + "channel first before using this API.");
         }
-    }
-
-    @Override
-    public String getDescription()
-    {
-        return "Delegates events to IRC Bot Listeners";
-    }
-
-    @Override
-    public String getName()
-    {
-        return "Internal Delegator";
     }
 
     @Override

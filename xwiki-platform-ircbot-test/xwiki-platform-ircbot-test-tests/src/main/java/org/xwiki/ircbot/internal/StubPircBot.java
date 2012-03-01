@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
-import org.xwiki.ircbot.IRCBotListener;
+import org.xwiki.ircbot.IRCBotMessageHandler;
 
 /**
  * Prevent anything going on the wire.
@@ -35,7 +35,7 @@ import org.xwiki.ircbot.IRCBotListener;
  */
 public class StubPircBot implements PircBotInterface
 {
-    private IRCBotListener ircBotListener;
+    private IRCBotMessageHandler messageHandler;
 
     private String hostname;
 
@@ -43,14 +43,20 @@ public class StubPircBot implements PircBotInterface
 
     private List<String> messages = new ArrayList();
 
-    public StubPircBot(IRCBotListener ircBotListener)
+    public StubPircBot(IRCBotMessageHandler messageHandler)
     {
-        this.ircBotListener = ircBotListener;
+        this.messageHandler = messageHandler;
     }
 
     public List<String> getMessages()
     {
         return this.messages;
+    }
+
+    @Override
+    public String[] getConnectedChannels()
+    {
+        return new String[] {"channel"};
     }
 
     @Override

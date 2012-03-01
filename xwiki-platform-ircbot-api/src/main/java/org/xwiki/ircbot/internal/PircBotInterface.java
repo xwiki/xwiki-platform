@@ -36,4 +36,5 @@ public interface PircBotInterface
     boolean isConnected();
 
     void setBotName(String botName);
+    String[] getConnectedChannels();
 }

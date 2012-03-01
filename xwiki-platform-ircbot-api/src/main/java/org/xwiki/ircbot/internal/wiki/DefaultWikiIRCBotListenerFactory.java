@@ -79,17 +79,31 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     @Inject
     private Logger logger;
 
+    /**
+     * Used to execute the Bot Listener's event scripts.
+     */
     @Inject
     @Named("macro")
     private Transformation macroTransformation;
 
+    /**
+     * Used to execute the Bot Listener's event scripts.
+     */
     @Inject
     @Named("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
 
+    /**
+     * We need to pass a reference to the Bot to the {@link WikiIRCBotListener} instances we create since they need
+     * to be able to send the result of their execution to the IRC Channel (if any).
+     */
     @Inject
     private IRCBot bot;
 
+    /**
+     * Used to compute the id for a Wiki Bot Listener (it's the serialized form of the page containing the Objects).
+     * Note that we use a compact serialization since Wiki Bot Listeners are registered for a given wiki only.
+     */
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -156,7 +170,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             this.entityReferenceSerializer.serialize(doc.getDocumentReference()), name, description, true);
 
         return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
-            this.plainTextBlockRenderer, this.bot);
+            this.plainTextBlockRenderer, this.bot, this.execution);
     }
 
     @Override

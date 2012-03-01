@@ -22,7 +22,7 @@ package org.xwiki.ircbot;
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface IRCBot extends IRCBotListener
+public interface IRCBot extends IRCBotMessageHandler
 {
     void connect(String botName, String hostname) throws IRCBotException;
     void joinChannel(String channel);
@@ -32,4 +32,5 @@ public interface IRCBot extends IRCBotListener
     void sendMessage(String message) throws IRCBotException;
 
     boolean isConnected();
+    String[] getConnectedChannels();
 }

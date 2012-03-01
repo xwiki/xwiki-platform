@@ -176,15 +176,26 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
                     throw new IRCBotException(String.format("Unable to register Wiki IRC Bot Listener in document [%s]",
                         this.compactWikiSerializer.serialize(reference)), e);
                 }
+                // Step 4: Give the opportunity to the Wiki IRC Bot Listener writer to do something on registration...
+                wikiListener.onRegistration();
             }
         }
     }
 
     @Override
-    public void unregisterWikiBotListener(DocumentReference reference)
+    public void unregisterWikiBotListener(DocumentReference reference) throws IRCBotException
     {
         String hint = this.compactWikiSerializer.serialize(reference);
-        this.componentManager.unregisterComponent(IRCBotListener.class, hint);
+        if (this.componentManager.hasComponent(IRCBotListener.class, hint)) {
+            try {
+                IRCBotListener listener = this.componentManager.lookup(IRCBotListener.class, hint);
+                // Give the opportunity to the Wiki IRC Bot Listener writer to do something on unregistration...
+                listener.onUnregistration();
+            } catch (ComponentLookupException e) {
+                throw new IRCBotException("Failed to unregister Wiki IRC Bot Listener", e);
+            }
+            this.componentManager.unregisterComponent(IRCBotListener.class, hint);
+        }
     }
 
     @Override

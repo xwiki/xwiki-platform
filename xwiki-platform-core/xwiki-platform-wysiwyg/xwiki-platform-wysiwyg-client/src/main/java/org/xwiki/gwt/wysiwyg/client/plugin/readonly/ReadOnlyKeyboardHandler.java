@@ -302,12 +302,12 @@ public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler,
         if (isBoundary(range)) {
             Element readOnlyContainer = readOnlyUtils.getClosestReadOnlyAncestor(range.getStartContainer());
             if (readOnlyContainer != null) {
-                Boolean readOnlyBoundary = isBoundary(range, readOnlyContainer);
-                if (readOnlyBoundary == null) {
+                int readOnlyBoundary = isBoundary(range, readOnlyContainer);
+                if (readOnlyBoundary == 0) {
                     event.xPreventDefault();
                 } else {
                     // Allow typing if the caret is at the boundary of a read-only area, by moving the caret outside.
-                    moveCaretOutside(readOnlyContainer, readOnlyBoundary.booleanValue());
+                    moveCaretOutside(readOnlyContainer, readOnlyBoundary < 0);
                 }
             }
         } else if (readOnlyUtils.isRangeBoundaryInsideReadOnlyElement(range)) {
@@ -328,70 +328,75 @@ public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler,
     }
 
     /**
-     * @param caret a collapsed range
+     * NOTE: We assume {@link #isBoundary(Range)} returns {@code true} for the given range.
+     * 
+     * @param caret a collapsed range within the given container
      * @param container a DOM node <strong>containing</strong> the caret
-     * @return {@code true} if the caret is at the start of the given node, {@code false} if it is at the end,
-     *         {@code null} otherwise
+     * @return {@code -1} if the caret is at the start of the given node before any visible content, {@code 1} if it is
+     *         at the end after all visible content, {@code 0} otherwise
      */
-    private Boolean isBoundary(Range caret, Element container)
+    private int isBoundary(Range caret, Element container)
     {
-        if (!hasVisibleContentBefore(container, caret)) {
-            return true;
-        } else if (!hasVisibleContentAfter(container, caret)) {
-            return false;
+        Range betweenNodes = caret;
+        // Make sure the caret is between DOM nodes and not inside a text node.
+        if (!domUtils.canHaveChildren(caret.getStartContainer())) {
+            betweenNodes = caret.cloneRange();
+            betweenNodes.selectNode(caret.getStartContainer());
+            betweenNodes.collapse(caret.getStartOffset() == 0);
         }
-        return null;
+        if (!hasVisibleContentBefore(container, betweenNodes)) {
+            return -1;
+        } else if (!hasVisibleContentAfter(container, betweenNodes)) {
+            return 1;
+        }
+        return 0;
     }
 
     /**
-     * NOTE: We assume {@link #isBoundary(Range)} returns {@code true} for the given range.
-     * 
      * @param container a DOM node
-     * @param caret specifies a position within the given container
+     * @param caret specifies a position within the given container, <strong>between</strong> DOM nodes
      * @return {@code true} if the given container has visible content before the caret position, {@code false}
      *         otherwise
      */
     private boolean hasVisibleContentBefore(Node container, Range caret)
     {
-        Node firstLeaf = domUtils.getFirstLeaf(container);
-        Node leaf = caret.getStartContainer();
-        if (leaf.getNodeType() != Node.TEXT_NODE || caret.getStartOffset() > 0) {
-            // The caret is between DOM nodes or at the end of a text node.
-            leaf = domUtils.getNextLeaf(caret);
+        Node leaf = domUtils.getPreviousLeaf(caret);
+        if (leaf == null || !container.isOrHasChild(leaf)) {
+            // We jumped outside of the container without finding any leaf.
+            return false;
         }
         // Move backward looking for a visible leaf, taking care not to jump over the first leaf.
-        while (leaf != firstLeaf) {
-            leaf = domUtils.getPreviousLeaf(leaf);
-            if (isVisible(leaf)) {
-                return true;
+        Node firstLeaf = domUtils.getFirstLeaf(container);
+        while (!isVisible(leaf)) {
+            if (leaf == firstLeaf) {
+                return false;
             }
+            leaf = domUtils.getPreviousLeaf(leaf);
         }
-        return false;
+        return true;
     }
 
     /**
-     * NOTE: We assume {@link #isBoundary(Range)} returns {@code true} for the given range.
-     * 
      * @param container a DOM node
-     * @param caret specifies a position within the given container
+     * @param caret specifies a position within the given container, <strong>between</strong> DOM nodes
      * @return {@code true} if the given container has visible content after the caret position, {@code false} otherwise
      */
     private boolean hasVisibleContentAfter(Node container, Range caret)
     {
-        Node lastLeaf = domUtils.getLastLeaf(container);
-        Node leaf = caret.getEndContainer();
-        if (leaf.getNodeType() != Node.TEXT_NODE || caret.getEndOffset() == 0) {
-            // The caret is between DOM nodes or at the start of a text node.
-            leaf = domUtils.getPreviousLeaf(caret);
+        Node leaf = domUtils.getNextLeaf(caret);
+        if (leaf == null || !container.isOrHasChild(leaf)) {
+            // We jumped outside of the container without finding any leaf.
+            return false;
         }
         // Move forward looking for a visible leaf, taking care not to jump over the last leaf.
-        while (leaf != lastLeaf) {
-            leaf = domUtils.getNextLeaf(leaf);
-            if (isVisible(leaf)) {
-                return true;
+        Node lastLeaf = domUtils.getLastLeaf(container);
+        while (!isVisible(leaf)) {
+            if (leaf == lastLeaf) {
+                return false;
             }
+            leaf = domUtils.getNextLeaf(leaf);
         }
-        return false;
+        return true;
     }
 
     /**

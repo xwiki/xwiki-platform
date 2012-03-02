@@ -161,7 +161,7 @@
     &lt;/div&gt;
     &lt;div class="annotationContent"&gt;
       #displayAnnotationBody($ann $mode)
-      #if ($mode == 'view')
+      #if ($mode == 'view' &amp;&amp; $annotationClassDocName == 'XWiki.XWikiComments')
         #set($annDocReference = $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
         #set($annoDoc = $xwiki.getDocument($annDocReference))
         #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))

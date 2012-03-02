@@ -59,9 +59,9 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @since 4.0M1
  */
 @Component
-@Named("R40000XWIKI7540")
+@Named("R40001XWIKI7540")
 @Singleton
-public class R40000XWIKI7540DataMigration extends AbstractHibernateDataMigration
+public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
     @Override
     public String getDescription()
@@ -72,14 +72,14 @@ public class R40000XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        // XWiki 4.0
-        return new XWikiDBVersion(40000);
+        // XWiki 4.0, second migration.
+        return new XWikiDBVersion(40001);
     }
 
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new R40000XWIKI7540HibernateCallback());
+        getStore().executeWrite(getXWikiContext(), true, new InternalHibernateCallback());
     }
 
     /**
@@ -87,7 +87,7 @@ public class R40000XWIKI7540DataMigration extends AbstractHibernateDataMigration
      * 
      * @version $Id$
      */
-    private class R40000XWIKI7540HibernateCallback implements HibernateCallback<Object>
+    private class InternalHibernateCallback implements HibernateCallback<Object>
     {
         @Override
         public Object doInHibernate(Session session) throws HibernateException, XWikiException

@@ -659,7 +659,7 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
-    // whenever the comments tab is loaded, refresh the document content with annotations on it, if annotations are shown.
+    // refresh the annotations displayed on the document when an annotation is deleted as a comment, that is from the comments tab when annotations are merged with comments
     document.observe('xwiki:annotation:tab:deleted', this.refreshAnnotationsOnCommentDelete.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
@@ -1363,6 +1363,7 @@ XWiki.Annotation = Class.create({
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
     }
+    // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
     var replyButton = container.down('a.commentreply');
     if (replyButton) {
       // When a click is done on this button, fire a click on the corresponding button in the comments tab.
@@ -1587,7 +1588,8 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Handles the refresh of the document content when there are modifications in the annotations tab (comments).
+   * Handles the refresh of the document content when an annotations is deleted from the comments tab.
+   * It applies only to the case when annotations are merged with (and stored as) comments. Custom annotations will not use this.
    */
   refreshAnnotationsOnCommentDelete : function(event) {
     // if the annotations are currently visible, re-fetch the annotations and display them

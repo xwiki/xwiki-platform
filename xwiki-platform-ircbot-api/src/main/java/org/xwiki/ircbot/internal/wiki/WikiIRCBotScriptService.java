@@ -125,6 +125,11 @@ public class WikiIRCBotScriptService implements ScriptService
         return statuses;
     }
 
+    public Map<String, Object> getContext()
+    {
+        return (Map<String, Object>) getXWikiContext().get(WikiIRCBotListener.LISTENER_XWIKICONTEXT_PROPERTY);
+    }
+
     /**
      * Get the error generated while performing the previously called action.
      *
@@ -151,7 +156,7 @@ public class WikiIRCBotScriptService implements ScriptService
      *
      * @return the XWikiContext.
      */
-    private XWikiContext getContext()
+    private XWikiContext getXWikiContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
@@ -160,7 +165,7 @@ public class WikiIRCBotScriptService implements ScriptService
     {
         boolean hasPermission = false;
 
-        XWikiContext context = getContext();
+        XWikiContext context = getXWikiContext();
         DocumentReference userReference = context.getUserReference();
 
         if (userReference != null) {

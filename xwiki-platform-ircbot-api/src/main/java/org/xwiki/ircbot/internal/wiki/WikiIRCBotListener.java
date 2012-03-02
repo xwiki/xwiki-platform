@@ -26,9 +26,9 @@ import org.apache.axis.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.ircbot.AbstractIRCBotListener;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -40,8 +40,10 @@ import org.xwiki.rendering.transformation.TransformationException;
 
 import com.xpn.xwiki.XWikiContext;
 
-public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
+public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIRCBotConstants
 {
+    public static final String LISTENER_XWIKICONTEXT_PROPERTY = "irclistener";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiIRCBotListener.class);
 
     private BotListenerData listenerData;
@@ -81,6 +83,17 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
     public String getDescription()
     {
         return this.listenerData.getDescription();
+    }
+
+    @Override
+    public int getPriority()
+    {
+        Integer priority = this.listenerData.getPriority();
+        if (priority == null) {
+            // Get the default priority from parent class
+            priority = super.getPriority();
+        }
+        return priority;
     }
 
     @Override
@@ -160,7 +173,8 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
             // Note that if a Bot Listener script needs access to the IRC Bot (for example to send a message to the
             // IRC channel), it can access it through the "ircbot" Script Service.
 
-            // Add bindings so that the Wiki Bot Listener can access data for the Event
+            // Add bindings to the XWiki Context so that the Bot Script Service can access them and thus give access
+            // to them to the Bot Listener.
             addBindings(bindings);
 
             // Execute the Macro Transformation on XDOM and send the result to the IRC server
@@ -205,7 +219,7 @@ public class WikiIRCBotListener implements IRCBotListener, WikiIRCBotConstants
 
         XWikiContext context = getContext();
         if (context != null) {
-            context.put("irclistener", params);
+            context.put(LISTENER_XWIKICONTEXT_PROPERTY, params);
         }
     }
 

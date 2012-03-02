@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @since 4.0M1
  */
 @ComponentRole
-public interface IRCBotListener extends IRCBotMessageHandler
+public interface IRCBotListener extends IRCBotMessageHandler, Comparable<IRCBotListener>
 {
     /**
      * @return the human-readable name of the Bot Listener (eg "Displays the list of command available when you type
@@ -41,6 +41,15 @@ public interface IRCBotListener extends IRCBotMessageHandler
      * @return the Bot listener's description
      */
     String getDescription();
+
+    /**
+     * The priority of execution relative to the other Bot Listeners. The lowest values have the highest priorities
+     * and execute first. For example a Bot Listener with a priority of 100 will execute before one with a priority of
+     * 500.
+     *
+     * @return the execution priority
+     */
+    int getPriority();
 
     /**
      * Give the opportunity to the IRC Bot Listener writer to do something when the listener is registered and

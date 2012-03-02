@@ -26,8 +26,8 @@ import org.jibble.pircbot.NickAlreadyInUseException;
 
 public interface PircBotInterface
 {
-    void connect(String hostname) throws IOException, IrcException, NickAlreadyInUseException;
-    void reconnect() throws IOException, IrcException, NickAlreadyInUseException;
+    void connect(String hostname) throws IOException, IrcException;
+    void reconnect() throws IOException, IrcException;
     void joinChannel(String channel);
     void disconnect();
     void identify(String password);

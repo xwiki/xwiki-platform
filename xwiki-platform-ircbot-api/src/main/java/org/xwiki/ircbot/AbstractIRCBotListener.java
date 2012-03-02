@@ -21,6 +21,25 @@ package org.xwiki.ircbot;
 
 public abstract class AbstractIRCBotListener implements IRCBotListener
 {
+    /**
+     * @see org.xwiki.ircbot.IRCBotListener#getPriority()
+     */
+    private int priority = 1000;
+
+    @Override
+    public int getPriority()
+    {
+        return this.priority;
+    }
+
+    /**
+     * @param priority the priority to use (lower means execute before others)
+     */
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
+    }
+
     @Override
     public void onRegistration()
     {
@@ -79,5 +98,11 @@ public abstract class AbstractIRCBotListener implements IRCBotListener
     public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
     {
         // Do nothing by default
+    }
+
+    @Override
+    public int compareTo(IRCBotListener ircBotListener)
+    {
+        return getPriority() - ircBotListener.getPriority();
     }
 }

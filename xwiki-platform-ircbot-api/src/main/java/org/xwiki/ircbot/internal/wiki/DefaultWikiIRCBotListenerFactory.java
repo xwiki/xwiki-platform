@@ -136,6 +136,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         // Extract listener definition.
         String name = listenerDefinition.getStringValue(NAME_PROPERTY);
         String description = listenerDefinition.getStringValue(DESCRIPTION_PROPERTY);
+        int priority = listenerDefinition.getIntValue(PRIORITY_PROPERTY);
 
         // Extract listener events.
         Map<String, XDOM> events = new HashMap<String, XDOM>();
@@ -165,9 +166,16 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             }
         }
 
-
-        BotListenerData botListenerData = new BotListenerData(
-            this.entityReferenceSerializer.serialize(doc.getDocumentReference()), name, description, true);
+        // If the priority is 0 then use the default priority since it means the Wiki Bot Listener has not defined it.
+        // Same for negative values.
+        BotListenerData botListenerData;
+        if (priority <= 0) {
+            botListenerData = new BotListenerData(this.entityReferenceSerializer.serialize(doc.getDocumentReference()),
+                name, description, true);
+        } else {
+            botListenerData = new BotListenerData(this.entityReferenceSerializer.serialize(doc.getDocumentReference()),
+                name, description, priority, true);
+        }
 
         return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
             this.plainTextBlockRenderer, this.bot, this.execution);

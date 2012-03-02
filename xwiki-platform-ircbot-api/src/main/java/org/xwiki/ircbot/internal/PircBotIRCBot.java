@@ -20,6 +20,7 @@
 package org.xwiki.ircbot.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -138,19 +139,25 @@ public class PircBotIRCBot implements IRCBot
     @Override
     public void onConnect()
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onConnect();
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onConnect();
+            }
+        });
     }
 
     @Override
     public void onDisconnect()
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onDisconnect();
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onDisconnect();
+            }
+        });
 
         if (!this.shouldStop) {
             this.logger.debug("IRC Bot has been disconnected");
@@ -181,58 +188,77 @@ public class PircBotIRCBot implements IRCBot
     }
 
     @Override
-    public void onJoin(String channel, String sender, String login, String hostname)
+    public void onJoin(final String channel, final String sender, final String login, final String hostname)
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onJoin(channel, sender, login, hostname);
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onJoin(channel, sender, login, hostname);
+            }
+        });
     }
 
     @Override
-    public void onMessage(String channel, String sender, String login, String hostname, String message)
+    public void onMessage(final String channel, final String sender, final String login, final String hostname,
+        final String message)
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onMessage(channel, sender, login, hostname, message);
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onMessage(channel, sender, login, hostname, message);
+            }
+        });
     }
 
     @Override
-    public void onNickChange(String oldNick, String login, String hostname, String newNick)
+    public void onNickChange(final String oldNick, final String login, final String hostname, final String newNick)
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onNickChange(oldNick, login, hostname, newNick);
-        }
-
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onNickChange(oldNick, login, hostname, newNick);
+            }
+        });
     }
 
     @Override
-    public void onPart(String channel, String sender, String login, String hostname)
+    public void onPart(final String channel, final String sender, final String login, final String hostname)
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onPart(channel, sender, login, hostname);
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onPart(channel, sender, login, hostname);
+            }
+        });
     }
 
     @Override
-    public void onPrivateMessage(String sender, String login, String hostname, String message)
+    public void onPrivateMessage(final String sender, final String login, final String hostname, final String message)
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onPrivateMessage(sender, login, hostname, message);
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onPrivateMessage(sender, login, hostname, message);
+            }
+        });
     }
 
     @Override
-    public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
+    public void onQuit(final String sourceNick, final String sourceLogin, final String sourceHostname,
+        final String reason)
     {
-        initExecutionContext();
-        for (IRCBotListener listener : getIRCBotListeners()) {
-            listener.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
-        }
+        executeListeners(new Executor()
+        {
+            @Override public void execute(IRCBotListener listener)
+            {
+                listener.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
+            }
+        });
     }
 
     /**
@@ -279,5 +305,28 @@ public class PircBotIRCBot implements IRCBot
     private List<String> splitMessage(String message)
     {
         return Arrays.asList(message.split("[\\r\\n]+"));
+    }
+
+    private interface Executor
+    {
+        void execute(IRCBotListener listener);
+    }
+
+    private void executeListeners(Executor executor)
+    {
+        initExecutionContext();
+        List<IRCBotListener> listeners = getIRCBotListeners();
+
+        // Sort the Bot Listeners by priority
+        Collections.sort(listeners);
+
+        for (IRCBotListener listener : listeners) {
+            try {
+                executor.execute(listener);
+            } catch (Exception e) {
+                // Don't prevent other listeners from executing!
+                this.logger.error("Failed to execute listener [{}]", listener.getName(), e);
+            }
+        }
     }
 }

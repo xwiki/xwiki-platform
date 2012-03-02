@@ -143,8 +143,9 @@
 <property>
 <script>{{velocity}}
 #set ($date = $datetool.get('HH:mm'))
-{{irclog channel="$xcontext.irclistener.channel"}}
-$date &lt;${xcontext.irclistener.sender}&gt; $xcontext.irclistener.message
+#set ($irccontext = $services.ircbot.context)
+{{irclog channel="$irccontext.channel"}}
+$date &lt;${irccontext.sender}&gt; $irccontext.message
 {{/irclog}}
 {{/velocity}}</script>
 </property>
@@ -206,8 +207,9 @@ $date &lt;${xcontext.irclistener.sender}&gt; $xcontext.irclistener.message
 <property>
 <script>{{velocity}}
 #set ($date = $datetool.get('HH:mm'))
-{{irclog channel="$xcontext.irclistener.channel"}}
-$date &lt;${xcontext.irclistener.sender}&gt; has joined $xcontext.irclistener.channel
+#set ($irccontext = $services.ircbot.context)
+{{irclog channel="$irccontext.channel"}}
+$date &lt;${irccontext.sender}&gt; has joined $irccontext.channel
 {{/irclog}}
 {{/velocity}}</script>
 </property>
@@ -269,8 +271,9 @@ $date &lt;${xcontext.irclistener.sender}&gt; has joined $xcontext.irclistener.ch
 <property>
 <script>{{velocity}}
 #set ($date = $datetool.get('HH:mm'))
-{{irclog channel="$xcontext.irclistener.channel"}}
-$date &lt;${xcontext.irclistener.sender}&gt; has left $xcontext.irclistener.channel
+#set ($irccontext = $services.ircbot.context)
+{{irclog channel="$irccontext.channel"}}
+$date &lt;${irccontext.sender}&gt; has left $irccontext.channel
 {{/irclog}}
 {{/velocity}}
 </script></property></object><object><class><name>IRC.IRCBotListenerEventClass</name>
@@ -328,8 +331,9 @@ $date &lt;${xcontext.irclistener.sender}&gt; has left $xcontext.irclistener.chan
 <property>
 <script>{{velocity}}
 #set ($date = $datetool.get('HH:mm'))
-{{irclog channel="$xcontext.irclistener.channel"}}
-$date &lt;${xcontext.irclistener.sourceNick}&gt; has quit
+#set ($irccontext = $services.ircbot.context)
+{{irclog channel="$irccontext.channel"}}
+$date &lt;${irccontext.sourceNick}&gt; has quit
 {{/irclog}}
 {{/velocity}}
 </script></property></object><object><class><name>IRC.IRCBotListenerEventClass</name>
@@ -387,8 +391,9 @@ $date &lt;${xcontext.irclistener.sourceNick}&gt; has quit
 <property>
 <script>{{velocity}}
 #set ($date = $datetool.get('HH:mm'))
-{{irclog channel="$xcontext.irclistener.channel"}}
-$date &lt;${xcontext.irclistener.oldNick}&gt; is now known as &lt;${xcontext.irclistener.newNick}&gt;
+#set ($irccontext = $services.ircbot.context)
+{{irclog channel="$irccontext.channel"}}
+$date &lt;${irccontext.oldNick}&gt; is now known as &lt;${irccontext.newNick}&gt;
 {{/irclog}}
 {{/velocity}}
 </script></property></object><content></content></xwikidoc>

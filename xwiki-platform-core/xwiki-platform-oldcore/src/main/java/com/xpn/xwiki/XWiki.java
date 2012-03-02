@@ -3212,6 +3212,15 @@ public class XWiki implements EventListener
             needsUpdate = true;
         }
 
+        needsUpdate |= bclass.addBooleanField("showannotations", "Show document annotations", "yesno");
+        needsUpdate |= bclass.addBooleanField("showcomments", "Show document comments", "yesno");
+        needsUpdate |= bclass.addBooleanField("showattachments", "Show document attachments", "yesno");
+        needsUpdate |= bclass.addBooleanField("showhistory", "Show document history", "yesno");
+        needsUpdate |= bclass.addBooleanField("showinformation", "Show document information", "yesno");
+        needsUpdate |= bclass.addBooleanField("editcomment", "Enable version summary", "yesno");
+        needsUpdate |= bclass.addBooleanField("editcomment_mandatory", "Make version summary mandatory", "yesno");
+        needsUpdate |= bclass.addBooleanField("minoredit", "Enable minor edits", "yesno");
+
         SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
         boolean withoutDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
         if (withoutDocumentSheets) {

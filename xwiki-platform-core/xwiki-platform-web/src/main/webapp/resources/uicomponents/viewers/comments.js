@@ -87,6 +87,8 @@ viewers.Comments = Class.create({
                 comment.replace(this.createNotification("$msg.get('core.viewers.comments.commentDeleted')"));
                 this.updateCount();
                 // fire an event for the annotations to know when a comment / annotation is deleted
+                // FIXME: This is not the best way to go because the Annotations system should be in charge of properly deleting annotations,
+                // not the Comments system. Try to find an alternative for the future.
                 if (comment.hasClassName('annotation')) {
                   document.fire("xwiki:annotation:tab:deleted");
                 }

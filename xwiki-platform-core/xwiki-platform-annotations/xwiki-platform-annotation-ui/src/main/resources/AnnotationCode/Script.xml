@@ -992,6 +992,8 @@ XWiki.Annotation = Class.create({
   },
 
   addDeleteListenersInTab : function() {
+    // This applies only to the annotations tab because merged annotations are currently displayed and deleted by the Comments system.
+    // NOTE: don't forget to change this too if, in the future, annotations are no longer deleted by the Comments system from the Comments tab.
     $$("#Annotationspane .annotation a.delete").each(function(item) {
       this.addDeleteListener(item);
     }.bind(this));

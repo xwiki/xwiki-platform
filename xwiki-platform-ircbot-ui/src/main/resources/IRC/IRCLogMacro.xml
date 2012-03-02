@@ -155,7 +155,11 @@
 ## Add the new content to the logging doc
 #set ($currentContent = $logDoc.content)
 #set ($newContent = $xcontext.macro.content)
-#set ($discard = $logDoc.setContent("${currentContent}\n$newContent"))
+#if ($currentContent.length() > 0)
+  #set ($newContent = "$currentContent
+$newContent")
+#end
+#set ($discard = $logDoc.setContent($newContent))
 ## Save it!
 #set ($discard = $logDoc.save("Logging from IRC", true))
 {{/velocity}}</code>

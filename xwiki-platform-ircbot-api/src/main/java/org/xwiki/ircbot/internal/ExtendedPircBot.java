@@ -22,15 +22,28 @@ package org.xwiki.ircbot.internal;
 import org.jibble.pircbot.PircBot;
 import org.xwiki.ircbot.IRCBotMessageHandler;
 
+/**
+ * Extends PIRC Bot implementation delegating all event methods to an IRC Bot Message Handler.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class ExtendedPircBot extends PircBot implements PircBotInterface
 {
+    /**
+     * @see #ExtendedPircBot(org.xwiki.ircbot.IRCBotMessageHandler)
+     */
     private IRCBotMessageHandler messageHandler;
 
+    /**
+     * @param messageHandler the handler to delegate to when event methods are called
+     */
     public ExtendedPircBot(IRCBotMessageHandler messageHandler)
     {
         this.messageHandler = messageHandler;
     }
 
+    @Override
     public void setBotName(String botName)
     {
         super.setName(botName);

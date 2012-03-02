@@ -32,16 +32,33 @@ import org.xwiki.ircbot.AbstractIRCBotListener;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotListener;
 
+/**
+ * Finds all other Bot Listeners and send their description to the IRC Channel allowing a user to see all the actions
+ * that can be done.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 @Component
 @Named("help")
 @Singleton
 public class HelpIRCBotListener extends AbstractIRCBotListener
 {
+    /**
+     * The command to type in the IRC channel to trigger this listener.
+     */
     private static final String COMMAND = "!help";
 
+    /**
+     * Used to find all Bot listeners available.
+     */
     @Inject
+    @Named("wiki")
     private ComponentManager componentManager;
 
+    /**
+     * Used to send the result to the IRC Channel.
+     */
     @Inject
     private IRCBot bot;
 
@@ -69,6 +86,9 @@ public class HelpIRCBotListener extends AbstractIRCBotListener
         }
     }
 
+    /**
+     * @return all the available Bot listeners
+     */
     private List<IRCBotListener> getIRCBotListeners()
     {
         List<IRCBotListener> result;
@@ -79,5 +99,4 @@ public class HelpIRCBotListener extends AbstractIRCBotListener
         }
         return result;
     }
-
 }

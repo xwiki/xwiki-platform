@@ -39,11 +39,27 @@ import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
 
-@Component(roles = {IRCBot.class})
+/**
+ * Implements an IRC Bot using pIrcBot and delegating all event methods to IRC Bot Listener components.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
+@Component(roles = { IRCBot.class })
 @Singleton
 public class PircBotIRCBot implements IRCBot
 {
+    /**
+     * Name under which we store a flag in the Execution Context to tell whether the execution is happening in a
+     * pIrcBot thread or not.
+     * @see #initExecutionContext()
+     */
     private static final String CONTEXT_IRCBOT_KEY = "ircbot";
+
+    /**
+     * The internal pIrcBot implementation that we delegate to.
+     */
+    protected PircBotInterface pircBot = new ExtendedPircBot(this);
 
     /**
      * The logger to log.
@@ -51,9 +67,17 @@ public class PircBotIRCBot implements IRCBot
     @Inject
     private Logger logger;
 
+    /**
+     * Used to store a flag telling if we're executing in a pIrcBot thread or not.
+     * @see #initExecutionContext()
+     */
     @Inject
     private Execution execution;
 
+    /**
+     * Used to create a new Execution Context when executing in a pIrcBot thread.
+     * @see #initExecutionContext()
+     */
     @Inject
     private ExecutionContextManager executionContextManager;
 
@@ -65,14 +89,17 @@ public class PircBotIRCBot implements IRCBot
     @Named("wiki")
     private ComponentManager componentManager;
 
+    /**
+     * We remember the channel set when calling {@link #joinChannel(String)} so that we can provide a
+     * {@link #sendMessage(String)} method not taking a channel parameter. This makes it simpler to write Bot
+     * Listeners.
+     */
     private String channel;
 
     /**
      * True if the IRC bot should be stopped.
      */
     private boolean shouldStop;
-
-    protected PircBotInterface pircBot = new ExtendedPircBot(this);
 
     @Override
     public String[] getConnectedChannels()
@@ -164,11 +191,10 @@ public class PircBotIRCBot implements IRCBot
             while (!isConnected()) {
                 try {
                     this.pircBot.reconnect();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // Cannot reconnect, wait for some time before trying to reconnect again
                     try {
-                        Thread.sleep(1000L*30);
+                        Thread.sleep(1000L * 30);
                     } catch (InterruptedException ie) {
                         // Failed to sleep, just ignore
                     }
@@ -285,6 +311,9 @@ public class PircBotIRCBot implements IRCBot
         }
     }
 
+    /**
+     * @return all the available Bot listeners
+     */
     private List<IRCBotListener> getIRCBotListeners()
     {
         List<IRCBotListener> result;
@@ -307,11 +336,20 @@ public class PircBotIRCBot implements IRCBot
         return Arrays.asList(message.split("[\\r\\n]+"));
     }
 
+    /**
+     * Allows implementing common code for all event methods in {@link PircBotIRCBot#executeListeners(Executor)}.
+     */
     private interface Executor
     {
+        /**
+         * @param listener the listener being invoked
+         */
         void execute(IRCBotListener listener);
     }
 
+    /**
+     * @param executor the executor that executes the method to call for a given event
+     */
     private void executeListeners(Executor executor)
     {
         initExecutionContext();

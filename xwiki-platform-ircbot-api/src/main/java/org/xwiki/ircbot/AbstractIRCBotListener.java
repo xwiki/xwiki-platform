@@ -19,6 +19,12 @@
  */
 package org.xwiki.ircbot;
 
+/**
+ * IRC Bot listeners should extend this class since it provides already implemented methods.
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 public abstract class AbstractIRCBotListener implements IRCBotListener
 {
     /**

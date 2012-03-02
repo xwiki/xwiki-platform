@@ -109,7 +109,7 @@
 #set ($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
 #if ("$!template" == '')
   #if ($hasGlobalAdmin)
-    #if ($xcontext.doc.getAttachment($TEMPLATE_PACKAGE))
+    #if ($doc.getAttachment($TEMPLATE_PACKAGE))
       #if ("$!request.confirmTemplateInstall" == '1')
         #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
@@ -143,7 +143,7 @@
       #end
     #else
 
-      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $xcontext.doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
+      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
     #end
   #else
     #set ($needsAdminRights = true)
@@ -173,7 +173,7 @@
     {{error}}Workspace template features can not be installed without the workspace base template being installed first.{{/error}}
   #end
 #elseif (!$xwiki.exists($manageWorkspaceDocumentReference))
-  #set ($templateFeaturesAttachment = $xcontext.doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
+  #set ($templateFeaturesAttachment = $doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
   #if (!$hasGlobalAdmin)
     #set ($needsAdminRights = true)
   #elseif ($templateFeaturesAttachment)
@@ -181,8 +181,7 @@
     #set ($currentDatabase = $xcontext.database)
     #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
     #set ($packager = $xwiki.package)
-    ## FIXME: This way of retrieving the attachment's content is a workaround for XWIKI-7184 since $xcontext.doc.getAttachment(...) outputs an XWikiAttachment and not an api.Attachment.
-    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.getContent($xcontext.context)))
+    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.content))
     #set ($templateFeaturesAttachmentInstallResult = $packager.install())
     ## Change back to the current wiki.
     #set ($discard = $xcontext.setDatabase($currentDatabase))
@@ -370,7 +369,7 @@
     #end
   #else
 
-    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $xcontext.doc.fullName]){{/error}}
+    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $doc.fullName]){{/error}}
   #end
 #else
   ##

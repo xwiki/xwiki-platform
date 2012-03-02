@@ -93,7 +93,10 @@ public class InsertExecutable extends InsertHTMLExecutable
         // Separate the comment nodes (the macro markers) with an empty element node to prevent them from being
         // normalized, i.e. merged into a single comment node. Firefox 10.0.2 normalizes the DOM tree for instance if we
         // insert a document fragment when the BODY element contains only a line break BR.
-        markers.appendChild(rta.getDocument().createSpanElement());
+        Element separator = rta.getDocument().createSpanElement().cast();
+        // We have to make sure the separator doesn't appear in rich text area's submitted HTML.
+        separator.setAttribute(Element.META_DATA_ATTR, "");
+        markers.appendChild(separator);
         markers.appendChild(rta.getDocument().createComment("stopmacro"));
         // Note: We refresh the rich text area after inserting the macro without going through the command manager
         // because we don't want to trigger the history mechanism.

@@ -17,26 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot;
+package org.xwiki.ircbot.internal.wiki;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.model.reference.DocumentReference;
 
-/**
- * Represents an IRC Bot.
- *
- * @version $Id$
- * @since 4.0M1
- */
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 @ComponentRole
-public interface IRCBot extends IRCBotMessageHandler
+public interface WikiIRCModel
 {
-    void connect(String botName, String hostname) throws IRCBotException;
-    void joinChannel(String channel);
-    void disconnect();
-    void identify(String password);
-    void sendMessage(String target, String message);
-    void sendMessage(String message) throws IRCBotException;
+    XWikiContext getXWikiContext() throws IRCBotException;
 
-    boolean isConnected();
-    String[] getConnectedChannels();
+    XWikiDocument getDocument(DocumentReference reference) throws IRCBotException;
+
+    XWikiDocument getConfigurationDocument() throws IRCBotException;
 }

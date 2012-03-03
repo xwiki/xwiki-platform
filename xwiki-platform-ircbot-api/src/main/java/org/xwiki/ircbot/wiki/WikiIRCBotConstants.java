@@ -30,26 +30,29 @@ import org.xwiki.model.reference.EntityReference;
  */
 public interface WikiIRCBotConstants
 {
+    /**
+     * Space where the IRC Bot pages are located.
+     */
     String SPACE = "IRC";
 
     /**
-     * Constant for representing IRC.IRCBotListenerClass xwiki class.
+     * IRC.IRCBotListenerClass xwiki class.
      */
     EntityReference WIKI_BOT_LISTENER_CLASS = new EntityReference("IRCBotListenerClass", EntityType.DOCUMENT,
         new EntityReference(SPACE, EntityType.SPACE));
 
     /**
-     * Constant for representing a listener name property.
+     * Listener name property.
      */
     String NAME_PROPERTY = "name";
 
     /**
-     * Constant for representing a listener description property.
+     * Listener description property.
      */
     String DESCRIPTION_PROPERTY = "description";
 
     /**
-     * Constant for representing a listener priority property.
+     * Listener priority property.
      */
     String PRIORITY_PROPERTY = "priority";
 
@@ -59,32 +62,69 @@ public interface WikiIRCBotConstants
     String INACTIVE_PROPERTY = "inactive";
 
     /**
-     * Constant for representing IRC.IRCBotListenerEventClass xwiki class. There's one such object per event (i.e.
-     * per onXXX() method handled).
+     * IRC.IRCBotListenerEventClass xwiki class. There's one such object per event (i.e. per onXXX() method handled).
      */
     EntityReference WIKI_BOT_LISTENER_EVENT_CLASS = new EntityReference("IRCBotListenerEventClass", EntityType.DOCUMENT,
         new EntityReference(SPACE, EntityType.SPACE));
 
     /**
-     * Constant for representing a listener event property.
+     * Listener event property.
      */
     String EVENT_NAME_PROPERTY = "event";
 
     /**
-     * Constant for representing a listener event script name property.
+     * Listener event script name property.
      */
     String EVENT_SCRIPT_PROPERTY = "script";
 
+    /**
+     * Listener event property value for the onRegistration event.
+     */
     String ON_REGISTRATION_EVENT_NAME = "onRegistration";
+
+    /**
+     * Listener event property value for the onUnregistration event.
+     */
     String ON_UNREGISTRATION_EVENT_NAME = "onUnregistration";
 
+    /**
+     * Listener event property value for the onConnect event.
+     */
     String ON_CONNECT_EVENT_NAME = "onConnect";
+
+    /**
+     * Listener event property value for the onDisconnect event.
+     */
     String ON_DISCONNECT_EVENT_NAME = "onDisconnect";
+
+    /**
+     * Listener event property value for the onJoin event.
+     */
     String ON_JOIN_EVENT_NAME = "onJoin";
+
+    /**
+     * Listener event property value for the onMessage event.
+     */
     String ON_MESSAGE_EVENT_NAME = "onMessage";
+
+    /**
+     * Listener event property value for the onNickChange event.
+     */
     String ON_NICK_CHANGE_EVENT_NAME = "onNickChange";
+
+    /**
+     * Listener event property value for the onPart event.
+     */
     String ON_PART_EVENT_NAME = "onPart";
+
+    /**
+     * Listener event property value for the onPrivateMessage event.
+     */
     String ON_PRIVATE_MESSAGE_EVENT_NAME = "onPrivateMessage";
+
+    /**
+     * Listener event property value for the onQuit event.
+     */
     String ON_QUIT_EVENT_NAME = "onQuit";
 
     /**
@@ -93,19 +133,36 @@ public interface WikiIRCBotConstants
     EntityReference WIKI_BOT_CONFIGURATION_CLASS = new EntityReference("IRCBot", EntityType.DOCUMENT,
         new EntityReference(SPACE, EntityType.SPACE));
 
+    /**
+     * Page containing Bot configuration data.
+     */
     String CONFIGURATION_PAGE = "IRCBotConfiguration";
 
     /**
-     * Bot's name.
+     * Property for the Bot's name.
      */
     String BOTNAME_PROPERTY = "botname";
 
     /**
-     * Channel to connect to.
+     * Property for the channel to connect to.
      */
     String CHANNEL_PROPERTY = "channel";
 
+    /**
+     * Property for the Server to connect to.
+     */
     String SERVER_PROPERTY = "server";
 
+    /**
+     * Property for the password to identify the user with the IRC server.
+     */
     String PASSWORD_PROPERTY = "password";
+
+    /**
+     * IRC.IRCEventExclusionClass xwiki class.
+     */
+    EntityReference EXCLUSION_CLASS = new EntityReference("IRCEventExclusionClass", EntityType.DOCUMENT,
+        new EntityReference(SPACE, EntityType.SPACE));
+
+    String PATTERN_PROPERTY = "pattern";
 }

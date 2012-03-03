@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
@@ -40,14 +39,11 @@ import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.transformation.Transformation;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -66,12 +62,6 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
      */
     @Inject
     private ComponentManager componentManager;
-
-    /**
-     * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
-     */
-    @Inject
-    private Execution execution;
 
     /**
      * The logger to log.
@@ -108,28 +98,14 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private WikiIRCModel ircModel;
+
     @Override
     public WikiIRCBotListener createWikiListener(DocumentReference documentReference) throws IRCBotException
     {
-        XWikiDocument doc;
-        try {
-            doc = getContext().getWiki().getDocument(documentReference, getContext());
-        } catch (XWikiException ex) {
-            throw new IRCBotException(String.format("Could not build Bot Listener from: [%s], unable to load document",
-                documentReference), ex);
-        }
-        return buildWikiListener(doc);
-    }
+        XWikiDocument doc = this.ircModel.getDocument(documentReference);
 
-    /**
-     * Creates a {@link WikiIRCBotListener} from an {@link XWikiDocument} which contains a wiki listener definition.
-     * 
-     * @param doc the {@link XWikiDocument} to look for a wiki listener definition
-     * @return the {@link WikiIRCBotListener} found inside the document
-     * @throws WikiMacroException when an invalid listener definition or no listener definition was found
-     */
-    private WikiIRCBotListener buildWikiListener(XWikiDocument doc) throws IRCBotException
-    {
         // Check whether this document contains a listener definition.
         BaseObject listenerDefinition = doc.getXObject(WIKI_BOT_LISTENER_CLASS);
 
@@ -178,7 +154,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         }
 
         return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
-            this.plainTextBlockRenderer, this.bot, this.execution);
+            this.plainTextBlockRenderer, this.bot, this.ircModel);
     }
 
     @Override
@@ -187,7 +163,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         boolean result;
         try {
             // Look for a Listener Class
-            XWikiDocument doc = getContext().getWiki().getDocument(documentReference, getContext());
+            XWikiDocument doc = this.ircModel.getDocument(documentReference);
             BaseObject listenerDefinition = doc.getXObject(WIKI_BOT_LISTENER_CLASS);
             result = (null != listenerDefinition);
 
@@ -197,19 +173,9 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             // Look for a Listener Event Class
             List<BaseObject> listenerEventDefinitions = doc.getXObjects(WIKI_BOT_LISTENER_EVENT_CLASS);
             result = result && (listenerEventDefinitions != null) && (listenerEventDefinitions.size() > 0);
-        } catch (XWikiException ex) {
+        } catch (Exception ex) {
             result = false;
         }
         return result;
-    }
-
-    /**
-     * Utility method for accessing XWikiContext.
-     *
-     * @return the XWikiContext.
-     */
-    private XWikiContext getContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

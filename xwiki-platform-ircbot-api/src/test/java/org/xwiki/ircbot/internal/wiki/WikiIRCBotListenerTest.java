@@ -25,8 +25,6 @@ import java.util.Map;
 
 import org.jmock.Expectations;
 import org.junit.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -59,22 +57,20 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer renderer = getMockery().mock(BlockRenderer.class);
         final IRCBot bot = getMockery().mock(IRCBot.class);
-        final Execution execution = getMockery().mock(Execution.class);
-        final ExecutionContext context = new ExecutionContext();
+        final WikiIRCModel ircModel = getMockery().mock(WikiIRCModel.class);
 
         Utils.setComponentManager(getComponentManager());
-        XWikiContext xwikiContext = new XWikiContext();
-        context.setProperty("xwikicontext", xwikiContext);
+        final XWikiContext xwikiContext = new XWikiContext();
 
         WikiIRCBotListener listener = new WikiIRCBotListener(data, events, Syntax.XWIKI_2_1, macroTransformation,
-            renderer, bot, execution);
+            renderer, bot, ircModel);
 
         getMockery().checking(new Expectations()
         {{
             oneOf(bot).getConnectedChannels();
                 will(returnValue(new String[] {"channel"}));
-            oneOf(execution).getContext();
-                will(returnValue(context));
+            oneOf(ircModel).getXWikiContext();
+                will(returnValue(xwikiContext));
             oneOf(macroTransformation).transform(with(any(XDOM.class)), with(any(TransformationContext.class)));
             oneOf(renderer).render(with(any(XDOM.class)), with(any(WikiPrinter.class)));
         }});

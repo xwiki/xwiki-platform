@@ -46,8 +46,10 @@ public class IRCBotTest extends AbstractTest
     public void testBot()
     {
         getUtil().deletePage(getTestClassName(), getTestMethodName());
+        String triggerPageName = getTestMethodName() + "NewPage";
+        getUtil().deletePage(getTestClassName(), triggerPageName);
 
-        // Go to the main Bot home page and start the bot
+        // Go to the main Bot home page
         IRCBotPage page = IRCBotPage.gotoPage();
 
         // Verify that the Bot is stopped
@@ -70,7 +72,28 @@ public class IRCBotTest extends AbstractTest
         // Verify that our Bot listener is listed and started
         //TODO
 
+        // Create a new page to verify that a message is sent to the IRC channel.
+        // We thus test the IRC Event Listener.
+        getUtil().createPage(getTestClassName(), triggerPageName, "whatever", "title");
+
+        // We verify indirectly that the message was sent to the IRC channel by verifying that the Log Bot Listener
+        // has archived the message. This also allows testing the Log Bot Listener.
+        //
+        // Note 1: We need to find the last page created matching "xwikitestArchive*" because we can't guess the page
+        // name with 100% probability (if the test executes around midnight then the current date might be different
+        // than the date used to create the archive page... ;)).
+        //
+        // Note 2: Since it can take some time for the message to appear on the channel and for it to be archived, we
+        // need to wait till the page it here.
+        String archivePageName = getUtil().executeContent(
+            "{{velocity}}\n"
+            + "$services.query.xwql(\"where doc.name like 'xwikitestArchive%' order by doc.creationDate desc\")."
+            + "setLimit(1).execute().get(0)\n"
+            + "{{/velocity}}");
+        // TODO: add the wait and assert the content of the archive
+
         // Stop the Bot
+        page = IRCBotPage.gotoPage();
         page.clickActionButton();
 
         // Verify that the Bot is stopped again

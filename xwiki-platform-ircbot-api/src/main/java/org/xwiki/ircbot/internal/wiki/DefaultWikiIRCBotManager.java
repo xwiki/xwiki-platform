@@ -35,7 +35,6 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.context.Execution;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
@@ -51,8 +50,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -92,12 +89,6 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     @Named("current")
     private DocumentReferenceResolver<String> currentReferenceResolver;
 
-    /**
-     * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
-     */
-    @Inject
-    private Execution execution;
-
     @Inject
     private IRCBot bot;
 
@@ -106,13 +97,16 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     private EntityReferenceSerializer<String> compactWikiSerializer;
 
     @Inject
+    private WikiIRCModel ircModel;
+
+    @Inject
     private EntityReferenceSerializer defaultSerializer;
 
     @Override
     public void startBot() throws IRCBotException
     {
         // Get configuration data for the Bot
-        XWikiDocument configurationDocument = getIRCBotConfigurationDocument();
+        XWikiDocument configurationDocument = this.ircModel.getConfigurationDocument();
         BaseObject configurationObject = configurationDocument.getXObject(WIKI_BOT_CONFIGURATION_CLASS);
         if (configurationObject == null) {
             // There's no Bot Configuration object
@@ -277,28 +271,5 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
         }
 
         return data;
-    }
-
-    /**
-     * Utility method for accessing XWikiContext.
-     *
-     * @return the XWikiContext.
-     */
-    private XWikiContext getContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-    }
-
-    private XWikiDocument getIRCBotConfigurationDocument() throws IRCBotException
-    {
-        XWikiDocument doc;
-        DocumentReference docReference = new DocumentReference(getContext().getDatabase(), SPACE, CONFIGURATION_PAGE);
-        try {
-            doc = getContext().getWiki().getDocument(docReference, getContext());
-        } catch (XWikiException ex) {
-            throw new IRCBotException(String.format("Could not build Bot Listener from: [%s], unable to load document",
-                this.compactWikiSerializer.serialize(docReference)), ex);
-        }
-        return doc;
     }
 }

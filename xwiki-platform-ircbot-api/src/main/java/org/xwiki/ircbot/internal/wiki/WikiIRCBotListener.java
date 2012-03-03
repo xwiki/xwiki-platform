@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.axis.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
 import org.xwiki.ircbot.AbstractIRCBotListener;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
@@ -58,11 +57,11 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
 
     private IRCBot bot;
 
-    private Execution execution;
+    private WikiIRCModel ircModel;
 
     public WikiIRCBotListener(BotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
         Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, IRCBot bot,
-        Execution execution)
+        WikiIRCModel ircModel)
     {
         this.listenerData = listenerData;
         this.events = events;
@@ -70,7 +69,7 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
         this.macroTransformation = macroTransformation;
         this.plainTextBlockRenderer = plainTextBlockRenderer;
         this.bot = bot;
-        this.execution = execution;
+        this.ircModel = ircModel;
     }
 
     @Override
@@ -173,36 +172,32 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
             // Note that if a Bot Listener script needs access to the IRC Bot (for example to send a message to the
             // IRC channel), it can access it through the "ircbot" Script Service.
 
-            // Add bindings to the XWiki Context so that the Bot Script Service can access them and thus give access
-            // to them to the Bot Listener.
-            addBindings(bindings);
-
-            // Execute the Macro Transformation on XDOM and send the result to the IRC server
-            TransformationContext txContext = new TransformationContext(xdom, this.syntax);
             try {
+                // Add bindings to the XWiki Context so that the Bot Script Service can access them and thus give access
+                // to them to the Bot Listener.
+                addBindings(bindings);
+
+                // Execute the Macro Transformation on XDOM and send the result to the IRC server
+                TransformationContext txContext = new TransformationContext(xdom, this.syntax);
                 this.macroTransformation.transform(xdom, txContext);
+                DefaultWikiPrinter printer = new DefaultWikiPrinter();
+                this.plainTextBlockRenderer.render(xdom, printer);
+
+                String executionResult = printer.toString();
+                if (!StringUtils.isEmpty(executionResult)) {
+                    this.bot.sendMessage(printer.toString());
+                }
+            } catch (IRCBotException e) {
+                // An error happened, log a warning and do nothing
+                LOGGER.warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
             } catch (TransformationException e) {
                 // The transformation failed to execute, log an error and continue
                 LOGGER.error("Failed to render Wiki IRC Bot Listener script", e);
-                return;
-            }
-            DefaultWikiPrinter printer = new DefaultWikiPrinter();
-            this.plainTextBlockRenderer.render(xdom, printer);
-
-            String executionResult = printer.toString();
-            if (!StringUtils.isEmpty(executionResult)) {
-                try {
-                    this.bot.sendMessage(printer.toString());
-                } catch (IRCBotException e) {
-                    // The bot is not connected to a channel yet, don't do anything
-                    LOGGER.warn(String.format("Failed to send message to the IRC server. Reason: [%s]",
-                        e.getMessage()));
-                }
             }
         }
     }
 
-    private void addBindings(Object... bindings)
+    private void addBindings(Object... bindings) throws IRCBotException
     {
         Map<String, Object> params = new HashMap<String, Object>();
        if (bindings != null) {
@@ -217,19 +212,9 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
             params.put("channel", channels[0]);
         }
 
-        XWikiContext context = getContext();
+        XWikiContext context = this.ircModel.getXWikiContext();
         if (context != null) {
             context.put(LISTENER_XWIKICONTEXT_PROPERTY, params);
         }
-    }
-
-    /**
-     * Utility method for accessing XWikiContext.
-     *
-     * @return the XWikiContext.
-     */
-    private XWikiContext getContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

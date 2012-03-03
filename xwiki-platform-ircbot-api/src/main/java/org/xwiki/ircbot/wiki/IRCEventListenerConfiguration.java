@@ -17,26 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot;
+package org.xwiki.ircbot.wiki;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.ircbot.IRCBotException;
 
 /**
- * Represents an IRC Bot.
+ * Configuration for the IRC Event Listener (ie the listener that sends IRC events when a document is modified).
  *
  * @version $Id$
  * @since 4.0M1
  */
 @ComponentRole
-public interface IRCBot extends IRCBotMessageHandler
+public interface IRCEventListenerConfiguration
 {
-    void connect(String botName, String hostname) throws IRCBotException;
-    void joinChannel(String channel);
-    void disconnect();
-    void identify(String password);
-    void sendMessage(String target, String message);
-    void sendMessage(String message) throws IRCBotException;
-
-    boolean isConnected();
-    String[] getConnectedChannels();
+    /**
+     * @return the regex patterns to use to decide if a notification for a given document reference should be sent or
+     *         not. Note that the pattern is to be done on the full serialized document reference.
+     * @throws IRCBotException if an error happens getting the exclusion patterns
+     */
+    List<Pattern> getExclusionPatterns() throws IRCBotException;
 }

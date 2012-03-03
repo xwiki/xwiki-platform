@@ -39,7 +39,6 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Allows scripts to easily access IRC Bot APIs.
@@ -59,12 +58,6 @@ public class WikiIRCBotScriptService implements ScriptService
 
     private static final String PR_REQUIRED = "This action requires Programming Rights";
 
-    /**
-     * Provides access to the current context.
-     */
-    @Inject
-    private Execution execution;
-
     @Inject
     private WikiIRCBotManager botManager;
 
@@ -77,6 +70,15 @@ public class WikiIRCBotScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private WikiIRCModel ircModel;
+
+    /**
+     * Provides access to the current context.
+     */
+    @Inject
+    private Execution execution;
 
     public void start()
     {
@@ -127,7 +129,14 @@ public class WikiIRCBotScriptService implements ScriptService
 
     public Map<String, Object> getContext()
     {
-        return (Map<String, Object>) getXWikiContext().get(WikiIRCBotListener.LISTENER_XWIKICONTEXT_PROPERTY);
+        Map<String, Object> context;
+        try {
+            context = (Map<String, Object>) this.ircModel.getXWikiContext().get(
+                WikiIRCBotListener.LISTENER_XWIKICONTEXT_PROPERTY);
+        } catch (IRCBotException e) {
+            context = null;
+        }
+        return context;
     }
 
     /**
@@ -151,41 +160,31 @@ public class WikiIRCBotScriptService implements ScriptService
         this.execution.getContext().setProperty(ERROR_KEY, exception);
     }
 
-    /**
-     * Utility method for accessing XWikiContext.
-     *
-     * @return the XWikiContext.
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-    }
-
     private boolean hasPermission()
     {
         boolean hasPermission = false;
 
-        XWikiContext context = getXWikiContext();
-        DocumentReference userReference = context.getUserReference();
+        try {
+            XWikiContext context = this.ircModel.getXWikiContext();
+            DocumentReference userReference = context.getUserReference();
 
-        if (userReference != null) {
-            String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
+            if (userReference != null) {
+                String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
 
-            // Check if the current user is logged on the main wiki.
-            if (userReference.getWikiReference().getName().equals(mainWiki))
-            {
-                DocumentReference mainXWikiPreferencesReference =
-                    new DocumentReference(mainWiki, "XWiki", "XWikiPreferences");
+                // Check if the current user is logged on the main wiki.
+                if (userReference.getWikiReference().getName().equals(mainWiki))
+                {
+                    DocumentReference mainXWikiPreferencesReference =
+                        new DocumentReference(mainWiki, "XWiki", "XWikiPreferences");
 
-                // Check if the user has Admin rights on the main wiki
-                try {
+                    // Check if the user has Admin rights on the main wiki
                     hasPermission = context.getWiki().getRightService().hasAccessLevel("admin",
                         this.entityReferenceSerializer.serialize(userReference),
                         this.entityReferenceSerializer.serialize(mainXWikiPreferencesReference), context);
-                } catch (XWikiException e) {
-                    // Don't allow access (permission is false by default)
                 }
             }
+        } catch (Exception e) {
+            // Don't allow access (permission is false by default)
         }
 
         return hasPermission;

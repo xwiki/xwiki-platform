@@ -1,4 +1,3 @@
 org.xwiki.csrf.internal.DefaultCSRFToken
 org.xwiki.csrf.internal.DefaultCSRFTokenConfiguration
-org.xwiki.csrf.internal.CSRFTokenInvalidator
 org.xwiki.csrf.internal.scripting.CSRFTokenScriptService

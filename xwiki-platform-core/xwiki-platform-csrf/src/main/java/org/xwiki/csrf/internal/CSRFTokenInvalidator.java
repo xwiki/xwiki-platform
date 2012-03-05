@@ -39,6 +39,8 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 4.0M1
  */
+// FIXME This is currently disabled because at the time this event is sent, the user has already been removed from the
+// context, so we're messing things up for guests.
 @Component
 @Named("csrf-token-invalidator")
 @Singleton

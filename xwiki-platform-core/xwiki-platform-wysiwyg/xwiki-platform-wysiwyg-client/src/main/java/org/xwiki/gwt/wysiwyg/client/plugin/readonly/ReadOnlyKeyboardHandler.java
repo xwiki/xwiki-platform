@@ -424,16 +424,12 @@ public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler,
      * @param node a DOM node
      * @param before {@code true} to place the caret before the given node, {@code false} to place it after
      */
-    private void moveCaretOutside(Node node, boolean before)
+    protected void moveCaretOutside(Node node, boolean before)
     {
         Document document = node.getOwnerDocument().cast();
         Range range = document.createRange();
-        if (before) {
-            range.setStartBefore(node);
-        } else {
-            range.setStartAfter(node);
-        }
-        range.collapse(true);
+        range.selectNode(node);
+        range.collapse(before);
         Selection selection = document.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);

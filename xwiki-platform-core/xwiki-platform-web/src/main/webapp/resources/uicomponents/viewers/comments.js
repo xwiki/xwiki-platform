@@ -341,7 +341,7 @@ viewers.Comments = Class.create({
          var notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.preview.inProgress')", "inprogress");
          new Ajax.Request(previewURL, {
             method : 'post',
-            parameters : {'xpage' : 'plain', 'content' : form.commentElt.value},
+            parameters : {'xpage' : 'plain', 'sheet' : '', 'content' : form.commentElt.value},
             onSuccess : function (response) {
               this.doPreview(response.responseText, form);
               notification.hide();

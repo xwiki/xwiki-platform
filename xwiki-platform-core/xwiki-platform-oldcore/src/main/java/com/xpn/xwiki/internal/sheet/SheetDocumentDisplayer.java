@@ -99,7 +99,13 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
         if (isSheetExpected(document, parameters)) {
             List<DocumentReference> sheetReferences = sheetManager.getSheets(document, getXWikiContext().getAction());
             for (DocumentReference sheetReference : sheetReferences) {
-                if (documentAccessBridge.isDocumentViewable(sheetReference)) {
+                if (document.getDocumentReference().equals(sheetReference)) {
+                    // If the sheet is the document itself then we simply display the document. We handle this case
+                    // differently because unsaved document changes might be ignored if we render the sheet (which is
+                    // loaded from the database). So in this case applying the sheet would actually mean displaying the
+                    // saved version of the document.
+                    break;
+                } else if (documentAccessBridge.isDocumentViewable(sheetReference)) {
                     try {
                         return applySheet(document, sheetReference, parameters);
                     } catch (Exception e) {

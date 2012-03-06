@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
-import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentEventManager;
@@ -200,18 +199,8 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
                 return;
             }
 
-            for (ComponentDeclaration componentDeclaration : componentDeclarations) {
-                try {
-                    for (ComponentDescriptor componentDescriptor : this.jarLoader.getComponentsDescriptors(classLoader
-                        .loadClass(componentDeclaration.getImplementationClassName()))) {
-                        this.componentManagerManager.getComponentManager(namespace, false).unregisterComponent(
-                            componentDescriptor);
-                    }
-                } catch (ClassNotFoundException e) {
-                    this.logger.warn("Can't find any existing component with class [{}]. Ignoring it.",
-                        componentDeclaration.getImplementationClassName());
-                }
-            }
+            this.jarLoader.unregister(this.componentManagerManager.getComponentManager(namespace, false), classLoader,
+                componentDeclarations);
         } catch (Exception e) {
             throw new UninstallException("Failed to unload jar file components", e);
         }

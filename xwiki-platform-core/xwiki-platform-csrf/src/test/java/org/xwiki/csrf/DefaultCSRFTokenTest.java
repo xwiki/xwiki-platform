@@ -61,11 +61,6 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @MockingRequirement
     private DefaultCSRFToken csrf;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#setUp()
-     */
     @Before
     @Override
     public void setUp() throws Exception

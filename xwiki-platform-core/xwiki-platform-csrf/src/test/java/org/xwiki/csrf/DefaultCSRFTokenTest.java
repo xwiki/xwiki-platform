@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSession;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -61,12 +60,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @MockingRequirement
     private DefaultCSRFToken csrf;
 
-    @Before
     @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         // set up mocked dependencies
 
         // document access bridge
@@ -179,7 +175,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     public void testNullNotValid() throws Exception
     {
         // Verify that the correct message is logged
-        final Logger logger = getComponentManager().lookup(Logger.class);
+        final Logger logger = getMockLogger();
 
         getMockery().checking(new Expectations() {{
             oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"null\", stored "
@@ -196,7 +192,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     public void testEmptyNotValid() throws Exception
     {
         // Verify that the correct message is logged
-        final Logger logger = getComponentManager().lookup(Logger.class);
+        final Logger logger = getMockLogger();
 
         getMockery().checking(new Expectations() {{
             oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"\", stored "
@@ -213,7 +209,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     public void testPrefixNotValid() throws Exception
     {
         // Verify that the correct message is logged
-        final Logger logger = getComponentManager().lookup(Logger.class);
+        final Logger logger = getMockLogger();
 
         getMockery().checking(new Expectations() {{
             oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token:")));

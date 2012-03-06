@@ -33,34 +33,15 @@ import org.openqa.selenium.support.FindBy;
  */
 public class CommentsTab extends ViewPage
 {
-    @FindBy(xpath = "//input[@value='Add comment']")
-    private WebElement buttonAddComment;
-
-    @FindBy(xpath = "//input[@value='Save comment']")
-    private WebElement buttonSaveComment;
-
     @FindBy(xpath = "//fieldset[@id='commentform']/label/span")
     private WebElement commentAuthor;
 
     @FindBy(id = "XWiki.XWikiComments_author")
     private WebElement anonymousCommentAuthor;
 
-    @FindBy(id = "XWiki.XWikiComments_comment")
-    private WebElement commentTextArea;
-
     CommentDeleteConfirmationModal confirmDelete;
 
     List<WebElement> commentsList;
-
-    public void clickAddComment()
-    {
-        this.buttonAddComment.click();
-    }
-
-    public void clickSaveComment()
-    {
-        this.buttonSaveComment.click();
-    }
 
     public String getCurrentAuthor()
     {
@@ -72,11 +53,6 @@ public class CommentsTab extends ViewPage
         WebElement commentForm = getDriver().findElement(
             By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
         return commentForm.isDisplayed();
-    }
-
-    public void setCommentContent(String content)
-    {
-        this.commentTextArea.sendKeys(content);
     }
 
     public void setAnonymousCommentAuthor(String author)
@@ -98,34 +74,28 @@ public class CommentsTab extends ViewPage
         return -1;
     }
 
-    public int postComment(String content, boolean validation)
+    /**
+     * @return the form used to add a new comment
+     */
+    public CommentForm getAddCommentForm()
     {
-        this.setCommentContent(content);
-        this.clickAddComment();
+        return new CommentForm(getDriver().findElement(By.id("AddComment")));
+    }
 
-        if (validation) {
-            waitUntilElementIsVisible(By
-                .xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']"));
-            getDriver().findElement(
-                By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']")).click();
-            waitUntilElementIsVisible(By.xpath("//div[@class='commentcontent']/p[contains(text(),'" + content + "')]"));
-        }
+    public int postComment(String content, boolean wait)
+    {
+        CommentForm addCommentForm = getAddCommentForm();
+        addCommentForm.getContentField().sendKeys(content);
+        addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
 
-    public int postCommentAsGuest(String content, String author, boolean validation)
+    public int postCommentAsGuest(String content, String author, boolean wait)
     {
-        this.setCommentContent(content);
+        CommentForm addCommentForm = getAddCommentForm();
+        addCommentForm.getContentField().sendKeys(content);
         this.setAnonymousCommentAuthor(author);
-        this.clickAddComment();
-
-        if (validation) {
-            waitUntilElementIsVisible(By
-                .xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']"));
-            getDriver().findElement(
-                By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']")).click();
-            waitUntilElementIsVisible(By.xpath("//div[@class='commentcontent']/p[contains(text(),'" + content + "')]"));
-        }
+        addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
 
@@ -139,27 +109,44 @@ public class CommentsTab extends ViewPage
             .click();
     }
 
-    public void replyToCommentByID(int id, String replyContent)
+    /**
+     * Clicks on the reply icon near the specified comment.
+     * 
+     * @param id identifies the comment to reply to
+     * @return the form used to reply
+     */
+    public CommentForm replyToCommentByID(int id)
     {
         getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
-        getDriver().findElement(By.id("XWiki.XWikiComments_comment")).sendKeys(replyContent);
-        this.clickAddComment();
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']"));
-        getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']"))
-            .click();
+        return getAddCommentForm();
+    }
+
+    public void replyToCommentByID(int id, String replyContent)
+    {
+        CommentForm replyCommentForm = replyToCommentByID(id);
+        replyCommentForm.getContentField().sendKeys(replyContent);
+        replyCommentForm.clickSubmit();
+    }
+
+    /**
+     * Clicks on the edit icon near the specified comment.
+     * 
+     * @param id identifies the comment to be edited
+     * @return the form used to edit the comment
+     */
+    public CommentForm editCommentByID(int id)
+    {
+        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
+        waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
+        return new CommentForm(getDriver().findElement(By.className("edit-xcomment")));
     }
 
     public void editCommentByID(int id, String content)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
-        waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
-        getDriver().findElement(By.id("XWiki.XWikiComments_" + id + "_comment")).clear();
-        getDriver().findElement(By.id("XWiki.XWikiComments_" + id + "_comment")).sendKeys(content);
-        this.clickSaveComment();
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']"));
-        getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment posted']"))
-            .click();
-        waitUntilElementIsVisible(By.xpath("//div[@class='commentcontent']/p[contains(text(),'" + content + "')]"));
+        CommentForm editCommentForm = editCommentByID(id);
+        editCommentForm.getContentField().clear();
+        editCommentForm.getContentField().sendKeys(content);
+        editCommentForm.clickSubmit();
     }
 
     public String getCommentAuthorByID(int id)

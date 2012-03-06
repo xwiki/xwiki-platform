@@ -46,9 +46,8 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Creates a new instance of this plugin API.

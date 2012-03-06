@@ -132,13 +132,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      * Used to convert a string into a proper Document Reference.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     private EntityReferenceSerializer<String> entityReferenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     private EntityReferenceSerializer<String> localWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     @Override
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException

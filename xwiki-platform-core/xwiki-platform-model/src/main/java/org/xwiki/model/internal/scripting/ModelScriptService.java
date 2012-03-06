@@ -47,6 +47,8 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("model")
 @Singleton
+//TODO: find a way to refactor this. The main issue is that the resolved type is not passed to #createDocumentReference
+//(the resolved type used to not be taken into account in the role type)
 public class ModelScriptService implements ScriptService
 {
     /**
@@ -147,7 +149,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookup(EntityReferenceResolver.class, hint);
+                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
             return new DocumentReference(resolver.resolve(stringRepresentation, EntityType.DOCUMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -181,7 +183,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookup(EntityReferenceResolver.class, hint);
+                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
             return new AttachmentReference(resolver.resolve(stringRepresentation, EntityType.ATTACHMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -215,7 +217,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookup(EntityReferenceResolver.class, hint);
+                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectReference(resolver.resolve(stringRepresentation, EntityType.OBJECT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -249,7 +251,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookup(EntityReferenceResolver.class, hint);
+                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY,
                 parameters));
         } catch (ComponentLookupException e) {

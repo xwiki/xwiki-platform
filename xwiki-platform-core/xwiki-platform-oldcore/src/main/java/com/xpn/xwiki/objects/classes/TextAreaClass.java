@@ -238,7 +238,7 @@ public class TextAreaClass extends StringClass
             // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
             // current wiki).
             EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
             LOGGER.warn("Error while getting the syntax corresponding to object ["
                 + compactWikiEntityReferenceSerializer.serialize(object.getDocumentReference())
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");

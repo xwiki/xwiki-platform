@@ -34,9 +34,8 @@ public class XWikiUser
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     private String user;
 

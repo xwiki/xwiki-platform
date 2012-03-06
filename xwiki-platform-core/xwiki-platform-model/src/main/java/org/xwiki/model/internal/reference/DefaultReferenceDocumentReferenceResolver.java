@@ -38,10 +38,10 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * {@link org.xwiki.model.ModelConfiguration} class.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 4.0M1
  */
 @Component
-@Named("default/reference")
+@Named("default")
 @Singleton
 public class DefaultReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
@@ -49,7 +49,7 @@ public class DefaultReferenceDocumentReferenceResolver implements DocumentRefere
      * Default entity reference resolver use for resolution.
      */
     @Inject
-    @Named("default/reference")
+    @Named("default")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Override

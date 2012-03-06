@@ -47,7 +47,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -114,20 +113,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
-
-    /**
-     * Used to convert a proper Class Reference to a string but without the wiki name.
-     */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+    protected EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.TYPE_STRING, "relative");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current/reference");
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
     public int getNumber()
     {

@@ -175,8 +175,7 @@ public class HtmlPackager
     private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
         throws XWikiException, IOException
     {
-        @SuppressWarnings("unchecked")
-        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class);
+        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
         DocumentReference docReference = new DocumentReference(resolver.resolve(pageName, EntityType.DOCUMENT));
         XWikiDocument doc = context.getWiki().getDocument(docReference, context);
 

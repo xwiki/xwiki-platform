@@ -40,7 +40,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Unit tests for {@link AttachmentURLStreamHandler}.
  * 
  * @version $Id$
- * @since 2.0.1
  */
 public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
 {
@@ -50,13 +49,12 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
 
     private ExtendedURLStreamHandler handler;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
 
-        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
 
         this.handler = getComponentManager().lookup(ExtendedURLStreamHandler.class, "attachmentjar");

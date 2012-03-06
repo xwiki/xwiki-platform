@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -328,40 +329,35 @@ public class XWiki implements EventListener
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localStringEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     private EntityReferenceValueProvider defaultEntityReferenceValueProvider = Utils
-        .getComponent(EntityReferenceValueProvider.class);
+        .getComponent((Type) EntityReferenceValueProvider.class);
 
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local/reference");
+        EntityReferenceSerializer.TYPE_REFERENCE, "local");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
-    @SuppressWarnings("unchecked")
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+        EntityReferenceResolver.TYPE_STRING, "relative");
 
-    private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+    private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
-    private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent(XWikiURLBuilder.class, "entity");
+    private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent((Type) XWikiURLBuilder.class, "entity");
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
-     *
+     * 
      * @since 3.2M2
      */
     private Boolean hasBacklinks;
@@ -408,7 +404,8 @@ public class XWiki implements EventListener
                 // initialize stub context here instead of during Execution context initialization because during
                 // Execution context initialization, the XWikiContext is not fully initialized (does not contains XWiki
                 // object) which make it unusable
-                Utils.getComponent(XWikiStubContextProvider.class).initialize(context);
+                Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
+                    .initialize(context);
             } else {
                 context.setWiki(xwiki);
             }
@@ -768,23 +765,24 @@ public class XWiki implements EventListener
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
             "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-        setAttachmentStore(Utils
-            .getComponent(XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint", "hibernate")));
+        setAttachmentStore(Utils.<XWikiAttachmentStoreInterface> getComponent(
+            (Type) XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint", "hibernate")));
 
-        setVersioningStore(Utils
-            .getComponent(XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint", "hibernate")));
+        setVersioningStore(Utils.<XWikiVersioningStoreInterface> getComponent(
+            (Type) XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint", "hibernate")));
 
-        setAttachmentVersioningStore(Utils.getComponent(AttachmentVersioningStore.class,
+        setAttachmentVersioningStore(Utils.<AttachmentVersioningStore> getComponent(
+            (Type) AttachmentVersioningStore.class,
             hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint", "hibernate") : "void"));
 
         if (hasRecycleBin(context)) {
-            setRecycleBinStore(Utils.getComponent(XWikiRecycleBinStoreInterface.class,
-                Param("xwiki.store.recyclebin.hint", "hibernate")));
+            setRecycleBinStore(Utils.<XWikiRecycleBinStoreInterface> getComponent(
+                (Type) XWikiRecycleBinStoreInterface.class, Param("xwiki.store.recyclebin.hint", "hibernate")));
         }
 
         if (hasAttachmentRecycleBin(context)) {
-            setAttachmentRecycleBinStore(Utils.getComponent(AttachmentRecycleBinStore.class,
-                Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
+            setAttachmentRecycleBinStore(Utils.<AttachmentRecycleBinStore> getComponent(
+                (Type) AttachmentRecycleBinStore.class, Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
         }
 
         resetRenderingEngine(context);
@@ -810,7 +808,7 @@ public class XWiki implements EventListener
         // that we need DB access to be available (at component initialization) to make this possible.
         registerWikiMacros();
 
-        Utils.getComponent(ObservationManager.class).addListener(this);
+        Utils.<ObservationManager> getComponent((Type) ObservationManager.class).addListener(this);
     }
 
     /**
@@ -831,7 +829,8 @@ public class XWiki implements EventListener
         getEditModeClass(context);
 
         try {
-            WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
+            WikiMacroInitializer wikiMacroInitializer =
+                Utils.getComponentManager().lookupComponent(WikiMacroInitializer.class);
             wikiMacroInitializer.installOrUpgradeWikiMacroClasses();
         } catch (Exception ex) {
             LOGGER.error("Error while installing / upgrading xwiki classes required for wiki macros.", ex);
@@ -852,7 +851,8 @@ public class XWiki implements EventListener
     protected void registerWikiMacros()
     {
         try {
-            WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
+            WikiMacroInitializer wikiMacroInitializer =
+                Utils.getComponentManager().lookupComponent(WikiMacroInitializer.class);
             wikiMacroInitializer.registerExistingWikiMacros();
         } catch (Exception ex) {
             LOGGER.error("Error while registering wiki macros.", ex);
@@ -1364,7 +1364,7 @@ public class XWiki implements EventListener
                 originalDocument = new XWikiDocument(doc.getDocumentReference());
             }
 
-            ObservationManager om = Utils.getComponent(ObservationManager.class);
+            ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
 
             // Notify listeners about the document about to be created or updated
 
@@ -2742,7 +2742,7 @@ public class XWiki implements EventListener
      */
     private XWikiContext getXWikiContext()
     {
-        Execution execution = Utils.getComponent(Execution.class);
+        Execution execution = Utils.getComponent((Type) Execution.class);
 
         ExecutionContext ec = execution.getContext();
 
@@ -3042,7 +3042,7 @@ public class XWiki implements EventListener
         needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");
 
         // Use XWikiUserSheet to display documents having XWikiUsers objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
         if (classSheetBinder.getSheets(doc).isEmpty()) {
             DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiUserSheet");
             needsUpdate |= classSheetBinder.bind(doc, sheet);
@@ -3221,7 +3221,7 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addBooleanField("editcomment_mandatory", "Make version summary mandatory", "yesno");
         needsUpdate |= bclass.addBooleanField("minoredit", "Enable minor edits", "yesno");
 
-        SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
+        SheetBinder documentSheetBinder = Utils.getComponent((Type) SheetBinder.class, "document");
         boolean withoutDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
         if (withoutDocumentSheets) {
             // Bind a document sheet to prevent the default class sheet from being used.
@@ -3234,7 +3234,7 @@ public class XWiki implements EventListener
         }
 
         // Use AdminSheet to display documents having XWikiPreferences objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
         if (classSheetBinder.getSheets(doc).isEmpty()) {
             DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "AdminSheet");
             needsUpdate |= classSheetBinder.bind(doc, sheet);
@@ -3262,7 +3262,7 @@ public class XWiki implements EventListener
         needsUpdate |= setClassDocumentFields(doc, "XWiki Group Class");
 
         // Use XWikiGroupSheet to display documents having XWikiGroups objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
         if (classSheetBinder.getSheets(doc).isEmpty()) {
             DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroupSheet");
             needsUpdate |= classSheetBinder.bind(doc, sheet);
@@ -3393,7 +3393,7 @@ public class XWiki implements EventListener
         needsUpdate |= setClassDocumentFields(doc, "XWiki Skin Class");
 
         // Use XWikiSkinsSheet to display documents having XWikiSkins objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent(SheetBinder.class, "class");
+        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
         if (classSheetBinder.getSheets(doc).isEmpty()) {
             DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkinsSheet");
             needsUpdate |= classSheetBinder.bind(doc, sheet);
@@ -4636,10 +4636,11 @@ public class XWiki implements EventListener
             WikiReference targetWikiReference = new WikiReference(targetWiki);
             for (String docname : list) {
                 DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
-                sourceDocumentReference = sourceDocumentReference.replaceParent(
-                    sourceDocumentReference.getWikiReference(), sourceWikiReference);
-                DocumentReference targetDocumentReference = sourceDocumentReference.replaceParent(
-                    sourceWikiReference, targetWikiReference);
+                sourceDocumentReference =
+                    sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(),
+                        sourceWikiReference);
+                DocumentReference targetDocumentReference =
+                    sourceDocumentReference.replaceParent(sourceWikiReference, targetWikiReference);
                 copyDocument(sourceDocumentReference, targetDocumentReference, language, context);
                 nb++;
             }
@@ -7208,8 +7209,9 @@ public class XWiki implements EventListener
             if ("plugins".equals(modifiedProperty)) {
                 onPluginPreferenceEvent(event, doc, context);
             } else if ("backlinks".equals(modifiedProperty)) {
-                this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
-                    (int) ParamAsLong("xwiki.backlinks", 0)) == 1;
+                this.hasBacklinks =
+                    doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
+                        (int) ParamAsLong("xwiki.backlinks", 0)) == 1;
             }
         } else if (event instanceof XObjectEvent) {
             onServerObjectEvent(event, doc, context);

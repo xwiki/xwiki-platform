@@ -75,17 +75,17 @@ public class ScriptMockSetup
 
         // Use a mock for the AttachmentReference Resolver
         attachmentReferenceResolver = mockery.mock(AttachmentReferenceResolver.class);
-        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
-        descriptorARF.setRole(AttachmentReferenceResolver.class);
+        DefaultComponentDescriptor<AttachmentReferenceResolver<String>> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceResolver<String>>();
+        descriptorARF.setRoleType(AttachmentReferenceResolver.TYPE_STRING);
         descriptorARF.setRoleHint("current");
         componentManager.registerComponent(descriptorARF, attachmentReferenceResolver);
 
         // Use a mock for the DocumentReference Resolver
         documentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
-        DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
-            new DefaultComponentDescriptor<DocumentReferenceResolver>();
-        descriptorDRF.setRole(DocumentReferenceResolver.class);
+        DefaultComponentDescriptor<DocumentReferenceResolver<String>> descriptorDRF =
+            new DefaultComponentDescriptor<DocumentReferenceResolver<String>>();
+        descriptorDRF.setRoleType(DocumentReferenceResolver.TYPE_STRING);
         descriptorDRF.setRoleHint("current");
         componentManager.registerComponent(descriptorDRF, documentReferenceResolver);
     }

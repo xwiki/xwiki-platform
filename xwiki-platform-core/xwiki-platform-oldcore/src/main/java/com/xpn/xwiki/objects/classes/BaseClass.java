@@ -38,7 +38,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -81,9 +80,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     private String nameField;
 
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local/reference");
+        EntityReferenceSerializer.TYPE_REFERENCE, "local");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -91,13 +89,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * the current wiki is used instead of the current document reference's wiki.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
-
-    /**
-     * Used here to merge setName() and setWiki() calls into the DocumentReference.
-     */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     @Override
     public DocumentReference getReference()
@@ -139,9 +131,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (reference != null) {
                 EntityReference relativeReference =
                     this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-                reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
-                         reference.getParent().getParent()));
+                reference =
+                    new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                        new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
+                            .getParent().getParent()));
             } else {
                 reference = this.currentMixedDocumentReferenceResolver.resolve(name);
             }

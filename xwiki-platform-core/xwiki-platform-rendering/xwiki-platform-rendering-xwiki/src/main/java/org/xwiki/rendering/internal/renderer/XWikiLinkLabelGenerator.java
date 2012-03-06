@@ -52,7 +52,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
 
     @Inject
     @Named("current")
-    private DocumentReferenceResolver currentDocumentReferenceResolver;
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
      * {@inheritDoc}

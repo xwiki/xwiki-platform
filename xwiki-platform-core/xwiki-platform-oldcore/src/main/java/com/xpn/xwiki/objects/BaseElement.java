@@ -63,8 +63,8 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+    protected EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to build uid string for the getId() hash.
@@ -157,25 +157,29 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @return return the LocalUidStringEntityReferenceSerializer to compute ids.
      * @since 4.0M1
      */
-    protected EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer() {
-        if (localUidStringEntityReferenceSerializer == null) {
-            localUidStringEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.class, "local/uid");
+    protected EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer()
+    {
+        if (this.localUidStringEntityReferenceSerializer == null) {
+            this.localUidStringEntityReferenceSerializer =
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
         }
-        return localUidStringEntityReferenceSerializer;
+
+        return this.localUidStringEntityReferenceSerializer;
     }
 
     /**
      * @return a unique identifier representing this element reference to be used for {@code hashCode()}.
      * @since 4.0M1
      */
-    protected String getLocalKey() {
+    protected String getLocalKey()
+    {
         // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly synced.
         return getLocalUidStringEntityReferenceSerializer().serialize(getReference());
     }
 
     /**
      * Return an truncated MD5 hash of the local key computed in {@link #getLocalKey()}.
-     *
+     * 
      * @return the identifier used by hibernate for storage.
      * @since 4.0M1
      */
@@ -187,6 +191,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Dummy function, do hibernate is always happy.
+     * 
      * @param id the identifier assigned by hibernate.
      * @since 4.0M1
      */

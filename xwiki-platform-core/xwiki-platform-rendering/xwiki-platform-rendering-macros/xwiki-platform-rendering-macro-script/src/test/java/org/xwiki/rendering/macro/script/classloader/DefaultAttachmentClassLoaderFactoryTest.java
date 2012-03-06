@@ -41,7 +41,7 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
 {
     private AttachmentClassLoaderFactory factory;
     
-    private AttachmentReferenceResolver arf;
+    private AttachmentReferenceResolver<String> arf;
     
     private DocumentAccessBridge dab;
 
@@ -50,7 +50,7 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     {
         super.registerComponents();
 
-        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
 
         this.factory = getComponentManager().lookup(AttachmentClassLoaderFactory.class);

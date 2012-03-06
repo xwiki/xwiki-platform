@@ -75,11 +75,11 @@ public class DefaultRepositoryManager implements RepositoryManager
      * Get the reference of the class in the current wiki.
      */
     @Inject
-    @Named("default/reference")
+    @Named("default")
     private DocumentReferenceResolver<EntityReference> referenceResolver;
 
     @Inject
-    @Named("current/reference")
+    @Named("current")
     private DocumentReferenceResolver<EntityReference> currentResolver;
 
     /**

@@ -82,7 +82,7 @@ public class DefaultPackager implements Packager, Initializable
     private Execution execution;
 
     @Inject
-    @Named("explicit/reference")
+    @Named("explicit")
     private DocumentReferenceResolver<EntityReference> resolver;
 
     /**

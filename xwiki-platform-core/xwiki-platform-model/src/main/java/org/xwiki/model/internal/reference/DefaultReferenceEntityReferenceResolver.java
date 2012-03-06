@@ -33,10 +33,10 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * not defined in the passed reference.
  * 
  * @version $Id$
- * @since 2.2M1
+ * @since 4.0M1
  */
 @Component
-@Named("default/reference")
+@Named("default")
 @Singleton
 public class DefaultReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {

@@ -94,7 +94,7 @@ public class DefaultGadgetSource implements GadgetSource
      * The current entity reference resolver, to resolve the gadgets class reference.
      */
     @Inject
-    @Named("current/reference")
+    @Named("current")
     protected DocumentReferenceResolver<EntityReference> currentReferenceEntityResolver;
 
     /**

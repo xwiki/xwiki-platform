@@ -66,7 +66,7 @@ public class DefaultLinkService implements LinkService
      * The component used to resolve an entity reference relative to another entity reference.
      */
     @Inject
-    @Named("explicit/reference")
+    @Named("explicit")
     private EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver;
 
     /**

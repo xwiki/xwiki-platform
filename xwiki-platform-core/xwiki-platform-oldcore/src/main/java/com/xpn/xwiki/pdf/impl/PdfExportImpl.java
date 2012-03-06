@@ -116,14 +116,12 @@ public class PdfExportImpl implements PdfExport
     private static final Properties TIDY_CONFIGURATION;
 
     /** Document name resolver. */
-    @SuppressWarnings("unchecked")
     private static DocumentReferenceResolver<String> referenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Document name serializer. */
-    @SuppressWarnings("unchecked")
     private static EntityReferenceSerializer<String> referenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /** Provides access to document properties. */
     private static DocumentAccessBridge dab = Utils.getComponent(DocumentAccessBridge.class);

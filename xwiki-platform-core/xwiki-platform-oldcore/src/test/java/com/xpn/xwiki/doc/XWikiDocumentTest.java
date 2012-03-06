@@ -119,7 +119,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.defaultEntityReferenceSerializer = getComponentManager().lookup(EntityReferenceSerializer.class);
+        this.defaultEntityReferenceSerializer = getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.document.setSyntax(Syntax.XWIKI_1_0);

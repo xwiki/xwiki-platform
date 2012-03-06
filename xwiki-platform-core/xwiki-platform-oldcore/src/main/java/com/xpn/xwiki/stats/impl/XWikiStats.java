@@ -93,7 +93,7 @@ public class XWikiStats extends BaseCollection
     private static final EntityReference EMPTY_REF = new EntityReference("$$EMPTY$$", EntityType.DOCUMENT);
 
     /** Resolve names into reference for uid string serialization. */
-    private final EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class);
+    private final EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
 
     /**
      * Default constructor.

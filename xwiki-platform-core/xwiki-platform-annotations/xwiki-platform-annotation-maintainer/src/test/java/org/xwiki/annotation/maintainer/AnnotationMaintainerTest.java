@@ -205,7 +205,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
         // register
         DefaultComponentDescriptor<EntityReferenceSerializer> ersDesc =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        ersDesc.setRole(EntityReferenceSerializer.class);
+        ersDesc.setRoleType(EntityReferenceSerializer.TYPE_STRING);
         getComponentManager().registerComponent(ersDesc, serializerMock);
         // and setup the mock
         setup.getMockery().checking(new Expectations()

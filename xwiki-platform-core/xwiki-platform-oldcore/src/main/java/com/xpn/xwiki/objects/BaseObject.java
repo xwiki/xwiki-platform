@@ -33,7 +33,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -52,13 +51,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * the current wiki is used instead of the current document reference's wiki.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
-
-    /**
-     * Used here to merge setName() and setWiki() calls into the DocumentReference.
-     */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * {@inheritDoc}
@@ -89,9 +82,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
 
         if (reference != null) {
             EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-            reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
-                    reference.getParent().getParent()));
+            reference =
+                new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
+                        .getParent().getParent()));
         } else {
             reference = this.currentMixedDocumentReferenceResolver.resolve(name);
         }

@@ -31,10 +31,10 @@ import org.xwiki.model.EntityType;
  * {@link org.xwiki.model.reference.EntityReference}.
  * 
  * @version $Id$
- * @since 2.23
+ * @since 4.0M1
  */
 @Component
-@Named("explicit/reference")
+@Named("explicit")
 @Singleton
 public class ExplicitReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {

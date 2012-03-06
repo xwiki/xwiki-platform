@@ -20,32 +20,33 @@
 package org.xwiki.classloader.internal.protocol.attachmentjar;
 
 import java.io.InputStream;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.AttachmentReference;
 
 /**
  * URL Connection that takes its content from a document attachment.
- *   
+ * 
  * @version $Id$
  * @since 2.0.1
  */
 public class AttachmentURLConnection extends URLConnection
 {
     private DocumentAccessBridge documentAccessBridge;
-    
+
     private AttachmentReference attachmentReference;
 
     /**
      * @param url the URL to connect to
      * @since 2.2M1
      */
-    public AttachmentURLConnection(URL url, AttachmentReference attachmentReference, DocumentAccessBridge documentAccessBridge)
+    public AttachmentURLConnection(URL url, AttachmentReference attachmentReference,
+        DocumentAccessBridge documentAccessBridge)
     {
         super(url);
+
         this.attachmentReference = attachmentReference;
         this.documentAccessBridge = documentAccessBridge;
     }

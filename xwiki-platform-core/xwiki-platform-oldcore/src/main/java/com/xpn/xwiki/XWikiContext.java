@@ -137,24 +137,21 @@ public class XWikiContext extends Hashtable<Object, Object>
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /** The Execution so that we can check if permissions were dropped there. */
     private final Execution execution = Utils.getComponent(Execution.class);

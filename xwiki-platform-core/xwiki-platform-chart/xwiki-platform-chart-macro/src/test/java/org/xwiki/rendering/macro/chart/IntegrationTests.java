@@ -81,7 +81,7 @@ public class IntegrationTests
         final EntityReferenceSerializer mockEntityReferenceSerializer = mockery.mock(EntityReferenceSerializer.class);
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorERS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        descriptorERS.setRole(EntityReferenceSerializer.class);
+        descriptorERS.setRoleType(EntityReferenceSerializer.TYPE_STRING);
         componentManager.registerComponent(descriptorERS, mockEntityReferenceSerializer);
 
         mockery.checking(new Expectations() {{

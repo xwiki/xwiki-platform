@@ -128,39 +128,34 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current");
+        DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly

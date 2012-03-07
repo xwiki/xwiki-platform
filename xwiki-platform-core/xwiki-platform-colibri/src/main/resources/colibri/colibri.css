@@ -145,8 +145,7 @@ input[type="text"], input[type="password"] {
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
-      {'color': $theme.pageBackgroundColor, 'position': '1px'},
+      {'color': $theme.fieldGradientColor, 'position': '1px'},
       {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
     ]
   })
@@ -161,8 +160,7 @@ textarea, select {
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
-      {'color': $theme.pageBackgroundColor, 'position': '1px'},
+      {'color': $theme.fieldGradientColor, 'position': '1px'},
       {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
     ]
   })
@@ -1460,7 +1458,7 @@ input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.linkColor, 'position': '0%'},
+      {'color': $theme.buttonPrimaryGradientColor, 'position': '0%'},
       {'color': $theme.buttonPrimaryBackgroundColor, 'position': '100%'}
     ]
   })
@@ -1472,7 +1470,7 @@ input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;
-  text-shadow: 0px 1px 0px $theme.titleColor;
+  text-shadow: 0px 1px 0px $theme.buttonPrimaryGradientColor;
   text-transform: uppercase;
 }
 
@@ -1482,7 +1480,7 @@ input.button:hover, .buttonwrapper a:hover{
      'angle': 'top',
      'colors': [
       {'color': $theme.buttonPrimaryBackgroundColor, 'position': '0%'},
-      {'color': $theme.linkColor, 'position': '100%'}
+      {'color': $theme.buttonPrimaryGradientColor, 'position': '100%'}
     ]
   })
   box-shadow: 0px 2px 2px $theme.borderColor;
@@ -1497,14 +1495,14 @@ input.button:hover, .buttonwrapper a:hover{
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryGradientColor, 'position': '0%'},
       {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
     ]
   })
   border-color: $theme.buttonSecondaryBackgroundColor;
   border-radius: 3px 3px 3px 3px;
   color: $theme.buttonSecondaryTextColor;
-  text-shadow: 0px 1px 0px $theme.pageContentBackgroundColor;
+  text-shadow: 0px 1px 0px $theme.buttonSecondaryGradientColor;
 }
 
 input.secondary:hover, .buttonwrapper a.secondary:hover {
@@ -1578,19 +1576,19 @@ input.icon-button {
 
 /* Section titles */
 .vertical-menu .group {
-  background-color: $theme.panelCollapsedBackgroundColor;
+  background-color: $theme.menuContentBackgroundColor;
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
-      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+      {'color': $theme.menuContentGradientColor, 'position': '0%'},
+      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
     ]
   })
   font-weight: 700;
   font-variant: small-caps;
 }
 .vertical-menu .group * {
-  color: $theme.panelCollapsedTextColor;
+  color: $theme.menuContentLinkColor;
 }
 
 /* Highlight items when hovering */
@@ -1598,17 +1596,17 @@ input.icon-button {
   background-color: $theme.highlightColor;
 }
 .vertical-menu .group:hover {
-  background-color: $theme.panelHeaderBackgroundColor;
+  background-color: $theme.menuBackgroundColor;
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
     ]
   })
 }
 .vertical-menu .group:hover * {
-  color: $theme.panelHeaderTextColor;
+  color: $theme.menuLinkColor;
 }
 
 /* Selected item */
@@ -1617,18 +1615,18 @@ input.icon-button {
   font-weight: bold;
 }
 .vertical-menu .current-group {
-  background-color: $theme.panelHeaderBackgroundColor;
+  background-color: $theme.menuBackgroundColor;
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
     ]
   })
-  color: $theme.panelHeaderTextColor;
+  color: $theme.menuLinkColor;
 }
 .vertical-menu .current-group *, .vertical-menu .current-group *:visited, .vertical-menu .current-group *:active {
-  color: $theme.panelHeaderTextColor;
+  color: $theme.menuLinkColor;
 }
 
 /* Draw an arrow pointing right for the selected item */
@@ -1647,7 +1645,7 @@ input.icon-button {
   right: -11px;
 }
 .vertical-menu .current-group:after {
-  border-left-color: $theme.panelHeaderBackgroundColor !important;
+  border-left-color: $theme.menuBackgroundColor !important;
 }
 
 /* @group PANELS */
@@ -1812,24 +1810,50 @@ ul.xwikitabbar {
 }
 
 /* -------------- Containers gradients -----------------*/
-#contentmenu, #editmenu, h1.xwikipaneltitle, ul.xwikitabbar {
-  background-color: $theme.pageBackgroundColor;
+h1.xwikipaneltitle {
+  background-color: $theme.panelHeaderBackgroundColor;
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageContentBackgroundColor, 'position': '0%'},
-      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+      {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
+      {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
+    ]
+  })
+  border-radius: 4px 4px 0 0;
+  color: $theme.panelHeaderTextColor;
+  text-shadow: 0 1px 0 $theme.panelHeaderGradientColor;
+}
+
+.collapsed h1.xwikipaneltitle {
+  background-color: $theme.panelCollapsedBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.panelCollapsedGradientColor, 'position': '0%'},
+      {'color': $theme.panelCollapsedBackgroundColor, 'position': '100%'}
+    ]
+  })
+  color: $theme.panelCollapsedTextColor;
+  text-shadow: 0 1px 0 $theme.panelCollapsedGradientColor;
+}
+
+#contentmenu, #editmenu, ul.xwikitabbar {
+  background-color: $theme.menuContentBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.menuContentGradientColor, 'position': '0%'},
+      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
     ]
   })
   border-radius: 4px 4px 0 0;
 }
 
-h1.xwikipaneltitle,
 #contentmenu.actionmenu a, #contentmenu.actionmenu a:visited, #contentmenu .menuarrow, #contentmenu .tmetype,
 #editmenu.actionmenu a, #editmenu.actionmenu a:visited, #editmenu .menuarrow, #editmenu .tmetype,
 .xwikitabbar li a, .xwikitabbar li a:visited, .xwikitabbar li a:active  {
-  color: $theme.buttonSecondaryTextColor;
-  text-shadow: 0 1px 0 $theme.pageContentBackgroundColor;
+  color: $theme.menuContentLinkColor;
+  text-shadow: 0 1px 0 $theme.menuContentGradientColor;
 }
 
 #contentmenu.actionmenu .submenuitem a ,
@@ -1839,34 +1863,30 @@ h1.xwikipaneltitle,
 
 #contentmenu.actionmenu .submenu,
 #editmenu.actionmenu .submenu {
-  background-color: $theme.pageBackgroundColor;
+  background-color: $theme.submenuContentBackgroundColor;
 }
 
 #mainmenu {
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
-      {'color': $theme.pageHeaderBackgroundColor, 'position': '0%'},
+      {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
     ]
   })
-  box-shadow: 0px 1px 2px $theme.linkColor;
+  box-shadow: 0px 1px 2px $theme.menuGradientColor;
 }
 
 #mainmenu .tmetype, #mainmenu .tme {
-  text-shadow: 0 1px 0 $theme.pageHeaderBackgroundColor;
+  text-shadow: 0 1px 0 $theme.menuGradientColor;
 }
 
 #mainmenu .tmCreate .tme {
   text-shadow: none;
 }
 
-#contentmenu .submenu  {
-  box-shadow: 0px 1px 2px $theme.buttonSecondaryBackgroundColor;
-}
-
-#mainmenu .submenu {
-  box-shadow: 0px 1px 1px $theme.textSecondaryColor;
+#mainmenu .submenu , #contentmenu .submenu  {
+  box-shadow: 0px 1px 1px $theme.borderColor;
 }
 
 .actionmenu .submenu {

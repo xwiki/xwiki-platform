@@ -136,7 +136,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
   },
   _onAdd : function() {
     if (this.input.value != '') {
-      window.self.location = this.urlTemplate.replace('__entryName__', this.input.value);
+      window.self.location = this.urlTemplate.replace('__entryName__', encodeURIComponent(this.input.value));
     } else {
       this.input.focus();
     }

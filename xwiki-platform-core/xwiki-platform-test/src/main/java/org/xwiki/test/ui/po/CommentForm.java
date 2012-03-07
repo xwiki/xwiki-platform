@@ -61,7 +61,7 @@ public class CommentForm extends BaseElement
     public WebElement clickPreview()
     {
         getUtil().findElementWithoutWaiting(getDriver(), container,
-            By.xpath("//input[@type = 'button' and @value = 'Preview']")).click();
+            By.xpath(".//input[@type = 'button' and @value = 'Preview']")).click();
         By previewLocator = By.className("commentPreview");
         waitUntilElementIsVisible(previewLocator);
         return getUtil().findElementWithoutWaiting(getDriver(), container, previewLocator);
@@ -73,7 +73,7 @@ public class CommentForm extends BaseElement
     public void clickBack()
     {
         getUtil().findElementWithoutWaiting(getDriver(), container,
-            By.xpath("//input[@type = 'button' and @value = 'Back']")).click();
+            By.xpath(".//input[@type = 'button' and @value = 'Back']")).click();
     }
 
     /**
@@ -95,7 +95,7 @@ public class CommentForm extends BaseElement
      */
     public void clickSubmit(boolean wait)
     {
-        getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath("//input[@type = 'submit']")).click();
+        getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(".//input[@type = 'submit']")).click();
         if (wait) {
             // The submit is done asynchronously so we have to wait for the success notification.
             waitForNotificationSuccessMessage("Comment posted");

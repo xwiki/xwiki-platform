@@ -19,6 +19,8 @@
  */
 package org.xwiki.ircbot;
 
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Listener;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
@@ -29,7 +31,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @since 4.0M1
  */
 @ComponentRole
-public interface IRCBotListener extends IRCBotMessageHandler, Comparable<IRCBotListener>
+public interface IRCBotListener<T extends PircBotX> extends Listener<T>
 {
     /**
      * @return the human-readable name of the Bot Listener (eg "Displays the list of command available when you type
@@ -41,28 +43,4 @@ public interface IRCBotListener extends IRCBotMessageHandler, Comparable<IRCBotL
      * @return the Bot listener's description
      */
     String getDescription();
-
-    /**
-     * The priority of execution relative to the other Bot Listeners. The lowest values have the highest priorities
-     * and execute first. For example a Bot Listener with a priority of 100 will execute before one with a priority of
-     * 500.
-     *
-     * @return the execution priority
-     */
-    int getPriority();
-
-    /**
-     * Give the opportunity to the IRC Bot Listener writer to do something when the listener is registered and
-     * thus activated. For example one could get some configuration parameter from some XWiki Class and store them
-     * in the context so that they're available from other events. Another example would be to use some Groovy script
-     * to register some class (such as an Event Listener); an example of this would be to write a Bot Listener that
-     * listens to document change events and send them to the IRC channel.
-     */
-    void onRegistration();
-
-    /**
-     * Give the opportunity to the IRC Bot Listener writer to do something when the listener is unregistered and
-     * thus deactivated.
-     */
-    void onUnregistration();
 }

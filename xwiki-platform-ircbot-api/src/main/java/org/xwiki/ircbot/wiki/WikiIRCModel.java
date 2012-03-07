@@ -17,34 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot;
+package org.xwiki.ircbot.wiki;
 
-import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
-import org.pircbotx.PircBotX;
-import org.pircbotx.exception.IrcException;
-import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.internal.wiki.BotData;
+import org.xwiki.ircbot.internal.wiki.BotListenerData;
+import org.xwiki.model.reference.DocumentReference;
 
-/**
- * Represents an IRC Bot.
- *
- * @version $Id$
- * @since 4.0M1
- */
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 @ComponentRole
-public interface IRCBot
+public interface WikiIRCModel
 {
-    void setName(String botName);
-    void connect(String hostname) throws IOException, IrcException;
-    void joinChannel(String channel);
-    void disconnect();
-    void identify(String password);
-    void sendMessage(String target, String message);
+    XWikiContext getXWikiContext() throws IRCBotException;
 
-    Set<String> getChannelsNames();
-    boolean isConnected();
+    XWikiDocument getDocument(DocumentReference reference) throws IRCBotException;
 
-    public ListenerManager<? extends PircBotX> getListenerManager();
+    XWikiDocument getConfigurationDocument() throws IRCBotException;
+
+    BotData loadBotData() throws IRCBotException;
+
+    /**
+     * @return the Bot Listener data for all documents containing {@link WikiIRCBotConstants#WIKI_BOT_LISTENER_CLASS}
+     *         objects in the current wiki
+     * @throws IRCBotException if we fail in searching the wiki
+     */
+    List<BotListenerData> getWikiBotListenerData() throws IRCBotException;
 }

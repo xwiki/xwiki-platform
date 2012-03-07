@@ -17,34 +17,57 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot;
-
-import java.io.IOException;
-import java.util.Set;
-
-import org.pircbotx.PircBotX;
-import org.pircbotx.exception.IrcException;
-import org.pircbotx.hooks.managers.ListenerManager;
-import org.xwiki.component.annotation.ComponentRole;
+package org.xwiki.ircbot.internal.wiki;
 
 /**
- * Represents an IRC Bot.
+ * Represents Bot Data (channel, server, password, bot name, etc).
  *
  * @version $Id$
  * @since 4.0M1
  */
-@ComponentRole
-public interface IRCBot
+public class BotData
 {
-    void setName(String botName);
-    void connect(String hostname) throws IOException, IrcException;
-    void joinChannel(String channel);
-    void disconnect();
-    void identify(String password);
-    void sendMessage(String target, String message);
+    private boolean isActive;
 
-    Set<String> getChannelsNames();
-    boolean isConnected();
+    private String channel;
 
-    public ListenerManager<? extends PircBotX> getListenerManager();
+    private String server;
+
+    private String botName;
+
+    private String password;
+
+    public BotData(String botName, String server, String password, String channel, boolean isActive)
+    {
+        this.botName = botName;
+        this.server = server;
+        this.password = password;
+        this.channel = channel;
+        this.isActive = isActive;
+    }
+
+    public String getBotName()
+    {
+        return this.botName;
+    }
+
+    public String getServer()
+    {
+        return this.server;
+    }
+
+    public String getPassword()
+    {
+        return this.password;
+    }
+
+    public String getChannel()
+    {
+        return this.channel;
+    }
+
+    public boolean isActive()
+    {
+        return this.isActive;
+    }
 }

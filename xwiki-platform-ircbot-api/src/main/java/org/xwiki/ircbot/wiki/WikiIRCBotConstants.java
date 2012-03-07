@@ -52,11 +52,6 @@ public interface WikiIRCBotConstants
     String DESCRIPTION_PROPERTY = "description";
 
     /**
-     * Listener priority property.
-     */
-    String PRIORITY_PROPERTY = "priority";
-
-    /**
      * Whether a Bot Listener or the Bot itself are marked inactive. If so they're not started.
      */
     String INACTIVE_PROPERTY = "inactive";

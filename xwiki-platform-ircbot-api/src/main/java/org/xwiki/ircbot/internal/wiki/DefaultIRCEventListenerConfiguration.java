@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.IRCEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
+import org.xwiki.ircbot.wiki.WikiIRCModel;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;

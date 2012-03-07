@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.wiki.IRCEventListenerConfiguration;
+import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -58,11 +59,10 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {{
             oneOf(bot).isConnected();
-            will(returnValue((false)));
+            will(returnValue(false));
 
             // The test is here, we verify that sendMessage is never called, i.e. that no message is sent to the IRC
-            // channel. Note that these 2 statements are not needed, they're just here to make the test more explicit.
-            never(bot).sendMessage(with(any(String.class)));
+            // channel. Note that this statement is not needed, it's just here to make the test more explicit.
             never(bot).sendMessage(with(any(String.class)), with(any(String.class)));
         }});
 
@@ -77,11 +77,10 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {{
             oneOf(bot).isConnected();
-            will(returnValue((true)));
+            will(returnValue(true));
 
             // The test is here, we verify that sendMessage is never called, i.e. that no message is sent to the IRC
-            // channel. Note that these 2 statements are not needed, they're just here to make the test more explicit.
-            never(bot).sendMessage(with(any(String.class)));
+            // channel. Note that this statement is not needed, it's just here to make the test more explicit.
             never(bot).sendMessage(with(any(String.class)), with(any(String.class)));
         }});
 
@@ -108,7 +107,9 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {{
             oneOf(bot).isConnected();
-                will(returnValue((true)));
+                will(returnValue(true));
+            oneOf(bot).getChannelsNames();
+                will(returnValue(Collections.singleton("channel")));
             oneOf(serializer).serialize(reference);
                 will(returnValue("wiki:space.page"));
             oneOf(configuration).getExclusionPatterns();
@@ -121,7 +122,7 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
                 will(returnValue(new URL("http://someurl")));
 
             // The test is here!
-            oneOf(bot).sendMessage("wiki:space.page was modified by userwiki:userspace.userpage (created) - "
+            oneOf(bot).sendMessage("channel", "wiki:space.page was modified by userwiki:userspace.userpage (created) - "
                 + "http://someurl");
         }});
 
@@ -145,7 +146,7 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {{
             oneOf(bot).isConnected();
-                will(returnValue((true)));
+                will(returnValue(true));
             oneOf(serializer).serialize(reference);
                 will(returnValue("wiki:space.page"));
             oneOf(configuration).getExclusionPatterns();

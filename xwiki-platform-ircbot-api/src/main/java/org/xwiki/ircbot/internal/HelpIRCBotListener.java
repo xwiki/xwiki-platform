@@ -19,17 +19,21 @@
  */
 package org.xwiki.ircbot.internal;
 
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.MessageEvent;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.ircbot.AbstractIRCBotListener;
-import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotListener;
 
 /**
@@ -42,7 +46,7 @@ import org.xwiki.ircbot.IRCBotListener;
 @Component
 @Named("help")
 @Singleton
-public class HelpIRCBotListener extends AbstractIRCBotListener
+public class HelpIRCBotListener<T extends PircBotX> extends ListenerAdapter<T> implements IRCBotListener<T>
 {
     /**
      * The command to type in the IRC channel to trigger this listener.
@@ -50,17 +54,17 @@ public class HelpIRCBotListener extends AbstractIRCBotListener
     private static final String COMMAND = "!help";
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Used to find all Bot listeners available.
      */
     @Inject
     @Named("wiki")
     private ComponentManager componentManager;
-
-    /**
-     * Used to send the result to the IRC Channel.
-     */
-    @Inject
-    private IRCBot bot;
 
     @Override
     public String getName()
@@ -75,13 +79,12 @@ public class HelpIRCBotListener extends AbstractIRCBotListener
     }
 
     @Override
-    public void onMessage(String channel, String sender, String login, String hostname, String message)
+    public void onMessage(MessageEvent<T> event) throws Exception
     {
-        super.onMessage(channel, sender, login, hostname, message);
-
-        if (message.startsWith(COMMAND)) {
+        if (event.getMessage().startsWith(COMMAND)) {
+            event.respond("Available Bot listeners:");
             for (IRCBotListener listener : getIRCBotListeners()) {
-                this.bot.sendMessage(channel, listener.getDescription());
+                event.respond(" - " + listener.getDescription());
             }
         }
     }
@@ -93,9 +96,10 @@ public class HelpIRCBotListener extends AbstractIRCBotListener
     {
         List<IRCBotListener> result;
         try {
-            result = this.componentManager.lookupList(IRCBotListener.class);
+            result = this.componentManager.lookupList((Type) IRCBotListener.class);
         } catch (ComponentLookupException e) {
-            throw new RuntimeException("Failed to look up IRC Bot Listeners", e);
+            this.logger.warn("Failed to look up IRC Bot Listeners", e);
+            result = Collections.emptyList();
         }
         return result;
     }

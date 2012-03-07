@@ -19,16 +19,20 @@
  */
 package org.xwiki.ircbot.internal.wiki;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.axis.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Event;
+import org.pircbotx.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.ircbot.AbstractIRCBotListener;
-import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
+import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -39,7 +43,8 @@ import org.xwiki.rendering.transformation.TransformationException;
 
 import com.xpn.xwiki.XWikiContext;
 
-public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIRCBotConstants
+public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
+    implements IRCBotListener<T>, WikiIRCBotConstants
 {
     public static final String LISTENER_XWIKICONTEXT_PROPERTY = "irclistener";
 
@@ -55,20 +60,16 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
 
     private BlockRenderer plainTextBlockRenderer;
 
-    private IRCBot bot;
-
     private WikiIRCModel ircModel;
 
     public WikiIRCBotListener(BotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
-        Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, IRCBot bot,
-        WikiIRCModel ircModel)
+        Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel)
     {
         this.listenerData = listenerData;
         this.events = events;
         this.syntax = syntax;
         this.macroTransformation = macroTransformation;
         this.plainTextBlockRenderer = plainTextBlockRenderer;
-        this.bot = bot;
         this.ircModel = ircModel;
     }
 
@@ -84,89 +85,20 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
         return this.listenerData.getDescription();
     }
 
-    @Override
-    public int getPriority()
-    {
-        Integer priority = this.listenerData.getPriority();
-        if (priority == null) {
-            // Get the default priority from parent class
-            priority = super.getPriority();
-        }
-        return priority;
-    }
-
-    @Override
-    public void onRegistration()
-    {
-        executeScript(ON_REGISTRATION_EVENT_NAME, null);
-    }
-
-    @Override
-    public void onUnregistration()
-    {
-        executeScript(ON_UNREGISTRATION_EVENT_NAME, null);
-    }
-
-    @Override
-    public void onConnect()
-    {
-        executeScript(ON_CONNECT_EVENT_NAME, null);
-    }
-
-    @Override
-    public void onDisconnect()
-    {
-        executeScript(ON_DISCONNECT_EVENT_NAME, null);
-    }
-
-    @Override
-    public void onJoin(String channel, String sender, String login, String hostname)
-    {
-        executeScript(ON_JOIN_EVENT_NAME, "sender", sender, "login", login, "hostname", hostname);
-    }
-
-    @Override
-    public void onMessage(String channel, String sender, String login, String hostname, String message)
-    {
-        executeScript(ON_MESSAGE_EVENT_NAME, "sender", sender, "login", login, "hostname", hostname,
-            "message", message);
-    }
-
-    @Override
-    public void onNickChange(String oldNick, String login, String hostname, String newNick)
-    {
-        executeScript(ON_NICK_CHANGE_EVENT_NAME, "oldNick", oldNick, "login", login, "hostname", hostname,
-            "newNick", newNick);
-    }
-
-    @Override
-    public void onPart(String channel, String sender, String login, String hostname)
-    {
-        executeScript(ON_PART_EVENT_NAME, "sender", sender, "login", login, "hostname", hostname);
-    }
-
-    @Override
-    public void onPrivateMessage(String sender, String login, String hostname, String message)
-    {
-        executeScript(ON_PRIVATE_MESSAGE_EVENT_NAME, "sender", sender, "login", login, "hostname", hostname,
-            "message", message);
-    }
-
-    @Override
-    public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
-    {
-        executeScript(ON_QUIT_EVENT_NAME, "sourceNick", sourceNick, "sourceLogin", sourceLogin,
-            "sourceHostname", sourceHostname, "reason", reason);
-    }
-
     /**
      * Execute the Wiki bot listener written in wiki syntax by executing the Macros and send the result to the IRC
      * server.
      *
-     * @param eventName the name of the event for which the script needs to be executed
+     * @param event the IRC Bot Event
      */
-    private void executeScript(String eventName, Object... bindings)
+    @Override
+    public void onEvent(Event event) throws Exception
     {
+        // Get the Event class name, remove the "Event" suffix, and prefix with "on". For example for "MessageEvent"
+        // this gives "onMessage".
+        // Find the XDOM to execute, using this key.
+        String eventName = "on" + StringUtils.removeEnd(event.getClass().getSimpleName(), "Event");
+
         XDOM xdom = this.events.get(eventName);
         if (xdom != null) {
             // Note that if a Bot Listener script needs access to the IRC Bot (for example to send a message to the
@@ -175,7 +107,7 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
             try {
                 // Add bindings to the XWiki Context so that the Bot Script Service can access them and thus give access
                 // to them to the Bot Listener.
-                addBindings(bindings);
+                addBindings(event);
 
                 // Execute the Macro Transformation on XDOM and send the result to the IRC server
                 TransformationContext txContext = new TransformationContext(xdom, this.syntax);
@@ -183,9 +115,9 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
                 DefaultWikiPrinter printer = new DefaultWikiPrinter();
                 this.plainTextBlockRenderer.render(xdom, printer);
 
-                String executionResult = printer.toString();
+                String executionResult = StringUtils.trim(printer.toString());
                 if (!StringUtils.isEmpty(executionResult)) {
-                    this.bot.sendMessage(printer.toString());
+                    event.respond(printer.toString());
                 }
             } catch (IRCBotException e) {
                 // An error happened, log a warning and do nothing
@@ -197,24 +129,36 @@ public class WikiIRCBotListener extends AbstractIRCBotListener implements WikiIR
         }
     }
 
-    private void addBindings(Object... bindings) throws IRCBotException
+    private void addBindings(Event event) throws IRCBotException
     {
         Map<String, Object> params = new HashMap<String, Object>();
-       if (bindings != null) {
-            for (int i = 0; i < bindings.length - 1; i += 2) {
-                params.put((String) bindings[i], bindings[i + 1]);
-            }
-        }
 
-        // Always bind to the first channel on which the bot is connected to
-        String[] channels = this.bot.getConnectedChannels();
-        if (channels.length > 0) {
-            params.put("channel", channels[0]);
-        }
+        // Bind variables
+        bindVariable("message", "getMessage", event, params);
+        bindVariable("user", "getUser", event, params);
+        bindVariable("channel", "getChannel", event, params);
+        bindVariable("source", "getUser", event, params);
+        bindVariable("reason", "getReason", event, params);
+        bindVariable("recipient", "getRecipient", event, params);
+        bindVariable("oldNick", "getOldNick", event, params);
+        bindVariable("newNick", "getNewNick", event, params);
+
+        // Bind the PircBotX instance
+        params.put("bot", event.getBot());
 
         XWikiContext context = this.ircModel.getXWikiContext();
         if (context != null) {
             context.put(LISTENER_XWIKICONTEXT_PROPERTY, params);
+        }
+    }
+
+    private void bindVariable(String variableName, String methodName, Event event, Map<String, Object> params)
+    {
+        try {
+            Method getMessageMethod = event.getClass().getMethod(methodName);
+            params.put(variableName, getMessageMethod.invoke(event));
+        } catch (Exception e) {
+            // No such method, don't bind anything
         }
     }
 }

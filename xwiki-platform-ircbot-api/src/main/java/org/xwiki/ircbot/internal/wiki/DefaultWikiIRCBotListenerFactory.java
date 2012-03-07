@@ -32,10 +32,10 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
+import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
@@ -84,13 +84,6 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     private BlockRenderer plainTextBlockRenderer;
 
     /**
-     * We need to pass a reference to the Bot to the {@link WikiIRCBotListener} instances we create since they need
-     * to be able to send the result of their execution to the IRC Channel (if any).
-     */
-    @Inject
-    private IRCBot bot;
-
-    /**
      * Used to compute the id for a Wiki Bot Listener (it's the serialized form of the page containing the Objects).
      * Note that we use a compact serialization since Wiki Bot Listeners are registered for a given wiki only.
      */
@@ -112,7 +105,6 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         // Extract listener definition.
         String name = listenerDefinition.getStringValue(NAME_PROPERTY);
         String description = listenerDefinition.getStringValue(DESCRIPTION_PROPERTY);
-        int priority = listenerDefinition.getIntValue(PRIORITY_PROPERTY);
 
         // Extract listener events.
         Map<String, XDOM> events = new HashMap<String, XDOM>();
@@ -142,19 +134,11 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             }
         }
 
-        // If the priority is 0 then use the default priority since it means the Wiki Bot Listener has not defined it.
-        // Same for negative values.
-        BotListenerData botListenerData;
-        if (priority <= 0) {
-            botListenerData = new BotListenerData(this.entityReferenceSerializer.serialize(doc.getDocumentReference()),
-                name, description, true);
-        } else {
-            botListenerData = new BotListenerData(this.entityReferenceSerializer.serialize(doc.getDocumentReference()),
-                name, description, priority, true);
-        }
+        BotListenerData botListenerData = new BotListenerData(
+            this.entityReferenceSerializer.serialize(doc.getDocumentReference()), name, description, true);
 
         return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
-            this.plainTextBlockRenderer, this.bot, this.ircModel);
+            this.plainTextBlockRenderer, this.ircModel);
     }
 
     @Override

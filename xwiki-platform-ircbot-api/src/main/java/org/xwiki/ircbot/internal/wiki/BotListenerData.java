@@ -41,11 +41,6 @@ public class BotListenerData
     private String name;
 
     /**
-     * @see #getPriority()
-     */
-    private Integer priority;
-
-    /**
      * @see #getDescription()
      */
     private String description;
@@ -62,18 +57,7 @@ public class BotListenerData
      */
     public BotListenerData(String id, String name, String description)
     {
-        this(id, name, description, null);
-    }
-
-    /**
-     * @param id see {@link #getId()}
-     * @param name see {@link #getName()}
-     * @param description see {@link #getDescription()}
-     * @param priority see {@link #getPriority()}
-     */
-    public BotListenerData(String id, String name, String description, Integer priority)
-    {
-        this(id, name, description, priority, false);
+        this(id, name, description, false);
     }
 
     /**
@@ -84,22 +68,9 @@ public class BotListenerData
      */
     public BotListenerData(String id, String name, String description, boolean isWikiBotListener)
     {
-        this(id, name, description, null, false);
-    }
-
-    /**
-     * @param id see {@link #getId()}
-     * @param name see {@link #getName()}
-     * @param description see {@link #getDescription()}
-     * @param priority see {@link #getPriority()}
-     * @param isWikiBotListener see {@link #isWikiBotListener()}
-     */
-    public BotListenerData(String id, String name, String description, Integer priority, boolean isWikiBotListener)
-    {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.priority = priority;
         this.isWikiBotListener = isWikiBotListener;
     }
 
@@ -136,14 +107,6 @@ public class BotListenerData
         return this.description;
     }
 
-    /**
-     * @return see {@link org.xwiki.ircbot.IRCBotListener#getPriority()}
-     */
-    public Integer getPriority()
-    {
-        return this.priority;
-    }
-
     @Override
     public boolean equals(Object object)
     {
@@ -161,7 +124,6 @@ public class BotListenerData
             .append(getId(), rhs.getId())
             .append(getName(), rhs.getName())
             .append(getDescription(), rhs.getDescription())
-            .append(getPriority(), rhs.getPriority())
             .append(isWikiBotListener(), rhs.isWikiBotListener())
             .isEquals();
     }
@@ -173,7 +135,6 @@ public class BotListenerData
             .append(getId())
             .append(getName())
             .append(getDescription())
-            .append(getPriority())
             .append(isWikiBotListener())
             .toHashCode();
     }

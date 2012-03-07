@@ -17,21 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot.internal.wiki;
+package org.xwiki.ircbot.internal;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.model.reference.DocumentReference;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.Socket;
+
+import org.pircbotx.InputThread;
+import org.pircbotx.PircBotX;
+import org.pircbotx.exception.IrcException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 
-@ComponentRole
-public interface WikiIRCModel
+public class ExtendedPircBotX extends PircBotX
 {
-    XWikiContext getXWikiContext() throws IRCBotException;
+    private boolean shouldStop;
 
-    XWikiDocument getDocument(DocumentReference reference) throws IRCBotException;
+    public boolean shouldStop()
+    {
+        return this.shouldStop;
+    }
 
-    XWikiDocument getConfigurationDocument() throws IRCBotException;
+    @Override
+    public synchronized void disconnect()
+    {
+        this.shouldStop = true;
+        super.disconnect();
+    }
+
+    @Override
+    public synchronized void connect(String hostname) throws IOException, IrcException
+    {
+        super.connect(hostname);
+        this.shouldStop = false;
+    }
 }

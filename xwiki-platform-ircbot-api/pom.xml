@@ -35,9 +35,9 @@
   <description>Java API for the IRC Bot Application</description>
   <dependencies>
     <dependency>
-      <groupId>pircbot</groupId>
-      <artifactId>pircbot</artifactId>
-      <version>1.5.0</version>
+      <groupId>org.pircbotx</groupId>
+      <artifactId>pircbotx</artifactId>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -70,6 +70,13 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Since we're mocking a class (PircBotX, see http://code.google.com/p/pircbotx/issues/detail?id=62) we need
+         those -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

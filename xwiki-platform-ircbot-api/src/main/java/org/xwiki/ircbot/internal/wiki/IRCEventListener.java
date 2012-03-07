@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.IRCEventListenerConfiguration;
+import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
@@ -112,7 +113,7 @@ public class IRCEventListener implements EventListener
                         getNotificationAuthor(event, document),
                         getNotificationComment(event, document),
                         getNotificationURL(event, document));
-                    this.bot.sendMessage(message);
+                    this.bot.sendMessage(this.bot.getChannelsNames().iterator().next(), message);
                 }
             } catch (IRCBotException e) {
                 // Failed to handle the event, log an error

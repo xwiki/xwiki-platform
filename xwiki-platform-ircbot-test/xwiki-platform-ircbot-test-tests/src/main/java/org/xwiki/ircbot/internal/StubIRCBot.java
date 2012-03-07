@@ -19,34 +19,92 @@
  */
 package org.xwiki.ircbot.internal;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Singleton;
 
+import org.pircbotx.PircBotX;
+import org.pircbotx.exception.IrcException;
+import org.pircbotx.hooks.managers.ListenerManager;
+import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.ircbot.IRCBot;
 
 /**
- * Stub IRC Bot for the functional tests. Extends the real IRC Bot implementation but ensures that nothing is sent
- * on the wire.
+ * Stub IRC Bot for the functional tests. Ensures that nothing is sent on the wire.
  *
  * @version $Id$
  * @since 4.0M1
  */
-@Component(roles = {IRCBot.class})
+@Component
 @Singleton
-public class StubIRCBot extends PircBotIRCBot implements Initializable
+public class StubIRCBot implements IRCBot
 {
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.pircBot = new StubPircBot(this);
-    }
+    private String hostname;
+
+    private List<String> messages = new ArrayList();
+
+    private ThreadedListenerManager listenerManager = new ThreadedListenerManager();
 
     public List<String> getMessages()
     {
-        return ((StubPircBot) this.pircBot).getMessages();
+        return this.messages;
+    }
+
+    @Override
+    public Set<String> getChannelsNames()
+    {
+        return Collections.singleton("channel");
+    }
+
+    @Override
+    public void connect(String hostname) throws IOException, IrcException
+    {
+        this.hostname = hostname;
+    }
+
+    @Override
+    public void disconnect()
+    {
+        this.hostname = null;
+    }
+
+    @Override
+    public void identify(String password)
+    {
+    }
+
+    @Override
+    public boolean isConnected()
+    {
+        // We consider that the bot is connected if the connect method has been called.
+        return this.hostname != null;
+    }
+
+    @Override
+    public void joinChannel(String channel)
+    {
+    }
+
+    @Override
+    public void sendMessage(String target, String message)
+    {
+        // Store the message sent in memory
+        this.messages.add(message);
+    }
+
+    @Override
+    public void setName(String botName)
+    {
+    }
+
+    @Override
+    public ListenerManager<? extends PircBotX> getListenerManager()
+    {
+        return this.listenerManager;
     }
 }

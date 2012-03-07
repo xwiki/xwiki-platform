@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1330685557000</creationDate>
-<date>1331122914000</date>
-<contentUpdateDate>1331122914000</contentUpdateDate>
+<date>1331128924000</date>
+<contentUpdateDate>1331128924000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -22,6 +22,31 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
+<class>
+<name>IRC.LoggingIRCBotListener</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<page>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>page</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Page</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</page>
+</class>
 <object>
 <class>
 <name>IRC.IRCBotListenerClass</name>
@@ -143,13 +168,12 @@
 </property>
 <property>
 <script>{{velocity}}
-#set ($date = $datetool.get('HH:mm'))
 #set ($irccontext = $services.ircbot.context)
-{{irclog channel="$irccontext.channel.name"}}
-$date &lt;${irccontext.user.nick}&gt; $irccontext.message
+{{irclog}}
+&lt;${irccontext.user.nick}&gt; $irccontext.message
 {{/irclog}}
 {{/velocity}}
-</script>
+      </script>
 </property>
 </object>
 <object>
@@ -208,13 +232,12 @@ $date &lt;${irccontext.user.nick}&gt; $irccontext.message
 </property>
 <property>
 <script>{{velocity}}
-#set ($date = $datetool.get('HH:mm'))
 #set ($irccontext = $services.ircbot.context)
-{{irclog channel="$irccontext.channel.name"}}
-$date &lt;${irccontext.user.nick}&gt; has joined $irccontext.channel.name
+{{irclog}}
+&lt;${irccontext.user.nick}&gt; has joined $irccontext.channel.name
 {{/irclog}}
 {{/velocity}}
-</script>
+      </script>
 </property>
 </object>
 <object>
@@ -273,13 +296,12 @@ $date &lt;${irccontext.user.nick}&gt; has joined $irccontext.channel.name
 </property>
 <property>
 <script>{{velocity}}
-#set ($date = $datetool.get('HH:mm'))
 #set ($irccontext = $services.ircbot.context)
-{{irclog channel="$irccontext.channel.name"}}
-$date &lt;${irccontext.user.nick}&gt; has left $irccontext.channel.name
+{{irclog}}
+&lt;${irccontext.user.nick}&gt; has left $irccontext.channel.name
 {{/irclog}}
 {{/velocity}}
-</script>
+      </script>
 </property>
 </object>
 <object>
@@ -338,13 +360,12 @@ $date &lt;${irccontext.user.nick}&gt; has left $irccontext.channel.name
 </property>
 <property>
 <script>{{velocity}}
-#set ($date = $datetool.get('HH:mm'))
 #set ($irccontext = $services.ircbot.context)
-{{irclog channel="$irccontext.user.channels.iterator().next().name"}}
-$date &lt;${irccontext.user.nick}&gt; has quit
+{{irclog}}
+&lt;${irccontext.user.nick}&gt; has quit
 {{/irclog}}
 {{/velocity}}
-</script>
+      </script>
 </property>
 </object>
 <object>
@@ -403,13 +424,12 @@ $date &lt;${irccontext.user.nick}&gt; has quit
 </property>
 <property>
 <script>{{velocity}}
-#set ($date = $datetool.get('HH:mm'))
 #set ($irccontext = $services.ircbot.context)
-{{irclog channel="$irccontext.bot.channelsNames.iterator().next()"}}
-$date &lt;${irccontext.oldNick}&gt; is now known as &lt;${irccontext.newNick}&gt;
+{{irclog}}
+&lt;${irccontext.oldNick}&gt; is now known as &lt;${irccontext.newNick}&gt;
 {{/irclog}}
 {{/velocity}}
-</script>
+      </script>
 </property>
 </object>
 <content></content></xwikidoc>

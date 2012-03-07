@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1330105914000</creationDate>
-<date>1330106032000</date>
-<contentUpdateDate>1330106032000</contentUpdateDate>
+<date>1331131267000</date>
+<contentUpdateDate>1331131267000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -119,6 +119,53 @@
 </property>
 <property>
 <server>irc.freenode.net</server>
+</property>
+</object>
+<object>
+<class>
+<name>IRC.LoggingIRCBotListener</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<page>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>page</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Page</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</page>
+</class>
+<name>IRC.IRCBotConfiguration</name>
+<number>0</number>
+<className>IRC.LoggingIRCBotListener</className>
+<guid>bfc1d12f-7bfe-4b2b-96a9-a99d97ff3cbf</guid>
+<property>
+<page>{{velocity}}
+#set ($irccontext = $services.ircbot.context)
+#set ($date = $datetool.get('yyyyMMdd'))
+#if ("$!irccontext" != "")
+  #set ($channel = "$irccontext.channel.name")
+  #if ("$!channel" == "")
+    #set ($channel = "$irccontext.bot.channelsNames.iterator().next()")
+  #end
+  #set ($channel = $stringtool.stripStart($channel, '#'))
+  IRC.${channel}Archive${date}
+#else
+IRC.xwikiArchive${date}
+#end
+{{/velocity}}</page>
 </property>
 </object>
 <content></content></xwikidoc>

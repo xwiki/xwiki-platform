@@ -21,8 +21,10 @@ package org.xwiki.ircbot.test.ui;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.ircbot.test.po.IRCBotConfigurationPage;
 import org.xwiki.ircbot.test.po.IRCBotPage;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.ViewPage;
 
 import junit.framework.Assert;
 
@@ -48,6 +50,12 @@ public class IRCBotTest extends AbstractTest
         getUtil().deletePage(getTestClassName(), getTestMethodName());
         String triggerPageName = getTestMethodName() + "NewPage";
         getUtil().deletePage(getTestClassName(), triggerPageName);
+        getUtil().deletePage("IRC", "testarchive");
+
+        // Configure the Logging Bot Listener to log into a fixed name page so that we can easily delete that page at
+        // the test start and find it easily to assert its content below.
+        IRCBotConfigurationPage configPage = IRCBotConfigurationPage.gotoPage();
+        configPage.setLoggingPage("IRC.testarchive");
 
         // Go to the main Bot home page
         IRCBotPage page = IRCBotPage.gotoPage();
@@ -78,18 +86,11 @@ public class IRCBotTest extends AbstractTest
 
         // We verify indirectly that the message was sent to the IRC channel by verifying that the Log Bot Listener
         // has archived the message. This also allows testing the Log Bot Listener.
-        //
-        // Note 1: We need to find the last page created matching "xwikitestArchive*" because we can't guess the page
-        // name with 100% probability (if the test executes around midnight then the current date might be different
-        // than the date used to create the archive page... ;)).
-        //
-        // Note 2: Since it can take some time for the message to appear on the channel and for it to be archived, we
-        // need to wait till the page it here.
-        String archivePageName = getUtil().executeContent(
-            "{{velocity}}\n"
-            + "$services.query.xwql(\"where doc.name like 'xwikitestArchive%' order by doc.creationDate desc\")."
-            + "setLimit(1).execute().get(0)\n"
-            + "{{/velocity}}");
+        ViewPage archivePage = getUtil().gotoPage("IRC", "testarchive");
+
+        // TODO: Need to wait till the content we expect is there
+        String content = archivePage.getContent();
+
         // TODO: add the wait and assert the content of the archive
 
         // Stop the Bot

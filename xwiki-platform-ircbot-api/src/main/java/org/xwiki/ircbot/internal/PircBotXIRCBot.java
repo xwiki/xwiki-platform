@@ -57,6 +57,10 @@ public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot, Initiali
     @Override
     public void initialize() throws InitializationException
     {
+        // We use a Fixed Thread Pool instead of the default Cached Thread Pool that PircBotX uses by default because
+        // we need to initialize each thread with an Execution Context (it's a ThreadLocal) and since we haven't found
+        // a way to clean up the Execution Context ThreadLocal when the thread dies, using a lot of short-lived threads
+        // (as it's done by the Cached Thread Pool) will slowly use up all memory...
         setListenerManager(new ThreadedListenerManager<PircBotX>(
             Executors.newFixedThreadPool(3, new XWikiContextualizedThreadFactory(this.execution,
                 this.executionContextManager, this.stubContextProvider))));

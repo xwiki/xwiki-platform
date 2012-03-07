@@ -18,12 +18,12 @@
   'borderColor'                      : '#E8E8E8',
   'linkColor'                        : '#528BA1',
   'highlightColor'                   : '#FFFFDD',
-  'fieldGradientColor'               : '',
+  'fieldGradientColor'               : '#F5F5F5',
   'menuBackgroundColor'              : '#ECECEC',
-  'menuGradientColor'                : '',
+  'menuGradientColor'                : '#FFFFFF',
   'menuLinkColor'                    : '#4D5860',
   'menuContentBackgroundColor'       : '#ECECEC',
-  'menuContentGradientColor'         : '',
+  'menuContentGradientColor'         : '#FFFFFF',
   'menuContentLinkColor'             : '#4D5860', 
   'menuSelectedEntryBackgroundColor' : '#FFFFFF',
   'menuSelectedEntryLinkColor'       : '#4D5860',
@@ -32,17 +32,17 @@
   'submenuContentBackgroundColor'    : '#ECECEC', 
   'panelBackgroundColor'             : '#FFFFFF',
   'panelHeaderBackgroundColor'       : '#ECECEC',
-  'panelHeaderGradientColor'         : '',
+  'panelHeaderGradientColor'         : '#FFFFFF',
   'panelHeaderTextColor'             : '#4D5860',
   'panelTextColor'                   : '#4D4D4D',
   'panelCollapsedBackgroundColor'    : '#ECECEC',
-  'panelCollapsedGradientColor'      : '',
+  'panelCollapsedGradientColor'      : '#FFFFFF',
   'panelCollapsedTextColor'          : '#4D5860',
   'buttonPrimaryBackgroundColor'     : '#528BA1',
-  'buttonPrimaryGradientColor'       : '',
+  'buttonPrimaryGradientColor'       : '#528BA1',
   'buttonPrimaryTextColor'           : '#FFFFFF',
   'buttonSecondaryBackgroundColor'   : '#ECECEC',
-  'buttonSecondaryGradientColor'     : '',
+  'buttonSecondaryGradientColor'     : '#FFFFFF',
   'buttonSecondaryTextColor'         : '#4D5860',
   'backgroundSecondaryColor'         : '#F3F3F3',
   'notificationInfoColor'            : '#336699',
@@ -64,7 +64,7 @@
     #set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
   #end
   #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
-  #set ($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass', true))
+  #set ($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass'))
 #end
 #if ("$!themeObj" != '')
   #foreach ($prop in $themeObj.properties)
@@ -79,5 +79,14 @@
          #set ($discard = $theme.put($prop.name, ''))
        #end
      #end
+  #end
+  #set ($gradientColorsToRemove = [])
+  #foreach ($prop in $theme.entrySet())
+    #if ($prop.key.endsWith('GradientColor') && "$!{themeObj.getProperty($prop.key).value}" == '')
+      #set ($discard = $gradientColorsToRemove.add($prop.key))
+    #end
+  #end
+  #foreach ($prop in $gradientColorsToRemove)
+    #set ($discard = $theme.put($prop, ''))
   #end
 #end

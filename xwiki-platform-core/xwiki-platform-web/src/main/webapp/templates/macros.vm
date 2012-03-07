@@ -2231,6 +2231,24 @@ Wysiwyg.onModuleLoad(function() {
  *                'position' : stop position for the color (between 0% and 100% or a lenght)
  *#
 #macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
+  ## Older color themes don't have values defined for the gradients, so we'll use a simple background-color instead
+  #set ($validColors = 0)
+  #set ($validColor = '')
+  #foreach ($colorEntry in $gradientData.colors)
+    #if ("$!{colorEntry.color}" != '')
+      #set ($validColors = $validColors + 1)
+      #set ($validColor = $colorEntry.color)
+    #end
+  #end
+  #if ($validColors <= 1)
+    #if ("$!{icon}" != '')
+      background-image: ${icon};
+    #end
+    #if ("$!{validColor}" != '')
+      background-color: ${validColor};
+    #end
+    #break($macro)
+  #end
   #set ($browserVariants = ['-moz-', '-webkit-', '-o-', '-ms-', ''])
   #set ($colors = '')
   #if ($gradientData.angle)

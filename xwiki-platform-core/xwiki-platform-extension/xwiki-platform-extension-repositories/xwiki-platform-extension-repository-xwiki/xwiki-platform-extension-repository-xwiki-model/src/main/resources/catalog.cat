@@ -1,5 +1,0 @@
---
-    If the <catalog/> parameter isn't working, this link to schema A is
-    not recognized and the test will fail because of a missing schema.
---
-REWRITE_SYSTEM "http://xwiki.org/xwiki.rest.model.xsd" "classpath:xwiki.rest.model.xsd"

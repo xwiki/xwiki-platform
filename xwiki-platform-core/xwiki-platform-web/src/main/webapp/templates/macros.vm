@@ -2041,6 +2041,7 @@ var $jsVarName = {
 #set($ok = $parameters.put('fontNames', $services.wysiwyg.config.getFontNames()))
 #set($ok = $parameters.put('fontSizes', $services.wysiwyg.config.getFontSizes()))
 #set($ok = $parameters.put('styleNames', $services.wysiwyg.config.getStyleNames()))
+#set($ok = $parameters.put('historySize', $services.wysiwyg.config.getHistorySize()))
 #set($ok = $parameters.put('wiki', $editedDocument.wiki))
 #set($ok = $parameters.put('space', $editedDocument.space))
 #set($ok = $parameters.put('page', $editedDocument.name))

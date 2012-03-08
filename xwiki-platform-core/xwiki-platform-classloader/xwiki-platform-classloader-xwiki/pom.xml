@@ -26,17 +26,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-extension</artifactId>
+    <artifactId>xwiki-platform-classloader</artifactId>
     <version>4.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-xwiki</artifactId>
-  <name>XWiki Platform - Extension - XWiki</name>
+  <artifactId>xwiki-platform-classloader-xwiki</artifactId>
+  <name>XWiki Platform - Classloader - XWiki</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - XWiki</description>
+  <description>XWiki Platform - Classloader - XWiki</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-handler-jar</artifactId>
+      <artifactId>xwiki-commons-classloader-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

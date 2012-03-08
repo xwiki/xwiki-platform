@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xwiki.internal;
+package org.xwiki.classloader.xwiki.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,14 +39,14 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  */
 @Component
 @Singleton
-@Named("jarextension")
-public class JarExtensionExecutionContextInitializer implements ExecutionContextInitializer
+@Named("threadclassloader")
+public class ThreadClassloaderExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
      * Used to get the classloader corresponding to the current wiki.
      */
     @Inject
-    private ClassLoaderManager jarExtensionClassLoader;
+    private ClassLoaderManager classLoaderManager;
 
     /**
      * Used to get the current wiki.
@@ -61,8 +61,7 @@ public class JarExtensionExecutionContextInitializer implements ExecutionContext
         String currentWikiId = this.provider.getDefaultValue(EntityType.WIKI);
 
         NamespaceURLClassLoader extensionClassLoader =
-            this.jarExtensionClassLoader.getURLClassLoader(currentWikiId != null ? "wiki:" + currentWikiId : null,
-                false);
+            this.classLoaderManager.getURLClassLoader(currentWikiId != null ? "wiki:" + currentWikiId : null, false);
 
         if (extensionClassLoader != null) {
             Thread.currentThread().setContextClassLoader(extensionClassLoader);

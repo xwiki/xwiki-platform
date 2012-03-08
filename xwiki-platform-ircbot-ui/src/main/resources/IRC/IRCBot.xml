@@ -161,6 +161,7 @@ To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCBo
 A Bot listener allows to add features to the IRC channel (such as logging messages in the wiki, searching the wiki directly from IRC, etc).
 
 {{velocity}}
+(% id="listenertable" %)
 |=Name|=Description|=Is started?
 #set ($statuses = $botManager.getBotListenerStatuses())
 #foreach ($status in $statuses.keySet())

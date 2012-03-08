@@ -19,6 +19,9 @@
  */
 package org.xwiki.ircbot.test.po;
 
+import java.util.List;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -57,5 +60,23 @@ public class IRCBotPage extends ViewPage
     public boolean isBotStarted()
     {
         return this.actionButton.getAttribute("value").equalsIgnoreCase("Stop the IRC Bot");
+    }
+
+    /**
+     * @param botListenerName the name of the listener bot (eg "Log")
+     * @return true if the bot is displayed as started or false otherwise
+     */
+    public boolean isBotListenerStarted(String botListenerName)
+    {
+        boolean result = false;
+
+        List<WebElement> tds = getDriver().findElements(By.xpath("//table[@id='listenertable']//tr/td"));
+        for (int i = 0; i < tds.size(); i++) {
+            if (tds.get(i).getText().equals(botListenerName)) {
+                result = tds.get(i + 2).findElement(By.tagName("img")).getAttribute("alt").equalsIgnoreCase("accept");
+                break;
+            }
+        }
+        return result;
     }
 }

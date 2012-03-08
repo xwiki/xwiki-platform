@@ -139,6 +139,14 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     {
         if (this.bot.isConnected()) {
             this.bot.disconnect();
+            // Wait for the IRC Server to be fully stopped
+            while (this.bot.isConnected()) {
+                try {
+                    Thread.sleep(100L);
+                } catch (InterruptedException e) {
+                    throw new IRCBotException("Failed to fully wait for IRC client termination", e);
+                }
+            }
         }
 
         // Unregister after disconnecting the Bot to allow the listeners to receive all the events till the last moment.

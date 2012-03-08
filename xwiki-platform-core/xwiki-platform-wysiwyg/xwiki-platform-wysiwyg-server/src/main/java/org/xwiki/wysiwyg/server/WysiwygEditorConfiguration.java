@@ -94,4 +94,9 @@ public interface WysiwygEditorConfiguration
      * @return the list of style names available in the style picker
      */
     String getStyleNames();
+
+    /**
+     * @return the maximum number of history entries that will be stored
+     */
+    Integer getHistorySize();
 }

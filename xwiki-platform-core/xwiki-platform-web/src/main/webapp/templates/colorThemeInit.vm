@@ -89,4 +89,14 @@
   #foreach ($prop in $gradientColorsToRemove)
     #set ($discard = $theme.put($prop, ''))
   #end
+  ## For old themes that don't have separate values for #mainmenu and #contentmenu overwrite #contentmenu values with the ones from the #mainmenu
+  #if ("$!{themeObj.getProperty('menuContentLinkColor').value}" == '')
+    #set ($discard = $theme.put('menuContentLinkColor', "$!{themeObj.getProperty('menuLinkColor').value}"))
+  #end
+  #if ("$!{themeObj.getProperty('menuContentBackgroundColor').value}" == '')
+    #set ($discard = $theme.put('menuContentBackgroundColor', "$!{themeObj.getProperty('menuBackgroundColor').value}"))
+  #end
+  #if ("$!{themeObj.getProperty('submenuContentBackgroundColor').value}" == '')
+    #set ($discard = $theme.put('submenuContentBackgroundColor', "$!{themeObj.getProperty('menuBackgroundColor').value}"))
+  #end
 #end

@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - ClassLoader - Protocols - Parent POM</description>
   <modules>
-    <module>xwiki-platform-classloader-protocol-jar</module>
     <module>xwiki-platform-classloader-protocol-attachmentjar</module>
   </modules>
 </project>

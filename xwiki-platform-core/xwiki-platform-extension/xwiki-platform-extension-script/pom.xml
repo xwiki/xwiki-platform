@@ -35,8 +35,8 @@
   <description>XWiki Platform - Extension - Script</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-api</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   

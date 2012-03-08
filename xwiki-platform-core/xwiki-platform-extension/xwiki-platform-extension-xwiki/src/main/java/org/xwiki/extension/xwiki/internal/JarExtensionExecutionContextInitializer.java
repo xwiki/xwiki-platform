@@ -23,12 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.extension.jar.internal.handler.ExtensionURLClassLoader;
-import org.xwiki.extension.jar.internal.handler.JarExtensionClassLoader;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
@@ -46,7 +46,7 @@ public class JarExtensionExecutionContextInitializer implements ExecutionContext
      * Used to get the classloader corresponding to the current wiki.
      */
     @Inject
-    private JarExtensionClassLoader jarExtensionClassLoader;
+    private ClassLoaderManager jarExtensionClassLoader;
 
     /**
      * Used to get the current wiki.
@@ -60,7 +60,7 @@ public class JarExtensionExecutionContextInitializer implements ExecutionContext
     {
         String currentWikiId = this.provider.getDefaultValue(EntityType.WIKI);
 
-        ExtensionURLClassLoader extensionClassLoader =
+        NamespaceURLClassLoader extensionClassLoader =
             this.jarExtensionClassLoader.getURLClassLoader(currentWikiId != null ? "wiki:" + currentWikiId : null,
                 false);
 

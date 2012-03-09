@@ -60,7 +60,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
     @Override
     public void initialize(XWikiContext context)
     {
-        this.initialContext = (XWikiContext) context.clone();
+        this.initialContext = context.clone();
 
         this.initialContext.setCacheDuration(0);
 
@@ -98,7 +98,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         XWikiContext stubContext;
 
         if (this.initialContext != null) {
-            stubContext = (XWikiContext) this.initialContext.clone();
+            stubContext = this.initialContext.clone();
 
             // We make sure to not share the same Request instance with several threads
             if (this.initialContext.getRequest() != null) {

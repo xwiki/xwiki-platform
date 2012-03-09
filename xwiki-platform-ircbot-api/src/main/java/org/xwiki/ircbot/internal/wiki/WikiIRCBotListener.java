@@ -109,11 +109,15 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                 // to them to the Bot Listener.
                 addBindings(event);
 
+                // Important: we clone the XDOM so that the transformation will not modify it. Otherwise next time
+                // this listener runs, it'll simply return the already transformed XDOM.
+                XDOM temporaryXDOM = xdom.clone();
+
                 // Execute the Macro Transformation on XDOM and send the result to the IRC server
-                TransformationContext txContext = new TransformationContext(xdom, this.syntax);
-                this.macroTransformation.transform(xdom, txContext);
+                TransformationContext txContext = new TransformationContext(temporaryXDOM, this.syntax);
+                this.macroTransformation.transform(temporaryXDOM, txContext);
                 DefaultWikiPrinter printer = new DefaultWikiPrinter();
-                this.plainTextBlockRenderer.render(xdom, printer);
+                this.plainTextBlockRenderer.render(temporaryXDOM, printer);
 
                 String executionResult = StringUtils.trim(printer.toString());
                 if (!StringUtils.isEmpty(executionResult)) {

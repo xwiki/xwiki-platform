@@ -24,8 +24,8 @@ import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.TablePlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.util.TableUtils;
 
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.TableCellElement;
-import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableRowElement;
 
 /**
@@ -52,38 +52,31 @@ public class DeleteRow extends AbstractTableFeature
         super(NAME, new Command(NAME), Strings.INSTANCE.deleteRow(), plugin);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
-        TableCellElement caretCell =
-            TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
-        TableRowElement row = TableUtils.getInstance().getRow(caretCell);
-        TableElement table = TableUtils.getInstance().getTable(row);
+        Node selectedNode = TableUtils.getInstance().getCaretNode(rta.getDocument());
 
-        // Move caret
-        TableCellElement newCaretCell = TableUtils.getInstance().getPreviousCellInColumn(caretCell);
-        if (newCaretCell == null) {
-            newCaretCell = TableUtils.getInstance().getNextCellInColumn(caretCell);
-        }
-        if (newCaretCell != null) {
-            TableUtils.getInstance().putCaretInNode(rta, newCaretCell);
+        // If the selection is inside a table cell then move the caret to the previous/next cell on the same column.
+        TableCellElement selectedCell = TableUtils.getInstance().getCell(selectedNode);
+        if (selectedCell != null) {
+            TableCellElement newCaretCell = TableUtils.getInstance().getPreviousCellInColumn(selectedCell);
+            if (newCaretCell == null) {
+                newCaretCell = TableUtils.getInstance().getNextCellInColumn(selectedCell);
+            }
+            if (newCaretCell != null) {
+                TableUtils.getInstance().putCaretInNode(rta, newCaretCell);
+            }
         }
 
-        // delete row
-        table.deleteRow(row.getRowIndex());
+        // Delete the selected table row.
+        TableRowElement selectedRow = TableUtils.getInstance().getRow(selectedNode);
+        TableUtils.getInstance().getTable(selectedRow).deleteRow(selectedRow.getRowIndex());
 
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled()

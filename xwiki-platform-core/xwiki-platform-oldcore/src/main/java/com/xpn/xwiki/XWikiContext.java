@@ -118,8 +118,6 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private int classCacheSize = 20;
 
-    private int archiveCacheSize = 20;
-
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     @SuppressWarnings("unchecked")

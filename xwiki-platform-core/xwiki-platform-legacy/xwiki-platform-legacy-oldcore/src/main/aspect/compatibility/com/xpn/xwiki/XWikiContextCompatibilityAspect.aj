@@ -50,4 +50,53 @@ public privileged aspect XWikiContextCompatibilityAspect
     {
         // this.virtual = virtual;
     }
+
+    /**
+     * Add a {@link XWikiDocumentArchive document archive} in a cache associated with this context, so that future
+     * access requests for the same document archive don't go through the database again.
+     *
+     * @param key the key used to identify a document archive in the cache
+     * @param archive the {@link XWikiDocumentArchive document archive} to cache
+     */
+    @Deprecated
+    public void addDocumentArchive(String key, XWikiDocumentArchive archive)
+    {
+        // Don't do anything, see XWIKI-7585
+    }
+
+    /**
+     * Get the cached {@link XWikiDocumentArchive document archive} from the context, if any.
+     *
+     * @param key the key used to identify a document archive in the cache
+     * @return the document archive, if it does exist in the context cache, or {@code null} otherwise
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
+    @Deprecated
+    public XWikiDocumentArchive getDocumentArchive(String key)
+    {
+        // Don't do anything, see XWIKI-7585
+    }
+
+    /**
+     * Remove the cached {@link XWikiDocumentArchive document archive} from the context.
+     *
+     * @param key the key used to identify a document archive in the cache
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
+    @Deprecated
+    public void removeDocumentArchive(String key)
+    {
+        // Don't do anything, see XWIKI-7585
+    }
+
+    /**
+     * Empty the document archive cache.
+     *
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
+    @Deprecated
+    public void flushArchiveCache()
+    {
+        // Don't do anything, see XWIKI-7585
+    }
 }

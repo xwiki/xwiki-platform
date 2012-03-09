@@ -21,7 +21,7 @@ package org.xwiki.ircbot;
 
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Listener;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * IRC Bot Listeners allows to perform some actions in answer to some IRC channel event. For example you may want to
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 4.0M1
  */
-@ComponentRole
+@Role
 public interface IRCBotListener<T extends PircBotX> extends Listener<T>
 {
     /**

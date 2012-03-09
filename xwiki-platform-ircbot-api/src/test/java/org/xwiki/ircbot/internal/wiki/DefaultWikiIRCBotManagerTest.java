@@ -74,7 +74,7 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
         final List<BotListenerData> listenerData = Arrays.asList(
             new BotListenerData("space.page", "wikiname", "wikidescription"));
         final DocumentReferenceResolver<String> resolver =
-            getComponentManager().lookupComponent(DocumentReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentReference wikiBotListenerReference = new DocumentReference("wiki", "space", "page");
         final ComponentManager componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
         final WikiIRCBotListenerFactory factory = getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);

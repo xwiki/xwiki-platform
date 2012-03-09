@@ -19,6 +19,7 @@
  */
 package org.xwiki.ircbot.internal.wiki;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,8 @@ public class WikiIRCBotScriptService implements ScriptService
      */
     private static final String ERROR_KEY = "scriptservice.ircbot.error";
 
-    private static final String PR_REQUIRED = "This action requires Programming Rights";
+    private static final String RIGHTS_REQUIRED = "This action requires to be logged on the main wiki and to have "
+        + "Admin rights.";
 
     @Inject
     private WikiIRCBotManager botManager;
@@ -90,7 +92,7 @@ public class WikiIRCBotScriptService implements ScriptService
                 setError(e);
             }
         } else {
-            setError(new IRCBotException(PR_REQUIRED));
+            setError(new IRCBotException(RIGHTS_REQUIRED));
         }
     }
 
@@ -103,7 +105,7 @@ public class WikiIRCBotScriptService implements ScriptService
                 setError(e);
             }
         } else {
-            setError(new IRCBotException(PR_REQUIRED));
+            setError(new IRCBotException(RIGHTS_REQUIRED));
         }
     }
 
@@ -119,7 +121,7 @@ public class WikiIRCBotScriptService implements ScriptService
         try {
             for (BotListenerData listenerData : this.botManager.getBotListenerData()) {
                 statuses.put(listenerData,
-                    this.componentManager.hasComponent(IRCBotListener.class, listenerData.getId()));
+                    this.componentManager.hasComponent((Type) IRCBotListener.class, listenerData.getId()));
             }
         } catch (IRCBotException e) {
             statuses = null;

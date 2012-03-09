@@ -21,7 +21,7 @@ package org.xwiki.ircbot.wiki;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.internal.wiki.BotListenerData;
 import org.xwiki.model.reference.DocumentReference;
@@ -32,7 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 4.0M1
  */
-@ComponentRole
+@Role
 public interface WikiIRCBotManager
 {
     /**

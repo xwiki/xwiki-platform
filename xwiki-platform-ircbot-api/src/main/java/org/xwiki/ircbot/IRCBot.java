@@ -25,7 +25,7 @@ import java.util.Set;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.managers.ListenerManager;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Represents an IRC Bot.
@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 4.0M1
  */
-@ComponentRole
+@Role
 public interface IRCBot
 {
     void setName(String botName);

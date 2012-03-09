@@ -121,7 +121,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
 
                 XDOM eventScriptXDOM;
                 try {
-                    Parser parser = this.componentManager.lookup(Parser.class, doc.getSyntax().toIdString());
+                    Parser parser = this.componentManager.lookupComponent(Parser.class, doc.getSyntax().toIdString());
                     eventScriptXDOM = parser.parse(new StringReader(eventScript));
                 } catch (ComponentLookupException e) {
                     throw new IRCBotException(

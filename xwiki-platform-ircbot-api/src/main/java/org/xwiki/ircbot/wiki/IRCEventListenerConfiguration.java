@@ -22,7 +22,7 @@ package org.xwiki.ircbot.wiki;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.ircbot.IRCBotException;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.ircbot.IRCBotException;
  * @version $Id$
  * @since 4.0M1
  */
-@ComponentRole
+@Role
 public interface IRCEventListenerConfiguration
 {
     /**

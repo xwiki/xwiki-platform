@@ -61,7 +61,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     private Execution execution;
 
     @Inject
-    private EntityReferenceSerializer defaultSerializer;
+    private EntityReferenceSerializer<String> defaultSerializer;
 
     @Inject
     @Named("compactwiki")
@@ -82,7 +82,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
             doc = xwikiContext.getWiki().getDocument(reference, xwikiContext);
         } catch (XWikiException e) {
             throw new IRCBotException(String.format("Unable to load document [%s]",
-                this.defaultSerializer.serialize(reference), e));
+                this.defaultSerializer.serialize(reference)), e);
         }
         return doc;
     }

@@ -31,14 +31,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -225,11 +225,12 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // lookup
 
-        this.taskManager = getComponentManager().lookup(JobManager.class);
-        this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class, "xar");
+        this.taskManager = getComponentManager().lookupComponent(JobManager.class);
+        this.localExtensionRepository = getComponentManager().lookupComponent(LocalExtensionRepository.class, "xar");
 
         // Get rid of wiki macro listener
-        getComponentManager().lookup(ObservationManager.class).removeListener("RegisterMacrosOnImportListener");
+        getComponentManager().<ObservationManager> lookupComponent(ObservationManager.class).removeListener(
+            "RegisterMacrosOnImportListener");
     }
 
     private XarLocalExtension install(ExtensionId extensionId, String wiki) throws Throwable

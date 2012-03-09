@@ -61,6 +61,7 @@ import org.xwiki.observation.event.Event;
  * Local repository proxy for XAR extensions.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
 @Component
 @Singleton

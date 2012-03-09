@@ -42,6 +42,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class DocumentImporterHandler extends DocumentHandler
 {
     private XarFile previousXarFile;

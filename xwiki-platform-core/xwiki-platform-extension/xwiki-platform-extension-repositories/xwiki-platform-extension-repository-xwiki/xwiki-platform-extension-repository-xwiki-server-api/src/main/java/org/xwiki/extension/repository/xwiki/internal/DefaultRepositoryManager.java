@@ -146,6 +146,7 @@ public class DefaultRepositoryManager implements RepositoryManager
         return getDocument(documentNames.get(0));
     }
 
+    @Override
     public BaseObject getExtensionVersion(XWikiDocument document, Version version)
     {
         List<BaseObject> objects = document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);

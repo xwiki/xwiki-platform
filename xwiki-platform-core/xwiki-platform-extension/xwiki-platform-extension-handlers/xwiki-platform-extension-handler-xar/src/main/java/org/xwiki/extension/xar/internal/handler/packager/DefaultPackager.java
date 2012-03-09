@@ -70,6 +70,7 @@ import com.xpn.xwiki.internal.event.XARImportingEvent;
  * Default implementation of {@link Packager}.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
 @Component
 @Singleton

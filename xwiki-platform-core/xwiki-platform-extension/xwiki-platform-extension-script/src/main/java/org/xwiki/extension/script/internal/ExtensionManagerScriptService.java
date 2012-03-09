@@ -38,11 +38,7 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobException;
-import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
-import org.xwiki.extension.job.event.status.JobStatus;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.InstallPlanJob;
 import org.xwiki.extension.job.internal.UninstallJob;
@@ -62,6 +58,10 @@ import org.xwiki.extension.version.VersionRange;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersionRange;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobManager;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
 
 /**

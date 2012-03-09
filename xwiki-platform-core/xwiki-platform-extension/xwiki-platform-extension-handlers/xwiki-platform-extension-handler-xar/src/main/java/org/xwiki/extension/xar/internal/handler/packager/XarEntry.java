@@ -24,6 +24,11 @@ import java.util.zip.ZipEntry;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarEntry
 {
     private EntityReference documentReference;

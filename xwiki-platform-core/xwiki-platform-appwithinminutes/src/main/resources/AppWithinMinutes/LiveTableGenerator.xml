@@ -174,7 +174,7 @@ ${escapetool.h}set(${escapetool.d}msg = ${escapetool.d}originalMsg)
 #end
 {{/velocity}}
 
-{{velocity}}
+{{velocity wiki="false"}}
 #if($request.collist)
   #outputLiveTableResults()
 #else

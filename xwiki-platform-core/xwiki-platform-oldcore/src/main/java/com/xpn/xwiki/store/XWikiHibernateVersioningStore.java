@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -139,24 +138,17 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         if (archiveDoc != null) {
             return archiveDoc;
         }
-        String key = getDocumentArchiveKey(doc);
 
-        archiveDoc = context.getDocumentArchive(key);
-        if (archiveDoc == null) {
-            String db = context.getDatabase();
-            try {
-                if (doc.getDatabase() != null) {
-                    context.setDatabase(doc.getDatabase());
-                }
-                archiveDoc = new XWikiDocumentArchive(doc.getId());
-                loadXWikiDocArchive(archiveDoc, true, context);
-                doc.setDocumentArchive(archiveDoc);
-            } finally {
-                context.setDatabase(db);
+        String db = context.getDatabase();
+        try {
+            if (doc.getDatabase() != null) {
+                context.setDatabase(doc.getDatabase());
             }
-            // This will also make sure that the Archive has a strong reference
-            // and will not be discarded as long as the context exists.
-            context.addDocumentArchive(key, archiveDoc);
+            archiveDoc = new XWikiDocumentArchive(doc.getId());
+            loadXWikiDocArchive(archiveDoc, true, context);
+            doc.setDocumentArchive(archiveDoc);
+        } finally {
+            context.setDatabase(db);
         }
         return archiveDoc;
     }
@@ -312,7 +304,6 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        context.removeDocumentArchive(getDocumentArchiveKey(doc));
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
             @Override
@@ -323,22 +314,5 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 return null;
             }
         });
-    }
-
-    /**
-     * Compute a unique key that can be used to identify a specific document's archive. This key is used to store and
-     * retrieve an already loaded document archive into a temporary cache attached to the current request context.
-     * 
-     * @param doc the document for which to compute the key
-     * @return the key used to identify a document archive in the
-     *         {@link XWikiContext#addDocumentArchive(String, XWikiDocumentArchive) context cache}
-     */
-    private String getDocumentArchiveKey(XWikiDocument doc)
-    {
-        String key = this.referenceSerializer.serialize(doc.getDocumentReference());
-        if (StringUtils.isNotEmpty(doc.getLanguage())) {
-            key += ':' + doc.getLanguage();
-        }
-        return key;
     }
 }

@@ -70,7 +70,6 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
         // Cleanup
         this.initialContext.flushClassCache();
-        this.initialContext.flushArchiveCache();
 
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host

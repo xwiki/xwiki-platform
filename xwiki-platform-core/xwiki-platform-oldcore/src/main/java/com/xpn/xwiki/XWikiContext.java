@@ -37,7 +37,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -125,12 +124,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     @SuppressWarnings("unchecked")
     private Map<DocumentReference, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
-
-    // Used to avoid reloading archives in the same request
-    // FIXME: why synchronized since a context is supposed to be tied to a thread ?
-    @SuppressWarnings("unchecked")
-    private Map<String, XWikiDocumentArchive> archiveCache = Collections.synchronizedMap(new LRUMap(
-        this.archiveCacheSize));
 
     // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
@@ -607,51 +600,6 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.classCache.clear();
     }
 
-    /**
-     * Add a {@link XWikiDocumentArchive document archive} in a cache associated with this context, so that future
-     * access requests for the same document archive don't go through the database again.
-     * 
-     * @param key the key used to identify a document archive in the cache
-     * @param archive the {@link XWikiDocumentArchive document archive} to cache
-     */
-    public void addDocumentArchive(String key, XWikiDocumentArchive archive)
-    {
-        this.archiveCache.put(key, archive);
-    }
-
-    /**
-     * Get the cached {@link XWikiDocumentArchive document archive} from the context, if any.
-     * 
-     * @param key the key used to identify a document archive in the cache
-     * @return the document archive, if it does exist in the context cache, or {@code null} otherwise
-     * @see #addDocumentArchive(String, XWikiDocumentArchive)
-     */
-    public XWikiDocumentArchive getDocumentArchive(String key)
-    {
-        return this.archiveCache.get(key);
-    }
-
-    /**
-     * Remove the cached {@link XWikiDocumentArchive document archive} from the context.
-     * 
-     * @param key the key used to identify a document archive in the cache
-     * @see #addDocumentArchive(String, XWikiDocumentArchive)
-     */
-    public void removeDocumentArchive(String key)
-    {
-        this.archiveCache.remove(key);
-    }
-
-    /**
-     * Empty the document archive cache.
-     * 
-     * @see #addDocumentArchive(String, XWikiDocumentArchive)
-     */
-    public void flushArchiveCache()
-    {
-        this.archiveCache.clear();
-    }
-
     public void setLinksAction(String action)
     {
         put("links_action", action);
@@ -776,14 +724,8 @@ public class XWikiContext extends Hashtable<Object, Object>
         XWikiContext context = (XWikiContext) super.clone();
 
         // Make sure to have unique instances of the various caches
-
         context.displayedFields = Collections.synchronizedList(new ArrayList<String>(this.displayedFields));
-
-        // Reset caches
-
         context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
-
-        context.archiveCache = Collections.synchronizedMap(new LRUMap(this.archiveCacheSize));
 
         return context;
     }

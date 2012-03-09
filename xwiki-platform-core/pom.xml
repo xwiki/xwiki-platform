@@ -328,6 +328,8 @@
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
                 <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
                 <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
+                <!-- Exclude needed because of http://jira.xwiki.org/browse/XWIKI-7585 -->
+                <exclude>com/xpn/xwiki/XWikiContext</exclude>
               </excludes>
             </configuration>
           </plugin>

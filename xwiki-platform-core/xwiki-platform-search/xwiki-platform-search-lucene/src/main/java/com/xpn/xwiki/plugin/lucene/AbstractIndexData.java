@@ -72,7 +72,7 @@ public abstract class AbstractIndexData
      * </ul>
      * 
      * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
-     *        content in the default language will be used.
+     *            content in the default language will be used.
      */
     public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
     {
@@ -158,12 +158,14 @@ public abstract class AbstractIndexData
 
     public String getDocumentFullName()
     {
-        return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getEntityReference());
+        return Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING, "local")
+            .serialize(getEntityReference());
     }
 
     public String getFullName()
     {
-        return (String) Utils.getComponent(EntityReferenceSerializer.class).serialize(getEntityReference());
+        return Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
+            getEntityReference());
     }
 
     // Object

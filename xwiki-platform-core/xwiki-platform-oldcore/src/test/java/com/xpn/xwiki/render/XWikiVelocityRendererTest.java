@@ -48,11 +48,6 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
 
     private XWikiDocument contentDocument;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {

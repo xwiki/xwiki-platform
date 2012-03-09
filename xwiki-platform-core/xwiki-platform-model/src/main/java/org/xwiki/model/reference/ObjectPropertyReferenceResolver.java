@@ -19,20 +19,39 @@
  */
 package org.xwiki.model.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import java.lang.reflect.ParameterizedType;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 
 /**
- * Resolve a Property reference defined in a given representation into a validated {@link ObjectPropertyReference} object,
- * i.e. with valid values and a valid hierarchy (e.g. a Property reference must have a parent which is an object
+ * Resolve a Property reference defined in a given representation into a validated {@link ObjectPropertyReference}
+ * object, i.e. with valid values and a valid hierarchy (e.g. a Property reference must have a parent which is an object
  * reference, reference values must not be null, etc).
  * 
  * @param <T> the type of the representation (e.g. a String)
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface ObjectPropertyReferenceResolver<T>
 {
+    /**
+     * Type instance for EntityReferenceResolver<String>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, ObjectPropertyReferenceResolver.class,
+        String.class);
+
+    /**
+     * Type instance for EntityReferenceResolver<EntityReference>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_REFERENCE = new DefaultParameterizedType(null, ObjectPropertyReferenceResolver.class,
+        EntityReference.class);
+
     /**
      * @param propertyReferenceRepresentation the representation of an object reference (e.g. as a String)
      * @return the valid resolved object reference as an object

@@ -22,8 +22,11 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class ViewrevAction extends XWikiAction {
-    public String render(XWikiContext context) throws XWikiException {
+public class ViewrevAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         try {
             handleRevision(context);
         } catch (XWikiException e) {

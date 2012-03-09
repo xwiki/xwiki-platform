@@ -33,7 +33,8 @@ import org.xwiki.component.annotation.ComponentRole;
  * {@link org.xwiki.annotation.io.IOService and org.xwiki.annotation.io.IOTargetService}. <br />
  * 
  * @version $Id$
- * @see {@link org.xwiki.annotation.io.IOTargetService}, {@link org.xwiki.annotation.io.IOTargetService}
+ * @see org.xwiki.annotation.io.IOTargetService
+ * @see org.xwiki.annotation.io.IOTargetService
  * @since 2.3M1
  */
 @ComponentRole
@@ -53,10 +54,11 @@ public interface AnnotationService
     String getAnnotatedHTML(String sourceReference) throws AnnotationServiceException;
 
     /**
-     * Returns result obtained by rendering with annotations markers the source referenced by the {@code
-     * sourceReference} parsed in {@code sourceSyntax}. The list of annotations to be added markers for is passed in the
-     * {@code annotations} parameter. Note that no test is done on the actual target of the annotations in the passed
-     * list, they will all be rendered, as long as their selected text and context can be identified in the content.
+     * Returns result obtained by rendering with annotations markers the source referenced by the
+     * {@code sourceReference} parsed in {@code sourceSyntax}. The list of annotations to be added markers for is passed
+     * in the {@code annotations} parameter. Note that no test is done on the actual target of the annotations in the
+     * passed list, they will all be rendered, as long as their selected text and context can be identified in the
+     * content.
      * 
      * @param sourceReference the reference to the source to be rendered in XHTML with annotations
      * @param sourceSyntax the syntax to parse the source in. If this parameter is null, the default source syntax will
@@ -129,7 +131,7 @@ public interface AnnotationService
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which are valid on the specified content
      * @throws AnnotationServiceException if anything goes wrong accessing the annotations store
-     * @see {@link org.xwiki.annotation.maintainer.AnnotationState}
+     * @see org.xwiki.annotation.maintainer.AnnotationState
      */
     Collection<Annotation> getValidAnnotations(String target) throws AnnotationServiceException;
 }

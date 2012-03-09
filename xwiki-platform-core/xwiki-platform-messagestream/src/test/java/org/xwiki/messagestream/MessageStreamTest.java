@@ -261,10 +261,10 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
         @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookup(EntityReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING, "current");
         @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
@@ -316,10 +316,10 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
         @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookup(EntityReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING, "current");
         @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
@@ -340,10 +340,10 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
         @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookup(EntityReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING, "current");
         @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
@@ -363,7 +363,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final Event e = setupForNewMessage();
         @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
@@ -379,7 +379,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final Event e = setupForNewMessage();
         @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
@@ -397,12 +397,11 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final QueryManager mockQueryManager = getComponentManager().lookup(QueryManager.class);
         final EventStream mockEventStream = getComponentManager().lookup(EventStream.class);
         final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookup(EntityReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING, "current");
         @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {

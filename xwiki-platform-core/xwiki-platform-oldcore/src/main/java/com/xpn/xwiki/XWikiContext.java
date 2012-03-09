@@ -137,24 +137,21 @@ public class XWikiContext extends Hashtable<Object, Object>
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /** The Execution so that we can check if permissions were dropped there. */
     private final Execution execution = Utils.getComponent(Execution.class);
@@ -607,20 +604,45 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.classCache.clear();
     }
 
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public void addDocumentArchive(String key, XWikiDocumentArchive obj)
+    /**
+     * Add a {@link XWikiDocumentArchive document archive} in a cache associated with this context, so that future
+     * access requests for the same document archive don't go through the database again.
+     * 
+     * @param key the key used to identify a document archive in the cache
+     * @param archive the {@link XWikiDocumentArchive document archive} to cache
+     */
+    public void addDocumentArchive(String key, XWikiDocumentArchive archive)
     {
-        this.archiveCache.put(key, obj);
+        this.archiveCache.put(key, archive);
     }
 
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    /**
+     * Get the cached {@link XWikiDocumentArchive document archive} from the context, if any.
+     * 
+     * @param key the key used to identify a document archive in the cache
+     * @return the document archive, if it does exist in the context cache, or {@code null} otherwise
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
     public XWikiDocumentArchive getDocumentArchive(String key)
     {
         return this.archiveCache.get(key);
     }
 
     /**
-     * Empty the archive cache.
+     * Remove the cached {@link XWikiDocumentArchive document archive} from the context.
+     * 
+     * @param key the key used to identify a document archive in the cache
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
+     */
+    public void removeDocumentArchive(String key)
+    {
+        this.archiveCache.remove(key);
+    }
+
+    /**
+     * Empty the document archive cache.
+     * 
+     * @see #addDocumentArchive(String, XWikiDocumentArchive)
      */
     public void flushArchiveCache()
     {

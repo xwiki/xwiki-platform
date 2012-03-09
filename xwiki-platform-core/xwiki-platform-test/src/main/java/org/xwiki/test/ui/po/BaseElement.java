@@ -88,6 +88,7 @@ public class BaseElement
     {
         getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
         {
+            @Override
             public WebElement apply(WebDriver driver)
             {
                 WebElement element = null;
@@ -132,6 +133,7 @@ public class BaseElement
     {
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 try {
@@ -176,6 +178,7 @@ public class BaseElement
     {
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 try {
@@ -203,6 +206,7 @@ public class BaseElement
     {
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 try {
@@ -229,6 +233,7 @@ public class BaseElement
     {
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 WebElement element = driver.findElement(locator);
@@ -251,7 +256,7 @@ public class BaseElement
      * alert.accept();
      * </code> Until then, the following hack does override the confirm method in Javascript to return the given value.
      * 
-     * @param {@code true} to accept the confirmation dialog, {@code false} to cancel it
+     * @param accept {@code true} to accept the confirmation dialog, {@code false} to cancel it
      */
     public void makeConfirmDialogSilent(boolean accept)
     {

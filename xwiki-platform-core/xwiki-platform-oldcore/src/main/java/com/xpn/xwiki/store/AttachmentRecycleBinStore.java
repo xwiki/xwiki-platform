@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Interface for AttachmentRecycleBin feature (XWIKI-2254) store system. Attachments can be placed in the recycle bin
  * using {@link #saveToRecycleBin(XWikiAttachment, String, Date, XWikiContext, boolean)}, restored using
  * {@link #restoreFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)}, and permanently removed from the
- * recycle bin using {@link #deleteFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)}.
+ * recycle bin using {@link #deleteFromRecycleBin(long, XWikiContext, boolean)}.
  * 
  * @version $Id$
  * @since 1.4M1
@@ -65,7 +65,7 @@ public interface AttachmentRecycleBinStore
      * @param context The current context.
      * @param bTransaction Should use old transaction (false) or create new (true).
      * @throws XWikiException If an error occurs while loading or restoring the attachment.
-     * @see #getDeletedAttachment(XWikiAttachment, long, XWikiContext, boolean)
+     * @see #getDeletedAttachment(long, XWikiContext, boolean)
      */
     XWikiAttachment restoreFromRecycleBin(XWikiAttachment attachment, long index, XWikiContext context,
         boolean bTransaction) throws XWikiException;

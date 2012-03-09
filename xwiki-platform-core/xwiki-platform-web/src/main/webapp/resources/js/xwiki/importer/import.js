@@ -79,12 +79,12 @@ var XWiki = (function(XWiki){
          */
         initialize:function(name, options) 
         {
-            this.name = decodeURIComponent( name ) 
+            this.name = name;
                         
             this.successCallback = options.onSuccess || function(){};
             this.failureCallback = options.onFailure || function(){};
             
-            var url = window.docgeturl + "?xpage=packageinfo&package=" + name;
+            var url = window.docgeturl + "?xpage=packageinfo&package=" + encodeURIComponent(name);
             
             var ajx = new Ajax.Request(url, {
                 onSuccess: this.onSuccess.bindAsEventListener(this),

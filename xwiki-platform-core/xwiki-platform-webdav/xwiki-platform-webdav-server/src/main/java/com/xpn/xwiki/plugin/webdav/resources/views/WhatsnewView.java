@@ -46,9 +46,7 @@ public class WhatsnewView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(WhatsnewView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -64,9 +62,7 @@ public class WhatsnewView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();

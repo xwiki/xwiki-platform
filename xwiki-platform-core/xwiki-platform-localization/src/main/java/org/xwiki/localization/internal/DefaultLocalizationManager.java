@@ -60,21 +60,13 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
     @Requirement
     private List<Bundle> bundles;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LocalizationManager#get(String)
-     */
+    @Override
     public String get(String key)
     {
         return get(key, this.wikiInfo.getContextLanguage());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LocalizationManager#get(String, String)
-     */
+    @Override
     public String get(String key, String language)
     {
         String result = key;
@@ -87,21 +79,13 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LocalizationManager#get(String, List)
-     */
+    @Override
     public String get(String key, List< ? > params)
     {
         return get(key, params, this.wikiInfo.getContextLanguage());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LocalizationManager#get(String, List, String)
-     */
+    @Override
     public String get(String key, List< ? > params, String language)
     {
         String translation = get(key, language);
@@ -111,11 +95,7 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
         return translation;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LocalizationManager#use(String, String)
-     */
+    @Override
     public void use(String bundleTypeHint, String bundleLocation)
     {
         try {
@@ -126,11 +106,7 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         Collections.sort(this.bundles);

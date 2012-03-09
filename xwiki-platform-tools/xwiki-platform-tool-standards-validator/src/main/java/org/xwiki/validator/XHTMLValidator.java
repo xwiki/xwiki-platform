@@ -28,11 +28,7 @@ import org.xwiki.validator.framework.AbstractXMLValidator;
  */
 public class XHTMLValidator extends AbstractXMLValidator
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#getName()
-     */
+    @Override
     public String getName()
     {
         return "XHTML";

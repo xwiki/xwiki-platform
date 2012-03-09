@@ -21,13 +21,26 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class LoginSubmitAction extends XWikiAction {
-    public String render(XWikiContext context) throws XWikiException {
-        String msg = (String)context.get("message");
-        if(msg != null && !msg.trim().equals("")) {
+/**
+ * Action for processing login requests sent using the normal web login form. The actual login request processing is
+ * done before this action is invoked, the URL will trigger the authenticator automatically. If the authentication was
+ * successful, then a proper user is set in the context, and the {@code login.vm} template will redirect to the view
+ * mode.
+ * 
+ * @version $Id$
+ */
+public class LoginSubmitAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        String msg = (String) context.get("message");
+        if (StringUtils.isNotBlank(msg)) {
             context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
         return "login";

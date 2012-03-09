@@ -23,10 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.velocity.VelocityContextInitializer;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.apache.velocity.VelocityContext;
+import org.xwiki.velocity.VelocityContextInitializer;
 
 @Component
 @Named("xwiki")
@@ -36,6 +36,7 @@ public class XWikiVelocityContextInitializer implements VelocityContextInitializ
     @Inject
     private Execution execution;
 
+    @Override
     public void initialize(VelocityContext context)
     {
         // TODO: Move the Velocity Context initialization code currently located in

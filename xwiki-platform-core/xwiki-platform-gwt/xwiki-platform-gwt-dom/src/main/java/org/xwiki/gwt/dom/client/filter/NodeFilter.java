@@ -25,7 +25,7 @@ import com.google.gwt.dom.client.Node;
  * Interface used to filter DOM nodes.
  * 
  * @version $Id$
- * @see http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter
+ * @see "http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter"
  */
 public interface NodeFilter
 {

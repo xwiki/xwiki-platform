@@ -53,9 +53,7 @@ public class CompositeDialogBox extends Composite implements HasCloseHandlers<Co
         dialog.addCloseHandler(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void initWidget(Widget widget)
     {
         super.initWidget(widget);
@@ -92,21 +90,13 @@ public class CompositeDialogBox extends Composite implements HasCloseHandlers<Co
         dialog.hide();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasCloseHandlers#addCloseHandler(CloseHandler)
-     */
+    @Override
     public HandlerRegistration addCloseHandler(CloseHandler<CompositeDialogBox> handler)
     {
         return addHandler(handler, CloseEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CloseHandler#onClose(CloseEvent)
-     */
+    @Override
     public void onClose(CloseEvent<PopupPanel> event)
     {
         if (event.getSource() == dialog) {

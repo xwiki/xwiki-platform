@@ -73,22 +73,14 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         this.tagName = tagName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         executed = isExecuted();
         return super.execute(parameter);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#execute(Text, int, int, String)
-     */
+    @Override
     protected TextFragment execute(Text text, int startIndex, int endIndex, String parameter)
     {
         return executed ? removeStyle(text, startIndex, endIndex) : addStyle(text, startIndex, endIndex);
@@ -173,11 +165,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         return new TextFragment(text, 0, text.getLength());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         Selection selection = rta.getDocument().getSelection();

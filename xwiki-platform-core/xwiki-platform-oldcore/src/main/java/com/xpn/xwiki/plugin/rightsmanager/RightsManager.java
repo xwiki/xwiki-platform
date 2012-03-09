@@ -134,13 +134,13 @@ public final class RightsManager
      * Used to resolve document reference based on another reference.
      */
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "explicit");
+        DocumentReferenceResolver.TYPE_STRING, "explicit");
 
     /**
      * Used to resolve reference based on context.
      */
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current");
+        DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Hidden constructor of RightsManager only access via getInstance().

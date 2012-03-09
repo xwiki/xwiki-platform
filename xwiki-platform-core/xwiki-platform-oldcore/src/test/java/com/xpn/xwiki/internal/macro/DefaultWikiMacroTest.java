@@ -80,6 +80,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
         super.registerComponents();
     }
 
+    @Override
     @Before
     public void setUp() throws Exception
     {

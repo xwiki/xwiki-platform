@@ -44,11 +44,6 @@ public class PreTagSubstitution extends WikiSubstitution
         setRemovePre(removepre);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.WikiSubstitution#appendSubstitution(java.lang.StringBuffer, org.apache.oro.text.regex.MatchResult, int, org.apache.oro.text.regex.PatternMatcherInput, org.apache.oro.text.regex.PatternMatcher, org.apache.oro.text.regex.Pattern)
-     */
     @Override
     public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
         PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern)

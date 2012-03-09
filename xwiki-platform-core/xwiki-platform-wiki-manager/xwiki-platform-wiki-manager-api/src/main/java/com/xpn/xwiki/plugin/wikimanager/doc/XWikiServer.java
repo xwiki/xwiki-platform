@@ -267,11 +267,6 @@ public class XWikiServer extends DefaultXObjectDocument
         return getBooleanValue(XWikiServerClass.FIELD_ISWIKITEMPLATE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#toString()
-     */
     @Override
     public String toString()
     {

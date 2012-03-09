@@ -119,7 +119,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.defaultEntityReferenceSerializer = getComponentManager().lookup(EntityReferenceSerializer.class);
+        this.defaultEntityReferenceSerializer = getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.document.setSyntax(Syntax.XWIKI_1_0);
@@ -1136,6 +1136,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testCopyDocument() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
+        doc.setTitle("Some title");
         BaseObject o = new BaseObject();
         o.setClassName(CLASSNAME);
         doc.addObject(CLASSNAME, o);
@@ -1145,6 +1146,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertNotSame(o, newDoc.getObject(CLASSNAME));
         assertFalse(newO.getGuid().equals(o.getGuid()));
+        // Verify that the title is copied
+        assertEquals("Some title", newDoc.getTitle());
+    }
+
+    /**
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-6743">XWIKI-6743</a>
+     */
+    public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki1", "space1", "page1"));
+        doc.setTitle(doc.getDocumentReference().getName());
+
+        XWikiDocument newDoc = doc.copyDocument(new DocumentReference("wiki2", "space2", "page2"), getContext());
+
+        // Verify that the title is modified
+        assertEquals("page2", newDoc.getTitle());
     }
 
     public void testResolveClassReference() throws Exception
@@ -1343,5 +1360,127 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         document.setXObject(this.baseObject.getXClassReference(), 0, this.baseObject);
 
         Assert.assertEquals(Arrays.asList(this.baseObject), document.getXObjects(this.baseObject.getXClassReference()));
+    }
+
+    /**
+     * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set
+     * to true).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetCreatorReferenceSetsMetadataDirtyFlag()
+    {
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setMetaDataDirty(false);
+
+        DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
+        this.document.setCreatorReference(creator);
+
+        assertEquals(true, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision
+     * (we verify that the metadata dirty flag is not set).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
+    {
+        // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
+        DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
+        this.document.setCreatorReference(creator);
+        this.document.setMetaDataDirty(false);
+
+        // Set the creator with the same reference to verify it doesn't change the flag
+        this.document.setCreatorReference(new DocumentReference("Wiki", "XWiki", "Creator"));
+
+        assertEquals(false, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set
+     * to true).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetAuthorReferenceSetsMetadataDirtyFlag()
+    {
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setMetaDataDirty(false);
+
+        DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
+        this.document.setAuthorReference(author);
+
+        assertEquals(true, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision
+     * (we verify that the metadata dirty flag is not set).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
+    {
+        // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
+        DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
+        this.document.setAuthorReference(author);
+        this.document.setMetaDataDirty(false);
+
+        // Set the author with the same reference to verify it doesn't change the flag
+        this.document.setAuthorReference(new DocumentReference("Wiki", "XWiki", "Author"));
+
+        assertEquals(false, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new content author will create a new revision (we verify that that metadata dirty flag is
+     * set to true).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
+    {
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setMetaDataDirty(false);
+
+        DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
+        this.document.setContentAuthorReference(contentAuthor);
+
+        assertEquals(true, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * Verify that setting a new content author that is the same as the currenet creator doesn't create a new revision
+     * (we verify that the metadata dirty flag is not set).
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     */
+    public void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
+    {
+        // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
+        DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
+        this.document.setContentAuthorReference(contentAuthor);
+        this.document.setMetaDataDirty(false);
+
+        // Set the content author with the same reference to verify it doesn't change the flag
+        this.document.setContentAuthorReference(new DocumentReference("Wiki", "XWiki", "ContentAuthor"));
+
+        assertEquals(false, this.document.isMetaDataDirty());
+    }
+
+    /**
+     * @see XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException
+     */
+    public void testGetIncludedPages()
+    {
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+
+        this.document.setContent("no include");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("bad {{include/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("good deprecated {{include document=\"Foo.Bar\"/}}");
+        assertEquals(Arrays.asList("Foo.Bar"), this.document.getIncludedPages(getContext()));
+
+        this.document.setContent("good {{include reference=\"One.Two\"/}}");
+        assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
     }
 }

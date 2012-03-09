@@ -35,11 +35,12 @@ import org.xwiki.rest.XWikiRestComponent;
 @Provider
 public class QueryExceptionMapper implements ExceptionMapper<QueryException>, XWikiRestComponent
 {
+    @Override
     public Response toResponse(QueryException exception)
     {
-        return Response.serverError().entity(
-            String.format("%s\n%s\n", exception.getMessage(), exception.getCause().getMessage())).type(
-            MediaType.TEXT_PLAIN).build();
+        return Response.serverError()
+            .entity(String.format("%s\n%s\n", exception.getMessage(), exception.getCause().getMessage()))
+            .type(MediaType.TEXT_PLAIN).build();
     }
 
 }

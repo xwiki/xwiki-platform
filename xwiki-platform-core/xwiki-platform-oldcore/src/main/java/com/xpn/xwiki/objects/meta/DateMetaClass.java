@@ -62,6 +62,7 @@ public class DateMetaClass extends PropertyMetaClass
         safeput("dateFormat", dateformat_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new DateClass();

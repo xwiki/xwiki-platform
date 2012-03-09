@@ -63,9 +63,7 @@ public class DavPage extends AbstractDavResource
      */
     private XWikiDocument doc;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
@@ -86,9 +84,7 @@ public class DavPage extends AbstractDavResource
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, 0));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -113,9 +109,7 @@ public class DavPage extends AbstractDavResource
         return last ? resource : resource.decode(tokens, next + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean exists()
     {
         return !doc.isNew();
@@ -164,9 +158,7 @@ public class DavPage extends AbstractDavResource
         return new DavResourceIteratorImpl(children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         getContext().checkAccess("edit", this.name);
@@ -196,9 +188,7 @@ public class DavPage extends AbstractDavResource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         getContext().checkAccess("edit", this.name);
@@ -223,9 +213,7 @@ public class DavPage extends AbstractDavResource
         dResource.clearCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void move(DavResource destination) throws DavException
     {
         // Renaming a page requires edit rights on the current document, overwrite rights on the
@@ -258,9 +246,7 @@ public class DavPage extends AbstractDavResource
         clearCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<XWikiDavResource> getInitMembers()
     {
         List<XWikiDavResource> initialMembers = new ArrayList<XWikiDavResource>();
@@ -277,25 +263,19 @@ public class DavPage extends AbstractDavResource
         return initialMembers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isCollection()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void spool(OutputContext outputContext) throws IOException
     {
         throw new IOException("Collection resources can't be spooled");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getModificationTime()
     {
         if (exists()) {

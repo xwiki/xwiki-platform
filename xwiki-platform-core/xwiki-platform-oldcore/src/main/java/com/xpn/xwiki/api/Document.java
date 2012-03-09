@@ -109,30 +109,26 @@ public class Document extends Api
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "local");
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to convert user references to string.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Document constructor.
@@ -2476,11 +2472,6 @@ public class Document extends Api
         return this.doc.isMostRecent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

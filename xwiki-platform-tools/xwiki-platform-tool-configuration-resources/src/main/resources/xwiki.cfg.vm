@@ -250,7 +250,11 @@ xwiki.inactiveuser.allowedpages=
 #-# Enable to allow superadmin. It is disabled by default as this could be a
 #-# security breach if it were set and you forgot about it. Should only be enabled
 #-# for recovering the Wiki when the rights are completely messed.
+#if ($xwikiCfgSuperadminPassword)
+xwiki.superadminpassword=$xwikiCfgSuperadminPassword
+#else
 # xwiki.superadminpassword=system
+#end
 
 #-# Authentication type. You can use 'basic' to always use basic authentication.
 # xwiki.authentication=form
@@ -443,8 +447,8 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# Time in s after which the list of members in a group is refreshed from LDAP
-#-# The default is 2800
-# xwiki.authentication.ldap.groupcache_expiration=21800
+#-# The default is 21600 (6 hours)
+# xwiki.authentication.ldap.groupcache_expiration=21600
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# - create : synchronize group membership only when the user is first created

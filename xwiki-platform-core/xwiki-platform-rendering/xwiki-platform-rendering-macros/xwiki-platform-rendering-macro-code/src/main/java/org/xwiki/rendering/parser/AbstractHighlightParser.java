@@ -36,11 +36,7 @@ public abstract class AbstractHighlightParser implements HighlightParser
      */
     private String syntaxId = "";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.Parser#parse(java.io.Reader)
-     */
+    @Override
     public XDOM parse(Reader source) throws ParseException
     {
         return new XDOM(highlight(getSyntaxId(), source));

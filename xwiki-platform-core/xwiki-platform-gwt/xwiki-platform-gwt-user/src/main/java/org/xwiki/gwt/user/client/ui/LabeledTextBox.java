@@ -64,11 +64,7 @@ public class LabeledTextBox extends TextBox implements FocusHandler, BlurHandler
         addBlurHandler(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusHandler#onFocus(FocusEvent)
-     */
+    @Override
     public void onFocus(FocusEvent event)
     {
         if (event.getSource() == this) {
@@ -79,11 +75,7 @@ public class LabeledTextBox extends TextBox implements FocusHandler, BlurHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlurHandler#onBlur(BlurEvent)
-     */
+    @Override
     public void onBlur(BlurEvent event)
     {
         if (event.getSource() == this && StringUtils.isEmpty(super.getText())) {
@@ -108,11 +100,7 @@ public class LabeledTextBox extends TextBox implements FocusHandler, BlurHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TextBox#getText()
-     */
+    @Override
     public String getText()
     {
         return labeled ? "" : super.getText();

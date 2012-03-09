@@ -22,6 +22,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -125,19 +126,19 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         }
     };
 
-    protected Cache<List<DocumentReference>> memberGroupsCache;
+    protected Cache<Collection<DocumentReference>> memberGroupsCache;
 
     /**
      * Used to convert a string into a proper Document Reference.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     private EntityReferenceSerializer<String> entityReferenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     private EntityReferenceSerializer<String> localWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     @Override
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException
@@ -218,7 +219,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             initCache(context);
         }
 
-        List<DocumentReference> list = this.memberGroupsCache.get(key);
+        Collection<DocumentReference> list = this.memberGroupsCache.get(key);
 
         if (list == null) {
             list = new ArrayList<DocumentReference>();
@@ -711,7 +712,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     public Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
         int offset, XWikiContext context) throws XWikiException
     {
-        List<DocumentReference> groupReferences = null;
+        Collection<DocumentReference> groupReferences = null;
 
         String prefixedFullName = this.entityReferenceSerializer.serialize(memberReference);
 
@@ -760,19 +761,22 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     throw new XWikiException(0, 0, ex.getMessage(), ex);
                 }
 
-                // If the 'XWiki.XWikiAllGroup' is implicit, all users/groups except XWikiGuest and XWikiAllGroup
-                // itself are part of it.
-                if (!groupNames.contains(XWikiRightService.ALLGROUP_GROUP_FULLNAME)
-                    && isAllGroupImplicit(context)
-                    && (!memberReference.getLastSpaceReference().getName().equals("XWiki") || !memberReference
-                        .getName().equals(XWikiRightService.ALLGROUP_GROUP)
-                        && !memberReference.getName().equals(XWikiRightService.GUEST_USER))) {
-                    groupNames.add("XWiki.XWikiAllGroup");
-                }
-
-                groupReferences = new ArrayList<DocumentReference>(groupNames.size());
+                groupReferences = new HashSet<DocumentReference>(groupNames.size());
                 for (String groupName : groupNames) {
                     groupReferences.add(this.currentMixedDocumentReferenceResolver.resolve(groupName));
+                }
+
+                // If the 'XWiki.XWikiAllGroup' is implicit, all users/groups except XWikiGuest and XWikiAllGroup
+                // itself are part of it.
+                if (isAllGroupImplicit(context)
+                    && memberReference.getWikiReference().getName().equals(context.getDatabase())
+                    && !memberReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                    DocumentReference currentXWikiAllGroup =
+                        new DocumentReference(context.getDatabase(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
+
+                    if (!currentXWikiAllGroup.equals(memberReference)) {
+                        groupReferences.add(currentXWikiAllGroup);
+                    }
                 }
 
                 if (supportCache) {

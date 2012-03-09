@@ -60,22 +60,12 @@ public class ActionExecutionEvent implements Event, Serializable
         return this.actionName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return getActionName().hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object object)
     {
@@ -85,11 +75,7 @@ public class ActionExecutionEvent implements Event, Serializable
         return getActionName().equals(object);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#matches(Object)
-     */
+    @Override
     public boolean matches(Object otherEvent)
     {
         boolean isMatching = false;

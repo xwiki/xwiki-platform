@@ -23,7 +23,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -56,13 +55,12 @@ public abstract class AbstractPackager
      */
     protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
     {
-        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
-        ecm.initialize(this.getClass().getClassLoader());
-        Utils.setComponentManager(ecm);
+        // Initialize the Component Manager and Environment
+        ComponentManager cm = org.xwiki.environment.System.initialize();
+        Utils.setComponentManager(cm);
 
-        // We need to initialize the Component Manager so that the components can be looked up
         XWikiContext xcontext = new XWikiContext();
-        xcontext.put(ComponentManager.class.getName(), ecm);
+        xcontext.put(ComponentManager.class.getName(), cm);
 
         // Initialize the Container fields (request, response, session).
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);

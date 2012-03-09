@@ -648,11 +648,15 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
     ##
     &lt;div id="vertical-tabs"&gt;
       &lt;div id="avatar"&gt;
+#if ($request.xpage == 'edituser')
+  #largeUserAvatar($doc.fullName)
+#else
 {{/html}}
 
 {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$msg.get('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
 
 {{html clean="false"}}
+#end
       &lt;/div&gt;## avatar
       &lt;div&gt; 
         &lt;ul&gt;

@@ -678,27 +678,24 @@ input.category-name-input {
 #elseif("$!request.xaction" == 'rename')
   #set ($newFullName = "$!{request.newCategoryName}")
   #if($newFullName.trim().equals(''))
-    $response.setStatus(400)
-    #error($msg.get('xe.blog.manageCategories.rename.error.emptyName'))
+    #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
   #elseif(!$xwiki.exists($request.category))
-    $response.setStatus(404)
-    #error($msg.get('thispagedoesnotexist'))
+    #blog__actionResponseError(404, 'thispagedoesnotexist', [])
   #elseif($xwiki.exists($newFullName))
-    $response.setStatus(409)
-    #error($msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)]))
+    #blog__actionResponseError(409, 'core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])
   #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newFullName))
-    $response.setStatus(403)
-    #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
+    #blog__actionResponseError(403, 'core.rename.targetNotWritable', [$newFullName])
   #else
     #renameCategory($request.category, $newFullName)
   #end
 #elseif("$!request.xaction" == 'create')
   #set($title = "$!{request.newCategoryName}")
+  #set($name = "${doc.space}.${title}")
   #if ($title.trim().equals(''))
-    $response.setStatus(400)
-    #error($msg.get('xe.blog.manageCategories.create.error.emptyName'))
+    #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
+  #elseif (!$xwiki.getDocument($name).isNew())
+    #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [])
   #else
-    #set($name = "${doc.space}.${title}")
     #set($title = $util.encodeURI($title))
     #set($newCategoryParent = $util.encodeURI($request.newCategoryParent))
     #if($request.ajax)
@@ -727,7 +724,7 @@ input.category-name-input {
   #addCategoryForm()
 #elseif ("$!request.display" == 'renameForm')
   #renameCategoryForm()
-#else
+#elseif (!$request.ajax)
 ##
 $xwiki.ssx.use('Blog.ManageCategories')##
 $xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##

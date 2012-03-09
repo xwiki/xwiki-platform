@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -302,9 +303,17 @@ public class TestUtils
         gotoPage(space, page, action, "");
     }
 
+    /**
+     * @since 3.5M1
+     */
+    public void gotoPage(String space, String page, String action, Object... queryParameters)
+    {
+        gotoPage(space, page, action, toQueryString(queryParameters));
+    }
+
     public void gotoPage(String space, String page, String action, Map<String, ? > queryParameters)
     {
-        getDriver().get(getURL(space, page, action, queryParameters));
+        gotoPage(space, page, action, toQueryString(queryParameters));
     }
 
     public void gotoPage(String space, String page, String action, String queryString)
@@ -402,16 +411,19 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        StringBuilder builder = new StringBuilder(this.BASE_BIN_URL);
+        return getURL(new String[] {space, page}, action, queryString);
+    }
+
+    private String getURL(String[] path, String action, String queryString)
+    {
+        StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
 
         builder.append(action);
-        builder.append('/');
-        builder.append(escapeURL(space));
-        builder.append('/');
-        builder.append(escapeURL(page));
+        for (int i = 0; i < path.length; i++) {
+            builder.append('/').append(escapeURL(path[i]));
+        }
 
-        boolean needToAddSecretToken =
-            !("view".equals(action) || "register".equals(action) || "download".equals(action));
+        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
         if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
             builder.append('?');
         }
@@ -437,54 +449,43 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, Map<String, ? > queryParameters)
     {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, ? > entry : queryParameters.entrySet()) {
-            addQueryStringEntry(builder, entry.getKey(), entry.getValue());
-            builder.append('&');
-        }
-
-        return getURL(space, page, action, builder.toString());
+        return getURL(space, page, action, toQueryString(queryParameters));
     }
 
+    /**
+     * @param space the name of the space that contains the page with the specified attachment
+     * @param page the name of the page that holds the attachment
+     * @param attachment the attachment name
+     * @param action the action to perform on the attachment
+     * @param queryString the URL query string
+     * @return the URL that performs the specified action on the specified attachment
+     */
+    public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
+    {
+        return getURL(new String[] {space, page, attachment}, action, queryString);
+    }
+
+    /**
+     * @param space the name of the space that contains the page with the specified attachment
+     * @param page the name of the page that holds the attachment
+     * @param attachment the attachment name
+     * @param action the action to perform on the attachment
+     * @return the URL that performs the specified action on the specified attachment
+     */
+    public String getAttachmentURL(String space, String page, String attachment, String action)
+    {
+        return getAttachmentURL(space, page, attachment, action, "");
+    }
+
+    /**
+     * @param space the name of the space that contains the page with the specified attachment
+     * @param page the name of the page that holds the attachment
+     * @param attachment the attachment name
+     * @return the URL to download the specified attachment
+     */
     public String getAttachmentURL(String space, String page, String attachment)
     {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(getURL(space, page, "download"));
-        builder.append('/');
-        builder.append(escapeURL(attachment));
-
-        return builder.toString();
-    }
-
-    /**
-     * @sice 3.2M1
-     */
-    public void addQueryStringEntry(StringBuilder builder, String key, Object value)
-    {
-        if (value != null) {
-            if (value instanceof Iterable) {
-                for (Object element : (Iterable< ? >) value) {
-                    addQueryStringEntry(builder, key, element.toString());
-                }
-            } else {
-                addQueryStringEntry(builder, key, value.toString());
-            }
-        } else {
-            addQueryStringEntry(builder, key, (String) null);
-        }
-    }
-
-    /**
-     * @sice 3.2M1
-     */
-    public void addQueryStringEntry(StringBuilder builder, String key, String value)
-    {
-        builder.append(escapeURL(key));
-        if (value != null) {
-            builder.append('=');
-            builder.append(escapeURL(value));
-        }
+        return getAttachmentURL(space, page, attachment, "download");
     }
 
     /**
@@ -495,18 +496,23 @@ public class TestUtils
      */
     public void recacheSecretToken()
     {
-        // the registration form uses secret token
-        getDriver().get(getURL("XWiki", "Register", "register"));
+        // Save the current URL to be able to get back after we cache the secret token. We're not using the browser's
+        // Back button because if the current page is the result of a POST request then by going back we are re-sending
+        // the POST data which can have unexpected results. Moreover, some browsers pop up a modal confirmation box
+        // which blocks the test.
+        String previousURL = getDriver().getCurrentUrl();
+        // Go to the registration page because the registration form uses secret token.
+        gotoPage("XWiki", "Register", "register");
         try {
             WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
             this.secretToken = tokenInput.getAttribute("value");
         } catch (NoSuchElementException exception) {
-            // something is really wrong if this happens
+            // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
             exception.printStackTrace();
         }
-        // return to the previous page
-        getDriver().navigate().back();
+        // Return to the previous page.
+        getDriver().get(previousURL);
     }
 
     /**
@@ -726,12 +732,69 @@ public class TestUtils
 
     public ClassEditPage addClassProperty(String space, String page, String propertyName, String propertyType)
     {
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("propname", propertyName);
-        props.put("proptype", propertyType);
-
-        gotoPage(space, page, "propadd", props);
+        gotoPage(space, page, "propadd", "propname", propertyName, "proptype", propertyType);
         return new ClassEditPage();
+    }
+
+    /**
+     * @since 3.5M1
+     */
+    public String toQueryString(Object... queryParameters)
+    {
+        return toQueryString(toQueryParameters(queryParameters));
+    }
+
+    /**
+     * @since 3.5M1
+     */
+    public String toQueryString(Map<String, ? > queryParameters)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for (Map.Entry<String, ? > entry : queryParameters.entrySet()) {
+            addQueryStringEntry(builder, entry.getKey(), entry.getValue());
+            builder.append('&');
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * @sice 3.2M1
+     */
+    public void addQueryStringEntry(StringBuilder builder, String key, Object value)
+    {
+        if (value != null) {
+            if (value instanceof Iterable) {
+                for (Object element : (Iterable< ? >) value) {
+                    addQueryStringEntry(builder, key, element.toString());
+                }
+            } else {
+                addQueryStringEntry(builder, key, value.toString());
+            }
+        } else {
+            addQueryStringEntry(builder, key, (String) null);
+        }
+    }
+
+    /**
+     * @sice 3.2M1
+     */
+    public void addQueryStringEntry(StringBuilder builder, String key, String value)
+    {
+        builder.append(escapeURL(key));
+        if (value != null) {
+            builder.append('=');
+            builder.append(escapeURL(value));
+        }
+    }
+
+    /**
+     * @since 3.5M1
+     */
+    public Map<String, ? > toQueryParameters(Object... properties)
+    {
+        return toQueryParameters(null, null, properties);
     }
 
     public Map<String, ? > toQueryParameters(String className, Integer objectNumber, Object... properties)
@@ -753,7 +816,9 @@ public class TestUtils
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
-        queryParameters.put("classname", className);
+        if (className != null) {
+            queryParameters.put("classname", className);
+        }
 
         for (Map.Entry<String, ? > entry : properties.entrySet()) {
             queryParameters.put(toQueryParameterKey(className, objectNumber, entry.getKey()), entry.getValue());
@@ -764,15 +829,22 @@ public class TestUtils
 
     public String toQueryParameterKey(String className, Integer objectNumber, String key)
     {
-        StringBuilder keyBuilder = new StringBuilder(className);
-        keyBuilder.append('_');
-        if (objectNumber != null) {
-            keyBuilder.append(objectNumber);
-            keyBuilder.append('_');
-        }
-        keyBuilder.append(key);
+        if (className == null) {
+            return key;
+        } else {
+            StringBuilder keyBuilder = new StringBuilder(className);
 
-        return keyBuilder.toString();
+            keyBuilder.append('_');
+
+            if (objectNumber != null) {
+                keyBuilder.append(objectNumber);
+                keyBuilder.append('_');
+            }
+
+            keyBuilder.append(key);
+
+            return keyBuilder.toString();
+        }
     }
 
     public WebElement findElementWithoutWaiting(WebDriver driver, By by)

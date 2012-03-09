@@ -19,45 +19,59 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.portlet.PortletContext;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class XWikiPortletContext implements XWikiEngineContext {
+import javax.portlet.PortletContext;
+
+public class XWikiPortletContext implements XWikiEngineContext
+{
     private PortletContext pcontext;
 
-    public XWikiPortletContext(PortletContext pcontext) {
+    public XWikiPortletContext(PortletContext pcontext)
+    {
         this.pcontext = pcontext;
     }
 
-    public PortletContext getPortletContext() {
+    public PortletContext getPortletContext()
+    {
         return pcontext;
     }
-    
-    public Object getAttribute(String name) {
+
+    @Override
+    public Object getAttribute(String name)
+    {
         return pcontext.getAttribute(name);
     }
 
-    public void setAttribute(String name, Object value) {
+    @Override
+    public void setAttribute(String name, Object value)
+    {
         pcontext.setAttribute(name, value);
     }
 
-    public String getRealPath(String path) {
+    @Override
+    public String getRealPath(String path)
+    {
         return pcontext.getRealPath(path);
     }
 
-    public URL getResource(String name) throws MalformedURLException {
+    @Override
+    public URL getResource(String name) throws MalformedURLException
+    {
         return pcontext.getResource(name);
     }
 
-    public InputStream getResourceAsStream(String name) {
+    @Override
+    public InputStream getResourceAsStream(String name)
+    {
         return pcontext.getResourceAsStream(name);
     }
 
-    public String getMimeType(String filename) {
+    @Override
+    public String getMimeType(String filename)
+    {
         return pcontext.getMimeType(filename);
     }
-
-
 }

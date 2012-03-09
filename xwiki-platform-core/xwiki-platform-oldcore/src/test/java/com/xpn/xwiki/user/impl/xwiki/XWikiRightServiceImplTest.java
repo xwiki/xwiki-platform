@@ -58,11 +58,6 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
     private XWikiDocument group2;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -80,6 +75,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(ANYTHING, eq("WebPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return new XWikiDocument(new DocumentReference(getContext().getDatabase(),
@@ -124,6 +120,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             eq(this.user.getDocumentReference()), ANYTHING, ANYTHING, ANYTHING).will(
             new CustomStub("Implements XWikiGroupService.getAllGroupsReferencesForMember")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiContext context = (XWikiContext) invocation.parameterValues.get(3);
@@ -187,6 +184,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     if (!getContext().getDatabase().equals("wiki2")) {
@@ -387,6 +385,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     if (!getContext().getDatabase().equals("wiki2")) {
@@ -571,6 +570,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     if (!getContext().getDatabase().equals("wiki")) {

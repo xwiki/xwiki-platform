@@ -45,11 +45,6 @@ public class CurrentMixedEntityReferenceValueProvider extends CurrentEntityRefer
     @Inject
     private EntityReferenceValueProvider defaultProvider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CurrentMixedEntityReferenceValueProvider#getDefaultValue(EntityType)
-     */
     @Override
     public String getDefaultValue(EntityType type)
     {

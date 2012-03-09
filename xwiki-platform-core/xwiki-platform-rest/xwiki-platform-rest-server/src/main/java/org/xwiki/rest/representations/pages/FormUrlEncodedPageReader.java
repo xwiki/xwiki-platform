@@ -56,11 +56,13 @@ public class FormUrlEncodedPageReader implements MessageBodyReader<Page>, XWikiR
 
     private static String CONTENT_FIELD_NAME = "content";
 
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Page.class.isAssignableFrom(type);
     }
 
+    @Override
     public Page readFrom(Class<Page> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

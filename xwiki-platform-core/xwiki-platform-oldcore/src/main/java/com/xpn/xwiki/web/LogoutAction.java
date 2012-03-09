@@ -19,27 +19,54 @@
  */
 package com.xpn.xwiki.web;
 
-import org.xwiki.csrf.CSRFToken;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * Action for processing logout requests. The actual logout request processing is done before this action is invoked,
+ * the URL will trigger the authenticator automatically. This action just cleans up the session and redirects to a view
+ * page.
+ * 
+ * @version $Id$
+ */
 public class LogoutAction extends XWikiAction
 {
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
 
-        // clear CSRF token
-        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
-        csrf.clearToken();
+        // Destroy the current session, if any, so that any private data stored in the session won't be accessible by
+        // the next user on the same computer
+        HttpSession currentSession = request.getSession(false);
+        if (currentSession != null) {
+            synchronized (currentSession) {
+                currentSession.invalidate();
+                // Early registration of a new session, so that the client gets to know the new session identifier early
+                // A new session is going to be needed after the redirect anyway
+                request.getSession(true);
+            }
+        }
 
+        // Process redirect
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null) || (redirect.equals("")))
-            redirect =
-                context.getURLFactory().createURL("Main", "WebHome", "view", context).toString();
+        if (StringUtils.isEmpty(redirect)) {
+            ModelConfiguration modelDefaults = Utils.getComponent(ModelConfiguration.class);
+            DocumentReference doc = new DocumentReference(
+                context.getDatabase(),
+                modelDefaults.getDefaultReferenceValue(EntityType.SPACE),
+                modelDefaults.getDefaultReferenceValue(EntityType.DOCUMENT));
+            redirect = context.getWiki().getURL(doc, "view", context);
+        }
         sendRedirect(response, redirect);
         return false;
     }

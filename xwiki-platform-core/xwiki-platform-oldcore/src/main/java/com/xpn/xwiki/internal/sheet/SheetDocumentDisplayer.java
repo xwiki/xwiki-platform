@@ -97,9 +97,14 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         if (isSheetExpected(document, parameters)) {
-            List<DocumentReference> sheetReferences = sheetManager.getSheets(document, getXWikiContext().getAction());
-            for (DocumentReference sheetReference : sheetReferences) {
-                if (documentAccessBridge.isDocumentViewable(sheetReference)) {
+            for (DocumentReference sheetReference : getSheetReferences(document)) {
+                if (document.getDocumentReference().equals(sheetReference)) {
+                    // If the sheet is the document itself then we simply display the document. We handle this case
+                    // differently because unsaved document changes might be ignored if we render the sheet (which is
+                    // loaded from the database). So in this case applying the sheet would actually mean displaying the
+                    // saved version of the document.
+                    break;
+                } else if (documentAccessBridge.isDocumentViewable(sheetReference)) {
                     try {
                         return applySheet(document, sheetReference, parameters);
                     } catch (Exception e) {
@@ -133,6 +138,30 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                 defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
             return false;
         }
+    }
+
+    /**
+     * @param document a document
+     * @return the list of sheet references that can be applied to the given document in the current context
+     */
+    private List<DocumentReference> getSheetReferences(DocumentModelBridge document)
+    {
+        XWikiContext xcontext = getXWikiContext();
+        // XObjects are shared by all document translations and are accessible only from the default translation. We
+        // have to pass the default document translation to the sheet manager because otherwise it won't detect the
+        // sheets.
+        DocumentModelBridge defaultTranslation = document;
+        // Check if the given document is a translation (i.e. if it's not the default translation).
+        if (((XWikiDocument) document).getTranslation() != 0) {
+            try {
+                // Load the default document translation.
+                defaultTranslation = xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext);
+            } catch (XWikiException e) {
+                String stringReference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+                logger.warn("Failed to load the default translation of [{}].", stringReference, e);
+            }
+        }
+        return sheetManager.getSheets(defaultTranslation, xcontext.getAction());
     }
 
     /**

@@ -44,11 +44,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     protected abstract class AbstractAsyncCallbackAdaptor<T> implements AsyncCallback<T>
     {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onFailure(Throwable)
-         */
+        @Override
         public void onFailure(Throwable caught)
         {
             // Keeping the finishing flag set prevents us from going back when an error occurs.
@@ -176,11 +172,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NavigationListener#onDirection(NavigationDirection)
-     */
+    @Override
     public void onDirection(final NavigationDirection direction)
     {
         dialog.setLoading(true);
@@ -320,11 +312,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
         wizardListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CloseHandler#onClose(CloseEvent)
-     */
+    @Override
     public void onClose(CloseEvent<CompositeDialogBox> event)
     {
         if (event.getTarget() == dialog) {

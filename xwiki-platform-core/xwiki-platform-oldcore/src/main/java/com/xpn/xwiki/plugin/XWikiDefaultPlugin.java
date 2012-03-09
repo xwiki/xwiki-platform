@@ -52,42 +52,32 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
         setName(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         // No public API by default
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiContext context)
     {
         // The default is to do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void virtualInit(XWikiContext context)
     {
         // The default is to do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void flushCache(XWikiContext context)
     {
         flushCache();
@@ -104,86 +94,66 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
         // The default is to do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void beginParsing(XWikiContext context)
     {
         // The default is to do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void beginRendering(XWikiContext context)
     {
         // The default is to do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String commonTagsHandler(String content, XWikiContext context)
     {
         // The default is to do nothing, just return back the same content
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String startRenderingHandler(String content, XWikiContext context)
     {
         // The default is to do nothing, just return back the same content
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String outsidePREHandler(String line, XWikiContext context)
     {
         // The default is to do nothing, just return back the same content
         return line;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String insidePREHandler(String line, XWikiContext context)
     {
         // The default is to do nothing, just return back the same content
         return line;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String endRenderingHandler(String content, XWikiContext context)
     {
         // The default is to do nothing, just return back the same content
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void endRendering(XWikiContext context)
     {
         // The default is to do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String endParsing(String content, XWikiContext context)
     {
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
         // The default is to do nothing, just return the original attachment

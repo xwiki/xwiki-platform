@@ -55,13 +55,13 @@
 # core.renderingcache.size=100
 
 #-------------------------------------------------------------------------------------
-# Container
+# Environment
 #-------------------------------------------------------------------------------------
 
-#-# [Since 3.2M3]
+#-# [Since 3.5M1, replaces the container.persistentDirectory property]
 #-# The directory used to store persistent data (data that should persist across server restarts). This is an
-#-# important directory containing important data and thus it should never be deleted (it should be backupped along
-#-# with the dabatase).
+#-# important directory containing important data and thus it should never be deleted (it should be backed-up along
+#-# with the database).
 #-# For example this is where the Extension Manager stores downloaded extensions if the extension.localRepository
 #-# property isn't configured.
 #-#
@@ -72,10 +72,10 @@
 #-#
 #-# If not specified, the Servlet container's temporary directory is used. This is absolutely not recommended and you
 #-# should specify a value.
-#if ($xwikiPropertiesContainerPersistentDirectory)
-container.persistentDirectory=$xwikiPropertiesContainerPersistentDirectory
+#if ($xwikiPropertiesEnvironmentPermanentDirectory)
+environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 #else
-# container.persistentDirectory=/var/local/xwiki/
+# environment.permanentDirectory=/var/local/xwiki/
 #end
 
 #-------------------------------------------------------------------------------------
@@ -402,3 +402,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# See container.persistentDirectory.
 # extension.localRepository=extension/repository
 
+#-# [Since 3.4]
+#-# The user agent to use when communication with external services (generally repositories).
+#-# 
+#-# The default is:
+# extension.userAgent=XWikiExtensionManager

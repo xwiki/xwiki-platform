@@ -31,11 +31,7 @@ import org.xwiki.gwt.dom.client.internal.mozilla.NativeSelection;
  */
 public class DefaultSelectionManager implements SelectionManager
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionManager#getSelection(Document)
-     */
+    @Override
     public Selection getSelection(Document document)
     {
         return new DefaultSelection(NativeSelection.getInstance(document));

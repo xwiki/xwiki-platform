@@ -38,6 +38,7 @@ public class TableDataSourceFactory implements DataSourceFactory
         return uniqueInstance;
     }
 
+    @Override
     public DataSource create(Map params, XWikiContext context) throws DataSourceException
     {
         return new TableDataSource(params, context);

@@ -238,11 +238,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return DEFAULT_PARAMS;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyndEntrySource#source(SyndEntry, Object, Map, XWikiContext)
-     */
+    @Override
     public void source(SyndEntry entry, Object obj, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {

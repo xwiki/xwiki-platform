@@ -47,11 +47,7 @@ public abstract class AbstractNavigationAwareWizardStep implements WizardStep
      */
     private EnumSet<NavigationDirection> validDirections = EnumSet.allOf(NavigationDirection.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStep#getDirectionName(NavigationDirection)
-     */
+    @Override
     public String getDirectionName(NavigationDirection direction)
     {
         return directionName.get(direction);
@@ -69,11 +65,7 @@ public abstract class AbstractNavigationAwareWizardStep implements WizardStep
         return directionName.put(direction, name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStep#getNextStep()
-     */
+    @Override
     public String getNextStep()
     {
         return nextStep;
@@ -89,11 +81,7 @@ public abstract class AbstractNavigationAwareWizardStep implements WizardStep
         this.nextStep = nextStep;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStep#getValidDirections()
-     */
+    @Override
     public EnumSet<NavigationDirection> getValidDirections()
     {
         return validDirections;

@@ -45,6 +45,7 @@ public class ObjectidDataSourceFactory implements DataSourceFactory
         return uniqueInstance;
     }
 
+    @Override
     public DataSource create(Map params, XWikiContext context) throws DataSourceException
     {
         int objectid;

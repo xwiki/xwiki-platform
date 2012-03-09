@@ -73,11 +73,6 @@ public class AttachmentResource extends BaseAttachmentsResource
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        /* Clear the fileName */
-        attachmentName =
-            Utils.getXWikiContext(componentManager).getWiki()
-                .clearName(attachmentName, false, true, Utils.getXWikiContext(componentManager));
-
         /* Attach the file */
         AttachmentInfo attachmentInfo = storeAttachment(doc, attachmentName, content);
 

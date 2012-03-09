@@ -57,9 +57,7 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
     @Inject
     private DocumentAccessBridge bridge;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
         if (query.getWiki() != null && !getBridge().hasProgrammingRights()) {
@@ -80,9 +78,7 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
         return getNestedQueryExecutorManager().execute(query);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Set<String> getLanguages()
     {
         return getNestedQueryExecutorManager().getLanguages();

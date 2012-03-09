@@ -51,16 +51,19 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         init(context);
     }
 
+    @Override
     public String getName()
     {
         return "svg";
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new SVGPluginApi((SVGPlugin) plugin, context);
     }
 
+    @Override
     public void flushCache()
     {
         try {
@@ -75,6 +78,7 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         }
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);

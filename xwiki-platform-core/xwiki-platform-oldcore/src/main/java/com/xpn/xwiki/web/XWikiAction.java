@@ -173,6 +173,7 @@ public abstract class XWikiAction extends Action
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
 
+            boolean eventSent = false;
             try {
                 // Prepare documents and put them in the context
                 if (!xwiki.prepareDocuments(context.getRequest(), context, vcontext)) {
@@ -208,9 +209,10 @@ public abstract class XWikiAction extends Action
                     ObservationManager om = Utils.getComponent(ObservationManager.class);
                     ActionExecutingEvent event = new ActionExecutingEvent(context.getAction());
                     om.notify(event, context.getDoc(), context);
+                    eventSent = true;
                     if (event.isCanceled()) {
                         // Action has been canceled
-                        // TODO: do somethin special ?
+                        // TODO: do something special ?
                         return null;
                     }
                 } catch (Throwable ex) {
@@ -257,9 +259,10 @@ public abstract class XWikiAction extends Action
                 try {
                     XWikiException xex = (XWikiException) e;
                     if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
-                        // Connection aborted, simply ignore this.
-                        LOGGER.error("Connection aborted");
-                        // We don't write any other message, as the connection is broken, anyway.
+                        // Connection aborted from the client side, there's not much we can do on the server side. We
+                        // simply ignore it.
+                        LOGGER.debug("Connection aborted", e);
+                        // We don't write any other message to the response, as the connection is broken, anyway.
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
                         Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception", "accessdenied"), context);
@@ -313,15 +316,17 @@ public abstract class XWikiAction extends Action
                     monitor.startTimer("notify");
                 }
 
-                // For the moment we're sending the XWiki context as the data, but this will be
-                // changed in the future, when the whole platform will be written using components
-                // and there won't be a need for the context.
-                try {
-                    ObservationManager om = Utils.getComponent(ObservationManager.class);
-                    om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
-                } catch (Throwable ex) {
-                    LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
-                        + context.getAction() + "]", ex);
+                if (eventSent) {
+                    // For the moment we're sending the XWiki context as the data, but this will be
+                    // changed in the future, when the whole platform will be written using components
+                    // and there won't be a need for the context.
+                    try {
+                        ObservationManager om = Utils.getComponent(ObservationManager.class);
+                        om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
+                    } catch (Throwable ex) {
+                        LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
+                            + context.getAction() + "]", ex);
+                    }
                 }
 
                 if (monitor != null) {
@@ -487,14 +492,14 @@ public abstract class XWikiAction extends Action
         return false;
     }
 
-    protected void sendRedirect(XWikiResponse response, String page) throws XWikiException
+    protected void sendRedirect(XWikiResponse response, String url) throws XWikiException
     {
         try {
-            if (page != null) {
-                response.sendRedirect(page);
+            if (url != null) {
+                response.sendRedirect(url);
             }
         } catch (IOException e) {
-            Object[] args = {page};
+            Object[] args = {url};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);

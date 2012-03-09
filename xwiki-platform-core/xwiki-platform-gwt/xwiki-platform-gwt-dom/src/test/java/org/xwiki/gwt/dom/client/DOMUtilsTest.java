@@ -37,11 +37,7 @@ public class DOMUtilsTest extends DOMTestCase
      */
     private DOMUtils domUtils;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

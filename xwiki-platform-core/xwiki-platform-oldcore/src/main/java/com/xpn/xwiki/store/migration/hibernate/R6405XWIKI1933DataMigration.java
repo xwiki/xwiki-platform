@@ -21,6 +21,7 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
@@ -38,6 +39,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 @Component
 @Named("R6405XWIKI1933")
+@Singleton
 public class R6405XWIKI1933DataMigration extends R4340XWIKI883DataMigration
 {
     @Override

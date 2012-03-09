@@ -81,21 +81,13 @@ public class ScriptClassLoaderHandlerListener implements EventListener
     @Inject
     private AttachmentClassLoaderFactory attachmentClassLoaderFactory;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "scriptmacroclassloader";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         List<Event> events = new LinkedList<Event>();
@@ -104,11 +96,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
         return events;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object, java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (!(data instanceof ScriptMacroParameters)) {

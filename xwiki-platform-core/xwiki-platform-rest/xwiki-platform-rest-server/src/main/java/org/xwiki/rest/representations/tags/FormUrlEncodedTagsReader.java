@@ -56,11 +56,13 @@ public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiR
 
     private static final String TAG_FIELD_NAME = "tag";
 
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Tags.class.isAssignableFrom(type);
     }
 
+    @Override
     public Tags readFrom(Class<Tags> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

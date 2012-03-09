@@ -59,6 +59,7 @@ public class DBListMetaClass extends ListMetaClass
         safeput("valueField", valuefield_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new DBListClass();

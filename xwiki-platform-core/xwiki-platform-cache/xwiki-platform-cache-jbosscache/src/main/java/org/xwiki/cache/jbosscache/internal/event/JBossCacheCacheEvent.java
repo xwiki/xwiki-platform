@@ -44,11 +44,7 @@ public class JBossCacheCacheEvent<T> implements CacheEvent<T>
         this.cache = cache;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEvent#getCache()
-     */
+    @Override
     public Cache<T> getCache()
     {
         return cache;

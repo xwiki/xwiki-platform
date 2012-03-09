@@ -48,6 +48,11 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @Inject
     private ConverterManager converterManager;
 
+    protected Configuration getConfiguration()
+    {
+        return this.configuration;
+    }
+
     protected void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
@@ -57,14 +62,25 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, T defaultValue)
     {
-        return getProperty(key, defaultValue, (Class<T>) defaultValue.getClass());
+        T result;
+        if (containsKey(key)) {
+            if (defaultValue != null) {
+                return getProperty(key, (Class<T>) defaultValue.getClass());
+            } else {
+                return getProperty(key);
+            }
+        } else {
+            result = defaultValue;
+        }
+
+        return result;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        return (T) this.configuration.getProperty(key);
+        return (T) getConfiguration().getProperty(key);
     }
 
     @Override
@@ -75,11 +91,11 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
         try {
             if (String.class.getName().equals(valueClass.getName())) {
-                result = (T) this.configuration.getString(key);
+                result = (T) getConfiguration().getString(key);
             } else if (List.class.isAssignableFrom(valueClass)) {
-                result = (T) this.configuration.getList(key);
+                result = (T) getConfiguration().getList(key);
             } else if (Properties.class.isAssignableFrom(valueClass)) {
-                result = (T) this.configuration.getProperties(key);
+                result = (T) getConfiguration().getProperties(key);
             } else if (null != getProperty(key)) {
                 result = (T) this.converterManager.convert(valueClass, getProperty(key));
             }
@@ -95,35 +111,26 @@ public class CommonsConfigurationSource implements ConfigurationSource
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getKeys()
     {
         List<String> keysList = new ArrayList<String>();
-        Iterator keys = this.configuration.getKeys();
+        Iterator<String> keys = (Iterator<String>) getConfiguration().getKeys();
         while (keys.hasNext()) {
-            keysList.add((String) keys.next());
+            keysList.add(keys.next());
         }
+
         return keysList;
     }
 
     @Override
     public boolean containsKey(String key)
     {
-        return this.configuration.containsKey(key);
+        return getConfiguration().containsKey(key);
     }
 
     @Override
     public boolean isEmpty()
     {
-        return this.configuration.isEmpty();
-    }
-
-    private <T> T getProperty(String key, T defaultValue, Class<T> valueClass)
-    {
-        T result = getProperty(key, valueClass);
-        if (result == null) {
-            result = defaultValue;
-        }
-        return result;
+        return getConfiguration().isEmpty();
     }
 }

@@ -67,6 +67,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
 
         Thread thread = new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 try {

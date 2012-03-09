@@ -40,12 +40,12 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @since 2.3M1
  */
 @Component
-@Named("currentmixed/reference")
+@Named("currentmixed")
 @Singleton
 public class CurrentMixedReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
     @Inject
-    @Named("currentmixed/reference")
+    @Named("currentmixed")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Override

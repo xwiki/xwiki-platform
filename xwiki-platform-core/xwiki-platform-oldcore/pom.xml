@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.4-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -69,7 +69,7 @@
     </dependency>
 
     <dependency>
-      <groupId>jfree</groupId>
+      <groupId>org.jfree</groupId>
       <artifactId>jfreechart</artifactId>
     </dependency>
 
@@ -235,6 +235,11 @@
       <groupId>javassist</groupId>
       <artifactId>javassist</artifactId>
       <version>3.9.0.GA</version>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>2.0.3</version>
     </dependency>
 
     <!-- Authentication -->
@@ -414,9 +419,19 @@
 
     <!-- Other XWiki modules -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-configuration-default</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-context</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -434,14 +449,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -583,11 +593,16 @@
 
     <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.0</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Test dependencies -->
 
     <!-- Used to mock XWiki class -->
@@ -1012,6 +1027,7 @@
               **/store/migration/hibernate/R4359XWIKI1459DataMigration.java,
               **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
               **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
+              **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
               **/store/XWikiAttachmentStoreInterface.java,
               **/store/XWikiBatcherFactory.java,
               **/store/XWikiBatcher.java,
@@ -1076,10 +1092,6 @@
               **/web/InlineAction.java,
               **/web/LifeBlogAction.java,
               **/web/LockAction.java,
-              **/web/LoginAction.java,
-              **/web/LoginErrorAction.java,
-              **/web/LoginSubmitAction.java,
-              **/web/LogoutAction.java,
               **/web/ObjectAddAction.java,
               **/web/ObjectAddForm.java,
               **/web/ObjectRemoveAction.java,
@@ -1135,8 +1147,6 @@
               **/xmlrpc/XWikiXmlRpcUser.java,
               <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
               **/stats/impl/xwiki/XWikiStatsReader.java,
-              <!-- Fan-Out complexity violation -->
-              **/plugin/zipexplorer/ZipExplorerPlugin.java
           </excludes>
         </configuration>
       </plugin>

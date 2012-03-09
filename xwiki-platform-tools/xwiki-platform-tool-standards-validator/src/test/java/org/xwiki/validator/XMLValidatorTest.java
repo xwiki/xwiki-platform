@@ -39,11 +39,6 @@ public class XMLValidatorTest extends TestCase
 
     private XMLValidator validator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {

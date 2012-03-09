@@ -86,11 +86,6 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         super(PLUGIN_NAME, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

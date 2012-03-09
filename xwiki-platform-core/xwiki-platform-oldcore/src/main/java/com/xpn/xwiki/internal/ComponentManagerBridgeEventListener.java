@@ -53,31 +53,19 @@ public class ComponentManagerBridgeEventListener implements EventListener
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return Collections.singletonList((Event) new ApplicationStartedEvent());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "Component Manager Bridge Listener";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventListener#onEvent(Event, Object, Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         Utils.setComponentManager(this.componentManager);

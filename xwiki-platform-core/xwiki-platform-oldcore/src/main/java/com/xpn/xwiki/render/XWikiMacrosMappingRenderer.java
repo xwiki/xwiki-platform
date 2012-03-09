@@ -86,21 +86,13 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
         Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return EVENTS;
@@ -141,12 +133,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#render(java.lang.String, com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
     {
         if (this.macros_libraries == null) {
@@ -218,47 +205,28 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
         return result.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#flushCache()
-     */
+    @Override
     public void flushCache()
     {
         this.macros_libraries = null;
         this.macros_mappings = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#convertMultiLine(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
         return allcontent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#convertSingleLine(java.lang.String, java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {
         return allcontent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiContext context = (XWikiContext) data;

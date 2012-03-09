@@ -76,11 +76,7 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
         return remoteObservationManager;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.jgroups.MessageListener#receive(org.jgroups.Message)
-     */
+    @Override
     public void receive(Message msg)
     {
         RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();

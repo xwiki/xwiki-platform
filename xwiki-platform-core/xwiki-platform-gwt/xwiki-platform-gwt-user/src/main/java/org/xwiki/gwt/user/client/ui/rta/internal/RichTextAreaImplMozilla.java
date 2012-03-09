@@ -49,12 +49,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#initElement()
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3176
-     */
+    @Override
     public native void initElement()
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
@@ -78,11 +73,6 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         }, false);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#setEnabledImpl(boolean)
-     */
     @Override
     protected void setEnabledImpl(boolean enabled)
     {
@@ -120,22 +110,13 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         return body.getChildCount() == 1 && "br".equalsIgnoreCase(body.getFirstChild().getNodeName());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#isEnabledImpl()
-     */
     @Override
     protected boolean isEnabledImpl()
     {
         return ((Document) IFrameElement.as(elem).getContentDocument()).isDesignMode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#hookEvents()
-     */
+    @Override
     protected void hookEvents()
     {
         // JSNI doesn't support super.*
@@ -156,11 +137,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         elem.contentWindow.addEventListener('paste', elem.__gwt_handler, true);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#unhookEvents()
-     */
+    @Override
     protected void unhookEvents()
     {
         // Double click event is not caught by default.
@@ -181,11 +158,6 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#setFocus(boolean)
-     */
     @Override
     public void setFocus(boolean focused)
     {

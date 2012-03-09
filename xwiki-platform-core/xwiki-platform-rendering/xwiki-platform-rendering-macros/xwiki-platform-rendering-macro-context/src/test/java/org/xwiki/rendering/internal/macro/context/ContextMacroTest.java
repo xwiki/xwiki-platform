@@ -76,7 +76,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     public void testExecuteWithReferencedDocumentHavingProgrammingRightsButNotCallingDocument() throws Exception
     {
         final DocumentReferenceResolver<String> resolver =
-            getComponentManager().lookup(DocumentReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
             oneOf(resolver).resolve("wiki:space.page");
@@ -110,7 +110,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         macroContext.setSyntax(Syntax.XWIKI_2_0);
 
         final DocumentReferenceResolver<String> drr =
-            getComponentManager().lookup(DocumentReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("wiki:space.page");
@@ -152,7 +152,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         final DocumentReference docReference = new DocumentReference("wiki", "space", "page");
 
         final DocumentReferenceResolver<String> drr =
-            getComponentManager().lookup(DocumentReferenceResolver.class, "current");
+            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("wiki:space.page");

@@ -63,9 +63,7 @@ public class XWikiJavaCodeFilter extends DefaultRegexCodeFormatter implements So
         addRegex(OBJECTS, "<span class=\"java-object\">$1</span>");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "java";

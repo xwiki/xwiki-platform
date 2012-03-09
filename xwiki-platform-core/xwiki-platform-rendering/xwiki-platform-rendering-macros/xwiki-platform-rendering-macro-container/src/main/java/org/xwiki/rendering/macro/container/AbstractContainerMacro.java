@@ -73,9 +73,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         super(name, description, contentDescriptor, parametersBeanClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -142,9 +140,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         return this.componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;

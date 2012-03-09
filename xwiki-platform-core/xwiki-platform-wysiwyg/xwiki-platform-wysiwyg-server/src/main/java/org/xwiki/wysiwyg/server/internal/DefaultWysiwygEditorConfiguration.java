@@ -177,4 +177,10 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
         Integer sourceEditorEnabled = (Integer) getProperty("sourceEditorEnabled");
         return sourceEditorEnabled == null ? null : ONE.equals(sourceEditorEnabled);
     }
+
+    @Override
+    public Integer getHistorySize()
+    {
+        return (Integer) getProperty("historySize");
+    }
 }

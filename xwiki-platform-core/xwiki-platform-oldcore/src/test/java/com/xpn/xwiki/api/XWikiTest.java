@@ -83,6 +83,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public java.lang.Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -96,6 +97,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public java.lang.Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);

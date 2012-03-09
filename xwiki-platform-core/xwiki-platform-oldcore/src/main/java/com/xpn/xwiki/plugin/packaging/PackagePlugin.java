@@ -26,18 +26,19 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
-
     public PackagePlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
     }
 
+    @Override
     public String getName()
     {
         return "package";
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         try {
@@ -47,10 +48,12 @@ public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         }
     }
 
+    @Override
     public void flushCache()
     {
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);

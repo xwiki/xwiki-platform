@@ -37,11 +37,6 @@ public class LevelTree
      */
     public AllowDeny direct;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

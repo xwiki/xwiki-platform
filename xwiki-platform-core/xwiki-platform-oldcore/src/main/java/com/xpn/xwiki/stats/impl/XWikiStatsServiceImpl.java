@@ -83,7 +83,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
      * Used to resolve reference based on context.
      */
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current");
+        DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * The statistics storing thread.

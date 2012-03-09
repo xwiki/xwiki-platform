@@ -78,7 +78,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner value of the state
      * and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException, SchedulerPluginException
+    public JobState getJobStatus(BaseObject object) throws SchedulerException
     {
         return getProtectedPlugin().getJobStatus(object, this.context);
     }

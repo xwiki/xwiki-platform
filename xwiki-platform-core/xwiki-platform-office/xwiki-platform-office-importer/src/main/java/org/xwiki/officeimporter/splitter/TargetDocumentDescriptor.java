@@ -118,7 +118,7 @@ public class TargetDocumentDescriptor
     {
         try {
             EntityReferenceSerializer<String> serializer =
-                this.componentManager.lookup(EntityReferenceSerializer.class, serializerHint);
+                this.componentManager.lookupComponent(EntityReferenceSerializer.TYPE_STRING, serializerHint);
             return serializer.serialize(documentReference);
         } catch (ComponentLookupException ex) {
             // TODO: put a descriptive comment.
@@ -126,9 +126,7 @@ public class TargetDocumentDescriptor
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean equals(Object obj)
     {
         boolean equals = false;
@@ -139,9 +137,7 @@ public class TargetDocumentDescriptor
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int hashCode()
     {
         return getDocumentReference().hashCode();

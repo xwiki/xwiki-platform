@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 
 /**
  * Looks for configuration data in {@code /WEB-INF/xwiki.properties}.
@@ -47,10 +47,10 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
 
     /**
-     * Injected by the Component Manager.
+     * the Environment from where to get the XWiki properties file.
      */
     @Inject
-    private Container container;
+    private Environment environment;
 
     /**
      * The logger to log.
@@ -63,27 +63,27 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     {
         // Register the Commons Properties Configuration, looking for a xwiki.properties file
         // in the XWiki path somewhere.
-        URL xwikiPropertiesUrl;
+        URL xwikiPropertiesUrl = null;
         try {
-            xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
+            xwikiPropertiesUrl = this.environment.getResource(XWIKI_PROPERTIES_FILE);
             if (xwikiPropertiesUrl != null) {
                 setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
-            } else if (this.logger.isDebugEnabled()) {
+            } else {
                 // We use a debug logging level here since we consider it's ok that there's no XWIKI_PROPERTIES_FILE
                 // available, in which case default values are used.
-                this.logger.debug("No configuration file [" + XWIKI_PROPERTIES_FILE + "] found. "
-                    + "Using default configuration values.");
-
-                // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
-                setConfiguration(new BaseConfiguration());
+                this.logger.debug("No configuration file [{}] found. Using default configuration values.",
+                    XWIKI_PROPERTIES_FILE);
             }
         } catch (Exception e) {
-            // Note: if we cannot read the configuration file for any reasonwe log a warning but continue since XWiki
+            // Note: if we cannot read the configuration file for any reason we log a warning but continue since XWiki
             // will use default values for all configurable elements.
-            this.logger.warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE
-                + "]. Using default configuration values. " + " Internal error [" + e.getMessage() + "]");
+            this.logger.warn("Failed to load configuration file [{}]. Using default configuration values. "
+                + "Internal error [{}]", XWIKI_PROPERTIES_FILE, e.getMessage());
+        }
 
-            // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
+        // If no Commons Properties Configuration has been set, use a default empty Commons Configuration
+        // implementation.
+        if (xwikiPropertiesUrl == null) {
             setConfiguration(new BaseConfiguration());
         }
     }

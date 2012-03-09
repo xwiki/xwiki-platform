@@ -40,8 +40,8 @@ public class ObjectAddAction extends XWikiAction
 {
     private static final String[] EMPTY_PROPERTY = new String[] {""};
 
-    @SuppressWarnings("unchecked")
-    private DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.class, "current");
+    private DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING,
+        "current");
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

@@ -21,39 +21,50 @@ package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.util.Util;
 
-public class RollbackForm extends XWikiForm {
+public class RollbackForm extends XWikiForm
+{
     private String rev;
+
     private String language;
+
     private String confirm;
 
-    public void readRequest() {
+    @Override
+    public void readRequest()
+    {
         XWikiRequest request = getRequest();
         setRev(request.getParameter("rev"));
         setLanguage(request.getParameter("language"));
         setConfirm(request.getParameter("confirm"));
     }
 
-    public String getRev() {
-        return rev;
+    public String getRev()
+    {
+        return this.rev;
     }
 
-    public void setRev(String rev) {
+    public void setRev(String rev)
+    {
         this.rev = rev;
     }
 
-    public String getLanguage() {
-        return language;
+    public String getLanguage()
+    {
+        return this.language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(String language)
+    {
         this.language = Util.normalizeLanguage(language);
     }
 
-	public String getConfirm() {
-		return confirm;
-	}
+    public String getConfirm()
+    {
+        return confirm;
+    }
 
-	public void setConfirm(String confirm) {
-		this.confirm = confirm;
-	}
+    public void setConfirm(String confirm)
+    {
+        this.confirm = confirm;
+    }
 }

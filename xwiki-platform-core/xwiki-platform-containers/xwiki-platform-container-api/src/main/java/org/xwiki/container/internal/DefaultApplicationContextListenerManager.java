@@ -37,9 +37,11 @@ import org.xwiki.container.ApplicationContextListenerManager;
  * 
  * @version $Id$
  * @since 1.9M2
+ * @deprecated starting with 3.5M1, use the notion of Environment instead
  */
 @Component
 @Singleton
+@Deprecated
 public class DefaultApplicationContextListenerManager implements ApplicationContextListenerManager
 {
     /**

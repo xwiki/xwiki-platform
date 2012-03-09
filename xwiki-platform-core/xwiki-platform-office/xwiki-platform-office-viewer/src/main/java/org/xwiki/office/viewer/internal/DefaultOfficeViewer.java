@@ -77,11 +77,7 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractOfficeViewer#createOfficeDocumentView(AttachmentReference, Map)
-     */
+    @Override
     protected OfficeDocumentView createOfficeDocumentView(AttachmentReference attachmentReference,
         Map<String, String> parameters) throws Exception
     {

@@ -19,30 +19,36 @@
  */
 package com.xpn.xwiki.web;
 
-
-
-public class PropAddForm extends XWikiForm {
+public class PropAddForm extends XWikiForm
+{
 
     private String propName;
+
     private String propType;
 
-    public String getPropName() {
+    public String getPropName()
+    {
         return propName;
     }
 
-    public void setPropName(String propName) {
-        this.propName = propName.replaceAll(" ","");
+    public void setPropName(String propName)
+    {
+        this.propName = propName.replaceAll(" ", "");
     }
 
-    public String getPropType() {
+    public String getPropType()
+    {
         return propType;
     }
 
-    public void setPropType(String propType) {
+    public void setPropType(String propType)
+    {
         this.propType = propType;
     }
 
-    public void readRequest() {
+    @Override
+    public void readRequest()
+    {
         XWikiRequest request = getRequest();
         setPropName(request.getParameter("propname"));
         setPropType(request.getParameter("proptype"));

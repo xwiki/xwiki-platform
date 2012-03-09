@@ -141,43 +141,27 @@ public class MenuItem extends com.google.gwt.user.client.ui.MenuItem
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.MenuItem#setHTML(String)
-     */
+    @Override
     public void setHTML(String html)
     {
         maybeCreateLabel();
         label.setHTML(html);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.MenuItem#getHTML()
-     */
+    @Override
     public String getHTML()
     {
         return label != null ? label.getHTML() : null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.MenuItem#setText(String)
-     */
+    @Override
     public void setText(String text)
     {
         maybeCreateLabel();
         label.setText(text);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.MenuItem#getText()
-     */
+    @Override
     public String getText()
     {
         return label != null ? label.getText() : null;

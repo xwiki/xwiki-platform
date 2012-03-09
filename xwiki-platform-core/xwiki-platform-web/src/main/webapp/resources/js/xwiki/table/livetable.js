@@ -274,10 +274,10 @@ XWiki.widgets.LiveTable = Class.create({
     var f = offset + limit - 1;
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
-    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('xe.pagination.results.of') <strong>" + this.totalRows + "</strong>";
+    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$msg.get('xe.pagination.results') " + msg;
+    this.limitsDisplay.innerHTML = "$msg.get('platform.livetable.paginationResults') " + msg;
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {

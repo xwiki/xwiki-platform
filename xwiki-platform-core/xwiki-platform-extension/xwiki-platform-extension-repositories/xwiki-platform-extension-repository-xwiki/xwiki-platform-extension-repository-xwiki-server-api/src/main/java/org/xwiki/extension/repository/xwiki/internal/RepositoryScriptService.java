@@ -21,6 +21,7 @@ package org.xwiki.extension.repository.xwiki.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -33,6 +34,7 @@ import org.xwiki.script.service.ScriptService;
 
 @Component
 @Named("repository")
+@Singleton
 public class RepositoryScriptService implements ScriptService
 {
     /**

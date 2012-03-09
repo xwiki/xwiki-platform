@@ -80,6 +80,10 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     @Inject
     private Logger logger;
 
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     @Override
     public void initializeApplicationContext(ServletContext servletContext)
     {

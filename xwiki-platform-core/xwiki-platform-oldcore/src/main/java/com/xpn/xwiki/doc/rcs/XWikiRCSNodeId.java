@@ -26,22 +26,32 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
- * Composite ID component used in {@link XWikiRCSNodeInfo} & {@link XWikiRCSNodeContent}.
- * Immutable.
+ * Composite ID component used in {@link XWikiRCSNodeInfo} & {@link XWikiRCSNodeContent}. Immutable.
+ * 
  * @version $Id$
  * @since 1.2M1
  */
 public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable, Cloneable
 {
-    /** @see XWikiDocument#getId(). */
-    private long    docId;
-    /** version of document. */
-    private Version version         = new Version(1, 1);
-
-    /** default constructor used in Hibernate to load this class. */
-    public XWikiRCSNodeId() { }
     /**
-     * @param docId = {@link XWikiDocument#getId()}
+     * @see com.xpn.xwiki.doc.XWikiDocument#getId()
+     */
+    private long docId;
+
+    /**
+     * Version of document.
+     */
+    private Version version = new Version(1, 1);
+
+    /**
+     * Default constructor used in Hibernate to load this class.
+     */
+    public XWikiRCSNodeId()
+    {
+    }
+
+    /**
+     * @param docId = {@link com.xpn.xwiki.doc.XWikiDocument#getId()}
      * @param version - version of document
      */
     public XWikiRCSNodeId(long docId, Version version)
@@ -50,59 +60,72 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
         this.docId = docId;
         this.version = version;
     }
-    /** @return {@link XWikiDocument#getId()} */
+
+    /**
+     * @return {@link com.xpn.xwiki.doc.XWikiDocument#getId()}
+     */
     public long getDocId()
     {
         return docId;
     }
-    /** @param docId = {@link XWikiDocument#getId()} */
+
+    /**
+     * @param docId = {@link com.xpn.xwiki.doc.XWikiDocument#getId()}
+     */
     protected void setDocId(long docId)
     {
         this.docId = docId;
     }
-    /** @return version of document */
+
+    /**
+     * @return version of document
+     */
     public Version getVersion()
     {
         return version;
     }
-    /** @param ver - version of document */
+
+    /**
+     * @param ver - version of document
+     */
     protected void setVersion(Version ver)
     {
         this.version = ver;
     }
+
     /**
-     * @return 1st number in version
-     * used in Hibernate to store this class
+     * @return 1st number in version used in Hibernate to store this class
      */
     protected int getVersion1()
     {
         return version.at(0);
     }
+
     /**
-     * @return 2nd number in version
-     * used in Hibernate to store this class
+     * @return 2nd number in version used in Hibernate to store this class
      */
     protected int getVersion2()
     {
         return version.at(1);
     }
+
     /**
-     * @param v1 = 1st number in version
-     * used in Hibernate to load this class
+     * @param v1 = 1st number in version used in Hibernate to load this class
      */
     protected void setVersion1(int v1)
     {
         this.version = new Version(v1, version.at(1));
     }
+
     /**
-     * @param v2 = 2nd number in version
-     * used in Hibernate to load this class
+     * @param v2 = 2nd number in version used in Hibernate to load this class
      */
     protected void setVersion2(int v2)
     {
         this.version = new Version(version.at(0), v2);
     }
-    /** {@inheritDoc} */
+
+    @Override
     public Object clone()
     {
         try {

@@ -109,44 +109,24 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return PLUGIN_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
         super.init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(XWikiContext)
-     */
     @Override
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

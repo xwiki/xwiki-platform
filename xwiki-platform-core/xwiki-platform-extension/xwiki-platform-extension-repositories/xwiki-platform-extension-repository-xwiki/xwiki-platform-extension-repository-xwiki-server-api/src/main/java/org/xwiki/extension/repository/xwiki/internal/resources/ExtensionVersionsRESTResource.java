@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -48,6 +49,7 @@ import org.xwiki.query.QueryException;
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionsRESTResource")
 @Path(Resources.EXTENSION_VERSIONS)
+@Singleton
 public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET

@@ -73,9 +73,7 @@ public interface OpenOfficeManager
             this.stateDescription = stateDescription;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public String toString()
         {
             return this.stateDescription;

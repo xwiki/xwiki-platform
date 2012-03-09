@@ -30,6 +30,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class DocumentHandler extends AbstractHandler
 {
     /**

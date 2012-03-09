@@ -47,11 +47,7 @@ public class JBossCacheCacheEntryEvent<T> extends JBossCacheCacheEvent<T> implem
         this.entry = entry;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryEvent#getEntry()
-     */
+    @Override
     public CacheEntry<T> getEntry()
     {
         return entry;

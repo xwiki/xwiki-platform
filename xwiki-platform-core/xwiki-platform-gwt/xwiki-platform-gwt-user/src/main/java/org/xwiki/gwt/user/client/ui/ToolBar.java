@@ -59,11 +59,7 @@ public class ToolBar extends Composite implements HasWidgets, IndexedPanel
         panel.add(clearFloats);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasWidgets#add(Widget)
-     */
+    @Override
     public void add(Widget w)
     {
         clearFloats.removeFromParent();
@@ -77,32 +73,20 @@ public class ToolBar extends Composite implements HasWidgets, IndexedPanel
         panel.add(clearFloats);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasWidgets#clear()
-     */
+    @Override
     public void clear()
     {
         panel.clear();
         panel.add(clearFloats);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasWidgets#iterator()
-     */
+    @Override
     public Iterator<Widget> iterator()
     {
         return panel.iterator();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasWidgets#remove(Widget)
-     */
+    @Override
     public boolean remove(Widget w)
     {
         if (w != clearFloats) {
@@ -112,41 +96,25 @@ public class ToolBar extends Composite implements HasWidgets, IndexedPanel
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IndexedPanel#getWidget(int)
-     */
+    @Override
     public Widget getWidget(int index)
     {
         return panel.getWidget(index);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IndexedPanel#getWidgetCount()
-     */
+    @Override
     public int getWidgetCount()
     {
         return panel.getWidgetCount();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IndexedPanel#getWidgetIndex(Widget)
-     */
+    @Override
     public int getWidgetIndex(Widget child)
     {
         return panel.getWidgetIndex(child);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IndexedPanel#remove(int)
-     */
+    @Override
     public boolean remove(int index)
     {
         if (getWidget(index) != clearFloats) {

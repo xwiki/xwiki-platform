@@ -75,9 +75,8 @@ import org.w3c.dom.ls.LSSerializer;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -117,14 +116,12 @@ public class PdfExportImpl implements PdfExport
     private static final Properties TIDY_CONFIGURATION;
 
     /** Document name resolver. */
-    @SuppressWarnings("unchecked")
     private static DocumentReferenceResolver<String> referenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Document name serializer. */
-    @SuppressWarnings("unchecked")
     private static EntityReferenceSerializer<String> referenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /** Provides access to document properties. */
     private static DocumentAccessBridge dab = Utils.getComponent(DocumentAccessBridge.class);
@@ -173,8 +170,8 @@ public class PdfExportImpl implements PdfExport
         // ----------------------------------------------------------------------
         fopFactory = FopFactory.newInstance();
         try {
-            ApplicationContext context = Utils.getComponent(Container.class).getApplicationContext();
-            String fontsPath = context.getResource(FONTS_PATH).getPath();
+            Environment environment = Utils.getComponent(Environment.class);
+            String fontsPath = environment.getResource(FONTS_PATH).getPath();
             Execution execution = Utils.getComponent(Execution.class);
             XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
             if (xcontext != null) {
@@ -234,23 +231,13 @@ public class PdfExportImpl implements PdfExport
         this.tidy.setConfigurationFromProps(TIDY_CONFIGURATION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#exportToPDF(XWikiDocument, OutputStream, XWikiContext)
-     * @since 1.0
-     */
+    @Override
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException
     {
         export(doc, out, ExportType.PDF, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#export(XWikiDocument, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
-     * @since 3.0M2
-     */
+    @Override
     public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
@@ -287,12 +274,7 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#exportHtml(String, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
-     * @since 3.0M2
-     */
+    @Override
     public void exportHtml(String html, OutputStream out, ExportType type, XWikiContext context) throws XWikiException
     {
         exportXHTML(applyCSS(convertToStrictXHtml(html), context), out, type, context);

@@ -34,11 +34,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPortletURLFactory.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#init(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
@@ -52,12 +47,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         contextPath = "xwiki/";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#createAttachmentURL(java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb,
         XWikiContext context)
@@ -96,12 +85,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
@@ -163,12 +146,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
-     *      boolean, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context)
     {
@@ -189,12 +166,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createExternalURL(java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context)
@@ -202,11 +173,6 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory
         return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#getServerURL(java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {

@@ -73,17 +73,13 @@ public class LegacyEventDispatcher implements EventListener
      */
     private ObservationManager observationManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "legacyEventDispatcher";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getEvents()
     {
         return new ArrayList<Event>()
@@ -97,9 +93,7 @@ public class LegacyEventDispatcher implements EventListener
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof DocumentDeletedEvent) {

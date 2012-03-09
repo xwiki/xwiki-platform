@@ -67,11 +67,6 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
 
     private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -89,6 +84,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -106,6 +102,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -123,6 +120,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("deleteXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -138,6 +136,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("getTranslationList").will(
             new CustomStub("Implements XWikiStoreInterface.getTranslationList")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);

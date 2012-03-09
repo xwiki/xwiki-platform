@@ -189,124 +189,37 @@ RU5ErkJggg==
 {{velocity}}
 ## Ajax call for a single extension
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
-  #set ($actions = [])
-  #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
-  #end
-  #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""$msg.get('extensions.actions.uninstall')"" class=""button""/&gt;&lt;/span&gt;"))
-  #end
   #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
+#elseif ($request.actionuninstall)
+  #handleUninstallExtensionRequest()
 #else
-##
-(% class="full column" %)(((
-#if ($request.actionuninstall)
-  = $msg.get('extensions.uninstall.title')
+  (% class="full column" %)(((
+  #displayExtensionSearchBar()
 
-  #if (!$request.extensionid || !$request.extensionversion)
-    {{error}}$msg.get('extensions.uninstall.error.missingIdOrVersion'){{/error}}
-  #elseif ($request.confirm)
-    #set($uninstallJob = $extensionManager.uninstall($request.extensionid, null))
-    #set($lasterror = $extensionManager.lastError)
-    #if ($lasterror)
-      {{error}}
-        $msg.get('extensions.uninstall.error.uninstallFailure', [$request.extensionid, $request.extensionversion]) ##
-        #printThrowable($lasterror)
-      {{/error}}
-    #else
-      {{box}}
-        #printJobLog($uninstallJob)
-      {{/box}}
-    #end
+  = $msg.get('extensions.installed.title')
+
+  #if ($request.extensionid &amp;&amp; $request.extensionversion)
+    #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
   #else
-    #set($uninstallPlan = $extensionManager.createUninstallPlan($request.extensionid, $extensionnamespace))
-    #if (!$uninstallPlan)
-      {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$request.extensionid, $request.extensionversion, $lasterror.message]){{/error}}
-    #else
-      #set($hasError = false)
-      #foreach($log in $uninstallPlan.log)
-        #if ($log.level.name() == 'ERROR')
-          #set($hasError = true)
-        #end
-      #end
-      ##
-      #if ($hasError)
-        {{box}}#printStatusLog($installPlan){{/box}}
-      #else
-        #set($extensionsToUninstall = [])
-        ##
-        #foreach($planAction in $uninstallPlan.actions)
-          #if ($planAction.action.name() == "UNINSTALL")
-            #set($void = $extensionsToUninstall.add($planAction))
-          #end
-        #end
-        ##
-        #if ($extensionsToUninstall.isEmpty())
-          {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
-        #else
-          The following extensions will be removed:
-          #foreach ($planAction in $extensionsToUninstall)
-            * $planAction.extension.id.id ($planAction.extension.id.version)
-          #end
-
-          {{html}}
-            &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
-              &lt;div&gt;
-                &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
-                &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
-                &lt;input name="actionuninstall" type="hidden" /&gt;
-                &lt;p&gt;
-                  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
-                  #if ("$!{request.xback}" != '')
-                    &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
-                  #end
-                &lt;/p&gt;
-              &lt;/div&gt;
-            &lt;/form&gt;
-          {{/html}}
-        #end
-      #end
+    #set($extensions = $extensionManager.getInstalledExtensions())
+  #end
+  #if ($extensions.isEmpty())
+    {{info}}$msg.get('extensions.installed.noExtensions'){{/info}}##
+  #else
+    #if ($extensions.size() &gt; 1)
+      #set ($hasPagination = true)
+      #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
+      {{html}}#pagination($paginationParams){{/html}}
+      #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
+    #end
+    #foreach($extension in $extensions)
+      #displayExtension($extension $actions)
+    #end
+    #if ($hasPagination)
+      #set ($discard = $paginationParams.put('position', 'bottom'))
+      {{html}}#pagination($paginationParams){{/html}}
     #end
   #end
-#else
-#displayExtensionSearchBar()
-
-= $msg.get('extensions.installed.title')
-
-#if ($request.extensionid &amp;&amp; $request.extensionversion)
-  #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
-#else
-  #set($extensions = $extensionManager.getInstalledExtensions())
-#end
-#if ($extensions.isEmpty())
-  {{info}}$msg.get('extensions.installed.noExtensions'){{/info}}##
-#else
-  #if ($extensions.size() &gt; 1)
-    #set ($hasPagination = true)
-    #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
-    {{html}}#pagination($paginationParams){{/html}}
-    #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
-  #end
-  #set ($actions = [])
-  #computeXBack()
-  #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
-  #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
-  #end
-  #if ($hasProgramming)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionuninstall"" value=""$msg.get('extensions.actions.uninstall')"" class=""button""/&gt;&lt;/span&gt;"))
-  #end
-  #foreach($extension in $extensions)
-    #displayExtension($extension $actions)
-  #end
-  #if ($hasPagination)
-    #set ($discard = $paginationParams.put('position', 'bottom'))
-    {{html}}#pagination($paginationParams){{/html}}
-  #end
-#end
-#end
-)))
+  )))
 #end
 {{/velocity}}</content></xwikidoc>

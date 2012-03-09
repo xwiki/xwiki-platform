@@ -41,11 +41,6 @@ public class CommandListenerCollectionTest extends UserTestCase
      */
     private final List<String> log = new ArrayList<String>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UserTestCase#gwtTearDown()
-     */
     @Override
     protected void gwtTearDown() throws Exception
     {

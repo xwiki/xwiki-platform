@@ -22,6 +22,7 @@ package org.xwiki.query.xwql.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +96,7 @@ public class QueryContext
         /**
          * Properties appeared in query
          */
-        public Map<String, PropertyInfo> properties = new HashMap<String, PropertyInfo>();
+        public Map<String, PropertyInfo> properties = new LinkedHashMap<String, PropertyInfo>();
 
         public ObjectInfo(String docAlias, String className, String objAlias)
         {
@@ -181,6 +182,8 @@ public class QueryContext
             objects.put(objAlias, res);
         } else if (di.unnamedObjects.get(className) == null) {
             di.unnamedObjects.put(className, res);
+        } else {
+            res = di.unnamedObjects.get(className);
         }
         nodeToObject.put(node, res);
         return res;

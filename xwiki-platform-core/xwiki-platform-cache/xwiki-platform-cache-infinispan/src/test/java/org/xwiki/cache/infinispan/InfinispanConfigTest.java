@@ -22,8 +22,7 @@ package org.xwiki.cache.infinispan;
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.cache.tests.AbstractTestCache;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 
 /**
  * Verify that defining an Infinispan config file is taken into account.
@@ -42,13 +41,10 @@ public class InfinispanConfigTest extends AbstractTestCache
     public void testConfig() throws Exception
     {
         // We register a mock Container to verify that getCacheFactory() below will call
-        // Container#getApplicationContext() which will mean that the configuration file is read.
-        final Container mockContainer = registerMockComponent(Container.class);
-        final ApplicationContext mockApplicationContext = getMockery().mock(ApplicationContext.class);
+        // Environment#getResourceAsStream() which will mean that the configuration file is read.
+        final Environment environment = registerMockComponent(Environment.class);
         getMockery().checking(new Expectations() {{
-            oneOf(mockContainer).getApplicationContext();
-            will(returnValue(mockApplicationContext));
-            oneOf(mockApplicationContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
+            oneOf(environment).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
             will(returnValue(null));
         }});
 

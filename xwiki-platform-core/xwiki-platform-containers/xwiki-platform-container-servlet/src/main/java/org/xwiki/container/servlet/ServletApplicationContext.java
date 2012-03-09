@@ -31,6 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.AbstractApplicationContext;
 
+/**
+ * @deprecated starting with 3.5M1, use the notion of Environment instead
+ */
+@Deprecated
 public class ServletApplicationContext extends AbstractApplicationContext
 {
     /**

@@ -20,20 +20,30 @@
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.net.ProxySelector;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.CoreProtocolPNames;
+import org.restlet.data.Disposition;
 import org.restlet.data.MediaType;
 import org.restlet.representation.InputRepresentation;
 import org.xwiki.component.annotation.Component;
@@ -41,12 +51,13 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.internal.reference.ExtensionResourceReference;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.xwiki.Resources;
+import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
+import org.xwiki.extension.repository.xwiki.internal.reference.ExtensionResourceReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.query.QueryException;
@@ -65,6 +76,7 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
+@Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
 {
     @Inject
@@ -75,13 +87,36 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
     @GET
     public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
-        @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion) throws XWikiException, QueryException,
-        URISyntaxException, IOException, ResolveException
+        @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion,
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYID) String repositoryId,
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYTYPE) String repositoryType,
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYURI) String repositoryURI) throws XWikiException,
+        QueryException, URISyntaxException, IOException, ResolveException
+    {
+        ResponseBuilder response;
+
+        if (repositoryId != null) {
+            response =
+                downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryId));
+        } else if (repositoryType != null && repositoryURI != null) {
+            response =
+                downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryType,
+                    new URI(repositoryURI)));
+        } else {
+            response = downloadLocalExtension(extensionId, extensionVersion);
+        }
+
+        return response.build();
+    }
+
+    private ResponseBuilder downloadLocalExtension(String extensionId, String extensionVersion)
+        throws ResolveException, IOException, QueryException, XWikiException
     {
         XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
         checkRights(extensionDocument);
 
+        BaseObject extensionObject = getExtensionObject(extensionDocument);
         BaseObject extensionVersionObject = getExtensionVersionObject(extensionDocument, extensionVersion);
 
         ResponseBuilder response = null;
@@ -109,21 +144,41 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // It's an URL
             URL url = new URL(resourceReference.getReference());
 
-            // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
-            // Should probably use javax.ws.rs.ext.MessageBodyWriter
+            DefaultHttpClient httpClient = new DefaultHttpClient();
 
-            URLConnection connection = url.openConnection();
+            httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "XWikiExtensionRepository");
+            httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
+            httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
 
-            if (connection instanceof HttpURLConnection) {
-                HttpURLConnection httpConnection = (HttpURLConnection) connection;
-                response = Response.status(httpConnection.getResponseCode());
-            } else {
-                response = Response.ok();
+            ProxySelectorRoutePlanner routePlanner =
+                new ProxySelectorRoutePlanner(httpClient.getConnectionManager().getSchemeRegistry(),
+                    ProxySelector.getDefault());
+            httpClient.setRoutePlanner(routePlanner);
+
+            HttpGet getMethod = new HttpGet(url.toString());
+
+            HttpResponse subResponse;
+            try {
+                subResponse = httpClient.execute(getMethod);
+            } catch (Exception e) {
+                throw new IOException("Failed to request [" + getMethod.getURI() + "]", e);
             }
 
+            response = Response.status(subResponse.getStatusLine().getStatusCode());
+
+            // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
+            // Should probably use javax.ws.rs.ext.MessageBodyWriter
+            HttpEntity entity = subResponse.getEntity();
             InputRepresentation content =
-                new InputRepresentation(connection.getInputStream(), new MediaType(connection.getContentType()),
-                    connection.getContentLength());
+                new InputRepresentation(entity.getContent(), new MediaType(entity.getContentType().getValue()),
+                    entity.getContentLength());
+
+            String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+
+            Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
+            disposition.setFilename(extensionId + '-' + extensionVersion + '.' + type);
+            content.setDisposition(disposition);
+
             response.entity(content);
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
             ExtensionResourceReference extensionResource;
@@ -133,53 +188,67 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 extensionResource = new ExtensionResourceReference(resourceReference.getReference());
             }
 
-            ExtensionRepository repository = null;
-            if (extensionResource.getRepositoryId() != null) {
-                repository = this.extensionRepositoryManager.getRepository(extensionResource.getRepositoryId());
-            }
-
-            if (repository == null && extensionResource.getRepositoryType() != null
-                && extensionResource.getRepositoryURI() != null) {
-                ExtensionRepositoryId repositoryId =
-                    new ExtensionRepositoryId("tmp", extensionResource.getRepositoryType(),
-                        extensionResource.getRepositoryURI());
-                try {
-                    ExtensionRepositoryFactory repositoryFactory =
-                        this.componentManager.lookup(ExtensionRepositoryFactory.class, repositoryId.getType());
-
-                    repository = repositoryFactory.createRepository(repositoryId);
-                } catch (Exception e) {
-                    // Ignore invalid repository
-                    this.logger.warning("Invalid repository in download link [" + resourceReference + "] in document ["
-                        + extensionDocument + "]");
-                }
-
-            }
-
-            // Resolve extension
-            Extension downloadExtension;
-            if (repository == null) {
-                downloadExtension =
-                    this.extensionRepositoryManager.resolve(new ExtensionId(extensionResource.getExtensionId(),
-                        extensionResource.getExtensionVersion()));
-            } else {
-                downloadExtension =
-                    repository.resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource
-                        .getExtensionVersion()));
-            }
-
-            // Get file
-            // TODO: find media type
-            ExtensionFile extensionFile = downloadExtension.getFile();
-            long length = extensionFile.getLength();
-            InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
-
-            response = Response.ok();
-            response.entity(content);
+            response = downloadRemoteExtension(extensionResource);
         } else {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return response.build();
+        return response;
+    }
+
+    private ResponseBuilder downloadRemoteExtension(ExtensionResourceReference extensionResource)
+        throws ResolveException, IOException
+    {
+        ExtensionRepository repository = null;
+        if (extensionResource.getRepositoryId() != null) {
+            repository = this.extensionRepositoryManager.getRepository(extensionResource.getRepositoryId());
+        }
+
+        if (repository == null && extensionResource.getRepositoryType() != null
+            && extensionResource.getRepositoryURI() != null) {
+            ExtensionRepositoryId repositoryId =
+                new ExtensionRepositoryId("tmp", extensionResource.getRepositoryType(),
+                    extensionResource.getRepositoryURI());
+            try {
+                ExtensionRepositoryFactory repositoryFactory =
+                    this.componentManager.lookupComponent(ExtensionRepositoryFactory.class, repositoryId.getType());
+
+                repository = repositoryFactory.createRepository(repositoryId);
+            } catch (Exception e) {
+                // Ignore invalid repository
+                this.logger.warning("Invalid repository in download link [" + extensionResource + "]");
+            }
+
+        }
+
+        // Resolve extension
+        Extension downloadExtension;
+        if (repository == null) {
+            downloadExtension =
+                this.extensionRepositoryManager.resolve(new ExtensionId(extensionResource.getExtensionId(),
+                    extensionResource.getExtensionVersion()));
+        } else {
+            downloadExtension =
+                repository.resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource
+                    .getExtensionVersion()));
+        }
+
+        // Get file
+        // TODO: find media type
+        ExtensionFile extensionFile = downloadExtension.getFile();
+        long length = extensionFile.getLength();
+
+        // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
+        // Should probably use javax.ws.rs.ext.MessageBodyWriter
+        InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
+
+        Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
+        disposition.setFilename(downloadExtension.getId().toString() + '.' + downloadExtension.getType());
+        content.setDisposition(disposition);
+
+        ResponseBuilder response = Response.ok();
+        response.entity(content);
+
+        return response;
     }
 }

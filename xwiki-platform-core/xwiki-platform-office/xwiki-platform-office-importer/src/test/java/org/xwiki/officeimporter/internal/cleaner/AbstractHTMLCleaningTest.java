@@ -56,9 +56,7 @@ public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTes
      */
     protected HTMLCleaner wysiwygHTMLCleaner;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();

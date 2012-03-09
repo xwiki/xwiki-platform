@@ -20,11 +20,10 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.Resources;
@@ -40,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 @Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionRESTResource")
 @Path(Resources.EXTENSION)
+@Singleton
 public class ExtensionRESTResource extends AbstractExtensionRESTResource
 {
     @GET

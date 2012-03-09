@@ -81,32 +81,19 @@ public class DocumentContentAnnotationUpdateListener implements EventListener
      */
     private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new DocumentUpdatedEvent()));
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return eventsList;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "DocumentContentAnnotationUpdateListener";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         DocumentModelBridge currentDocument = (DocumentModelBridge) source;

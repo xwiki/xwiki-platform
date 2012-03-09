@@ -24,9 +24,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -34,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -57,8 +60,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
 
-    /** Colon symbol. */
-    private static final String COLON = ":";
+    /** Needed for computing the archive cache key. */
+    @Inject
+    private EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -135,31 +139,26 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         if (archiveDoc != null) {
             return archiveDoc;
         }
-        String key = ((doc.getDatabase() == null) ? "xwiki" : doc.getDatabase()) + COLON + doc.getFullName();
-        if (!"".equals(doc.getLanguage())) {
-            key = key + COLON + doc.getLanguage();
-        }
+        String key = getDocumentArchiveKey(doc);
 
-        synchronized (key) {
-            archiveDoc = context.getDocumentArchive(key);
-            if (archiveDoc == null) {
-                String db = context.getDatabase();
-                try {
-                    if (doc.getDatabase() != null) {
-                        context.setDatabase(doc.getDatabase());
-                    }
-                    archiveDoc = new XWikiDocumentArchive(doc.getId());
-                    loadXWikiDocArchive(archiveDoc, true, context);
-                    doc.setDocumentArchive(archiveDoc);
-                } finally {
-                    context.setDatabase(db);
+        archiveDoc = context.getDocumentArchive(key);
+        if (archiveDoc == null) {
+            String db = context.getDatabase();
+            try {
+                if (doc.getDatabase() != null) {
+                    context.setDatabase(doc.getDatabase());
                 }
-                // This will also make sure that the Archive has a strong reference
-                // and will not be discarded as long as the context exists.
-                context.addDocumentArchive(key, archiveDoc);
+                archiveDoc = new XWikiDocumentArchive(doc.getId());
+                loadXWikiDocArchive(archiveDoc, true, context);
+                doc.setDocumentArchive(archiveDoc);
+            } finally {
+                context.setDatabase(db);
             }
-            return archiveDoc;
+            // This will also make sure that the Archive has a strong reference
+            // and will not be discarded as long as the context exists.
+            context.addDocumentArchive(key, archiveDoc);
         }
+        return archiveDoc;
     }
 
     @Override
@@ -313,6 +312,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
+        context.removeDocumentArchive(getDocumentArchiveKey(doc));
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
             @Override
@@ -323,5 +323,22 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 return null;
             }
         });
+    }
+
+    /**
+     * Compute a unique key that can be used to identify a specific document's archive. This key is used to store and
+     * retrieve an already loaded document archive into a temporary cache attached to the current request context.
+     * 
+     * @param doc the document for which to compute the key
+     * @return the key used to identify a document archive in the
+     *         {@link XWikiContext#addDocumentArchive(String, XWikiDocumentArchive) context cache}
+     */
+    private String getDocumentArchiveKey(XWikiDocument doc)
+    {
+        String key = this.referenceSerializer.serialize(doc.getDocumentReference());
+        if (StringUtils.isNotEmpty(doc.getLanguage())) {
+            key += ':' + doc.getLanguage();
+        }
+        return key;
     }
 }

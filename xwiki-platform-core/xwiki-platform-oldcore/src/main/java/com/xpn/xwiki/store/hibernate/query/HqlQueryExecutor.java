@@ -88,6 +88,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             return getStore().executeRead(getContext(), true, new HibernateCallback<List<T>>()
             {
                 @SuppressWarnings("unchecked")
+                @Override
                 public List<T> doInHibernate(Session session)
                 {
                     org.hibernate.Query hquery = createHibernateQuery(session, query);

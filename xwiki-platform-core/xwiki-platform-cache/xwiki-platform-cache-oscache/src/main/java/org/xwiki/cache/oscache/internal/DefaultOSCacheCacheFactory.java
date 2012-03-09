@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Implements {@link CacheFactory} based on OSCache.
+ * Implements {@link org.xwiki.cache.CacheFactory} based on OSCache.
  * 
  * @version $Id$
  */

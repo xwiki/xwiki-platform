@@ -111,12 +111,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -162,11 +157,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         return Collections.singletonList((Block) imageBlock);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;

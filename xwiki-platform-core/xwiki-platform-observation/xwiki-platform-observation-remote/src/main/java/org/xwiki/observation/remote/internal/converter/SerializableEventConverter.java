@@ -21,6 +21,8 @@ package org.xwiki.observation.remote.internal.converter;
 
 import java.io.Serializable;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
@@ -28,20 +30,17 @@ import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 /**
- * Default implementation of {@link org.xwiki.observation.remote.converter.LocalEventConverter}.
- * Support any serializable event.
+ * Default implementation of {@link org.xwiki.observation.remote.converter.LocalEventConverter}. Support any
+ * serializable event.
  * 
  * @version $Id$
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class SerializableEventConverter extends AbstractEventConverter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.AbstractEventConverter#getPriority()
-     */
+    @Override
     public int getPriority()
     {
         // SerializableEventConverter is used only if no other converter could be found so we make sure it has a very
@@ -49,12 +48,7 @@ public class SerializableEventConverter extends AbstractEventConverter
         return 2000;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(org.xwiki.observation.remote.RemoteEventData,
-     *      org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
         if (remoteEvent.getEvent() instanceof Event) {
@@ -74,12 +68,7 @@ public class SerializableEventConverter extends AbstractEventConverter
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(org.xwiki.observation.remote.LocalEventData,
-     *      org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
         if (isSerializable(localEvent)) {

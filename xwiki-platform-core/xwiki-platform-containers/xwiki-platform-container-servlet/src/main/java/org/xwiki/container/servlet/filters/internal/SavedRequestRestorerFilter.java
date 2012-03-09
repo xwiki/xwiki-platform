@@ -184,22 +184,13 @@ public class SavedRequestRestorerFilter implements Filter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
-     */
+    @Override
     public void init(FilterConfig filterConfig)
     {
         // Don't do anything, as this filter does not need any resources.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
-     *      javax.servlet.FilterChain)
-     */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
     {
@@ -219,11 +210,7 @@ public class SavedRequestRestorerFilter implements Filter
         filteredRequest.removeAttribute(ATTRIBUTE_APPLIED);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
         // Don't do anything, as this filter does not use any resources.

@@ -59,9 +59,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
     @Inject
     private Provider<QueryExecutor> namedQueryExecutorProvider;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
         if (query.isNamed()) {
@@ -71,9 +69,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Set<String> getLanguages()
     {
         return Collections.unmodifiableSet(this.executors.keySet());

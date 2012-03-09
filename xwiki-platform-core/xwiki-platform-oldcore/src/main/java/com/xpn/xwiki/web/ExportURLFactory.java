@@ -146,12 +146,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createSkinURL(java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
@@ -175,12 +169,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return super.createSkinURL(filename, skin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createSkinURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context)
     {
@@ -269,12 +257,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createResourceURL(java.lang.String, boolean,
-     *      com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
@@ -295,12 +277,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return super.createResourceURL(filename, forceSkinAction, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
@@ -370,12 +346,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return new URI("file://" + path.replace(" ", "%20")).toURL();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createAttachmentURL(java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
@@ -389,12 +359,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#createAttachmentRevisionURL(java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb,
         XWikiContext context)
@@ -408,11 +372,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String getURL(URL url, XWikiContext context)
     {

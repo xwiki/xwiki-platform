@@ -52,14 +52,13 @@ public class LineBreakFilter extends AbstractHTMLFilter
         Arrays.sort(BLOCK_ELEMENT_TAGS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         List<Element> lineBreaksToReplace =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_BR}, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     Node prev = findPreviousNode(element);

@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,7 @@ import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -57,11 +59,6 @@ public class DownloadAction extends XWikiAction
     /** The format of a valid range header. */
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.web.XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -270,7 +267,11 @@ public class DownloadAction extends XWikiAction
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
-        response.setCharacterEncoding("");
+        try {
+            response.setCharacterEncoding("");
+        } catch (IllegalCharsetNameException ex) {
+            response.setCharacterEncoding(XWiki.DEFAULT_ENCODING);
+        }
 
         String ofilename =
             Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");

@@ -38,11 +38,11 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobException;
-import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
-import org.xwiki.extension.job.event.status.JobStatus;
+import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.InstallPlanJob;
+import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.extension.job.internal.UninstallPlanJob;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -58,6 +58,10 @@ import org.xwiki.extension.version.VersionRange;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersionRange;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobManager;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -340,6 +344,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(id);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -347,7 +352,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         Job job;
         try {
-            job = this.jobManager.install(installRequest);
+            job = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
 
@@ -381,8 +386,8 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob("installplan", installRequest)
-                    .getStatus());
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(InstallPlanJob.JOBTYPE,
+                    installRequest).getStatus());
         } catch (JobException e) {
             setError(e);
 
@@ -413,6 +418,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(id);
         uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -420,7 +426,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         Job job;
         try {
-            job = this.jobManager.uninstall(uninstallRequest);
+            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
         } catch (Exception e) {
             setError(e);
 
@@ -453,7 +459,7 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob("uninstallplan",
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE,
                     uninstallRequest).getStatus());
         } catch (JobException e) {
             setError(e);

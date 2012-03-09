@@ -38,6 +38,8 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 2.3M1
  */
+//TODO: find a way to refactor this. The main issue is that the resolved type is not passed to #createDocumentReference
+//(the resolved type used to not be taken into account in the role type)
 public class ModelScriptServiceTest
 {
     private ModelScriptService service;

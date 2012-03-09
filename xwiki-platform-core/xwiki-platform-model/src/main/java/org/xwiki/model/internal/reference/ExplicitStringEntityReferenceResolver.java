@@ -38,11 +38,6 @@ import org.xwiki.model.EntityType;
 @Singleton
 public class ExplicitStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
-    /**
-     * {@inheritDoc} Expects an EntityReference parameter from which to extract the default values.
-     *
-     * @see AbstractStringEntityReferenceResolver#getDefaultValue
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {

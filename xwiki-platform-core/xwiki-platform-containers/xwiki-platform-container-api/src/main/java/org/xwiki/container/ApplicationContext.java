@@ -24,6 +24,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * @version $Id$
+ * @deprecated starting with 3.5M1, use the notion of Environment instead
+ */
+@Deprecated
 public interface ApplicationContext
 {
     InputStream getResourceAsStream(String resourceName);

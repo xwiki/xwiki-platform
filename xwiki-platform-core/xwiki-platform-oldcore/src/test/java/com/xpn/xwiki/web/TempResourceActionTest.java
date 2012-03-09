@@ -26,11 +26,11 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Test;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -55,14 +55,27 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     private ExecutionContext executionContext;
 
     @Override
+    public void setUp() throws Exception
+    {
+        base = new File(getClass().getResource("/").toURI());
+
+        super.setUp();
+
+        action = new TempResourceAction();
+    }
+
+    @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
 
         this.executionContext = new ExecutionContext();
-        
-        final Container mockContainer = registerMockComponent(Container.class);
-        final ApplicationContext mockAppContext = registerMockComponent(ApplicationContext.class);
+
+        // Configure Servlet Environment defined in AbstractBridgedComponentTestCase so that it returns a good
+        // temporary directory
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().lookup(Environment.class);
+        environment.setTemporaryDirectory(base);
+
         final ExecutionContextManager mockExecutionContextManager =
             registerMockComponent(ExecutionContextManager.class);
         final Execution mockExecution = registerMockComponent(Execution.class);
@@ -74,26 +87,8 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockExecution).getContext(); will(returnValue(executionContext));
                 allowing(mockExecution).removeContext();
-
-                ignoring(mockContainer).setApplicationContext(with(any(ApplicationContext.class)));
-
-                allowing(mockContainer).getApplicationContext();
-                will(returnValue(mockAppContext));
-
-                allowing(mockAppContext).getTemporaryDirectory();
-                will(returnValue(base));
             }
         });
-    }
-
-    @Override
-    public void setUp() throws Exception
-    {
-        base = new File(getClass().getResource("/").toURI());
-
-        super.setUp();
-
-        action = new TempResourceAction();
     }
 
     /**

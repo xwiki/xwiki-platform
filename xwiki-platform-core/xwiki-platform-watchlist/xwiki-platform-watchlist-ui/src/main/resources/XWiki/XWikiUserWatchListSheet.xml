@@ -102,7 +102,8 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
                                     tr.insert(new Element('td').update(row.pageName));
                                   }
                                   var deleteLink = new Element('a', {
-                                    href : row.deleteUrl
+                                    href : row.deleteUrl,
+                                    title : '$escapetool.javascript($msg.get('platform.core.profile.watchlist.unwatch'))'
                                   });
                                   deleteLink.insert(new Element('img', {
                                     'src' : '${xwiki.getSkinFile('icons/silk/cross.png')}'

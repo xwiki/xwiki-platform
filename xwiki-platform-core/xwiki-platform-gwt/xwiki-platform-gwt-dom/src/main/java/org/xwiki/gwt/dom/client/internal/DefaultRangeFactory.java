@@ -30,11 +30,7 @@ import org.xwiki.gwt.dom.client.RangeFactory;
  */
 public class DefaultRangeFactory implements RangeFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RangeFactory#createRange(Document)
-     */
+    @Override
     public Range createRange(Document doc)
     {
         // We create a new native range wrapper without passing a reference to a native range. The selection

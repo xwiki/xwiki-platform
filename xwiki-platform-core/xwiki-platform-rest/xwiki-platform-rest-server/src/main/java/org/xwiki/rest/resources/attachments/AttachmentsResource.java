@@ -136,11 +136,6 @@ public class AttachmentsResource extends BaseAttachmentsResource
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
 
-        /* Clear the fileName */
-        attachmentName =
-            Utils.getXWikiContext(componentManager).getWiki()
-                .clearName(attachmentName, false, true, Utils.getXWikiContext(componentManager));
-
         byte[] buffer = new byte[4096];
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (true) {

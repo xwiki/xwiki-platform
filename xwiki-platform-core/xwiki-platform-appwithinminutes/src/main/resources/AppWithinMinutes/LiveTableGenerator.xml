@@ -162,7 +162,9 @@ ${escapetool.h}set(${escapetool.d}msg = ${escapetool.d}originalMsg)
 
 #macro(outputLiveTableResults)
   #set($output = "#gridresult($!request.classname $request.collist.split(','))")
-  $output.replaceAll("$!{request.transprefix}emptyvalue", '-')
+  ## We have to escape the translation key because it appears as JSON value in the output.
+  #set($escapedEmptyValueTranslationKey = $escapetool.javascript("${request.transprefix}emptyvalue"))
+  $output.replace($escapedEmptyValueTranslationKey, '-')
 #end
 {{/velocity}}
 

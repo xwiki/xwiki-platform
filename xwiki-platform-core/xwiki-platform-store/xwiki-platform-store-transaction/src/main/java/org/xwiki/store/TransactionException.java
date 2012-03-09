@@ -168,31 +168,19 @@ public class TransactionException extends Exception
         return writer.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Throwable#printStackTrace()
-     */
+    @Override
     public void printStackTrace()
     {
         this.printStackTrace(System.err);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Throwable#printStackTrace(PrintStream)
-     */
+    @Override
     public void printStackTrace(final PrintStream writeTo)
     {
         this.printStackTrace(new PrintWriter(writeTo));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Throwable#printStackTrace(PrintWriter)
-     */
+    @Override
     public void printStackTrace(final PrintWriter writeTo)
     {
         this.printInfo(writeTo, true);

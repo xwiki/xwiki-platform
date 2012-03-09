@@ -25,6 +25,11 @@ import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarPageLimitedHandler extends AbstractHandler
 {
     private XarEntry xarEntry = new XarEntry();

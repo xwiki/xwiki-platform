@@ -42,11 +42,6 @@ public class SsxAction extends AbstractSxAction
     /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SsxAction.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSxAction#getExtensionType()
-     */
     @Override
     public Extension getExtensionType()
     {

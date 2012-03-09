@@ -44,21 +44,16 @@ public abstract class AbstractRichTextAreaExecutable implements Executable
         this.rta = rta;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
-        return isSupported() && rta.isEnabled();
+        // Note that we check if the rich text area is visible to account for the case when the editor is loaded lazy
+        // and the user can switch between view and edit mode without reloading the page (so the rich text area can be
+        // attached and enabled but hidden).
+        return isSupported() && rta.isEnabled() && rta.getElement().getOffsetWidth() > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return rta.isAttached() && rta.getDocument() != null;

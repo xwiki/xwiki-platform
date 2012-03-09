@@ -111,4 +111,10 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
             throw new DataMigrationException(String.format("Data migration %s failed", getName()), e);
         }
     }
+
+    @Override
+    public String getLiquibaseChangeLog() throws DataMigrationException
+    {
+        return null;
+    }
 }

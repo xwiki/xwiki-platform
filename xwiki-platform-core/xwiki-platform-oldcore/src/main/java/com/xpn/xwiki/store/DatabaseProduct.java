@@ -94,11 +94,6 @@ public final class DatabaseProduct
         return this.productName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object object)
     {
@@ -140,11 +135,6 @@ public final class DatabaseProduct
         return product;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

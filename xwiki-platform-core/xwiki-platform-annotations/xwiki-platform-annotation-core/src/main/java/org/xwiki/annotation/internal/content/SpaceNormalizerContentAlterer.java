@@ -50,11 +50,7 @@ public class SpaceNormalizerContentAlterer extends AbstractContentAlterer
     @Named("whitespace")
     private Filter whitespaceFilter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.ContentAlterer#alter(java.lang.CharSequence)
-     */
+    @Override
     public AlteredContent alter(CharSequence sequence)
     {
         // same as filtering only that on encountering the first space in a series of whitespace, only print the first

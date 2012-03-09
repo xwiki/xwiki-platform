@@ -90,21 +90,13 @@ public class ShortcutKey
         return modifiers;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
+    @Override
     public int hashCode()
     {
         return hashCode;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) {

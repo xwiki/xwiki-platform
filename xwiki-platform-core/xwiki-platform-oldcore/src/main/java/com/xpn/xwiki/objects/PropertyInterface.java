@@ -23,9 +23,18 @@ import org.dom4j.Element;
 
 public interface PropertyInterface extends ElementInterface
 {
-    int getId();
+    /**
+     * Returns the identifier of this property for hibernate.
+     * The return type is long since 4.0M1
+     * @return the identifier of this property
+     */
+    long getId();
 
-    void setId(int id);
+    /**
+     * Dummy function to satisfy hibernate requirements.
+     * @param id the identifier. A long since 4.0M1
+     */
+    void setId(long id);
 
     BaseCollection getObject();
 

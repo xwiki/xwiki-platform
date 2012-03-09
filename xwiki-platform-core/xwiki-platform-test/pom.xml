@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.4-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test</artifactId>
   <name>XWiki Platform - Test Framework</name>
@@ -59,11 +59,9 @@
     </dependency>
 
     <!-- Dependencies for the UI test framework -->
-
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>2.14.0</version>
     </dependency>
 
     <!-- Make it easy to debug flickering tests by repeating them.
@@ -97,9 +95,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-repository-xwiki-model</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-xwiki-model</artifactId>
+      <version>${commons.version}</version>
     </dependency>
 
   </dependencies>

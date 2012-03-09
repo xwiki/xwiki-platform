@@ -47,7 +47,7 @@ public class ScriptMacroParameters
     /**
      * @param output indicate the output result has to be inserted back in the document.
      */
-    @PropertyDescription("Specifies whether the output result should be inserted back in the document")
+    @PropertyDescription("Specifies whether or not the output result should be inserted back in the document.")
     public void setOutput(boolean output)
     {
         this.output = output;
@@ -66,7 +66,7 @@ public class ScriptMacroParameters
      *            it's put in a verbatim block.
      * @since 2.0M1
      */
-    @PropertyDescription("Specifies whether the macro content will be considered as wiki syntax or not")
+    @PropertyDescription("Specifies whether or not the script output contains wiki markup.")
     public void setWiki(boolean wiki)
     {
         this.wiki = wiki;

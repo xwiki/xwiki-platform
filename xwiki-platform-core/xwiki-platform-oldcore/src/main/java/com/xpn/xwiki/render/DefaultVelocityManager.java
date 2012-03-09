@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.render;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -69,14 +67,10 @@ public class DefaultVelocityManager implements VelocityManager
      */
     private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
 
-    /**
-     * Store one VelocityEngine instance per skin since a skin is allowed to have a global velocimacro macros.vm file.
-     */
-    private Map<String, VelocityEngine> velocityManagers = new HashMap<String, VelocityEngine>();
-
     @Inject
     private Execution execution;
 
+    @Override
     public VelocityContext getVelocityContext()
     {
         // The Velocity Context is set in VelocityRequestInterceptor, when the XWiki Request is initialized so we are

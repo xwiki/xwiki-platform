@@ -49,9 +49,7 @@ import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 @Component
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
     {

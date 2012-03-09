@@ -24,7 +24,6 @@ import java.lang.reflect.Constructor;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 
 import com.xpn.xwiki.plugin.charts.ChartCustomizer;
@@ -47,6 +46,7 @@ public class BarPlotFactory implements PlotFactory
         return uniqueInstance;
     }
 
+    @Override
     public Plot create(DataSource dataSource, ChartParams params) throws GenerateException, DataSourceException
     {
         Class rendererClass = params.getClass(ChartParams.RENDERER);
@@ -65,16 +65,13 @@ public class BarPlotFactory implements PlotFactory
             return CategoryPlotFactory.getInstance().create(dataSource, renderer, params);
         } else if (XYItemRenderer.class.isAssignableFrom(rendererClass)) {
             XYItemRenderer renderer;
-            if (rendererClass != null) {
-                try {
-                    Constructor ctor = rendererClass.getConstructor(new Class[] {});
-                    renderer = (XYItemRenderer) ctor.newInstance(new Object[] {});
-                } catch (Throwable e) {
-                    throw new GenerateException(e);
-                }
-            } else {
-                renderer = new XYBarRenderer(); // will never run
+            try {
+                Constructor ctor = rendererClass.getConstructor(new Class[] {});
+                renderer = (XYItemRenderer) ctor.newInstance(new Object[] {});
+            } catch (Throwable e) {
+                throw new GenerateException(e);
             }
+
             ChartCustomizer.customizeXYItemRenderer(renderer, params);
 
             return XYPlotFactory.getInstance().create(dataSource, renderer, params);

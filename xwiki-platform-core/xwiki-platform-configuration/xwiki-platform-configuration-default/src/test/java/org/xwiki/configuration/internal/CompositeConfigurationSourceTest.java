@@ -48,6 +48,7 @@ public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
 
     private Configuration config2;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {

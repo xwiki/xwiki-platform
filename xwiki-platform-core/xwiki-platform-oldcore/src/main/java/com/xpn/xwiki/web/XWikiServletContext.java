@@ -19,45 +19,59 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.servlet.ServletContext;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class XWikiServletContext implements XWikiEngineContext {
+import javax.servlet.ServletContext;
+
+public class XWikiServletContext implements XWikiEngineContext
+{
     private ServletContext scontext;
 
-    public XWikiServletContext(ServletContext scontext) {
+    public XWikiServletContext(ServletContext scontext)
+    {
         this.scontext = scontext;
     }
 
-    public ServletContext getServletContext() {
+    public ServletContext getServletContext()
+    {
         return scontext;
     }
 
-    public Object getAttribute(String name) {
+    @Override
+    public Object getAttribute(String name)
+    {
         return scontext.getAttribute(name);
     }
 
-    public void setAttribute(String name, Object value) {
+    @Override
+    public void setAttribute(String name, Object value)
+    {
         scontext.setAttribute(name, value);
     }
 
-    public String getRealPath(String path) {
+    @Override
+    public String getRealPath(String path)
+    {
         return scontext.getRealPath(path);
     }
 
-    public URL getResource(String name) throws MalformedURLException {
+    @Override
+    public URL getResource(String name) throws MalformedURLException
+    {
         return scontext.getResource(name);
     }
 
-    public InputStream getResourceAsStream(String name) {
+    @Override
+    public InputStream getResourceAsStream(String name)
+    {
         return scontext.getResourceAsStream(name);
     }
 
-    public String getMimeType(String filename) {
+    @Override
+    public String getMimeType(String filename)
+    {
         return scontext.getMimeType(filename);
     }
-
-
 }

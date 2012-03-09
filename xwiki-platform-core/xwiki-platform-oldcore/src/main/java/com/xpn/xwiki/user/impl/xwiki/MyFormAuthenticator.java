@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
@@ -49,6 +48,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param request the current request
      * @param response the current response
      */
+    @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
         throws IOException
     {
@@ -63,11 +63,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.securityfilter.authenticator.Authenticator#showLogin(HttpServletRequest, HttpServletResponse)
-     */
     @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
@@ -96,12 +91,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.securityfilter.authenticator.FormAuthenticator#processLogin(org.securityfilter.filter.SecurityRequestWrapper,
-     *      javax.servlet.http.HttpServletResponse)
-     */
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
@@ -122,6 +111,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param response
      * @return true if the filter should return after this method ends, false otherwise
      */
+    @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
         throws Exception
     {
@@ -196,6 +186,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param response
      * @return true if the filter should return after this method ends, false otherwise
      */
+    @Override
     public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
         HttpServletResponse response, XWikiContext context) throws Exception
     {
@@ -282,11 +273,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return context.getWiki().getAuthService().authenticate(username, password, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Authenticator#processLogout(SecurityRequestWrapper, HttpServletResponse, URLPatternMatcher)
-     */
     @Override
     public boolean processLogout(SecurityRequestWrapper securityRequestWrapper,
         HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception

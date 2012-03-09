@@ -61,9 +61,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
     @Inject
     private DocumentAccessBridge docBridge;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
         throws MacroExecutionException
     {

@@ -67,13 +67,13 @@ public class ObjectEditPage extends EditPage
 
         // Make sure we wait for the element to appear since there's no page refresh.
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
             {
-                public Boolean apply(WebDriver driver)
-                {
-                    return Boolean.valueOf(driver.findElements(objectsLocator).size() > initialObjectCount);
-                }
+                return Boolean.valueOf(driver.findElements(objectsLocator).size() > initialObjectCount);
             }
-        );
+        });
 
         List<FormElement> objects = getObjectsOfClass(className);
         return objects.get(objects.size() - 1);
@@ -88,13 +88,13 @@ public class ObjectEditPage extends EditPage
 
         // Make sure we wait for the element to appear since there's no page refresh.
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
             {
-                public Boolean apply(WebDriver driver)
-                {
-                    return Boolean.valueOf(driver.findElements(objectsLocator).size() > initialObjectCount);
-                }
+                return Boolean.valueOf(driver.findElements(objectsLocator).size() > initialObjectCount);
             }
-        );
+        });
 
         List<FormElement> objects = getObjectsOfClass(className);
         return objects.get(objects.size() - 1);
@@ -151,10 +151,10 @@ public class ObjectEditPage extends EditPage
     /** className will look something like "XWiki.XWikiRights" */
     public List<FormElement> getObjectsOfClass(String className)
     {
-        List<WebElement> titles = getDriver().findElement(By.id("xclass_" + className))
-            .findElements(By.className("xobject-title"));
-        List<WebElement> elements = getDriver().findElement(By.id("xclass_" + className))
-            .findElements(By.className("xobject-content"));
+        List<WebElement> titles =
+            getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-title"));
+        List<WebElement> elements =
+            getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-content"));
         List<FormElement> forms = new ArrayList<FormElement>(elements.size());
         for (int i = 0; i < elements.size(); i++) {
             WebElement element = elements.get(i);

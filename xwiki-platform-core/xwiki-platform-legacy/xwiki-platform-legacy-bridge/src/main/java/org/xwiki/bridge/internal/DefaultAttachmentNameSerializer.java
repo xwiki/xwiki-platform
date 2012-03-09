@@ -46,10 +46,7 @@ public class DefaultAttachmentNameSerializer implements AttachmentNameSerializer
     @Inject
     private DocumentNameSerializer documentNameSerializer;
     
-    /**
-     * {@inheritDoc}
-     * @see AttachmentNameSerializer#serialize(AttachmentName)
-     */
+    @Override
     public String serialize(AttachmentName attachmentName)
     {
         // A valid AttachmentReference must not have any null value and thus we don't need to check for nulls here.

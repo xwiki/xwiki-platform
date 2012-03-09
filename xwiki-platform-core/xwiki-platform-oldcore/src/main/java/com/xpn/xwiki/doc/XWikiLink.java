@@ -76,11 +76,6 @@ public class XWikiLink implements Serializable
         this.fullName = fullName;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -88,11 +83,6 @@ public class XWikiLink implements Serializable
         return (objlink.getDocId() == getDocId() && objlink.getLink().equals(getLink()));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

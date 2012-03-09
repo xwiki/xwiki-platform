@@ -75,21 +75,21 @@ table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
 
 /* ----------------CSS3 adjustments----------------*/
 input[type="text"], input[type="password"] {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageBackgroundColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.fieldGradientColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
 }
 textarea, select {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageBackgroundColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.fieldGradientColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
 }
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.linkColor', endColorstr='$theme.buttonPrimaryBackgroundColor',GradientType=0 );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryGradientColor', endColorstr='$theme.buttonPrimaryBackgroundColor',GradientType=0 );
 }
 input.button:hover, .buttonwrapper a:hover{
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryBackgroundColor', endColorstr='$theme.linkColor',GradientType=0 );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryBackgroundColor', endColorstr='$theme.buttonPrimaryGradientColor',GradientType=0 );
 }
 .buttonwrapper input.secondary, .buttonwrapper a.secondary, 
 .buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageContentBackgroundColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonSecondaryGradientColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 );
 }
 .actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dececec', endColorstr='#00ececec',GradientType=0 );
@@ -104,10 +104,16 @@ input.button:hover, .buttonwrapper a:hover{
   width: 100%;
 }
 #mainmenu .gradientfilterIE {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageHeaderBackgroundColor', endColorstr='$theme.menuBackgroundColor',GradientType=0 );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.menuGradientColor', endColorstr='$theme.menuBackgroundColor',GradientType=0 );
 }
-#contentmenu .gradientfilterIE, #editmenu .gradientfilterIE, h1.xwikipaneltitle, ul.xwikitabbar  {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.pageContentBackgroundColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 );
+#contentmenu .gradientfilterIE, #editmenu .gradientfilterIE, ul.xwikitabbar  {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.menuContentGradientColor', endColorstr='$theme.menuContentBackgroundColor',GradientType=0 );
+ }
+h1.xwikipaneltitle {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.panelHeaderGradientColor', endColorstr='$theme.panelHeaderBackgroundColor',GradientType=0 );
+ }
+.collapsed h1.xwikipaneltitle {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.panelCollapsedGradientColor', endColorstr='$theme.panelCollapsedBackgroundColor',GradientType=0 );
  }
 #mainmenu .componentcontainer, #contentmenu .componentcontainer, #editmenu .componentcontainer {
   margin-top: -22px;

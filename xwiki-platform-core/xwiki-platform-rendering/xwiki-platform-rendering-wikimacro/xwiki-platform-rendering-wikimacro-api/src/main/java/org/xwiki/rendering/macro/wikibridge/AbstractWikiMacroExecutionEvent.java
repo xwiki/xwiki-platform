@@ -29,11 +29,7 @@ import org.xwiki.observation.event.Event;
  */
 public abstract class AbstractWikiMacroExecutionEvent implements Event
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
+    @Override
     public boolean matches(Object otherEvent)
     {
         return this.getClass().isAssignableFrom(otherEvent.getClass());

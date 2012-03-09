@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiContext;
  * A provider of QueryExecutor. Allows providing of a QueryExecutor defined by the configuration.
  * 
  * @version $Id$
- * @since 3.2M2
+ * @since 4.0M1
  */
 @Component
 @Singleton

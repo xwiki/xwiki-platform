@@ -29,6 +29,10 @@ import javax.portlet.PortletContext;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.AbstractApplicationContext;
 
+/**
+ * @deprecated starting with 3.5M1, use the notion of Environment instead
+ */
+@Deprecated
 public class PortletApplicationContext extends AbstractApplicationContext
 {
     private PortletContext portletContext;

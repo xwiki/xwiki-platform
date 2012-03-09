@@ -20,6 +20,7 @@
 package com.xpn.xwiki.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -70,24 +72,21 @@ public class XWiki extends Api
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils
-        .getComponent(DocumentReferenceResolver.class);
+        .getComponent(DocumentReferenceResolver.TYPE_STRING);
 
     /**
      * The object used to serialize entity references into strings. We need it because we have script APIs that work
      * with entity references but have to call older, often internal, methods that still use string references.
      */
-    @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
+    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer = Utils
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * XWiki API Constructor
@@ -143,8 +142,8 @@ public class XWiki extends Api
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
-     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
-     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
     public Document getDocument(String fullName) throws XWikiException
@@ -167,8 +166,8 @@ public class XWiki extends Api
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
      * @param reference the reference of the XWiki document to be loaded
-     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
-     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M1
      */
@@ -194,8 +193,8 @@ public class XWiki extends Api
      * the currently executing script before sending back the loaded document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
-     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
-     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -220,8 +219,8 @@ public class XWiki extends Api
      * the currently executing script before sending back the loaded document.
      * 
      * @param reference the reference of the XWiki document to be loaded
-     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
-     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -401,8 +400,8 @@ public class XWiki extends Api
      * 
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
-     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved,
-     *         you can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
     public Document getDocument(String space, String fullname) throws XWikiException
@@ -1273,8 +1272,9 @@ public class XWiki extends Api
             if (hasProgrammingRights()) {
                 registerRight = true;
             } else {
-                registerRight = this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                    "XWiki.XWikiPreferences", getXWikiContext());
+                registerRight =
+                    this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
+                        "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -1495,14 +1495,16 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference = sourceDocumentReference.replaceParent(
-                sourceDocumentReference.getWikiReference(), new WikiReference(sourceWiki));
+            sourceDocumentReference =
+                sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(), new WikiReference(
+                    sourceWiki));
         }
 
         DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference = targetDocumentReference.replaceParent(
-                targetDocumentReference.getWikiReference(), new WikiReference(targetWiki));
+            targetDocumentReference =
+                targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(), new WikiReference(
+                    targetWiki));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);
@@ -2405,8 +2407,9 @@ public class XWiki extends Api
     public boolean renamePage(Document doc, String newFullName)
     {
         try {
-            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService().hasAccessLevel(
-                "delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
+            if (this.xwiki.exists(newFullName, getXWikiContext())
+                && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
+                    getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
@@ -2778,23 +2781,29 @@ public class XWiki extends Api
     {
         Syntax syntax = null;
 
-        List<PrintRendererFactory> factories = Utils.getComponentList(PrintRendererFactory.class);
-        for (PrintRendererFactory factory : factories) {
-            Syntax factorySyntax = factory.getSyntax();
-            if (syntaxVersion != null) {
-                if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
-                    && factorySyntax.getVersion().equals(syntaxVersion)) {
-                    syntax = factorySyntax;
-                    break;
-                }
-            } else {
-                // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example. We
-                // should have a Version which implements Comparable like we have SyntaxId in Syntax
-                if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
-                    && (syntax == null || factorySyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
-                    syntax = factorySyntax;
+        try {
+            List<PrintRendererFactory> factories =
+                Utils.getComponentManager().lookupList((Type) PrintRendererFactory.class);
+            for (PrintRendererFactory factory : factories) {
+                Syntax factorySyntax = factory.getSyntax();
+                if (syntaxVersion != null) {
+                    if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
+                        && factorySyntax.getVersion().equals(syntaxVersion)) {
+                        syntax = factorySyntax;
+                        break;
+                    }
+                } else {
+                    // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example.
+                    // We
+                    // should have a Version which implements Comparable like we have SyntaxId in Syntax
+                    if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
+                        && (syntax == null || factorySyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
+                        syntax = factorySyntax;
+                    }
                 }
             }
+        } catch (ComponentLookupException e) {
+            LOGGER.error("Failed to lookup available renderer syntaxes", e);
         }
 
         return syntax;

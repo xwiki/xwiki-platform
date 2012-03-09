@@ -88,22 +88,12 @@ public class DocumentName implements Serializable
         return this.page;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return "wiki = [" + getWiki() + "], space = [" + getSpace() + "], page = [" + getPage() + "]";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -124,11 +114,6 @@ public class DocumentName implements Serializable
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

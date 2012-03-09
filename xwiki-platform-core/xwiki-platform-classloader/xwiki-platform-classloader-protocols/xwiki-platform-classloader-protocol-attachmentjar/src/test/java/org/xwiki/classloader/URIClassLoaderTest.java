@@ -40,7 +40,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Unit tests for {@link URIClassLoader}.
  * 
  * @version $Id$
- * @since 2.0.1
  */
 public class URIClassLoaderTest extends AbstractComponentTestCase
 {
@@ -54,7 +53,7 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
     {
         super.registerComponents();
 
-        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
     }
 

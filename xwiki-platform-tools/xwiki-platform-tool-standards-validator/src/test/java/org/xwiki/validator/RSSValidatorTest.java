@@ -25,11 +25,7 @@ public class RSSValidatorTest extends TestCase
 {
     private RSSValidator validator;
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

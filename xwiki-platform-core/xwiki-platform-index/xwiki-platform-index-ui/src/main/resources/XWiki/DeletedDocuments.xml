@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>DeletedDocuments</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Main.AllDocs</parent>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1253204449000</creationDate>
+<date>1301566279000</date>
+<contentUpdateDate>1301566279000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.index.documentsTrash")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.DeletedDocuments</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>222ca0ed-b042-41d5-9d7e-942c4cc8a94b</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>// Make sure the XWiki.index.trash.documents 'namespace' exists.
+if (typeof XWiki == "undefined") {
+  XWiki = new Object();
+}
+if (typeof XWiki.index == "undefined") {
+  XWiki.index = new Object();
+}
+if (typeof XWiki.index.trash == "undefined") {
+  XWiki.index.trash = new Object();
+}
+if (typeof XWiki.index.trash.documents == "undefined") {
+  XWiki.index.trash.documents = new Object();
+}
+
+/**
+ * Callback function used by the DeletedDocuments livetable for generating the HTML code needed to display an entry.
+ * 
+ * @param row the JSON data corresponding to the entry to be displayed
+ * @param i the index of the row in the list of entries
+ * @param table the LiveTable javascript object
+ */
+XWiki.index.trash.documents.displayEntry = function (row, i, table) {
+  var tr = new Element('tr'); // The resulting table row
+  var page = new Element('a', {'href' : row.url}).update(row.fullname);
+  tr.appendChild(new Element('td').update(page));
+  tr.appendChild(new Element('td').update(row.title));
+  tr.appendChild(new Element('td').update(row.date));
+  var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
+  tr.appendChild(new Element('td').update(deleter));
+  var actions = new Element('td', {'class' : 'itemActions'});
+  if(!row.alreadyExists) {
+    if(row.canRestore) {
+      var restore = new Element('a', {
+          'href' : row.restoreUrl,
+          'class' : 'tool restore',
+          'title' : "$msg.get('platform.index.trashDocumentsActionsRestoreTooltip')"
+        }).update("$msg.get('platform.index.trashDocumentsActionsRestoreText')");
+      actions.appendChild(restore);
+    }
+  } else {
+    var restore = new Element('a', {
+        'href' : row.originalUrl,
+        'class' : "tool cannot-restore",
+        'title' : "$msg.get('platform.index.trashDocumentsActionsCannotRestoreTooltip')"
+      }).update("$msg.get('platform.index.trashDocumentsActionsCannotRestoreText')");
+    actions.appendChild(restore);
+  }
+  if(row.canDelete) {
+    var delete_ = new Element('a', {
+        'href' : row.deleteUrl,
+        'class' : "tool delete",
+        'title' : "$msg.get('platform.index.trashDocumentsActionsDeleteTooltip')"
+      }).update("$msg.get('platform.index.trashDocumentsActionsDeleteText')");
+    actions.appendChild(document.createTextNode(' '));
+    actions.appendChild(delete_);
+    delete_.observe('click', XWiki.index.trash.documents.confirmDelete.bindAsEventListener(delete_, table, i));
+  }
+  tr.appendChild(actions);
+  return tr;
+}
+
+/**
+ * Event listener, called when clicking a delete version link. It displays a confirmation box, speeding up the two-step
+ * deletion process.
+ * 
+ * @param event the link activation event
+ * @param table the LiveTable javascript object
+ * @param rowIdx the index of the row corresponding to the entry to be deleted
+ */
+XWiki.index.trash.documents.confirmDelete = function(event, table, rowIdx) {
+  event.stop();
+  if (this.disabled) {
+    // Do nothing if the button was already clicked and it's waiting for a response from the server.
+    return;
+  } else {
+    new XWiki.widgets.ConfirmedAjaxRequest(
+      /* Ajax request URL */
+      this.href + '&amp;confirm=1' + (Prototype.Browser.Opera ? "" : "&amp;ajax=1"),
+      /* Ajax request parameters */
+      {
+        onCreate : function() {
+          // Disable the button, to avoid a cascade of clicks from impatient users
+          this.disabled = true;
+        }.bind(this),
+        onSuccess : function(table, rowIdx) {
+          // Remove the corresponding HTML element from the UI and update the livetable
+          table.deleteRow(rowIdx);
+        }.bind(this, table, rowIdx),
+        // This is an expected 404, returned when the document has been successfully deleted and is no longer found
+        on404 : function(response, table, rowIdx) {
+          response.request.options.onSuccess(table, rowIdx);
+        }.bindAsEventListener(this, table, rowIdx),
+        onComplete : function() {
+          // In the end: re-enable the button
+          this.disabled = false;
+        }.bind(this)
+      },
+      /* Interaction parameters */
+      {
+         confirmationText: "$msg.get('core.recyclebin.completelyDeleteConfirm')",
+         progressMessageText : "$msg.get('platform.index.trashDocumentsDeleteInProgress')",
+         successMessageText : "$msg.get('platform.index.trashDocumentsDeleteDone')",
+         failureMessageText : "$msg.get('platform.index.trashDocumentsDeleteFailed')"
+      }
+      );
+  }
+}
+/*
+ * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
+ * Re-display it when the document loads and Javascript is available.
+ */
+document.observe('xwiki:dom:loaded', function() {
+  if ($('documentsTrash')) {
+    $('documentsTrash').up('.hidden').removeClassName('hidden');
+  }
+});</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.RequiredRightClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<level>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>level</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>level</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>edit|programming</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</level>
+</class>
+<name>XWiki.DeletedDocuments</name>
+<number>0</number>
+<className>XWiki.RequiredRightClass</className>
+<guid>8de78194-f5ba-4cd8-8f0e-69b9d554e31c</guid>
+<property>
+<level>programming</level>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.DeletedDocuments</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>aa8c7e27-a767-4e44-ac29-7809763dff56</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>.itemActions .tool {
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+  float: left;
+  text-indent: -1000em;
+  overflow: hidden;
+  background: transparent no-repeat center center;
+}
+.itemActions .delete {
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif')) !important;
+}
+.itemActions .restore {
+   background-image: url($xwiki.getSkinFile('/icons/silk/arrow_refresh.gif')) !important;
+}
+.itemActions .cannot-restore {
+   background-image: url($xwiki.getSkinFile('/icons/silk/page_error.gif')) !important;
+}</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<content>{{velocity}}##
+#if(!$xwiki.hasProgrammingRights())
+  {{warning}}This document requires programming rights and needs to be saved by an administrator of this Wiki{{/warning}}
+#else
+#set($dateFormat = 'yyyy MMMM d, HH:mm')
+$xwiki.ssx.use('XWiki.DeletedDocuments')##
+$xwiki.jsx.use('XWiki.DeletedDocuments')##
+##
+#set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'actions'])
+#set($columnProperties = {
+    'ddoc.fullName'  : { 'type' : 'text', 'size' : 10 },
+    'ddoc.title'     : { 'type' : 'text', 'filterable' : false, 'sortable' : false },
+    'ddoc.date'      : { 'type' : 'date', 'filterable' : false },
+    'ddoc.deleter'   : { 'type' : 'text', 'size' : 10 },
+    'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
+  })##
+#set($options = {
+    'url'               : "$xwiki.getURL('XWiki.DeletedDocumentsJSON', 'view', 'list=1&amp;xpage=plain&amp;outputSyntax=plain')",
+    'callback'          : 'XWiki.index.trash.documents.displayEntry',
+    'translationPrefix' : 'platform.index.trashDocuments.'
+  })##
+##
+##
+##
+{{html wiki="true" clean="false"}}
+&lt;div class="hidden"&gt;
+#livetable('documentsTrash' $columns $columnProperties $options)
+&lt;/div&gt;
+{{/html}}
+##
+##
+##
+
+{{html wiki="true" clean="false"}}
+&lt;noscript&gt;
+  #set($deletedDocuments = $xwiki.search('select count(ddoc.id) from XWikiDeletedDocument as ddoc').get(0))
+  #if($deletedDocuments == 0)
+
+    {{info}}$msg.get('platform.index.trashDocumentsEmpty'){{/info}}
+
+  #else
+  #macro(displayDeletedDoc $id)
+    #set($ddoc = $xwiki.getDeletedDocument('', '', "$id"))
+    #set($originalDocument = $ddoc.getDocument())
+    &lt;tr&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getURL('view', "viewer=recyclebin&amp;amp;id=${id}")"&gt;$ddoc.fullName&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;$originalDocument.displayTitle&lt;/td&gt;
+      &lt;td&gt;$xwiki.formatDate($ddoc.getDate(), $dateFormat)&lt;/td&gt;
+      &lt;td&gt;$xwiki.getLocalUserName($ddoc.getDeleter())&lt;/td&gt;
+      &lt;td class="itemActions"&gt;
+        #if($xwiki.getDocument($ddoc.fullName).isNew())
+          #if($ddoc.canUndelete())
+            &lt;a href="${originalDocument.getURL('undelete', "id=${id}")}" class="tool restore" title="$msg.get('platform.index.trashDocumentsActionsRestoreTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsRestoreText')&lt;/a&gt;
+          #end
+        #else
+          &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$msg.get('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
+        #end
+        #if($ddoc.canDelete())
+          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$util.encodeURI($!request.getRequestURI())?$util.encodeURI($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
+        #end
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  #end
+##
+  #if("$!{request.view}" == '')
+    #set($queryParams = '')
+  #else
+    #set($queryParams = "view=$!{escapetool.url($request.view)}")
+  #end
+  #set($paginationParameters = {
+    'totalItems' : $xwiki.search("select count(ddoc.id) from XWikiDeletedDocument as ddoc").get(0),
+    'defaultItemsPerPage' : 15,
+    'url' : $doc.getURL('view', $queryParams)
+  })
+  #pagination($paginationParameters)
+  &lt;table id="searchResults" class="xwiki-livetable xwiki-livetable-display"&gt;
+    &lt;thead class="xwiki-livetable-display-header"&gt;&lt;tr&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$msg.get('platform.index.trashDocuments.ddoc.fullName')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.ddoc.title')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.ddoc.date')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.ddoc.deleter')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.actions')&lt;/th&gt;
+    &lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody class="xwiki-livetable-display-body"&gt;
+    #foreach($item in $xwiki.search('select ddoc.id from XWikiDeletedDocument as ddoc order by ddoc.fullName asc', $paginationParameters.itemsPerPage, $paginationParameters.firstItem))
+      #displayDeletedDoc($item)
+    #end
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+  #set($discard = $paginationParameters.put('position', 'bottom'))
+  #pagination($paginationParameters)
+  #end ## deletedDocuments.size
+&lt;/noscript&gt;
+{{/html}}##
+#end## hasProgramR
+{{/velocity}}</content></xwikidoc>

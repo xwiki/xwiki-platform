@@ -19,7 +19,10 @@
  */
 package org.xwiki.model.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import java.lang.reflect.ParameterizedType;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 
 /**
  * Resolve an Object reference defined in a given representation into a validated {@link ObjectReference} object, i.e.
@@ -30,9 +33,24 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface ObjectReferenceResolver<T>
 {
+    /**
+     * Type instance for EntityReferenceResolver<String>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, ObjectReferenceResolver.class, String.class);
+
+    /**
+     * Type instance for EntityReferenceResolver<EntityReference>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_REFERENCE = new DefaultParameterizedType(null, ObjectReferenceResolver.class,
+        EntityReference.class);
+
     /**
      * @param objectReferenceRepresentation the representation of an object reference (e.g. as a String)
      * @return the valid resolved object reference as an object

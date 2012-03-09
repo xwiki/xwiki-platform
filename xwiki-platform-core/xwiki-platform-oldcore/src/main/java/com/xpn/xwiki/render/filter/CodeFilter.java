@@ -44,11 +44,13 @@ public class CodeFilter extends RegexTokenFilter
         super("\\{(code)(?::([^\\}]*))?\\}(.*?)\\{code}", MULTILINE);
     }
 
+    @Override
     public void setInitialContext(InitialRenderContext context)
     {
         this.codeMacro.setInitialContext(context);
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
     	// Call the XWikiCodeMacro macro...

@@ -103,41 +103,25 @@ public abstract class AbstractCommandManager implements CommandManager
      */
     private final List<PendingRegistration> pendingRegistrations = new ArrayList<PendingRegistration>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#execute(Command, int)
-     */
+    @Override
     public boolean execute(Command cmd, int param)
     {
         return execute(cmd, String.valueOf(param));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#execute(Command, boolean)
-     */
+    @Override
     public boolean execute(Command cmd, boolean param)
     {
         return execute(cmd, String.valueOf(param));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#execute(Command)
-     */
+    @Override
     public boolean execute(Command cmd)
     {
         return execute(cmd, (String) null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#getIntegerValue(Command)
-     */
+    @Override
     public Integer getIntegerValue(Command cmd)
     {
         String sValue = getStringValue(cmd);
@@ -151,11 +135,7 @@ public abstract class AbstractCommandManager implements CommandManager
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#getBooleanValue(Command)
-     */
+    @Override
     public Boolean getBooleanValue(Command cmd)
     {
         String sValue = getStringValue(cmd);
@@ -166,11 +146,7 @@ public abstract class AbstractCommandManager implements CommandManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#addCommandListener(CommandListener)
-     */
+    @Override
     public void addCommandListener(CommandListener listener)
     {
         if (firingDepth == 0) {
@@ -180,11 +156,7 @@ public abstract class AbstractCommandManager implements CommandManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#removeCommandListener(CommandListener)
-     */
+    @Override
     public void removeCommandListener(CommandListener listener)
     {
         if (firingDepth == 0) {
@@ -211,31 +183,19 @@ public abstract class AbstractCommandManager implements CommandManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#registerCommand(Command, Executable)
-     */
+    @Override
     public Executable registerCommand(Command command, Executable executable)
     {
         return executables.put(command, executable);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#unregisterCommand(Command)
-     */
+    @Override
     public Executable unregisterCommand(Command command)
     {
         return executables.remove(command);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#getExecutable(Command)
-     */
+    @Override
     public Executable getExecutable(Command command)
     {
         return executables.get(command);

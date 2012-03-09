@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
- * Validate {@link XWikiDocument#merge(XWikiDocument, XWikiDocument, com.xpn.xwiki.XWikiContext)}.
+ * Validate {@link XWikiDocument#merge(XWikiDocument, XWikiDocument, MergeConfiguration, com.xpn.xwiki.XWikiContext)}.
  * 
  * @version $Id$
  */
@@ -54,6 +54,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
     private MergeConfiguration configuration;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -137,9 +138,9 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         this.previousDocument.addXObject(this.xobject);
         this.document.addXObject(this.xobject.clone());
-        
+
         merge();
-        
+
         Assert.assertNull(this.document.getXObject(this.xclass.getReference(), 0));
     }
 }

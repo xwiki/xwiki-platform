@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Main</web>
+<name>AllDocs</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1252447200000</creationDate>
+<date>1320310690000</date>
+<contentUpdateDate>1320310690000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("platform.index.documents")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+##================
+## Find which tab to display
+##================
+#if("$!{view}" == '')
+  #set($view = $request.getParameter('view'))
+  #if("$!{view}" == '')
+    #set ($view = 'index')
+  #end
+#end
+##========
+## Set Tab Data
+##========
+#set ($tabs = [
+  {'tabName' : 'index', 'idSuffix' : 'index', 'translationKey' : 'platform.index', 'document' : 'XWiki.Tableview'},
+  {'tabName' : 'tree', 'idSuffix' : 'treeview', 'translationKey' : 'platform.index.tree', 'document' : 'XWiki.Treeview'},
+  {'tabName' : 'orphans', 'idSuffix' : 'orphansview', 'translationKey' : 'platform.index.orphaned', 'document' : 'XWiki.OrphanedPages'},
+  {'tabName' : 'attachments', 'idSuffix' : 'attachments', 'translationKey' : 'platform.index.attachments', 'document' : 'XWiki.AllAttachments'},
+  {'tabName' : 'deletedDocs', 'idSuffix' : 'deletedDocs', 'translationKey' : 'platform.index.documentsTrash', 'document' : 'XWiki.DeletedDocuments'},
+  {'tabName' : 'deletedAttachments', 'idSuffix' : 'deletedAttachments', 'translationKey' : 'platform.index.attachmentsTrash', 'document' : 'XWiki.DeletedAttachments'}
+])
+##=============================================
+## Add External Links tab if the LinkChecker module is present.
+## TODO: In the future replace this hardcoded link with Interface Extensions
+##=============================================
+#if($services.rendering.defaultTransformationNames.contains('linkchecker') &amp;&amp; $services.linkchecker)
+  #set ($dummy = $tabs.add({'tabName' : 'externalLinks', 'idSuffix' : 'externalLinks', 'translationKey' : 'platform.linkchecker.indexTab', 'document' : 'XWiki.ExternalLinks'}))
+#end
+##===========
+## Display the Tabs
+##===========
+{{html}}
+&lt;div class="floatcontainer"&gt;
+  &lt;ul class="xwikitabbar"&gt;
+#foreach ($tab in $tabs)
+  &lt;li id="xwiki$tab['idSuffix']"#if($view == $tab['tabName']) class="active"#end&gt;&lt;a href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"&gt;$msg.get($tab['translationKey'])&lt;/a&gt;&lt;/li&gt;
+#end
+  &lt;/ul&gt;
+&lt;/div&gt;
+{{/html}}
+
+##==========================
+## Include the Tab data for the selected Tab
+##==========================
+{{html wiki="true"}}
+&lt;div class='xwikitabpanescontainer'&gt;
+#foreach ($tab in $tabs)
+  #if ($tab['tabName'] == $view)
+    {{include document="$tab['document']"/}}
+    #break
+  #end
+#end
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content></xwikidoc>

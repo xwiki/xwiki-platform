@@ -69,17 +69,13 @@ public class XDOMOfficeDocument implements OfficeDocument
         this.componentManager = componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XDOM getContentDocument()
     {
         return this.xdom;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getContentAsString()
     {
         return getContentAsString("xwiki/2.0");
@@ -104,9 +100,7 @@ public class XDOMOfficeDocument implements OfficeDocument
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, byte[]> getArtifacts()
     {
         return this.artifacts;

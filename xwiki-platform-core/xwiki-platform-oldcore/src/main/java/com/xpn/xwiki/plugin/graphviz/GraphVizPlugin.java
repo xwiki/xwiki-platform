@@ -83,33 +83,18 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
         return "graphviz";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new GraphVizPluginApi((GraphVizPlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#flushCache(XWikiContext)
-     */
     @Override
     public void flushCache()
     {
@@ -120,11 +105,6 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#init(XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {

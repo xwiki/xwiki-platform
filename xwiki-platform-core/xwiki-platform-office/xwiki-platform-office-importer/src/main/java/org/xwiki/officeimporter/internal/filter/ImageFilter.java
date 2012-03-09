@@ -74,9 +74,7 @@ public class ImageFilter extends AbstractHTMLFilter
     @Named("currentmixed")
     private DocumentReferenceResolver<String> documentStringReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document htmlDocument, Map<String, String> cleaningParams)
     {
         String targetDocument = cleaningParams.get("targetDocument");

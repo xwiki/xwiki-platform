@@ -29,11 +29,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
  */
 public class EnableExecutableTest extends RichTextAreaTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -48,6 +44,7 @@ public class EnableExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new com.google.gwt.user.client.Command()
         {
+            @Override
             public void execute()
             {
                 assertTrue(rta.getCommandManager().isSupported(Command.ENABLE));

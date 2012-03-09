@@ -124,7 +124,7 @@ public class OfficeImporterVelocityBridge
             this.execution = componentManager.lookup(Execution.class);
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
             this.currentMixedDocumentReferenceResolver =
-                componentManager.lookup(DocumentReferenceResolver.class, "currentmixed");
+                componentManager.lookupComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
             this.officeManager = componentManager.lookup(OpenOfficeManager.class);
             this.officeConfiguration = componentManager.lookup(OpenOfficeConfiguration.class);
             this.xhtmlBuilder = componentManager.lookup(XHTMLOfficeDocumentBuilder.class);

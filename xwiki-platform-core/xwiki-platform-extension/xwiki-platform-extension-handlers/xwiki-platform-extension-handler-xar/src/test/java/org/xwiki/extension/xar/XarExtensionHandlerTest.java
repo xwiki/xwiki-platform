@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.extension.xar;
 
 import java.util.HashMap;
@@ -32,12 +31,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobManager;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -75,14 +76,14 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private DocumentReference contextUser;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.repositoryUtil =
-            new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
-        this.repositoryUtil.setup();
+        this.repositoryUtil = new RepositoryUtil(getComponentManager());
+        this.repositoryUtil.setup(getMockery());
 
         // mock
 
@@ -109,6 +110,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getDocument(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("getDocument")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         Map<String, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
@@ -131,6 +133,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockStore).loadXWikiDoc(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("loadXWikiDoc")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
@@ -159,6 +162,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                     with(any(XWikiContext.class)));
                 will(new CustomAction("saveDocument")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
@@ -182,6 +186,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).deleteDocument(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("deleteDocument")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
@@ -199,6 +204,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getXClass(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("getXClass")
                 {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         DocumentReference documentReference = (DocumentReference) invocation.getParameter(0);
@@ -219,11 +225,12 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // lookup
 
-        this.taskManager = getComponentManager().lookup(JobManager.class);
-        this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class, "xar");
+        this.taskManager = getComponentManager().lookupComponent(JobManager.class);
+        this.localExtensionRepository = getComponentManager().lookupComponent(LocalExtensionRepository.class, "xar");
 
         // Get rid of wiki macro listener
-        getComponentManager().lookup(ObservationManager.class).removeListener("RegisterMacrosOnImportListener");
+        getComponentManager().<ObservationManager> lookupComponent(ObservationManager.class).removeListener(
+            "RegisterMacrosOnImportListener");
     }
 
     private XarLocalExtension install(ExtensionId extensionId, String wiki) throws Throwable
@@ -233,7 +240,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         if (wiki != null) {
             installRequest.addNamespace("wiki:" + wiki);
         }
-        Job installJob = this.taskManager.install(installRequest);
+        Job installJob = this.taskManager.executeJob(InstallJob.JOBTYPE, installRequest);
 
         List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
         if (!errors.isEmpty()) {
@@ -250,7 +257,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         if (wiki != null) {
             uninstallRequest.addNamespace("wiki:" + wiki);
         }
-        Job uninstallJob = this.taskManager.uninstall(uninstallRequest);
+        Job uninstallJob = this.taskManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog(LogLevel.ERROR);
         if (!errors.isEmpty()) {
@@ -308,7 +315,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertNotNull("Document wiki:space.page has not been saved in the database", translated);
         Assert.assertFalse("Document wiki:space.page has not been saved in the database", translated.isNew());
-        
+
         Assert.assertEquals("Wrong content", "translated content", translated.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
         Assert.assertEquals("Wrong versions", "1.1", translated.getVersion());

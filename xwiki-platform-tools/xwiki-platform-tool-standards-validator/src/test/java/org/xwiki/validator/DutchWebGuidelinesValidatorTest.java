@@ -30,11 +30,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 {
     private DutchWebGuidelinesValidator validator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -455,7 +451,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     public void testRpd8s16Links() throws Exception
     {
-        setValidatorDocument("<body><a href='mailto:text@text.com'>text@text.com</a></body>");
+        setValidatorDocument("<body><a href='mailto:text@text.com?subject=foobar'>text@text.com</a></body>");
         this.validator.validateRpd8s16();
         assertTrue(getErrors(this.validator), isValid(this.validator));
 
@@ -466,7 +462,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     public void testRpd8s17Links() throws Exception
     {
-        setValidatorDocument("<body><a href='mailto:text@text.com text'>text@text.com</a></body>");
+        setValidatorDocument("<body><a href='mailto:text@text.com?subject=foobar'>text@text.com</a></body>");
         this.validator.validateRpd8s17();
         assertFalse(getErrors(this.validator), isValid(this.validator));
 

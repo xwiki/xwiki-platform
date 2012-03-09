@@ -81,24 +81,23 @@ public class SelectionPreserver
             DOMUtils domUtils = DOMUtils.getInstance();
             Node startContainer = range.getStartContainer();
             Node endContainer = range.getEndContainer();
-            int rightOffset = domUtils.getLength(endContainer) - range.getEndOffset();
 
-            start = createMarker((Document) startContainer.getOwnerDocument());
+            end = createMarker((Document) startContainer.getOwnerDocument());
+            if (endContainer.getNodeType() == Node.ELEMENT_NODE) {
+                domUtils.insertAt(endContainer, end, range.getEndOffset());
+                endOffset = -1;
+            } else {
+                domUtils.insertAfter(end, endContainer);
+                endOffset = domUtils.getLength(endContainer) - range.getEndOffset();
+            }
+
+            start = end.cloneNode(true);
             if (startContainer.getNodeType() == Node.ELEMENT_NODE) {
                 domUtils.insertAt(startContainer, start, range.getStartOffset());
                 startOffset = -1;
             } else {
                 startContainer.getParentNode().insertBefore(start, startContainer);
                 startOffset = range.getStartOffset();
-            }
-
-            end = start.cloneNode(true);
-            if (endContainer.getNodeType() == Node.ELEMENT_NODE) {
-                domUtils.insertAt(endContainer, end, endContainer.getChildNodes().getLength() - rightOffset);
-                endOffset = -1;
-            } else {
-                domUtils.insertAfter(end, endContainer);
-                endOffset = rightOffset;
             }
         }
 

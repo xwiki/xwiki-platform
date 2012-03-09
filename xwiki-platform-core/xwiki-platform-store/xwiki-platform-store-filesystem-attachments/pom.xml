@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>3.4-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-filesystem-attachments</artifactId>
   <name>XWiki Platform - Store - Filesystem - Attachments</name>
@@ -90,6 +90,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-locks</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Used for getting the persistent storage directory in FilesystemStoreTools. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

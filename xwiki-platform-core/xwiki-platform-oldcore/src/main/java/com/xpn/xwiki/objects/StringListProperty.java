@@ -21,13 +21,16 @@ package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.objects.classes.ListClass;
 
-public class StringListProperty extends ListProperty {
-
-    public Object getCustomMappingValue() {
+public class StringListProperty extends ListProperty
+{
+    @Override
+    public Object getCustomMappingValue()
+    {
         return getTextValue();
     }
 
-    public void setTextValue(String value) {
+    public void setTextValue(String value)
+    {
         setList(ListClass.getListFromString(value));
     }
 

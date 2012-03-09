@@ -38,9 +38,10 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
      * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#setHTMLImpl(String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3147"
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3156"
      */
+    @Override
     protected void setHTMLImpl(String html)
     {
         if (elem.getPropertyBoolean(RichTextArea.DIRTY)) {
@@ -49,11 +50,7 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#initElement()
-     */
+    @Override
     public native void initElement()
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
@@ -77,11 +74,6 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         }, false);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#uninitElement()
-     */
     @Override
     public void uninitElement()
     {
@@ -95,11 +87,6 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         IFrameElement.as(elem).setSrc("about:blank");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#setEnabledImpl(boolean)
-     */
     @Override
     protected void setEnabledImpl(boolean enabled)
     {
@@ -108,22 +95,13 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#isEnabledImpl()
-     */
     @Override
     protected boolean isEnabledImpl()
     {
         return ((Document) IFrameElement.as(elem).getContentDocument()).isDesignMode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#hookEvents()
-     */
+    @Override
     protected void hookEvents()
     {
         // JSNI doesn't support super.*
@@ -145,11 +123,7 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         elem.contentWindow.addEventListener('paste', elem.__gwt_handler, true);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#unhookEvents()
-     */
+    @Override
     protected void unhookEvents()
     {
         // Double click event is not caught by default.
@@ -170,11 +144,6 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#setFocus(boolean)
-     */
     @Override
     public void setFocus(boolean focused)
     {

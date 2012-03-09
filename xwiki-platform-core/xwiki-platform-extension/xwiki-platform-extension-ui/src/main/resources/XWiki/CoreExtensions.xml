@@ -185,47 +185,34 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
 {{velocity}}
 ## Ajax call for a single extension
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
-  #set ($actions = [])
-  #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-  #end
   #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
 #else
-##
-(% class="full column" %)(((
-#displayExtensionSearchBar()
+  (% class="full column" %)(((
+  #displayExtensionSearchBar()
 
-= $msg.get('extensions.core.title')
+  = $msg.get('extensions.core.title')
 
-#if ($request.extensionid &amp;&amp; $request.extensionversion)
-  #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
-#else
-  #set($extensions = $extensionManager.getCoreExtensions())
-#end
-#if ($extensions.isEmpty())
-  {{info}}$msg.get('extensions.core.noExtensions'){{/info}}##
-#else
-  #if ($extensions.size() &gt; 1)
-    #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
-    {{html}}#pagination($paginationParams){{/html}}
-    #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
-  #end
-  #set ($actions = [])
-  #computeXBack()
-  #if ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #if ($request.extensionid &amp;&amp; $request.extensionversion)
+    #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
   #else
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
+    #set($extensions = $extensionManager.getCoreExtensions())
   #end
-  #foreach($extension in $extensions)
-    #displayExtension($extension $actions)
+  #if ($extensions.isEmpty())
+    {{info}}$msg.get('extensions.core.noExtensions'){{/info}}##
+  #else
+    #if ($extensions.size() &gt; 1)
+      #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
+      {{html}}#pagination($paginationParams){{/html}}
+      #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
+    #end
+    #foreach($extension in $extensions)
+      #displayExtension($extension $actions)
+    #end
+    #if ($paginationParams)
+      #set ($discard = $paginationParams.put('position', 'bottom'))
+      {{html}}#pagination($paginationParams){{/html}}
+    #end
   #end
-  #if ($paginationParams)
-    #set ($discard = $paginationParams.put('position', 'bottom'))
-    {{html}}#pagination($paginationParams){{/html}}
-  #end
-#end
-)))
+  )))
 #end
 {{/velocity}}</content></xwikidoc>

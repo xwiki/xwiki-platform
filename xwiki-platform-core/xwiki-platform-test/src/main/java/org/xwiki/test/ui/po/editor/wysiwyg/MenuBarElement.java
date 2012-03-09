@@ -32,6 +32,11 @@ import org.xwiki.test.ui.po.BaseElement;
 public class MenuBarElement extends BaseElement
 {
     /**
+     * The XPath used to locate a menu item by its label.
+     */
+    private static final String MENU_ITEM_XPATH = "//td[contains(@class, 'gwt-MenuItem') and . = '%s']";
+
+    /**
      * The element that wraps the menu bar.
      */
     private final WebElement container;
@@ -55,19 +60,43 @@ public class MenuBarElement extends BaseElement
     }
 
     /**
+     * Click on the table menu.
+     */
+    public void clickTableMenu()
+    {
+        clickMenuWithLabel("Table");
+    }
+
+    /**
      * Clicks on the "Attached Image..." menu.
      * 
      * @return the pane used to select an attached image to insert
      */
     public AttachedImageSelectPane clickInsertAttachedImageMenu()
     {
-        WebElement insertAttachedImageMenu =
-            container.findElement(By.xpath("//td[contains(@class, 'gwt-MenuItem') and . = 'Attached Image...']"));
+        String xpath = String.format(MENU_ITEM_XPATH, "Attached Image...");
+        WebElement insertAttachedImageMenu = container.findElement(By.xpath(xpath));
         if (!isMenuEnabled(insertAttachedImageMenu)) {
             return null;
         }
         insertAttachedImageMenu.click();
         return new AttachedImageSelectPane().waitToLoad();
+    }
+
+    /**
+     * Clicks on the "Insert Table..." menu.
+     * 
+     * @return the pane used to configure the table to be inserted
+     */
+    public TableConfigPane clickInsertTableMenu()
+    {
+        String xpath = String.format(MENU_ITEM_XPATH, "Insert Table...");
+        WebElement insertTableMenu = container.findElement(By.xpath(xpath));
+        if (!isMenuEnabled(insertTableMenu)) {
+            return null;
+        }
+        insertTableMenu.click();
+        return new TableConfigPane().waitToLoad();
     }
 
     /**
@@ -86,8 +115,6 @@ public class MenuBarElement extends BaseElement
      */
     private void clickMenuWithLabel(String label)
     {
-        WebElement menu =
-            container.findElement(By.xpath("//td[contains(@class, 'gwt-MenuItem') and . = '" + label + "']"));
-        menu.click();
+        container.findElement(By.xpath(String.format(MENU_ITEM_XPATH, label))).click();
     }
 }

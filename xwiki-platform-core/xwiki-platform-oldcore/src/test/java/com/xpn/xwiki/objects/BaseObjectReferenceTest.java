@@ -79,7 +79,7 @@ public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
             new BaseObjectReference(new EntityReference("wiki:space.class[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
-        Assert.assertEquals((int) 42, (int) reference.getObjectNumber());
+        Assert.assertEquals(42, (int) reference.getObjectNumber());
 
         reference = new BaseObjectReference(new EntityReference("wiki:space.class", EntityType.OBJECT, this.document));
 
@@ -100,7 +100,7 @@ public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
             new BaseObjectReference(new EntityReference("wiki:space.class\\\\[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class\\"), reference.getXClassReference());
-        Assert.assertEquals((int) 42, (int) reference.getObjectNumber());
+        Assert.assertEquals(42, (int) reference.getObjectNumber());
 
         reference =
             new BaseObjectReference(new EntityReference("wiki:space.class\\\\\\[42]", EntityType.OBJECT, this.document));

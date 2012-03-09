@@ -28,6 +28,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -57,7 +59,20 @@ public class XWikiServletContextListener implements ServletContextListener
         StackingComponentEventManager eventManager = new StackingComponentEventManager();
         this.componentManager.setComponentEventManager(eventManager);
 
-        // Initializes XWiki's Container with the Servlet Context.
+        // Initialize the Environment
+        try {
+            ServletEnvironment servletEnvironment =
+                (ServletEnvironment) this.componentManager.lookup(Environment.class);
+            servletEnvironment.setServletContext(servletContextEvent.getServletContext());
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to initialize the Servlet Environment", e);
+        }
+
+        // Initializes the Application Context.
+        // Even though the notion of ApplicationContext has been deprecated in favor of the notion of Environment we
+        // still keep this initialization for backward-compatibility.
+        // TODO: Add an Observation Even that we send when the Environment is initialized so that we can move the code
+        // below in an Event Listener and move it to the legacy module.
         try {
             ServletContainerInitializer containerInitializer =
                 this.componentManager.lookup(ServletContainerInitializer.class);
@@ -106,6 +121,10 @@ public class XWikiServletContextListener implements ServletContextListener
             // TODO: Log a warning
         }
 
+        // Even though the notion of ApplicationContext has been deprecated in favor of the notion of Environment we
+        // still keep this destruction for backward-compatibility.
+        // TODO: Add an Observation Even that we send when the Environment is destroyed so that we can move the code
+        // below in an Event Listener and move it to the legacy module.
         try {
             ApplicationContextListenerManager applicationContextListenerManager =
                 this.componentManager.lookup(ApplicationContextListenerManager.class);

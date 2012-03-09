@@ -39,7 +39,14 @@
       <outputDirectory>/jetty/lib</outputDirectory>
       <excludes>
         <exclude>org.eclipse.jetty:jetty-start</exclude>
+        <exclude>org.xwiki.platform:xwiki-platform-tool-jetty-listener</exclude>
       </excludes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>/jetty/lib/ext</outputDirectory>
+      <includes>
+        <include>org.xwiki.platform:xwiki-platform-tool-jetty-listener</include>
+      </includes>
     </dependencySet>
   </dependencySets>
   <fileSets>

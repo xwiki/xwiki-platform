@@ -51,11 +51,6 @@ public class TextAreaClass extends StringClass
         this(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.StringClass#newProperty()
-     */
     @Override
     public BaseProperty newProperty()
     {
@@ -161,12 +156,6 @@ public class TextAreaClass extends StringClass
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.StringClass#displayEdit(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
@@ -205,12 +194,6 @@ public class TextAreaClass extends StringClass
         buffer.append(textarea.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.PropertyClass#displayView(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
@@ -255,7 +238,7 @@ public class TextAreaClass extends StringClass
             // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
             // current wiki).
             EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
             LOGGER.warn("Error while getting the syntax corresponding to object ["
                 + compactWikiEntityReferenceSerializer.serialize(object.getDocumentReference())
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");

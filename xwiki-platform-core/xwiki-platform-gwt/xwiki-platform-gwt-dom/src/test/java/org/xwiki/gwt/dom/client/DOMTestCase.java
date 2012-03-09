@@ -44,11 +44,7 @@ public class DOMTestCase extends GWTTestCase
      */
     private Element container;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -58,11 +54,7 @@ public class DOMTestCase extends GWTTestCase
         document.getBody().appendChild(container);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#gwtTearDown()
-     */
+    @Override
     protected void gwtTearDown() throws Exception
     {
         super.gwtTearDown();
@@ -86,11 +78,7 @@ public class DOMTestCase extends GWTTestCase
         return container;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#getModuleName()
-     */
+    @Override
     public String getModuleName()
     {
         return "org.xwiki.gwt.dom.DOMTest";

@@ -34,7 +34,7 @@ import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -69,13 +69,11 @@ public class TempResourceAction extends XWikiAction
     private Tika tika = new Tika();
 
     /**
-     * Used to resolve temporary working dir.
+     * Used to find the temporary dir.
      */
-    private Container container = Utils.getComponent(Container.class);
+    private Environment environment = Utils.getComponent(Environment.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
@@ -136,7 +134,7 @@ public class TempResourceAction extends XWikiAction
             String prefix = String.format("temp/%s/%s/%s/%s/", module, wiki, space, page);
             String path = URI.create(prefix + filePath).normalize().toString();
             if (path.startsWith(prefix)) {
-                result = new File(container.getApplicationContext().getTemporaryDirectory(), path);
+                result = new File(this.environment.getTemporaryDirectory(), path);
                 result = result.exists() ? result : null;
             }
         }

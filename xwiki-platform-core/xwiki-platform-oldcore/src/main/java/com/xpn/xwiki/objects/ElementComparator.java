@@ -35,6 +35,7 @@ public class ElementComparator implements Comparator
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @Override
     public int compare(Object o1, Object o2)
     {
         // Get a null comparator that is backed by a static "natural" comparator

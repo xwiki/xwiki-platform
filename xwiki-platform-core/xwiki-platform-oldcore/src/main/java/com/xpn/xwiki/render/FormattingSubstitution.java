@@ -66,11 +66,6 @@ public class FormattingSubstitution extends WikiSubstitution
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.WikiSubstitution#makePattern(java.lang.String)
-     */
     @Override
     public String makePattern(String patternparam)
     {
@@ -85,11 +80,6 @@ public class FormattingSubstitution extends WikiSubstitution
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.WikiSubstitution#prepareSubstitution(org.apache.oro.text.regex.MatchResult)
-     */
     @Override
     public void prepareSubstitution(MatchResult matchResult)
     {

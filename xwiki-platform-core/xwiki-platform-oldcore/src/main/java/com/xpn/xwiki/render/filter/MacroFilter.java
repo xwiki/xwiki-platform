@@ -48,6 +48,7 @@ public class MacroFilter extends RegexTokenFilter
         addRegex("\\{([^:}]+)(?::([^\\}]*))?\\}", "", MULTILINE);
     }
 
+    @Override
     public void setInitialContext(InitialRenderContext context)
     {
         macros = MacroRepository.getInstance();
@@ -59,6 +60,7 @@ public class MacroFilter extends RegexTokenFilter
         return macros;
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         String command = result.group(1);

@@ -36,11 +36,7 @@ public class DefaultImageCaptchaAction extends AbstractImageCaptchaAction
     /** The service which provides the captcha, must be static because struts instanciates per request. */
     private static final ImageCaptchaService SERVICE = new DefaultManageableImageCaptchaService();
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractCaptchaAction#getCaptchaService()
-     */
+    @Override
     ImageCaptchaService getCaptchaService()
     {
         return SERVICE;

@@ -223,11 +223,6 @@ public class Wiki extends Document
         return contains;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

@@ -22,6 +22,11 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarMergeResult
 {
     private Map<XarEntry, XarEntryMergeResult> mergeResults = new LinkedHashMap<XarEntry, XarEntryMergeResult>();

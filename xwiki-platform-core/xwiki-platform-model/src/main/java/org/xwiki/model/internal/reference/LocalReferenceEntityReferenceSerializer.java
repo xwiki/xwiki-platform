@@ -31,11 +31,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * (usually we don't want to print it but only if it's the same as the current wiki).
  * 
  * @version $Id$
- * @since 2.2.3
+ * @since 4.0M1
  * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead
  */
 @Deprecated
-@Component("local/reference")
+@Component("local")
 public class LocalReferenceEntityReferenceSerializer implements EntityReferenceSerializer<EntityReference>
 {
     @Override

@@ -44,11 +44,6 @@ public class WhiteSpaceContentAlterer extends AbstractFilterContentAlterer
     @Named("whitespace")
     private Filter whiteSpaceFilter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.internal.content.AbstractFilterContentAlterer#getFilter()
-     */
     @Override
     protected Filter getFilter()
     {

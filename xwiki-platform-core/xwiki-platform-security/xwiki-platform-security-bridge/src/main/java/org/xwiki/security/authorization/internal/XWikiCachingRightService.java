@@ -62,6 +62,7 @@ public class XWikiCachingRightService implements XWikiRightService
     static {
         ACTION_MAP
             .putAction(LOGIN_ACTION, Right.LOGIN)
+            .putAction("imagecaptcha", Right.LOGIN)
             .putAction("view", Right.VIEW)
             .putAction(DELETE_ACTION, Right.DELETE)
             .putAction("admin", Right.ADMIN)
@@ -105,12 +106,16 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("propadd", Right.EDIT)
             .putAction("propupdate", Right.EDIT)
             .putAction("propdelete", Right.EDIT)
+            .putAction("propdisable", Right.EDIT)
+            .putAction("propenable", Right.EDIT)
             .putAction("objectadd", Right.EDIT)
             .putAction("objectremove", Right.EDIT)
             .putAction("objectsync", Right.EDIT)
             .putAction("rollback", Right.EDIT)
             .putAction("upload", Right.EDIT)
-            .putAction("create", Right.EDIT);
+            .putAction("create", Right.EDIT)
+            .putAction("deleteversions", Right.DELETE)
+            .putAction("deletespace", Right.ADMIN);
     }
 
     /** Resolver for document references. */

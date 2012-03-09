@@ -1154,6 +1154,15 @@ $html
 ##
 ##
 #**
+ * Escape a string for verbatim rendering in XWiki syntax 2.0 or 2.1 and output the result.
+ *
+ * @param string The string to escape.
+ *###
+#macro(escapeXWikiSyntax $string){{{$string.replaceAll('(?:(\{)\{\{)|(?:(\})\}\})', '~$1$2~$1$2~$1$2')}}}#end
+##
+##
+##
+#**
  * Displays a submit button, i.e. an <tt>input</tt> element with <tt>type=submit</tt>.
  * For styling purposes, the button is wrapped in a span element.
  * @param name The value of the <tt>name</tt> attribute

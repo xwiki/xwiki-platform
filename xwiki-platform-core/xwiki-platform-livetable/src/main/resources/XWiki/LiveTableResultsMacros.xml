@@ -200,21 +200,21 @@
   ## ==============================================
 {
   #if("$!request.sql" == '1')
-    "sql": "$escapetool.javascript($sql)",
-    "countsql": "$escapetool.javascript($countSql)",
-    "params": "$escapetool.javascript($sqlParams)"
+    "sql": "#escapeXWikiSyntax($escapetool.javascript($sql))",
+    "countsql": "#escapeXWikiSyntax($escapetool.javascript($countSql))",
+    "params": "#escapeXWikiSyntax($escapetool.javascript($sqlParams))"
   #end
   "totalrows": $totalItems,
   "matchingtags": {
   #foreach($tag in $tagsMatchingFilters.keySet())
     #if($velocityCount &gt; 1) , #end
-    "$escapetool.javascript($tag)": {}
+    "#escapeXWikiSyntax($escapetool.javascript($tag))": {}
   #end
   },
   "tags" : [
   #foreach($tag in $allMatchingTags.keySet())
     #if($velocityCount &gt; 1) , #end
-    {"tag": "$escapetool.javascript($tag)", "count": $allMatchingTags.get($tag)}
+    {"tag": "#escapeXWikiSyntax($escapetool.javascript($tag))", "count": $allMatchingTags.get($tag)}
   #end
   ],
   "returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
@@ -243,43 +243,43 @@
         #set($deleteUrl = $itemDoc.getURL('delete'))
         #set($renameUrl = $itemDoc.getURL('view', 'xpage=rename&amp;step=1'))
         #set($rightsUrl = $itemDoc.getURL('edit', 'editor=rights'))
-        "doc_name" : "$escapetool.javascript($itemDoc.name)",
-        "doc_fullname" : "$escapetool.javascript($fullname)",
-        "doc_space" : "$escapetool.javascript(${itemDoc.space})",
-        "doc_url" : "$escapetool.javascript(${itemUrl})",
-        "doc_space_url" : "$escapetool.javascript(${spaceUrl})",
+        "doc_name" : "#escapeXWikiSyntax($escapetool.javascript($itemDoc.name))",
+        "doc_fullname" : "#escapeXWikiSyntax($escapetool.javascript($fullname))",
+        "doc_space" : "#escapeXWikiSyntax($escapetool.javascript(${itemDoc.space}))",
+        "doc_url" : "#escapeXWikiSyntax($escapetool.javascript(${itemUrl}))",
+        "doc_space_url" : "#escapeXWikiSyntax($escapetool.javascript(${spaceUrl}))",
         #if($xwiki.isVirtualMode())
-          "doc_wiki" : "$escapetool.javascript($wiki)",
-          "doc_wiki_url" : "$escapetool.javascript($wikiUrl)",
+          "doc_wiki" : "#escapeXWikiSyntax($escapetool.javascript($wiki))",
+          "doc_wiki_url" : "#escapeXWikiSyntax($escapetool.javascript($wikiUrl))",
         #end
         "doc_hasadmin"  : $xwiki.hasAdminRights(),
         "doc_hasedit" : $xwiki.hasAccessLevel('edit', $context.user, $fullname),
         "doc_hasdelete" : $xwiki.hasAccessLevel('delete', $context.user, $fullname),
-        "doc_edit_url" : "$escapetool.javascript($editUrl)",
-        "doc_copy_url"   : "$escapetool.javascript($copyUrl)",
-        "doc_delete_url" : "$escapetool.javascript($deleteUrl)",
-        "doc_rename_url" : "$escapetool.javascript($renameUrl)",
-        "doc_rights_url" : "$escapetool.javascript($rightsUrl)",
-        "doc_author_url" : "$escapetool.javascript($xwiki.getURL($itemDoc.author))",
-        "doc_date" : "$escapetool.javascript(${xwiki.formatDate($itemDoc.date)})",
-        "doc_title" : "$escapetool.javascript($escapetool.xml(${itemDoc.plainTitle}))",
-        "doc_author" : "$escapetool.javascript(${xwiki.getLocalUserName($itemDoc.author, false)})",
-        "doc_creationDate" : "$escapetool.javascript(${xwiki.formatDate($itemDoc.creationDate)})",
-        "doc_creator" : "$escapetool.javascript(${xwiki.getLocalUserName($itemDoc.creator, false)})"
+        "doc_edit_url" : "#escapeXWikiSyntax($escapetool.javascript($editUrl))",
+        "doc_copy_url"   : "#escapeXWikiSyntax($escapetool.javascript($copyUrl))",
+        "doc_delete_url" : "#escapeXWikiSyntax($escapetool.javascript($deleteUrl))",
+        "doc_rename_url" : "#escapeXWikiSyntax($escapetool.javascript($renameUrl))",
+        "doc_rights_url" : "#escapeXWikiSyntax($escapetool.javascript($rightsUrl))",
+        "doc_author_url" : "#escapeXWikiSyntax($escapetool.javascript($xwiki.getURL($itemDoc.author)))",
+        "doc_date" : "#escapeXWikiSyntax($escapetool.javascript(${xwiki.formatDate($itemDoc.date)}))",
+        "doc_title" : "#escapeXWikiSyntax($escapetool.javascript($escapetool.xml(${itemDoc.plainTitle})))",
+        "doc_author" : "#escapeXWikiSyntax($escapetool.javascript(${xwiki.getLocalUserName($itemDoc.author, false)}))",
+        "doc_creationDate" : "#escapeXWikiSyntax($escapetool.javascript(${xwiki.formatDate($itemDoc.creationDate)}))",
+        "doc_creator" : "#escapeXWikiSyntax($escapetool.javascript(${xwiki.getLocalUserName($itemDoc.creator, false)}))"
         #foreach($colname in $collist)
           #if($colname.startsWith('doc.'))
           #elseif($colname == '_action') ,
             #set($text = $msg.get("${request.transprefix}actiontext"))
-           "$escapetool.javascript(${colname})" : "$escapetool.javascript(${text})"
+           "$escapetool.javascript(${colname})" : "#escapeXWikiSyntax($escapetool.javascript(${text}))"
           #elseif($colname == '_attachments') ,
             #livetable_getAttachmentsList($itemDoc)
-            "$escapetool.javascript(${colname})" : "$escapetool.javascript(${attachlist})"
+            "$escapetool.javascript(${colname})" : "#escapeXWikiSyntax($escapetool.javascript(${attachlist}))"
           #elseif($colname == '_avatar') ,
             #livetable_getAvatar($itemDoc)
-            "$escapetool.javascript(${colname})" : "$escapetool.javascript(${avatar})"
+            "$escapetool.javascript(${colname})" : "#escapeXWikiSyntax($escapetool.javascript(${avatar}))"
           #elseif($colname == '_images') ,
             #livetable_getImagesList($itemDoc)
-            "$escapetool.javascript(${colname})" : "$escapetool.javascript(${imagesList})"
+            "$escapetool.javascript(${colname})" : "#escapeXWikiSyntax($escapetool.javascript(${imagesList}))"
           #else ,
             #set($propClassName = "$!{request.get(${colname.concat('_class')})}")
             #if($propClassName != '')
@@ -306,9 +306,10 @@
                 #set($fieldUrl = '')
               #end
             #end
-            "$escapetool.javascript(${colname})" : "$escapetool.javascript($fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", ''))",
-            "$escapetool.javascript(${colname})_value" : "$escapetool.javascript(${fieldValue})",
-            "$escapetool.javascript(${colname})_url" : "$escapetool.javascript(${fieldUrl})"
+            #set($fieldDisplayValue = $escapetool.javascript($fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+            "$escapetool.javascript(${colname})" : "#escapeXWikiSyntax($fieldDisplayValue)",
+            "$escapetool.javascript(${colname})_value" : "#escapeXWikiSyntax($escapetool.javascript(${fieldValue}))",
+            "$escapetool.javascript(${colname})_url" : "#escapeXWikiSyntax($escapetool.javascript(${fieldUrl}))"
             ## reset to the default class
             #set($discard = $itemDoc.use($className))
           #end

@@ -21,6 +21,7 @@
 package compatibility.com.xpn.xwiki;
  
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWikiContext} class.
@@ -59,7 +60,7 @@ public privileged aspect XWikiContextCompatibilityAspect
      * @param archive the {@link XWikiDocumentArchive document archive} to cache
      */
     @Deprecated
-    public void addDocumentArchive(String key, XWikiDocumentArchive archive)
+    public void XWikiContext.addDocumentArchive(String key, XWikiDocumentArchive archive)
     {
         // Don't do anything, see XWIKI-7585
     }
@@ -72,9 +73,10 @@ public privileged aspect XWikiContextCompatibilityAspect
      * @see #addDocumentArchive(String, XWikiDocumentArchive)
      */
     @Deprecated
-    public XWikiDocumentArchive getDocumentArchive(String key)
+    public XWikiDocumentArchive XWikiContext.getDocumentArchive(String key)
     {
-        // Don't do anything, see XWIKI-7585
+        // Act as if the cache is empty, see XWIKI-7585
+        return null;
     }
 
     /**
@@ -84,7 +86,7 @@ public privileged aspect XWikiContextCompatibilityAspect
      * @see #addDocumentArchive(String, XWikiDocumentArchive)
      */
     @Deprecated
-    public void removeDocumentArchive(String key)
+    public void XWikiContext.removeDocumentArchive(String key)
     {
         // Don't do anything, see XWIKI-7585
     }
@@ -95,7 +97,7 @@ public privileged aspect XWikiContextCompatibilityAspect
      * @see #addDocumentArchive(String, XWikiDocumentArchive)
      */
     @Deprecated
-    public void flushArchiveCache()
+    public void XWikiContext.flushArchiveCache()
     {
         // Don't do anything, see XWIKI-7585
     }

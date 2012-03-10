@@ -234,9 +234,8 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
 
         // Step 2: Look for all registered bot listeners in the component manager but not already in the data structure
         try {
-            for (Map.Entry<String, IRCBotListener> entry :
-                this.componentManager.<IRCBotListener>lookupMap((Type) IRCBotListener.class).entrySet())
-            {
+            Map<String, IRCBotListener> botListeners = this.componentManager.lookupMap((Type) IRCBotListener.class);
+            for (Map.Entry<String, IRCBotListener> entry : botListeners.entrySet()) {
                 BotListenerData listenerData =
                     new BotListenerData(entry.getKey(), entry.getValue().getName(), entry.getValue().getDescription());
                 if (!data.containsKey(entry.getKey())) {

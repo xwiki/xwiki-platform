@@ -46,5 +46,5 @@ public interface IRCBot
     Set<String> getChannelsNames();
     boolean isConnected();
 
-    public ListenerManager<? extends PircBotX> getListenerManager();
+    ListenerManager<? extends PircBotX> getListenerManager();
 }

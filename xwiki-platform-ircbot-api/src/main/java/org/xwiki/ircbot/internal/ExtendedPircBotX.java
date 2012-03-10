@@ -19,20 +19,19 @@
  */
 package org.xwiki.ircbot.internal;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.Socket;
 
-import org.pircbotx.InputThread;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextManager;
 
-import com.xpn.xwiki.XWikiContext;
-
+/**
+ * Extends PircBotX to set a flag when the bot is stopped so that we can differentiate between a user stop of the Bot
+ * versus a disconnection. This is required for example in the AutoReconnect Bot Listener where we automatically
+ * try to reconnect when the Bot is disconnected (but not voluntarily by a user).
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class ExtendedPircBotX extends PircBotX
 {
     private boolean shouldStop;

@@ -28,6 +28,14 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBotListener;
 
+/**
+ * Automatically reconnects when the IRC Client connection to the IRC server is lost.
+ *
+ * @param <T> the reference to the PircBotX instance
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 @Component
 @Named("autoreconnect")
 public class AutoReconnectListener<T extends ExtendedPircBotX> extends ListenerAdapter<T> implements IRCBotListener<T>
@@ -55,19 +63,19 @@ public class AutoReconnectListener<T extends ExtendedPircBotX> extends ListenerA
     {
         ExtendedPircBotX bot = event.getBot();
         if (!bot.shouldStop()) {
-             this.logger.debug("IRC Bot has been disconnected");
-             while (!bot.isConnected()) {
-                 try {
-                     bot.reconnect();
-                 } catch (Exception e) {
-                     // Cannot reconnect, wait for some time before trying to reconnect again
-                     try {
-                         Thread.sleep(1000L * 30);
-                     } catch (InterruptedException ie) {
-                         // Failed to sleep, just ignore
-                     }
-                 }
-             }
-         }
+            this.logger.debug("IRC Bot has been disconnected");
+            while (!bot.isConnected()) {
+                try {
+                    bot.reconnect();
+                } catch (Exception e) {
+                    // Cannot reconnect, wait for some time before trying to reconnect again
+                    try {
+                        Thread.sleep(1000L * 30);
+                    } catch (InterruptedException ie) {
+                        // Failed to sleep, just ignore
+                    }
+                }
+            }
+        }
     }
 }

@@ -145,6 +145,7 @@ public class IRCBotTest extends AbstractTest
         getUtil().deletePage(getTestClassName(), LISTENER_PAGE);
 
         // Verify that our Bot is no longer listed
-        //TODO
+        page = IRCBotPage.gotoPage();
+        Assert.assertFalse(page.containsListener("Test"));
     }
 }

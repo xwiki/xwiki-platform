@@ -79,4 +79,22 @@ public class IRCBotPage extends ViewPage
         }
         return result;
     }
+
+    /**
+     * @param botListenerName the name of the listener bot (eg "Log")
+     * @return true if the bot is displayed in the listener table
+     */
+    public boolean containsListener(String botListenerName)
+    {
+        boolean result = false;
+
+        List<WebElement> tds = getDriver().findElements(By.xpath("//table[@id='listenertable']//tr/td"));
+        for (int i = 0; i < tds.size(); i++) {
+            if (tds.get(i).getText().equals(botListenerName)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 }

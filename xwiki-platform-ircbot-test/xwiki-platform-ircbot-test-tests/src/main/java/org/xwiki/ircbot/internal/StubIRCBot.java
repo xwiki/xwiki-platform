@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.managers.ListenerManager;
-import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBot;
 
@@ -42,13 +41,16 @@ import org.xwiki.ircbot.IRCBot;
  */
 @Component
 @Singleton
-public class StubIRCBot implements IRCBot
+public class StubIRCBot extends PircBotXIRCBot implements IRCBot
 {
     private String hostname;
 
     private List<String> messages = new ArrayList();
 
-    private ThreadedListenerManager listenerManager = new ThreadedListenerManager();
+    public StubIRCBot()
+    {
+        // Don't call the parent constructor to override what happens in PircBotX
+    }
 
     public List<String> getMessages()
     {
@@ -65,6 +67,8 @@ public class StubIRCBot implements IRCBot
     public void connect(String hostname) throws IOException, IrcException
     {
         this.hostname = hostname;
+        // Clear the message cache on connect
+        this.messages.clear();
     }
 
     @Override

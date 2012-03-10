@@ -21,10 +21,6 @@ package org.xwiki.ircbot.test.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.NotFoundException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.ircbot.test.po.IRCBotConfigurationPage;
 import org.xwiki.ircbot.test.po.IRCBotPage;
 import org.xwiki.test.ui.AbstractTest;
@@ -40,20 +36,18 @@ import junit.framework.Assert;
  */
 public class IRCBotTest extends AbstractTest
 {
+    private static final String ARCHIVE_PAGE = "IRCArchive";
+
+    private static final String SERVER_PAGE = "IRCServer";
+
+    private static final String LISTENER_PAGE = "TestListener";
+
     @Before
     public void setUp()
     {
         // Login as superadmin to have delete rights.
         getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
         getUtil().recacheSecretToken();
-    }
-
-    @Test
-    public void testBot()
-    {
-        getUtil().deletePage(getTestClassName(), getTestMethodName());
-        String triggerPageName = getTestMethodName() + "NewPage";
-        getUtil().deletePage(getTestClassName(), triggerPageName);
 
         // Verify that the Bot is stopped, if not, stop it
         // We do this as the first thing since otherwise events could be sent to the bot which would make our
@@ -64,24 +58,30 @@ public class IRCBotTest extends AbstractTest
         }
         Assert.assertFalse(page.isBotStarted());
 
-        // Remove the Log listener archive page to start from a clean slate.
-        getUtil().deletePage("IRC", "testarchive");
+        // Delete pages that we create in the test
+        getUtil().deletePage(getTestClassName(), LISTENER_PAGE);
+        getUtil().deletePage(getTestClassName(), SERVER_PAGE);
+        getUtil().deletePage(getTestClassName(), ARCHIVE_PAGE);
 
         // Configure the Logging Bot Listener to log into a fixed name page so that we can easily delete that page at
         // the test start and find it easily to assert its content below.
         IRCBotConfigurationPage configPage = IRCBotConfigurationPage.gotoPage();
-        configPage.setLoggingPage("IRC.testarchive");
+        configPage.setLoggingPage(getTestClassName() + "." + ARCHIVE_PAGE);
+    }
 
-        // Add a Bot Listener
-        getUtil().addObject(getTestClassName(), getTestMethodName(), "IRC.IRCBotListenerClass",
+    @Test
+    public void testBot()
+    {
+        // Add a Test Bot Listener
+        getUtil().addObject(getTestClassName(), LISTENER_PAGE, "IRC.IRCBotListenerClass",
             "description", "bot listener test",
             "name", "Test");
-        getUtil().addObject(getTestClassName(), getTestMethodName(), "IRC.IRCBotListenerEventClass",
+        getUtil().addObject(getTestClassName(), LISTENER_PAGE, "IRC.IRCBotListenerEventClass",
             "event", "onMessage",
             "script", "gotcha!");
 
         // Start the Bot
-        page = IRCBotPage.gotoPage();
+        IRCBotPage page = IRCBotPage.gotoPage();
         // Note that starting the Bot will generate a Join Event and thanks to the Log Bot Listener, the following
         // will be logged in the archive page: "<XWikiBotTest> has joined #xwikitest"
         page.clickActionButton();
@@ -97,41 +97,35 @@ public class IRCBotTest extends AbstractTest
         Assert.assertTrue(page.isBotListenerStarted("Help"));
         Assert.assertTrue(page.isBotListenerStarted("AutoReconnect"));
 
-        // Create a new page to verify that a message is sent to the IRC channel.
-        // We thus test the IRC Event Listener.
-        getUtil().createPage(getTestClassName(), triggerPageName, "whatever", "title");
+        // Create a new page for 2 reasons:
+        // - It allows us testing the IRC Event Listener since a message will be sent to the IRC Channel
+        // - In the content of this page we get access to the list of messages sent to the IRC channel and we can
+        //    verify that the IRC Event Listener has sent the correct message to the channel
+        final ViewPage messagesPage = getUtil().createPage(getTestClassName(), SERVER_PAGE,
+              "{{velocity}}\n"
+            + "#if (\"$!request.message\" != \"\")\n"
+            + "  #set ($discard = $services.ircserver.typeInChannel($request.message))\n"
+            + "#else\n"
+            + "  #foreach ($message in $services.ircserver.messages)\n"
+            + "    $message\n"
+            + "  #end\n"
+            + "#end\n"
+            + "{{/velocity}}", "title");
+        messagesPage.waitUntilContent("xwiki:" + getTestClassName() + "\\." + SERVER_PAGE + " was modified by "
+                    + "xwiki:XWiki\\.superadmin \\(created\\) - .*" + getTestClassName() + "/" + SERVER_PAGE);
 
         // Simulate typing some content in the IRC Channel. This will have two effects:
         // - the message will be logged
         // - our test listener will send "gotcha!" to the IRC channel
-        //TODO: Send "hello"
+        getUtil().gotoPage(getTestClassName(), SERVER_PAGE, "view", "message", "hello");
+        getUtil().gotoPage(getTestClassName(), SERVER_PAGE);
+        messagesPage.waitUntilContent(".*was modified by.*nick: gotcha!.*was modified.*");
 
         // Verify the Archive page (this tests the Log Bot Listener).
-        // It may take some time for the IRC Server to send back the Join event thus we wait for the archive page to
+        // It may take some time for the IRC Server to send back the events thus we wait for the archive page to
         // be created.
-        final ViewPage archivePage = getUtil().gotoPage("IRC", "testarchive");
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    driver.navigate().refresh();
-                    return archivePage.getContent().contains("<XWikiBotTest> has joined #xwikitest")
-                        && archivePage.getContent().contains("hello");
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
-            }
-        });
-
-        // Verify the messages sent to the IRC Server. There should be 2:
-        // - one sent by the Document Event Listener when we have created the new page
-        // - one sent by the Test Listener in response to "hello".
-        // TODO: verify the messages
+        final ViewPage archivePage = getUtil().gotoPage(getTestClassName(), ARCHIVE_PAGE);
+        archivePage.waitUntilContent("<nick> hello");
 
         // Stop the Bot
         page = IRCBotPage.gotoPage();
@@ -148,7 +142,7 @@ public class IRCBotTest extends AbstractTest
         Assert.assertTrue(page.isBotListenerStarted("AutoReconnect"));
 
         // Remove our Bot Listener
-        getUtil().deletePage(getTestClassName(), getTestMethodName());
+        getUtil().deletePage(getTestClassName(), LISTENER_PAGE);
 
         // Verify that our Bot is no longer listed
         //TODO

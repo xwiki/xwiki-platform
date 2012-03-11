@@ -200,9 +200,7 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         params.put("bot", event.getBot());
 
         XWikiContext context = this.ircModel.getXWikiContext();
-        if (context != null) {
-            context.put(LISTENER_XWIKICONTEXT_PROPERTY, params);
-        }
+        context.put(LISTENER_XWIKICONTEXT_PROPERTY, params);
     }
 
     /**

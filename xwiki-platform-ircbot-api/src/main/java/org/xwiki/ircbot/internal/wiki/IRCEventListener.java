@@ -150,7 +150,7 @@ public class IRCEventListener implements EventListener
 
         // If the document has been deleted then the author is the author who's done the delete (i.e. the current
         // author) and not the author of the document.
-        if (event instanceof  DocumentDeletedEvent) {
+        if (event instanceof DocumentDeletedEvent) {
             authorReference = this.ircModel.getXWikiContext().getUserReference();
         } else {
             authorReference = source.getAuthorReference();
@@ -170,9 +170,9 @@ public class IRCEventListener implements EventListener
     private String getNotificationComment(Event event, XWikiDocument source)
     {
         String comment;
-        if (event instanceof  DocumentDeletedEvent) {
+        if (event instanceof DocumentDeletedEvent) {
             comment = "(deleted)";
-        } else if (event instanceof  DocumentCreatedEvent) {
+        } else if (event instanceof DocumentCreatedEvent) {
             comment = "(created)";
             if (!StringUtils.isEmpty(source.getComment())) {
                 comment = comment + " " + source.getComment();

@@ -55,52 +55,132 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
     @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
     DefaultWikiIRCBotListenerManager manager;
 
-    @Test
-    public void registerWikiBotListeners() throws Exception
+    private DocumentReference wikiBotListenerReference1;
+    private DocumentReference wikiBotListenerReference2;
+
+    private WikiIRCBotListener wikiIRCBotListener1;
+    private WikiIRCBotListener wikiIRCBotListener2;
+
+    private ListenerManager listenerManager;
+
+    private ComponentManager componentManager;
+
+    @Override
+    public void configure() throws Exception
     {
         final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
-        // Assume we have one Wiki Bot Listener in the wiki
-        final BotListenerData listenerData = new BotListenerData("space.page", "wikiname", "wikidescription");
+
+        // Assume we have two Wiki Bot Listeners in the wiki
+        final BotListenerData listenerData1 = new BotListenerData("space1.page1", "wikiname1", "wikidescription1");
+        final BotListenerData listenerData2 = new BotListenerData("space2.page2", "wikiname2", "wikidescription2");
+
         final DocumentReferenceResolver<String> resolver =
             getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        final DocumentReference wikiBotListenerReference = new DocumentReference("wiki", "space", "page");
-        final ComponentManager componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
-        final WikiIRCBotListenerFactory factory =
-            getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);
-        final WikiIRCBotListener wikiIRCBotListener = new WikiIRCBotListener(listenerData,
-            Collections.singletonMap("onSomeEvent", new XDOM(Arrays.asList((Block) new WordBlock("whatever")))),
-                Syntax.XWIKI_2_1, getMockery().mock(Transformation.class), getMockery().mock(BlockRenderer.class),
-                    ircModel);
+
+        this.wikiBotListenerReference1 = new DocumentReference("wiki1", "space1", "page1");
+        this.wikiBotListenerReference2 = new DocumentReference("wiki2", "space2", "page2");
+
+        Transformation macroTransformation = getMockery().mock(Transformation.class);
+        BlockRenderer plainTextRenderer = getMockery().mock(BlockRenderer.class);
+        this.wikiIRCBotListener1 = new WikiIRCBotListener(listenerData1,
+            Collections.singletonMap("onSomeEvent1", new XDOM(Arrays.asList((Block) new WordBlock("whatever1")))),
+                Syntax.XWIKI_2_1, macroTransformation, plainTextRenderer, ircModel);
+        this.wikiIRCBotListener2 = new WikiIRCBotListener(listenerData2,
+            Collections.singletonMap("onSomeEvent2", new XDOM(Arrays.asList((Block) new WordBlock("whatever2")))),
+                Syntax.XWIKI_2_1, macroTransformation, plainTextRenderer, ircModel);
+
         final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
-        final ListenerManager listenerManager = getMockery().mock(ListenerManager.class);
+        this.listenerManager = getMockery().mock(ListenerManager.class);
+
+        this.componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(ircModel).getWikiBotListenerData();
-            will(returnValue(Arrays.asList(listenerData)));
-            oneOf(resolver).resolve("space.page");
-            will(returnValue(wikiBotListenerReference));
-            // Assume that the Wiki Bot Listener isn't registered yet
-            oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki:space.page");
-            will(returnValue(false));
-            oneOf(factory).containsWikiListener(wikiBotListenerReference);
-            will(returnValue(true));
-            oneOf(factory).createWikiListener(wikiBotListenerReference);
-            will(returnValue(wikiIRCBotListener));
-            oneOf(bot).getListenerManager();
+            allowing(ircModel).getWikiBotListenerData();
+            will(returnValue(Arrays.asList(listenerData1, listenerData2)));
+
+            allowing(resolver).resolve("space1.page1");
+            will(returnValue(wikiBotListenerReference1));
+            allowing(resolver).resolve("space2.page2");
+            will(returnValue(wikiBotListenerReference2));
+
+            allowing(bot).getListenerManager();
             will(returnValue(listenerManager));
+        }});
+    }
+
+    @Test
+    public void registerWikiBotListeners() throws Exception
+    {
+        final WikiIRCBotListenerFactory factory =
+            getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            // Assume that the first Bot Listener isn't registered yet but that the second is
+            oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki1:space1.page1");
+            will(returnValue(false));
+            oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki2:space2.page2");
+            will(returnValue(true));
+            oneOf(factory).containsWikiListener(wikiBotListenerReference1);
+            will(returnValue(true));
+            oneOf(factory).createWikiListener(wikiBotListenerReference1);
+            will(returnValue(wikiIRCBotListener1));
 
             // Real tests are here:
             // - We verify the IRC Bot Listener is registered against the Component Manager
             DefaultComponentDescriptor<IRCBotListener> cd = new DefaultComponentDescriptor<IRCBotListener>();
             cd.setRoleType(IRCBotListener.class);
-            cd.setRoleHint("wiki:space.page");
-            oneOf(componentManager).registerComponent(cd, wikiIRCBotListener);
+            cd.setRoleHint("wiki1:space1.page1");
+            oneOf(componentManager).registerComponent(cd, wikiIRCBotListener1);
 
             // - We verify the IRC Bot Listener is added to the IRC Bot
-            oneOf(listenerManager).addListener(wikiIRCBotListener);
+            oneOf(listenerManager).addListener(wikiIRCBotListener1);
         }});
 
         this.manager.registerWikiBotListeners();
+    }
+
+    @Test
+    public void registerWikiBotListenersWhenTheyDontContainValidXObjects() throws Exception
+    {
+        final WikiIRCBotListenerFactory factory =
+            getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            // Assume that the first Bot Listener isn't registered yet but that the second is
+            oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki1:space1.page1");
+            will(returnValue(false));
+            oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki2:space2.page2");
+            will(returnValue(true));
+            oneOf(factory).containsWikiListener(wikiBotListenerReference1);
+            will(returnValue(false));
+        }});
+
+        this.manager.registerWikiBotListeners();
+    }
+    @Test
+    public void unregisterWikiBotListeners() throws Exception
+    {
+        getMockery().checking(new Expectations()
+        {{
+                // Assume that the first Bot Listener is registered and that the second isn't
+                oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki1:space1.page1");
+                will(returnValue(true));
+                oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki2:space2.page2");
+                will(returnValue(false));
+                oneOf(componentManager).lookupComponent(IRCBotListener.class, "wiki1:space1.page1");
+                will(returnValue(wikiIRCBotListener1));
+
+                // Real tests are here:
+                // - The Wiki Bot Listener in unregistered
+                oneOf(componentManager).unregisterComponent((Type) IRCBotListener.class, "wiki1:space1.page1");
+
+                // - The Wiki Bot Listener is removed from the Bot Listener Manager
+                oneOf(listenerManager).removeListener(wikiIRCBotListener1);
+            }});
+
+        this.manager.unregisterWikiBotListeners();
     }
 }

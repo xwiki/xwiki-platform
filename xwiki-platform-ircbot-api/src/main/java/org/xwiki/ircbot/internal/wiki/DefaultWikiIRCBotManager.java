@@ -115,7 +115,7 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
 
             // Connect to server if not already connected
             if (!this.bot.isConnected()) {
-                this.bot.setName(botData.getBotName());
+                this.bot.setName(botData.getName());
                 try {
                     this.bot.connect(botData.getServer());
                 } catch (Exception e) {

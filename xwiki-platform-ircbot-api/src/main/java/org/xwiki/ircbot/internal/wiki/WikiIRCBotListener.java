@@ -43,25 +43,68 @@ import org.xwiki.rendering.transformation.TransformationException;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * Represents a dynamic component instance of a Wiki Bot Listener (ie a Listener defined in a Wiki page) that we
+ * register against the Component Manager.
+ *
+ * @param <T> the reference to the PircBotX instance
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     implements IRCBotListener<T>, WikiIRCBotConstants
 {
+    /**
+     * The variable name under which we save the Event bindings in the XWiki Context.
+     * @see #addBindings(org.pircbotx.hooks.Event)
+     */
     public static final String LISTENER_XWIKICONTEXT_PROPERTY = "irclistener";
 
+    /**
+     * The logger to log.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiIRCBotListener.class);
 
+    /**
+     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     */
     private BotListenerData listenerData;
 
+    /**
+     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     */
     private Map<String, XDOM> events;
 
+    /**
+     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     */
     private Syntax syntax;
 
+    /**
+     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     */
     private Transformation macroTransformation;
 
+    /**
+     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     */
     private BlockRenderer plainTextBlockRenderer;
 
+    /**
+     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     */
     private WikiIRCModel ircModel;
 
+    /**
+     * @param listenerData the listener data that have been extracted from the wiki page XObject
+     * @param events the event scripts that have been extracted from the wiki page XObjects
+     * @param syntax the syntax of the wiki page that contained the Bot Listener XObjects
+     * @param macroTransformation the macro transformation that we'll run to execute the event scripts
+     * @param plainTextBlockRenderer the renderer that we'll use to render the parsed event scripts into plain text.
+     *        If the rendering has non empty text then this text is sent to the IRC channel
+     * @param ircModel used to access the XWiki Context
+     */
     public WikiIRCBotListener(BotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
         Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel)
     {
@@ -133,19 +176,25 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         }
     }
 
+    /**
+     * Bind variables related to the IRC event in the XWiki Context under the {@link #LISTENER_XWIKICONTEXT_PROPERTY}
+     * key so that they can be made available to wiki scripts through a Script Service.
+     *
+     * @param event the IRC event from which to get the data to bind
+     * @throws IRCBotException if an error happens when retrieving the XWiki Context
+     */
     private void addBindings(Event event) throws IRCBotException
     {
         Map<String, Object> params = new HashMap<String, Object>();
 
         // Bind variables
-        bindVariable("message", "getMessage", event, params);
-        bindVariable("user", "getUser", event, params);
-        bindVariable("channel", "getChannel", event, params);
-        bindVariable("source", "getUser", event, params);
-        bindVariable("reason", "getReason", event, params);
-        bindVariable("recipient", "getRecipient", event, params);
-        bindVariable("oldNick", "getOldNick", event, params);
-        bindVariable("newNick", "getNewNick", event, params);
+        bindVariable("getMessage", event, params, "message");
+        bindVariable("getUser", event, params, "user", "source");
+        bindVariable("getChannel", event, params, "channel");
+        bindVariable("getReason", event, params, "reason");
+        bindVariable("getRecipient", event, params, "recipient");
+        bindVariable("getOldNick", event, params, "oldNick");
+        bindVariable("getNewNick", event, params, "newNick");
 
         // Bind the PircBotX instance
         params.put("bot", event.getBot());
@@ -156,11 +205,23 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         }
     }
 
-    private void bindVariable(String variableName, String methodName, Event event, Map<String, Object> params)
+    /**
+     * Bind a single variable located in the Event, using reflection.
+     *
+     * @param methodName the name of the method to call in the Event instance to get the value to bind
+     * @param event the event from whih to get the data from
+     * @param params the map in which to save the bindings
+     * @param variableNames the names of the variable to put in the context and that will contain the result of
+     *        executing the Method corresponding to the passed method name
+     */
+    private void bindVariable(String methodName, Event event, Map<String, Object> params, String... variableNames)
     {
         try {
             Method getMessageMethod = event.getClass().getMethod(methodName);
-            params.put(variableName, getMessageMethod.invoke(event));
+            Object value = getMessageMethod.invoke(event);
+            for (String variableName : variableNames) {
+                params.put(variableName, value);
+            }
         } catch (Exception e) {
             // No such method, don't bind anything
         }

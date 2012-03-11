@@ -34,8 +34,15 @@ import org.pircbotx.exception.IrcException;
  */
 public class ExtendedPircBotX extends PircBotX
 {
+    /**
+     * @see #shouldStop()
+     */
     private boolean shouldStop;
 
+    /**
+     * @return true if the Bot has been stopped by the user (ie disconnect has been called explicitly) or false
+     *         otherwise (if the bot has been disconnected by the Server)
+     */
     public boolean shouldStop()
     {
         return this.shouldStop;

@@ -40,6 +40,8 @@ import org.xwiki.ircbot.IRCBotListener;
  * Finds all other Bot Listeners and send their description to the IRC Channel allowing a user to see all the actions
  * that can be done.
  *
+ * @param <T> the reference to the PircBotX instance
+ *
  * @version $Id$
  * @since 4.0M1
  */

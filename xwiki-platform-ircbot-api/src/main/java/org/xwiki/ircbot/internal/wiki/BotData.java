@@ -27,45 +27,83 @@ package org.xwiki.ircbot.internal.wiki;
  */
 public class BotData
 {
+    /**
+     * @see #isActive()
+     */
     private boolean isActive;
 
+    /**
+     * @see #getChannel()
+     */
     private String channel;
 
+    /**
+     * @see #getServer()
+     */
     private String server;
 
-    private String botName;
+    /**
+     * @see #getName
+     */
+    private String name;
 
+    /**
+     * @see #getPassword()
+     */
     private String password;
 
-    public BotData(String botName, String server, String password, String channel, boolean isActive)
+    /**
+     * @param name see {@link #getName()}
+     * @param server see {@link #getServer()}
+     * @param password see {@link #getPassword()}
+     * @param channel see {@link #getChannel()}
+     * @param isActive see {@link #isActive()}
+     */
+    public BotData(String name, String server, String password, String channel, boolean isActive)
     {
-        this.botName = botName;
+        this.name = name;
         this.server = server;
         this.password = password;
         this.channel = channel;
         this.isActive = isActive;
     }
 
-    public String getBotName()
+    /**
+     * @return the Bot's name in the IRC Channel
+     */
+    public String getName()
     {
-        return this.botName;
+        return this.name;
     }
 
+    /**
+     * @return the IRC Server to connect to
+     */
     public String getServer()
     {
         return this.server;
     }
 
+    /**
+     * @return the optional password to identify against the IRC Server
+     */
     public String getPassword()
     {
         return this.password;
     }
 
+    /**
+     * @return the name of the channel the Bot should connect to
+     */
     public String getChannel()
     {
         return this.channel;
     }
 
+    /**
+     * @return true if the Bot is active or false otherwise. This is useful for example for the IRC Bot Scheduler so
+     *         that it'll (re)start the Bot automatically if not started but only if the Bot is active.
+     */
     public boolean isActive()
     {
         return this.isActive;

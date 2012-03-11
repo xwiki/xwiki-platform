@@ -45,12 +45,21 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 @Singleton
 public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot, Initializable
 {
+    /**
+     * Used to construct a clean Execution Context for the PircBotX input threads.
+     */
     @Inject
     private Execution execution;
 
+    /**
+     * Used to construct a clean Execution Context for the PircBotX input threads.
+     */
     @Inject
     private ExecutionContextManager executionContextManager;
 
+    /**
+     * Used to construct a clean Execution Context for the PircBotX input threads.
+     */
     @Inject
     private XWikiStubContextProvider stubContextProvider;
 

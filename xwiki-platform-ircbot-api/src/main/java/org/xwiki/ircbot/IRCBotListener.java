@@ -27,6 +27,8 @@ import org.xwiki.component.annotation.Role;
  * IRC Bot Listeners allows to perform some actions in answer to some IRC channel event. For example you may want to
  * code a Bot Listener that would do something when a given word is typed on the IRC channel.
  *
+ * @param <T> the reference to the PircBotX instance
+ *
  * @version $Id$
  * @since 4.0M1
  */

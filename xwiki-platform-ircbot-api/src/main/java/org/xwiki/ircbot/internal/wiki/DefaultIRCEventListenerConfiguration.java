@@ -45,6 +45,9 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultIRCEventListenerConfiguration implements IRCEventListenerConfiguration, WikiIRCBotConstants
 {
+    /**
+     * Provides access to the Bot configuration data stored in a wiki page.
+     */
     @Inject
     private WikiIRCModel ircModel;
 

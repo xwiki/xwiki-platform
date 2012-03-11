@@ -91,6 +91,9 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    /**
+     * Provides APIs to easily access data stored in wiki pages.
+     */
     @Inject
     private WikiIRCModel ircModel;
 

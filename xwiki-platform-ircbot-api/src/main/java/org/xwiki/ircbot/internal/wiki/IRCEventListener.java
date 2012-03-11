@@ -55,12 +55,22 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class IRCEventListener implements EventListener
 {
+    /**
+     * Used to send messages to the Bot and to verify if the Bot is started.
+     */
     @Inject
     private IRCBot bot;
 
+    /**
+     * Configuration data for this listener.
+     */
     @Inject
     private IRCEventListenerConfiguration configuration;
 
+    /**
+     * Used to generate a String out of the reference to the Document in received Events so that it can be compared
+     * against exclusion Patterns to decide whether or not to send a message to the IRC channel for the received event.
+     */
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
@@ -70,6 +80,9 @@ public class IRCEventListener implements EventListener
     @Inject
     private Logger logger;
 
+    /**
+     * Used to get access to the XWiki Context.
+     */
     @Inject
     private WikiIRCModel ircModel;
 
@@ -123,6 +136,14 @@ public class IRCEventListener implements EventListener
         }
     }
 
+    /**
+     * Get the author name that we want to print in the notification message we send to the IRC channel.
+     *
+     * @param event the XWiki Document event
+     * @param source the source document from the Document event
+     * @return the author name
+     * @throws IRCBotException if we cannot access the XWikiContext
+     */
     private String getNotificationAuthor(Event event, XWikiDocument source) throws IRCBotException
     {
         DocumentReference authorReference;
@@ -138,6 +159,14 @@ public class IRCEventListener implements EventListener
         return this.serializer.serialize(authorReference);
     }
 
+    /**
+     * Get a comment part that we want to print in the notification message we send to the IRC channel.
+     *
+     * @param event the XWiki Document event
+     * @param source the source document from the Document event
+     * @return the comment part
+     * @throws IRCBotException if we cannot access the XWikiContext
+     */
     private String getNotificationComment(Event event, XWikiDocument source)
     {
         String comment;
@@ -155,6 +184,14 @@ public class IRCEventListener implements EventListener
         return comment;
     }
 
+    /**
+     * Get the URL that we want to print in the notification message we send to the IRC channel.
+     *
+     * @param event the XWiki Document event
+     * @param source the source document from the Document event
+     * @return the notification URL
+     * @throws IRCBotException if we cannot access the XWikiContext
+     */
     private String getNotificationURL(Event event, XWikiDocument source) throws IRCBotException
     {
         String url;

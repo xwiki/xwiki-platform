@@ -1,6 +1,7 @@
 org.xwiki.ircbot.internal.PircBotXIRCBot
 org.xwiki.ircbot.internal.wiki.WikiIRCBotScriptService
 org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotManager
+org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotListenerManager
 org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotListenerFactory
 org.xwiki.ircbot.internal.wiki.IRCEventListener
 org.xwiki.ircbot.internal.wiki.DefaultIRCEventListenerConfiguration

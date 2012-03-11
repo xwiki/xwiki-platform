@@ -34,23 +34,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
-import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
-import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
+import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCBotManager;
+import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
- * Default implementation of {@link WikiIRCBotManager}.
+ * Default implementation of {@link org.xwiki.ircbot.wiki.WikiIRCBotManager}.
  *
  * @version $Id$
  * @since 4.0M1
@@ -60,11 +55,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotConstants
 {
     /**
-     * Creates {@link WikiIRCBotListener} objects.
+     * Used to find all registered IRC Bot listener components in the system.
      */
-    @Inject
-    private WikiIRCBotListenerFactory listenerFactory;
-
     @Inject
     @Named("wiki")
     private ComponentManager componentManager;
@@ -75,22 +67,29 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     @Inject
     private Logger logger;
 
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentReferenceResolver;
-
+    /**
+     * The Bot to start/stop.
+     */
     @Inject
     private IRCBot bot;
 
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiSerializer;
-
+    /**
+     * Used to load Bot configuration data.
+     */
     @Inject
     private WikiIRCModel ircModel;
 
+    /**
+     * Used to find all Bot Listener Components in the system, in order to register them against the Bot itself.
+     */
     @Inject
     private Provider<List<IRCBotListener>> botListenerComponents;
+
+    /**
+     * Used to register/unregister Wiki IRC Bot listeners.
+     */
+    @Inject
+    private WikiIRCBotListenerManager botListenerManager;
 
     @Override
     public void startBot() throws IRCBotException
@@ -111,7 +110,7 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
 
             // Register all Wiki Bot Listeners before we start the Bot itself just because we want all Bot Listeners to
             // be ready when the Bot starts so that they can receive all the events and not miss any.
-            registerWikiBotListeners();
+            this.botListenerManager.registerWikiBotListeners();
 
             // Connect to server if not already connected
             if (!this.bot.isConnected()) {
@@ -152,68 +151,7 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
         // Unregister after disconnecting the Bot to allow the listeners to receive all the events till the last moment.
         // Note that Bot Listeners handling event after the disconnection should pay attention not to send anything to
         // the channel since the Bot is stopped!
-        unregisterWikiBotListeners();
-    }
-
-    @Override
-    public void registerWikiBotListener(DocumentReference reference) throws IRCBotException
-    {
-        // Step 1: Verify if the bot listener is already registered
-        String hint = this.compactWikiSerializer.serialize(reference);
-        if (!this.componentManager.hasComponent((Type) IRCBotListener.class, hint)) {
-            // Step 2: Create the Wiki Bot Listener component if the document has the correct objects
-            if (this.listenerFactory.containsWikiListener(reference)) {
-                WikiIRCBotListener wikiListener = this.listenerFactory.createWikiListener(reference);
-                // Step 3: Register it!
-                try {
-                    DefaultComponentDescriptor<IRCBotListener> componentDescriptor =
-                        new DefaultComponentDescriptor<IRCBotListener>();
-                    componentDescriptor.setRoleType(IRCBotListener.class);
-                    componentDescriptor.setRoleHint(this.compactWikiSerializer.serialize(reference));
-                    this.componentManager.registerComponent(componentDescriptor, wikiListener);
-                } catch (ComponentRepositoryException e) {
-                    throw new IRCBotException(String.format("Unable to register Wiki IRC Bot Listener in document [%s]",
-                        this.compactWikiSerializer.serialize(reference)), e);
-                }
-                // Step 4: Add the listener to the Bot
-                this.bot.getListenerManager().addListener(wikiListener);
-            }
-        }
-    }
-
-    @Override
-    public void unregisterWikiBotListener(DocumentReference reference) throws IRCBotException
-    {
-        String hint = this.compactWikiSerializer.serialize(reference);
-        if (this.componentManager.hasComponent((Type) IRCBotListener.class, hint)) {
-            IRCBotListener listener;
-            try {
-                listener = this.componentManager.lookupComponent(IRCBotListener.class, hint);
-            } catch (ComponentLookupException e) {
-                throw new IRCBotException("Failed to unregister Wiki IRC Bot Listener", e);
-            }
-            this.componentManager.unregisterComponent((Type) IRCBotListener.class, hint);
-            // Remove the listener from the Bot
-            this.bot.getListenerManager().removeListener(listener);
-        }
-    }
-
-    @Override
-    public void registerWikiBotListeners() throws IRCBotException
-    {
-        for (BotListenerData data : this.ircModel.getWikiBotListenerData()) {
-            DocumentReference reference = this.currentReferenceResolver.resolve(data.getId());
-            registerWikiBotListener(reference);
-        }
-    }
-
-    @Override
-    public void unregisterWikiBotListeners() throws IRCBotException
-    {
-        for (BotListenerData data : this.ircModel.getWikiBotListenerData()) {
-            DocumentReference reference = this.currentReferenceResolver.resolve(data.getId());
-            unregisterWikiBotListener(reference);
-        }
+        this.botListenerManager.unregisterWikiBotListeners();
     }
 
     @Override

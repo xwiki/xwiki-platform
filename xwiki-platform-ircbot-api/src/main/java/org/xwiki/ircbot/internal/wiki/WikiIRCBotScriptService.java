@@ -62,7 +62,7 @@ public class WikiIRCBotScriptService implements ScriptService
         + "Admin rights.";
 
     @Inject
-    private WikiIRCBotManager botManager;
+    private WikiIRCBotManager wikiBotManager;
 
     @Inject
     @Named("wiki")
@@ -87,7 +87,7 @@ public class WikiIRCBotScriptService implements ScriptService
     {
         if (hasPermission()) {
             try {
-                this.botManager.startBot();
+                this.wikiBotManager.startBot();
             } catch (IRCBotException e) {
                 setError(e);
             }
@@ -100,7 +100,7 @@ public class WikiIRCBotScriptService implements ScriptService
     {
         if (hasPermission()) {
             try {
-                this.botManager.stopBot();
+                this.wikiBotManager.stopBot();
             } catch (IRCBotException e) {
                 setError(e);
             }
@@ -111,7 +111,7 @@ public class WikiIRCBotScriptService implements ScriptService
 
     public boolean isStarted()
     {
-        return this.botManager.isBotStarted();
+        return this.wikiBotManager.isBotStarted();
     }
 
     public Map<BotListenerData, Boolean> getBotListenerStatuses()
@@ -119,7 +119,7 @@ public class WikiIRCBotScriptService implements ScriptService
         Map<BotListenerData, Boolean> statuses = new HashMap<BotListenerData, Boolean>();
 
         try {
-            for (BotListenerData listenerData : this.botManager.getBotListenerData()) {
+            for (BotListenerData listenerData : this.wikiBotManager.getBotListenerData()) {
                 statuses.put(listenerData,
                     this.componentManager.hasComponent((Type) IRCBotListener.class, listenerData.getId()));
             }

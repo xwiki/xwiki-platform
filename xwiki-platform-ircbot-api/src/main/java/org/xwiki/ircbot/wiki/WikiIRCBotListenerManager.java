@@ -19,47 +19,46 @@
  */
 package org.xwiki.ircbot.wiki;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.internal.wiki.BotListenerData;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Start/stop the Wiki IRC Bot including its Wiki Bot Listeners and provides some other APIs about the Wiki IRC Bot.
+ * Registers/unregisters Wiki Bot Listeners.
  *
  * @version $Id$
  * @since 4.0M1
  */
 @Role
-public interface WikiIRCBotManager
+public interface WikiIRCBotListenerManager
 {
     /**
-     * Connects the IRC Bot using the Configuration data located in
-     * {@link WikiIRCBotConstants#WIKI_BOT_CONFIGURATION_CLASS} and registers all Wiki Bot Listeners that are
-     * not marked as inactive. Note that the Bot is only connected if it's not marked inactive.
+     * Register (and thus activate) the Wiki Bot Listener defined in the passed document's reference.
+     *
+     * @param reference the reference of the document containing the Wiki Bot Listener definition
+     * @throws IRCBotException if any error happens
+     */
+    void registerWikiBotListener(DocumentReference reference) throws IRCBotException;
+
+    /**
+     * Unregister (and thus deactivate) the Wiki Bot Listener defined in the passed document's reference.
+     *
+     * @param reference the reference of the document containing the Wiki Bot Listener definition
+     * @throws IRCBotException if any error happens
+     */
+    void unregisterWikiBotListener(DocumentReference reference) throws IRCBotException;
+
+    /**
+     * Register (and thus activate) all the Wiki Bot Listeners found in the current wiki.
      *
      * @throws IRCBotException if any error happens
      */
-    void startBot() throws IRCBotException;
+    void registerWikiBotListeners() throws IRCBotException;
 
     /**
-     * Disconnect the IRC Bot and unregister all Wiki Bot Listeners.
+     * Unregister (and thus deactivate) all the Wiki Bot Listeners found in the current wiki.
      *
      * @throws IRCBotException if any error happens
      */
-    void stopBot() throws IRCBotException;
-
-    /**
-     * @return true if the IRC Bot is connected or false otherwise
-     */
-    boolean isBotStarted();
-
-    /**
-     * Provides information about all Bot Listeners (whether they are Wiki Bot Listeners or standard Java components).
-     *
-     * @return the information about all Bot Listeners (such as id, name, description, etc
-     * @throws IRCBotException if any error happens
-     */
-    List<BotListenerData> getBotListenerData() throws IRCBotException;
+    void unregisterWikiBotListeners() throws IRCBotException;
 }

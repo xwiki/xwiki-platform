@@ -27,18 +27,14 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotListener;
-import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
+import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -56,72 +52,45 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
     DefaultWikiIRCBotManager manager;
 
-    @Override
-    public void setUp() throws Exception
-    {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        super.setUp();
-    }
-
     @Test
     public void startBot() throws Exception
     {
         final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
-        final ListenerManager listenerManager = getMockery().mock(ListenerManager.class);
         final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
         final BotData botData = new BotData("botName", "server", null, "channel", true);
-        // Assume we have one Wiki Bot Listener in the wiki
-        final List<BotListenerData> listenerData = Arrays.asList(
-            new BotListenerData("space.page", "wikiname", "wikidescription"));
-        final DocumentReferenceResolver<String> resolver =
-            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        final DocumentReference wikiBotListenerReference = new DocumentReference("wiki", "space", "page");
-        final ComponentManager componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
-        final WikiIRCBotListenerFactory factory = getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);
-        final WikiIRCBotListener wikiIRCBotListener = getMockery().mock(WikiIRCBotListener.class);
+        final ListenerManager listenerManager = getMockery().mock(ListenerManager.class);
         final Provider<List<IRCBotListener>> botListenerComponents =
             getComponentManager().lookupComponent(new DefaultParameterizedType(null, Provider.class,
                 new DefaultParameterizedType(null, List.class, IRCBotListener.class)));
         final IRCBotListener componentBotListener = getMockery().mock(IRCBotListener.class);
+        final WikiIRCBotListenerManager botListenerManager =
+            getComponentManager().lookupComponent(WikiIRCBotListenerManager.class);
 
         getMockery().checking(new Expectations()
         {{
-                oneOf(bot).isConnected();
-                will(returnValue(false));
-                oneOf(ircModel).loadBotData();
-                will(returnValue(botData));
-                allowing(bot).getListenerManager();
-                will(returnValue(listenerManager));
-                oneOf(botListenerComponents).get();
-                will(returnValue(Collections.singletonList(componentBotListener)));
-                oneOf(ircModel).getWikiBotListenerData();
-                will(returnValue(listenerData));
-                oneOf(resolver).resolve("space.page");
-                will(returnValue(wikiBotListenerReference));
-                // Assume that the Wiki Bot Listener isn't registered yet
-                oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki:space.page");
-                will(returnValue(false));
-                oneOf(factory).containsWikiListener(wikiBotListenerReference);
-                will(returnValue(true));
-                oneOf(factory).createWikiListener(wikiBotListenerReference);
-                will(returnValue(wikiIRCBotListener));
-                DefaultComponentDescriptor<IRCBotListener> cd = new DefaultComponentDescriptor<IRCBotListener>();
-                cd.setRoleType(IRCBotListener.class);
-                cd.setRoleHint("wiki:space.page");
-                oneOf(componentManager).registerComponent(cd, wikiIRCBotListener);
-                oneOf(bot).isConnected();
-                will(returnValue(false));
+            oneOf(bot).isConnected();
+            will(returnValue(false));
+            oneOf(ircModel).loadBotData();
+            will(returnValue(botData));
+            allowing(bot).getListenerManager();
+            will(returnValue(listenerManager));
+            oneOf(botListenerComponents).get();
+            will(returnValue(Collections.singletonList(componentBotListener)));
+            oneOf(bot).isConnected();
+            will(returnValue(false));
 
-                // Real tests are here:
-                // - Verify that the listeners are added to the ListenerManager
-                oneOf(listenerManager).addListener(wikiIRCBotListener);
-                oneOf(listenerManager).addListener(componentBotListener);
+            // Real tests are here:
 
-                // - Verify that the Bot sets the bot name, connects to the server and join the channel
-                oneOf(bot).setName("botName");
-                oneOf(bot).connect("server");
-                oneOf(bot).joinChannel("channel");
-            }});
+            // - Verify that the component listener is added to the ListenerManager and that the Wiki Bot Listeners
+            //    registration is made
+            oneOf(listenerManager).addListener(componentBotListener);
+            oneOf(botListenerManager).registerWikiBotListeners();
+
+            // - Verify that the Bot sets the bot name, connects to the server and join the channel
+            oneOf(bot).setName("botName");
+            oneOf(bot).connect("server");
+            oneOf(bot).joinChannel("channel");
+        }});
 
         this.manager.startBot();
     }

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
@@ -219,6 +220,11 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             xXWikiSpace.getOriginalSpaceReference()));
         aMissingGroupRef = factory.newGroupReference(new DocumentReference("missingGroup",
             xXWikiSpace.getOriginalSpaceReference()));
+
+        final Logger mockLogger = getMockLogger(DefaultSecurityCache.class);
+        getMockery().checking(new Expectations() {{
+            allowing (mockLogger).isDebugEnabled(); will(returnValue(false));
+        }});
     }
 
     private List<SecurityRuleEntry> getMockedSecurityRuleEntries(final List<? extends SecurityReference> references)

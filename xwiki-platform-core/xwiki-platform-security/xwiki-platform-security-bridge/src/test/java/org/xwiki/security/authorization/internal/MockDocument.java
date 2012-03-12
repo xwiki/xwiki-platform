@@ -23,12 +23,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 public class MockDocument extends XWikiDocument
 {
@@ -40,11 +38,6 @@ public class MockDocument extends XWikiDocument
     {
         super(docRef);
         super.setCreator(creator);
-    }
-
-    public MockDocument(String docName, String creator)
-    {
-        this(Utils.getComponent(DocumentReferenceResolver.class).resolve(docName), creator);
     }
 
     @Override
@@ -92,9 +85,9 @@ public class MockDocument extends XWikiDocument
         return this;
     }
 
-    public static MockDocument newGroupDocument(String name, String[] members)
+    public static MockDocument newGroupDocument(DocumentReference nameRef, String[] members)
     {
-        MockDocument doc = new MockDocument(name, "xwiki:XWiki.Admin");
+        MockDocument doc = new MockDocument(nameRef, "xwiki:XWiki.Admin");
         for (String member : members) {
             doc.addMember(member);
         }

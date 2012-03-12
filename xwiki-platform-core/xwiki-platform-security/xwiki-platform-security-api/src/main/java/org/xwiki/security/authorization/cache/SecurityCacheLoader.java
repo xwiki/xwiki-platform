@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization.cache;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -34,7 +34,7 @@ import org.xwiki.security.authorization.SecurityAccessEntry;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface SecurityCacheLoader
 {
     /**

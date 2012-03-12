@@ -19,14 +19,14 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Configuration of the {@link AuthorizationManager}.
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface AuthorizationManagerConfiguration
 {
     /**

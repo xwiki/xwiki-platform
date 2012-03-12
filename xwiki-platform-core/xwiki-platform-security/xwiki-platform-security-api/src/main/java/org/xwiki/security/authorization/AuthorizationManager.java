@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
@@ -38,7 +38,7 @@ import org.xwiki.model.reference.EntityReference;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface AuthorizationManager
 {
     /**

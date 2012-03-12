@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.EventListener;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccess;
@@ -39,16 +40,30 @@ import static java.util.Arrays.asList;
 import static org.xwiki.security.authorization.Right.COMMENT;
 import static org.xwiki.security.authorization.Right.EDIT;
 
+import org.xwiki.environment.Environment;
+
 public class DefaultSecurityCacheLoaderTest extends AbstractTestCase
 {
+    /**
+     * String document reference resolver.
+     */
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        getComponentManager().unregisterComponent(Environment.class, "default");
+        documentReferenceResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
+    }
+
     @Test 
     public void testSecurityCacheLoader() throws Exception
     {
         final UserSecurityReference userX = referenceFactory.newUserReference(docRefResolver.resolve("wikiY:XWiki.userX"));
         final UserSecurityReference userY = referenceFactory.newUserReference(docRefResolver.resolve("wikiY:XWiki.userY"));
 
-        MockDocument wikiDocument = new MockDocument("xwiki:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
-        MockDocument allGroupDocument = MockDocument.newGroupDocument("xwiki:XWiki.XWikiAllGroup", 
+        MockDocument wikiDocument = new MockDocument(documentReferenceResolver.resolve("xwiki:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
+        MockDocument allGroupDocument = MockDocument.newGroupDocument(documentReferenceResolver.resolve("xwiki:XWiki.XWikiAllGroup"),
                                                                       new String[]{"wikiY:XWiki.userX", 
                                                                                    "wikiY:XWiki.userY" });
         wiki.add(new MockDocument(userX.getOriginalReference(), "xwiki:XWiki.Admin")
@@ -127,7 +142,7 @@ public class DefaultSecurityCacheLoaderTest extends AbstractTestCase
                 allowing(mockGroupService).getAllMembersNamesForGroup("xwiki:XWiki.GroupX", 100, 0, xwikiContext);
                 will(Expectations.returnValue(asList("wikiY:XWiki.userX")));
             }});
-        MockDocument group = MockDocument.newGroupDocument("XWiki.GroupX", new String[] {"wikiY:XWiki.userX" } );
+        MockDocument group = MockDocument.newGroupDocument(documentReferenceResolver.resolve("XWiki.GroupX"), new String[] {"wikiY:XWiki.userX" } );
         wiki.add(group);
         ((EventListener) rulesInvalidator).onEvent(null, group, null);
 

@@ -21,7 +21,7 @@ package org.xwiki.security.internal;
 
 import java.util.Collection;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -31,7 +31,7 @@ import org.xwiki.security.authorization.AuthorizationException;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface UserBridge
 {
     /**

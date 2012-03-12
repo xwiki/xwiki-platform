@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 
@@ -28,7 +28,7 @@ import org.xwiki.security.UserSecurityReference;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface EntityBridge
 {
     /**

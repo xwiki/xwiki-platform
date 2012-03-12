@@ -85,7 +85,6 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("dot", Right.VIEW)
             .putAction("svg", Right.VIEW)
             .putAction("pdf", Right.VIEW)
-            .putAction("deleteversions", Right.ADMIN)
                 // .putAction("undelete", "undelete"); Huh??
             .putAction("undelete", Right.EDIT)
             .putAction("reset", Right.DELETE)
@@ -114,19 +113,19 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("rollback", Right.EDIT)
             .putAction("upload", Right.EDIT)
             .putAction("create", Right.EDIT)
-            .putAction("deleteversions", Right.DELETE)
+            .putAction("deleteversions", Right.ADMIN)
             .putAction("deletespace", Right.ADMIN);
     }
 
     /** Resolver for document references. */
     @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> documentReferenceResolver
-        = Utils.getComponent(DocumentReferenceResolver.class);
+        = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
 
     /** Resolver for user and group document references. */
     @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> userAndGroupReferenceResolver
-        = Utils.getComponent(DocumentReferenceResolver.class, "user");
+        = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "user");
 
     /** The authorization manager used to really do the job. */
     private final AuthorizationManager authorizationManager

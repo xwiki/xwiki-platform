@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.EventListener;
 import org.xwiki.security.authorization.AuthorizationManager;
 
@@ -38,6 +39,8 @@ import static java.util.Arrays.asList;
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
 import static org.xwiki.security.authorization.Right.VIEW;
+
+import org.xwiki.environment.Environment;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
@@ -66,17 +69,30 @@ public class XWikiRightServiceTest extends AbstractTestCase
      */
     private static final String GUEST_USER_FULLNAME = XWIKI_SPACE_PREFIX + GUEST_USER;
 
+
+    /**
+     * String document reference resolver.
+     */
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
     private XWikiContext getContext()
     {
         return xwikiContext;
     }
 
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        getComponentManager().unregisterComponent(Environment.class, "default");
+        documentReferenceResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
+    }
+
     @Test
     public void testHasAccessLevelWhithUserFromAnotherWiki() throws XWikiException
     {
-        final MockDocument doc = new MockDocument("wiki2:Space.Page", "xwiki:XWiki.Admin");
+        final MockDocument doc = new MockDocument(documentReferenceResolver.resolve("wiki2:Space.Page"), "xwiki:XWiki.Admin");
 
-        MockDocument preferences = new MockDocument("wiki2:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
+        MockDocument preferences = new MockDocument(documentReferenceResolver.resolve("wiki2:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
         final XWikiRightService rightService = new XWikiCachingRightService();
 
         final XWikiDocument user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
@@ -123,7 +139,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
 
         
 
-        preferences = new MockDocument("wiki2:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
+        preferences = new MockDocument(documentReferenceResolver.resolve("wiki2:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
         preferences.allowGlobal(asList(VIEW), Collections.<String>emptyList(), asList(group.getPrefixedFullName()));
         wiki.add(preferences);
         
@@ -151,7 +167,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
 
         // user is wiki owner
 
-        preferences = new MockDocument("wiki2:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
+        preferences = new MockDocument(documentReferenceResolver.resolve("wiki2:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
         wiki.add(preferences);
 
         ((EventListener) rulesInvalidator).onEvent(null, preferences, null);
@@ -189,7 +205,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
     {
         final XWikiRightService rightService = new XWikiCachingRightService();
         // Setup an XWikiPreferences document granting programming rights to XWiki.Programmer
-        MockDocument prefs = new MockDocument("XWiki.XWikiPreferences", "XWiki.Admin");
+        MockDocument prefs = new MockDocument(documentReferenceResolver.resolve("XWiki.XWikiPreferences"), "XWiki.Admin");
         prefs.allowGlobal(asList(PROGRAM, ADMIN), asList("XWiki.Programmer"), Collections.<String>emptyList());
         wiki.add(prefs);
 

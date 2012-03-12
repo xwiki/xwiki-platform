@@ -19,14 +19,14 @@
  */
 package org.xwiki.security.authorization.cache;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * The instance of this class monitors updates and invalidates right
  * cache entries whenever necessary.
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface SecurityCacheRulesInvalidator
 {
     /** Suspend delivery of invalidation events. */

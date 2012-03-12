@@ -20,18 +20,16 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security</artifactId>
-    <version>3.4-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>xwiki-platform-security-api</artifactId>
   <name>XWiki Platform - Security - API</name>
+  <version>4.0-SNAPSHOT</version>
   <description>XWiki Platform - Security - API - a new security API. Currently only a replacement for the old RightService (experimental)</description>
   <packaging>jar</packaging>
-
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

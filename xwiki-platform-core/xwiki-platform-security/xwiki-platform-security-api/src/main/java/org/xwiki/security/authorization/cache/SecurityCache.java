@@ -21,7 +21,7 @@ package org.xwiki.security.authorization.cache;
 
 import java.util.Collection;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
@@ -33,7 +33,7 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface SecurityCache
 {
     /**

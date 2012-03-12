@@ -32,9 +32,10 @@ public class UserAndGroupReferenceResolverTest  extends AbstractComponentTestCas
     @Test
     public void testResolver()
     {
+
         try {
-            DocumentReferenceResolver<String> resolver = getComponentManager().lookup(DocumentReferenceResolver.class, "user");
-            DocumentReferenceResolver<String> defaultResolver = getComponentManager().lookup(DocumentReferenceResolver.class, "user");
+            DocumentReferenceResolver<String> resolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "user");
+            DocumentReferenceResolver<String> defaultResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
             Assert.assertTrue(resolver.resolve("Bosse").equals(defaultResolver.resolve("xwiki:XWiki.Bosse")));
             Assert.assertTrue(
                 resolver.resolve("bossesSpace.Bosse").equals(defaultResolver.resolve("xwiki:bossesSpace.Bosse")));
@@ -49,7 +50,5 @@ public class UserAndGroupReferenceResolverTest  extends AbstractComponentTestCas
             e.printStackTrace(System.out);
             assert false;
         }
-
-
     }
 }

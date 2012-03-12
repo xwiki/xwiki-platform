@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.security.SecurityReference;
 
 /**
@@ -29,7 +29,7 @@ import org.xwiki.security.SecurityReference;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface SecurityEntryReader
 {
     /**

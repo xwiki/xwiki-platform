@@ -22,7 +22,7 @@ package org.xwiki.security.authorization;
 import java.util.Collection;
 import java.util.Deque;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 
@@ -32,7 +32,7 @@ import org.xwiki.security.UserSecurityReference;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface AuthorizationSettler
 {
     /**

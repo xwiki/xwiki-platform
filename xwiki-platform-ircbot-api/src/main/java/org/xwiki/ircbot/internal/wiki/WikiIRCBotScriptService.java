@@ -83,11 +83,11 @@ public class WikiIRCBotScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    public void start()
+    public void start(boolean updateBotStatus)
     {
         if (hasPermission()) {
             try {
-                this.wikiBotManager.startBot();
+                this.wikiBotManager.startBot(updateBotStatus);
             } catch (IRCBotException e) {
                 setError(e);
             }
@@ -96,11 +96,11 @@ public class WikiIRCBotScriptService implements ScriptService
         }
     }
 
-    public void stop()
+    public void stop(boolean updateBotStatus)
     {
         if (hasPermission()) {
             try {
-                this.wikiBotManager.stopBot();
+                this.wikiBotManager.stopBot(updateBotStatus);
             } catch (IRCBotException e) {
                 setError(e);
             }

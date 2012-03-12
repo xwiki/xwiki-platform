@@ -108,9 +108,9 @@
 ## --------------------------------------
 #set ($botManager = $services.ircbot)
 #if ($request.action == "start")
-  #set ($discard = $botManager.start())
+  #set ($discard = $botManager.start(true))
 #elseif ($request.action == "stop")
-  #set ($discard = $botManager.stop())
+  #set ($discard = $botManager.stop(true))
 #end
 ## -----------------
 ## Display any error

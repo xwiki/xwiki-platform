@@ -106,22 +106,20 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Override
     public BotData loadBotData() throws IRCBotException
     {
-        XWikiDocument configurationDocument = getConfigurationDocument();
-        BaseObject configurationObject = configurationDocument.getXObject(WIKI_BOT_CONFIGURATION_CLASS);
-        if (configurationObject == null) {
-            // There's no Bot Configuration object
-            throw new IRCBotException(String.format("Cannot find IRC Bot Configuration object in [%s] document",
-                this.compactWikiSerializer.serialize(configurationDocument.getDocumentReference())));
-        }
-
+        BaseObject configurationObject = getIRCBotConfigurationObject();
         BotData botData = new BotData(
             configurationObject.getStringValue(BOTNAME_PROPERTY),
             configurationObject.getStringValue(SERVER_PROPERTY),
             configurationObject.getStringValue(PASSWORD_PROPERTY),
             configurationObject.getStringValue(CHANNEL_PROPERTY),
             configurationObject.getIntValue(INACTIVE_PROPERTY) != 1);
-
         return botData;
+    }
+
+    @Override
+    public void setActive(boolean isActive) throws IRCBotException
+    {
+        getIRCBotConfigurationObject().set(INACTIVE_PROPERTY, isActive ? 0 : 1, getXWikiContext());
     }
 
     @Override
@@ -147,5 +145,17 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         }
 
         return data;
+    }
+
+    private BaseObject getIRCBotConfigurationObject() throws IRCBotException
+    {
+        XWikiDocument configurationDocument = getConfigurationDocument();
+        BaseObject configurationObject = configurationDocument.getXObject(WIKI_BOT_CONFIGURATION_CLASS);
+        if (configurationObject == null) {
+            // There's no Bot Configuration object
+            throw new IRCBotException(String.format("Cannot find IRC Bot Configuration object in [%s] document",
+                this.compactWikiSerializer.serialize(configurationDocument.getDocumentReference())));
+        }
+        return configurationObject;
     }
 }

@@ -32,6 +32,7 @@ import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.ircbot.IRCBot;
+import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
@@ -52,12 +53,11 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
     DefaultWikiIRCBotManager manager;
 
-    @Test
-    public void startBot() throws Exception
+    private void prepareStartBotTests(boolean isBotActive) throws Exception
     {
         final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
         final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
-        final BotData botData = new BotData("botName", "server", null, "channel", true);
+        final BotData botData = new BotData("botName", "server", null, "channel", isBotActive);
         final ListenerManager listenerManager = getMockery().mock(ListenerManager.class);
         final Provider<List<IRCBotListener>> botListenerComponents =
             getComponentManager().lookupComponent(new DefaultParameterizedType(null, Provider.class,
@@ -91,8 +91,73 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
             oneOf(bot).connect("server");
             oneOf(bot).joinChannel("channel");
         }});
+    }
 
-        this.manager.startBot();
+    @Test
+    public void startBot() throws Exception
+    {
+        prepareStartBotTests(true);
+
+        this.manager.startBot(false);
+    }
+
+    @Test
+    public void startBotAndUpdateBotStatus() throws Exception
+    {
+        prepareStartBotTests(false);
+
+        final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
+        getMockery().checking(new Expectations()
+        {{
+            // The real test is here
+            oneOf(ircModel).setActive(true);
+        }});
+
+        this.manager.startBot(true);
+    }
+
+    @Test
+    public void stopBot() throws Exception
+    {
+        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final WikiIRCBotListenerManager botListenerManager =
+            getComponentManager().lookupComponent(WikiIRCBotListenerManager.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            oneOf(bot).isConnected();
+            will(returnValue(true));
+            oneOf(bot).disconnect();
+            // Simulate the fact that the Bot may not stop immediately
+            oneOf(bot).isConnected();
+            will(returnValue(true));
+            // Now it's stopped!
+            oneOf(bot).isConnected();
+            will(returnValue(false));
+            // Now expect the unregistration of the wiki bot listeners
+            oneOf(botListenerManager).unregisterWikiBotListeners();
+        }});
+
+        this.manager.stopBot(false);
+    }
+
+    @Test
+    public void stopBotWhenNotStarted() throws Exception
+    {
+        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            oneOf(bot).isConnected();
+            will(returnValue(false));
+        }});
+
+        try {
+            this.manager.stopBot(false);
+            Assert.fail("Should have thrown an exception");
+        } catch (IRCBotException expected) {
+            Assert.assertEquals("Bot is already stopped!", expected.getMessage());
+        }
     }
 
     @Test

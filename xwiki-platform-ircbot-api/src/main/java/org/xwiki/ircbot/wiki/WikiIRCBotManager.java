@@ -39,16 +39,19 @@ public interface WikiIRCBotManager
      * {@link WikiIRCBotConstants#WIKI_BOT_CONFIGURATION_CLASS} and registers all Wiki Bot Listeners that are
      * not marked as inactive. Note that the Bot is only connected if it's not marked inactive.
      *
+     * @param updateBotStatus if true then update the Bot status to mark it as active
      * @throws IRCBotException if any error happens
      */
-    void startBot() throws IRCBotException;
+    void startBot(boolean updateBotStatus) throws IRCBotException;
 
     /**
      * Disconnect the IRC Bot and unregister all Wiki Bot Listeners.
      *
+     * @param updateBotStatus if true then update the Bot status to mark it as inactive (this means that the Bot should
+     *        not be restarted automatically by the IRC Bot Scheduler Job for example)
      * @throws IRCBotException if any error happens
      */
-    void stopBot() throws IRCBotException;
+    void stopBot(boolean updateBotStatus) throws IRCBotException;
 
     /**
      * @return true if the IRC Bot is connected or false otherwise

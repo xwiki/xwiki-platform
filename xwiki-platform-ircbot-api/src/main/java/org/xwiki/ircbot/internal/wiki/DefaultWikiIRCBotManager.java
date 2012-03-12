@@ -92,7 +92,7 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     private WikiIRCBotListenerManager botListenerManager;
 
     @Override
-    public void startBot() throws IRCBotException
+    public void startBot(boolean updateBotStatus) throws IRCBotException
     {
         if (isBotStarted()) {
             throw new IRCBotException("Bot is already started!");
@@ -101,7 +101,7 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
         // Get configuration data for the Bot
         BotData botData = this.ircModel.loadBotData();
 
-        if (botData.isActive()) {
+        if (botData.isActive() || updateBotStatus) {
             // Register Bot Listener components to the Bot
             ListenerManager listenerManager = this.bot.getListenerManager();
             for (IRCBotListener botListener : this.botListenerComponents.get()) {
@@ -130,21 +130,30 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
 
             // Join channel
             this.bot.joinChannel(botData.getChannel());
+
+            // Mark the Bot as active if it's not already and updateBotStatus is true
+            if (updateBotStatus && !botData.isActive()) {
+                this.ircModel.setActive(true);
+            }
+
         }
     }
 
     @Override
-    public void stopBot() throws IRCBotException
+    public void stopBot(boolean updateBotStatus) throws IRCBotException
     {
-        if (this.bot.isConnected()) {
-            this.bot.disconnect();
-            // Wait for the IRC Server to be fully stopped
-            while (this.bot.isConnected()) {
-                try {
-                    Thread.sleep(100L);
-                } catch (InterruptedException e) {
-                    throw new IRCBotException("Failed to fully wait for IRC client termination", e);
-                }
+        if (!isBotStarted()) {
+            throw new IRCBotException("Bot is already stopped!");
+        }
+
+        this.bot.disconnect();
+
+        // Wait for the IRC Server to be fully stopped
+        while (this.bot.isConnected()) {
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException e) {
+                throw new IRCBotException("Failed to fully wait for IRC client termination", e);
             }
         }
 
@@ -152,6 +161,11 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
         // Note that Bot Listeners handling event after the disconnection should pay attention not to send anything to
         // the channel since the Bot is stopped!
         this.botListenerManager.unregisterWikiBotListeners();
+
+        // Mark the Bot as inactive
+        if (updateBotStatus) {
+            this.ircModel.setActive(false);
+        }
     }
 
     @Override

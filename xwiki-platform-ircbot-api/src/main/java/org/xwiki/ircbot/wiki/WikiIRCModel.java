@@ -41,6 +41,8 @@ public interface WikiIRCModel
 
     BotData loadBotData() throws IRCBotException;
 
+    void setActive(boolean isActive) throws IRCBotException;
+
     /**
      * @return the Bot Listener data for all documents containing {@link WikiIRCBotConstants#WIKI_BOT_LISTENER_CLASS}
      *         objects in the current wiki

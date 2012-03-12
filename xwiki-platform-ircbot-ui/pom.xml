@@ -71,5 +71,13 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We need the scheduler app since we register a Scheduler job to automatically start the bot if not started. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

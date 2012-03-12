@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321509118000</creationDate>
-<date>1327678083000</date>
-<contentUpdateDate>1327678083000</contentUpdateDate>
+<date>1331567251000</date>
+<contentUpdateDate>1331567251000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -1137,9 +1137,18 @@ ul.repositories .addRepository:hover  {
 <content>{{velocity output="false"}}
 $xwiki.ssx.use('ExtensionManagerMacros')
 $xwiki.jsx.use('ExtensionManagerMacros')
+
 #set ($extensionManager = $services.extension)
+
 #if ($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
   #set($extensionwiki = $request.extensionwiki)
+#else
+  #if (!$xcontext.isMainWiki())
+    #set($extensionwiki = $xcontext.database)
+  #end
+#end
+
+#if ($extensionwiki)
   #set($extensionnamespace = "wiki:${extensionwiki}")
 #end
 
@@ -1155,7 +1164,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       {{/html}}
     )))
     (% class="extHeaderRight" %)(((
-      ## Advanced search form
+      ## Advanced install form
       {{html clean="false"}}
       &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
         &lt;fieldset id="advancedextensionsearch"&gt;
@@ -1164,10 +1173,14 @@ $xwiki.jsx.use('ExtensionManagerMacros')
           &lt;div class="plainmessage advancedsearchpopup hidden"&gt;
             &lt;input type="hidden" name="xback" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
             &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;$msg.get('extensions.advancedSearch.id.label')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;&lt;input type="text" name="extensionid" id="advancedextensionsearch-id" value="" /&gt;&lt;/dd&gt;
-            &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
+              &lt;dt&gt;&lt;label for="advancedextensionsearch-id"&gt;$msg.get('extensions.advancedSearch.id.label')&lt;/label&gt;&lt;/dt&gt;
+              &lt;dd&gt;&lt;input type="text" name="extensionid" id="advancedextensionsearch-id" value="" /&gt;&lt;/dd&gt;
+              &lt;dt&gt;&lt;label for="advancedextensionsearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
+              &lt;dd&gt;&lt;input type="text" name="extensionversion" id="advancedextensionsearch-version" value="" /&gt;&lt;/dd&gt;
+              #if ($xcontext.isMainWiki() &amp;&amp; $xwiki.isVirtualMode())
+                &lt;dt&gt;&lt;label for="advancedextensionsearch-wiki"&gt;$msg.get('extensions.advancedSearch.wiki.label')&lt;/label&gt;&lt;/dt&gt;
+                &lt;dd&gt;&lt;input type="text" name="extensionwiki" id="advancedextensionsearch-wiki" value="" /&gt;&lt;/dd&gt;
+              #end
             &lt;/dl&gt;
             &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
                &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;

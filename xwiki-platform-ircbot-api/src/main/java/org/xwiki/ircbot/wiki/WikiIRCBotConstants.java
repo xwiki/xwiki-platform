@@ -159,5 +159,9 @@ public interface WikiIRCBotConstants
     EntityReference EXCLUSION_CLASS = new EntityReference("IRCEventExclusionClass", EntityType.DOCUMENT,
         new EntityReference(SPACE, EntityType.SPACE));
 
+    /**
+     * Property to represent exclusion patterns for the IRC Event Listener (references matching those patterns are not
+     * notified on the IRC channel).
+     */
     String PATTERN_PROPERTY = "pattern";
 }

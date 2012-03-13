@@ -165,7 +165,6 @@ public class IRCEventListener implements EventListener
      * @param event the XWiki Document event
      * @param source the source document from the Document event
      * @return the comment part
-     * @throws IRCBotException if we cannot access the XWikiContext
      */
     private String getNotificationComment(Event event, XWikiDocument source)
     {
@@ -194,15 +193,11 @@ public class IRCEventListener implements EventListener
      */
     private String getNotificationURL(Event event, XWikiDocument source) throws IRCBotException
     {
-        String url;
-        if (event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent) {
-            url = source.getExternalURL("view", this.ircModel.getXWikiContext());
-        } else {
+        String queryString = null;
+        if (!(event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent)) {
             // Return a diff URL since the action done was a modification
-            url = source.getExternalURL("view",
-                String.format("viewer=changes&amp;rev2=%s", source.getVersion()), this.ircModel.getXWikiContext());
+            queryString = String.format("viewer=changes&amp;rev2=%s", source.getVersion());
         }
-
-        return url;
+        return source.getExternalURL("view", queryString, this.ircModel.getXWikiContext());
     }
 }

@@ -30,17 +30,44 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Provides APIs to access to the Wiki Model of the Bot (ie documents in the wiki containing Bot data).
+ *
+ * @version $Id$
+ * @since 4.0M1
+ */
 @Role
 public interface WikiIRCModel
 {
+    /**
+     * @return the XWiki Context
+     * @throws IRCBotException if the XWiki Context is null
+     */
     XWikiContext getXWikiContext() throws IRCBotException;
 
+    /**
+     * @param reference the reference to the document to access
+     * @return the document instance
+     * @throws IRCBotException if the document cannot be retrieved
+     */
     XWikiDocument getDocument(DocumentReference reference) throws IRCBotException;
 
+    /**
+     * @return the document instance of the Bot configuration page
+     * @throws IRCBotException if the configuration document cannot be retrieved
+     */
     XWikiDocument getConfigurationDocument() throws IRCBotException;
 
+    /**
+     * @return Bot configuration data (channel, server, etc)
+     * @throws IRCBotException if the configuration document cannot be retrieved
+     */
     BotData loadBotData() throws IRCBotException;
 
+    /**
+     * @param isActive true if the Bot is to be marked as active or false if it's to be marked as inactive
+     * @throws IRCBotException if the XWiki Context is null
+     */
     void setActive(boolean isActive) throws IRCBotException;
 
     /**

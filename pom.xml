@@ -33,10 +33,6 @@
   <name>XWiki Platform - IRC Bot - Parent POM</name>
   <packaging>pom</packaging>
   <description>IRC Bot Application for XWiki</description>
-  <properties>
-    <!-- TODO: Remove this -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
   <modules>
     <module>xwiki-platform-ircbot-api</module>
     <module>xwiki-platform-ircbot-ui</module>

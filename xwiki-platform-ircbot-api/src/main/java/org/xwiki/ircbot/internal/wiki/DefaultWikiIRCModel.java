@@ -60,9 +60,15 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Inject
     private Execution execution;
 
+    /**
+     * Used to format references in exception messages.
+     */
     @Inject
     private EntityReferenceSerializer<String> defaultSerializer;
 
+    /**
+     * Used to compute a Wiki Bot Listener id from a relative Document reference without the wiki part.
+     */
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiSerializer;
@@ -147,14 +153,18 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         return data;
     }
 
+    /**
+     * @return the XObject in the IRC Configuration document that represents the IRC Bot Configuration.
+     * @throws IRCBotException if the document failed to be retrieved
+     */
     private BaseObject getIRCBotConfigurationObject() throws IRCBotException
     {
         XWikiDocument configurationDocument = getConfigurationDocument();
         BaseObject configurationObject = configurationDocument.getXObject(WIKI_BOT_CONFIGURATION_CLASS);
         if (configurationObject == null) {
             // There's no Bot Configuration object
-            throw new IRCBotException(String.format("Cannot find IRC Bot Configuration object in [%s] document",
-                this.compactWikiSerializer.serialize(configurationDocument.getDocumentReference())));
+            throw new IRCBotException(String.format("Cannot find the IRC Bot Configuration object in the [%s] document",
+                this.defaultSerializer.serialize(configurationDocument.getDocumentReference())));
         }
         return configurationObject;
     }

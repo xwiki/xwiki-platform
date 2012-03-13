@@ -109,8 +109,8 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
             this.model.loadBotData();
             Assert.fail("Should have thrown an exception");
         } catch (IRCBotException expected) {
-            Assert.assertEquals("Cannot find IRC Bot Configuration object in [IRC.IRCBotConfiguration] document",
-                expected.getMessage());
+            Assert.assertEquals("Cannot find the IRC Bot Configuration object in the [xwiki:IRC.IRCBotConfiguration] "
+                + "document", expected.getMessage());
         }
     }
 

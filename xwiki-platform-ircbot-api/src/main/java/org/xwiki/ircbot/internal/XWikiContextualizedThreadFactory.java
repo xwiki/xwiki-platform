@@ -37,12 +37,26 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  */
 public class XWikiContextualizedThreadFactory implements ThreadFactory
 {
+    /**
+     * Used to get the Execution Context.
+     */
     private Execution execution;
 
+    /**
+     * Used to create a new Execution Contexte from scratch.
+     */
     private ExecutionContextManager executionContextManager;
 
+    /**
+     * Used to clone the XWiki Context.
+     */
     private XWikiStubContextProvider stubContextProvider;
 
+    /**
+     * @param execution the way to get the Execution Context
+     * @param executionContextManager the way to create a new Execution Contexte from scratch
+     * @param stubContextProvider the way to clone the XWiki Context
+     */
     public XWikiContextualizedThreadFactory(Execution execution,
         ExecutionContextManager executionContextManager,
         XWikiStubContextProvider stubContextProvider)
@@ -52,8 +66,14 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
         this.stubContextProvider = stubContextProvider;
     }
 
+    /**
+     * A Thread that has an initialized Execution Context.
+     */
     private class XWikiContextualizedThread extends Thread
     {
+        /**
+         * @param runnable the object whose run method is called.
+         */
         public XWikiContextualizedThread(Runnable runnable)
         {
             super(runnable);

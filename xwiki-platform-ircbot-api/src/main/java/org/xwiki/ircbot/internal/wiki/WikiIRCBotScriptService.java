@@ -58,22 +58,40 @@ public class WikiIRCBotScriptService implements ScriptService
      */
     private static final String ERROR_KEY = "scriptservice.ircbot.error";
 
+    /**
+     * Message to display when the user doesn't have the permission to start/stop the bot.
+     */
     private static final String RIGHTS_REQUIRED = "This action requires to be logged on the main wiki and to have "
-        + "Admin rights.";
+        + "Admin rights there.";
 
+    /**
+     * Allows starting/stopping the Bot and other actions on the Bot.
+     */
     @Inject
     private WikiIRCBotManager wikiBotManager;
 
+    /**
+     * Used to find which Bot Listeners are registered (ie active).
+     */
     @Inject
     @Named("wiki")
     private ComponentManager componentManager;
 
+    /**
+     * Used to find the name of the main wiki.
+     */
     @Inject
     private EntityReferenceValueProvider valueProvider;
 
+    /**
+     * Used to serialize references because of old APIs taking only Strings.
+     */
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    /**
+     * Used to get the XWiki Context.
+     */
     @Inject
     private WikiIRCModel ircModel;
 
@@ -83,6 +101,9 @@ public class WikiIRCBotScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    /**
+     * @param updateBotStatus see {@link WikiIRCBotManager#startBot(boolean)}
+     */
     public void start(boolean updateBotStatus)
     {
         if (hasPermission()) {
@@ -96,6 +117,9 @@ public class WikiIRCBotScriptService implements ScriptService
         }
     }
 
+    /**
+     * @param updateBotStatus see {@link WikiIRCBotManager#stopBot(boolean)}
+     */
     public void stop(boolean updateBotStatus)
     {
         if (hasPermission()) {
@@ -109,11 +133,20 @@ public class WikiIRCBotScriptService implements ScriptService
         }
     }
 
+    /**
+     * @return see {@link WikiIRCBotManager#isBotStarted()}
+     */
     public boolean isStarted()
     {
         return this.wikiBotManager.isBotStarted();
     }
 
+    /**
+     * Provides information about all Bot Listeners (whether they are Wiki Bot Listeners or standard Java components)
+     * along with their status (i.e. whether they're active or not).
+     *
+     * @return the information about all Bot Listeners (such as id, name, description, etc) and their status
+     */
     public Map<BotListenerData, Boolean> getBotListenerStatuses()
     {
         Map<BotListenerData, Boolean> statuses = new HashMap<BotListenerData, Boolean>();
@@ -130,12 +163,14 @@ public class WikiIRCBotScriptService implements ScriptService
         return statuses;
     }
 
+    /**
+     * @return see {@link WikiIRCBotManager#getContext()}
+     */
     public Map<String, Object> getContext()
     {
         Map<String, Object> context;
         try {
-            context = (Map<String, Object>) this.ircModel.getXWikiContext().get(
-                WikiIRCBotListener.LISTENER_XWIKICONTEXT_PROPERTY);
+            context = this.wikiBotManager.getContext();
         } catch (IRCBotException e) {
             context = null;
         }
@@ -163,6 +198,10 @@ public class WikiIRCBotScriptService implements ScriptService
         this.execution.getContext().setProperty(ERROR_KEY, exception);
     }
 
+    /**
+     * @return true if the user is allowed to start/stop the Bot ie if the user is logged on the main wiki and has
+     *         Admin rights on the main wiki
+     */
     private boolean hasPermission()
     {
         boolean hasPermission = false;

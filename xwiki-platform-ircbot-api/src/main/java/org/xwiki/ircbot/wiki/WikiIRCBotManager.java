@@ -20,6 +20,7 @@
 package org.xwiki.ircbot.wiki;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.ircbot.IRCBotException;
@@ -61,8 +62,16 @@ public interface WikiIRCBotManager
     /**
      * Provides information about all Bot Listeners (whether they are Wiki Bot Listeners or standard Java components).
      *
-     * @return the information about all Bot Listeners (such as id, name, description, etc
+     * @return the information about all Bot Listeners (such as id, name, description, etc)
      * @throws IRCBotException if any error happens
      */
     List<BotListenerData> getBotListenerData() throws IRCBotException;
+
+    /**
+     * @return the IRC Bot Execution Context where variables from the Bot Events are stored. You'll need to access
+     *         this if you write a Wiki Bot Listener and want access to the Event data such as the channel, the message
+     *         the user, etc
+     * @throws IRCBotException if any error happens
+     */
+    Map<String, Object> getContext() throws IRCBotException;
 }

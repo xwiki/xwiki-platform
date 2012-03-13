@@ -135,7 +135,7 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
      * @param event the IRC Bot Event
      */
     @Override
-    public void onEvent(Event event) throws Exception
+    public void onEvent(Event event)
     {
         // Get the Event class name, remove the "Event" suffix, and prefix with "on". For example for "MessageEvent"
         // this gives "onMessage".

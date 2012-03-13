@@ -200,4 +200,11 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
 
         return new ArrayList<BotListenerData>(data.values());
     }
+
+    @Override
+    public Map<String, Object> getContext() throws IRCBotException
+    {
+        return (Map<String, Object>) this.ircModel.getXWikiContext().get(
+            WikiIRCBotListener.LISTENER_XWIKICONTEXT_PROPERTY);
+    }
 }

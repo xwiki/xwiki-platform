@@ -34,12 +34,14 @@ Here are the IRC logs archived by the IRC Bot:
 {{velocity}}
 #set ($columns = ['doc.date', 'channel', 'doc.name'])
 #set ($columnsProperties = {
-  'channel' : { 'type' : 'text', 'size' : 20, 'link' : 'view'}
-})
-#set ($columnsProperties = {
   'doc.date' : { 'type' : 'text' },
   'channel' : { 'type' : 'text' },
   'doc.name' : { 'type' : 'text', 'link' : 'view'}
+})
+#set ($options = {
+  'className': 'IRC.IRCBotArchiveClass',
+  'rowCount': 10,
+  'defaultOrder': 'desc'
 })
 #livetable('ircarchives' $columns $columnsProperties $options)
 {{/velocity}}</content></xwikidoc>

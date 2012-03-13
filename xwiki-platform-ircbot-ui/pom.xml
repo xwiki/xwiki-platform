@@ -75,6 +75,14 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We need the livetable for the IRC Home page that lists all archives -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livetable</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- We need the scheduler app since we register a Scheduler job to automatically start the bot if not started. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

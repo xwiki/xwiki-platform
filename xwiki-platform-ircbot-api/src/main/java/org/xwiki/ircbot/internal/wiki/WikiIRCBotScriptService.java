@@ -202,7 +202,7 @@ public class WikiIRCBotScriptService implements ScriptService
      * @return true if the user is allowed to start/stop the Bot ie if the user is logged on the main wiki and has
      *         Admin rights on the main wiki
      */
-    private boolean hasPermission()
+    public boolean hasPermission()
     {
         boolean hasPermission = false;
 

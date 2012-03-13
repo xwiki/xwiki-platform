@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.ircbot.test.po.IRCBotConfigurationPage;
 import org.xwiki.ircbot.test.po.IRCBotPage;
+import org.xwiki.ircbot.test.po.WebHomePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -147,5 +148,9 @@ public class IRCBotTest extends AbstractTest
         // Verify that our Bot is no longer listed
         page = IRCBotPage.gotoPage();
         Assert.assertFalse(page.containsListener("Test"));
+
+        // Go to the IRC Home Page and verify that the Archive Livetable contains our Log Archive document
+        WebHomePage homePage = WebHomePage.gotoPage();
+        Assert.assertTrue(homePage.getArchiveLiveTable().hasRow("doc.name", ARCHIVE_PAGE));
     }
 }

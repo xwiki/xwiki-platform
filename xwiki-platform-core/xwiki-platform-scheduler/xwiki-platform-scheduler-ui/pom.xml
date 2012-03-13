@@ -44,13 +44,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- The Groovy macro is required since Scheduler scripts are Groovy scripts -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Include Macro is required by the SchedulerJobTemplate page to include its Sheet
          TODO: Use the new Sheet system -->
     <dependency>

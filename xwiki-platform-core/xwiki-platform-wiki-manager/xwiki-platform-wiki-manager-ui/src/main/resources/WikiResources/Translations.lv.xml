@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:52:32 CEST 2011
 XWiki.XWikiServerClass_visibility_private=Privāts
 XWiki.XWikiServerClass_visibility_public=Publisks
 error.ERROR_XWIKI_ACCESS_DENIED=Jums nav tiesību veikt šo darbību

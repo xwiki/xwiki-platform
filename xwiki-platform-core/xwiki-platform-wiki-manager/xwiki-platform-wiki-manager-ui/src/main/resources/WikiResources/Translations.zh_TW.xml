@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language zh_TW generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:52:45 CEST 2011
 error.ERROR_XWIKI_ACCESS_DENIED=您沒有權限進行此操作
 wikimanager.action.createwiki.hidedoc=隱藏文件
 wikimanager.action.createwiki.nonstepbystep=切換至一般檢視模式

@@ -27,7 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
  * Registers/unregisters Wiki Bot Listeners.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface WikiIRCBotListenerManager

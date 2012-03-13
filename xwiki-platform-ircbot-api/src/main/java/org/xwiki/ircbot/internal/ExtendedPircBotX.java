@@ -30,7 +30,7 @@ import org.pircbotx.exception.IrcException;
  * try to reconnect when the Bot is disconnected (but not voluntarily by a user).
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class ExtendedPircBotX extends PircBotX
 {

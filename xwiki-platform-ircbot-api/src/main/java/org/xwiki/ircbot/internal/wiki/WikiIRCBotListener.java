@@ -50,7 +50,7 @@ import com.xpn.xwiki.XWikiContext;
  * @param <T> the reference to the PircBotX instance
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     implements IRCBotListener<T>, WikiIRCBotConstants

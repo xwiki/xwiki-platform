@@ -26,7 +26,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * In-memory information about a Bot Listener.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class BotListenerData
 {

@@ -46,7 +46,7 @@ import junit.framework.Assert;
  * Unit tests for {@link DefaultWikiIRCBotManager}.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCase
 {

@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  * Unit tests for {@link IRCEventListener}.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class IRCEventListenerTest extends AbstractMockingComponentTestCase
 {

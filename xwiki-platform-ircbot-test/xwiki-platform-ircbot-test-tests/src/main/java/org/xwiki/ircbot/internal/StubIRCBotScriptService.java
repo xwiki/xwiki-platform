@@ -38,7 +38,7 @@ import org.xwiki.script.service.ScriptService;
  * getting the messages sent to the channel, etc).
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Named("ircserver")

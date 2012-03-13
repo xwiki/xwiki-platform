@@ -48,7 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Send notifications to an IRC channel when a document is modified in the wiki.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Named("ircdocumentevents")

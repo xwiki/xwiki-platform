@@ -33,7 +33,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * Create new threads that have a proper XWiki Execution Context.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class XWikiContextualizedThreadFactory implements ThreadFactory
 {

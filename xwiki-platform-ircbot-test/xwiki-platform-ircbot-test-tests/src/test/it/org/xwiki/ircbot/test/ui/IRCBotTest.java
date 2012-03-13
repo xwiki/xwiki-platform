@@ -33,7 +33,7 @@ import junit.framework.Assert;
  * UI tests for the IRC Bot feature.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class IRCBotTest extends AbstractTest
 {

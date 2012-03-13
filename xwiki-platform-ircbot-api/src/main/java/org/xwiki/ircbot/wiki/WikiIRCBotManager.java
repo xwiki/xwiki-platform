@@ -30,7 +30,7 @@ import org.xwiki.ircbot.internal.wiki.BotListenerData;
  * Start/stop the Wiki IRC Bot including its Wiki Bot Listeners and provides some other APIs about the Wiki IRC Bot.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface WikiIRCBotManager

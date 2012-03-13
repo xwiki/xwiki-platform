@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.Role;
  * Represents an IRC Bot.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface IRCBot

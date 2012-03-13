@@ -43,7 +43,7 @@ import org.xwiki.ircbot.IRCBotListener;
  * @param <T> the reference to the PircBotX instance
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Named("help")

@@ -37,7 +37,7 @@ import org.xwiki.ircbot.IRCBot;
  * Stub IRC Bot for the functional tests. Ensures that nothing is sent on the wire.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Singleton

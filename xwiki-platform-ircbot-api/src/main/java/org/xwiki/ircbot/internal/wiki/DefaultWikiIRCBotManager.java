@@ -48,7 +48,7 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
  * Default implementation of {@link org.xwiki.ircbot.wiki.WikiIRCBotManager}.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Singleton

@@ -46,7 +46,7 @@ import com.xpn.xwiki.XWikiContext;
  * Allows scripts to easily access IRC Bot APIs.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Named("ircbot")

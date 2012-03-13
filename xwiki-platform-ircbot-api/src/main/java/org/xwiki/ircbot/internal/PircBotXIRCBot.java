@@ -39,7 +39,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * Make PircBotX a Component.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Singleton

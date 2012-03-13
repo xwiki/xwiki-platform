@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
  * Constants identifying various properties used for defining wiki IRC Bot listeners.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public interface WikiIRCBotConstants
 {

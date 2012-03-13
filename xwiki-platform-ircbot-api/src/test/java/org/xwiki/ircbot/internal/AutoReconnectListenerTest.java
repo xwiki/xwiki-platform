@@ -32,7 +32,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
  * Unit tests for {@link AutoReconnectListener}.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class AutoReconnectListenerTest extends AbstractMockingComponentTestCase
 {

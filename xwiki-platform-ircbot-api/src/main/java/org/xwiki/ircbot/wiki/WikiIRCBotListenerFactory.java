@@ -28,7 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
  * Create a Bot Listener object by gathering the Listener metadata from a document.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface WikiIRCBotListenerFactory

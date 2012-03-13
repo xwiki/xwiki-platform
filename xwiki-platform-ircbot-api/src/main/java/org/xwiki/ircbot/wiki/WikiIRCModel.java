@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Provides APIs to access to the Wiki Model of the Bot (ie documents in the wiki containing Bot data).
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface WikiIRCModel

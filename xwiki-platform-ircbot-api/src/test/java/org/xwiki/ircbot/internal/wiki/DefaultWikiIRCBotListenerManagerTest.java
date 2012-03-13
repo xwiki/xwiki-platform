@@ -48,7 +48,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * Unit tests for {@link DefaultWikiIRCBotListenerManager}.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingComponentTestCase
 {

@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
  * Represents actions that can be done on the IRC.IRCBotConfiguration page.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class IRCBotConfigurationPage extends ViewPage
 {

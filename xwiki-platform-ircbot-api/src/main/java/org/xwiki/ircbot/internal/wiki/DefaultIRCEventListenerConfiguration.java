@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Provides configuration data for the {@link IRCEventListener} Event Listener.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Singleton

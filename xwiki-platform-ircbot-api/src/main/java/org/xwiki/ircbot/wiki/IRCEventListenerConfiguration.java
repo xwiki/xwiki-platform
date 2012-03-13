@@ -29,7 +29,7 @@ import org.xwiki.ircbot.IRCBotException;
  * Configuration for the IRC Event Listener (ie the listener that sends IRC events when a document is modified).
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface IRCEventListenerConfiguration

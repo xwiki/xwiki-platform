@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
  * @param <T> the reference to the PircBotX instance
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Role
 public interface IRCBotListener<T extends PircBotX> extends Listener<T>

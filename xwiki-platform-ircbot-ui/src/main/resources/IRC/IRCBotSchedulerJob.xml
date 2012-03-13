@@ -128,7 +128,7 @@
 <contextLang>en</contextLang>
 </property>
 <property>
-<contextUser>XWiki.Admin</contextUser>
+<contextUser>XWiki.superadmin</contextUser>
 </property>
 <property>
 <cron>0 * * * * ?</cron>

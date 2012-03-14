@@ -227,7 +227,7 @@
      {
       "doc_viewable" : $viewable,
       #if(!$viewable)
-        "doc_fullname" : "$escapetool.javascript(${context.database}):$escapetool.javascript(${item})"
+        "doc_fullName" : "$escapetool.javascript(${context.database}):$escapetool.javascript(${item})"
       #else
         #set($itemDoc = $xwiki.getDocument($item))
         #set($fullname = "${itemDoc.wiki}:${itemDoc.space}.${itemDoc.name}")
@@ -244,7 +244,7 @@
         #set($renameUrl = $itemDoc.getURL('view', 'xpage=rename&amp;step=1'))
         #set($rightsUrl = $itemDoc.getURL('edit', 'editor=rights'))
         "doc_name" : "$escapetool.javascript($itemDoc.name)",
-        "doc_fullname" : "$escapetool.javascript($fullname)",
+        "doc_fullName" : "$escapetool.javascript($fullname)",
         "doc_space" : "$escapetool.javascript(${itemDoc.space})",
         "doc_url" : "$escapetool.javascript(${itemUrl})",
         "doc_space_url" : "$escapetool.javascript(${spaceUrl})",

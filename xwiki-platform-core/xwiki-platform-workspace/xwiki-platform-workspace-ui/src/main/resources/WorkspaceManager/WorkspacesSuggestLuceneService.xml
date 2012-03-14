@@ -27,7 +27,7 @@
 #set($input = "$!request.input")
 #set($nb = "$!request.nb")
 #if($nb != '')
-  #set($nb = $util.parseInt($nb) + 1)
+  #set($nb = $mathtool.toInteger($nb) + 1)
 #else
   #set($nb = 6)
 #end
@@ -35,7 +35,7 @@
   #set($query = $query.replaceAll('__INPUT__', $input))
   #set($discard = $response.setContentType("text/xml"))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-  #set($rawresults = $xwiki.lucene.getSearchResults($query, $util.null))
+  #set($rawresults = $xwiki.lucene.getSearchResults($query, $NULL))
   #set($results = $rawresults.getResults("0", "$nb"))
   &lt;results&gt;
     #foreach($item in $results)

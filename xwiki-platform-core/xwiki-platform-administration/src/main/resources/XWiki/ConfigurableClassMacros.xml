@@ -98,7 +98,7 @@
   #else
     #set($userToCheck = $docToCheck.getAuthor())
   #end
-  #set ($hasAccess = $util.null)
+  #set ($hasAccess = $NULL)
   #setVariable ("$hasAccess" $xwiki.hasAccessLevel('edit', $userToCheck, $currentDoc))
 #end
 

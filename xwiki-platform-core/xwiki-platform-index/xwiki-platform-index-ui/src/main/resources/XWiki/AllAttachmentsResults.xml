@@ -70,10 +70,10 @@
 ## ============================================================================================
 #if ("$!request.get('xpage')" == 'plain')
   $response.setContentType('application/json')##
-  #set ($offset = $util.parseInt($request.get('offset')))
+  #set ($offset = $mathtool.toInteger($request.get('offset')))
   ## offset starts from 0 in velocity and 1 in javascript
   #set ($off = $offset - 1)
-  #set ($limit = $util.parseInt($request.get('limit')))
+  #set ($limit = $mathtool.toInteger($request.get('limit')))
   #set ($title = $request.get('doc.name'))
   #set ($author = $request.get('author'))
   #set ($space = $request.get('doc.space'))
@@ -139,7 +139,7 @@
 "totalrows": $totalItems,
 "returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
 "offset": $offset,
-"reqNo": $util.parseInt($request.reqNo),
+"reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
 #foreach ($item in $items)
   #set ($docName = $item.get(0))

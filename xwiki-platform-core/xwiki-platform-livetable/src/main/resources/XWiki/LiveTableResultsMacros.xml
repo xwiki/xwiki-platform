@@ -44,14 +44,14 @@
   #if("$!{request.xpage}" == 'plain')
     $response.setContentType('application/json')
   #end
-  #set($offset = $util.parseInt($request.get('offset')))
+  #set($offset = $mathtool.toInteger($request.get('offset')))
   ## offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if($offset &lt; 0)
     #set($offset = 0)
   #end
-  #set($limit = $util.parseInt($request.get('limit')))
-  #set($tablelist = $util.arrayList)
+  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #set($tablelist = [])
   ##
   ##
   ##
@@ -219,7 +219,7 @@
   ],
   "returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
   "offset": $mathtool.add($offset, 1),
-  "reqNo": $util.parseInt($request.reqNo),
+  "reqNo": $mathtool.toInteger($request.reqNo),
   "rows": [
     #foreach($item in $items)
      #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
@@ -482,7 +482,7 @@
       #livetable_getTableName($colname)
       #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-      #set($discard = $whereParams.addAll(["${colname}", $util.parseInt(${filterValue})]))
+      #set($discard = $whereParams.addAll(["${colname}", $mathtool.toInteger(${filterValue})]))
     #elseif($propType == 'DateClass')
       #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")

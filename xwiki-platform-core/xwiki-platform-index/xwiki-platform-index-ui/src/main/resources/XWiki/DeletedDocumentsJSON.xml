@@ -71,10 +71,10 @@
 ## ============================================================================================
 #if("$!{request.get('xpage')}" == 'plain')
 $response.setContentType('application/json')
-#set($offset = $util.parseInt($request.get('offset')))
+#set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
-#set($limit = $util.parseInt($request.get('limit')))
+#set($limit = $mathtool.toInteger($request.get('limit')))
 #set($docNameFilter = $request.get('ddoc.fullName'))
 #set($deleterFilter = $request.get('ddoc.deleter'))
 #set($sql = '')

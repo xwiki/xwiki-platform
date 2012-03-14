@@ -29,7 +29,7 @@
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $util.parseInt($request.get('offset')))
+#set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
 #if($offset &lt; 0)
@@ -38,7 +38,7 @@
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $util.parseInt($request.get('limit')))
+#set($limit = $mathtool.toInteger($request.get('limit')))
 ##====================================
 ## Step1: Transform Map into list, one list item per link/page
 ##====================================
@@ -92,7 +92,7 @@
 "tags" : [],
 "returnedrows":  ${resultList.size()},
 "offset": $mathtool.add($offset, 1),
-"reqNo": $util.parseInt($request.reqNo),
+"reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
 #foreach ($entry in $resultList)
   #if($velocityCount &gt; 1) , #end

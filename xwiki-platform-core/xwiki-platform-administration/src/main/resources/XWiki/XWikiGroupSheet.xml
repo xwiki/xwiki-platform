@@ -56,7 +56,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $doc.fullName) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
     #set($result = true)
   #end
-  #set($hasGroupRight = $util.null)
+  #set($hasGroupRight = $NULL)
   #setVariable("$hasGroupRight" $result)
 #end
 #hasGroupRight('edit' $hasEditGroupRight)

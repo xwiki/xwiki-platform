@@ -435,7 +435,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
           &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$msg.get('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
         #end
         #if($ddoc.canDelete())
-          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$util.encodeURI($!request.getRequestURI())?$util.encodeURI($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
+          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;

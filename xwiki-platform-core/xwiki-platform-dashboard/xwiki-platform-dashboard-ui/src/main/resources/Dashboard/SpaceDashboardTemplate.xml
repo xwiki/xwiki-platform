@@ -195,7 +195,7 @@
 <guid>3bafd624-2fa9-4711-b2bc-c3e8a58131ca</guid>
 <property>
 <content>{{velocity}}
-#set($tagSpace = $util.null)
+#set($tagSpace = $NULL)
 #if ($doc.space != "Main")
   #set($tagSpace = $doc.space)
 #end
@@ -263,7 +263,7 @@
 <guid>5a58a6cc-13a8-4ee3-b5d2-9df994cf6671</guid>
 <property>
 <content>{{velocity}}
-#set($aSpace = $util.null)
+#set($aSpace = $NULL)
 #if ($doc.space != "Main")
   #set ($aSpace = $doc.space)
 #end

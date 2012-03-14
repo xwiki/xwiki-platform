@@ -44,7 +44,7 @@
 <content>{{velocity output="false"}}
 ### Administer the wiki editor preferences, at global level
 #set ($legend = ['editor', 'versioning'])
-#set ($params = $util.hashMap)
+#set ($params = {})
 #set ($params.editor = ['editor', 'core.defaultDocumentSyntax', 'xwiki.title.mandatory'])
 #set ($params.versioning = ['editcomment', 'editcomment_mandatory', 'minoredit'])
 {{/velocity}}

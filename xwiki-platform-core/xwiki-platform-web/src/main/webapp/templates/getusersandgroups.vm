@@ -4,10 +4,10 @@
 ###
 ###
 $response.setContentType("application/x-json")
-#set($offset = $util.parseInt($request.get("offset")))
+#set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($off = $offset - 1)
-#set($limit = $util.parseInt($request.get("limit")))
+#set($limit = $mathtool.toInteger($request.get('limit')))
 #set($rm = $xwiki.rightsmanager)
 ##
 ## Get all the request parameters which are filters
@@ -18,9 +18,9 @@ $response.setContentType("application/x-json")
 ## Params that should filter the document, not object properties
 #set($docProps = ["fullName", "name"])
 ## The filter being constructed. It will be passed to the rightsmanager API.
-#set($filterMap = $util.hashMap)
-## 
-#set($orderList = $util.arrayList)
+#set($filterMap = {})
+##
+#set($orderList = [])
 #foreach($key in $keys)
   ## foreach needed because request.getParameterMap returns a list of values for each parameter
   #foreach($i in $params.get($key)) #set($value = $i) #end
@@ -28,19 +28,19 @@ $response.setContentType("application/x-json")
     ## Put in the filters map
     #if($docProps.contains($key))
       ## Each filter is: key=>[propType, value], where propType is null for document properties
-      #set($arr = $util.arrayList)
-      #set($discard = $arr.add(null)) ## null => document property
+      #set($arr = [])
+      #set($discard = $arr.add(null))## null => document property
       #set($discard = $arr.add("$value"))
       #set($discard = $filterMap.put("$key", $arr))
 ## Question: Why do we order using the filter fields?
 ##      #set($discard = $orderList.add("$key"))
     #else
-      #set($arr = $util.arrayList)
+      #set($arr = [])
       ## This may be variable... For the moment, assume it is a StringProperty
       #set($discard = $arr.add("StringProperty"))
       #set($discard = $arr.add("$value"))
       #set($discard = $filterMap.put("$key", $arr))
-##      #set($arr2 = $util.arrayList)
+##      #set($arr2 = [])
 ##      #set($discard = $arr2.add("$key"))
 ##      #set($discard = $arr2.add("StringProperty"))
 ##      #set($discard = $orderList.add($arr2))
@@ -91,7 +91,7 @@ $response.setContentType("application/x-json")
 ### json starts
 {
 "totalrows": $matchedCount,
-"reqNo"    : $util.parseInt($request.reqNo),
+"reqNo"    : $mathtool.toInteger($request.reqNo),
 "returnedrows": #if($matchedCount < $limit) $matchedCount #else $limit #end,
 "offset"   : $offset,
 "clsname"  : "$!{escapetool.javascript($clsname)}",
@@ -105,8 +105,8 @@ $response.setContentType("application/x-json")
   #else
     #set($username = $user.fullName)
   #end
-  #set($allows = $util.hashMap)
-  #set($denys = $util.hashMap)
+  #set($allows = {})
+  #set($denys = {})
   #if($velocityCount > 1) , #end
   ## Get the rights for that user or group
   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights

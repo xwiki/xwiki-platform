@@ -581,7 +581,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
       window.panelsavesuccess = "$escapetool.javascript($msg.get('panelsavesuccess'))";
       window.panelsaveerror = "$escapetool.javascript($msg.get('panelsaveerror'))";
       #set ($counter = 0)
-      #set ($panelsStatus = $util.hashMap)
+      #set ($panelsStatus = {})
       #foreach ($category in $categoryList)
         #set ($categPanels = $categoryMap.get($category))
         #foreach ($item in $categPanels)

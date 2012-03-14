@@ -74,12 +74,6 @@ table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
 }
 
 /* ----------------CSS3 adjustments----------------*/
-input[type="text"], input[type="password"] {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.fieldGradientColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
-}
-textarea, select {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.fieldGradientColor', endColorstr='$theme.pageContentBackgroundColor',GradientType=0 );
-}
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryGradientColor', endColorstr='$theme.buttonPrimaryBackgroundColor',GradientType=0 );
 }

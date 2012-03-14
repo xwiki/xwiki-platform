@@ -208,6 +208,9 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     this.savingBox.replace(this.failedBox);
     if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
       $('ajaxRequestFailureReason').update('Server not responding');
+    } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
+      // Regard the body of plain text responses as custom status messages.
+      $('ajaxRequestFailureReason').update(response.responseText);
     } else {
       $('ajaxRequestFailureReason').update(response.statusText);
     }

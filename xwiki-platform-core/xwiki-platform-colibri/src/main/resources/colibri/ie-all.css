@@ -75,18 +75,18 @@ table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
 
 /* ----------------CSS3 adjustments----------------*/
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryGradientColor', endColorstr='$theme.buttonPrimaryBackgroundColor',GradientType=0 );
+  #css_filterGradient($theme.buttonPrimaryGradientColor, $theme.buttonPrimaryBackgroundColor)
 }
 input.button:hover, .buttonwrapper a:hover{
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonPrimaryBackgroundColor', endColorstr='$theme.buttonPrimaryGradientColor',GradientType=0 );
+  #css_filterGradient($theme.buttonPrimaryBackgroundColor, $theme.buttonPrimaryGradientColor)
 }
 .buttonwrapper input.secondary, .buttonwrapper a.secondary, 
 .buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.buttonSecondaryGradientColor', endColorstr='$theme.buttonSecondaryBackgroundColor',GradientType=0 );
+  #css_filterGradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor)
 }
 .actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dececec', endColorstr='#00ececec',GradientType=0 );
+  #css_filterGradient('#4dececec','#00ececec')
 }
 .globalsearch input.button, .buttonwrapper a.attachment-picker-start {
   filter: none;
@@ -98,16 +98,16 @@ input.button:hover, .buttonwrapper a:hover{
   width: 100%;
 }
 #mainmenu .gradientfilterIE {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.menuGradientColor', endColorstr='$theme.menuBackgroundColor',GradientType=0 );
+  #css_filterGradient($theme.menuGradientColor, $theme.menuBackgroundColor)
 }
 #contentmenu .gradientfilterIE, #editmenu .gradientfilterIE, ul.xwikitabbar  {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.menuContentGradientColor', endColorstr='$theme.menuContentBackgroundColor',GradientType=0 );
+  #css_filterGradient($theme.menuContentGradientColor, $theme.menuContentBackgroundColor)
  }
 h1.xwikipaneltitle {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.panelHeaderGradientColor', endColorstr='$theme.panelHeaderBackgroundColor',GradientType=0 );
+  #css_filterGradient($theme.panelHeaderGradientColor, $theme.panelHeaderBackgroundColor)
  }
 .collapsed h1.xwikipaneltitle {
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$theme.panelCollapsedGradientColor', endColorstr='$theme.panelCollapsedBackgroundColor',GradientType=0 );
+  #css_filterGradient($theme.panelCollapsedGradientColor, $theme.panelCollapsedBackgroundColor)
  }
 #mainmenu .componentcontainer, #contentmenu .componentcontainer, #editmenu .componentcontainer {
   margin-top: -22px;

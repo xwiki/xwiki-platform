@@ -49,7 +49,7 @@
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
 <validationRegExp></validationRegExp>
-<values>onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+<values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </event>
 <script>

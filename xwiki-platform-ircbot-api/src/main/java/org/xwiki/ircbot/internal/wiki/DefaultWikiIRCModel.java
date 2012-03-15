@@ -175,7 +175,11 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
             executor.execute();
         } finally {
             xwikiContext.setUserReference(currentUserReference);
-            xwikiContext.put(SECURITY_DOC_PROPERTY, currentSecurityDocument);
+            if (currentSecurityDocument != null) {
+                xwikiContext.put(SECURITY_DOC_PROPERTY, currentSecurityDocument);
+            } else {
+                xwikiContext.remove(SECURITY_DOC_PROPERTY);
+            }
         }
     }
 

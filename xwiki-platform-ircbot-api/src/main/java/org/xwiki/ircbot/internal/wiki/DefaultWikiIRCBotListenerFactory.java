@@ -144,8 +144,14 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         // consequence they'll need to set that user as the current user when the Wiki Bot Listener receives an event
         // and renders its XDOM. The reason is that the XDOM might use privileged API that require some special rights
         // (like Programming Rights if it contains a Groovy macro for example).
-        return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
-            this.plainTextBlockRenderer, this.ircModel, this.ircModel.getXWikiContext().getUserReference());
+        WikiIRCBotListener listener = new WikiIRCBotListener(botListenerData, events, doc.getSyntax(),
+            this.macroTransformation, this.plainTextBlockRenderer, this.ircModel,
+            this.ircModel.getXWikiContext().getUserReference());
+
+        // Call Wiki Bot Listener initialization.
+        listener.initialize();
+
+        return listener;
     }
 
     @Override

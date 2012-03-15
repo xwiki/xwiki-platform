@@ -103,6 +103,11 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     private DocumentReference executingUserReference;
 
     /**
+     * @see #initialize()
+     */
+    private Map<String, Object> initializationBindings = new HashMap<String, Object>();
+
+    /**
      * @param listenerData the listener data that have been extracted from the wiki page XObject
      * @param events the event scripts that have been extracted from the wiki page XObjects
      * @param syntax the syntax of the wiki page that contained the Bot Listener XObjects
@@ -139,6 +144,33 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     }
 
     /**
+     * Initialize the Bot Listener by calling its "onRegistration" Event Object (if any). This allows the Listener
+     * to bind properties to the LISTENER_XWIKICONTEXT_PROPERTY property name and these bindings will be available
+     * to the other Event Objects when they execute.
+     */
+    public void initialize()
+    {
+        XDOM xdom = this.events.get("onRegistration");
+        if (xdom != null) {
+            try {
+                // Step 1: Execute the onRegistration XProperty content
+                renderContent(xdom);
+
+                // Step 2: Save the bindings that the content could have set so that when other events execute later on
+                // they'll have those bindings set. This allow onRegistration content to set some initialization
+                // variables.
+                XWikiContext context = this.ircModel.getXWikiContext();
+                Map<String, Object> bindings = (Map<String, Object>) context.get(LISTENER_XWIKICONTEXT_PROPERTY);
+                if (bindings != null) {
+                    this.initializationBindings.putAll(bindings);
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Failed to initialize Wiki Bot Listener [{}]", getName(), e);
+            }
+        }
+    }
+
+    /**
      * Execute the Wiki bot listener written in wiki syntax by executing the Macros and send the result to the IRC
      * server.
      *
@@ -171,15 +203,35 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                     {
                         @Override public void execute() throws Exception
                         {
-                            String executionResult = renderContent(xdom);
-                            if (!StringUtils.isEmpty(executionResult)) {
-                                event.respond(executionResult);
-                            }
+                            respond(renderContent(xdom), event);
                         }
                     });
             } catch (Exception e) {
                 // An error happened, log a warning and do nothing
                 LOGGER.warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
+            }
+        }
+    }
+
+    /**
+     * Send a String content back to the IRC channel line by line with a maximum of 5 lines to prevent flooding.
+     *
+     * @param response the response to send
+     * @param event the Event that we use to send back the response
+     */
+    private void respond(String response, Event event)
+    {
+        if (!StringUtils.isEmpty(response)) {
+            String[] lines = response.split("[\\r\\n]+");
+            int counter = 0;
+            for (String line : lines) {
+                event.respond(line);
+                if (counter++ > 4) {
+                    break;
+                }
+            }
+            if (counter < lines.length) {
+                event.respond("... and " + (lines.length - counter) + " more lines...");
             }
         }
     }
@@ -216,6 +268,9 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     private void addBindings(Event event) throws IRCBotException
     {
         Map<String, Object> params = new HashMap<String, Object>();
+
+        // Add the initialization bindings
+        params.putAll(this.initializationBindings);
 
         // Bind variables
         bindVariable("getMessage", event, params, "message");

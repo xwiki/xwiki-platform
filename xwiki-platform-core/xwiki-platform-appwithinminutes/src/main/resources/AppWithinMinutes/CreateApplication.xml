@@ -364,10 +364,6 @@ return XWiki;
     #end
   )))
   &lt;form action="" method="post" class="xform wizard-body"&gt;
-    (% class="hidden" %)
-    (((
-      &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()"/&gt;
-    )))
     ; &lt;label for="appName"&gt;$msg.get('platform.appwithinminutes.appNameLabel')&lt;/label&gt;
       (% class="xHint" %)$msg.get('platform.appwithinminutes.appNameHint')
     : &lt;input type="text" id="appName" name="appName" /&gt;
@@ -376,8 +372,27 @@ return XWiki;
   {{/html}}
 #end
 
+#macro(getAppDescriptor $appName)
+  #set($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
+  #set($appDescriptorStatement = "from doc.object($appDescriptorClassName) as obj where doc.space = :space")
+  #set($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $appName).execute())
+  #if($appDescriptors.size() &gt; 0)
+    #set($appDescriptor = $xwiki.getDocument($appDescriptors.get(0)))
+  #end
+#end
+
 #macro(processStep)
-  #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "#toXMLName($request.appName)Class"))
+  ## Check if the application already exists.
+  #getAppDescriptor($request.appName)
+  #if($appDescriptor)
+    ## Edit an existing application. Use the configured class name.
+    #set($classStringRef = $appDescriptor.getObject($appDescriptorClassName).getProperty('class').value)
+    ## The class string reference is relative to the document holding the application descriptor.
+    #set($classRef = $services.model.resolveDocument($classStringRef, 'explicit', $appDescriptor.documentReference))
+  #else
+    ## Create a new application. Use the default class name.
+    #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "#toXMLName($request.appName)Class"))
+  #end
   #set($queryString = 'wizard=true')
   #if(!$xwiki.exists($classRef))
     #set($classTitle = "$request.appName Class")
@@ -387,20 +402,33 @@ return XWiki;
 #end
 
 #macro(validateAppName $appName)
-  #set($className = "#toXMLName($appName)")
-  #if($className == '')
-    (% class="xErrorMsg" %)$msg.get('platform.appwithinminutes.appNameInvalidClassNameError')
+  #getAppDescriptor("$!appName")
+  #if($appDescriptor)
+    ## Edit an existing application.
+    #set($appHomeRef = $appDescriptor.documentReference)
+    #set($classStringRef = $appDescriptor.getObject($appDescriptorClassName).getProperty('class').value)
+    ## The class string reference is relative to the document holding the application descriptor.
+    #set($appClassRef = $services.model.resolveDocument($classStringRef, 'explicit', $appDescriptor.documentReference))
+  #else
+    ## Create a new application.
+    #set($className = "#toXMLName($appName)")
+    #if($className == '')
+      (% class="xErrorMsg" %)$msg.get('platform.appwithinminutes.appNameInvalidClassNameError')
+    #end
+    #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
+    #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
   #end
-  #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
   #set($appHomeURL = $xwiki.getDocument($appHomeRef).getExternalURL())
+  #if($appHomeURL.endsWith('/WebHome'))
+    #set($appHomeURL = $appHomeURL.substring(0, $mathtool.sub($appHomeURL.length(), 7)))
+  #end
   ; $msg.get('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
-  : {{{$!appHomeURL.substring(0, $mathtool.sub($appHomeURL.length(), 7))}}}
+  : {{{$!appHomeURL}}}
   ; $msg.get('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
   : {{{$doc.wiki}}} » {{{$appName}}}
   ; $msg.get('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
-  : {{{$doc.wiki}}} » {{{$appName}}} » {{{$!{className}Class}}}
-  #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
-  #if($xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
+  : {{{$appClassRef.wikiReference.name}}} » {{{$appClassRef.lastSpaceReference.name}}} » {{{$appClassRef.name}}}
+  #if($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
 
     {{warning}}$msg.get('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
   #end
@@ -411,10 +439,9 @@ return XWiki;
 #if("$!request.appName" != '')
   #if($context.action == 'get')
     #validateAppName($request.appName)
-  #elseif($services.csrf.isTokenValid($request.form_token))
-    #processStep()
   #else
-    $response.sendRedirect($services.csrf.getResubmissionURL());
+    ## CSRF protection is not needed because this step only redirects to the next one passing data in the query string.
+    #processStep()
   #end
 #else
   #showStep()

@@ -72,8 +72,14 @@
   $response.setContentType('application/json')##
   #set ($offset = $mathtool.toInteger($request.get('offset')))
   ## offset starts from 0 in velocity and 1 in javascript
-  #set ($off = $offset - 1)
+  #set ($offset = $offset - 1)
+  #if (!$offset || $offset &lt; 0)
+    #set ($offset = 0)
+  #end
   #set ($limit = $mathtool.toInteger($request.get('limit')))
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
   #set ($title = $request.get('doc.name'))
   #set ($author = $request.get('author'))
   #set ($space = $request.get('doc.space'))
@@ -129,7 +135,7 @@
   ##
   #set ($countQuery = "select count(*) from XWikiDocument as doc, XWikiAttachment as attach where attach.docId=doc.id" + $query)
   #set ($query = "select doc.fullName, attach from XWikiDocument as doc, XWikiAttachment as attach where attach.docId=doc.id" + $query + " order by $order $dir")
-  #set ($items = $xwiki.search($query, $limit, $off, $queryParameters))
+  #set ($items = $xwiki.search($query, $limit, $offset, $queryParameters))
   #set ($totalItems = $xwiki.search($countQuery, 0, 0, $queryParameters).get(0))
   #set ($returnedItems = $items.size())
   ## ==============================================
@@ -138,7 +144,7 @@
 {
 "totalrows": $totalItems,
 "returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
-"offset": $offset,
+"offset": $mathtool.add($offset, 1),
 "reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
 #foreach ($item in $items)

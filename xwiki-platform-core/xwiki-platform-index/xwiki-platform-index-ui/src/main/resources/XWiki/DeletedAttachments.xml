@@ -460,7 +460,13 @@ $response.setContentType('application/json')
 #set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
+#if (!$offset || $offset &lt; 0)
+  #set ($offset = 0)
+#end
 #set($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
 #set($filenameFilter = $request.get('datt.filename'))
 #set($docNameFilter = $request.get('datt.docName'))
 #set($deleterFilter = $request.get('datt.deleter'))
@@ -495,7 +501,7 @@ $response.setContentType('application/json')
 {
 "totalrows": $totalItems,
 "returnedrows": $returnedItems,
-"offset": ${request.get('offset')},
+"offset": ${mathtool.add($offset, 1)},
 "reqNo": ${request.reqNo},
 "query" : "$selectSql", 
 "rows": [

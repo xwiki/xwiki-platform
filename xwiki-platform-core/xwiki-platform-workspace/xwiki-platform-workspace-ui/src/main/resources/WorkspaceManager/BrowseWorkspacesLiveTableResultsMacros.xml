@@ -46,10 +46,13 @@
   #set($offset = $mathtool.toInteger($request.get('offset')))
   ## offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
-  #if($offset &lt; 0)
+  #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
   #set($limit = $mathtool.toInteger($request.get('limit')))
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
   #set($tablelist = [])
   ##
   ##

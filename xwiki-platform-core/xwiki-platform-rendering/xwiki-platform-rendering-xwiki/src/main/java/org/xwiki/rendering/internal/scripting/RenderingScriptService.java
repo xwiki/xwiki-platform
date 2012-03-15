@@ -33,12 +33,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -63,6 +65,12 @@ public class RenderingScriptService implements ScriptService
      */
     @Inject
     private RenderingConfiguration configuration;
+
+    /**
+     * @see #resolveSyntax(String)
+     */
+    @Inject
+    private SyntaxFactory syntaxFactory;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -145,5 +153,22 @@ public class RenderingScriptService implements ScriptService
             result = null;
         }
         return result;
+    }
+
+    /**
+     * Converts a Syntax specified as a String into a proper Syntax object.
+     *
+     * @param syntaxId the syntax as a string (eg "xwiki/2.0", "html/4.01", etc)
+     * @return the proper Syntax object representing the passed syntax
+     */
+    public Syntax resolveSyntax(String syntaxId)
+    {
+        Syntax syntax;
+        try {
+            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+        } catch (ParseException exception) {
+            syntax = null;
+        }
+        return syntax;
     }
 }

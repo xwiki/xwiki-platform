@@ -91,5 +91,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We need the Groovy macro for some Wiki Bot Listeners -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

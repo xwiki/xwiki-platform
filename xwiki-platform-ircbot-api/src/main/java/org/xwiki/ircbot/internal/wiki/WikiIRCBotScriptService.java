@@ -32,6 +32,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
+import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.EntityType;

@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.internal.BotData;
+import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;

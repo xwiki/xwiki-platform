@@ -29,6 +29,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.ircbot.IRCBotException;
+import org.xwiki.ircbot.internal.BotData;
+import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.EntityType;
@@ -54,6 +56,11 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
 {
+    /**
+     * Name of the security document property in the XWiki Context.
+     */
+    private static final String SECURITY_DOC_PROPERTY = "sdoc";
+
     /**
      * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
      */
@@ -151,6 +158,25 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         }
 
         return data;
+    }
+
+    @Override
+    public void executeAsUser(DocumentReference executingUserReference, DocumentReference securityDocumentReference,
+        Executor executor) throws Exception
+    {
+        XWikiContext xwikiContext = getXWikiContext();
+        DocumentReference currentUserReference = xwikiContext.getUserReference();
+        XWikiDocument currentSecurityDocument = (XWikiDocument) xwikiContext.get(SECURITY_DOC_PROPERTY);
+        try {
+            // Set executing user in the XWiki Context
+            xwikiContext.setUserReference(executingUserReference);
+            // Set the security document which is used to test permissions
+            xwikiContext.put(SECURITY_DOC_PROPERTY, getDocument(securityDocumentReference));
+            executor.execute();
+        } finally {
+            xwikiContext.setUserReference(currentUserReference);
+            xwikiContext.put(SECURITY_DOC_PROPERTY, currentSecurityDocument);
+        }
     }
 
     /**

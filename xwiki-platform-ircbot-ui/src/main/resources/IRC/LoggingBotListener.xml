@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>IRC</web>
-<name>LoggingIRCBotListener</name>
+<name>LoggingBotListener</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>IRC.WebHome</parent>
+<parent>IRC.IRCBot</parent>
 <creator>xwiki:XWiki.Admin</creator>
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
@@ -23,7 +23,7 @@
 <syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -98,7 +98,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 </class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <number>0</number>
 <className>IRC.IRCBotListenerClass</className>
 <guid>ba8714a6-4bf0-4964-9696-5a3ca0f9f93f</guid>
@@ -159,7 +159,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <number>0</number>
 <className>IRC.IRCBotListenerEventClass</className>
 <guid>795e5450-8a7c-4db1-8cb5-7b7eda6d49c5</guid>
@@ -223,7 +223,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <number>1</number>
 <className>IRC.IRCBotListenerEventClass</className>
 <guid>0894cdbb-0e6b-4146-9fc9-b4ccc1cd2462</guid>
@@ -287,7 +287,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <number>2</number>
 <className>IRC.IRCBotListenerEventClass</className>
 <guid>dd8fce69-f596-4b81-b3aa-8ec60f6b8a9f</guid>
@@ -351,7 +351,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <number>3</number>
 <className>IRC.IRCBotListenerEventClass</className>
 <guid>f6e0a104-1b96-4b75-8aa3-f2b6786fc33b</guid>
@@ -415,7 +415,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.LoggingIRCBotListener</name>
+<name>IRC.LoggingBotListener</name>
 <number>4</number>
 <className>IRC.IRCBotListenerEventClass</className>
 <guid>448afe83-a5c5-4a3e-a528-4a8ae28f5eee</guid>

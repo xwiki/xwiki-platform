@@ -44,8 +44,8 @@ public class IRCBotConfigurationPage extends ViewPage
     public void setLoggingPage(String name)
     {
         ObjectEditPage oep = editObjects();
-        FormElement form = oep.getObjectsOfClass("IRC.LoggingIRCBotListener").get(0);
-        form.setFieldValue(By.id("IRC.LoggingIRCBotListener_0_page"), name);
+        FormElement form = oep.getObjectsOfClass("IRC.LoggingBotListener").get(0);
+        form.setFieldValue(By.id("IRC.LoggingBotListener_0_page"), name);
         oep.clickSaveAndContinue();
     }
 }

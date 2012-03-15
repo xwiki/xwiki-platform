@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.internal.wiki.BotListenerData;
+import org.xwiki.ircbot.internal.BotListenerData;
 
 /**
  * Start/stop the Wiki IRC Bot including its Wiki Bot Listeners and provides some other APIs about the Wiki IRC Bot.

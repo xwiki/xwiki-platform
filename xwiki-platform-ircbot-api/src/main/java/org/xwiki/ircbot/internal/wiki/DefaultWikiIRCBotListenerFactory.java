@@ -137,11 +137,15 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
             }
         }
 
-        BotListenerData botListenerData = new BotListenerData(
-            this.entityReferenceSerializer.serialize(doc.getDocumentReference()), name, description, true);
+        WikiBotListenerData botListenerData = new WikiBotListenerData(documentReference,
+            this.entityReferenceSerializer.serialize(doc.getDocumentReference()), name, description);
 
+        // Note: We save the current user since the Wiki Bot listeners will execute on the PircBotX threads. As a
+        // consequence they'll need to set that user as the current user when the Wiki Bot Listener receives an event
+        // and renders its XDOM. The reason is that the XDOM might use privileged API that require some special rights
+        // (like Programming Rights if it contains a Groovy macro for example).
         return new WikiIRCBotListener(botListenerData, events, doc.getSyntax(), this.macroTransformation,
-            this.plainTextBlockRenderer, this.ircModel);
+            this.plainTextBlockRenderer, this.ircModel, this.ircModel.getXWikiContext().getUserReference());
     }
 
     @Override

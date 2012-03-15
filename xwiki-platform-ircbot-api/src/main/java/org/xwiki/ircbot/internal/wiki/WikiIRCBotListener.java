@@ -33,6 +33,7 @@ import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -67,34 +68,39 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiIRCBotListener.class);
 
     /**
-     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     * @see #WikiIRCBotListener
      */
-    private BotListenerData listenerData;
+    private WikiBotListenerData listenerData;
 
     /**
-     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     * @see #WikiIRCBotListener
      */
     private Map<String, XDOM> events;
 
     /**
-     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     * @see #WikiIRCBotListener
      */
     private Syntax syntax;
 
     /**
-     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     * @see #WikiIRCBotListener
      */
     private Transformation macroTransformation;
 
     /**
-     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     * @see #WikiIRCBotListener
      */
     private BlockRenderer plainTextBlockRenderer;
 
     /**
-     * @see #WikiIRCBotListener(BotListenerData, java.util.Map, Syntax, Transformation, BlockRenderer, WikiIRCModel)
+     * @see #WikiIRCBotListener
      */
     private WikiIRCModel ircModel;
+
+    /**
+     * @see #WikiIRCBotListener
+     */
+    private DocumentReference executingUserReference;
 
     /**
      * @param listenerData the listener data that have been extracted from the wiki page XObject
@@ -104,9 +110,12 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
      * @param plainTextBlockRenderer the renderer that we'll use to render the parsed event scripts into plain text.
      *        If the rendering has non empty text then this text is sent to the IRC channel
      * @param ircModel used to access the XWiki Context
+     * @param executingUserReference the reference to the user under which the Wiki Bot Listener will executed its
+     *        content.
      */
-    public WikiIRCBotListener(BotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
-        Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel)
+    public WikiIRCBotListener(WikiBotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
+        Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel,
+        DocumentReference executingUserReference)
     {
         this.listenerData = listenerData;
         this.events = events;
@@ -114,6 +123,7 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         this.macroTransformation = macroTransformation;
         this.plainTextBlockRenderer = plainTextBlockRenderer;
         this.ircModel = ircModel;
+        this.executingUserReference = executingUserReference;
     }
 
     @Override
@@ -135,14 +145,14 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
      * @param event the IRC Bot Event
      */
     @Override
-    public void onEvent(Event event)
+    public void onEvent(final Event event)
     {
         // Get the Event class name, remove the "Event" suffix, and prefix with "on". For example for "MessageEvent"
         // this gives "onMessage".
         // Find the XDOM to execute, using this key.
         String eventName = "on" + StringUtils.removeEnd(event.getClass().getSimpleName(), "Event");
 
-        XDOM xdom = this.events.get(eventName);
+        final XDOM xdom = this.events.get(eventName);
         if (xdom != null) {
             // Note that if a Bot Listener script needs access to the IRC Bot (for example to send a message to the
             // IRC channel), it can access it through the "ircbot" Script Service.
@@ -152,28 +162,48 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                 // to them to the Bot Listener.
                 addBindings(event);
 
-                // Important: we clone the XDOM so that the transformation will not modify it. Otherwise next time
-                // this listener runs, it'll simply return the already transformed XDOM.
-                XDOM temporaryXDOM = xdom.clone();
-
                 // Execute the Macro Transformation on XDOM and send the result to the IRC server
-                TransformationContext txContext = new TransformationContext(temporaryXDOM, this.syntax);
-                this.macroTransformation.transform(temporaryXDOM, txContext);
-                DefaultWikiPrinter printer = new DefaultWikiPrinter();
-                this.plainTextBlockRenderer.render(temporaryXDOM, printer);
-
-                String executionResult = StringUtils.trim(printer.toString());
-                if (!StringUtils.isEmpty(executionResult)) {
-                    event.respond(printer.toString());
-                }
-            } catch (IRCBotException e) {
+                // Note: We execute the macros with a current user being the user that was used to register the Wiki
+                // Bot Listener. The reason is that the XDOM might use privileged API that require some special rights
+                // (like Programming Rights if it contains a Groovy macro for example).
+                this.ircModel.executeAsUser(this.executingUserReference, listenerData.getReference(),
+                    new WikiIRCModel.Executor()
+                    {
+                        @Override public void execute() throws Exception
+                        {
+                            String executionResult = renderContent(xdom);
+                            if (!StringUtils.isEmpty(executionResult)) {
+                                event.respond(executionResult);
+                            }
+                        }
+                    });
+            } catch (Exception e) {
                 // An error happened, log a warning and do nothing
                 LOGGER.warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
-            } catch (TransformationException e) {
-                // The transformation failed to execute, log an error and continue
-                LOGGER.error("Failed to render Wiki IRC Bot Listener script", e);
             }
         }
+    }
+
+    /**
+     * Renders the content in plain text by executing the macros.
+     *
+     * @param xdom the parsed content to render and on which to apply the Macro transformation
+     * @return the plain text result
+     * @throws TransformationException if the Macro transformation fails somewhere
+     */
+    private String renderContent(XDOM xdom) throws TransformationException
+    {
+        // Important: we clone the XDOM so that the transformation will not modify it. Otherwise next time
+        // this listener runs, it'll simply return the already transformed XDOM.
+        XDOM temporaryXDOM = xdom.clone();
+
+        // Execute the Macro Transformation on XDOM and send the result to the IRC server
+        TransformationContext txContext = new TransformationContext(temporaryXDOM, this.syntax);
+        this.macroTransformation.transform(temporaryXDOM, txContext);
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        this.plainTextBlockRenderer.render(temporaryXDOM, printer);
+
+        return StringUtils.trim(printer.toString());
     }
 
     /**

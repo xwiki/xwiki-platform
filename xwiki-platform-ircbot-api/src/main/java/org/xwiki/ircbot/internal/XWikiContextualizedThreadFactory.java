@@ -28,6 +28,7 @@ import org.xwiki.context.ExecutionContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Create new threads that have a proper XWiki Execution Context.
@@ -94,7 +95,14 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
                 }
 
                 // Bridge with old XWiki Context, required for old code.
-                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, stubContextProvider.createStubContext());
+                XWikiContext xwikiContext = stubContextProvider.createStubContext();
+                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
+
+                // Ensure that the Servlet URL Factory is used since the IRC Event Listener needs to compute
+                // External URLs.
+                XWikiURLFactory urlf = xwikiContext.getWiki().getURLFactoryService().createURLFactory(
+                    XWikiContext.MODE_SERVLET, xwikiContext);
+                xwikiContext.setURLFactory(urlf);
 
                 execution.pushContext(context);
             }

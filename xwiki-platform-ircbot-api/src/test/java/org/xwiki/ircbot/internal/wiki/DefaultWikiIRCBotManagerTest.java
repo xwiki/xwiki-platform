@@ -34,6 +34,8 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.IRCBotListener;
+import org.xwiki.ircbot.internal.BotData;
+import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.EntityReferenceSerializer;

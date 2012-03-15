@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.internal.wiki.BotData;
-import org.xwiki.ircbot.internal.wiki.BotListenerData;
+import org.xwiki.ircbot.internal.BotData;
+import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -76,4 +76,29 @@ public interface WikiIRCModel
      * @throws IRCBotException if we fail in searching the wiki
      */
     List<BotListenerData> getWikiBotListenerData() throws IRCBotException;
+
+    /**
+     * Execute some code as the passed user and using the passed document as the current security document on which
+     * permissions are verified.
+     *
+     * @param executingUserReference the user under which to run
+     * @param securityDocumentReference the security document under which to run
+     * @param executor the code to execute
+     * @throws Exception if any error happens when executing the code or if the XWiki Context is null
+     */
+    void executeAsUser(DocumentReference executingUserReference, DocumentReference securityDocumentReference,
+        Executor executor) throws Exception;
+
+    /**
+     * Generic interface to execute code.
+     */
+    public interface Executor
+    {
+        /**
+         * Execute some code.
+         *
+         * @throws Exception if any error happens when executing the code
+         */
+        void execute() throws Exception;
+    }
 }

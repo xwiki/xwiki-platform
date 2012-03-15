@@ -15,7 +15,8 @@
 #set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-#set ($versions = $collectionstool.reverse($tdoc.getRevisions($criteria)))
+#set ($versions = $tdoc.getRevisions($criteria))
+#set ($discard = $collectionstool.reverse($versions))
 #set ($totalVersions = $versions.size())
 #if ($totalVersions == 0)
   #warning ($msg.get('thispagedoesnotexist'))
@@ -29,7 +30,8 @@
   #set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
 ## Reuse the old object, just add the range.
   $criteria.setRange($range)
-  #set ($versions = $collectionstool.reverse($tdoc.getRevisions($criteria)))
+  #set ($versions = $tdoc.getRevisions($criteria))
+  #set ($discard = $collectionstool.reverse($versions))
   #if ($tdoc.realLanguage != '')
     #set ($lang = "&amp;language=${tdoc.realLanguage}")
   #else

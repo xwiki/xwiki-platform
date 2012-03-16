@@ -36,14 +36,15 @@
   <properties>
     <!-- TODO: Remove once http://jira.xwiki.org/jira/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Override in order to add the Scheduler Plugin -->
+    <!-- Override in order to add the Scheduler and Lucene Plugins -->
     <xwikiCfgPlugins>\
       com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.scheduler.SchedulerPlugin
+      com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
+      com.xpn.xwiki.plugin.lucene.LucenePlugin
     </xwikiCfgPlugins>
   </properties>
   <dependencies>
@@ -57,6 +58,12 @@
       <artifactId>xwiki-platform-ircbot-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- Needed for the Wiki Search Bot Listener -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-lucene</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

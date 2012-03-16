@@ -26,6 +26,7 @@ import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.xwiki.test.ui.XWikiWrappingDriver;
@@ -54,6 +55,7 @@ import org.xwiki.test.ui.XWikiWrappingDriver;
 public class BrowserMethodRule implements MethodRule
 {
     private String currentBrowserName;
+    private String currentBrowserVersion;
 
     public BrowserMethodRule(WebDriver driver)
     {
@@ -61,7 +63,11 @@ public class BrowserMethodRule implements MethodRule
         if (driver instanceof XWikiWrappingDriver) {
             nativeDriver = ((XWikiWrappingDriver) driver).getWrappedDriver();
         }
+        // We get the name of the current user Browser
         this.currentBrowserName = ((RemoteWebDriver) nativeDriver).getCapabilities().getBrowserName();
+        // We get the version of the current used Browser
+        this.currentBrowserVersion = ((RemoteWebDriver) nativeDriver).getCapabilities().getVersion(); 
+
     }
 
     @Override
@@ -74,7 +80,10 @@ public class BrowserMethodRule implements MethodRule
                 IgnoreBrowser ignoreBrowser = method.getAnnotation(IgnoreBrowser.class);
                 if (ignoreBrowser != null) {
                     List<String> ignoreBrowserList = Arrays.asList(ignoreBrowser.value());
-                    if (ignoreBrowserList.contains(currentBrowserName)) {
+                    String[] ignoreVersionList = ignoreBrowser.version();
+                    int index = ignoreBrowserList.indexOf(currentBrowserName);
+                    if (index >= 0
+                        && (index >= ignoreVersionList.length || ignoreVersionList[index].equals(currentBrowserVersion))) {
                         // We don't run the test since the current Browser is in the list of browsers to ignore.
                         // Returning an AssumptionViolatedException makes the test runner report the test as ignored!
                         throw new AssumptionViolatedException(ignoreBrowser.reason());

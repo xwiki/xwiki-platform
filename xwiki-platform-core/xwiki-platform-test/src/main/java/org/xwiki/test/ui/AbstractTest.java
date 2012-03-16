@@ -31,6 +31,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.ui.browser.BrowserMethodRule;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.BaseElement;
 
 import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
@@ -49,6 +51,12 @@ public class AbstractTest
      */
     @Rule
     public final TestName testName = new TestName();
+
+    /**
+     * Used for ignoring tests that use {@link IgnoreBrowser} annotation.
+     */
+    @Rule
+    public BrowserMethodRule browseMethodRule = new BrowserMethodRule(getDriver());
 
     /**
      * The object used to watch tests and log when they start and succeed/fail.

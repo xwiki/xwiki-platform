@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1331654461000</creationDate>
-<date>1331850296000</date>
-<contentUpdateDate>1331850296000</contentUpdateDate>
+<date>1331889448000</date>
+<contentUpdateDate>1331889448000</contentUpdateDate>
 <version>1.1</version>
 <title>JIRA Id Bot Listener</title>
 <template></template>
@@ -22,6 +22,42 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
+<class>
+<name>IRC.JIRAIdBotListener</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<pattern>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>pattern</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>JIRA Pattern</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</pattern>
+<url>
+<customDisplay></customDisplay>
+<disabled>0</disabled>
+<name>url</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>JIRA URL</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</url>
+</class>
 <object>
 <class>
 <name>IRC.IRCBotListenerClass</name>
@@ -153,10 +189,14 @@ def message = irccontext.get("message")
 if (jiraPattern != null &amp;&amp; jiraURL != null) {
   def matcher = jiraPattern.matcher(message);
   while(matcher.find()) {
-    def jiraIssue = matcher.group()
-    def url = "${jiraURL}/si/jira.issueviews:issue-xml/${jiraIssue}/${jiraIssue}.xml?field=key&amp;field=summary&amp;field=status&amp;field=link".toURL().text
-    def root = new XmlSlurper().parseText(url)
-    println "${root.channel.item.key} - ${root.channel.item.summary} - ${root.channel.item.link} (${root.channel.item.status})"
+    try {
+      def jiraIssue = matcher.group()
+      def url = "${jiraURL}/si/jira.issueviews:issue-xml/${jiraIssue}/${jiraIssue}.xml?field=key&amp;field=summary&amp;field=status&amp;field=link".toURL().text
+      def root = new XmlSlurper().parseText(url)
+      println "${root.channel.item.key} - ${root.channel.item.summary} - ${root.channel.item.link} (${root.channel.item.status})"
+    } catch (Exception e) {
+      // The issue doesn't exist or the URL cannot be reached, do nothing
+    }
   }
 }
 {{/groovy}}</script>
@@ -220,9 +260,23 @@ if (jiraPattern != null &amp;&amp; jiraURL != null) {
 <script>{{groovy}}
 import java.util.regex.*
 
+def object = xwiki.getDocument("IRC.IRCBotConfiguration").getObject("IRC.JIRAIdBotListener")
+if (object == null) {
+  return
+}
+
 def mappings = [:]
-mappings.put("jiraURL", "http://jira.xwiki.org")
-mappings.put("jiraPattern", Pattern.compile("[A-Z]+-\\d+"))
+
+def url = object.getProperty("url").value
+if (url != null &amp;&amp; url.trim().length() &gt; 0) {
+  mappings.put("jiraURL", url)
+}
+
+def pattern = object.getProperty("pattern").value
+if (pattern != null &amp;&amp; pattern.trim().length() &gt; 0) {
+  mappings.put("jiraPattern", Pattern.compile(pattern))
+}
+
 xcontext.put("irclistener", mappings)
 {{/groovy}}</script>
 </property>

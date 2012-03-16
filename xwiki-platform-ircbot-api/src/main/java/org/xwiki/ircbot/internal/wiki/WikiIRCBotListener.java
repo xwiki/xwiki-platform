@@ -203,7 +203,10 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                     {
                         @Override public void execute() throws Exception
                         {
-                            event.respond(renderContent(xdom));
+                            String result = renderContent(xdom);
+                            if (!StringUtils.isEmpty(result)) {
+                                event.respond(result);
+                            }
                         }
                     });
             } catch (Exception e) {

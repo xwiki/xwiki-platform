@@ -21,7 +21,6 @@ package org.xwiki.ircbot.internal;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -74,18 +73,16 @@ public class ExtendedPircBotX extends PircBotX
     @Override
     public void sendMessage(Channel channel, User user, String message)
     {
-        if (!StringUtils.isEmpty(message)) {
-            String[] lines = message.split("[\\r\\n]+");
-            int counter = 0;
-            for (String line : lines) {
-                super.sendMessage(channel, user, line);
-                if (counter++ > 3) {
-                    break;
-                }
+        String[] lines = message.split("[\\r\\n]+");
+        int counter = 0;
+        for (String line : lines) {
+            super.sendMessage(channel, user, line);
+            if (counter++ > 3) {
+                break;
             }
-            if (counter < lines.length) {
-                super.sendMessage(channel, user, "... and " + (lines.length - counter) + " more lines...");
-            }
+        }
+        if (counter < lines.length) {
+            super.sendMessage(channel, user, "... and " + (lines.length - counter) + " more lines...");
         }
     }
 }

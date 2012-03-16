@@ -203,35 +203,12 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                     {
                         @Override public void execute() throws Exception
                         {
-                            respond(renderContent(xdom), event);
+                            event.respond(renderContent(xdom));
                         }
                     });
             } catch (Exception e) {
                 // An error happened, log a warning and do nothing
                 LOGGER.warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
-            }
-        }
-    }
-
-    /**
-     * Send a String content back to the IRC channel line by line with a maximum of 5 lines to prevent flooding.
-     *
-     * @param response the response to send
-     * @param event the Event that we use to send back the response
-     */
-    private void respond(String response, Event event)
-    {
-        if (!StringUtils.isEmpty(response)) {
-            String[] lines = response.split("[\\r\\n]+");
-            int counter = 0;
-            for (String line : lines) {
-                event.respond(line);
-                if (counter++ > 4) {
-                    break;
-                }
-            }
-            if (counter < lines.length) {
-                event.respond("... and " + (lines.length - counter) + " more lines...");
             }
         }
     }

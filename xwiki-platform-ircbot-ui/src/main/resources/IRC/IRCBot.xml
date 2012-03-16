@@ -147,13 +147,13 @@
 ## Display Bot Configuration
 ## -------------------------
 The following configuration is used:
-#set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCBotConfiguration'))
+#set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCConfiguration'))
 #set ($discard = $ircconfigdoc.use($doc.fullName))
 * Server: {{box}}$ircconfigdoc.getValue('server'){{/box}}
 * Channel: {{box}}$ircconfigdoc.getValue('channel'){{/box}}
 * Bot name: {{box}}$ircconfigdoc.getValue('botname'){{/box}}
 
-To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCBotConfiguration]].
+To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfiguration]].
 {{/velocity}}
 
 = Available Bot Listeners =

@@ -140,9 +140,9 @@
 <code>{{velocity}}
 ## ============================================
 ## Compute the page name in which to log by executing the script located
-## at IRC.IRCBotConfiguration in an IRC.LoggingBotListener object
+## at IRC.IRCConfiguration in an IRC.LoggingBotListener object
 ## ============================================
-#set ($configDoc = $xwiki.getDocument("IRC.IRCBotConfiguration"))
+#set ($configDoc = $xwiki.getDocument("IRC.IRCConfiguration"))
 #set ($logListenerDoc = $xwiki.getDocument("IRC.LoggingBotListener"))
 #set ($data = $configDoc.getObject("IRC.LoggingBotListener"))
 #set ($pageScript = $data.getProperty("page").getValue())

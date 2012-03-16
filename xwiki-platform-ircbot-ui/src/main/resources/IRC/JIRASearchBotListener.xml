@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>IRC</web>
-<name>JIRAIdBotListener</name>
+<name>JIRASearchBotListener</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>IRC.IRCBot</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.superadmin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.superadmin</contentAuthor>
-<creationDate>1331654461000</creationDate>
-<date>1331901740000</date>
-<contentUpdateDate>1331901740000</contentUpdateDate>
-<version>3.4</version>
-<title>JIRA Id Bot Listener</title>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1331898231000</creationDate>
+<date>1331901629000</date>
+<contentUpdateDate>1331901629000</contentUpdateDate>
+<version>1.1</version>
+<title>JIRA Search Bot Listener</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>Updated class property</comment>
-<minorEdit>true</minorEdit>
+<comment></comment>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
@@ -73,18 +73,18 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 </class>
-<name>IRC.JIRAIdBotListener</name>
+<name>IRC.JIRASearchBotListener</name>
 <number>0</number>
 <className>IRC.IRCBotListenerClass</className>
-<guid>ee0847e7-db8f-4819-9b29-7a3eac2179b0</guid>
+<guid>511e4a17-49b9-4bfb-9c79-b9b4f9d1b52a</guid>
 <property>
-<description>Displays description + URL of a JIRA issue when encountering a JIRA id in a typed message in the IRC channel</description>
+<description>!jira &lt;search term&gt;: Searches JIRA for the passed terms and return the first 5 results</description>
 </property>
 <property>
 <inactive></inactive>
 </property>
 <property>
-<name>JIRA Id</name>
+<name>JIRA Search</name>
 </property>
 </object>
 <object>
@@ -134,33 +134,39 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.JIRAIdBotListener</name>
+<name>IRC.JIRASearchBotListener</name>
 <number>0</number>
 <className>IRC.IRCBotListenerEventClass</className>
-<guid>6d832e6f-7fe1-4bd5-9072-e87b1ba61ac1</guid>
+<guid>00c13ba5-71ad-425e-9bd2-07c3198f1ee7</guid>
 <property>
 <event>onMessage</event>
 </property>
 <property>
 <script>{{groovy}}
-import java.util.regex.*
-
 def irccontext = services.get("ircbot").getContext() 
-def jiraURL = irccontext.get("jiraURL")
-def jiraPattern = irccontext.get("jiraPattern")
 def message = irccontext.get("message")
 
-if (jiraPattern != null &amp;&amp; jiraURL != null) {
-  def matcher = jiraPattern.matcher(message)
-  while(matcher.find()) {
-    def jiraIssue = matcher.group()
-    try {
-      def url = "${jiraURL}/si/jira.issueviews:issue-xml/${jiraIssue}/${jiraIssue}.xml?field=key&amp;field=summary&amp;field=status&amp;field=link".toURL().text
-      def root = new XmlSlurper().parseText(url)
-      println "${root.channel.item.key} - ${root.channel.item.summary} - ${root.channel.item.link} (${root.channel.item.status})"
-    } catch (Exception e) {
-      println "No such issue [${jiraIssue}]"
+if (message.startsWith("!jira")) {
+  int maxResults = 4
+  def query = message[6..-1]
+  def jiraURL = irccontext.get("jiraURL")
+
+  println "Results for JIRA search [${query}] (${maxResults} results only)"
+
+  try {
+    def jql = URLEncoder.encode("summary ~ ${query} OR description ~ ${query} OR comment ~ ${query}", "UTF-8")
+    def columns = "field=key&amp;field=summary&amp;field=status&amp;field=link"
+    def url = "${jiraURL}/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=${jql}&amp;${columns}&amp;tempMax=${maxResults}".toURL().text
+    def root = new XmlSlurper().parseText(url)
+
+    root.channel.item.each() {
+      println "  * ${it.key} - ${it.summary} - ${it.link}"
     }
+    if (root.channel.item.size() == 0) {
+      println "No match found!"
+    }
+  } catch (e) {
+    println "Error: ${e.message}"
   }
 }
 {{/groovy}}</script>
@@ -213,10 +219,10 @@ if (jiraPattern != null &amp;&amp; jiraURL != null) {
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </script>
 </class>
-<name>IRC.JIRAIdBotListener</name>
+<name>IRC.JIRASearchBotListener</name>
 <number>1</number>
 <className>IRC.IRCBotListenerEventClass</className>
-<guid>3687db2b-5e48-4b88-af6d-83326f13dac3</guid>
+<guid>45eb9bc5-9a5c-4f98-8c3c-02d9476e8308</guid>
 <property>
 <event>onRegistration</event>
 </property>
@@ -234,11 +240,6 @@ def mappings = [:]
 def url = object.getProperty("url").value
 if (url != null &amp;&amp; url.trim().length() &gt; 0) {
   mappings.put("jiraURL", url)
-}
-
-def pattern = object.getProperty("pattern").value
-if (pattern != null &amp;&amp; pattern.trim().length() &gt; 0) {
-  mappings.put("jiraPattern", Pattern.compile(pattern))
 }
 
 xcontext.put("irclistener", mappings)

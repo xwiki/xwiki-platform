@@ -119,7 +119,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Override
     public BotData loadBotData() throws IRCBotException
     {
-        BaseObject configurationObject = getIRCBotConfigurationObject();
+        BaseObject configurationObject = getIRCConfigurationObject();
         BotData botData = new BotData(
             configurationObject.getStringValue(BOTNAME_PROPERTY),
             configurationObject.getStringValue(SERVER_PROPERTY),
@@ -132,7 +132,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Override
     public void setActive(boolean isActive) throws IRCBotException
     {
-        getIRCBotConfigurationObject().set(INACTIVE_PROPERTY, isActive ? 0 : 1, getXWikiContext());
+        getIRCConfigurationObject().set(INACTIVE_PROPERTY, isActive ? 0 : 1, getXWikiContext());
     }
 
     @Override
@@ -184,16 +184,16 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     }
 
     /**
-     * @return the XObject in the IRC Configuration document that represents the IRC Bot Configuration.
+     * @return the XObject in the IRC Configuration document that represents the IRC Configuration.
      * @throws IRCBotException if the document failed to be retrieved
      */
-    private BaseObject getIRCBotConfigurationObject() throws IRCBotException
+    private BaseObject getIRCConfigurationObject() throws IRCBotException
     {
         XWikiDocument configurationDocument = getConfigurationDocument();
         BaseObject configurationObject = configurationDocument.getXObject(WIKI_BOT_CONFIGURATION_CLASS);
         if (configurationObject == null) {
             // There's no Bot Configuration object
-            throw new IRCBotException(String.format("Cannot find the IRC Bot Configuration object in the [%s] document",
+            throw new IRCBotException(String.format("Cannot find the IRC Configuration object in the [%s] document",
                 this.defaultSerializer.serialize(configurationDocument.getDocumentReference())));
         }
         return configurationObject;

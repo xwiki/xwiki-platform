@@ -25,20 +25,20 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 /**
- * Represents actions that can be done on the IRC.IRCBotConfiguration page.
+ * Represents actions that can be done on the IRC.IRCConfiguration page.
  *
  * @version $Id$
  * @since 4.0M2
  */
-public class IRCBotConfigurationPage extends ViewPage
+public class IRCConfigurationPage extends ViewPage
 {
     /**
      * Opens the page.
      */
-    public static IRCBotConfigurationPage gotoPage()
+    public static IRCConfigurationPage gotoPage()
     {
-        getUtil().gotoPage("IRC", "IRCBotConfiguration");
-        return new IRCBotConfigurationPage();
+        getUtil().gotoPage("IRC", "IRCConfiguration");
+        return new IRCConfigurationPage();
     }
 
     public void setLoggingPage(String name)

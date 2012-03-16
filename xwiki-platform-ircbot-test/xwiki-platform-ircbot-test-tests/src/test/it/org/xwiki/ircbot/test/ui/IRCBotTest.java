@@ -21,7 +21,7 @@ package org.xwiki.ircbot.test.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.ircbot.test.po.IRCBotConfigurationPage;
+import org.xwiki.ircbot.test.po.IRCConfigurationPage;
 import org.xwiki.ircbot.test.po.IRCBotPage;
 import org.xwiki.ircbot.test.po.WebHomePage;
 import org.xwiki.test.ui.AbstractTest;
@@ -66,7 +66,7 @@ public class IRCBotTest extends AbstractTest
 
         // Configure the Logging Bot Listener to log into a fixed name page so that we can easily delete that page at
         // the test start and find it easily to assert its content below.
-        IRCBotConfigurationPage configPage = IRCBotConfigurationPage.gotoPage();
+        IRCConfigurationPage configPage = IRCConfigurationPage.gotoPage();
         configPage.setLoggingPage(getTestClassName() + "." + ARCHIVE_PAGE);
     }
 

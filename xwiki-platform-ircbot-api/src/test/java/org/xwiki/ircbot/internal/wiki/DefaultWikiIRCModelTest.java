@@ -80,7 +80,7 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
 
         context.setProperty("xwikicontext", this.xwikiContext);
 
-        final DocumentReference configDocReference = new DocumentReference("xwiki", "IRC", "IRCBotConfiguration");
+        final DocumentReference configDocReference = new DocumentReference("xwiki", "IRC", "IRCConfiguration");
         this.configDoc = getMockery().mock(XWikiDocument.class);
 
         getMockery().checking(new Expectations()
@@ -111,7 +111,7 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
             this.model.loadBotData();
             Assert.fail("Should have thrown an exception");
         } catch (IRCBotException expected) {
-            Assert.assertEquals("Cannot find the IRC Bot Configuration object in the [xwiki:IRC.IRCBotConfiguration] "
+            Assert.assertEquals("Cannot find the IRC Configuration object in the [xwiki:IRC.IRCConfiguration] "
                 + "document", expected.getMessage());
         }
     }

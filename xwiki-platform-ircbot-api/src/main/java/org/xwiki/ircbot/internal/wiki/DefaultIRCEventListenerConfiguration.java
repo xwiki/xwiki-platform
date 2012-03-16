@@ -56,7 +56,7 @@ public class DefaultIRCEventListenerConfiguration implements IRCEventListenerCon
     {
         List<Pattern> patterns = new ArrayList<Pattern>();
 
-        // Look for IRC.IRCEventExclusionClass objects in the IRC.IRCBotConfiguration document
+        // Look for IRC.IRCEventExclusionClass objects in the IRC.IRCConfiguration document
         XWikiDocument configurationDocument = this.ircModel.getConfigurationDocument();
         List<BaseObject> exclusionObjects = configurationDocument.getXObjects(EXCLUSION_CLASS);
         if (exclusionObjects != null) {

@@ -129,9 +129,9 @@ public interface WikiIRCBotConstants
         new EntityReference(SPACE, EntityType.SPACE));
 
     /**
-     * Page containing Bot configuration data.
+     * Page containing IRC configuration data.
      */
-    String CONFIGURATION_PAGE = "IRCBotConfiguration";
+    String CONFIGURATION_PAGE = "IRCConfiguration";
 
     /**
      * Property for the Bot's name.

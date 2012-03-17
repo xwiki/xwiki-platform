@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.IRCEventListenerConfiguration;
+import org.xwiki.ircbot.NotificationEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -37,18 +37,18 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Provides configuration data for the {@link org.xwiki.ircbot.internal.IRCEventListener} Event Listener.
+ * Provides configuration data for the {@link NotificationEventListener} Event Listener.
  *
  * @version $Id$
  * @since 4.0M2
  */
 @Component
 @Singleton
-public class DefaultIRCEventListenerConfiguration implements IRCEventListenerConfiguration
+public class DefaultNotificationEventListenerConfiguration implements NotificationEventListenerConfiguration
 {
     /**
-     * Property to represent exclusion patterns for the IRC Event Listener (references matching those patterns are not
-     * notified on the IRC channel).
+     * Property to represent exclusion patterns for the Notification Event Listener (references matching those patterns
+     * are not notified on the IRC channel).
      */
     String PATTERN_PROPERTY = "pattern";
 

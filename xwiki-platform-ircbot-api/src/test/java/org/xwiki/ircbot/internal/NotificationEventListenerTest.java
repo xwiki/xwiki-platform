@@ -28,7 +28,7 @@ import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.ircbot.IRCBot;
-import org.xwiki.ircbot.IRCEventListenerConfiguration;
+import org.xwiki.ircbot.NotificationEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -41,15 +41,15 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
- * Unit tests for {@link IRCEventListener}.
+ * Unit tests for {@link NotificationEventListener}.
  *
  * @version $Id$
  * @since 4.0M2
  */
-public class IRCEventListenerTest extends AbstractMockingComponentTestCase
+public class NotificationEventListenerTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement
-    private IRCEventListener listener;
+    private NotificationEventListener listener;
 
     @Test
     public void onEventWhenBotNotStarted() throws Exception
@@ -94,8 +94,8 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final IRCEventListenerConfiguration configuration =
-            getComponentManager().lookupComponent(IRCEventListenerConfiguration.class);
+        final NotificationEventListenerConfiguration configuration =
+            getComponentManager().lookupComponent(NotificationEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
 
@@ -139,8 +139,8 @@ public class IRCEventListenerTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final IRCEventListenerConfiguration configuration =
-            getComponentManager().lookupComponent(IRCEventListenerConfiguration.class);
+        final NotificationEventListenerConfiguration configuration =
+            getComponentManager().lookupComponent(NotificationEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
 
         getMockery().checking(new Expectations()

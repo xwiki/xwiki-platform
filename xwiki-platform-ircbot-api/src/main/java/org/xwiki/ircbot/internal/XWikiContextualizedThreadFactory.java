@@ -98,8 +98,8 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
                 XWikiContext xwikiContext = stubContextProvider.createStubContext();
                 context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
 
-                // Ensure that the Servlet URL Factory is used since the IRC Event Listener needs to compute
-                // External URLs.
+                // Ensure that the Servlet URL Factory is used since the Notifications Event Listener needs to compute
+                // External URLs (for example).
                 XWikiURLFactory urlf = xwikiContext.getWiki().getURLFactoryService().createURLFactory(
                     XWikiContext.MODE_SERVLET, xwikiContext);
                 xwikiContext.setURLFactory(urlf);

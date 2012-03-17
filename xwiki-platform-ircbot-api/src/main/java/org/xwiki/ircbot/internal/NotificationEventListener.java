@@ -35,7 +35,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.IRCEventListenerConfiguration;
+import org.xwiki.ircbot.NotificationEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -53,7 +53,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("ircdocumentevents")
 @Singleton
-public class IRCEventListener implements EventListener
+public class NotificationEventListener implements EventListener
 {
     /**
      * Used to send messages to the Bot and to verify if the Bot is started.
@@ -65,7 +65,7 @@ public class IRCEventListener implements EventListener
      * Configuration data for this listener.
      */
     @Inject
-    private IRCEventListenerConfiguration configuration;
+    private NotificationEventListenerConfiguration configuration;
 
     /**
      * Used to generate a String out of the reference to the Document in received Events so that it can be compared

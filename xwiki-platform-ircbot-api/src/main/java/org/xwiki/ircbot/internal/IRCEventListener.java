@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot.internal.wiki;
+package org.xwiki.ircbot.internal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +35,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.wiki.IRCEventListenerConfiguration;
+import org.xwiki.ircbot.IRCEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;

@@ -152,16 +152,4 @@ public interface WikiIRCBotConstants
      * Property for the password to identify the user with the IRC server.
      */
     String PASSWORD_PROPERTY = "password";
-
-    /**
-     * IRC.IRCEventExclusionClass xwiki class.
-     */
-    EntityReference EXCLUSION_CLASS = new EntityReference("IRCEventExclusionClass", EntityType.DOCUMENT,
-        new EntityReference(SPACE, EntityType.SPACE));
-
-    /**
-     * Property to represent exclusion patterns for the IRC Event Listener (references matching those patterns are not
-     * notified on the IRC channel).
-     */
-    String PATTERN_PROPERTY = "pattern";
 }

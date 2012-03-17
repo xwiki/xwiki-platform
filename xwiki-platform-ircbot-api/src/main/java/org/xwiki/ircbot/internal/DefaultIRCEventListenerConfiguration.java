@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ircbot.internal.wiki;
+package org.xwiki.ircbot.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,23 +28,36 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.wiki.IRCEventListenerConfiguration;
-import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
+import org.xwiki.ircbot.IRCEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Provides configuration data for the {@link IRCEventListener} Event Listener.
+ * Provides configuration data for the {@link org.xwiki.ircbot.internal.IRCEventListener} Event Listener.
  *
  * @version $Id$
  * @since 4.0M2
  */
 @Component
 @Singleton
-public class DefaultIRCEventListenerConfiguration implements IRCEventListenerConfiguration, WikiIRCBotConstants
+public class DefaultIRCEventListenerConfiguration implements IRCEventListenerConfiguration
 {
+    /**
+     * Property to represent exclusion patterns for the IRC Event Listener (references matching those patterns are not
+     * notified on the IRC channel).
+     */
+    String PATTERN_PROPERTY = "pattern";
+
+    /**
+     * IRC.IRCEventExclusionClass xwiki class.
+     */
+    EntityReference EXCLUSION_CLASS = new EntityReference("IRCEventExclusionClass", EntityType.DOCUMENT,
+        new EntityReference("IRC", EntityType.SPACE));
+
     /**
      * Provides access to the Bot configuration data stored in a wiki page.
      */

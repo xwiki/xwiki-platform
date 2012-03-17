@@ -99,9 +99,9 @@ public class IRCBotTest extends AbstractTest
         Assert.assertTrue(page.isBotListenerStarted("AutoReconnect"));
 
         // Create a new page for 2 reasons:
-        // - It allows us testing the Notifications Event Listener since a message will be sent to the IRC Channel
+        // - It allows us testing the Document Modified Event Listener since a message will be sent to the IRC Channel
         // - In the content of this page we get access to the list of messages sent to the IRC channel and we can
-        //    verify that the Notifications Event Listener has sent the correct message to the channel
+        //    verify that the Document Modified Event Listener has sent the correct message to the channel
         final ViewPage messagesPage = getUtil().createPage(getTestClassName(), SERVER_PAGE,
               "{{velocity}}\n"
             + "#if (\"$!request.message\" != \"\")\n"

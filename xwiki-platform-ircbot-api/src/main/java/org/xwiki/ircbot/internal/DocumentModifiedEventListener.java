@@ -33,9 +33,9 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.ircbot.DocumentModifiedEventListenerConfiguration;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.NotificationEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -51,9 +51,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 4.0M2
  */
 @Component
-@Named("ircdocumentevents")
+@Named("ircdocumentmodified")
 @Singleton
-public class NotificationEventListener implements EventListener
+public class DocumentModifiedEventListener implements EventListener
 {
     /**
      * Used to send messages to the Bot and to verify if the Bot is started.
@@ -65,7 +65,7 @@ public class NotificationEventListener implements EventListener
      * Configuration data for this listener.
      */
     @Inject
-    private NotificationEventListenerConfiguration configuration;
+    private DocumentModifiedEventListenerConfiguration configuration;
 
     /**
      * Used to generate a String out of the reference to the Document in received Events so that it can be compared
@@ -95,7 +95,7 @@ public class NotificationEventListener implements EventListener
     @Override
     public String getName()
     {
-        return "ircdocumentevents";
+        return "ircdocumentmodified";
     }
 
     @Override

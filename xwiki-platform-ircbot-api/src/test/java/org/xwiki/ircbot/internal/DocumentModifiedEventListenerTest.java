@@ -27,8 +27,8 @@ import java.util.regex.Pattern;
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.ircbot.DocumentModifiedEventListenerConfiguration;
 import org.xwiki.ircbot.IRCBot;
-import org.xwiki.ircbot.NotificationEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -41,15 +41,15 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
- * Unit tests for {@link NotificationEventListener}.
+ * Unit tests for {@link DocumentModifiedEventListener}.
  *
  * @version $Id$
  * @since 4.0M2
  */
-public class NotificationEventListenerTest extends AbstractMockingComponentTestCase
+public class DocumentModifiedEventListenerTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement
-    private NotificationEventListener listener;
+    private DocumentModifiedEventListener listener;
 
     @Test
     public void onEventWhenBotNotStarted() throws Exception
@@ -94,8 +94,8 @@ public class NotificationEventListenerTest extends AbstractMockingComponentTestC
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final NotificationEventListenerConfiguration configuration =
-            getComponentManager().lookupComponent(NotificationEventListenerConfiguration.class);
+        final DocumentModifiedEventListenerConfiguration configuration =
+            getComponentManager().lookupComponent(DocumentModifiedEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
 
@@ -139,8 +139,8 @@ public class NotificationEventListenerTest extends AbstractMockingComponentTestC
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final NotificationEventListenerConfiguration configuration =
-            getComponentManager().lookupComponent(NotificationEventListenerConfiguration.class);
+        final DocumentModifiedEventListenerConfiguration configuration =
+            getComponentManager().lookupComponent(DocumentModifiedEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
 
         getMockery().checking(new Expectations()

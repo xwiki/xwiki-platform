@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.ircbot.DocumentModifiedEventListenerConfiguration;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.NotificationEventListenerConfiguration;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -37,29 +37,29 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Provides configuration data for the {@link NotificationEventListener} Event Listener.
+ * Provides configuration data for the {@link DocumentModifiedEventListener} Event Listener.
  *
  * @version $Id$
  * @since 4.0M2
  */
 @Component
 @Singleton
-public class DefaultNotificationEventListenerConfiguration implements NotificationEventListenerConfiguration
+public class DefaultDocumentModifiedEventListenerConfiguration implements DocumentModifiedEventListenerConfiguration
 {
     /**
-     * Property to represent exclusion patterns for the Notification Event Listener (references matching those patterns
-     * are not notified on the IRC channel).
+     * Property to represent exclusion patterns for the Document Modified Event Listener (references matching those
+     * patterns are not notified on the IRC channel).
      */
-    String PATTERN_PROPERTY = "pattern";
+    private static final String PATTERN_PROPERTY = "pattern";
 
     /**
-     * IRC.IRCEventExclusionClass xwiki class.
+     * IRC.DocumentModifiedClass xwiki class.
      */
-    EntityReference EXCLUSION_CLASS = new EntityReference("IRCEventExclusionClass", EntityType.DOCUMENT,
-        new EntityReference("IRC", EntityType.SPACE));
+    private static final EntityReference CONFIGURATION_CLASS = new EntityReference("DocumentModifiedClass",
+        EntityType.DOCUMENT, new EntityReference("IRC", EntityType.SPACE));
 
     /**
-     * Provides access to the Bot configuration data stored in a wiki page.
+     * Provides access to the configuration data stored in a wiki page.
      */
     @Inject
     private WikiIRCModel ircModel;
@@ -69,9 +69,9 @@ public class DefaultNotificationEventListenerConfiguration implements Notificati
     {
         List<Pattern> patterns = new ArrayList<Pattern>();
 
-        // Look for IRC.IRCEventExclusionClass objects in the IRC.IRCConfiguration document
+        // Look for IRC.DocumentModifiedClass objects in the IRC.IRCConfiguration document
         XWikiDocument configurationDocument = this.ircModel.getConfigurationDocument();
-        List<BaseObject> exclusionObjects = configurationDocument.getXObjects(EXCLUSION_CLASS);
+        List<BaseObject> exclusionObjects = configurationDocument.getXObjects(CONFIGURATION_CLASS);
         if (exclusionObjects != null) {
             for (BaseObject exclusionObject : exclusionObjects) {
                 String pattern = exclusionObject.getStringValue(PATTERN_PROPERTY);

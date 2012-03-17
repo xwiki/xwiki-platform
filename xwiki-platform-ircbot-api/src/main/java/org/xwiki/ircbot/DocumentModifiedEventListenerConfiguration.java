@@ -25,14 +25,14 @@ import java.util.regex.Pattern;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Configuration for the Notifications Event Listener (ie the listener that sends IRC events when a document is
+ * Configuration for the Document Modifier Event Listener (ie the listener that sends IRC messages when a document is
  * modified).
  *
  * @version $Id$
  * @since 4.0M2
  */
 @Role
-public interface NotificationEventListenerConfiguration
+public interface DocumentModifiedEventListenerConfiguration
 {
     /**
      * @return the regex patterns to use to decide if a notification for a given document reference should be sent or

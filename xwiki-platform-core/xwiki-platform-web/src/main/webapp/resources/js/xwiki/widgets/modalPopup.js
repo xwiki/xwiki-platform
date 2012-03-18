@@ -4,6 +4,7 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
 widgets.ModalPopup = Class.create({
   /** Configuration. Empty values will fall back to the CSS. */
   options : {
+    globalDialog : true,
     title : "",
     displayCloseButton : true,
     screenColor : "",
@@ -113,17 +114,27 @@ widgets.ModalPopup = Class.create({
       Event.stop(event);
     }
     // Only do this if the dialog is not already active.
-    if (!widgets.ModalPopup.active) {
-      widgets.ModalPopup.active = true;
-      if (!this.dialog) {
-        // The dialog wasn't loaded, create it.
-        this.createDialog();
+    if (this.options.globalDialog) {
+      if (widgets.ModalPopup.active) {
+        return;
+      } else {
+        widgets.ModalPopup.active = true;
       }
-      // Start listening to keyboard events
-      this.attachKeyListeners();
-      // Display the dialog
-      this.dialog.show();
+    } else {
+      if (this.active) {
+        return;
+      } else {
+        this.active = true;
+      }
     }
+    if (!this.dialog) {
+      // The dialog wasn't loaded, create it.
+      this.createDialog();
+    }
+    // Start listening to keyboard events
+    this.attachKeyListeners();
+    // Display the dialog
+    this.dialog.show();
   },
   /** Called when the dialog is closed. Disables the key listeners, hides the UI and re-enables the 'Show' behavior. */
   closeDialog : function(event) {
@@ -140,7 +151,11 @@ widgets.ModalPopup = Class.create({
     // Stop the UI shortcuts (except the initial Show Dialog one).
     this.detachKeyListeners();
     // Re-enable the 'show' behavior.
-    widgets.ModalPopup.active = false;
+    if (this.options.globalDialog) {
+      widgets.ModalPopup.active = false;
+    } else {
+      this.active = false;
+    }
   },
   /** Enables all the keyboard shortcuts, except the one that opens the dialog, which is already enabled. */
   attachKeyListeners : function() {

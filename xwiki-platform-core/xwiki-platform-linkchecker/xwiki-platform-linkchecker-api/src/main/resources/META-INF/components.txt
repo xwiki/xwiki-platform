@@ -1,0 +1,2 @@
+org.xwiki.linkchecker.internal.LinkCheckerEventListener
+org.xwiki.linkchecker.internal.ContextLinkCheckerThreadInitializer

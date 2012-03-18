@@ -46,6 +46,9 @@
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
       com.xpn.xwiki.plugin.lucene.LucenePlugin
     </xwikiCfgPlugins>
+    <!-- Override in order to activate the Link Checker transformation for the Broken Links Bot Listener and Broken
+         Link Event Listener -->
+    <xwikiRenderingTransformations>macro, icon, linkchecker</xwikiRenderingTransformations>
   </properties>
   <dependencies>
     <dependency>

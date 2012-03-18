@@ -44,7 +44,7 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
     private Execution execution;
 
     /**
-     * Used to create a new Execution Contexte from scratch.
+     * Used to create a new Execution Context from scratch.
      */
     private ExecutionContextManager executionContextManager;
 

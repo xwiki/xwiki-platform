@@ -10,3 +10,4 @@ org.xwiki.ircbot.internal.DocumentModifiedEventListener
 org.xwiki.ircbot.internal.DefaultDocumentModifiedEventListenerConfiguration
 org.xwiki.ircbot.internal.BrokenLinkEventListener
 org.xwiki.ircbot.internal.DefaultBrokenLinkEventListenerConfiguration
+org.xwiki.ircbot.internal.BrokenLinksBotListener

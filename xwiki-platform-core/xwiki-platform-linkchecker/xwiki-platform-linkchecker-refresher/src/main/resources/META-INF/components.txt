@@ -1,1 +1,0 @@
-org.xwiki.linkchecker.internal.LinkCheckerEventListener

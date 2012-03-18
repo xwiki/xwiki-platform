@@ -35,7 +35,7 @@
   <description>XWiki Platform - LinkChecker - Parent POM</description>
   <modules>
     <module>xwiki-platform-linkchecker-ui</module>
-    <module>xwiki-platform-linkchecker-refresher</module>
+    <module>xwiki-platform-linkchecker-api</module>
   </modules>
   <profiles>
     <profile>

@@ -121,33 +121,14 @@ widgets.ModalPopup = Class.create({
       }
       // Start listening to keyboard events
       this.attachKeyListeners();
-      // In IE, position: fixed does not work.
-      if (window.browser.isIE6x) {
-        this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
-        this.dialog._x_scrollListener = this.onScroll.bindAsEventListener(this);
-        Event.observe(window, "scroll", this.dialog._x_scrollListener);
-        $$("select").each(function(item) {
-          item._x_initiallyVisible = item.style.visibility;
-          item.style.visibility = 'hidden';
-        });
-      }
       // Display the dialog
       this.dialog.show();
     }
-  },
-  onScroll : function(event) {
-    this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
   },
   /** Called when the dialog is closed. Disables the key listeners, hides the UI and re-enables the 'Show' behavior. */
   closeDialog : function(event) {
     if (event) {
       Event.stop(event);
-    }
-    if (window.browser.isIE6x) {
-      Event.stopObserving(window, "scroll", this.dialog._x_scrollListener);
-      $$("select").each(function(item) {
-        item.style.visibility = item._x_initiallyVisible;
-      });
     }
     // Call optional callback
     this.options.onClose.call(this);

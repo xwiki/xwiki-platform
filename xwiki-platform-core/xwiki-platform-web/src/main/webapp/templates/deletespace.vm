@@ -18,7 +18,7 @@
 #else
   #set ($confirmationMessage = $msg.get('core.space.delete.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))
 #end
-#xwikimessagebox($msg.get('core.delete') $confirmationMessage $doc.getURL('deletespace', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}") $cancelURL $msg.get('yes') $msg.get('no'))
+#xwikimessagebox($msg.get('core.delete') $confirmationMessage $doc.getURL('deletespace', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}") $escapetool.xml($cancelURL) $msg.get('yes') $msg.get('no'))
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main

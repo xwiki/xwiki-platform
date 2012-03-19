@@ -167,17 +167,18 @@ ${escapetool.h}set(${escapetool.d}msg = ${escapetool.d}originalMsg)
   $output.replace($escapedEmptyValueTranslationKey, '-')
 #end
 {{/velocity}}{{velocity}}
+#set($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
 ## We do the include separately because the wiki syntax is evaluated after the Velocity code.
-#if("$!request.collist" != '')
+#if($isLiveTableResultsRequest)
   {{include document="XWiki.LiveTableResultsMacros" /}}
 #end
 {{/velocity}}{{velocity wiki="false"}}
 ## We need custom live table results just because we don't generate/register a document translation bundle yet.
-#if("$!request.collist" != '')
+#if($isLiveTableResultsRequest)
   #outputLiveTableResults()
 #end
 {{/velocity}}{{velocity}}
-#if("$!request.collist" == '')
+#if(!$isLiveTableResultsRequest)
   #maybeGenerateLiveTable()
 #end
 {{/velocity}}</content></xwikidoc>

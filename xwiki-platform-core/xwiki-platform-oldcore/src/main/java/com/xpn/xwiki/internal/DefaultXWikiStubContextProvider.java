@@ -93,9 +93,11 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         // Set the URL Factory so that the URL Factory doesn't depend of the mode of the first action that entered
         // the system (Servlet, PDF, GWT, Portlet, etc).
         // We decide arbitrarily to use the Servlet URL Factory since it's the "standard" factory.
-        XWikiURLFactory urlf =
-            newContext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, context);
-        context.setURLFactory(urlf);
+        if (newContext.getURLFactory() != null) {
+            XWikiURLFactory urlf =
+                newContext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, context);
+            newContext.setURLFactory(urlf);
+        }
 
         this.initialContext = newContext;
         this.logger.debug("Stub context initialized.");

@@ -284,6 +284,45 @@ return XWiki;
 </object>
 <object>
 <class>
+<name>XWiki.RequiredRightClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<level>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>level</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>level</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values>edit|programming</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</level>
+</class>
+<name>AppWithinMinutes.LiveTableEditSheet</name>
+<number>0</number>
+<className>XWiki.RequiredRightClass</className>
+<guid>c8e4a863-1a27-47d5-bb40-a37bcd27508d</guid>
+<property>
+<level>programming</level>
+</property>
+</object>
+<object>
+<class>
 <name>XWiki.SheetDescriptorClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -581,6 +620,24 @@ return XWiki;
   {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
 #end
 
+#macro(maybeGrantSpaceAdminRights)
+  #set($spaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+  ## Grant space administration rights only if the space is new.
+  #if(!$xwiki.exists($spaceHomeRef))
+    #set($spacePrefsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+    #set($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
+    ## Don't overwrite existing space preferences.
+    #if($spacePrefsDoc.isNew())
+      #set($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
+      #set($discard = $spacePrefsDoc.set('allow', 1))
+      #set($discard = $spacePrefsDoc.set('levels', 'admin'))
+      #set($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
+      #set($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
+      #set($discard = $spacePrefsDoc.saveWithProgrammingRights($msg.get('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
+    #end
+  #end
+#end
+
 #macro(updateAndSaveLiveTable)
   #set($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
   #set($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
@@ -594,6 +651,7 @@ return XWiki;
 #end
 
 #macro(doSave)
+  #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
   #if($action == 'save')
     #if($errorMessage)

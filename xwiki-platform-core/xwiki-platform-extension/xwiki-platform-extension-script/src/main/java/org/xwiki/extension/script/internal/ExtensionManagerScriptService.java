@@ -400,6 +400,8 @@ public class ExtensionManagerScriptService implements ScriptService
     /**
      * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
      * other job is in progress already.
+     * <p>
+     * Only uninstall from the provided namespace.
      * 
      * @param id the identifier of the extension to remove
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
@@ -437,8 +439,46 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
+     * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
+     * other job is in progress already.
+     * <p>
+     * Uninstall from all namepspace.
+     * 
+     * @param extensionId the identifier of the extension to remove
+     * @return the {@link Job} object which can be used to monitor the progress of the uninstallation process, or
+     *         {@code null} in case of failure
+     */
+    public Job uninstall(ExtensionId extensionId)
+    {
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            setError(new JobException("Need programming right to uninstall an extension"));
+
+            return null;
+        }
+
+        setError(null);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(extensionId.getId());
+        uninstallRequest.addExtension(extensionId);
+
+        Job job;
+        try {
+            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
+        } catch (Exception e) {
+            setError(e);
+
+            job = null;
+        }
+
+        return job;
+    }
+
+    /**
      * Start the asynchronous uninstallation plan creation process for an extension if no other job is in progress
      * already.
+     * <p>
+     * Only uninstall from the provided namespace.
      * 
      * @param id the identifier of the extension to install
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
@@ -455,6 +495,37 @@ public class ExtensionManagerScriptService implements ScriptService
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
         }
+
+        ExtensionPlan status;
+        try {
+            status =
+                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE,
+                    uninstallRequest).getStatus());
+        } catch (JobException e) {
+            setError(e);
+
+            status = null;
+        }
+
+        return status;
+    }
+
+    /**
+     * Start the asynchronous uninstallation plan creation process for an extension if no other job is in progress
+     * already.
+     * <p>
+     * Uninstall from all namepspace.
+     * 
+     * @param extensionId the identifier of the extension to install
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
+    {
+        setError(null);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.addExtension(extensionId);
 
         ExtensionPlan status;
         try {

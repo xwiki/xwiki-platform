@@ -27,37 +27,52 @@
 }
 .xdialog-box {
   text-align: left;
-  padding: 10px;
+  padding: 0;
   margin: auto;
   position: relative;
   width: 400px;
-  color: $theme.textColor;
-  border: 2px solid $theme.borderColor;
-  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.panelTextColor;
+  border: 1px solid $theme.borderColor;
+  background-color: $theme.panelBackgroundColor;
+  border-radius: 4px;
+  box-shadow: 0 0 7px $theme.borderColor;
+}
+.xdialog-box .xdialog-content {
+  margin: .8em;
 }
 .xdialog-close {
   float: right;
   cursor: pointer;
-  margin: -8px -8px 8px 5px;
-  width: 12px;
-  height: 12px;
+  width: .8em;
+  margin-right: .4em;
+  height: 1.4em;
   text-align : center; 
   font-weight: bold;
-  font-size: 13px;
-  text-transform: lowercase;
   font-family: Arial, Helvetica, sans-serif;
-  line-height: 8px;
-  color: $theme.textColor;
+  line-height: 1.4em;
+  color: $theme.panelTextColor;
 }
-* html .xdialog-close {
-  width: 22px;
+.xdialog-title .xdialog-close {
+  font-size: 1.25em;
+  margin-right: -0.56em;
+  margin-top: -0.24em;
+  color: $theme.panelHeaderTextColor;
 }
 .xdialog-title {
   font-size: 80%;
   font-weight: bold;
-  margin-top: -5px;
-  margin-bottom: 10px;
-  color: $theme.textColor;
+  padding: .3em 1.2em .3em .8em;
+  background-color: $theme.panelHeaderBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'angle': 'top',
+     'colors': [
+      {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
+      {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
+    ]
+  })
+  border-radius: 4px 4px 0 0;
+  color: $theme.panelHeaderTextColor;
+  text-shadow: 0 1px 0 $theme.panelHeaderGradientColor;
 }
 .xdialog-box .xform { 
   width: 100%;

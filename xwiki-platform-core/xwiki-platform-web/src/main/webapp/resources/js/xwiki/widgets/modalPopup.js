@@ -45,7 +45,7 @@ widgets.ModalPopup = Class.create({
     // The dialog chrome
     this.dialogBox = new Element('div', {'class': 'xdialog-box'});
     // Insert the content
-    this.dialogBox._x_contentPlug = new Element('div');
+    this.dialogBox._x_contentPlug = new Element('div', {'class' : 'xdialog-content'});
     this.dialogBox.update(this.dialogBox._x_contentPlug);
     this.dialogBox._x_contentPlug.update(this.content);
     // Add the dialog title
@@ -57,9 +57,15 @@ widgets.ModalPopup = Class.create({
     // Add the close button
     if (this.options.displayCloseButton) {
       var closeButton = new Element('div', {'class': 'xdialog-close', 'title': 'Close'}).update("&#215;");
-      closeButton.setStyle({"color": this.options.titleColor});
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
-      this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+      if (this.options.title) {
+        title.insert({bottom: closeButton});
+        if (this.options.titleColor) {
+          closeButton.setStyle({"color": this.options.titleColor});
+        }
+      } else {
+        this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+      }
     }
     this.dialog.appendChild(this.dialogBox);
     this.dialogBox.setStyle({

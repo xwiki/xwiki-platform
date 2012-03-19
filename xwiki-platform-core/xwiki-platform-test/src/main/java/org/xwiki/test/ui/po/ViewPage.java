@@ -56,9 +56,6 @@ public class ViewPage extends BasePage
     @FindBy(id = "tmCreateSpace")
     private WebElement createSpaceMenuLink;
 
-    @FindBy(id = "tmAdminWiki")
-    private WebElement administerWikiMenuLink;
-
     @FindBy(id = "xwikicontent")
     private WebElement content;
 
@@ -210,11 +207,11 @@ public class ViewPage extends BasePage
         return new CopyPage();
     }
 
-    public DeletePage delete()
+    public ConfirmationPage delete()
     {
         hoverOverMenu("tmPage");
         this.deletePageLink.click();
-        return new DeletePage();
+        return new ConfirmationPage();
     }
 
     public boolean canDelete()

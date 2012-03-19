@@ -23,33 +23,33 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents the common actions possible after a Page has been deleted.
+ * Represents a confirmation page that allows the user cancel or confirm the current action (e.g. delete a page, delete
+ * a space, etc.).
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.0M2
  */
-public class DeleteConfirmationPage extends ViewPage
+public class ConfirmationPage extends ViewPage
 {
-    @FindBy(xpath = "//table[@class='centered']//span[@class='wikilink']")
-    private WebElement deletingUser;
+    @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//input[@value = 'yes']")
+    private WebElement yesButton;
 
-    @FindBy(xpath = "//p[@class='xwikimessage']")
-    private WebElement confirmationMessage;
+    @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//input[@value = 'no']")
+    private WebElement noButton;
 
     /**
-     * @since 3.2M3
+     * Clicks on the Yes button to confirm the current action.
      */
-    public String getPageDeleter()
+    public void clickYes()
     {
-        return this.deletingUser.getText();
+        this.yesButton.click();
     }
 
     /**
-     * @since 3.2M3
+     * Clicks on the No button to cancel the current action.
      */
-    public String getConfirmationMessage()
+    public void clickNo()
     {
-        return this.confirmationMessage.getText();
+        this.noButton.click();
     }
-
 }

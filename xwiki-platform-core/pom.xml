@@ -256,7 +256,6 @@
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-invitation</module>
-    <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-legacy</module>

@@ -28,14 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -60,9 +62,23 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 @Component
 @Named("R40001XWIKI7540")
-@Singleton
 public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
+    /** Everybody logs... sometimes. */
+    @Inject
+    protected Logger logger;
+
+    /** Used to serialize document references when logging. */
+    @Inject
+    protected EntityReferenceSerializer<String> referenceSerializer;
+
+    /** Holds the work to be done by grouping datedComments by documents. */
+    protected Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap =
+        new HashMap<DocumentReference, List<Entry<Date, BaseObject>>>();
+
+    /** Holds the work to be done by grouping properties by the objects to which they belong. */
+    protected Map<BaseObject, List<BaseProperty>> objectToPropertiesMap = new HashMap<BaseObject, List<BaseProperty>>();
+
     @Override
     public String getDescription()
     {
@@ -79,21 +95,37 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new InternalHibernateCallback());
+        logger.info("Computing the work to be done.");
+
+        // 1st step: populate the 2 maps with the work to be done.
+        getStore().executeRead(getXWikiContext(), true, new GetWorkToBeDoneHibernateCallback());
+
+        logger.info("There is a total of {} documents to migrate.", documentToDatedObjectsMap.keySet().size());
+
+        // 2nd step: for each document, delete the old objects and create new (updated) ones. One transaction per
+        // document.
+        DoWorkOnDocumentHibernateCallback doWorkOnDocumentHibernateCallback = new DoWorkOnDocumentHibernateCallback();
+        for (DocumentReference documentReference : documentToDatedObjectsMap.keySet()) {
+            logger.info("Migrating document {}", referenceSerializer.serialize(documentReference, (Object[]) null));
+
+            doWorkOnDocumentHibernateCallback.setDocumentReference(documentReference);
+            getStore().executeWrite(getXWikiContext(), true, doWorkOnDocumentHibernateCallback);
+        }
     }
 
     /**
-     * Inner class for the HibernateCallback in order to avoid using an anonymous one.
+     * Inner class that retrieves the documents, objects and properties that need to be migrated.
      * 
      * @version $Id$
      */
-    private class InternalHibernateCallback implements HibernateCallback<Object>
+    private class GetWorkToBeDoneHibernateCallback implements HibernateCallback<Object>
     {
         @Override
         public Object doInHibernate(Session session) throws HibernateException, XWikiException
         {
             try {
-                // Get each annotation object and every property corresponding to it.
+                // Get all annotation object and comment object with every property that they have. Do this only for
+                // documents that have annotation objects in them, and thus need to be migrated.
                 Query getExistingAnnotationsAndCommentsQuery =
                     session.createQuery("SELECT obj, prop FROM BaseObject obj, BaseProperty prop WHERE "
                         + "(obj.className='AnnotationCode.AnnotationClass' OR obj.className='XWiki.XWikiComments') "
@@ -102,101 +134,117 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                         + "ann.name=doc.fullName AND ann.className='AnnotationCode.AnnotationClass')");
                 List<Object[]> queryResults = (List<Object[]>) getExistingAnnotationsAndCommentsQuery.list();
 
-                // Build a map that groups datedComments by documents and a map that groups objects with their
-                // properties.
-                Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap =
-                    new HashMap<DocumentReference, List<Entry<Date, BaseObject>>>();
-                Map<BaseObject, List<BaseProperty>> objectToPropertiesMap =
-                    new HashMap<BaseObject, List<BaseProperty>>();
-
-                // Populate the maps and delete the existing session objects and properties.
-                preProcessResults(queryResults, documentToDatedObjectsMap, objectToPropertiesMap, session);
-
-                // Parse the maps and create new objects and properties in the session that replace the old ones.
-                processObjects(documentToDatedObjectsMap, objectToPropertiesMap, session);
+                preProcessResults(queryResults, session);
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                    getName() + " migration failed", e);
+                    getName() + " failed to read the work to be done.", e);
             }
 
             return Boolean.TRUE;
         }
-    }
 
-    /**
-     * Pre-process the results into data structures that can be easily worked with. Also make sure to delete from the
-     * hibernate session all the objects and properties because they might clash IDs with the new ones that we will
-     * replace them later on. This is caused by the fact that the changes that we need to do are part of the computed
-     * object ID, making updates impossible.
-     * 
-     * @param queryResults an array containing multiple [comment, property] arrays
-     * @param documentToDatedObjectsMap empty map that is to contain a mapping of documents to dated objects
-     * @param objectToPropertiesMap empty map that is to contain a mapping of objects to their properties
-     * @param session the Hibernate session
-     * @throws HibernateException if underlying Hibernate operations fail
-     */
-    private void preProcessResults(List<Object[]> queryResults,
-        Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap,
-        Map<BaseObject, List<BaseProperty>> objectToPropertiesMap, Session session) throws HibernateException
-    {
-        for (Object[] queryResult : queryResults) {
-            BaseObject object = (BaseObject) queryResult[0];
-            BaseProperty property = (BaseProperty) queryResult[1];
-            DocumentReference documentReference = object.getDocumentReference();
+        /**
+         * Pre-process the results into data structures that can be easily worked with.
+         * 
+         * @param queryResults an array containing multiple [comment, property] arrays
+         * @param session the Hibernate session
+         * @throws HibernateException if underlying Hibernate operations fail
+         */
+        private void preProcessResults(List<Object[]> queryResults, Session session) throws HibernateException
+        {
+            for (Object[] queryResult : queryResults) {
+                BaseObject object = (BaseObject) queryResult[0];
+                BaseProperty property = (BaseProperty) queryResult[1];
+                DocumentReference documentReference = object.getDocumentReference();
 
-            if (property instanceof DateProperty) {
-                List<Entry<Date, BaseObject>> datedObjects = documentToDatedObjectsMap.get(documentReference);
-                if (datedObjects == null) {
-                    datedObjects = new ArrayList<Map.Entry<Date, BaseObject>>();
-                    documentToDatedObjectsMap.put(documentReference, datedObjects);
+                if (property instanceof DateProperty) {
+                    List<Entry<Date, BaseObject>> datedObjects = documentToDatedObjectsMap.get(documentReference);
+                    if (datedObjects == null) {
+                        datedObjects = new ArrayList<Map.Entry<Date, BaseObject>>();
+                        documentToDatedObjectsMap.put(documentReference, datedObjects);
+                    }
+
+                    Date date = (Date) ((DateProperty) property).getValue();
+                    Entry<Date, BaseObject> datedObject = new HashMap.SimpleEntry<Date, BaseObject>(date, object);
+                    datedObjects.add(datedObject);
                 }
 
-                Date date = (Date) ((DateProperty) property).getValue();
-                Entry<Date, BaseObject> datedObject = new HashMap.SimpleEntry<Date, BaseObject>(date, object);
-                datedObjects.add(datedObject);
+                List<BaseProperty> properties = objectToPropertiesMap.get(object);
+                if (properties == null) {
+                    properties = new ArrayList<BaseProperty>();
+                    objectToPropertiesMap.put(object, properties);
+                }
+                properties.add(property);
             }
-
-            List<BaseProperty> properties = objectToPropertiesMap.get(object);
-            if (properties == null) {
-                properties = new ArrayList<BaseProperty>();
-                objectToPropertiesMap.put(object, properties);
-            }
-            properties.add(property);
-
-            // Delete from the session both object and property since they might clash IDs with the ones that will
-            // replace them later on.
-            session.delete(object);
-            session.delete(property);
         }
-
-        // Flush and clear the session to be able to make sure the delete batch is processed before the insertions
-        // batch, avoiding collisions in the DB at insert time.
-        session.flush();
-        session.clear();
     }
 
     /**
-     * Sort the objects by date and assign new object IDs. For objects that are annotations (using
-     * AnnotationCode.AnnotationClass) convert them to XWiki.XWikiComments.
+     * Inner class that is in charge of migrating each document.
      * 
-     * @param documentToDatedObjectsMap a mapping of documents to dated objects
-     * @param objectToPropertiesMap a mapping of objects to their properties
-     * @param session the Hibernate Session
-     * @throws HibernateException if underlying Hibernate operations fail
+     * @version $Id$
      */
-    private void processObjects(Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap,
-        Map<BaseObject, List<BaseProperty>> objectToPropertiesMap, Session session) throws HibernateException
+    private class DoWorkOnDocumentHibernateCallback implements HibernateCallback<Object>
     {
-        DocumentReference xwikiCommentsClassReference =
-            new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "XWikiComments");
-        DocumentReference annotationClassReference =
-            new DocumentReference(getXWikiContext().getDatabase(), "AnnotationCode", "AnnotationClass");
+        /** @see #setDocumentReference(DocumentReference) */
+        private DocumentReference documentReference;
 
-        // For each document
-        for (DocumentReference document : documentToDatedObjectsMap.keySet()) {
-            List<Entry<Date, BaseObject>> datedObjects = documentToDatedObjectsMap.get(document);
+        /** @param documentReference the document on which to work */
+        public void setDocumentReference(DocumentReference documentReference)
+        {
+            this.documentReference = documentReference;
+        }
 
-            // Sort the objects by date.
+        @Override
+        public Object doInHibernate(Session session) throws HibernateException, XWikiException
+        {
+            try {
+                // Parse the maps, delete the old objects and properties, and create new (updated) ones that replace
+                // them.
+                processObjects(documentToDatedObjectsMap, objectToPropertiesMap, session);
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                    getName() + " failed to do the work for document "
+                        + referenceSerializer.serialize(documentReference, (Object[]) null), e);
+            }
+
+            return Boolean.TRUE;
+        }
+
+        /**
+         * Sort the objects by date and assign new object IDs. For objects that are annotations (using
+         * AnnotationCode.AnnotationClass) convert them to XWiki.XWikiComments.
+         * 
+         * @param documentToDatedObjectsMap a mapping of documents to dated objects
+         * @param objectToPropertiesMap a mapping of objects to their properties
+         * @param session the Hibernate Session
+         * @throws HibernateException if underlying Hibernate operations fail
+         */
+        private void processObjects(Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap,
+            Map<BaseObject, List<BaseProperty>> objectToPropertiesMap, Session session) throws HibernateException
+        {
+            List<Entry<Date, BaseObject>> datedObjects = documentToDatedObjectsMap.get(documentReference);
+
+            // Because the changes we need to do are part of the computed object ID, updating the objects and
+            // properties in the session is not possible. Thus, we need to delete from the session all objects and
+            // properties for the current document so that they do not clash IDs with the ones that will replace them
+            // below.
+            for (Entry<Date, BaseObject> datedObject : datedObjects) {
+                BaseObject object = datedObject.getValue();
+
+                for (BaseProperty property : objectToPropertiesMap.get(object)) {
+                    session.delete(property);
+                }
+
+                session.delete(object);
+            }
+
+            // Flush and clear the session to be able to make sure the delete batch is processed before the insertions
+            // batch, avoiding ID collisions in the DB at insert time.
+            session.flush();
+            session.clear();
+
+            // Sort the objects by date. The objects were removed from the session but are still available in-memory.
             Collections.sort(datedObjects, new Comparator<Entry<Date, BaseObject>>()
             {
                 @Override
@@ -206,61 +254,85 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                 }
             });
 
-            // Reassign object numbers for the current document, based on the previous sorting.
+            // Reassign object numbers and convert annotations for the current document, based on the previous sorting.
             for (int newObjectNumber = 0; newObjectNumber < datedObjects.size(); newObjectNumber++) {
-                Entry<Date, BaseObject> datedComment = datedObjects.get(newObjectNumber);
+                BaseObject deletedObject = datedObjects.get(newObjectNumber).getValue();
 
-                BaseObject deletedObject = datedComment.getValue();
+                BaseObject newComment = getMigratedObject(deletedObject, newObjectNumber);
 
-                // Clone the deleted object and use the new number.
-                BaseObject newComment = deletedObject.clone();
-                newComment.setNumber(newObjectNumber);
-
-                // If the deleted object is an annotation, make sure to use the comments class instead.
-                if (deletedObject.getXClassReference().equals(annotationClassReference)) {
-                    newComment.setXClassReference(xwikiCommentsClassReference);
-                }
-
-                // Save it as a new object in the database.
                 session.save(newComment);
 
-                // Do the same for each of the deleted object's properties and link the new properties to
-                // the new object.
+                // Migrate each of the deleted object's properties and link the new properties to the new object.
                 List<BaseProperty> deletedProperties = objectToPropertiesMap.get(deletedObject);
                 for (BaseProperty deletedProperty : deletedProperties) {
-                    BaseProperty newProperty = null;
-
-                    // Note: LargeStringProperty instances are a bit special because they share the same table with
-                    // StringListProperty and Hibernate gets confused when loading them. The result is that
-                    // StringListProperty instances are loaded instead of LargeStringProperty and, since we know our
-                    // classes well in this specific migration, we can just create the LargeStringProperty instances
-                    // ourselves from the loaded ones. It might be related to http://jira.xwiki.org/browse/XWIKI-4384
-                    if (deletedProperty instanceof StringListProperty) {
-                        // The "author" property was of type User List in AnnotationClass and now it is going to be
-                        // String in XWikiComments.
-                        if ("author".equals(deletedProperty.getName())) {
-                            newProperty = new StringProperty();
-                        } else {
-                            newProperty = new LargeStringProperty();
-                        }
-
-                        String deletedPropertyValue = ((StringListProperty) deletedProperty).getList().get(0);
-                        newProperty.setValue(deletedPropertyValue);
-                        newProperty.setName(deletedProperty.getName());
-                    } else {
-                        newProperty = deletedProperty.clone();
-                    }
-                    newProperty.setId(newComment.getId());
-
-                    // If the deleted property was "annotation" (from AnnotationClass), then name the new
-                    // property "comment" for (XWikiComments).
-                    if ("annotation".equals(deletedProperty.getName())) {
-                        newProperty.setName("comment");
-                    }
+                    BaseProperty newProperty = getMigratedProperty(deletedProperty, newComment);
 
                     session.save(newProperty);
                 }
             }
+        }
+
+        /**
+         * @param deletedObject the old object to migrate
+         * @param newObjectNumber the new object ID to assign to the migrated object
+         * @return an in-memory migrated version of the old object
+         */
+        private BaseObject getMigratedObject(BaseObject deletedObject, int newObjectNumber)
+        {
+            DocumentReference xwikiCommentsClassReference =
+                new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "XWikiComments");
+            DocumentReference annotationClassReference =
+                new DocumentReference(getXWikiContext().getDatabase(), "AnnotationCode", "AnnotationClass");
+
+            // Clone the deleted object and use the new number.
+            BaseObject newComment = deletedObject.clone();
+            newComment.setNumber(newObjectNumber);
+
+            // If the deleted object is an annotation, make sure to use the comments class instead.
+            if (deletedObject.getXClassReference().equals(annotationClassReference)) {
+                newComment.setXClassReference(xwikiCommentsClassReference);
+            }
+
+            return newComment;
+        }
+
+        /**
+         * @param deletedProperty the old property to migrate
+         * @param newComment the new comment to which to assign the migrated property
+         * @return an in-memory migrated version of the old property
+         */
+        private BaseProperty getMigratedProperty(BaseProperty deletedProperty, BaseObject newComment)
+        {
+            BaseProperty newProperty = null;
+
+            // Note: LargeStringProperty instances are a bit special because they share the same table with
+            // StringListProperty and Hibernate gets confused when loading them. The result is that
+            // StringListProperty instances are loaded instead of LargeStringProperty and, since we know our
+            // classes well in this specific migration, we can just create the LargeStringProperty instances
+            // ourselves from the loaded ones. It might be related to http://jira.xwiki.org/browse/XWIKI-4384
+            if (deletedProperty instanceof StringListProperty) {
+                // The "author" property was of type User List in AnnotationClass and now it is going to be
+                // String in XWikiComments.
+                if ("author".equals(deletedProperty.getName())) {
+                    newProperty = new StringProperty();
+                } else {
+                    newProperty = new LargeStringProperty();
+                }
+
+                String deletedPropertyValue = ((StringListProperty) deletedProperty).getList().get(0);
+                newProperty.setValue(deletedPropertyValue);
+                newProperty.setName(deletedProperty.getName());
+            } else {
+                newProperty = deletedProperty.clone();
+            }
+            newProperty.setId(newComment.getId());
+
+            // If the deleted property was "annotation" (from AnnotationClass), then use the new
+            // property "comment" for (XWikiComments).
+            if ("annotation".equals(deletedProperty.getName())) {
+                newProperty.setName("comment");
+            }
+            return newProperty;
         }
     }
 }

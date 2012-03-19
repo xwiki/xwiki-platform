@@ -1,0 +1,13 @@
+org.xwiki.ircbot.internal.PircBotXIRCBot
+org.xwiki.ircbot.internal.wiki.WikiIRCBotScriptService
+org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotManager
+org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotListenerManager
+org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotListenerFactory
+org.xwiki.ircbot.internal.wiki.DefaultWikiIRCModel
+org.xwiki.ircbot.internal.HelpIRCBotListener
+org.xwiki.ircbot.internal.AutoReconnectListener
+org.xwiki.ircbot.internal.DocumentModifiedEventListener
+org.xwiki.ircbot.internal.DefaultDocumentModifiedEventListenerConfiguration
+org.xwiki.ircbot.internal.BrokenLinkEventListener
+org.xwiki.ircbot.internal.DefaultBrokenLinkEventListenerConfiguration
+org.xwiki.ircbot.internal.BrokenLinksBotListener

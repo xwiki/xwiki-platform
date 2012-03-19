@@ -124,8 +124,10 @@
 <content>{{velocity}}
 $msg.get('platform.appwithinminutes.description')
 
-(% class="buttonwrapper" %)[[$msg.get('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
+#if($hasCreateSpace)
+  (% class="buttonwrapper" %)[[$msg.get('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
 
+#end
 = $msg.get('platform.appwithinminutes.appsLiveTableHeading') =##
 #set($columnsProperties = {
   'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},

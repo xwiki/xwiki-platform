@@ -95,6 +95,16 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
+     * @param inputId the filter input identifier
+     * @return the value of the filter input for the specified column
+     * @see #filterColumn(String, String)
+     */
+    public String getFilterValue(String inputId)
+    {
+        return getDriver().findElement(By.id(inputId)).getAttribute("value");
+    }
+
+    /**
      * @param columnTitle the title of live table column
      * @return the 0-based index of the specified column
      */

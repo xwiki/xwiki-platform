@@ -475,7 +475,8 @@ public class DOMUtils
         Range start = getShrunkenRangeStart(range);
         Range end = getShrunkenRangeEnd(range);
 
-        if (start.compareBoundaryPoints(RangeCompare.START_TO_END, end) <= 0) {
+        // If at least one of the end points moved and the range is still valid.
+        if ((start != range || end != range) && start.compareBoundaryPoints(RangeCompare.END_TO_START, end) <= 0) {
             Range result = range.cloneRange();
             result.setStart(start.getEndContainer(), start.getEndOffset());
             result.setEnd(end.getStartContainer(), end.getStartOffset());
@@ -502,20 +503,28 @@ public class DOMUtils
                 // After the last child of an element.
                 startContainer = getNextLeaf(startContainer);
             }
-        } else if (range.getStartOffset() > 0) {
-            // Inside a text node.
+        } else if (range.getStartOffset() > 0 && range.getStartOffset() == startContainer.getNodeValue().length()) {
+            // At the end of a non-empty text node.
             startContainer = getNextLeaf(startContainer);
         }
 
-        int startOffset = 0;
-        if (startContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(startContainer)) {
-            startOffset = getNodeIndex(startContainer);
+        if (startContainer != null) {
+            int startOffset = 0;
+            if (startContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(startContainer)) {
+                startOffset = getNodeIndex(startContainer);
+                startContainer = startContainer.getParentNode();
+            }
+
+            // Return a new range only if we managed to move the start.
+            if (startContainer != range.getStartContainer()) {
+                Range start = range.cloneRange();
+                start.setEnd(startContainer, startOffset);
+                start.collapse(false);
+                return start;
+            }
         }
 
-        Range start = range.cloneRange();
-        start.setEnd(startContainer, startOffset);
-        start.collapse(false);
-        return start;
+        return range;
     }
 
     /**
@@ -536,20 +545,28 @@ public class DOMUtils
                 // Before the first child of an element.
                 endContainer = getPreviousLeaf(endContainer);
             }
-        } else if (range.getEndOffset() < getLength(endContainer)) {
-            // Inside a text node.
+        } else if (range.getEndOffset() == 0 && getLength(endContainer) > 0) {
+            // At the start of a non-empty text node.
             endContainer = getPreviousLeaf(endContainer);
         }
 
-        int endOffset = getLength(endContainer);
-        if (endContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(endContainer)) {
-            endOffset = getNodeIndex(endContainer) + 1;
+        if (endContainer != null) {
+            int endOffset = getLength(endContainer);
+            if (endContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(endContainer)) {
+                endOffset = getNodeIndex(endContainer) + 1;
+                endContainer = endContainer.getParentNode();
+            }
+
+            // Return a new range only if we managed to move the end.
+            if (endContainer != range.getEndContainer()) {
+                Range end = range.cloneRange();
+                end.setStart(endContainer, endOffset);
+                end.collapse(true);
+                return end;
+            }
         }
 
-        Range end = range.cloneRange();
-        end.setStart(endContainer, endOffset);
-        end.collapse(true);
-        return end;
+        return range;
     }
 
     /**

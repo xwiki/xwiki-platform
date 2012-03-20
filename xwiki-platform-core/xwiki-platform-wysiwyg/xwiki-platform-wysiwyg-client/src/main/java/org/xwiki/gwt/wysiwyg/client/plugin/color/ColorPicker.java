@@ -86,6 +86,6 @@ public class ColorPicker extends PopupPanel implements SelectionHandler<String>
      */
     public void setColor(String color)
     {
-        getColorPalette().setSelectedColor(converter.convertToHex(color));
+        getColorPalette().setSelectedColor(color);
     }
 }

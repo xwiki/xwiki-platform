@@ -42,6 +42,11 @@ public class ColorPalette extends Composite implements HasSelectionHandlers<Stri
     private ColorCell selectedCell;
 
     /**
+     * The object used to get the hex code for a given color.
+     */
+    private final ColorConverter converter = new ColorConverter();
+
+    /**
      * Creates a new color palette using the specified color codes to fill the color grid.
      * 
      * @param colors the array of color codes that are used to fill the color grid.
@@ -131,10 +136,12 @@ public class ColorPalette extends Composite implements HasSelectionHandlers<Stri
     public void setSelectedColor(String color)
     {
         if (color != null) {
+            String hexColorCode = converter.convertToHex(color);
             for (int i = 0; i < getColorGrid().getRowCount(); i++) {
                 for (int j = 0; j < getColorGrid().getColumnCount(); j++) {
                     ColorCell cell = (ColorCell) getColorGrid().getWidget(i, j);
-                    if (cell.getColor().equalsIgnoreCase(color)) {
+                    if (color.equalsIgnoreCase(cell.getColor())
+                        || (hexColorCode != null && hexColorCode.equalsIgnoreCase(cell.getHexColorCode()))) {
                         setSelectedCell(cell);
                         return;
                     }

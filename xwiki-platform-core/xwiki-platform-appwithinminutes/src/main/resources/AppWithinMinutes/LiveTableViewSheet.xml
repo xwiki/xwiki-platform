@@ -325,7 +325,7 @@ return XWiki;
           #end
           #set($templateName = $escapetool.url("${templateName}Template"))
           #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
-          {{html clean="false"}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
+          {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
       #end
       #if($hasEdit &amp;&amp; !$isReadOnly)
         * [[$msg.get('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="appName=$escapetool.url($doc.space)" class="action edit"]]

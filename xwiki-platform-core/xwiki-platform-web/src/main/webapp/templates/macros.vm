@@ -2280,7 +2280,7 @@ Wysiwyg.onModuleLoad(function() {
  *#
 #macro (css_filterGradient $startColor $endColor)
   #if (("$!{startColor}" != '') && ("$!{endColor}" != ''))
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='${startColor}', endColorstr='${endColor}',GradientType=0 );
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=${startColor}, endColorstr=${endColor},GradientType=0 );
   #end
 #end
 

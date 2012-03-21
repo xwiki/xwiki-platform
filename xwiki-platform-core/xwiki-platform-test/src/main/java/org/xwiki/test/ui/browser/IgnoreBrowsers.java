@@ -28,24 +28,16 @@ import java.lang.annotation.Target;
  * Annotation to exclude running a test for a given list of browsers.
  * 
  * @version $Id$
- * @since 3.5M1
+ * @since 4.0M2
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface IgnoreBrowser
+public @interface IgnoreBrowsers
 {
-    /**
-     * @return the browser name to ignore
-     */
-    String value();
 
     /**
-     * @return the browser version to ignore
+     * @return the list of annotations within the compound
      */
-    String version() default "";
+    IgnoreBrowser[] value();
 
-    /**
-     * @return the reason this test is ignored
-     */
-    String reason() default "";
 }

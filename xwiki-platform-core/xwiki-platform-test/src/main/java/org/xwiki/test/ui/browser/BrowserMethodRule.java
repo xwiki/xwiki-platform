@@ -90,7 +90,7 @@ public class BrowserMethodRule implements MethodRule
                 if (ignoreBrowser != null) {
                     ignoreBrowsersList.add(ignoreBrowser);
                 }
-                // We check if t here is a IgnoreBrowsers annotation compound
+                // We check if there is a IgnoreBrowsers annotation compound
                 IgnoreBrowsers ignoreBrowsers = method.getAnnotation(IgnoreBrowsers.class);
                 if (ignoreBrowsers != null) {
                     ignoreBrowsersList.addAll(Arrays.asList(ignoreBrowsers.value()));

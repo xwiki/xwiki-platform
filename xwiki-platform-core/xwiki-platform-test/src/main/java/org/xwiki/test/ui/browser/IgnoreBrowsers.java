@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Annotation to exclude running a test for a given list of browsers.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

@@ -35,12 +35,12 @@ import java.lang.annotation.Target;
 public @interface IgnoreBrowser
 {
     /**
-     * @return the list of browser name to ignore
+     * @return the browser name to ignore
      */
     String value();
 
     /**
-     * @return the list of browser version to ignore
+     * @return the browser version to ignore
      */
     String version() default "";
 

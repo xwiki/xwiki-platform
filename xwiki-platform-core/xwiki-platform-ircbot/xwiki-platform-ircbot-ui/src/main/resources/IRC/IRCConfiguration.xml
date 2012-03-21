@@ -267,7 +267,20 @@
 <className>IRC.LoggingBotListener</className>
 <guid>bfc1d12f-7bfe-4b2b-96a9-a99d97ff3cbf</guid>
 <property>
-<page>IRCBotTest.IRCArchive</page>
+<page>{{velocity}}
+#set ($irccontext = $services.ircbot.context)
+#set ($date = $datetool.get('yyyyMMdd'))
+#if ("$!irccontext" != "")
+  #set ($channel = "$!irccontext.channel.name")
+  #if ("$!channel" == "")
+    #set ($channel = "$!irccontext.bot.channelsNames.iterator().next()")
+  #end
+  #set ($channel = $stringtool.stripStart($channel, '#'))
+  IRC.${channel}Archive${date}
+#else
+IRC.xwikiArchive${date}
+#end
+{{/velocity}}</page>
 </property>
 </object>
 <object>

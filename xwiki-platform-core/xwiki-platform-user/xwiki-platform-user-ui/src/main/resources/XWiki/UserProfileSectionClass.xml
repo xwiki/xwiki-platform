@@ -51,7 +51,7 @@
 <name>properties</name>
 <number>2</number>
 <picker>0</picker>
-<prettyName>Properties to isplay</prettyName>
+<prettyName>Properties to display</prettyName>
 <rows>5</rows>
 <size>40</size>
 <unmodifiable>0</unmodifiable>

@@ -3024,12 +3024,12 @@ public class XWiki implements EventListener
         // Email field custom display (email obfuscation).
         PropertyClass emailProperty = (PropertyClass) bclass.get("email");
         if (!emailProperty.isCustomDisplayed(context)) {
-            emailProperty.setCustomDisplay("{{velocity}}"
-                + "#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')"
-                + "  {{html}}<input type='text' name='$prefix$name' value='$value' />{{/html}}" + "#else"
-                + "  ## Allow $obfuscateEmail to be set in some other place." + "  #if(\"$obfuscateEmail\" == 'false')"
-                + "    $value" + "  #else" + "    $value.replaceAll('@.*', '@ xxxxxx')" + "  #end" + "#end"
-                + "{{/velocity}}");
+            emailProperty.setCustomDisplay("{{velocity}}\n"
+                + "#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n"
+                + "  {{html}}<input type='text' name='$prefix$name' value='$value' />{{/html}}\n" + "#else\n"
+                + "  ## Allow $obfuscateEmail to be set in some other place.\n"
+                + "  #if(\"$obfuscateEmail\" == 'false')\n" + "    $value\n" + "  #else\n"
+                + "    $value.replaceAll('@.*', '@ xxxxxx')\n" + "  #end\n" + "#end\n" + "{{/velocity}}");
             needsUpdate = true;
         }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);

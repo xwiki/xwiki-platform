@@ -106,7 +106,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         // document.
         DoWorkOnDocumentHibernateCallback doWorkOnDocumentHibernateCallback = new DoWorkOnDocumentHibernateCallback();
         for (DocumentReference documentReference : documentToDatedObjectsMap.keySet()) {
-            logger.info("Migrating document {}", referenceSerializer.serialize(documentReference, (Object[]) null));
+            logger.info("Migrating document [{}]", referenceSerializer.serialize(documentReference, (Object[]) null));
 
             doWorkOnDocumentHibernateCallback.setDocumentReference(documentReference);
             getStore().executeWrite(getXWikiContext(), true, doWorkOnDocumentHibernateCallback);
@@ -319,7 +319,14 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                     newProperty = new LargeStringProperty();
                 }
 
-                String deletedPropertyValue = ((StringListProperty) deletedProperty).getList().get(0);
+                // Extract the value as first element in the internal list. If the list has 0 elements, then the value
+                // is null.
+                String deletedPropertyValue = null;
+                List<String> internalListValue = ((StringListProperty) deletedProperty).getList();
+                if (internalListValue.size() != 0) {
+                    deletedPropertyValue = internalListValue.get(0);
+                }
+
                 newProperty.setValue(deletedPropertyValue);
                 newProperty.setName(deletedProperty.getName());
             } else {

@@ -151,6 +151,6 @@ public class IRCBotTest extends AbstractTest
 
         // Go to the IRC Home Page and verify that the Archive Livetable contains our Log Archive document
         WebHomePage homePage = WebHomePage.gotoPage();
-        Assert.assertTrue(homePage.getArchiveLiveTable().hasRow("doc.name", ARCHIVE_PAGE));
+        Assert.assertTrue(homePage.getArchiveLiveTable().hasRow("irc.doc.name", ARCHIVE_PAGE));
     }
 }

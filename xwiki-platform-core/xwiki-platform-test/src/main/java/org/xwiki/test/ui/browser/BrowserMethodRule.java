@@ -21,11 +21,10 @@ package org.xwiki.test.ui.browser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.internal.AssumptionViolatedException;
-import org.junit.internal.builders.IgnoredBuilder;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -90,6 +89,7 @@ public class BrowserMethodRule implements MethodRule
                 if (ignoreBrowser != null) {
                     ignoreBrowsersList.add(ignoreBrowser);
                 }
+
                 // We check if there is a IgnoreBrowsers annotation compound
                 IgnoreBrowsers ignoreBrowsers = method.getAnnotation(IgnoreBrowsers.class);
                 if (ignoreBrowsers != null) {
@@ -98,9 +98,13 @@ public class BrowserMethodRule implements MethodRule
 
                 // We iterate through the array of annotations
                 for (IgnoreBrowser ignoredBrowser : ignoreBrowsersList) {
-                    if (ignoredBrowser.value().equals(currentBrowserName)
-                        && (ignoredBrowser.version().isEmpty() || ignoredBrowser.version()
-                            .equals(currentBrowserVersion))) {
+                    Pattern browserNamePattern = Pattern.compile(ignoreBrowser.value());
+                    Pattern browserVersionPattern = Pattern.compile(ignoreBrowser.version());
+
+                    if (browserNamePattern.matcher(currentBrowserName).matches()
+                        && (ignoredBrowser.version().isEmpty()
+                            || browserVersionPattern.matcher(currentBrowserVersion).matches()))
+                    {
                         throw new AssumptionViolatedException(ignoredBrowser.reason());
                     }
                 }

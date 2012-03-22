@@ -65,6 +65,11 @@ public final class DatabaseProduct
     public static final DatabaseProduct MYSQL = new DatabaseProduct("MySQL");
 
     /**
+     * The product name for PostgreSQL databases.
+     */
+    public static final DatabaseProduct POSTGRESQL = new DatabaseProduct("PostgreSQL");
+
+    /**
      * Represents an unknown database for which we were not able to find the product name.
      */
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
@@ -133,6 +138,8 @@ public final class DatabaseProduct
             product = DB2;
         } else if (productNameAsString.equalsIgnoreCase(MYSQL.getProductName())) {
             product = MYSQL;
+        } else if (productNameAsString.equalsIgnoreCase(POSTGRESQL.getProductName())) {
+            product = POSTGRESQL;
         } else {
             product = UNKNOWN;
         }

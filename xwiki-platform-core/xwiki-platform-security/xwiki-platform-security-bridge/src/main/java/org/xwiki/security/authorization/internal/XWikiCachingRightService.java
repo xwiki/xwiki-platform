@@ -195,6 +195,13 @@ public class XWikiCachingRightService implements XWikiRightService
     {
         try {
             if (context.getRequest() != null
+                /*
+                 * We must explicitly check the action from the context, as some templates that are
+                 * rendered may call checkAccess with different actions (which, strictly speaking is
+                 * incorrect, those templates should use hasAccessLevel).  In particular, 'menuview.vm'
+                 * will call checkAccess with action 'view', if the document 'XWiki.XWikiLogin' exists.
+                 */
+                && !LOGIN_ACTION.equals(context.getAction())
                 && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
                 context.getWiki().getAuthService().showLogin(context);
             }

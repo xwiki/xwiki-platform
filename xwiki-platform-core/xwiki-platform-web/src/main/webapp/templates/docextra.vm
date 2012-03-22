@@ -26,7 +26,7 @@
 ## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', ExtraNumberOfItems, 'extratemplate.vm', 'keyboardShortcut']
 ##
 #if (!$docextras)
-  #set ($docextras = $util.arrayList)
+  #set ($docextras = [])
   #if ($showcomments)
     $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)

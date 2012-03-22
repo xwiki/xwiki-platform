@@ -145,7 +145,7 @@
     ## 100 documents displayed by default if no value is specified
     #set ($limit = '100')
   #end
-  #set ($limit = $util.parseInt($limit))
+  #set ($limit = $mathtool.toInteger($limit))
   ## get the space to display the documents for
   #set ($spaceParam = $doc.space)
   #set ($spaceMacroParam = $xcontext.macro.params.get('space'))

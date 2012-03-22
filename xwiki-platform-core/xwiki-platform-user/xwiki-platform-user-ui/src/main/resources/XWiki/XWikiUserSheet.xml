@@ -611,7 +611,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 ##
 ## Categories
 ##
-#set($categories = $util.arrayList)
+#set($categories = [])
 #set($discard = $categories.add(['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.png']))
 #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
 #if($isMyProfile || $hasAdmin)

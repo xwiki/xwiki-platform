@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:49:24 CEST 2011
 xapp.action.exportnonrecurse=Eksportēt (nerekursīvi)
 xapp.action.exportrecurse=Eksportēt
 xapp.action.reloadapp=Pārlādēt

@@ -16,7 +16,7 @@ $response.setContentType("text/xml")
 #set($input = "$!{request.get('input').toLowerCase()}")
 #set($sep = "$!{p.getSeparators()}")
 #if($p.isMultiSelect() && ($sep != "")) ### has separators
-  #set($input_words = $util.split($input, $sep))
+  #set($input_words = $stringtool.split($input, $sep))
   #foreach($i in $input_words)
     #set($input = $i.trim())
   #end

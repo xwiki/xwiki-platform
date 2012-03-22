@@ -101,8 +101,8 @@ public class DefaultVelocityManager implements VelocityManager
             vcontext.put("xcontext", apiContext);
 
             // Make the Syntax Factory component available from Velocity.
-            // TODO: We need to decide how we want to expose components in general and how to protect users from
-            // "dangerous" apis.
+            // This is @Depecated in XWiki 4.0M2 and shouldn't be used. Instead the Rendering Script Service should be
+            // used.
             vcontext.put("syntaxFactory", Utils.getComponent(SyntaxFactory.class));
 
             // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the

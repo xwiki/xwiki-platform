@@ -37,7 +37,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -119,17 +118,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private int classCacheSize = 20;
 
-    private int archiveCacheSize = 20;
-
     // Used to avoid recursive loading of documents if there are recursives usage of classes
+    // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     @SuppressWarnings("unchecked")
     private Map<DocumentReference, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
-    // Used to avoid reloading archives in the same request
-    @SuppressWarnings("unchecked")
-    private Map<String, XWikiDocumentArchive> archiveCache = Collections.synchronizedMap(new LRUMap(
-        this.archiveCacheSize));
-
+    // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
 
     /**
@@ -380,7 +374,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * Make sure to use "XWiki" as default space when it's not provided in  user name.
+     * Make sure to use "XWiki" as default space when it's not provided in user name.
      */
     private DocumentReference resolveUserReference(String user)
     {
@@ -604,51 +598,6 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.classCache.clear();
     }
 
-    /**
-     * Add a {@link XWikiDocumentArchive document archive} in a cache associated with this context, so that future
-     * access requests for the same document archive don't go through the database again.
-     * 
-     * @param key the key used to identify a document archive in the cache
-     * @param archive the {@link XWikiDocumentArchive document archive} to cache
-     */
-    public void addDocumentArchive(String key, XWikiDocumentArchive archive)
-    {
-        this.archiveCache.put(key, archive);
-    }
-
-    /**
-     * Get the cached {@link XWikiDocumentArchive document archive} from the context, if any.
-     * 
-     * @param key the key used to identify a document archive in the cache
-     * @return the document archive, if it does exist in the context cache, or {@code null} otherwise
-     * @see #addDocumentArchive(String, XWikiDocumentArchive)
-     */
-    public XWikiDocumentArchive getDocumentArchive(String key)
-    {
-        return this.archiveCache.get(key);
-    }
-
-    /**
-     * Remove the cached {@link XWikiDocumentArchive document archive} from the context.
-     * 
-     * @param key the key used to identify a document archive in the cache
-     * @see #addDocumentArchive(String, XWikiDocumentArchive)
-     */
-    public void removeDocumentArchive(String key)
-    {
-        this.archiveCache.remove(key);
-    }
-
-    /**
-     * Empty the document archive cache.
-     * 
-     * @see #addDocumentArchive(String, XWikiDocumentArchive)
-     */
-    public void flushArchiveCache()
-    {
-        this.archiveCache.clear();
-    }
-
     public void setLinksAction(String action)
     {
         put("links_action", action);
@@ -716,6 +665,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * Drop permissions for the remainder of the request cycle.
+     * <p>
      * After this is called:
      * <ul>
      * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>
@@ -732,12 +682,9 @@ public class XWikiContext extends Hashtable<Object, Object>
      * way for code following this call to save another document as this user, blessing it too with programming right.
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
-     *
      * <p>
-     * If you are interested in a more flexable sandboxing method which sandboxed code only
-     * for the remainder of the rendering cycle, consider using
-     * {@link com.xpn.xwiki.api.Document#dropPermissions()}.
-     * <p>
+     * If you are interested in a more flexable sandboxing method which sandboxed code only for the remainder of the
+     * rendering cycle, consider using {@link com.xpn.xwiki.api.Document#dropPermissions()}.
      * 
      * @since 3.0M3
      */
@@ -747,10 +694,10 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return true if {@link XWikiContext#dropPermissions()} has been called
-     *              on this context, or if the {@link XWikiConstant.DROPPED_PERMISSIONS}
-     *              key has been set in the {@link org.xwiki.context.ExecutionContext}
-     *              for this thread. This is done by calling {@Document#dropPermissions()}
+     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context, or if the
+     *         {@link XWikiConstant.DROPPED_PERMISSIONS} key has been set in the
+     *         {@link org.xwiki.context.ExecutionContext} for this thread. This is done by calling
+     *         {@Document#dropPermissions()}
      */
     public boolean hasDroppedPermissions()
     {
@@ -758,13 +705,26 @@ public class XWikiContext extends Hashtable<Object, Object>
             return true;
         }
 
-        final Object dropped =
-            this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
+        final Object dropped = this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
 
         if (dropped == null || !(dropped instanceof Integer)) {
             return false;
         }
 
         return ((Integer) dropped) == System.identityHashCode(this.execution.getContext());
+    }
+
+    // Object
+
+    @Override
+    public synchronized XWikiContext clone()
+    {
+        XWikiContext context = (XWikiContext) super.clone();
+
+        // Make sure to have unique instances of the various caches
+        context.displayedFields = Collections.synchronizedList(new ArrayList<String>(this.displayedFields));
+        context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
+
+        return context;
     }
 }

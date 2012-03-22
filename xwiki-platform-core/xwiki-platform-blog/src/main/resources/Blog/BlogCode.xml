@@ -110,7 +110,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       #end
     #end
   #end
-  #set ($blogDoc = $util.null)
+  #set ($blogDoc = $NULL)
   #setVariable ("$blogDoc" $result)
 #end
 ##
@@ -124,7 +124,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(getBlogTitle $blogDoc $title)
   #getBlogProperty($blogDoc 'title' $!blogDoc.displayTitle $result)
-  #set ($title = $util.null)
+  #set ($title = $NULL)
   #setVariable ("$title" $result)
 #end
 ##
@@ -139,7 +139,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(getBlogDescription $blogDoc $description)
   #getBlogProperty($blogDoc 'description' '' $result)
-  #set ($description = $util.null)
+  #set ($description = $NULL)
   #setVariable ("$description" $result)
 #end
 ##
@@ -194,7 +194,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #end
   #set($totalEntries = $xwiki.countDocuments(${query}))
   #getBlogProperty($blogDoc 'itemsPerPage' '10' $defaultItemsPerPage)
-  #set($defaultItemsPerPage = $util.parseInt($defaultItemsPerPage))
+  #set($defaultItemsPerPage = $mathtool.toInteger($defaultItemsPerPage))
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
   #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt)))
@@ -315,7 +315,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param query The basic query for selecting blog entries.
  *###
 #macro(getBlogEntriesBaseQuery $query)
-  #set ($query = $util.null)
+  #set ($query = $NULL)
   #setVariable ("$query" ", BaseObject obj, IntegerProperty isPublished, IntegerProperty hidden, DateProperty publishDate 
     where doc.fullName &lt;&gt; '${blogPostTemplate}' and
       obj.name = doc.fullName and obj.className = '${blogPostClassname}' and
@@ -339,7 +339,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #if($discard == 'global')
     #set($result = true)
   #end
-  #set ($isGlobal = $util.null)
+  #set ($isGlobal = $NULL)
   #setVariable ("$isGlobal" $result)
 #end
 ##
@@ -355,7 +355,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(getBlogDisplayType $blogDoc $displayType)
   #getBlogProperty($blogDoc 'displayType' 'paginated' $result)
-  #set ($displayType = $util.null)
+  #set ($displayType = $NULL)
   #setVariable ("$displayType" $result)
 #end
 ##
@@ -412,7 +412,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #if(!$result)
     #set($result = $entryDoc.getObject("${oldArticleClassname}"))
   #end
-  #set ($entryObj = $util.null)
+  #set ($entryObj = $NULL)
   #setVariable ("$entryObj" $result)
 #end
 ##
@@ -427,7 +427,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param result The resulting date, an instance of &lt;tt&gt;java.util.Date&lt;/tt&gt;.
  *###
 #macro(getEntryDate $entryDoc $entryObj $result)
-  #set ($result = $util.null)
+  #set ($result = $NULL)
   #setVariable ("$result" $entryObj.getProperty('publishDate').value)
 #end
 ##
@@ -498,7 +498,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param isPublished The resulting boolean, true if the entry is considered published.
  *###
 #macro(isPublished $entryObj $isPublished)
-  #set ($isPublished = $util.null)
+  #set ($isPublished = $NULL)
   ## This should work for both old articles, which don't have the 'published' property at all, and
   ## are considered published by default, and new entries, that should have 1 if published.
   #if ("$!{entryObj.getProperty('published').value}" != '0')
@@ -517,7 +517,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param isHiddel The resulting boolean, true if the entry is considered hidden.
  *###
 #macro(isHidden $entryObj $isHidden)
-  #set ($isHidden = $util.null)
+  #set ($isHidden = $NULL)
   ## This should work for both old articles, which don't have the 'hidden' property at all, and
   ## are considered visible by default, and new entries, that should have 1 if hidden.
   #if ("$!{entryObj.getProperty('hidden').value}" == '1')
@@ -680,7 +680,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       #set($result = "${result} [[...&gt;&gt;${entryDoc}||title='$msg.get('xe.blog.code.readpost')']]")
     #end
   #end
-  #set ($entryContent = $util.null)
+  #set ($entryContent = $NULL)
   #setVariable ("$entryContent" $result)
 #end
 ##
@@ -827,13 +827,13 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param monthDate The resulting week, a JODATime MutableDateTime.
  *###
 #macro(getRequestedWeek $weekDate)
-  #set ($weekDate = $util.null)
+  #set ($weekDate = $NULL)
   #setVariable ("$weekDate" $xwiki.jodatime.mutableDateTime)
   #if("$!{request.year}" != '')
-    $weekDate.setYear($util.parseInt($request.year))
+    $weekDate.setYear($mathtool.toInteger($request.year))
   #end
   #if("$!{request.week}" != '')
-    $weekDate.setWeekOfWeekyear($util.parseInt($request.week))
+    $weekDate.setWeekOfWeekyear($mathtool.toInteger($request.week))
   #end
 #end
 ##
@@ -846,13 +846,13 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param monthDate The resulting month, a JODATime MutableDateTime.
  *###
 #macro(getRequestedMonth $monthDate)
-  #set ($monthDate = $util.null)
+  #set ($monthDate = $NULL)
   #setVariable ("$monthDate" $xwiki.jodatime.mutableDateTime)
   #if("$!{request.year}" != '')
-    $monthDate.setYear($util.parseInt($request.year))
+    $monthDate.setYear($mathtool.toInteger($request.year))
   #end
   #if("$!{request.month}" != '')
-    $monthDate.setMonthOfYear($util.parseInt($request.month))
+    $monthDate.setMonthOfYear($mathtool.toInteger($request.month))
   #end
 #end
 ##
@@ -871,7 +871,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #if($result == '')
     #set($result = $defaultValue)
   #end
-  #set ($propertyValue = $util.null)
+  #set ($propertyValue = $NULL)
   #setVariable ("$propertyValue" $result)
 #end
 

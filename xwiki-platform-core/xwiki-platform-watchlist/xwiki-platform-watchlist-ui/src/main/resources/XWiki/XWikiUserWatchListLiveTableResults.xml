@@ -36,7 +36,7 @@
 #set($wikis = $xwiki.watchlist.getWatchedWikis())
 #set($spaces = $xwiki.watchlist.getWatchedSpaces())
 #set($pages = $xwiki.watchlist.getWatchedDocuments())
-#set($elements = $util.getArrayList())
+#set($elements = [])
 ## Wikis
 #foreach($wiki in $wikis)
   #if("$!wiki" != '')

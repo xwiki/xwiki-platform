@@ -329,6 +329,10 @@
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
                 <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
                 <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
+                <exclude>org/xwiki/test/ui/po/DeleteConfirmationPage</exclude>
+                <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
+                <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
+                <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
               </excludes>
             </configuration>
           </plugin>

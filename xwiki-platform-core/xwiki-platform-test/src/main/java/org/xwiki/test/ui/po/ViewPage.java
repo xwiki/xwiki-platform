@@ -20,11 +20,14 @@
 package org.xwiki.test.ui.po;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -52,9 +55,6 @@ public class ViewPage extends BasePage
 
     @FindBy(id = "tmCreateSpace")
     private WebElement createSpaceMenuLink;
-
-    @FindBy(id = "tmAdminWiki")
-    private WebElement administerWikiMenuLink;
 
     @FindBy(id = "xwikicontent")
     private WebElement content;
@@ -207,11 +207,11 @@ public class ViewPage extends BasePage
         return new CopyPage();
     }
 
-    public DeletePage delete()
+    public ConfirmationPage delete()
     {
         hoverOverMenu("tmPage");
         this.deletePageLink.click();
-        return new DeletePage();
+        return new ConfirmationPage();
     }
 
     public boolean canDelete()
@@ -282,5 +282,26 @@ public class ViewPage extends BasePage
     {
         hoverOverMenu("tmSpace");
         this.watchSpaceLink.click();
+    }
+
+    /**
+     * Waits until the page has the passed content by refreshing the page
+     *
+     * @param expectedValue the content value to wait for (in regex format)
+     * @since 4.0M1
+     */
+    public void waitUntilContent(final String expectedValue)
+    {
+        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            private Pattern pattern = Pattern.compile(expectedValue, Pattern.DOTALL);
+
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                driver.navigate().refresh();
+                return Boolean.valueOf(pattern.matcher(getContent()).matches());
+            }
+        });
     }
 }

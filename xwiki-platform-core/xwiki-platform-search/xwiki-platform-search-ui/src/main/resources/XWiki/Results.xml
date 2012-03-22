@@ -114,7 +114,7 @@
       ##*********************************************************##
 #*
       #if($xwiki.hasAdminRights())
-          #set($copyURL = $xwiki.getURL('XWiki.CopyDocument', 'view', "sourcedoc=${util.encodeURI($itemfullname)}"))
+          #set($copyURL = $xwiki.getURL('XWiki.CopyDocument', 'view', "sourcedoc=${escapetool.url($itemfullname)}"))
           #set($deleteURL = $xwiki.getDocument($itemfullname).getURL('delete'))
           #set($renameURL = $xwiki.getDocument($itemfullname).getURL('view', 'xpage=rename&amp;amp;step=1'))
           #set($rightsURL = $xwiki.getDocument($itemfullname).getURL('edit', 'editor=rights'))

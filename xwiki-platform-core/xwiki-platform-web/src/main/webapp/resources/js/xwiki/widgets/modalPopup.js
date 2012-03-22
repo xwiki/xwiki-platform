@@ -4,6 +4,7 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
 widgets.ModalPopup = Class.create({
   /** Configuration. Empty values will fall back to the CSS. */
   options : {
+    globalDialog : true,
     title : "",
     displayCloseButton : true,
     screenColor : "",
@@ -44,7 +45,7 @@ widgets.ModalPopup = Class.create({
     // The dialog chrome
     this.dialogBox = new Element('div', {'class': 'xdialog-box'});
     // Insert the content
-    this.dialogBox._x_contentPlug = new Element('div');
+    this.dialogBox._x_contentPlug = new Element('div', {'class' : 'xdialog-content'});
     this.dialogBox.update(this.dialogBox._x_contentPlug);
     this.dialogBox._x_contentPlug.update(this.content);
     // Add the dialog title
@@ -56,9 +57,15 @@ widgets.ModalPopup = Class.create({
     // Add the close button
     if (this.options.displayCloseButton) {
       var closeButton = new Element('div', {'class': 'xdialog-close', 'title': 'Close'}).update("&#215;");
-      closeButton.setStyle({"color": this.options.titleColor});
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
-      this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+      if (this.options.title) {
+        title.insert({bottom: closeButton});
+        if (this.options.titleColor) {
+          closeButton.setStyle({"color": this.options.titleColor});
+        }
+      } else {
+        this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+      }
     }
     this.dialog.appendChild(this.dialogBox);
     this.dialogBox.setStyle({
@@ -113,41 +120,32 @@ widgets.ModalPopup = Class.create({
       Event.stop(event);
     }
     // Only do this if the dialog is not already active.
-    if (!widgets.ModalPopup.active) {
-      widgets.ModalPopup.active = true;
-      if (!this.dialog) {
-        // The dialog wasn't loaded, create it.
-        this.createDialog();
+    if (this.options.globalDialog) {
+      if (widgets.ModalPopup.active) {
+        return;
+      } else {
+        widgets.ModalPopup.active = true;
       }
-      // Start listening to keyboard events
-      this.attachKeyListeners();
-      // In IE, position: fixed does not work.
-      if (window.browser.isIE6x) {
-        this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
-        this.dialog._x_scrollListener = this.onScroll.bindAsEventListener(this);
-        Event.observe(window, "scroll", this.dialog._x_scrollListener);
-        $$("select").each(function(item) {
-          item._x_initiallyVisible = item.style.visibility;
-          item.style.visibility = 'hidden';
-        });
+    } else {
+      if (this.active) {
+        return;
+      } else {
+        this.active = true;
       }
-      // Display the dialog
-      this.dialog.show();
     }
-  },
-  onScroll : function(event) {
-    this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
+    if (!this.dialog) {
+      // The dialog wasn't loaded, create it.
+      this.createDialog();
+    }
+    // Start listening to keyboard events
+    this.attachKeyListeners();
+    // Display the dialog
+    this.dialog.show();
   },
   /** Called when the dialog is closed. Disables the key listeners, hides the UI and re-enables the 'Show' behavior. */
   closeDialog : function(event) {
     if (event) {
       Event.stop(event);
-    }
-    if (window.browser.isIE6x) {
-      Event.stopObserving(window, "scroll", this.dialog._x_scrollListener);
-      $$("select").each(function(item) {
-        item.style.visibility = item._x_initiallyVisible;
-      });
     }
     // Call optional callback
     this.options.onClose.call(this);
@@ -159,7 +157,11 @@ widgets.ModalPopup = Class.create({
     // Stop the UI shortcuts (except the initial Show Dialog one).
     this.detachKeyListeners();
     // Re-enable the 'show' behavior.
-    widgets.ModalPopup.active = false;
+    if (this.options.globalDialog) {
+      widgets.ModalPopup.active = false;
+    } else {
+      this.active = false;
+    }
   },
   /** Enables all the keyboard shortcuts, except the one that opens the dialog, which is already enabled. */
   attachKeyListeners : function() {

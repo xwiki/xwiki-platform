@@ -12,7 +12,7 @@
 ## Check all possible problems with the specified versions.
 #if($validVersions.size() < 2)
   ## Not enough versions, show all the content introduced by the first (if any) version of the document
-  #set($origdoc = $util.null)
+  #set($origdoc = $NULL)
   #set($newdoc = $tdoc)
   #set($rev1 = '0')
   #set($rev2 = $tdoc.version)

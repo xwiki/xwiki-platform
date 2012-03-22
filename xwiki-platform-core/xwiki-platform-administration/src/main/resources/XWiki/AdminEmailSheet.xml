@@ -44,7 +44,7 @@
 <content>{{velocity output="false"}}
 ### Administer email related wiki preferences, at global level
 #set($legend = ['sender', 'smtp'])
-#set($params = $util.hashMap)
+#set($params = {})
 #set($params.sender = ['admin_email'])
 #set($params.smtp = ['smtp_server', 'smtp_port', 'smtp_server_username', 'smtp_server_password', 'javamail_extra_props'])
 {{/velocity}}

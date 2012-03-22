@@ -872,9 +872,13 @@ isc.XWETreeGrid.addMethods({
      *
      * @param rt XWEResultTree.
      * @param resource Object representing a XWiki resource (see XWiki.resource.get()).
+     * @param parentStack optional parameter that holds the stack of parents visited so far; serves as a way to prevent infinite recursion when the parent chain has cycles
      */
-    openParent : function(rt, resource) {
-        if (resource.name != "") {
+    openParent : function(rt, resource, parentStack) {
+        parentStack = parentStack || [];
+        // Prevent infinite recursion.
+        if (resource.name != "" && parentStack.indexOf(resource.prefixedFullName) < 0) {
+            parentStack.push(resource.prefixedFullName);
             // Look for the parent/child relationship in the cache.
             if (rt.parentMap[resource.prefixedFullName] == null) {
                 // Usage of a DataSource to retrieve page REST resource.
@@ -895,7 +899,7 @@ isc.XWETreeGrid.addMethods({
                             this.openNode(rt, parentRes.prefixedFullName, true);
                         } else {
                             // The node does not exist, call the openParent method again with the parent we've found.
-                            this.openParent(rt, parentRes);
+                            this.openParent(rt, parentRes, parentStack);
                         }
                     } else {
                         if (this.displayAddPage == true) {
@@ -920,7 +924,7 @@ isc.XWETreeGrid.addMethods({
                     this.openNode(rt, parentRes.prefixedFullName, true);
                 } else {
                     // The node does not exist, call the openParent method again with the parent we've found.
-                    this.openParent(rt, parentRes);
+                    this.openParent(rt, parentRes, parentStack);
                 }
             }
         }

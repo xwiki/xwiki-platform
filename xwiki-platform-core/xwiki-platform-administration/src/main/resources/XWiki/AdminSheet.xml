@@ -3518,8 +3518,8 @@ document.observe('xwiki:dom:loaded', function() {
 #elseif ($crtCategoryId != '')
   #set ($crtItemId = $adminMenu.get($crtCategoryId).id)
 #end
-#set ($crtSection = $util.null)
-#set ($crtCategory = $util.null)
+#set ($crtSection = $NULL)
+#set ($crtCategory = $NULL)
 
 
 ##

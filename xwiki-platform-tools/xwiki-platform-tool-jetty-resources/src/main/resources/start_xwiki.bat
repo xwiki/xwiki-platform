@@ -21,6 +21,7 @@ REM -------------------------------------------------------------------------
 
 set JETTY_HOME=jetty
 set JETTY_PORT=8080
+set JETTY_STOP_PORT=8079
 set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=128m
 
 REM Ensure the logs directory exists as otherwise Jetty reports an error
@@ -32,14 +33,16 @@ if not exist %JETTY_HOME%\work mkdir %JETTY_HOME%\work
 REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
 if not exist data mkdir data
 
-REM Specify port on which HTTP requests will be handled
+REM The port on which to start Jetty can be passed to this script as the first argument
+IF NOT [%1]==[] set JETTY_PORT=%1
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
 
 REM Specify Jetty's home directory
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME%
 
-REM Specify port and key to stop a running Jetty instance
-set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=8079
+REM The port on which to stop Jetty can be passed to this script as the second argument
+IF NOT [%2]==[] set JETTY_STOP_PORT=%2
+set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
 
 REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
@@ -52,4 +55,4 @@ REM Note that setting this value too high can leave your server vulnerable to de
 REM service attacks.
 set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.mortbay.jetty.Request.maxFormContentSize=1000000
 
-java %XWIKI_OPTS% %2 %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
+java %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar

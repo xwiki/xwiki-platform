@@ -696,17 +696,17 @@ input.category-name-input {
   #elseif (!$xwiki.getDocument($name).isNew())
     #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [])
   #else
-    #set($title = $util.encodeURI($title))
-    #set($newCategoryParent = $util.encodeURI($request.newCategoryParent))
+    #set($title = $escapetool.url($title))
+    #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
     #if($request.ajax)
       #if("$!{request.mode}" == 'select')
         #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}")})
       #else
         #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}")})
       #end
-      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=$util.encodeURI($xredirect)&amp;form_token=$!{services.csrf.getToken()}"))
+      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;form_token=$!{services.csrf.getToken()}"))
     #else ## request.ajax
-      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${util.encodeURI(${doc.getURL()})}&amp;form_token=$!{services.csrf.getToken()}"))
+      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url(${doc.getURL()})}&amp;form_token=$!{services.csrf.getToken()}"))
     #end
   #end ## empty title
 #end

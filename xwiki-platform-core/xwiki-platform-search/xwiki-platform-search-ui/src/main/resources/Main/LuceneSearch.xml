@@ -144,10 +144,10 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## ---------------
 #set($text = "$!request.getParameter('text')")
 #set($query = $text)
-#set($utext = $util.encodeURI($query))
+#set($utext = $escapetool.url($query))
 #set($defaultItemsPerPage = 30)
-#set($itemsPerPage = $util.parseInt("$!{request.perPage}"))
-#if($itemsPerPage &lt;= 0)
+#set($itemsPerPage = $mathtool.toInteger("$!{request.perPage}"))
+#if(!$itemsPerPage || $itemsPerPage &lt;= 0)
   #set($itemsPerPage = $defaultItemsPerPage)
 #end
 ## ---------------
@@ -202,17 +202,17 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
           #set($firstIndex = '0')
         #end
       #end
-      #set($firstIndex = $util.parseInt($firstIndex))
+      #set($firstIndex = $mathtool.toInteger($firstIndex))
       #set($firstIndex = $firstIndex + 1)
       #set($results = $searchresults.getResults("$firstIndex", "$itemsPerPage"))
       #if ($rssmode)
-        #set ($list = $util.arrayList)
+        #set ($list = [])
         #foreach ($item in $results)
           #if ($item.type != "attachment")
             #set ($ok = $list.add(0, "${item.space}.${item.name}"))
           #end
         #end
-        #set ($feed = $xwiki.feed.getDocumentFeed($list, $util.getHashMap()))
+        #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
         #set ($feedURI = $doc.getExternalURL("view"))
         #set ($discard = $feed.setLink($feedURI))
         #set ($discard = $feed.setUri($feedURI))

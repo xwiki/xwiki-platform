@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:49:17 CEST 2011
 xapp.action.exportnonrecurse=Export (non récursif)
 xapp.action.exportrecurse=Export
 xapp.action.reloadapp=Recharger

@@ -179,7 +179,7 @@ $xwiki.ssx.use('XWiki.WorkspaceUsers')
   #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
     #set($result = true)
   #end
-  #set($hasGroupRight = $util.null)
+  #set($hasGroupRight = $NULL)
   #setVariable("$hasGroupRight" $result)
 #end
 #hasGroupRight('edit' $hasEditGroupRight)
@@ -202,7 +202,7 @@ $xwiki.ssx.use('XWiki.WorkspaceUsers')
 #if ($hasAdmin &amp;&amp; ($request.acceptUser || $request.rejectUser))
   ## Handle a candidate members's request.
   ##
-  #set ($candidateNumber = $util.parseInt("$!{request.candidateNumber}"))
+  #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
   #set ($candidateMember = $groupDoc.getObject($candidateClass, $candidateNumber))
   #if ($candidateMember &amp;&amp; $candidateMember.getProperty('status').getValue() == 'pending')
     ## Common values.
@@ -300,7 +300,7 @@ Comment: $message")
 #elseif ($hasAdmin &amp;&amp; $request.cancelInvitation)
   ##
   ## Handle canceling an invitation.
-  #set ($candidateNumber = $util.parseInt("$!{request.candidateNumber}"))
+  #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
   #set ($candidateMember = $groupDoc.getObject($candidateClass, $candidateNumber))
   #if ($candidateMember &amp;&amp; $candidateMember.getProperty('status').getValue() == 'pending')
     ## Remove the invitation

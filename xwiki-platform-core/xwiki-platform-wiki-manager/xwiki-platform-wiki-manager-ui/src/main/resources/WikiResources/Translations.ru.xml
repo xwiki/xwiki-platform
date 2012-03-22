@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
-#Fri Dec 16 04:50:26 CET 2011
 XWiki.XWikiServerClass_visibility_private=Приватный доступ
 XWiki.XWikiServerClass_visibility_public=Публичный доступ
 error.ERROR_XWIKI_ACCESS_DENIED=У вас нет разрешения, чтобы выполнить это действие.

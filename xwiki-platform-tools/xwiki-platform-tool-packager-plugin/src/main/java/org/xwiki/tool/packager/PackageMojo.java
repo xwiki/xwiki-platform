@@ -176,6 +176,14 @@ public class PackageMojo extends AbstractMojo
     private VelocityComponent velocity;
 
     /**
+     * The user under which the import should be done. If not user is specified then we import with backup pack.
+     * For example {@code superadmin}.
+     *
+     * @parameter
+     */
+    private String importUser;
+
+    /**
      * List of skin artifacts to include in the packaging.
      *
      * @parameter
@@ -243,7 +251,8 @@ public class PackageMojo extends AbstractMojo
         }
 
         // Step 8: Import specified XAR files into the database
-        getLog().info("Import XAR dependencies ...");
+        getLog().info(String.format("Import XAR dependencies %s...",
+            this.importUser == null ? "as a backup pack" : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
     }
 
@@ -332,7 +341,7 @@ public class PackageMojo extends AbstractMojo
                 try {
                     getLog().info("  ... Importing XAR: " + xarArtifact.getFile());
                     importer.importDocuments(xarTargetDirectory, "xwiki",
-                        new File(webInfDirectory, "hibernate.cfg.xml"));
+                        new File(webInfDirectory, "hibernate.cfg.xml"), this.importUser);
                 } catch (Exception e) {
                     throw new MojoExecutionException(
                         String.format("Failed to import XAR [%s]", xarArtifact.toString()), e);

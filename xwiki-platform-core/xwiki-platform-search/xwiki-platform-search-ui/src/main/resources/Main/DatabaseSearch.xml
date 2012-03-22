@@ -51,7 +51,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ##
 ##
 #set($text = "$!request.getParameter('text')")
-#set($utext = $util.encodeURI($text))
+#set($utext = $escapetool.url($text))
 ## ---------------
 ## Query form
 ## ---------------
@@ -70,7 +70,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 {{/html}}
 #end
 #set($space = $selectedSpace)
-#set($datedlist = $util.arrayList)
+#set($datedlist = [])
 #if("$!text" == '')
   ## No search
 #else
@@ -134,14 +134,15 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #addelement($item $datedlist)
   #end
 #end
-#set($list = $util.arrayList)
-#foreach($item in $util.sort($datedlist))
+#set($list = [])
+#set ($discard = $collectionstool.sort($datedlist))
+#foreach($item in $datedlist)
   ## datedlist contains items prefixed with the date; strip the date from the actual item name:
   #set($ok = $list.add(0, $item.substring(14)))
 #end
 #if ("$!utext" != '')
   #if($rssmode)
-    #set ($feed = $xwiki.feed.getDocumentFeed($list, $util.getHashMap()))
+    #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
     #set ($feedURI = $doc.getExternalURL("view"))
     #set ($discard = $feed.setLink($feedURI))
     #set ($discard = $feed.setUri($feedURI))

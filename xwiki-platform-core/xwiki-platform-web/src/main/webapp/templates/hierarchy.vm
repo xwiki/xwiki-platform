@@ -1,5 +1,5 @@
 #template('xwikivars.vm')
-#set($parents = $util.arrayList)
+#set($parents = [])
 #set($discard = $parents.add($doc.fullName))
 #macro(computeHierarchy $doc $result $level)
   #set($parent = $doc.parent)

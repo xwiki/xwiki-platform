@@ -76,7 +76,7 @@
   // ]]>
       {/pre}</script>
     #else ## displayType != input && displayType != select
-      #set($existingTags = $util.arrayList)
+      #set($existingTags = [])
       #foreach($tag in $!tdoc.tags.split("[|]"))
         #set($discard = $existingTags.add($tag))
       #end

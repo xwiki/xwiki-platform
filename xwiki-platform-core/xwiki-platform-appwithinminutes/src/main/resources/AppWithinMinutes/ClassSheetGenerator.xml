@@ -145,7 +145,7 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
 ${escapetool.d}xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator')
 ${escapetool.h}set(${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
 ${escapetool.h}${escapetool.h} We don't have access to the form element to set the CSS class for the vertical form layout standard.
-(% class="xform half" %)
+(% class="xform" %)
 (((
 #foreach($property in $doc.getxWikiClass().properties)
 #set($displayFormType = $property.getProperty('displayFormType'))

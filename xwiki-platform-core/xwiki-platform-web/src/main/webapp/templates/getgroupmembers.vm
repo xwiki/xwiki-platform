@@ -1,8 +1,8 @@
 #template('xwikivars.vm')
 $response.setContentType('application/x-json')
-#set($offset = $util.parseInt($request.get('offset')))
+#set($offset = $mathtool.toInteger($request.get('offset')))
 #set($off = $offset - 1 )
-#set($limit = $util.parseInt($request.get('limit')))
+#set($limit = $mathtool.toInteger($request.get('limit')))
 #set($order = true)
 #if("$!{request.dir}" == 'desc')
   #set($order = false)
@@ -14,7 +14,7 @@ $response.setContentType('application/x-json')
   #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit, $off, $order))
 #else
   #set($countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
-  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $util.null, $limit, $off, $order))
+  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $NULL, $limit, $off, $order))
 #end
 
 {

@@ -15,7 +15,8 @@
 #set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-#set ($versions = $util.reverseList($tdoc.getRevisions($criteria)))
+#set ($versions = $tdoc.getRevisions($criteria))
+#set ($discard = $collectionstool.reverse($versions))
 #set ($totalVersions = $versions.size())
 #if ($totalVersions == 0)
   #warning ($msg.get('thispagedoesnotexist'))
@@ -29,7 +30,8 @@
   #set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
 ## Reuse the old object, just add the range.
   $criteria.setRange($range)
-  #set ($versions = $util.reverseList($tdoc.getRevisions($criteria)))
+  #set ($versions = $tdoc.getRevisions($criteria))
+  #set ($discard = $collectionstool.reverse($versions))
   #if ($tdoc.realLanguage != '')
     #set ($lang = "&amp;language=${tdoc.realLanguage}")
   #else
@@ -50,7 +52,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <div class="centered">
-      <table class="xwikidatatable" summary="$msg.get('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($util.add($versions.size(), -1)), $versions.get(0)])">
+      <table class="xwikidatatable" summary="$msg.get('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
 ## Print the table header
         <tr>
         #if ($totalVersions > 1)

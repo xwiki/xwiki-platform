@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321058328000</creationDate>
-<date>1326742491000</date>
-<contentUpdateDate>1326742491000</contentUpdateDate>
+<date>1332153510000</date>
+<contentUpdateDate>1332153510000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("admin.xwiki.installedextensions")</title>
 <template></template>
@@ -179,13 +179,6 @@ RU5ErkJggg==
 </content></attachment>
 <content>{{include document="ExtensionManagerMacros" /}}
 
-{{velocity output="false"}}
-#set($extensionwiki = $request.extensionwiki)
-#if ($extensionwiki)
-  #set($extensionnamespace = "wiki:$extensionwiki")
-#end
-{{/velocity}}
-
 {{velocity}}
 ## Ajax call for a single extension
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
@@ -201,7 +194,11 @@ RU5ErkJggg==
   #if ($request.extensionid &amp;&amp; $request.extensionversion)
     #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
   #else
-    #set($extensions = $extensionManager.getInstalledExtensions())
+    #if ($xcontext.isMainWiki())
+      #set($extensions = $extensionManager.getInstalledExtensions())
+    #else
+      #set($extensions = $extensionManager.getInstalledExtensions($extensionnamespace))
+    #end
   #end
   #if ($extensions.isEmpty())
     {{info}}$msg.get('extensions.installed.noExtensions'){{/info}}##

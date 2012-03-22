@@ -127,7 +127,7 @@ public class XWikiHibernateBaseStore implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        Execution execution = Utils.getComponent(Execution.class);
         XWikiContext context = (XWikiContext) execution.getContext().getProperty("xwikicontext");
         setPath(context.getWiki().getConfig().getProperty("xwiki.store.hibernate.path", getPath()));
     }
@@ -660,7 +660,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             }
 
-            dataMigrationManager.checkDatabase();
+            this.dataMigrationManager.checkDatabase();
         } catch (Exception e) {
             endTransaction(context, false); // close session with rollback to avoid further usage
             Object[] args = {context.getDatabase()};

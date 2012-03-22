@@ -58,7 +58,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * comments order is not affected.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 @Component
 @Named("R40001XWIKI7540")
@@ -134,7 +134,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                         + "ann.name=doc.fullName AND ann.className='AnnotationCode.AnnotationClass')");
                 List<Object[]> queryResults = (List<Object[]>) getExistingAnnotationsAndCommentsQuery.list();
 
-                preProcessResults(queryResults, session);
+                preProcessResults(queryResults);
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                     getName() + " failed to read the work to be done.", e);
@@ -147,10 +147,9 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
          * Pre-process the results into data structures that can be easily worked with.
          * 
          * @param queryResults an array containing multiple [comment, property] arrays
-         * @param session the Hibernate session
          * @throws HibernateException if underlying Hibernate operations fail
          */
-        private void preProcessResults(List<Object[]> queryResults, Session session) throws HibernateException
+        private void preProcessResults(List<Object[]> queryResults) throws HibernateException
         {
             for (Object[] queryResult : queryResults) {
                 BaseObject object = (BaseObject) queryResult[0];
@@ -201,7 +200,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             try {
                 // Parse the maps, delete the old objects and properties, and create new (updated) ones that replace
                 // them.
-                processObjects(documentToDatedObjectsMap, objectToPropertiesMap, session);
+                processObjects(session);
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                     getName() + " failed to do the work for document "
@@ -215,13 +214,10 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
          * Sort the objects by date and assign new object IDs. For objects that are annotations (using
          * AnnotationCode.AnnotationClass) convert them to XWiki.XWikiComments.
          * 
-         * @param documentToDatedObjectsMap a mapping of documents to dated objects
-         * @param objectToPropertiesMap a mapping of objects to their properties
          * @param session the Hibernate Session
          * @throws HibernateException if underlying Hibernate operations fail
          */
-        private void processObjects(Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap,
-            Map<BaseObject, List<BaseProperty>> objectToPropertiesMap, Session session) throws HibernateException
+        private void processObjects(Session session) throws HibernateException
         {
             List<Entry<Date, BaseObject>> datedObjects = documentToDatedObjectsMap.get(documentReference);
 

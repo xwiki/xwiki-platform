@@ -82,24 +82,24 @@ public class BrowserMethodRule implements MethodRule
             public void evaluate() throws Throwable
             {
                 // The full List with ignored browsers, taken from both annotations
-                List<IgnoreBrowser> ignoreBrowsersList = new ArrayList<IgnoreBrowser>();
+                List<IgnoreBrowser> ignoredBrowsersList = new ArrayList<IgnoreBrowser>();
 
                 // We check if there is a IgnoreBrowser annotation
                 IgnoreBrowser ignoreBrowser = method.getAnnotation(IgnoreBrowser.class);
                 if (ignoreBrowser != null) {
-                    ignoreBrowsersList.add(ignoreBrowser);
+                    ignoredBrowsersList.add(ignoreBrowser);
                 }
 
                 // We check if there is a IgnoreBrowsers annotation compound
                 IgnoreBrowsers ignoreBrowsers = method.getAnnotation(IgnoreBrowsers.class);
                 if (ignoreBrowsers != null) {
-                    ignoreBrowsersList.addAll(Arrays.asList(ignoreBrowsers.value()));
+                    ignoredBrowsersList.addAll(Arrays.asList(ignoreBrowsers.value()));
                 }
 
-                // We iterate through the array of annotations
-                for (IgnoreBrowser ignoredBrowser : ignoreBrowsersList) {
-                    Pattern browserNamePattern = Pattern.compile(ignoreBrowser.value());
-                    Pattern browserVersionPattern = Pattern.compile(ignoreBrowser.version());
+                // We iterate through the list of BrowserIgnore annotations
+                for (IgnoreBrowser ignoredBrowser : ignoredBrowsersList) {
+                    Pattern browserNamePattern = Pattern.compile(ignoredBrowser.value());
+                    Pattern browserVersionPattern = Pattern.compile(ignoredBrowser.version());
 
                     if (browserNamePattern.matcher(currentBrowserName).matches()
                         && (ignoredBrowser.version().isEmpty()

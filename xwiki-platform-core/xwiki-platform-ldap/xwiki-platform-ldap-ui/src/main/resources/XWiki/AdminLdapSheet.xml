@@ -666,7 +666,11 @@ Note : 'ldap_validate_password' has been voluntary left out, has it's xwiki.cfg 
 {{/velocity}}
 
 {{velocity}}
-#if(!$services.ldap.isXWikiLDAPAuthenticator())
+#if(!$services.ldap)
+{{error}}
+$msg.get('platform.ldap.missingLdapService')
+{{/error}}
+#elseif(!$services.ldap.isXWikiLDAPAuthenticator())
 {{warning}}
 $msg.get('platform.ldap.ldapAuthenticationIsNotEnabledWarning')
 {{/warning}}

@@ -4788,7 +4788,13 @@ public class XWikiDocument implements DocumentModelBridge
                 // nice with people migrating from 1.0 to 2.0 syntax
 
                 if (macroBlock.getId().equalsIgnoreCase("include")) {
-                    String documentName = macroBlock.getParameters().get("document");
+                    String documentName = macroBlock.getParameters().get("reference");
+                    if (StringUtils.isEmpty(documentName)) {
+                        documentName = macroBlock.getParameters().get("document");
+                        if (StringUtils.isEmpty(documentName)) {
+                            continue;
+                        }
+                    }
                     if (documentName.indexOf('.') == -1) {
                         documentName = getSpace() + "." + documentName;
                     }

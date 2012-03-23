@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.extension.xar;
 
 import java.util.HashMap;
@@ -82,8 +81,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.repositoryUtil =
-            new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource(), getComponentManager());
+        this.repositoryUtil = new RepositoryUtil(getConfigurationSource(), getComponentManager());
         this.repositoryUtil.setup(getMockery());
 
         // mock

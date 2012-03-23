@@ -418,7 +418,7 @@ public final class XWikiLDAPConfig
         try {
             return context.getWiki().getXWikiPreferenceAsInt("ldap_groupcache_expiration", context);
         } catch (Exception e) {
-            return (int) context.getWiki().ParamAsLong("xwiki.authentication.ldap.groupcache_expiration", 21800);
+            return (int) context.getWiki().ParamAsLong("xwiki.authentication.ldap.groupcache_expiration", 21600);
         }
     }
 

@@ -100,12 +100,10 @@
          Enables collection of global JMX statistics, and allows you to customize the JMX domain name under which
          MBeans are registered.
       -->
-      <!-- 
-      <globalJmxStatistics 
+      <globalJmxStatistics
             enabled="true" 
             jmxDomain="org.infinispan" 
             cacheManagerName="SampleCacheManager"/>
-      -->
 
       <!--
          Used to customize the marshaller used to serialize objects and deserialize byte streams.  Also allows you to
@@ -192,9 +190,7 @@
       <!--
          Used to register JMX statistics in any available MBean server
       -->
-      <!--
       <jmxStatistics enabled="true"/>
-      -->
 
       <!--
          Used to control whether objects stored in Infinispan nodes are primarily stored as rehydrated Objects or as

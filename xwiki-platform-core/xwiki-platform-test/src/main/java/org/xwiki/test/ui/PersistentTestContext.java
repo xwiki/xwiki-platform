@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.xwiki.test.integration.XWikiExecutor;
 
@@ -40,6 +41,14 @@ public class PersistentTestContext
     /** Utility methods which should be available to tests and to pages. */
     private final TestUtils util = new TestUtils();
 
+    private WebDriverFactory webDriverFactory = new WebDriverFactory();
+
+    /**
+     * Decide on which browser to run the tests and defaults to Firefox if no system property is defined (useful
+     * for running in your IDE for example).
+     */
+    private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
+
     public PersistentTestContext() throws Exception
     {
         this.executor = new XWikiExecutor(0);
@@ -49,7 +58,8 @@ public class PersistentTestContext
         // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
         // extensions such as Firebug), simply uncomment the following line:
         // System.setProperty("webdriver.firefox.profile", "default");
-        this.driver = new XWikiWrappingDriver(new FirefoxDriver(), getUtil());
+        WebDriver nativeDriver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
+        this.driver = new XWikiWrappingDriver(nativeDriver, getUtil());
 
         // Wait when trying to find elements on the page till the timeout expires
         getUtil().setDriverImplicitWait(this.driver);

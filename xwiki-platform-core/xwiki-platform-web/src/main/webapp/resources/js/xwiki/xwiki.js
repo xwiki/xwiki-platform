@@ -1299,9 +1299,10 @@ document.observe('xwiki:dom:loading', function() {
 /**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
  *
- * To activate this behavior on an input element, add the "withTip" classname to it.
+ * To activate this behavior on an input element, add the "withTip" classname to it or pass it as the 'element' value
+ * of the memo of a 'xwiki:addBehavior:withTip' event.
  */
-document.observe('xwiki:dom:loaded', function() {
+(function(){
   var onFocus = function() {
     if (this.value==this.defaultValue) {
       this.value="";
@@ -1314,12 +1315,19 @@ document.observe('xwiki:dom:loaded', function() {
       this.value=this.defaultValue;
     }
   }
-  $$("input.withTip", "textarea.withTip").each(function(item) {
-    item.observe('focus', onFocus.bindAsEventListener(item));
-    item.observe('blur', onBlur.bindAsEventListener(item));
+  document.observe('xwiki:addBehavior:withTip', function(event){
+    var item = event.memo.element;
+    if (item) {
+      item.observe('focus', onFocus.bindAsEventListener(item));
+      item.observe('blur', onBlur.bindAsEventListener(item));
+    }
   });
-});
-
+  document.observe('xwiki:dom:loaded', function() {
+    $$("input.withTip", "textarea.withTip").each(function(item) {
+      document.fire("xwiki:addBehavior:withTip", {'element' : item});
+    });
+  });
+})();
 /**
  * Small JS improvement, which suggests document names (doc.fullName) when typing in an input.
  *

@@ -52,6 +52,17 @@ public class XWikiServletContextListener implements ServletContextListener
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
 
+        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
+        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
+        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
+        // Class that need to lookup then just need to get it from the XWikiContext instance.
+        // This is of course not necessary for XWiki components since they just need to implement
+        // the Composable interface to get access to the Component Manager or better they simply
+        // need to declare their components requirements using the @Inject annotation of the xwiki
+        // component manager together with a private class member, for automatic injection by the CM on init.
+        servletContextEvent.getServletContext().setAttribute(
+            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
+
         // Use a Component Event Manager that stacks Component instance creation events till we tell it to flush them.
         // The reason is that the Observation Manager used to send the events but we need the Application Context to
         // be set up before we start sending events since there can be Observation Listener components that require
@@ -86,7 +97,6 @@ public class XWikiServletContextListener implements ServletContextListener
         ObservationManager observationManager;
         try {
             observationManager = this.componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new ApplicationStartedEvent(), this);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to find the Observation Manager component", e);
         }
@@ -96,16 +106,8 @@ public class XWikiServletContextListener implements ServletContextListener
         eventManager.shouldStack(false);
         eventManager.flushEvents();
 
-        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
-        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
-        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
-        // Class that need to lookup then just need to get it from the XWikiContext instance.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to declare their components requirements using the @Inject annotation of the xwiki
-        // component manager together with a private class member, for automatic injection by the CM on init.
-        servletContextEvent.getServletContext().setAttribute(
-            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
+        // Indicate to the various components that XWiki is ready
+        observationManager.notify(new ApplicationStartedEvent(), this);
     }
 
     @Override

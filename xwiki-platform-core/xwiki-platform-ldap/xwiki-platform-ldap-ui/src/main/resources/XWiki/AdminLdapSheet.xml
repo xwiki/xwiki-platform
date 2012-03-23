@@ -341,7 +341,8 @@
                         'type'  : 'text'
                       , 'class' : 'key'
                       , 'value' : this.input.getAttribute("data-key-tip") || ''
-                      , 'style' : 'width:42%'
+                      , 'style' : 'width:42%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
+                                              // FIXME need to refactor this to use flexible box model when available.
                     })
         , valueInput = new Element("input", {
                         'type'  : 'text'

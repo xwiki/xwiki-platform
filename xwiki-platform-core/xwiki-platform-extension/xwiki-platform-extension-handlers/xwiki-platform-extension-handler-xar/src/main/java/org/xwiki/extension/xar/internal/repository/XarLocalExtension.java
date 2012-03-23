@@ -29,6 +29,11 @@ import org.xwiki.extension.wrap.WrappingLocalExtension;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarLocalExtension extends WrappingLocalExtension<LocalExtension>
 {
     private XarLocalExtensionRepository repository;

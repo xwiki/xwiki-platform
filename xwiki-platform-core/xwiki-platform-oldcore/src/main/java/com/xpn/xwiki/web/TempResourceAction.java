@@ -73,9 +73,7 @@ public class TempResourceAction extends XWikiAction
      */
     private Environment environment = Utils.getComponent(Environment.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();

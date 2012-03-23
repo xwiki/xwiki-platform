@@ -50,7 +50,16 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
-      <version>5.0.1.FINAL</version>
+      <version>5.1.1.FINAL</version>
+      <exclusions>
+        <!-- Exclude JGroups for now since we use Infinispan for local caches and thus don't need but also because
+             we use JGroups in our dependencies and Infinispan draws a more recent version than the one we use.
+             TODO: We should be able to remove this once we move to JGroups 3.x -->
+        <exclusion>
+          <artifactId>jgroups</artifactId>
+          <groupId>org.jgroups</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Test Dependencies -->

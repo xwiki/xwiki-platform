@@ -75,11 +75,6 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
         super.virtualInit(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
-     */
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
@@ -96,22 +91,12 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
         return result.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractDocumentSkinExtensionPlugin#getExtensionClassName()
-     */
     @Override
     protected String getExtensionClassName()
     {
         return JSX_CLASS_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractDocumentSkinExtensionPlugin#getExtensionName()
-     */
     @Override
     protected String getExtensionName()
     {

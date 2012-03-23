@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+  "-//Hibernate/Hibernate Mapping DTD//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="true">
+
+    <!-- This file is a copy of xwiki.hbm.xml with the following modifications:
+         - Redefine materialized_clob as StringClobType
+    -->
+
+    <!--
+     All new table names should be all lower case versions of the name of the class which they represent
+     for example:
+     XWikiDocument should map to a table called xwikidocument
+     All new column names should be all lower case versions of the property which they represent for example:
+     fullName should map to a column called fullname
+    -->
+
+    <!-- The PostgreSQL JDBC driver wrongly calls the method getAsciiStream() whenever dealing with Clobs,
+         which causes all the non-ASCII chars to be discarded. This is a workaround for the issue. -->
+    <typedef name="materialized_clob" class="org.hibernate.type.StringClobType" />
+
+    <!-- com.xpn.xwiki.doc.XWikiDocument root -->
+    <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWD_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="fullName" type="string" column="XWD_FULLNAME" length="255" index="DOC_FULLNAME" not-null="true" />
+        <property name="name" type="string" column="XWD_NAME" length="255" index="DOC_NAME" not-null="true" />
+        <property name="title" type="string" column="XWD_TITLE" length="255" index="DOC_TITLE" not-null="true" />
+        <property name="language" type="string" column="XWD_LANGUAGE" index="DOC_LANGUAGE" length="5" />
+        <property name="defaultLanguage" type="string" column="XWD_DEFAULT_LANGUAGE" index="DOC_DEFAULT_LANGUAGE" length="5" />
+        <property name="translation" type="integer" column="XWD_TRANSLATION" not-null="true" />
+        <property name="date" type="timestamp" column="XWD_DATE" index="DOC_DATE" not-null="true" />
+        <property name="contentUpdateDate" type="timestamp" column="XWD_CONTENT_UPDATE_DATE" index="DOC_CONTENT_UPDATE_DATE" not-null="true" />
+        <property name="creationDate" type="timestamp" column="XWD_CREATION_DATE" index="DOC_CREATION_DATE" not-null="true" />
+        <property name="author" type="string" column="XWD_AUTHOR" length="255" index="DOC_AUTHOR" not-null="true" />
+        <property name="contentAuthor" type="string" column="XWD_CONTENT_AUTHOR" length="255" index="DOC_CONTENT_AUTHOR" not-null="true" />
+        <property name="creator" type="string" column="XWD_CREATOR" length="255" index="DOC_CREATOR" not-null="true" />
+        <!-- This property is deprecated and should not be used anymore. Use .space instead. -->
+        <property name="web" type="string" update="false" insert="false" column="XWD_WEB" length="255" not-null="true" />
+        <property name="space" type="string" column="XWD_WEB" length="255" index="DOC_SPACE" not-null="true" />
+        <property name="content" type="text" column="XWD_CONTENT" length="200000" not-null="true" />
+        <property name="version" type="string" column="XWD_VERSION" length="255" not-null="true" />
+        <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="255" not-null="true" />
+        <property name="parent" type="string" column="XWD_PARENT" length="511" not-null="true" />
+        <property name="xWikiClassXML" type="text" column="XWD_CLASS_XML" length="60000" not-null="false" />
+        <property name="elements" type="integer" not-null="true" column="XWD_ELEMENTS" />
+        <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" not-null="true" />
+        <property name="validationScript" type="string" column="XWD_VALIDATION_SCRIPT" not-null="true" />
+        <property name="comment" type="string" column="XWD_COMMENT" length="1023" not-null="true" />
+        <property name="minorEdit1" type="boolean" column="XWD_MINOREDIT" index="DOC_MINOREDIT" not-null="true" />
+        <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
+        <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
+        <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
+            <key-property name="docId" column="XWR_DOCID" type="long" />
+            <key-property name="version1" column="XWR_VERSION1" type="integer" />
+            <key-property name="version2" column="XWR_VERSION2" type="integer" />
+        </composite-id>
+        <property name="date" type="timestamp" column="XWR_DATE" index="REV_DATE" not-null="true" />
+        <property name="comment" type="string" column="XWR_COMMENT" not-null="true" />
+        <property name="author" type="string" column="XWR_AUTHOR" index="REV_AUTHOR" not-null="true" />
+        <property name="diff" type="boolean" column="XWR_ISDIFF" index="REV_ISDIFF" not-null="false" update="false" insert="false" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent" table="xwikircs">
+        <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
+            <key-property name="docId" column="XWR_DOCID" type="long" />
+            <key-property name="version1" column="XWR_VERSION1" type="integer" />
+            <key-property name="version2" column="XWR_VERSION2" type="integer" />
+        </composite-id>
+        <component name="patch">
+            <property name="diff" type="boolean" column="XWR_ISDIFF" not-null="false" />
+            <property name="content" type="materialized_clob" column="XWR_PATCH" not-null="false" length="1000000000" />
+        </component>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiDeletedDocument" table="xwikirecyclebin" mutable="false">
+        <id name="id" column="XDD_ID">
+            <generator class="native" />
+        </id>
+        <natural-id mutable="false">
+            <property name="fullName" column="XDD_FULLNAME" type="string" length="255" />
+            <property name="language" column="XDD_LANGUAGE" type="string" length="5" index="XDD_LANGUAGE" />
+            <property name="date" type="timestamp" column="XDD_DATE" index="XDD_DATE" />
+        </natural-id>
+        <property name="deleter" type="string" column="XDD_DELETER" index="XDD_DELETER" />
+        <property name="xml" type="materialized_clob" column="XDD_XML" not-null="true" length="1000000000" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.DeletedAttachment" table="xwikiattrecyclebin" mutable="false">
+        <id name="id" column="XDA_ID">
+            <generator class="native" />
+        </id>
+        <natural-id mutable="false">
+            <!-- We use docId because most databases do not support indexes on lengthy columns. -->
+            <property name="docId" column="XDA_DOCID" type="long" />
+            <property name="filename" column="XDA_FILENAME" type="string" length="255" index="XDA_FILENAME" />
+            <property name="date" type="timestamp" column="XDA_DATE" index="XDA_DATE" />
+        </natural-id>
+        <property name="docName" column="XDA_DOC_NAME" type="string" length="255" index="XDA_DOC_NAME" />
+        <property name="deleter" type="string" column="XDA_DELETER" index="XDA_DELETER" />
+        <property name="xml" type="materialized_clob" column="XDA_XML" not-null="true" length="1000000000" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
+        <id name="docId" type="long" unsaved-value="undefined">
+            <column name="XWL_DOC_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="userName" type="string" column="XWL_AUTHOR" length="255" />
+        <property name="date" type="timestamp" column="XWL_DATE" not-null="true" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
+        <composite-id unsaved-value="undefined">
+            <key-property name="docId" column="XWL_DOC_ID" type="long" />
+            <key-property name="link" type="string" length="255">
+                <column name="XWL_LINK" index="XWLNK_LINK" />
+            </key-property>
+        </composite-id>
+        <property name="fullName" type="string" column="XWL_FULLNAME" length="255" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWA_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="docId" type="long" column="XWA_DOC_ID" index="ATT_DOC_ID" />
+        <property name="filename" type="string" column="XWA_FILENAME" length="255" not-null="true" />
+        <property name="filesize" type="integer" column="XWA_SIZE" />
+        <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />
+        <property name="author" type="string" column="XWA_AUTHOR" length="255" index="ATT_AUTHOR" />
+        <property name="version" type="string" column="XWA_VERSION" length="255" not-null="true" />
+        <property name="comment" type="string" column="XWA_COMMENT" length="255" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWA_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="content" type="materialized_blob" column="XWA_CONTENT" length="1000000000" not-null="true" />
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachmentArchive" table="xwikiattachment_archive">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWA_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="archive" type="materialized_blob" column="XWA_ARCHIVE" length="1000000000" />
+    </class>
+
+    <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
+        <composite-id unsaved-value="undefined">
+            <key-property name="id" column="XWP_ID" type="long" />
+            <key-property name="name" type="string">
+                <column name="XWP_NAME" index="PROP_NAME" />
+            </key-property>
+        </composite-id>
+        <property name="classType" type="string" column="XWP_CLASSTYPE" length="255" />
+
+        <joined-subclass name="com.xpn.xwiki.objects.IntegerProperty" table="xwikiintegers">
+            <key>
+                <column name="XWI_ID" />
+                <column name="XWI_NAME" index="XWINT_NAME" />
+            </key>
+            <property name="value" type="integer" column="XWI_VALUE" index="XWINT_VALUE" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.LongProperty" table="xwikilongs">
+            <key>
+                <column name="XWL_ID" />
+                <column name="XWL_NAME" index="XWLONG_NAME" />
+            </key>
+            <property name="value" type="long" column="XWL_VALUE" index="XWLONG_VALUE" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.FloatProperty" table="xwikifloats">
+            <key>
+                <column name="XWF_ID" />
+                <column name="XWF_NAME" index="XWFLOAT_NAME" />
+            </key>
+            <property name="value" type="float" column="XWF_VALUE" index="XWFLOAT_VALUE" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.DoubleProperty" table="xwikidoubles">
+            <key>
+                <column name="XWD_ID" />
+                <column name="XWD_NAME" index="XWDOUBLE_NAME" />
+            </key>
+            <property name="value" type="double" column="XWD_VALUE" index="XWDOUBLE_VALUE" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.StringProperty" table="xwikistrings">
+            <key>
+                <column name="XWS_ID" />
+                <column name="XWS_NAME" index="XWSTR_NAME" />
+            </key>
+            <property name="value" type="string" column="XWS_VALUE" length="255" index="XWSTR_VALUE" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.DateProperty" table="xwikidates">
+            <key>
+                <column name="XWS_ID" />
+                <column name="XWS_NAME" index="XWDATE_NAME" />
+            </key>
+            <property name="value" type="timestamp" column="XWS_VALUE" index="XWDATE_VALUE" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.LargeStringProperty" table="xwikilargestrings">
+            <key>
+                <column name="XWL_ID" />
+                <column name="XWL_NAME" index="XWLS_NAME" />
+            </key>
+            <property name="value" type="text" column="XWL_VALUE" length="60000" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikilargestrings">
+            <key>
+                <column name="XWL_ID" />
+                <column name="XWL_NAME" />
+            </key>
+            <property name="textValue" type="text" column="XWL_VALUE" length="60000" />
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.DBStringListProperty" table="xwikilists">
+            <key>
+                <column name="XWL_ID" />
+                <column name="XWL_NAME" index="XWLIST_NAME" />
+            </key>
+            <list name="list" table="xwikilistitems" lazy="false">
+                <key>
+                    <column name="XWL_ID" />
+                    <column name="XWL_NAME" index="XWLI_NAME" />
+                </key>
+                <index column="XWL_NUMBER" />
+                <element type="string">
+                    <column name="XWL_VALUE" index="XWLI_VALUE" />
+                </element>
+            </list>
+        </joined-subclass>
+    </class>
+
+    <class name="com.xpn.xwiki.objects.BaseObject" table="xwikiobjects">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWO_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="number" type="integer" column="XWO_NUMBER" index="OBJ_NUMBER" not-null="false" />
+        <property name="name" type="string" column="XWO_NAME" index="OBJ_NAME" not-null="true" length="255" />
+        <property name="className" type="string" column="XWO_CLASSNAME" index="OBJ_CLASSNAME" not-null="true" length="255" />
+        <property name="guid" type="string" column="XWO_GUID" not-null="false" length="255" />
+    </class>
+
+    <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWS_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="number" type="integer" column="XWS_NUMBER" not-null="false" />
+        <property name="name" type="string" column="XWS_NAME" not-null="true" length="255" index="XWDS_NAME" />
+        <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
+             implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
+             name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
+             (new stats) -->
+        <property name="className" type="string" column="XWS_CLASSNAME" length="255" />
+        <property name="action" type="string" column="XWS_ACTION" not-null="true" length="255" index="XWDS_ACTION" />
+        <property name="pageViews" type="integer" column="XWS_PAGE_VIEWS" index="XWDS_PAGE_VIEWS" not-null="false" />
+        <property name="uniqueVisitors" type="integer" column="XWS_UNIQUE_VISITORS" index="XWDS_UNIQUE_VISITORS" not-null="false" />
+        <property name="period" type="integer" column="XWS_PERIOD" index="XWDS_PERIOD" not-null="false" />
+        <property name="visits" type="integer" column="XWS_VISITS" index="XWDS_VISITS" not-null="false" />
+    </class>
+
+    <class name="com.xpn.xwiki.stats.impl.RefererStats" table="xwikistatsreferer">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWR_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="number" type="integer" column="XWR_NUMBER" not-null="false" />
+        <property name="name" type="string" column="XWR_NAME" not-null="true" length="255" index="XWRS_NAME" />
+        <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
+             implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
+             name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
+             (new stats) -->
+        <property name="className" type="string" column="XWR_CLASSNAME" length="255" />
+        <property name="referer" type="string" column="XWR_REFERER" not-null="true" length="8192" />
+        <property name="pageViews" type="integer" column="XWR_PAGE_VIEWS" index="XWRS_PAGE_VIEWS" not-null="false" />
+        <property name="period" type="integer" column="XWR_PERIOD" index="XWRS_PERIOD" not-null="false" />
+    </class>
+
+    <class name="com.xpn.xwiki.stats.impl.VisitStats" table="xwikistatsvisit">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWV_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="number" type="integer" column="XWV_NUMBER" not-null="false" />
+        <property name="name" type="string" column="XWV_NAME" not-null="true" length="255" index="XWVS_NAME" />
+        <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
+             implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
+             name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
+             (new stats) -->
+        <property name="className" type="string" column="XWV_CLASSNAME" length="255" />
+        <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
+        <property name="userAgent" type="string" column="XWV_USER_AGENT" not-null="true" length="8192" />
+        <property name="cookie" type="string" column="XWV_COOKIE" not-null="true" length="8192" />
+        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
+        <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
+        <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
+        <property name="downloads" type="integer" column="XWV_DOWNLOADS" index="XWVS_DOWNLOADS" not-null="false" />
+        <property name="startDate" type="timestamp" column="XWV_START_DATE" index="XWVS_START_DATE" not-null="false" />
+        <property name="endDate" type="timestamp" column="XWV_END_DATE" index="XWVS_END_DATE" not-null="false" />
+    </class>
+
+    <!-- XWikiPreferences custom mapping -->
+    <class entity-name="XWiki.XWikiPreferences" table="xwikipreferences">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWP_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="language" type="string" column="XWP_LANGUAGE" length="255" />
+        <property name="default_language" type="string" column="XWP_DEFAULT_LANGUAGE" length="255" />
+        <property name="multilingual" type="integer" column="XWP_MULTI_LINGUAL" />
+        <property name="authenticate_edit" type="integer" column="XWP_AUTHENTICATE_EDIT" />
+        <property name="authenticate_view" type="integer" column="XWP_AUTHENTICATE_VIEW" />
+        <property name="auth_active_check" type="integer" column="XWP_AUTH_ACTIVE_CHECK" />
+        <property name="backlinks" type="integer" column="XWP_BACKLINKS" />
+        <property name="skin" type="string" column="XWP_SKIN" length="255" />
+        <property name="stylesheet" type="string" column="XWP_STYLESHEET" length="255" />
+        <property name="stylesheets" type="string" column="XWP_STYLESHEETS" length="255" />
+        <property name="editor" type="string" column="XWP_EDITOR" length="255" />
+        <property name="webcopyright" type="string" column="XWP_WEBCOPYRIGHT" length="255" />
+        <property name="title" type="string" column="XWP_TITLE" length="255" />
+        <property name="version" type="string" column="XWP_VERSION" length="255" />
+        <property name="meta" type="text" column="XWP_META" length="30000" />
+        <property name="use_email_verification" type="integer" column="XWP_USE_EMAIL_VERIFICATION" />
+        <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="255" />
+        <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="255" />
+        <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
+        <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
+        <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
+        <property name="leftPanels" type="string" column="XWP_LEFT_PANELS" length="2000" />
+        <property name="rightPanels" type="string" column="XWP_RIGHT_PANELS" length="2000" />
+        <property name="showLeftPanels" type="integer" column="XWP_SHOW_LEFT_PANELS" />
+        <property name="showRightPanels" type="integer" column="XWP_SHOW_RIGHT_PANELS" />
+        <property name="languages" type="string" column="XWP_LANGUAGES" length="255" />
+        <property name="registration_anonymous" type="string" column="XWP_REGISTRATION_ANONYMOUS" length="255" />
+        <property name="registration_registered" type="string" column="XWP_REGISTRATION_REGISTERED" length="255" />
+        <property name="edit_anonymous" type="string" column="XWP_EDIT_ANONYMOUS" length="255" />
+        <property name="edit_registered" type="string" column="XWP_EDIT_REGISTERED" length="255" />
+        <property name="comment_anonymous" type="string" column="XWP_COMMENT_ANONYMOUS" length="255" />
+        <property name="comment_registered" type="string" column="XWP_COMMENT_REGISTERED" length="255" />
+        <property name="documentBundles" type="string" column="XWP_DOCUMENT_BUNDLES" length="2000" />
+    </class>
+
+    <!-- XWikiComments custom mapping -->
+    <class entity-name="XWiki.XWikiComments" table="xwikicomments">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWC_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="author" type="string" column="XWC_AUTHOR" length="255" index="COMMENT_AUTHOR" />
+        <property name="highlight" type="text" column="XWC_HIGHLIGHT" length="60000" />
+        <property name="comment" type="text" column="XWC_COMMENT" length="60000" />
+        <property name="replyto" type="integer" column="XWP_REPLYTO" index="COMMENT_REPLYTO" />
+        <property name="date" type="timestamp" column="XWP_DATE" index="COMMENT_DATE" />
+    </class>
+
+    <!-- XWikiPreferences custom mapping -->
+    <!--
+    <class entity-name="XWiki.XWikiUsers" table="xwikiusers">
+        <id name="id" type="integer" unsaved-value="undefined">
+            <column name="XWU_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="first_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_FIRST_NAME" length="255" not-null="false" />
+        <property name="last_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_LAST_NAME" length="255" not-null="false" />
+        <property name="email" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_EMAIL" length="50" />
+        <property name="company" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_COMPANY" length="255" />
+        <property name="password" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_PASSWORD" length="255" />
+        <property name="validationKey" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_VALIDATION_KEY" />
+        <property name="skin" type="string" column="XWU_SKIN" length="255" />
+        <property name="leftPanels" type="string" column="XWU_LEFT_PANELS" length="2000" />
+        <property name="rightPanels" type="string" column="XWU_RIGHT_PANELS" length="2000" />
+        <property name="showLeftPanels" type="integer" column="XWU_SHOW_LEFT_PANELS" />
+        <property name="showRightPanels" type="integer" column="XWU_SHOW_RIGHT_PANELS" />
+        <property name="pageWidth" type="string" column="XWU_PAGE_WIDTH" length="255" />
+        <property name="avatar" type="string" column="XWU_AVATAR" length="255" />
+    </class>
+    -->
+
+    <class name="com.xpn.xwiki.store.migration.XWikiDBVersion" table="xwikidbversion">
+        <id name="version" type="integer" unsaved-value="undefined">
+            <column name="XWV_VERSION" not-null="true" />
+            <generator class="assigned" />
+        </id>
+    </class>
+</hibernate-mapping>

@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter.internal;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Assert;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityContextInitializer;
 

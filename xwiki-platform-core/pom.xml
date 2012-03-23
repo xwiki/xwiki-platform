@@ -37,7 +37,6 @@
     <gwt.version>2.4.0</gwt.version>
     <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
-    <restlet.version>2.0.11</restlet.version>
   </properties>
   <dependencies>
     <dependency>
@@ -87,7 +86,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2-xwiki</version>
+        <version>2.5.2</version>
       </dependency>
       <!-- JFreeChart -->
       <dependency>
@@ -315,11 +314,25 @@
             <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <!-- Remove the following excludes after we release 3.5 -->
-                <exclude>org/xwiki/container/ContainerFactory</exclude>
-                <!-- Moved to another module -->
-                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
-                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>
+                <!-- Remove the following excludes after we release 4.0 -->
+                <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
+                <exclude>com/xpn/xwiki/objects/BaseObject</exclude>
+                <exclude>com/xpn/xwiki/objects/BaseProperty</exclude>
+                <exclude>com/xpn/xwiki/objects/PropertyInterface</exclude>
+                <exclude>com/xpn/xwiki/objects/classes/PropertyClass</exclude>
+                <exclude>com/xpn/xwiki/store/XWikiHibernateBaseStore</exclude>
+                <exclude>com/xpn/xwiki/stats/impl/XWikiStats</exclude>
+                <exclude>com/xpn/xwiki/store/migration/AbstractDataMigrationManager*</exclude>
+                <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration*</exclude>
+                <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigrationManager*</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
+                <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
+                <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
+                <exclude>org/xwiki/test/ui/po/DeleteConfirmationPage</exclude>
+                <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
+                <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
+                <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
               </excludes>
             </configuration>
           </plugin>

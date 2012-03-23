@@ -340,7 +340,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #set ($secondHalfIntervalSize = $mathtool.div($mathtool.sub($maxCount, $countAverage), $levelsHalf))
   ##
   ## Use a sorted map
-  #set ($popularityMap = $util.getTreeMap())
+  #set ($popularityMap = $collectionstool.getSortedMap())
   #set ($previousPopularityMax = $minCount)
   #set ($intervalSize = $firstHalfIntervalSize)
   #set ($halfPassed = false)

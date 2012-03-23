@@ -40,11 +40,6 @@ public class XWikiValidator extends AbstractDOMValidator
         super(false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.framework.AbstractXMLValidator#validate(org.w3c.dom.Document)
-     */
     @Override
     protected void validate(Document document)
     {
@@ -61,11 +56,7 @@ public class XWikiValidator extends AbstractDOMValidator
             XPathConstants.BOOLEAN));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#getName()
-     */
+    @Override
     public String getName()
     {
         return "XWiki";

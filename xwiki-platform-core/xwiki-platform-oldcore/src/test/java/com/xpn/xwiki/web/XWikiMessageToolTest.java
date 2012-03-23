@@ -44,6 +44,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
 
     private XWikiMessageTool tool;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -60,6 +61,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
     {
         private final Object[][] contents = {{"key", "value"}};
 
+        @Override
         public Object[][] getContents()
         {
             return contents;
@@ -112,6 +114,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
         final XWikiDocument transdocument = createDocument(name, transContent, "fr", "", false);
         mockDocument.stubs().method("getTranslatedDocument").will(new CustomStub("Implements getTranslatedDocument")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 if (invocation.parameterValues.size() == 1) {

@@ -32,11 +32,6 @@ import org.xwiki.model.EntityType;
 @Component("compactwiki")
 public class CompactWikiStringEntityReferenceSerializer extends CompactStringEntityReferenceSerializer
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CompactStringEntityReferenceSerializer#resolveDefaultValue(org.xwiki.model.EntityType, Object...)
-     */
     @Override
     protected String resolveDefaultValue(EntityType type, Object... parameters)
     {

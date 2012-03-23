@@ -113,11 +113,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
@@ -145,11 +141,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         return this.scriptContextManager.getScriptContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext)
-     */
     @Override
     protected List<Block> evaluateBlock(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

@@ -39,7 +39,7 @@ $response.setContentType('application/rss+xml')
   #if($category == '')
     #set($category = $defaultCategoryParent)
   #end
-  #set ($categoryDoc = $util.null)
+  #set ($categoryDoc = $NULL)
   #setVariable ("$categoryDoc" $xwiki.getDocument($category))
 #end
 #getTargetCategory($categoryDoc)

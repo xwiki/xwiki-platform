@@ -89,21 +89,13 @@ public final class DefaultConfig implements Config
         this.params = params;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Config#getParameter(String)
-     */
+    @Override
     public String getParameter(String paramName)
     {
         return getParameter(paramName, null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Config#getParameter(String, String)
-     */
+    @Override
     public String getParameter(String paramName, String defaultValue)
     {
         try {
@@ -114,11 +106,7 @@ public final class DefaultConfig implements Config
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Config#getParameterNames()
-     */
+    @Override
     public Set<String> getParameterNames()
     {
         if (params != null) {

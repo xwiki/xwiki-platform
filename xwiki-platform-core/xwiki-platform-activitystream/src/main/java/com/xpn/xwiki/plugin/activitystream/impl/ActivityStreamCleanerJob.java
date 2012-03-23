@@ -42,9 +42,6 @@ import com.xpn.xwiki.plugin.scheduler.AbstractJob;
  */
 public class ActivityStreamCleanerJob extends AbstractJob implements Job
 {
-    /**
-     * {@inheritDoc} 
-     */
     @Override
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {

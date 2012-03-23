@@ -43,6 +43,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         return processLogin(request, response, null);
     }
 
+    @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
         throws Exception
     {
@@ -58,6 +59,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         return false;
     }
 
+    @Override
     public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
         HttpServletResponse response, XWikiContext context) throws Exception
     {
@@ -203,6 +205,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         }
     }
 
+    @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
         throws IOException
     {

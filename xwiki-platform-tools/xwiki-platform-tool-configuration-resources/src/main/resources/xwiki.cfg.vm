@@ -250,7 +250,11 @@ xwiki.inactiveuser.allowedpages=
 #-# Enable to allow superadmin. It is disabled by default as this could be a
 #-# security breach if it were set and you forgot about it. Should only be enabled
 #-# for recovering the Wiki when the rights are completely messed.
+#if ($xwikiCfgSuperadminPassword)
+xwiki.superadminpassword=$xwikiCfgSuperadminPassword
+#else
 # xwiki.superadminpassword=system
+#end
 
 #-# Authentication type. You can use 'basic' to always use basic authentication.
 # xwiki.authentication=form

@@ -40,6 +40,7 @@ public class MainDataSourceFactory implements DataSourceFactory
         return uniqueInstance;
     }
 
+    @Override
     public DataSource create(Map params, XWikiContext context) throws DataSourceException
     {
         String type = (String) params.get("type");

@@ -159,12 +159,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         super("Dashboard", DESCRIPTION, DashboardMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(DashboardMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -297,11 +292,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;

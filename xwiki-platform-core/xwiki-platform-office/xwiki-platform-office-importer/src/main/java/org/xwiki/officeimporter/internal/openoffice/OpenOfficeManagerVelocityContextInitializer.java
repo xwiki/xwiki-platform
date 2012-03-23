@@ -70,9 +70,7 @@ public class OpenOfficeManagerVelocityContextInitializer implements VelocityCont
      */
     private OpenOfficeManagerVelocityBridge veloBridge;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize(VelocityContext context)
     {
         if (null == veloBridge) {

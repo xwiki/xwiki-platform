@@ -169,11 +169,6 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -194,11 +189,6 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

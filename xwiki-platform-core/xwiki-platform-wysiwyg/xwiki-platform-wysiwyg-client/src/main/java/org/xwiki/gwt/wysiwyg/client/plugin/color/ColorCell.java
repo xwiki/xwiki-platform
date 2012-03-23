@@ -55,9 +55,19 @@ public class ColorCell extends FlowPanel
     private final String color;
 
     /**
+     * The HEX code of the {@link #color}.
+     */
+    private final String hexColorCode;
+
+    /**
      * The CSS class name used when the color cell is selected. It depends on the color brightness.
      */
     private final String selectedStyleName;
+
+    /**
+     * The object used to get the hex code for a given color.
+     */
+    private final ColorConverter converter = new ColorConverter();
 
     /**
      * Flag indicating if this cell was clicked, thus selected.
@@ -74,7 +84,8 @@ public class ColorCell extends FlowPanel
         super();
 
         this.color = color;
-        selectedStyleName = getBrightness(color) < .5 ? SELECTED_DARK_STYLE_NAME : SELECTED_LIGHT_STYLE_NAME;
+        hexColorCode = converter.convertToHex(color);
+        selectedStyleName = getBrightness(hexColorCode) < .5 ? SELECTED_DARK_STYLE_NAME : SELECTED_LIGHT_STYLE_NAME;
         getElement().getStyle().setBackgroundColor(color);
         addStyleName(NORMAL_STYLE_NAME);
 
@@ -87,6 +98,14 @@ public class ColorCell extends FlowPanel
     public String getColor()
     {
         return color;
+    }
+
+    /**
+     * @return the HEX code of this cell's color
+     */
+    public String getHexColorCode()
+    {
+        return hexColorCode;
     }
 
     /**
@@ -136,6 +155,10 @@ public class ColorCell extends FlowPanel
      */
     private double getBrightness(String color)
     {
+        if (color == null) {
+            // Default to brightest.
+            return 1;
+        }
         int red = Integer.parseInt(color.substring(1, 3), 16);
         int green = Integer.parseInt(color.substring(3, 5), 16);
         int blue = Integer.parseInt(color.substring(5, 7), 16);

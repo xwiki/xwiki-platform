@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,8 +40,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class UserDirectoryPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
-    private static Logger LOGGER = LoggerFactory.getLogger(UserDirectoryPlugin.class);
-
     public static final String DEFAULT_PLUGIN_SPACE = "Directory";
 
     public static final String DEFAULT_GROUP_TEMPLATE = "XWiki.DirectoryGroupTemplate";
@@ -65,11 +61,13 @@ public class UserDirectoryPlugin extends XWikiDefaultPlugin implements XWikiPlug
         super(name, className, context);
     }
 
+    @Override
     public String getName()
     {
         return "userdirectory";
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new UserDirectoryPluginAPI((UserDirectoryPlugin) plugin, context);
@@ -79,7 +77,6 @@ public class UserDirectoryPlugin extends XWikiDefaultPlugin implements XWikiPlug
      * Add a group from the request
      * 
      * @param context
-     * @return
      */
     public Group addGroup(XWikiContext context) throws XWikiException
     {

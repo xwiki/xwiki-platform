@@ -32,9 +32,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
  */
 public class AreaPlotGenerator extends AbstractXYPlotGenerator
 {    
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected XYItemRenderer getXYItemRenderer(Map<String, String> parameters)
     {
         return new XYAreaRenderer();

@@ -50,22 +50,14 @@ public class LoggingCommandListener implements CommandListener
         this.log = log;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         log.add(name + " before(" + command + ',' + param + ')');
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         log.add(name + " after(" + command + ',' + param + ')');

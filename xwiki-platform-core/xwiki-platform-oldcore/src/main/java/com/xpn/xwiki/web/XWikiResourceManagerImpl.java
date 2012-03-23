@@ -27,11 +27,6 @@ import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 public class XWikiResourceManagerImpl extends ResourceManagerImpl
 {
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.velocity.runtime.resource.ResourceManagerImpl#getResource(String, int, String)
-     */
     @Override
     public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException,
         ParseErrorException

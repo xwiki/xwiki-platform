@@ -20,7 +20,6 @@
 package org.xwiki.test.ui;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.xwiki.test.integration.XWikiExecutor;
 
 /**
@@ -49,10 +48,21 @@ public class PersistentTestContext
      */
     private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
 
+    /**
+     * Starts an XWiki instance if not already started.
+     */
     public PersistentTestContext() throws Exception
     {
-        this.executor = new XWikiExecutor(0);
+        this(new XWikiExecutor(0));
         this.executor.start();
+    }
+
+    /**
+     * Don't start an XWiki instance, instead use an existing started instance.
+     */
+    public PersistentTestContext(XWikiExecutor executor) throws Exception
+    {
+        this.executor = executor;
 
         // Use a wrapping driver to display more information when there are failures.
         // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
@@ -60,17 +70,6 @@ public class PersistentTestContext
         // System.setProperty("webdriver.firefox.profile", "default");
         WebDriver nativeDriver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
         this.driver = new XWikiWrappingDriver(nativeDriver, getUtil());
-
-        // Wait when trying to find elements on the page till the timeout expires
-        getUtil().setDriverImplicitWait(this.driver);
-    }
-
-    public PersistentTestContext(XWikiExecutor executor) throws Exception
-    {
-        this.executor = executor;
-
-        // Use a wrapping driver to display more information when there are failures.
-        this.driver = new XWikiWrappingDriver(new FirefoxDriver(), getUtil());
 
         // Wait when trying to find elements on the page till the timeout expires
         getUtil().setDriverImplicitWait(this.driver);
@@ -119,6 +118,7 @@ public class PersistentTestContext
     {
         return new PersistentTestContext(this)
         {
+            @Override
             public void shutdown()
             {
                 // Do nothing, that's why it's unstoppable.

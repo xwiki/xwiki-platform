@@ -30,12 +30,6 @@ package org.xwiki.bridge;
 public class AttachmentName
 {
     /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * @see #getDocumentName()
      */
     private DocumentName documentName;
@@ -98,22 +92,12 @@ public class AttachmentName
         return this.fileName;
     }
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return "documentName = [" + getDocumentName() + "], fileName = [" + getFileName() + "]";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -133,11 +117,6 @@ public class AttachmentName
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

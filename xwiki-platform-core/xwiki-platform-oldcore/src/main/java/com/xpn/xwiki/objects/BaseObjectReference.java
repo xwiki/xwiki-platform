@@ -59,13 +59,13 @@ public class BaseObjectReference extends ObjectReference
      * Used to parse object reference name to class reference.
      */
     private static final DocumentReferenceResolver<String> RESOLVER = Utils
-        .getComponent(DocumentReferenceResolver.class);
+        .getComponent(DocumentReferenceResolver.TYPE_STRING);
 
     /**
      * Used to serialize class reference to object reference name.
      */
     private static final EntityReferenceSerializer<String> SERIALIZER = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to match number part of the object reference name.

@@ -221,7 +221,7 @@
 
    <!-- Image plugin cache -->
    <namedCache name="xwiki.plugin.image">
-      <loaders passivation="true">
+      <loaders>
          <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
            <!-- Let XWiki cache module set the proper location -->
          </loader>
@@ -230,7 +230,7 @@
 
    <!-- Equation plugin cache -->
    <namedCache name="xwiki.plugin.equation">
-      <loaders passivation="true">
+      <loaders>
          <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
            <!-- Let XWiki cache module set the proper location -->
          </loader>

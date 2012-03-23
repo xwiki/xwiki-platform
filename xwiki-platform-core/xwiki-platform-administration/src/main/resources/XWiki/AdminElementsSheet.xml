@@ -48,7 +48,7 @@
 #else
   #set ($legend = ['header', 'panels', 'docextra'])
 #end
-#set ($params = $util.hashMap)
+#set ($params = {})
 #set ($params.header = ['title', 'meta'])
 #set ($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
 #set ($params.docextra = ['showannotations', 'showcomments', 'showattachments', 'showhistory', 'showinformation'])

@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Keeps track of file system storage used by {@link OpenOfficeConverter} for a particular conversion.
+ * Keeps track of file system storage used by {@link org.xwiki.officeimporter.openoffice.OpenOfficeConverter} for a
+ * particular conversion.
  * 
  * @version $Id$
  * @since 2.2M2

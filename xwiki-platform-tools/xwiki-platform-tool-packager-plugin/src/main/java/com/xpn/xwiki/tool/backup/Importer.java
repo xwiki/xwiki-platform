@@ -33,6 +33,7 @@ import java.io.IOException;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Import a set of XWiki documents into an existing database.
@@ -59,6 +60,30 @@ public class Importer extends AbstractPackager
      */
     public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig) throws Exception
     {
+        importDocuments(sourceDirectory, databaseName, hibernateConfig, null);
+    }
+
+    /**
+     * Import documents defined in an XML file located in the passed document definition directory into a database
+     * defined by its passed name and by an Hibernate configuration file.
+     * <p>
+     * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
+     * allowed for method names though.
+     * </p>
+     *
+     * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
+     *            located
+     * @param databaseName some database name (TODO: find out what this name is really)
+     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
+     *            password, etc)
+     * @param importUser optionally the user under which to perform the import (useful for example when importing
+     *        pages that need to have Programming Rights and the page author is not the same as the importing user)
+     * @throws Exception if the import failed for any reason
+     * @todo Replace the Hibernate config file with a list of parameters required for the importation
+     */
+    public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig, String importUser)
+        throws Exception
+    {
         XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
 
         Package pack = new Package();
@@ -72,8 +97,7 @@ public class Importer extends AbstractPackager
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to import documents from ["
                 + sourceDirectory + "]", e);
         }
-
-        pack.install(context);
+        installWithUser(importUser, pack, context);
 
         // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
         // to disk and will be lost. In practice this means the last Document imported has a
@@ -81,6 +105,32 @@ public class Importer extends AbstractPackager
         // TODO: Find a way to implement this generically for all databases and inside
         // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
         shutdownHSQLDB(context);
+    }
+
+    /**
+     * Install a Package as a backup pack or with the passed user (if any).
+     *
+     * @param importUser the user to import with or null if it should be imported as a backup pack
+     * @param pack the Package instance performing the import
+     * @param context the XWiki Context
+     * @throws XWikiException if the import failed for any reason
+     */
+    private void installWithUser(String importUser, Package pack, XWikiContext context) throws XWikiException
+    {
+        // Set the current context user if an import user is specified (i.e. not null)
+        DocumentReference currentUserReference = context.getUserReference();
+        if (importUser != null) {
+            pack.setBackupPack(false);
+            // Set the current user in the context to the import user
+            context.setUserReference(new DocumentReference("xwiki", "XWiki", importUser));
+        }
+
+        try {
+            pack.install(context);
+        } finally {
+            // Restore context user as before
+            context.setUserReference(currentUserReference);
+        }
     }
 
     /**

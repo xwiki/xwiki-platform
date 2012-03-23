@@ -56,11 +56,7 @@ public class InsertHTMLExecutable extends AbstractSelectionExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         Element container = rta.getDocument().createDivElement().cast();

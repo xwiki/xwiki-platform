@@ -53,11 +53,6 @@ public class ExpandedMacroBlock extends MacroBlock
         this.contentRenderer = contentRenderer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroBlock#getContent()
-     */
     @Override
     public String getContent()
     {

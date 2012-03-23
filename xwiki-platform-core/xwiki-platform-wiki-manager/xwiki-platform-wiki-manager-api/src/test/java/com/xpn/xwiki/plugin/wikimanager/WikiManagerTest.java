@@ -107,11 +107,6 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         getDocuments(document.getDatabase(), true).put(document.getFullName(), document);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -133,6 +128,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         mockXWiki.stubs().method("getDocument").with(isA(DocumentReference.class), ANYTHING).will(new CustomStub("Implements XWiki.getDocument")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 return getDocument((DocumentReference) invocation.parameterValues.get(0));
@@ -140,6 +136,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
         mockXWiki.stubs().method("getDocument").with(isA(String.class), ANYTHING).will(new CustomStub("Implements XWiki.getDocument")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 return getDocument((String) invocation.parameterValues.get(0));
@@ -147,6 +144,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
         mockXWiki.stubs().method("saveDocument").will(new CustomStub("Implements XWiki.saveDocument")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 saveDocument((XWikiDocument) invocation.parameterValues.get(0));
@@ -156,6 +154,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
         mockXWiki.stubs().method("getXClass").will(new CustomStub("Implements XWiki.getClass")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 DocumentReference classReference = (DocumentReference) invocation.parameterValues.get(0);
@@ -168,6 +167,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
         mockXWiki.stubs().method("clearName").will(new CustomStub("Implements XWiki.clearName")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 return invocation.parameterValues.get(0);
@@ -180,6 +180,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         mockXWikiStore.stubs().method("createWiki").will(new CustomStub("Implements XWikiStoreInterface.createWiki")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 String wikiName = (String) invocation.parameterValues.get(0);

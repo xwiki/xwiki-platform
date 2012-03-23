@@ -47,9 +47,7 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(AttachmentsByFirstLettersSubView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
@@ -59,9 +57,7 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -78,9 +74,7 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();

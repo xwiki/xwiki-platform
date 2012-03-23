@@ -19,13 +19,16 @@
  */
 package org.xwiki.test.ui.browser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.xwiki.test.ui.XWikiWrappingDriver;
@@ -54,6 +57,7 @@ import org.xwiki.test.ui.XWikiWrappingDriver;
 public class BrowserMethodRule implements MethodRule
 {
     private String currentBrowserName;
+    private String currentBrowserVersion;
 
     public BrowserMethodRule(WebDriver driver)
     {
@@ -61,7 +65,13 @@ public class BrowserMethodRule implements MethodRule
         if (driver instanceof XWikiWrappingDriver) {
             nativeDriver = ((XWikiWrappingDriver) driver).getWrappedDriver();
         }
-        this.currentBrowserName = ((RemoteWebDriver) nativeDriver).getCapabilities().getBrowserName();
+
+        Capabilities capability = ((RemoteWebDriver) nativeDriver).getCapabilities();
+        // We get the name of the current user Browser
+        this.currentBrowserName = capability.getBrowserName();
+        // We get the version of the current used Browser
+        this.currentBrowserVersion = capability.getVersion();
+
     }
 
     @Override
@@ -71,19 +81,34 @@ public class BrowserMethodRule implements MethodRule
             @Override
             public void evaluate() throws Throwable
             {
+                // The full List with ignored browsers, taken from both annotations
+                List<IgnoreBrowser> ignoredBrowsersList = new ArrayList<IgnoreBrowser>();
+
+                // We check if there is a IgnoreBrowser annotation
                 IgnoreBrowser ignoreBrowser = method.getAnnotation(IgnoreBrowser.class);
                 if (ignoreBrowser != null) {
-                    List<String> ignoreBrowserList = Arrays.asList(ignoreBrowser.value());
-                    if (ignoreBrowserList.contains(currentBrowserName)) {
-                        // We don't run the test since the current Browser is in the list of browsers to ignore.
-                        // Returning an AssumptionViolatedException makes the test runner report the test as ignored!
-                        throw new AssumptionViolatedException(ignoreBrowser.reason());
-                    } else {
-                        statement.evaluate();
-                    }
-                } else {
-                    statement.evaluate();
+                    ignoredBrowsersList.add(ignoreBrowser);
                 }
+
+                // We check if there is a IgnoreBrowsers annotation compound
+                IgnoreBrowsers ignoreBrowsers = method.getAnnotation(IgnoreBrowsers.class);
+                if (ignoreBrowsers != null) {
+                    ignoredBrowsersList.addAll(Arrays.asList(ignoreBrowsers.value()));
+                }
+
+                // We iterate through the list of BrowserIgnore annotations
+                for (IgnoreBrowser ignoredBrowser : ignoredBrowsersList) {
+                    Pattern browserNamePattern = Pattern.compile(ignoredBrowser.value());
+                    Pattern browserVersionPattern = Pattern.compile(ignoredBrowser.version());
+
+                    if (browserNamePattern.matcher(currentBrowserName).matches()
+                        && (ignoredBrowser.version().isEmpty()
+                            || browserVersionPattern.matcher(currentBrowserVersion).matches()))
+                    {
+                        throw new AssumptionViolatedException(ignoredBrowser.reason());
+                    }
+                }
+                statement.evaluate();
             }
         };
     }

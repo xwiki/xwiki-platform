@@ -37,11 +37,7 @@ public class DOMUtilsTest extends DOMTestCase
      */
     private DOMUtils domUtils;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -904,5 +900,70 @@ public class DOMUtilsTest extends DOMTestCase
         assertEquals("<span class=\"bar\"><em>one</em></span>"
             + "<span id=\"foo\" class=\"bar\"><strong>two</strong></span>" + "<span class=\"bar\">three</span>",
             getContainer().getInnerHTML().toLowerCase());
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#shrinkRange(Range)} when the returned range is the same.
+     */
+    public void testShrinkRangeSameResult()
+    {
+        getContainer().setInnerHTML("four");
+
+        // four|
+        Range range = getDocument().createRange();
+        range.setStart(getContainer().getFirstChild(), 4);
+        range.collapse(true);
+        Range result = domUtils.shrinkRange(range);
+        assertSame(range, result);
+
+        // f|ou|r
+        range = getDocument().createRange();
+        range.setStart(getContainer().getFirstChild(), 1);
+        range.setEnd(getContainer().getFirstChild(), 3);
+        result = domUtils.shrinkRange(range);
+        assertSame(range, result);
+
+        getContainer().setInnerHTML("before<em>center</em>after");
+
+        // be|fore<em>center</em>afte|r
+        range = getDocument().createRange();
+        range.setStart(getContainer().getFirstChild(), 2);
+        range.setEnd(getContainer().getLastChild(), 4);
+        result = domUtils.shrinkRange(range);
+        assertSame(range, result);
+
+        // before<em>center|</em>|after
+        range = getDocument().createRange();
+        range.setStart(getContainer().getChild(1), 1);
+        range.setEnd(getContainer(), 2);
+        result = domUtils.shrinkRange(range);
+        assertSame(range, result);
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#shrinkRange(Range)} when the returned range is different.
+     */
+    public void testShrinkRangeDifferentResult()
+    {
+        getContainer().setInnerHTML("one<em>two</em>three");
+        Range range = getDocument().createRange();
+        range.setStart(getContainer().getFirstChild(), 3);
+        range.setEnd(getContainer(), 2);
+        Range result = domUtils.shrinkRange(range);
+        assertEquals(0, result.getStartOffset());
+        assertSame(getContainer().getChild(1).getFirstChild(), result.getStartContainer());
+        assertEquals(3, result.getEndOffset());
+        assertSame(getContainer().getChild(1).getFirstChild(), result.getEndContainer());
+
+        getContainer().setInnerHTML("before<img/>after");
+        getContainer().insertBefore(getDocument().createTextNode(""), getContainer().getLastChild());
+        range = getDocument().createRange();
+        range.setStart(getContainer().getFirstChild(), 6);
+        range.setEnd(getContainer().getLastChild(), 0);
+        result = domUtils.shrinkRange(range);
+        assertEquals(1, result.getStartOffset());
+        assertSame(getContainer(), result.getStartContainer());
+        assertEquals(0, result.getEndOffset());
+        assertSame(getContainer().getChild(2), result.getEndContainer());
     }
 }

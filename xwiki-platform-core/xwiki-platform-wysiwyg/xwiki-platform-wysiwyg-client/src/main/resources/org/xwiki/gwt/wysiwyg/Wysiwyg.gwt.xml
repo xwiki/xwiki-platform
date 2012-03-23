@@ -43,6 +43,11 @@
     <when-property-is name="user.agent" value="safari" />
   </replace-with>
 
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.OperaReadOnlyKeyboardHandler">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler" />
+    <when-property-is name="user.agent" value="opera" />
+  </replace-with>
+
   <!-- LinePlugin -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />

@@ -50,7 +50,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-linkchecker-refresher</artifactId>
+      <artifactId>xwiki-platform-linkchecker-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

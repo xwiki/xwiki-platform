@@ -80,11 +80,7 @@ public class ScryptMemoryHardKeyDerivationFunction extends AbstractMemoryHardKey
      */
     private transient byte[] blockMixBufferY;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.AbstractMemoryHardKeyDerivationFunction#init(int, int, int)
-     */
+    @Override
     public void init(final int kilobytesOfMemoryToUse,
                      final int millisecondsOfProcessorTimeToSpend,
                      final int derivedKeyLength)
@@ -180,11 +176,7 @@ public class ScryptMemoryHardKeyDerivationFunction extends AbstractMemoryHardKey
         System.arraycopy(salt, 0, this.salt, 0, salt.length);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.MemoryHardKeyDerivationFunction#deriveKey(byte[])
-     */
+    @Override
     public byte[] deriveKey(final byte[] password)
     {
         try {

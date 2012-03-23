@@ -34,6 +34,7 @@ public class XWikiNotificationManagerTest extends TestCase
 {
     private XWikiNotificationManager notificationManager;
 
+    @Override
     protected void setUp() throws Exception
     {
         notificationManager = new XWikiNotificationManager();
@@ -68,18 +69,22 @@ public class XWikiNotificationManagerTest extends TestCase
     {
         return new XWikiNotificationRule()
         {
+            @Override
             public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
             {
             }
 
+            @Override
             public void preverify(XWikiDocument doc, String action, XWikiContext context)
             {
             }
 
+            @Override
             public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
             {
             }
 
+            @Override
             public void verify(XWikiDocument doc, String action, XWikiContext context)
             {
             }

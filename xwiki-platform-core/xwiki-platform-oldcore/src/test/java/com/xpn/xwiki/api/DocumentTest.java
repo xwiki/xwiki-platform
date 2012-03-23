@@ -132,9 +132,10 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         mockXWiki.stubs().method("isVirtualMode")
         .will(returnValue(false));
         mockXWiki.stubs().method("getRightService")
-            .will(returnValue((XWikiRightService)mockRightService.proxy()));
+            .will(returnValue(mockRightService.proxy()));
         mockXWiki.expects(once()).method("saveDocument").with(ANYTHING, ANYTHING, ANYTHING, ANYTHING)
             .will(new CustomStub("Make sure the contentAuthor is Alice") {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     assertEquals("Saving a document before calling dropPermissions() did not save as "

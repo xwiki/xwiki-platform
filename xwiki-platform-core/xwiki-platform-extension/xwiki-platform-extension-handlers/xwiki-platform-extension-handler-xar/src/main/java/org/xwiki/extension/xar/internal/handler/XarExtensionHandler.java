@@ -31,22 +31,26 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
-import org.xwiki.extension.job.Request;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.job.Request;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 @Component
 @Singleton
 @Named("xar")
@@ -60,9 +64,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     @Named("xar")
     private LocalExtensionRepository xarRepository;
-
-    @Inject
-    private Logger logger;
 
     /**
      * @param extra the extra parameters associated to the action

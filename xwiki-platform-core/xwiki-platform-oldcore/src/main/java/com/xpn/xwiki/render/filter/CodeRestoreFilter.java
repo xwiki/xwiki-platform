@@ -35,9 +35,7 @@ public class CodeRestoreFilter extends RegexTokenFilter
         super("(\\{(code)(?::([^\\}]*))?\\})\\{code}", SINGLELINE);
     }
 
-    /**
-     * @see CodeRemoveFilter#handleMatch(StringBuffer, MatchResult, FilterContext) 
-     */
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         LinkedList contentList =

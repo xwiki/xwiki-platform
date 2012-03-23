@@ -48,11 +48,7 @@ public class DefaultPasswordVerificationFunction implements PasswordVerification
     /** The used key derivation function. */
     private KeyDerivationFunction underlyingHashFunction;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordVerificationFunction#init(KeyDerivationFunction, byte[])
-     */
+    @Override
     public void init(final KeyDerivationFunction underlyingHashFunction,
                      final byte[] password)
     {
@@ -60,21 +56,13 @@ public class DefaultPasswordVerificationFunction implements PasswordVerification
         this.passwordHash = this.underlyingHashFunction.deriveKey(password);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordVerificationFunction#serialize()
-     */
+    @Override
     public byte[] serialize() throws IOException
     {
         return SerializationUtils.serialize(this);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordVerificationFunction#init(KeyDerivationFunction, byte[])
-     */
+    @Override
     public boolean isPasswordCorrect(final byte[] password)
     {
         return Arrays.equals(this.passwordHash, this.underlyingHashFunction.deriveKey(password));

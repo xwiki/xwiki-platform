@@ -97,11 +97,7 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
      */
     private Cache<OfficeDocumentView> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         CacheConfiguration config = new CacheConfiguration();
@@ -113,11 +109,7 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewer#createView(AttachmentReference, Map)
-     */
+    @Override
     public XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
         // Search the cache.

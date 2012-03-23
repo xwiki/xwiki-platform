@@ -36,10 +36,10 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * defined in {@link org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver}.
  *
  * @version $Id$
- * @since 2.2.3
+ * @since 4.0M1
  */
 @Component
-@Named("explicit/reference")
+@Named("explicit")
 @Singleton
 public class ExplicitReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
@@ -47,7 +47,7 @@ public class ExplicitReferenceDocumentReferenceResolver implements DocumentRefer
      * Default entity reference resolver used for resolution.
      */
     @Inject
-    @Named("explicit/reference")
+    @Named("explicit")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Override

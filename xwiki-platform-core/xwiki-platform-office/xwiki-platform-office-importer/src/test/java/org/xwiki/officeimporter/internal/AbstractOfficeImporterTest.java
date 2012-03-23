@@ -59,9 +59,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
      */
     protected OpenOfficeManager mockOpenOfficeManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @SuppressWarnings("unchecked")
     protected void registerComponents() throws Exception
     {
@@ -74,19 +72,19 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         this.mockDefaultStringEntityReferenceSerializer = getMockery().mock(EntityReferenceSerializer.class, "s1");
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorDSRS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        descriptorDSRS.setRole(EntityReferenceSerializer.class);
+        descriptorDSRS.setRoleType(EntityReferenceSerializer.TYPE_STRING);
         getComponentManager().registerComponent(descriptorDSRS, mockDefaultStringEntityReferenceSerializer);
 
         // Mock (compactwiki) string document name serializer.
         mockCompactWikiStringEntityReferenceSerializer = getMockery().mock(EntityReferenceSerializer.class, "s2");
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorCWSRS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        descriptorCWSRS.setRole(EntityReferenceSerializer.class);
+        descriptorCWSRS.setRoleType(EntityReferenceSerializer.TYPE_STRING);
         descriptorCWSRS.setRoleHint("compactwiki");
         getComponentManager().registerComponent(descriptorCWSRS, mockCompactWikiStringEntityReferenceSerializer);
 
         // Document name factory.
-        this.mockDocumentReferenceResolver = registerMockComponent(DocumentReferenceResolver.class, "currentmixed");
+        this.mockDocumentReferenceResolver = registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
         // Mock OpenOffice manager.
         this.mockOpenOfficeManager = registerMockComponent(OpenOfficeManager.class);

@@ -33,9 +33,7 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.jmock.Expectations;
 import org.jmock.Mock;
-import org.jmock.core.Constraint;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -90,6 +88,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
+            @Override
             protected void registerWikiMacros()
             {
             }
@@ -118,6 +117,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -131,6 +131,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -143,6 +144,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("deleteXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);

@@ -101,7 +101,7 @@
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
     #foreach ($user in $users)
       #if ($xcontext.database == $xcontext.mainWikiName) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
+      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
     #end
   &lt;/select&gt;
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;

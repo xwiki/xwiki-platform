@@ -85,6 +85,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
+        @Override
         public int compare(SyndEntry entry1, SyndEntry entry2)
         {
             if ((entry1.getPublishedDate() == null) && (entry2.getPublishedDate() == null)) {
@@ -103,6 +104,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public static class EntriesComparator implements Comparator<com.xpn.xwiki.api.Object>
     {
+        @Override
         public int compare(com.xpn.xwiki.api.Object entry1, com.xpn.xwiki.api.Object entry2)
         {
             BaseObject bobj1 = entry1.getXWikiObject();

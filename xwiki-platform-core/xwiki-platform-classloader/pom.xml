@@ -34,7 +34,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - ClassLoader - Parent POM</description>
   <modules>
-    <module>xwiki-platform-classloader-api</module>
     <module>xwiki-platform-classloader-protocols</module>
+    <module>xwiki-platform-classloader-xwiki</module>
   </modules>
 </project>

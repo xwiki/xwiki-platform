@@ -31,6 +31,9 @@ import org.junit.runners.model.FrameworkMethod;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.ui.browser.BrowserMethodRule;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
+import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.BaseElement;
 
 import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
@@ -51,12 +54,18 @@ public class AbstractTest
     public final TestName testName = new TestName();
 
     /**
+     * Used for ignoring tests that use {@link IgnoreBrowser} and {@link IgnoreBrowsers} annotations.
+     */
+    @Rule
+    public BrowserMethodRule browseMethodRule = new BrowserMethodRule(getDriver());
+
+    /**
      * The object used to watch tests and log when they start and succeed/fail.
      * <p>
      * The reason we need this is simply to overcome a deficiency in error reporting in Jenkins. The reason is that
      * Jenkins bases its test reporting on the Maven Surefire plugin reporting which itself is using a file to report
-     * test status. Since ui-tests are using a test suite, {@link PageObjectSuite}, there's only a single file generated and
-     * it's only generated when all tests have finished executing. Thus if a test hangs there won't be any file
+     * test status. Since ui-tests are using a test suite, {@link PageObjectSuite}, there's only a single file generated
+     * and it's only generated when all tests have finished executing. Thus if a test hangs there won't be any file
      * generated and looking at the Jenkins UI it won't be possible to see which tests have executed.
      * <p>
      * Normally each JUnit Test Runner knows what test is executing and when it's finished and thus can report them in

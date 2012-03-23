@@ -54,6 +54,7 @@ public abstract class XWikiForm extends ActionForm
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      */
+    @Override
     public void reset(ActionMapping mapping, HttpServletRequest request)
     {
         setRequest(request);

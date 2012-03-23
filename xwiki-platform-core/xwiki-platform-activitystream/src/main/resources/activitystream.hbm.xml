@@ -48,10 +48,15 @@
     <property name="param3" type="string" column="ase_param3" length="2000" />
     <property name="param4" type="string" column="ase_param4" length="2000" />
     <property name="param5" type="string" column="ase_param5" length="2000" />
-    <map name="parameters" table="activitystream_events_params" lazy="false">
+    <!-- The map mapping below was a feature introduced in http://jira.xwiki.org/browse/XWIKI-6839 to add support for
+         named parameters. However it's currently causing serious performance issues (see
+         http://jira.xwiki.org/browse/XWIKI-7520) and has had to be disabled for now.
+         TODO: Remove this comment below when http://jira.xwiki.org/browse/XWIKI-7554 is fixed
+    -->
+    <!--map name="parameters" table="activitystream_events_params" lazy="false">
       <key column="eventId"/>
       <index column="name" type="string" length="255"/>
       <element column="value" type="string" length="2000"/>
-    </map>
+    </map-->
   </class>
 </hibernate-mapping>

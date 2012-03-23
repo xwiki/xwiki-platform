@@ -31,11 +31,6 @@ import org.xwiki.annotation.Annotation;
  */
 public class TestDocumentFactory extends org.xwiki.annotation.TestDocumentFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.TestDocumentFactory#getDocument(java.lang.String)
-     */
     @Override
     public MockDocument getDocument(String docName) throws IOException
     {
@@ -48,12 +43,6 @@ public class TestDocumentFactory extends org.xwiki.annotation.TestDocumentFactor
         return loadedDoc;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.TestDocumentFactory#saveKeyToDoc(java.lang.String, java.lang.String,
-     *      org.xwiki.annotation.MockDocument, java.lang.String)
-     */
     @Override
     protected void saveKeyToDoc(String currentKey, String currentValue, org.xwiki.annotation.MockDocument doc,
         String docName) throws IOException

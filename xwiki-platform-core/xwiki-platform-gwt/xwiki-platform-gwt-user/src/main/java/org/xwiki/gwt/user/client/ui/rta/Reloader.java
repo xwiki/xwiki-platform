@@ -135,11 +135,7 @@ public class Reloader implements RequestCallback, LoadHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RequestCallback#onError(Request, Throwable)
-     */
+    @Override
     public void onError(Request request, Throwable exception)
     {
         this.request = null;
@@ -147,11 +143,7 @@ public class Reloader implements RequestCallback, LoadHandler
         callback = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RequestCallback#onResponseReceived(Request, Response)
-     */
+    @Override
     public void onResponseReceived(Request request, Response response)
     {
         this.request = null;
@@ -253,11 +245,7 @@ public class Reloader implements RequestCallback, LoadHandler
         document.close();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadHandler#onLoad(LoadEvent)
-     */
+    @Override
     public void onLoad(LoadEvent event)
     {
         loadRegistration.removeHandler();

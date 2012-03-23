@@ -35,6 +35,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroovyAuthServiceImpl.class);
 
+    @Override
     protected String getParam(String name, XWikiContext context)
     {
         String param = "";
@@ -80,6 +81,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         XWikiAuthService authservice = getAuthService(context);
@@ -94,6 +96,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
@@ -109,6 +112,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public void showLogin(XWikiContext context) throws XWikiException
     {
         XWikiAuthService authservice = getAuthService(context);
@@ -123,6 +127,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
     {
         XWikiAuthService authservice = getAuthService(context);
@@ -136,5 +141,4 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
             }
         }
     }
-
 }

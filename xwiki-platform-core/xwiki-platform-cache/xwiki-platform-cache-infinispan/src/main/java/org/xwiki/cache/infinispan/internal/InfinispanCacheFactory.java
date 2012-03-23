@@ -21,18 +21,14 @@ package org.xwiki.cache.infinispan.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.infinispan.config.Configuration;
-import org.infinispan.config.InfinispanConfiguration;
+import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
@@ -84,12 +80,6 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
      */
     private EmbeddedCacheManager cacheManager;
 
-    /**
-     * Configurations assigned to specific cache identifiers.
-     */
-    private final ConcurrentMap<String, Configuration> namedConfigurations =
-        new ConcurrentHashMap<String, Configuration>();
-
     @Override
     public void initialize() throws InitializationException
     {
@@ -106,26 +96,6 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
         InputStream configurationStream = getConfigurationFileAsStream();
 
         if (configurationStream != null) {
-            // Configuration file loading
-
-            try {
-                InfinispanConfiguration configuration =
-                    InfinispanConfiguration.newInfinispanConfiguration(configurationStream,
-                        InfinispanConfiguration.findSchemaInputStream());
-
-                Configuration defaultConfiguration = configuration.parseDefaultConfiguration();
-
-                for (Map.Entry<String, Configuration> entry : configuration.parseNamedConfigurations().entrySet()) {
-                    Configuration c = defaultConfiguration.clone();
-                    c.applyOverrides(entry.getValue());
-                    this.namedConfigurations.put(entry.getKey(), c);
-                }
-            } catch (IOException e) {
-                this.logger.error("Failed to load Infinispan configuration file", e);
-            } finally {
-                IOUtils.closeQuietly(configurationStream);
-            }
-
             // CacheManager initialization
 
             configurationStream = getConfigurationFileAsStream();
@@ -159,31 +129,25 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
-        Configuration customizedConfiguration = null;
-
-        String cacheName = configuration.getConfigurationId();
-        if (cacheName == null) {
-            // Infinispan require a name for the cache
-            cacheName = UUID.randomUUID().toString();
-            configuration.setConfigurationId(cacheName);
-        } else {
-            customizedConfiguration = this.namedConfigurations.get(cacheName);
-        }
-
-        // Apply XWiki cache configuration
-
         InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration);
 
-        if (customizedConfiguration == null) {
-            customizedConfiguration = this.cacheManager.getDefaultConfiguration().clone();
-            loader.customize(customizedConfiguration, true);
-        } else {
-            loader.customize(customizedConfiguration, false);
-        }
+        String cacheName = configuration.getConfigurationId();
 
         // Set custom configuration
 
-        this.cacheManager.defineConfiguration(cacheName, customizedConfiguration);
+        Configuration modifiedConfiguration =
+            loader.customize(this.cacheManager.getDefaultCacheConfiguration(),
+                cacheName != null ? this.cacheManager.getCacheConfiguration(cacheName) : null);
+
+        if (cacheName == null) {
+            // Infinispan require a name for the cache
+            cacheName = UUID.randomUUID().toString();
+            loader.getCacheConfiguration().setConfigurationId(cacheName);
+        }
+
+        if (modifiedConfiguration != null) {
+            this.cacheManager.defineConfiguration(cacheName, modifiedConfiguration);
+        }
 
         // create cache
 

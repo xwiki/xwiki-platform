@@ -49,11 +49,7 @@ public class CancelableAsyncCallback<T> implements AsyncCallback<T>
         this.callback = callback;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AsyncCallback#onFailure(Throwable)
-     */
+    @Override
     public void onFailure(Throwable caught)
     {
         if (!isCanceled()) {
@@ -61,11 +57,7 @@ public class CancelableAsyncCallback<T> implements AsyncCallback<T>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AsyncCallback#onSuccess(Object)
-     */
+    @Override
     public void onSuccess(T result)
     {
         if (!isCanceled()) {

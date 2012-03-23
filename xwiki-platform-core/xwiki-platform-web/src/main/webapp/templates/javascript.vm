@@ -11,7 +11,7 @@
 ##
 $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
-$xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)
+$xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
 $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
 $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $context.language})
 $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)

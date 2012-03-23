@@ -80,6 +80,7 @@ public class DefaultCoreConfiguration implements CoreConfiguration
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      * @since 2.3M1
      */
+    @Override
     public Syntax getDefaultDocumentSyntax()
     {
         // If the found value is an empty string then default to the configuration value in the main configuration

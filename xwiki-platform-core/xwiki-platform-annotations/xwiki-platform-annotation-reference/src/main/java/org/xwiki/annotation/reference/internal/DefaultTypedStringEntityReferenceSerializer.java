@@ -42,11 +42,6 @@ public class DefaultTypedStringEntityReferenceSerializer extends AbstractTypedSt
     @Inject
     private EntityReferenceSerializer<String> referenceSerializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.reference.internal.AbstractTypedStringEntityReferenceSerializer #getSerializer()
-     */
     @Override
     protected EntityReferenceSerializer<String> getSerializer()
     {

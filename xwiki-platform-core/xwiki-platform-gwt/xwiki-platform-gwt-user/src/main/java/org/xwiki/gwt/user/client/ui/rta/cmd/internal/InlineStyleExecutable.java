@@ -66,11 +66,7 @@ public class InlineStyleExecutable extends AbstractSelectionExecutable
         return property;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         Selection selection = rta.getDocument().getSelection();
@@ -226,11 +222,7 @@ public class InlineStyleExecutable extends AbstractSelectionExecutable
         element.getStyle().setProperty(property.getJSName(), parameter);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         Selection selection = rta.getDocument().getSelection();

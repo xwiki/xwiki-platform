@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.render;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -69,14 +67,10 @@ public class DefaultVelocityManager implements VelocityManager
      */
     private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
 
-    /**
-     * Store one VelocityEngine instance per skin since a skin is allowed to have a global velocimacro macros.vm file.
-     */
-    private Map<String, VelocityEngine> velocityManagers = new HashMap<String, VelocityEngine>();
-
     @Inject
     private Execution execution;
 
+    @Override
     public VelocityContext getVelocityContext()
     {
         // The Velocity Context is set in VelocityRequestInterceptor, when the XWiki Request is initialized so we are
@@ -107,8 +101,8 @@ public class DefaultVelocityManager implements VelocityManager
             vcontext.put("xcontext", apiContext);
 
             // Make the Syntax Factory component available from Velocity.
-            // TODO: We need to decide how we want to expose components in general and how to protect users from
-            // "dangerous" apis.
+            // This is @Depecated in XWiki 4.0M2 and shouldn't be used. Instead the Rendering Script Service should be
+            // used.
             vcontext.put("syntaxFactory", Utils.getComponent(SyntaxFactory.class));
 
             // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the

@@ -123,6 +123,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#addAnnotation(String, org.xwiki.annotation.Annotation)
      */
+    @Override
     public void addAnnotation(String target, Annotation annotation) throws IOServiceException
     {
         try {
@@ -186,6 +187,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#getAnnotations(String)
      */
+    @Override
     public Collection<Annotation> getAnnotations(String target) throws IOServiceException
     {
         try {
@@ -224,11 +226,7 @@ public class DefaultIOService implements IOService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.io.IOService#getAnnotation(java.lang.String, java.lang.String)
-     */
+    @Override
     public Annotation getAnnotation(String target, String annotationID) throws IOServiceException
     {
         try {
@@ -272,6 +270,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#removeAnnotation(String, String)
      */
+    @Override
     public void removeAnnotation(String target, String annotationID) throws IOServiceException
     {
         try {
@@ -327,6 +326,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#updateAnnotations(String, java.util.Collection)
      */
+    @Override
     public void updateAnnotations(String target, Collection<Annotation> annotations) throws IOServiceException
     {
         try {

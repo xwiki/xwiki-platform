@@ -36,6 +36,7 @@ public class TCPROMTest extends AbstractROMTestCase
     
     private Mockery context = new Mockery();
 
+    @Override
     @Before
     public void setUp() throws Exception
     {

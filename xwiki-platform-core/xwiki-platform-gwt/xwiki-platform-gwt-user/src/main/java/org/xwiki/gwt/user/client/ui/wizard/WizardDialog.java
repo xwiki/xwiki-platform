@@ -187,21 +187,13 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         buttons.add(button);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#addNavigationListener(NavigationListener)
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         navigationListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#removeNavigationListener(NavigationListener)
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);

@@ -70,6 +70,7 @@ import com.xpn.xwiki.internal.event.XARImportingEvent;
  * Default implementation of {@link Packager}.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
 @Component
 @Singleton
@@ -82,7 +83,7 @@ public class DefaultPackager implements Packager, Initializable
     private Execution execution;
 
     @Inject
-    @Named("explicit/reference")
+    @Named("explicit")
     private DocumentReferenceResolver<EntityReference> resolver;
 
     /**
@@ -96,6 +97,7 @@ public class DefaultPackager implements Packager, Initializable
 
     private SAXParserFactory parserFactory;
 
+    @Override
     public void initialize() throws InitializationException
     {
         this.parserFactory = SAXParserFactory.newInstance();

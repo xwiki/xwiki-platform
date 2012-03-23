@@ -90,11 +90,7 @@ public class BridgeEventStream implements EventStream
     @Named("explicit")
     private EntityReferenceResolver<String> explicitResolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventStream#addEvent(Event)
-     */
+    @Override
     public void addEvent(Event e)
     {
         try {
@@ -106,11 +102,7 @@ public class BridgeEventStream implements EventStream
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventStream#deleteEvent(Event)
-     */
+    @Override
     public void deleteEvent(Event e)
     {
         try {
@@ -122,11 +114,7 @@ public class BridgeEventStream implements EventStream
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventStream#getRelatedEvents(Event)
-     */
+    @Override
     public EventGroup getRelatedEvents(Event e)
     {
         XWikiContext context = getXWikiContext();
@@ -141,11 +129,7 @@ public class BridgeEventStream implements EventStream
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventStream#searchEvents(Query)
-     */
+    @Override
     public List<Event> searchEvents(Query query) throws QueryException
     {
         Query q = this.qm.createQuery("select event from ActivityEventImpl event "

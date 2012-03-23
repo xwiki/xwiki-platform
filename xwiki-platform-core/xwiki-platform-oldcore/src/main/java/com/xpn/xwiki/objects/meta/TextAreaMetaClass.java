@@ -62,6 +62,7 @@ public class TextAreaMetaClass extends StringMetaClass
         safeput("contenttype", contenttype_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new TextAreaClass();

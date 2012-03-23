@@ -15,13 +15,19 @@
     #set ($pageDoc = $xwiki.getDocument($page))
     $pageDoc.getRenderedContent()
     #if ($request.includechilds)
-      #set ($clevel = $util.parseInt($request.includechilds))
+      #set ($clevel = $mathtool.toInteger($request.includechilds))
+      #if (!$clevel)
+        #set ($clevel = 0)
+      #end
       #includeChildren($page $withPageBreaks)
     #elseif ($request.includelinks)
-      #set ($clevel = $util.parseInt($request.includelinks))
+      #set ($clevel = $mathtool.toInteger($request.includelinks))
+      #if (!$clevel)
+        #set ($clevel = 0)
+      #end
       #includeLinks($page $withPageBreaks)
     #end
-    #if ($velocityHasNext)
+    #if ($foreach.hasNext)
       #pagebreak()
     #end
   #end
@@ -30,10 +36,16 @@
     $cdoc.getRenderedContent()
   </div>
   #if ($request.includechilds)
-    #set ($clevel = $util.parseInt($request.includechilds))
+    #set ($clevel = $mathtool.toInteger($request.includechilds))
+    #if (!$clevel)
+      #set ($clevel = 0)
+    #end
     #includeChildren($cdoc $withPageBreaks)
   #elseif ($request.includelinks)
-    #set ($clevel = $util.parseInt($request.includelinks))
+    #set ($clevel = $mathtool.toInteger($request.includelinks))
+    #if (!$clevel)
+      #set ($clevel = 0)
+    #end
     #includeLinks($cdoc.fullName $withPageBreaks)
   #end
 #end

@@ -34,9 +34,7 @@ import org.xwiki.chart.model.ChartModel;
  */
 public class PiePlotGenerator implements PlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Plot generate(ChartModel model, Map<String, String> parameters)
     {
         DefaultPieDataset dataset = new DefaultPieDataset();

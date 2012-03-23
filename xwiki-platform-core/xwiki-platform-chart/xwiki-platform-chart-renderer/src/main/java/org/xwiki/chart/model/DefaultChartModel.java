@@ -92,25 +92,19 @@ public class DefaultChartModel implements ChartModel
         this.columnHeaders = columnHeaders;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getRowCount()
     {
         return rowCount;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getColumnCount()
     {
         return columnCount;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Number getCellValue(int rowIndex, int columnIndex)
     {
         if (rowIndex >= 0 && rowIndex < rowCount && columnIndex >= 0 && columnIndex < columnCount) {
@@ -119,9 +113,7 @@ public class DefaultChartModel implements ChartModel
         throw new IllegalArgumentException(String.format("Invalid cell specified : (%d, %d).", rowIndex, columnIndex));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getRowHeader(int rowIndex)
     {
         if (rowIndex >= 0 && rowIndex < rowCount) {
@@ -130,9 +122,7 @@ public class DefaultChartModel implements ChartModel
         throw new IllegalArgumentException(String.format("Invalid row index : [%s].", rowIndex));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getColumnHeader(int columnIndex)
     {
         if (columnIndex >= 0 && columnIndex < columnCount) {

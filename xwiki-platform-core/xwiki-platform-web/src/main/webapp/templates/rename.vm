@@ -19,7 +19,7 @@
   #if("$!{step}" == '')
     #set($step = '1')
   #end
-  #set($step = $util.parseInt("$step"))
+  #set($step = $mathtool.toInteger("$step"))
   <div class="main layoutsubsection">
   <div id="mainContentArea">
     #if($step == 1)

@@ -40,11 +40,7 @@ import com.xpn.xwiki.render.macro.XWikiMacro;
 
 public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWikiMacro
 {
-    public ChartingMacro()
-    {
-        super();
-    }
-
+    @Override
     public String getLocaleKey()
     {
         return "macro.charting";

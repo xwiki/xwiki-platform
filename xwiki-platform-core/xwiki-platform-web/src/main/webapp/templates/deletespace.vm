@@ -8,15 +8,17 @@
 #if ($message)
   <div id="xwikimessage">$message</div>
 #end
+#set ($cancelURL = $doc.getURL())
 #if ($request.xredirect)
   #set ($redirectparam = "&amp;xredirect=$escapetool.url($request.xredirect)")
+  #set ($cancelURL = $request.xredirect)
 #end
 #if ($xwiki.hasRecycleBin())
   #set ($confirmationMessage = $msg.get('core.space.recyclebin.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))
 #else
   #set ($confirmationMessage = $msg.get('core.space.delete.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))
 #end
-#xwikimessagebox($msg.get('core.delete') $confirmationMessage $doc.getURL('deletespace', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}") $doc.getURL('view') $msg.get('yes') $msg.get('no'))
+#xwikimessagebox($msg.get('core.delete') $confirmationMessage $doc.getURL('deletespace', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}") $escapetool.xml($cancelURL) $msg.get('yes') $msg.get('no'))
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main

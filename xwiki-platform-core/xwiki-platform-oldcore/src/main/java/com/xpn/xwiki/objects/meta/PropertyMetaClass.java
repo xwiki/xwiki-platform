@@ -102,15 +102,18 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface
         safeput("validationMessage", validationMessage_class);
     }
 
+    @Override
     public BaseCollection getObject()
     {
         return null;
     }
 
+    @Override
     public void setObject(BaseCollection object)
     {
     }
 
+    @Override
     public String toFormString()
     {
         return null;

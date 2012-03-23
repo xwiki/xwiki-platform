@@ -53,9 +53,7 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
      */
     private Map<String, PlotGenerator> plotGenerators;
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         plotGenerators = new HashMap<String, PlotGenerator>();        
@@ -65,9 +63,7 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
         plotGenerators.put("pie", new PiePlotGenerator());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public byte[] generate(ChartModel model, Map<String, String> parameters) throws ChartGeneratorException
     {
         setDefaultParams(parameters);

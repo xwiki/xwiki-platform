@@ -87,10 +87,10 @@ div.suggestItemInfo {
 }
 
 div.resultContainer div.sourceName {
-  background-color:$theme.panelCollapsedBackgroundColor;
+  background-color:$theme.menuContentBackgroundColor;
   font-variant: small-caps;
   font-weight: 700;
-  color:$theme.panelHeaderBackgroundColor;
+  color:$theme.menuContentLinkColor;
   padding-top:3px;
   font-size:0.875em;
   background-position:3px 3px;
@@ -112,7 +112,7 @@ div.resultContainer div.sourceName {
 
 .horizontalLayout div.resultContainer div.results {
   clear:both;
-  background-color:$theme.panelCollapsedBackgroundColor;
+  background-color:$theme.menuContentBackgroundColor;
 }
 
 .horizontalLayout div.resultContainer ul.suggestList {

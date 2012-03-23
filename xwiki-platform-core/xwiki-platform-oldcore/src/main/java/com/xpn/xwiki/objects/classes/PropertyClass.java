@@ -52,7 +52,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 {
     private BaseClass xclass;
 
-    private int id;
+    private long id;
 
     private PropertyMetaClass pMetaClass;
 
@@ -69,11 +69,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         setDisabled(false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#createReference()
-     */
     @Override
     protected ClassPropertyReference createReference()
     {
@@ -94,11 +89,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         this.pMetaClass = (PropertyMetaClass) xWikiClass;
     }
 
+    @Override
     public BaseCollection getObject()
     {
         return this.xclass;
     }
 
+    @Override
     public void setObject(BaseCollection object)
     {
         this.xclass = (BaseClass) object;
@@ -113,7 +110,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public int getId()
+    public long getId()
     {
         if (getObject() == null) {
             return this.id;
@@ -122,16 +119,18 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public void setId(int id)
+    public void setId(long id)
     {
         this.id = id;
     }
 
+    @Override
     public String toString(BaseProperty property)
     {
         return property.toText();
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         return null;
@@ -143,6 +142,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         return fromString(value);
     }
 
+    @Override
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
@@ -158,6 +158,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         buffer.append(input.toString());
     }
 
+    @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -166,6 +167,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         }
     }
 
+    @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
@@ -387,6 +389,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         return toXML();
     }
 
+    @Override
     public Element toXML()
     {
         Element pel = new DOMElement(getName());
@@ -427,6 +430,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         }
     }
 
+    @Override
     public String toFormString()
     {
         return toString();
@@ -490,6 +494,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         return true;
     }
 
+    @Override
     public BaseProperty fromValue(Object value)
     {
         BaseProperty property = newProperty();
@@ -497,6 +502,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         return property;
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         return new BaseProperty();
@@ -546,6 +552,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         }
     }
 
+    @Override
     public void flushCache()
     {
     }
@@ -559,6 +566,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
      * @see #getNumber()
      * @since 2.4M2
      */
+    @Override
     public int compareTo(PropertyClass other)
     {
         int result = this.getNumber() - other.getNumber();

@@ -35,21 +35,12 @@ public class TestEvent implements Event, Serializable
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
+    @Override
     public boolean matches(Object otherEvent)
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {

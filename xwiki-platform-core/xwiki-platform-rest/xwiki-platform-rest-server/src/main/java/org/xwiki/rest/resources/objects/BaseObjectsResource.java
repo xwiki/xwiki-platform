@@ -35,8 +35,8 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class BaseObjectsResource extends XWikiResource
 {
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
-        com.xpn.xwiki.web.Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        com.xpn.xwiki.web.Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     protected BaseObject getBaseObject(Document doc, String className, int objectNumber) throws XWikiException
     {

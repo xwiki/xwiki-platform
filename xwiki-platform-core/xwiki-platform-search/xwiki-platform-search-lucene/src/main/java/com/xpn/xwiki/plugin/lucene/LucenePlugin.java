@@ -142,11 +142,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
         return new LucenePluginApi((LucenePlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#finalize()
-     */
     @Override
     protected void finalize() throws Throwable
     {
@@ -599,11 +594,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
         LOGGER.debug("Lucene plugin initialized.");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void flushCache(XWikiContext context)
     {

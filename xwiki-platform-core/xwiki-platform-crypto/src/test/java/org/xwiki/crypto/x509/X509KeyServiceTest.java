@@ -96,7 +96,7 @@ public class X509KeyServiceTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void newPrivateKeyWrongPassword() throws GeneralSecurityException
+    public void newPrivateKeyWrongPassword()
     {
         try {
             Assert.assertNotNull("Private key is null", getKeyPair(passwordService).getPrivateKey("asdf"));

@@ -42,11 +42,6 @@ public class DefaultAnnotationMaintainer extends AbstractAnnotationMaintainer
     @Inject
     private DiffService diffService;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.AbstractAnnotationMaintainer#getDiffService()
-     */
     @Override
     public DiffService getDiffService()
     {

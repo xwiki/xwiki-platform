@@ -451,7 +451,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
       #end
     #end
   #end
-  #set ($valuesMap = $util.null)
+  #set ($valuesMap = $NULL)
   #setVariable ("$valuesMap" $result)
 #end
 

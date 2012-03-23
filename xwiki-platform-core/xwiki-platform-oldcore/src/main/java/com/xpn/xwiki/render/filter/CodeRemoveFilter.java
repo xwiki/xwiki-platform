@@ -38,6 +38,7 @@ public class CodeRemoveFilter extends RegexTokenFilter
         super("(\\{(code)(?::([^\\}]*))?\\})(.*?)\\{code}", MULTILINE);
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
     	// Remove the content inside the code macro. It'll be put back in CodeRestoreFilter

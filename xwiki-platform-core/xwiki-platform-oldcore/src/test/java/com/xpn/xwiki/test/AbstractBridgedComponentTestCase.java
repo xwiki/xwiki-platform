@@ -59,6 +59,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getMockery().setImposteriser(imposteriser);
     }
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -97,6 +98,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         }});
     }
 
+    @Override
     @After
     public void tearDown() throws Exception
     {

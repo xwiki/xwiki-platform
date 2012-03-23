@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
+<syntaxId>xwiki/2.1</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -136,7 +136,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
   },
   _onAdd : function() {
     if (this.input.value != '') {
-      window.self.location = this.urlTemplate.replace('__entryName__', this.input.value);
+      window.self.location = this.urlTemplate.replace('__entryName__', encodeURIComponent(this.input.value));
     } else {
       this.input.focus();
     }
@@ -271,6 +271,10 @@ return XWiki;
   background-image: url("$xwiki.getSkinFile('icons/silk/application_edit.png')");
 }
 
+#actionBox .action.delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_delete.png')");
+}
+
 #actionBox .action.add {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }
@@ -286,6 +290,11 @@ return XWiki;
 #entryNamePopup input[type=image] {
   margin-left: 2px;
   position: absolute;
+}
+
+.xwiki-livetable-container {
+  /* Make sure the live table doesn't overflow the action panel. */
+  clear: right;
 }</code>
 </property>
 <property>
@@ -304,23 +313,28 @@ return XWiki;
   #set($discard = $doc.use($liveTableObj))
   #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
   #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
-  #set($className = $liveTableObj.getProperty('class').value)
-  (% id="actionBox" class="floatinginfobox" %)
-  (((
-    = $msg.get('platform.appwithinminutes.appHomePageActionsHeading') =
-    {{html wiki="true"}}
-    * [[$msg.get('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;#AddNewEntry||class="action add"]]##
-      #set($templateName = $className)
-      #if($templateName.endsWith('Class'))
-        #set($templateName = $templateName.substring(0, $mathtool.sub($templateName.length(), 5)))
+  #if($hasCreatePage || ($hasEdit &amp;&amp; !$isReadOnly) || $hasSpaceAdmin)
+    (% id="actionBox" class="floatinginfobox" %)
+    (((
+      = $msg.get('platform.appwithinminutes.appHomePageActionsHeading') =
+      #if($hasCreatePage)
+        * [[$msg.get('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
+          #set($templateName = $liveTableObj.getProperty('class').value)
+          #if($templateName.endsWith('Class'))
+            #set($templateName = $templateName.substring(0, $mathtool.sub($templateName.length(), 5)))
+          #end
+          #set($templateName = $escapetool.url("${templateName}Template"))
+          #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
+          {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
       #end
-      #set($templateName = $escapetool.url("${templateName}Template"))
-      #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
-      {{html clean="false"}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
-    * &lt;a class="action edit" href="$xwiki.getURL($className, 'edit')"&gt;$msg.get('platform.appwithinminutes.appHomePageEditClassLabel')&lt;/a&gt;
-    {{/html}}
-  )))
-  = $msg.get('platform.appwithinminutes.appHomePageDescriptionHeading') =
+      #if($hasEdit &amp;&amp; !$isReadOnly)
+        * [[$msg.get('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="appName=$escapetool.url($doc.space)" class="action edit"]]
+      #end
+      #if($hasSpaceAdmin)
+        * [[$msg.get('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$doc.getURL('deletespace')||class="action delete"]]
+      #end
+    )))
+  #end
   $doc.display('description')
   ## Display the live table only if it was generated.
   #if($doc.content.length() &gt; 0)

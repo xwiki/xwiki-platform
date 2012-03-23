@@ -64,27 +64,21 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteArchive(XWikiAttachment attachment, XWikiContext context, boolean transaction)
         throws XWikiException
     {
         // Don't do anything since it's a void implementation.
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveArchive(XWikiAttachmentArchive archive, XWikiContext context, boolean transaction)
         throws XWikiException
     {
         // Don't do anything since it's a void implementation.
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiAttachmentArchive loadArchive(XWikiAttachment attachment, XWikiContext context, boolean transaction)
         throws XWikiException
     {

@@ -176,6 +176,14 @@ public class PackageMojo extends AbstractMojo
     private VelocityComponent velocity;
 
     /**
+     * The user under which the import should be done. If not user is specified then we import with backup pack.
+     * For example {@code superadmin}.
+     *
+     * @parameter
+     */
+    private String importUser;
+
+    /**
      * List of skin artifacts to include in the packaging.
      *
      * @parameter
@@ -243,7 +251,8 @@ public class PackageMojo extends AbstractMojo
         }
 
         // Step 8: Import specified XAR files into the database
-        getLog().info("Import XAR dependencies ...");
+        getLog().info(String.format("Import XAR dependencies %s...",
+            this.importUser == null ? "as a backup pack" : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
     }
 
@@ -332,7 +341,7 @@ public class PackageMojo extends AbstractMojo
                 try {
                     getLog().info("  ... Importing XAR: " + xarArtifact.getFile());
                     importer.importDocuments(xarTargetDirectory, "xwiki",
-                        new File(webInfDirectory, "hibernate.cfg.xml"));
+                        new File(webInfDirectory, "hibernate.cfg.xml"), this.importUser);
                 } catch (Exception e) {
                     throw new MojoExecutionException(
                         String.format("Failed to import XAR [%s]", xarArtifact.toString()), e);
@@ -366,7 +375,7 @@ public class PackageMojo extends AbstractMojo
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
-                if (artifact.getType().equals("jar") && artifact.getGroupId().equals("hsqldb")
+                if (artifact.getType().equals("jar") && artifact.getGroupId().equals("org.hsqldb")
                     && artifact.getArtifactId().equals("hsqldb"))
                 {
                     hsqldbArtifact = artifact;
@@ -377,7 +386,7 @@ public class PackageMojo extends AbstractMojo
 
         // If the HSQLDB artifact wasn't defined, try to resolve the default HSQLDB JAR artifact
         if (hsqldbArtifact == null) {
-            hsqldbArtifact = this.factory.createArtifact("hsqldb", "hsqldb", "1.8.0.7", "", "jar");
+            hsqldbArtifact = this.factory.createArtifact("org.hsqldb", "hsqldb", "2.2.8", "", "jar");
         }
 
         if (hsqldbArtifact != null) {

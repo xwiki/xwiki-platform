@@ -40,11 +40,13 @@ public class DefaultQuery implements IQuery
         _queryFactory = qf;
     }
 
+    @Override
     public List list() throws XWikiException
     {
         return null;
     }
 
+    @Override
     public String getNativeQuery()
     {
         return null;
@@ -56,18 +58,21 @@ public class DefaultQuery implements IQuery
 
     protected boolean _isdistinct = false;
 
+    @Override
     public IQuery setMaxResults(int fs)
     {
         _fetchSize = fs;
         return this;
     }
 
+    @Override
     public IQuery setFirstResult(int fr)
     {
         _firstResult = fr;
         return this;
     }
 
+    @Override
     public IQuery setDistinct(boolean d)
     {
         _isdistinct = d;
@@ -89,6 +94,7 @@ public class DefaultQuery implements IQuery
         return _querytree;
     }
 
+    @Override
     public String toString()
     {
         try {

@@ -427,7 +427,7 @@ function prettyNameChanged()
           #if ($user != 'XWiki.XWikiGuest')
             #set ($selectAsOwner = ($xcontext.user == $user))
             #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-            &lt;option value="$user" #if($selectAsOwner)selected='selected'#{end}&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
+            &lt;option value="$user" #if($selectAsOwner)selected='selected'#{end}&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
           #end
         #end
       &lt;/select&gt;
@@ -454,7 +454,7 @@ function prettyNameChanged()
           ## Also skip the guest user.
           #if (($hasAdmin || (!$hasAdmin &amp;&amp; $user != $xcontext.user)) &amp;&amp; ($user != 'XWiki.XWikiGuest'))
             #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-            &lt;option value="$user"&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
+            &lt;option value="$user"&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
           #end
         #end
       &lt;/select&gt;

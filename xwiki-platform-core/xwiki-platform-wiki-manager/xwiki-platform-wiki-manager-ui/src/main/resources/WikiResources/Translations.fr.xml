@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:52:26 CEST 2011
 XWiki.XWikiServerClass_visibility_private=Privé
 XWiki.XWikiServerClass_visibility_public=Public
 error.ERROR_XWIKI_ACCESS_DENIED=Vous n'avez pas le droit d'effectuer cette action.

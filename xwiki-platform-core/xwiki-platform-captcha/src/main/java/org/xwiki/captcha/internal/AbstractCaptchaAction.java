@@ -37,21 +37,13 @@ import com.octo.captcha.service.CaptchaService;
 public abstract class AbstractCaptchaAction<T extends CaptchaService> extends Action
     implements CaptchaVerifier
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @see CaptchaVerifier#isAnswerCorrect(String, String)
-     */
+    @Override
     public boolean isAnswerCorrect(String userId, String answer)
     {
         return getCaptchaService().validateResponseForID(userId, answer);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see CaptchaVerifier#getUserId(javax.servlet.http.HttpServletRequest)
-     */
+    @Override
     public String getUserId(HttpServletRequest request)
     {
         return request.getSession().getId();

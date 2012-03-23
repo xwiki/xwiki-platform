@@ -40,11 +40,6 @@ public class UsersGroups
      */
     public Collection<String> groups = new HashSet<String>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

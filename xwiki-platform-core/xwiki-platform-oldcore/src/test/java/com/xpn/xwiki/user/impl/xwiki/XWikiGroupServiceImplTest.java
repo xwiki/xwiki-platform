@@ -46,11 +46,6 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
     private XWikiDocument group;
     private BaseObject groupObject;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -66,6 +61,7 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(ANYTHING, eq("WebPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return new XWikiDocument(new DocumentReference(getContext().getDatabase(),

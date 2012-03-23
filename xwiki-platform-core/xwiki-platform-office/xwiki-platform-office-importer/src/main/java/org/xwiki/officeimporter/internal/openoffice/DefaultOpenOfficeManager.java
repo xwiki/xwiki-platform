@@ -158,21 +158,13 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
         this.converter = new DefaultOpenOfficeConverter(this.jodConverter, workDir);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#getState()
-     */
+    @Override
     public ManagerState getState()
     {
         return this.state;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#start()
-     */
+    @Override
     public void start() throws OpenOfficeManagerException
     {
         // If the OpenOffice server is running then stop it in order to restart the connection.
@@ -189,11 +181,7 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#stop()
-     */
+    @Override
     public void stop() throws OpenOfficeManagerException
     {
         // We should try stopping the OpenOffice server even if the status is not connected but we should not raise an
@@ -211,11 +199,7 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#getConverter()
-     */
+    @Override
     public OpenOfficeConverter getConverter()
     {
         return this.converter;

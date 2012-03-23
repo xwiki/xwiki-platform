@@ -28,6 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+import org.xwiki.csrf.CSRFToken;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Action used for saving and returning to the edit page rather than viewing changes.
  * 
@@ -35,16 +40,28 @@ import com.xpn.xwiki.XWikiException;
  */
 public class SaveAndContinueAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
+
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        // CSRF prevention
-        if (!csrfTokenCheck(context)) {
+        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
+        String token = context.getRequest().getParameter("form_token");
+
+        if (!csrf.isTokenValid(token)) {
+            try {
+                context.getResponse().setContentType("text/plain");
+                context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
+                context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+                context.getResponse().getWriter().print(context.getMessageTool()
+                                                        .get("core.editors.saveandcontinue.csrfCheckFailed"));
+            } catch (IOException e) {
+                LOGGER.error("Failed to send error in response to save & continue action with mismatching CSRF token.",
+                             e);
+            }
+
             return false;
         }
 
@@ -83,11 +100,6 @@ public class SaveAndContinueAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

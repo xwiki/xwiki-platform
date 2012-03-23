@@ -31,6 +31,7 @@ public class Tag implements Comparable<Tag>
         this.name = tagName;
     }
 
+    @Override
     public int compareTo(Tag o)
     {
         return -o.name.compareTo(this.name);

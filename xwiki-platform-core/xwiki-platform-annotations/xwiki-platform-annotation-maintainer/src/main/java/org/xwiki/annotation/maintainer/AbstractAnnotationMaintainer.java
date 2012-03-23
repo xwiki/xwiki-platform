@@ -77,12 +77,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
     @Inject
     protected ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.AnnotationMaintainer#updateAnnotations(java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public void updateAnnotations(String target, String previousContent, String currentContent)
         throws MaintainerServiceException
     {

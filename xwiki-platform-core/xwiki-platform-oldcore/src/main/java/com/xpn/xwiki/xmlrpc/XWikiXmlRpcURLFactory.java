@@ -33,6 +33,7 @@ public class XWikiXmlRpcURLFactory extends XWikiServletURLFactory
     {
     }
 
+    @Override
     public String getURL(URL url, XWikiContext context)
     {
         return url.toString();

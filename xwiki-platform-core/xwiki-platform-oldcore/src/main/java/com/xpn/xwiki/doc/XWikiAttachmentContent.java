@@ -122,11 +122,6 @@ public class XWikiAttachmentContent implements Cloneable
         // The id is taken from the attachment which is set in XWikiHibernateAttachmentStore#loadAttachmentContent.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {

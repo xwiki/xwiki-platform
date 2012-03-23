@@ -35,13 +35,11 @@ public class NativeAsyncCallback<T> implements AsyncCallback<T>
     /**
      * The JavaScript function to call on success.
      */
-    @SuppressWarnings("unused")
     private final JavaScriptObject onSuccess;
 
     /**
      * The JavaScript function to call on failure.
      */
-    @SuppressWarnings("unused")
     private final JavaScriptObject onFailure;
 
     /**
@@ -56,11 +54,7 @@ public class NativeAsyncCallback<T> implements AsyncCallback<T>
         this.onFailure = onFailure;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AsyncCallback#onFailure(Throwable)
-     */
+    @Override
     public native void onFailure(Throwable caught)
     /*-{
         var onFailure = this.@org.xwiki.gwt.user.client.NativeAsyncCallback::onFailure;
@@ -73,11 +67,7 @@ public class NativeAsyncCallback<T> implements AsyncCallback<T>
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AsyncCallback#onSuccess(Object)
-     */
+    @Override
     public native void onSuccess(T result)
     /*-{
         var onSuccess = this.@org.xwiki.gwt.user.client.NativeAsyncCallback::onSuccess;

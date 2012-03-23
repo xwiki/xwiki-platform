@@ -280,11 +280,6 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
         return isApplication;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     protected boolean updateBaseClass(BaseClass baseClass)
     {
@@ -326,11 +321,6 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
         return needsUpdate;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
-     */
     @Override
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
@@ -415,12 +405,6 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
         return newXObjectDocument(doc, objectId, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
-     *      int, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiApplication newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
         throws XWikiException

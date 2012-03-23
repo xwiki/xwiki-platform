@@ -81,9 +81,8 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
             }
         });
 
-        @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookup(EntityReferenceResolver.class);
+            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING);
         getMockery().checking(new Expectations()
                     {
             {

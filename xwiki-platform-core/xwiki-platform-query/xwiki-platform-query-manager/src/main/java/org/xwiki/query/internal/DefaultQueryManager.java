@@ -41,9 +41,7 @@ public class DefaultQueryManager extends AbstractQueryManager
     @Inject
     protected QueryExecutorManager queryExecutorManager;
 
-    /**
-     * @return {@link QueryExecutorManager}
-     */
+    @Override
     protected QueryExecutorManager getQueryExecutorManager()
     {
         return this.queryExecutorManager;

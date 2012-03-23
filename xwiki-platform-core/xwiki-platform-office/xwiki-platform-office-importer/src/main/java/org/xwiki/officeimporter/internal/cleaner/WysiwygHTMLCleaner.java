@@ -100,31 +100,19 @@ public class WysiwygHTMLCleaner implements HTMLCleaner
     @Named("officeimporter/table")
     private HTMLFilter tableFilter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent)
     {
         return clean(originalHtmlContent, getDefaultConfiguration());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader, HTMLCleanerConfiguration)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
         return this.defaultHtmlCleaner.clean(originalHtmlContent, configuration);
     }
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#getDefaultConfiguration()
-     */
+    @Override
     public HTMLCleanerConfiguration getDefaultConfiguration()
     {
         HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();

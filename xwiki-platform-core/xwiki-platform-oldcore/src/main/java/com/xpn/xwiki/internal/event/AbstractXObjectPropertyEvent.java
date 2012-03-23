@@ -30,12 +30,6 @@ import org.xwiki.model.reference.EntityReference;
 public abstract class AbstractXObjectPropertyEvent extends AbstractXObjectEvent implements XObjectPropertyEvent
 {
     /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * Default constructor. Matches any {@link XObjectPropertyEvent}.
      */
     public AbstractXObjectPropertyEvent()

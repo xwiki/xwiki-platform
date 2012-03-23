@@ -41,22 +41,14 @@ public class StandardsModeIFrameLinker extends IFrameLinker
     private static final String DOCTYPE =
         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IFrameLinker#getModulePrefix(TreeLogger, LinkerContext, String)
-     */
+    @Override
     protected String getModulePrefix(TreeLogger logger, LinkerContext context, String strongName)
         throws UnableToCompleteException
     {
         return DOCTYPE + super.getModulePrefix(logger, context, strongName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IFrameLinker#getModulePrefix(TreeLogger, LinkerContext, String, int)
-     */
+    @Override
     protected String getModulePrefix(TreeLogger logger, LinkerContext context, String strongName, int numFragments)
         throws UnableToCompleteException
     {

@@ -42,5 +42,6 @@
     <module>xwiki-platform-legacy-observation</module>
     <module>xwiki-platform-legacy-annotation</module>
     <module>xwiki-platform-legacy-bridge</module>
+    <module>xwiki-platform-legacy-model</module>
   </modules>
 </project>

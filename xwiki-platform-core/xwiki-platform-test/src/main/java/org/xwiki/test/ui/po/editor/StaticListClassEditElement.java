@@ -50,6 +50,7 @@ public class StaticListClassEditElement extends BaseElement
             this.id = id;
         }
 
+        @Override
         public String toString()
         {
             return this.id;

@@ -236,6 +236,11 @@
       <artifactId>javassist</artifactId>
       <version>3.9.0.GA</version>
     </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>2.0.3</version>
+    </dependency>
 
     <!-- Authentication -->
     <dependency>
@@ -280,9 +285,9 @@
 
     <!-- JSON -->
     <dependency>
+      <!-- Used by packaging plugin -->
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
-      <version>2.3</version>
       <classifier>jdk15</classifier>
     </dependency>
 
@@ -1022,6 +1027,7 @@
               **/store/migration/hibernate/R4359XWIKI1459DataMigration.java,
               **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
               **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
+              **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
               **/store/XWikiAttachmentStoreInterface.java,
               **/store/XWikiBatcherFactory.java,
               **/store/XWikiBatcher.java,
@@ -1086,10 +1092,6 @@
               **/web/InlineAction.java,
               **/web/LifeBlogAction.java,
               **/web/LockAction.java,
-              **/web/LoginAction.java,
-              **/web/LoginErrorAction.java,
-              **/web/LoginSubmitAction.java,
-              **/web/LogoutAction.java,
               **/web/ObjectAddAction.java,
               **/web/ObjectAddForm.java,
               **/web/ObjectRemoveAction.java,

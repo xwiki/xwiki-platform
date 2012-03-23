@@ -35,7 +35,7 @@
         #end ## @
         #if (!$recipients.contains($recipient) && "$!recipient" != '')
           #set ($discard = $recipients.add($recipient))
-          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${util.null}, ${util.null}, $context.language, 'XWiki.SharePage', ${util.null}))
+          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, $context.language, 'XWiki.SharePage', ${NULL}))
           #if ($result != 0)
             #set ($discard = $errors.put($fullRecipientName, $msg.get('core.viewers.share.error.serverError')))
           #else

@@ -43,11 +43,6 @@ public class XWikiRootServlet extends HttpServlet
      */
     private String xwiki = "xwiki";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.GenericServlet#init()
-     */
     @Override
     public void init() throws ServletException
     {

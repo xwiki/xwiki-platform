@@ -412,7 +412,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
       &lt;td&gt;$xwiki.getLocalUserName($datt.getDeleter())&lt;/td&gt;
       &lt;td class="itemActions"&gt;
         #if($datt.canDelete())
-          &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$util.encodeURI($!request.getRequestURI())?$util.encodeURI($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
+          &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;
@@ -457,10 +457,16 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
 ## ============================================================================================
 #if("$!{request.get('xpage')}" == 'plain')
 $response.setContentType('application/json')
-#set($offset = $util.parseInt($request.get('offset')))
+#set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
-#set($limit = $util.parseInt($request.get('limit')))
+#if (!$offset || $offset &lt; 0)
+  #set ($offset = 0)
+#end
+#set($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
 #set($filenameFilter = $request.get('datt.filename'))
 #set($docNameFilter = $request.get('datt.docName'))
 #set($deleterFilter = $request.get('datt.deleter'))
@@ -495,7 +501,7 @@ $response.setContentType('application/json')
 {
 "totalrows": $totalItems,
 "returnedrows": $returnedItems,
-"offset": ${request.get('offset')},
+"offset": ${mathtool.add($offset, 1)},
 "reqNo": ${request.reqNo},
 "query" : "$selectSql", 
 "rows": [

@@ -37,11 +37,7 @@ import com.octo.captcha.service.sound.SoundCaptchaService;
  */
 public abstract class AbstractSoundCaptchaAction extends AbstractCaptchaAction<SoundCaptchaService>
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractCaptchaAction#execute(ActionMapping, ActionForm, HttpServletRequest, HttpServletResponse)
-     */
+    @Override
     public ActionForward execute(ActionMapping actionMapping, ActionForm actionForm,
                                  HttpServletRequest request, HttpServletResponse response)
         throws Exception

@@ -152,6 +152,7 @@ ul.commentreplies, .reply {
   display: none;
 }
 #AddComment .commentcontainer textarea {
+  resize: vertical;
   width: 100%;
 }
 * html #AddComment .commentcontainer textarea {

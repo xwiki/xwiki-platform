@@ -36,11 +36,10 @@
   <properties>
     <maven.version>3.0.4</maven.version>
 
-    <!-- Extension Manager is still in experimental sate and change very often -->
+    <!-- Remove when 4.0 is released -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-extension-api</module>
     <module>xwiki-platform-extension-handlers</module>
     <module>xwiki-platform-extension-repositories</module>
     <module>xwiki-platform-extension-cluster</module>

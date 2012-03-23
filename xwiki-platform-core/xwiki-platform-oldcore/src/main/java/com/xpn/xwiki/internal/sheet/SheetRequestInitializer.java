@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
@@ -57,7 +56,10 @@ public class SheetRequestInitializer implements RequestInitializer
     public void initialize(Request request) throws RequestInitializerException
     {
         String sheet = (String) request.getProperty(SHEET_PROPERTY_NAME);
-        if (!StringUtils.isEmpty(sheet)) {
+        // Note: Empty string value makes sense because it means the sheet is the document itself (the sheet reference
+        // is resolved relative to the current document and thus the empty string reference refers to the current
+        // document). In other words, the empty string value can be used to display the document without a sheet.
+        if (sheet != null) {
             execution.getContext().setProperty(SHEET_PROPERTY_NAME, sheet);
         }
     }

@@ -56,10 +56,7 @@ public class ComponentsObjectFactory implements ObjectFactory
         this.componentManager = componentManager;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.restlet.ext.jaxrs.ObjectFactory#getInstance(java.lang.Class)
-     */
+    @Override
     public <T> T getInstance(Class<T> clazz) throws InstantiateException
     {
         try {

@@ -50,12 +50,7 @@ public class DefaultGadgetRenderer implements GadgetRenderer
      */
     protected static final String ID = "id";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.dashboard.GadgetRenderer
-     *      #decorateGadget(org.xwiki.rendering.macro.dashboard.Gadget)
-     */
+    @Override
     public List<Block> decorateGadget(Gadget gadget)
     {
         // prepare the title of the gadget, in a heading 2

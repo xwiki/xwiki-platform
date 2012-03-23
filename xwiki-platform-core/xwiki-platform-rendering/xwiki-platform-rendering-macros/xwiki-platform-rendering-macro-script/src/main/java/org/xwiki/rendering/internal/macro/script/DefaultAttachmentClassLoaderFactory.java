@@ -71,20 +71,14 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     @Named("attachmentjar")
     private ExtendedURLStreamHandler attachmentJarHandler;
     
-    /**
-     * {@inheritDoc}
-     * @see AttachmentClassLoaderFactory#createAttachmentClassLoader(String, ClassLoader)
-     */
+    @Override
     public ExtendedURLClassLoader createAttachmentClassLoader(String jarURLs, ClassLoader parent) throws Exception
     {
         URI[] uris = extractURIs(jarURLs).toArray(new URI[0]);
         return new URIClassLoader(uris, parent, this.streamHandlerFactory);
     }
     
-    /**
-     * {@inheritDoc}
-     * @see AttachmentClassLoaderFactory#extendAttachmentClassLoader(String, ExtendedURLClassLoader)
-     */
+    @Override
     public void extendAttachmentClassLoader(String jarURLs, ExtendedURLClassLoader source) throws Exception
     {
         for (URI uri : extractURIs(jarURLs)) {

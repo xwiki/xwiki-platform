@@ -66,9 +66,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
      */
     private OpenOfficeManager officeManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @Before
     public void setUp() throws Exception
     {

@@ -44,7 +44,7 @@
 <content>{{velocity output="false"}}
 ### Globally administrate the registration of new users in a wiki.
 #set($legend = ['registration'])
-#set($params = $util.hashMap)
+#set($params = {})
 #set($params.registration = ['use_email_verification', 'auth_active_check', 'validation_email_content', 'confirmation_email_content', 'invitation_email_content'])
 {{/velocity}}
 

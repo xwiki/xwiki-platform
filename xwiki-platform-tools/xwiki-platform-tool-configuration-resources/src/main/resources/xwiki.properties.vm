@@ -406,4 +406,4 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The user agent to use when communication with external services (generally repositories).
 #-# 
 #-# The default is:
-# extension.userAgent=ExtensionMannager
+# extension.userAgent=XWikiExtensionManager

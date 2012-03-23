@@ -56,10 +56,10 @@ public class Element extends Api
 
     /**
      * Get the name of this element.
-     * If the Element is an XWiki {@link com.xon.xwiki.api.Object} then it will be the name of the Document
-     * containing the Object, if it's an XWiki {@link com.xon.xwiki.api.Class} it will be the full name of the
-     * {@link com.xon.xwiki.api.Document} where the class is defined, if it's an XWiki 
-     * {@link com.xon.xwiki.api.Property} then it will be the name of the property.
+     * If the Element is an XWiki {@link com.xpn.xwiki.api.Object} then it will be the name of the Document
+     * containing the Object, if it's an XWiki {@link com.xpn.xwiki.api.Class} it will be the full name of the
+     * {@link com.xpn.xwiki.api.Document} where the class is defined, if it's an XWiki 
+     * {@link com.xpn.xwiki.api.Property} then it will be the name of the property.
      *
      * @return the name of this Element.
      */

@@ -309,7 +309,7 @@
   #else
     #getBlogDocument('Blog' $result)
   #end
-  #set ($blogDoc = $util.null)
+  #set ($blogDoc = $NULL)
   #setVariable ("$blogDoc" $result)
   ## TODO: Check if the document has a Blog.BlogClass object.
 #end
@@ -329,7 +329,7 @@ $escapetool.xml($entryDoc.display($fieldName, 'view', $entryObj))#end
   #elseif (($request.scheme == 'https') &amp;&amp; ($request.serverPort != 443))
     #set ($port = ":${request.serverPort}")
   #end
-  #set ($logoUrl = $util.null)
+  #set ($logoUrl = $NULL)
   #setVariable ("$logoUrl" "${request.scheme}://${request.serverName}${port}${path}")
 #end
 {{/velocity}}</content>

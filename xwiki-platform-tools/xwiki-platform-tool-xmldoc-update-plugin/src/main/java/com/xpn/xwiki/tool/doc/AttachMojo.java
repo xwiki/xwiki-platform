@@ -56,6 +56,7 @@ public class AttachMojo extends AbstractDocumentMojo
     {
     }
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         try {

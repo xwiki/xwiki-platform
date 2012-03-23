@@ -1,4 +1,4 @@
-#set($parents = $util.arrayList)
+#set ($parents = [])
 #set($discard = $parents.add($doc.fullName))
 #macro(breadcrumb $doc $string $level)
 #set($parent = $doc.parent)

@@ -23,6 +23,7 @@ package com.xpn.xwiki.store.migration.hibernate;
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.xpn.xwiki.store.migration.DataMigration;
+import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
  * Hibernate data migrations role.
@@ -32,4 +33,10 @@ import com.xpn.xwiki.store.migration.DataMigration;
 @ComponentRole
 public interface HibernateDataMigration extends DataMigration
 {
+    /**
+     * @return a changelog file for the liquibase database refactoring
+     * @throws com.xpn.xwiki.store.migration.DataMigrationException on error
+     * @since 4.0M1
+     */
+    String getLiquibaseChangeLog() throws DataMigrationException;
 }

@@ -68,11 +68,7 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
     @Inject
     private LinkLabelGenerator linkLabelGenerator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         ListenerChain chain = new ListenerChain();

@@ -55,11 +55,6 @@ public class PreviewAction extends XWikiAction
         return StringUtils.isNotEmpty(action);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -94,11 +89,6 @@ public class PreviewAction extends XWikiAction
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

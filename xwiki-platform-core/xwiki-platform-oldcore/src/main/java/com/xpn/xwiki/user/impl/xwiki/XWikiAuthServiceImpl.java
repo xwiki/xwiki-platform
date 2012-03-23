@@ -65,9 +65,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Used to convert a string into a proper Document Name.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current");
+        DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Used to convert a Document Reference to a username to a string. Note that we must be careful not to include the
@@ -76,9 +75,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * another wiki. This should probably be fixed in the future though but it requires changing existing code that
      * depend on this behavior.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Each wiki has its own authenticator.

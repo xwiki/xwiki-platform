@@ -39,11 +39,7 @@ public class SelectionPreserverTest extends RichTextAreaTestCase
      */
     private SelectionPreserver preserver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

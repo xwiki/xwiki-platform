@@ -20,8 +20,6 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
-import java.util.Locale;
-
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;

@@ -119,11 +119,6 @@ public class XWikiAttachment implements Cloneable
     {
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {

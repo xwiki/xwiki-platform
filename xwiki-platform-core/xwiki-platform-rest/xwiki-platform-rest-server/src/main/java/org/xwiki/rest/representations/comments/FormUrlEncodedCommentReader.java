@@ -54,11 +54,13 @@ public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, 
     
     private static final String COMMENT_REPLYTO_FIELD_NAME = "replyTo";
 
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Comment.class.isAssignableFrom(type);
     }
 
+    @Override
     public Comment readFrom(Class<Comment> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

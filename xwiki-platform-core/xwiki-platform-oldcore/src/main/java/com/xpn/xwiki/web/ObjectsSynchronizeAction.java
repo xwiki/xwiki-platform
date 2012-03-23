@@ -38,11 +38,6 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 public class ObjectsSynchronizeAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

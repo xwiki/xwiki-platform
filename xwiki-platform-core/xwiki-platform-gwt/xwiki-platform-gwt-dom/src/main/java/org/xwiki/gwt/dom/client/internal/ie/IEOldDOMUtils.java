@@ -112,12 +112,6 @@ public class IEOldDOMUtils extends IEDOMUtils
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IEDOMUtils#setInnerHTML(Element, String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
-     */
     @Override
     public void setInnerHTML(Element element, String html)
     {

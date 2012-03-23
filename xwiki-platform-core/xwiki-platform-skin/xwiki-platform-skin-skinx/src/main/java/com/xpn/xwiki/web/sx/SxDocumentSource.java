@@ -77,11 +77,7 @@ public class SxDocumentSource implements SxSource
         this.extension = extension;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource#getCachePolicy()
-     */
+    @Override
     public CachePolicy getCachePolicy()
     {
         CachePolicy finalCache = CachePolicy.LONG;
@@ -147,11 +143,7 @@ public class SxDocumentSource implements SxSource
         return resultBuilder.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource#getLastModifiedDate()
-     */
+    @Override
     public long getLastModifiedDate()
     {
         return this.document.getDate().getTime();

@@ -45,21 +45,13 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiVelocityRenderer.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiInterpreter#interpret(String,XWikiDocument,XWikiContext)
-     */
+    @Override
     public String interpret(String content, XWikiDocument contextdoc, XWikiContext context)
     {
         return render(content, contextdoc, contextdoc, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiRenderer#render(String,XWikiDocument,XWikiDocument,XWikiContext)
-     */
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
     {
         // If there are no # or $ characters than the content doesn't contain any velocity code
@@ -99,11 +91,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.render.XWikiRenderer#flushCache()
-     */
+    @Override
     public void flushCache()
     {
         // To change body of implemented methods use File | Settings | File Templates.

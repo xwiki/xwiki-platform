@@ -73,16 +73,13 @@ import java.io.Writer;
  */
 public class XWikiCodeMacro extends CodeMacro
 {
-    public XWikiCodeMacro()
-    {
-        super();
-    }
-
+    @Override
     public String getLocaleKey()
     {
         return "macro.code";
     }
 
+    @Override
     public void execute(Writer writer, MacroParameter params)
         throws IllegalArgumentException, IOException
     {

@@ -34,9 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Repository - XWiki</description>
   <modules>
-    <module>xwiki-platform-extension-repository-xwiki-model</module>
-    <module>xwiki-platform-extension-repository-xwiki-api</module>
-    <module>xwiki-platform-extension-repository-xwiki-handler</module>
     <module>xwiki-platform-extension-repository-xwiki-server-api</module>
     <module>xwiki-platform-extension-repository-xwiki-server-ui</module>
   </modules>

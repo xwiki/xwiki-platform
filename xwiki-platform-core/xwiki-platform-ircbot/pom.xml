@@ -30,11 +30,26 @@
     <version>4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot</artifactId>
-  <name>XWiki Platform - IRC Bot</name>
-  <packaging>xar</packaging>
+  <name>XWiki Platform - IRC Bot - Parent POM</name>
+  <packaging>pom</packaging>
   <description>IRC Bot Application for XWiki</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-ircbot-api</module>
+    <module>xwiki-platform-ircbot-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <!-- This property is automatically defined by the Maven release plugin when executing
+             a release. Thus this profile will be automatically enabled when releasing -->
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <modules>
+        <module>xwiki-platform-ircbot-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

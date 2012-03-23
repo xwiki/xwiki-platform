@@ -40,11 +40,7 @@ public class ViewAction extends XWikiAction
      */
     public static final String VIEW_ACTION = "view";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         boolean shouldRender = true;
@@ -68,11 +64,7 @@ public class ViewAction extends XWikiAction
         return shouldRender;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         handleRevision(context);

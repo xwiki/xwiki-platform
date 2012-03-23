@@ -290,8 +290,8 @@ public class XWikiExecutor
                 response.responseBody = method.getResponseBody();
 
                 if (DEBUG) {
-                    System.out.println("Result of pinging [" + url + "] = [" + response.responseCode + "], Message = ["
-                        + new String(response.responseBody) + "]");
+                    System.out.println(String.format("Result of pinging [%s] = [%s], Message = [%s]",
+                        url, response.responseCode, new String(response.responseBody)));
                 }
 
                 // check the http response code is either not an error, either "unauthorized"

@@ -30,7 +30,7 @@
 ##
 #############################################################################
 #if ($request.nb)
-  #set($nb = $util.parseInt($request.nb))
+  #set($nb = $mathtool.toInteger($request.nb))
 #end
 #############################################################################
 #includeMacros("WikiCode.Macros")

@@ -19,21 +19,39 @@
  */
 package org.xwiki.model.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import java.lang.reflect.ParameterizedType;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
- * Resolve an Entity reference defined in a given representation into a validated {@link EntityReference} object,
- * ie with valid values and a valid hierarchy (eg a Document reference must have a parent which is a space reference,
+ * Resolve an Entity reference defined in a given representation into a validated {@link EntityReference} object, ie
+ * with valid values and a valid hierarchy (eg a Document reference must have a parent which is a space reference,
  * reference values must not be null, etc).
- *
+ * 
  * @param <T> the object to resolve into an Entity Reference
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentRole
+@Role
 public interface EntityReferenceResolver<T>
 {
+    /**
+     * Type instance for EntityReferenceResolver<String>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class);
+
+    /**
+     * Type instance for EntityReferenceResolver<EntityReference>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_REFERENCE = new DefaultParameterizedType(null, EntityReferenceResolver.class,
+        EntityReference.class);
+
     /**
      * @param entityReferenceRepresentation the representation of an entity reference (eg as a String)
      * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc) to resolve out of the representation

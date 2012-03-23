@@ -50,6 +50,7 @@ public class SecHibernateQuery extends HibernateQuery
 
     private List _allowdocs = new ArrayList();
 
+    @Override
     public boolean constructWhere(StringBuffer sb)
     {
         boolean r = super.constructWhere(sb);
@@ -76,6 +77,7 @@ public class SecHibernateQuery extends HibernateQuery
 
     boolean isAllow = true;
 
+    @Override
     protected void _addSelect(ObjProperty p)
     {
         super._addSelect(p);
@@ -99,6 +101,7 @@ public class SecHibernateQuery extends HibernateQuery
             isQueryRight = true;
     }
 
+    @Override
     protected void _addPropClass(Class class1)
     {
         super._addPropClass(class1);
@@ -106,6 +109,7 @@ public class SecHibernateQuery extends HibernateQuery
             isAllow = false;
     }
 
+    @Override
     public List list() throws XWikiException
     {
         if (translator == null)

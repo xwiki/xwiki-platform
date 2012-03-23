@@ -34,13 +34,7 @@ import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 public abstract class AbstractFormUrlEncodedAnnotationUpdateRequestReader<T extends AnnotationUpdateRequest> extends
     AbstractFormUrlEncodedAnnotationRequestReader<T>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rest.internal.representations.AbstractFormUrlEncodedAnnotationRequestReader
-     *      #saveField(org.xwiki.annotation.rest.model.jaxb.AnnotationRequest, java.lang.String, java.lang.String,
-     *      org.xwiki.annotation.rest.model.jaxb.ObjectFactory)
-     */
+    @Override
     protected boolean saveField(T readObject, String key, String value, ObjectFactory objectFactory)
     {
         // first try to pass this through the super reader, to read the specific request fields

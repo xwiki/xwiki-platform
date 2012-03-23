@@ -29,68 +29,81 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 public abstract class XWikiDefaultStore implements XWikiStoreInterface
 {
+    @Override
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
     {
         return searchDocumentsNames(wheresql, 0, 0, "", context);
     }
 
+    @Override
     public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException
     {
         return searchDocumentsNames(wheresql, nb, start, "", context);
     }
 
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, true, 0, 0, context);
     }
 
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, XWikiContext context)
         throws XWikiException
     {
         return searchDocuments(wheresql, distinctbylanguage, 0, 0, context);
     }
 
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, distinctbylanguage, customMapping, 0, 0, context);
     }
 
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         return searchDocuments(wheresql, true, nb, start, context);
     }
 
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, int nb, int start,
         XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, distinctbyname, false, nb, start, context);
     }
 
+    @Override
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException
     {
         return false;
     }
 
+    @Override
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext xWikiContext) throws XWikiException
     {
         return false;
     }
 
+    @Override
     public void injectCustomMappings(XWikiContext context) throws XWikiException
     {
     }
 
+    @Override
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException
     {
     }
 
+    @Override
     public List getCustomMappingPropertyList(BaseClass bclass)
     {
         return new ArrayList();
     }
 
+    @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb,
         int start, XWikiContext context) throws XWikiException
     {

@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.repository.xwiki.internal;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.version.Version;
@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@ComponentRole
+@Role
 public interface RepositoryManager
 {
     XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException;

@@ -65,9 +65,7 @@ public class StyleFilter extends AbstractHTMLFilter
         attributeMappingsStrict.put(TAG_TH, "|colspan|");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         String mode = cleaningParams.get("filterStyles");

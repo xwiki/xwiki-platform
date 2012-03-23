@@ -67,21 +67,13 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiInformation#getDefaultWikiLanguage()
-     */
+    @Override
     public String getDefaultWikiLanguage()
     {
         return getDefaultWikiLanguage(getCurrentWikiName());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiInformation#getDefaultWikiLanguage()
-     */
+    @Override
     public String getDefaultWikiLanguage(String wiki)
     {
         try {
@@ -93,11 +85,7 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
         return DEFAULT_LANGUAGE;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiInformation#getContextLanguage()
-     */
+    @Override
     public String getContextLanguage()
     {
         return getContextLocale().getLanguage();

@@ -49,11 +49,6 @@ public class XWikiLDAPSearchAttribute
         this.value = value;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

@@ -73,6 +73,7 @@ public class XWiki10DocumentContentDisplayer extends DocumentContentDisplayer
      * @return the XWiki context
      * @deprecated avoid using this method; try using the document access bridge instead
      */
+    @Deprecated
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");

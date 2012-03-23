@@ -34,8 +34,8 @@ public class BaseElementTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetReferenceGetName() throws Exception
     {
-        BaseElement baseElement = new BaseElement()
-        {
+        BaseElement baseElement = new BaseElement() {
+
         };
 
         baseElement.setDocumentReference(new DocumentReference("wiki", "space", "page"));

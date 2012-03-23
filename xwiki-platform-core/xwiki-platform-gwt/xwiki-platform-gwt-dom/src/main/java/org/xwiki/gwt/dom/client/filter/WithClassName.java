@@ -45,11 +45,7 @@ public class WithClassName implements NodeFilter
         this.className = className;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NodeFilter#acceptNode(Node)
-     */
+    @Override
     public Action acceptNode(Node node)
     {
         return (node.getNodeType() == Node.ELEMENT_NODE && Element.as(node).hasClassName(className)) ? Action.ACCEPT

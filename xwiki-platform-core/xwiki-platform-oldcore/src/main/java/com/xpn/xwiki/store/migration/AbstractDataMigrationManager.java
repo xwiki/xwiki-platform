@@ -335,9 +335,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Update database schema to the latest structure.
+     * @param migrations the migration that will be executed (since 4.0M1)
      * @throws DataMigrationException if any error
      */
-    protected abstract void updateSchema() throws DataMigrationException;
+    protected abstract void updateSchema(Collection<XWikiMigration> migrations) throws DataMigrationException;
 
     @Override
     public void checkDatabase() throws MigrationRequiredException, DataMigrationException
@@ -505,8 +506,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     private void startMigrationsForDatabase() throws DataMigrationException
     {
         try {
-            updateSchema();
             Collection<XWikiMigration> neededMigrations = getNeededMigrations();
+            updateSchema(neededMigrations);
             startMigrations(neededMigrations);
         } catch (Exception e) {
             String message = String.format("Failed to migrate database [%s]...", getXWikiContext().getDatabase());
@@ -543,7 +544,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                         (migration.isForced ? " (forced)" : "")});
                 }
             } else {
-                logger.info("No storage migration required since current version is [{}]", curversion.toString());
+                logger.info("No storage migration required since current version is [{}]", curversion);
             }
         }
 

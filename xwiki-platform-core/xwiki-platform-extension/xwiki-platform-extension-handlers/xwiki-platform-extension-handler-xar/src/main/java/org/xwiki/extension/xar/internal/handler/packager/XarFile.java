@@ -30,6 +30,11 @@ import java.util.zip.ZipFile;
 
 import org.xwiki.model.reference.EntityReference;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarFile
 {
     private ZipFile zipFile;

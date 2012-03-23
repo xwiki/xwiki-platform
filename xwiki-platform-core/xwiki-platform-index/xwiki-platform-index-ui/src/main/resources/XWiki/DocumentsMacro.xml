@@ -529,9 +529,11 @@
 </object>
 <content>Example:
 
-{{code}}
+{{box}}
+{{{
 {{documents count="5" actions="false" space="Main" parent="Main.WebHome"/}}
-{{/code}}
+}}}
+{{/box}}
 
 Generates:
 

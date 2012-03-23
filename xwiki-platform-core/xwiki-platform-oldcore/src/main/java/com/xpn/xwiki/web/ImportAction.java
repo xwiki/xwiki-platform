@@ -39,11 +39,6 @@ import com.xpn.xwiki.util.Util;
  */
 public class ImportAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

@@ -98,6 +98,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
     // Property doesn't exists in Hibernate2
     private static final String AUTOCOMMIT = "hibernate.connection.autocommit";
 
+    @Override
     public void configure(Properties props) throws HibernateException
     {
         try {
@@ -216,6 +217,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
         LOGGER.debug("Configure DBCPConnectionProvider complete");
     }
 
+    @Override
     public Connection getConnection() throws SQLException
     {
         Connection conn = null;
@@ -227,6 +229,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
         return conn;
     }
 
+    @Override
     public void closeConnection(Connection conn) throws SQLException
     {
         try {
@@ -236,6 +239,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
         }
     }
 
+    @Override
     public void close() throws HibernateException
     {
         LOGGER.debug("Close DBCPConnectionProvider");
@@ -264,6 +268,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
      * Typically, this is only true in managed environments where a container tracks connections by transaction or
      * thread.
      */
+    @Override
     public boolean supportsAggressiveRelease()
     {
         return false;

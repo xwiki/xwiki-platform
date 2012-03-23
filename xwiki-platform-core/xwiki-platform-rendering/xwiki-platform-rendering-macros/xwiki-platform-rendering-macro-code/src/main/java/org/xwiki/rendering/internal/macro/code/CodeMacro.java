@@ -96,12 +96,6 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.box.DefaultBoxMacro#parseContent(org.xwiki.rendering.macro.box.BoxMacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected List<Block> parseContent(CodeMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException

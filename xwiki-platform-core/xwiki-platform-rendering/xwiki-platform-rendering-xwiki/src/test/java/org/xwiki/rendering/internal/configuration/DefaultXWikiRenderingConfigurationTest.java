@@ -26,7 +26,6 @@ import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 

@@ -492,14 +492,14 @@ public abstract class XWikiAction extends Action
         return false;
     }
 
-    protected void sendRedirect(XWikiResponse response, String page) throws XWikiException
+    protected void sendRedirect(XWikiResponse response, String url) throws XWikiException
     {
         try {
-            if (page != null) {
-                response.sendRedirect(page);
+            if (url != null) {
+                response.sendRedirect(url);
             }
         } catch (IOException e) {
-            Object[] args = {page};
+            Object[] args = {url};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);

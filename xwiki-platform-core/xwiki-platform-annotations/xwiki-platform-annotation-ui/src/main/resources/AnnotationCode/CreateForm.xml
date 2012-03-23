@@ -61,7 +61,7 @@
 
 {{html}}
 ## get create a hashmap with request data about the selection
-#set($annData = $util.hashMap)
+#set($annData = {})
 #set($dispose = $annData.put("selection", $!request.selection))
 #set($dispose = $annData.put("selectionContext", $!request.selectionContext))
 #set($dispose = $annData.put("selectionOffset", $!request.selectionOffset))

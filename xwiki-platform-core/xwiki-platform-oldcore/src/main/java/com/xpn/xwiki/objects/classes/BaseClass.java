@@ -38,7 +38,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -81,9 +80,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     private String nameField;
 
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local/reference");
+        EntityReferenceSerializer.TYPE_REFERENCE, "local");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -91,19 +89,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * the current wiki is used instead of the current document reference's wiki.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
-    /**
-     * Used here to merge setName() and setWiki() calls into the DocumentReference.
-     */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#getReference()
-     */
     @Override
     public DocumentReference getReference()
     {
@@ -144,9 +131,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (reference != null) {
                 EntityReference relativeReference =
                     this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-                reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
-                         reference.getParent().getParent()));
+                reference =
+                    new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                        new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
+                            .getParent().getParent()));
             } else {
                 reference = this.currentMixedDocumentReferenceResolver.resolve(name);
             }
@@ -205,22 +193,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#get(java.lang.String)
-     */
     @Override
     public PropertyInterface get(String name)
     {
         return safeget(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
     @Override
     public void put(String name, PropertyInterface property)
     {
@@ -419,11 +397,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#clone()
-     */
     @Override
     public BaseClass clone()
     {
@@ -438,11 +411,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return bclass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -492,11 +460,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     public Element toXML(BaseClass bclass)
     {
@@ -1190,11 +1153,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#getDiff(java.lang.Object, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {

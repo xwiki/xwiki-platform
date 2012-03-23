@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1321658413000</creationDate>
-<date>1326741788000</date>
-<contentUpdateDate>1326741788000</contentUpdateDate>
+<date>1331567255000</date>
+<contentUpdateDate>1331567255000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("admin.xwiki.addextensions")</title>
 <template></template>
@@ -179,13 +179,6 @@ kWrCyQnxm2ZJfeIlY0GPBCzxmrX6lfPaT2RHZ1x6nICBGK7dgnDibwklpKMxXKkqnYRnJ/7T3y1p
 TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 </content></attachment>
 <content>{{include document="ExtensionManagerMacros" /}}
-
-{{velocity}}
-#set($extensionwiki = $request.extensionwiki)
-#if ($extensionwiki)
-  #set($extensionnamespace = "wiki:$extensionwiki")
-#end
-{{/velocity}}
 
 {{velocity}}
 ## Ajax call for a single extension

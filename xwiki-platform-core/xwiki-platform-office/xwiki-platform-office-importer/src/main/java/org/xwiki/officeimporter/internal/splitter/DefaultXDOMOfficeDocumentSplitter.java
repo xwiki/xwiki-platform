@@ -96,11 +96,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 2.2M1
-     */
+    @Override
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
         throws OfficeImporterException

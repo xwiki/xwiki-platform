@@ -28,9 +28,9 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.job.Job;
-import org.xwiki.extension.job.JobException;
-import org.xwiki.extension.job.JobManager;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.observation.EventListener;
@@ -40,6 +40,7 @@ import org.xwiki.observation.event.Event;
  * Receive remote extension install/uninstall request events and apply them on current instance.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
 @Component
 @Named(RemoteListener.LISTENERID)

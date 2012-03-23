@@ -21,6 +21,11 @@ package org.xwiki.extension.xar.internal.handler.packager;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarEntryMergeResult
 {
     private XarEntry entry;

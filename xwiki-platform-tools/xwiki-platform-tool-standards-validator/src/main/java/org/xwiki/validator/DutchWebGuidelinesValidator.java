@@ -75,11 +75,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         super(false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#getName()
-     */
+    @Override
     public String getName()
     {
         return "Dutch Web Guidelines";
@@ -99,11 +95,6 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         super.addError(errorType, line, column, this.messages.getString(key));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.framework.AbstractXMLValidator#validate(org.w3c.dom.Document)
-     */
     @Override
     protected void validate(Document document)
     {

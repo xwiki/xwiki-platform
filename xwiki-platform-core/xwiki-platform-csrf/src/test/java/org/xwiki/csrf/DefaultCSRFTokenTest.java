@@ -31,8 +31,8 @@ import javax.servlet.http.HttpSession;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
@@ -40,6 +40,7 @@ import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests for the {@link DefaultCSRFToken} component.
@@ -59,17 +60,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @MockingRequirement
     private DefaultCSRFToken csrf;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#setUp()
-     */
-    @Before
     @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         // set up mocked dependencies
 
         // document access bridge
@@ -133,6 +126,11 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
                 will(returnValue(servletRequest));
             }
         });
+        // logging
+        getMockery().checking(new Expectations() {{
+            // Ignore all calls to debug()
+            ignoring(any(Logger.class)).method("debug");
+        }});
     }
 
     /**
@@ -174,8 +172,16 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that null is not valid.
      */
     @Test
-    public void testNullNotValid()
+    public void testNullNotValid() throws Exception
     {
+        // Verify that the correct message is logged
+        final Logger logger = getMockLogger();
+
+        getMockery().checking(new Expectations() {{
+            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"null\", stored "
+                + "token:")));
+        }});
+
         Assert.assertFalse("Null passed validity check", this.csrf.isTokenValid(null));
     }
 
@@ -183,8 +189,16 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that empty string is not valid.
      */
     @Test
-    public void testEmptyNotValid()
+    public void testEmptyNotValid() throws Exception
     {
+        // Verify that the correct message is logged
+        final Logger logger = getMockLogger();
+
+        getMockery().checking(new Expectations() {{
+            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"\", stored "
+                + "token:")));
+        }});
+
         Assert.assertFalse("Empty string passed validity check", this.csrf.isTokenValid(""));
     }
 
@@ -192,8 +206,15 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that the prefix of the valid token is not valid.
      */
     @Test
-    public void testPrefixNotValid()
+    public void testPrefixNotValid() throws Exception
     {
+        // Verify that the correct message is logged
+        final Logger logger = getMockLogger();
+
+        getMockery().checking(new Expectations() {{
+            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token:")));
+        }});
+
         String token = this.csrf.getToken();
         if (token != null) {
             token = token.substring(0, token.length() - 2);
@@ -231,8 +252,11 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         // We cannot easily control the value of the token, so we just test if it contains any "bad" characters and hope
         // for the best. Since the probability that the token contains some specific character is about 1/3, this test
         // will start to flicker (instead of always failing) if something like XWIKI-5996 is reintroduced
-        String token = this.csrf.getToken();
-        Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
-            token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+        for (int i = 0; i < 30; ++i) {
+            this.csrf.clearToken();
+            String token = this.csrf.getToken();
+            Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
+                token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+        }
     }
 }

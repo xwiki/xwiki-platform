@@ -21,18 +21,19 @@ package org.xwiki.store.legacy.doc.internal;
 
 import java.util.Date;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Filesystem based Archive of deleted attachment,
- * stored in {@link com.xpn.xwiki.store.FilesystemAttachmentRecycleBinStore}.
- *
+ * Filesystem based Archive of deleted attachment, stored in
+ * {@link org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinStore}.
+ * 
  * @version $Id$
  * @since 3.0M3
  */
@@ -49,8 +50,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     private XWikiAttachment attachment;
 
     /**
-     * Protected Constructor.
-     * Used by MutableDeletedFilesystemAttachment.
+     * Protected Constructor. Used by MutableDeletedFilesystemAttachment.
      */
     protected DeletedFilesystemAttachment()
     {
@@ -58,14 +58,12 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
 
     /**
      * A constructor with all the information about the deleted attachment.
-     *
+     * 
      * @param attachment Deleted attachment.
      * @param deleter User which deleted the attachment.
      * @param deleteDate Date of delete action.
      */
-    public DeletedFilesystemAttachment(final XWikiAttachment attachment,
-        final String deleter,
-        final Date deleteDate)
+    public DeletedFilesystemAttachment(final XWikiAttachment attachment, final String deleter, final Date deleteDate)
     {
         this.setDocId(attachment.getDocId());
         this.setDocName(attachment.getDoc().getFullName());
@@ -76,11 +74,6 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
         this.docReference = attachment.getDoc().getDocumentReference();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedAttachment#getDocId()
-     */
     @Override
     public long getDocId()
     {
@@ -92,9 +85,8 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * {@inheritDoc}
-     * context is unused and may safely be null.
-     *
+     * {@inheritDoc} context is unused and may safely be null.
+     * 
      * @see com.xpn.xwiki.doc.DeletedAttachment#setAttachment(XWikiAttachment, XWikiContext)
      */
     @Override
@@ -106,11 +98,6 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedAttachment#setDate(Date)
-     */
     @Override
     public void setDate(Date date)
     {
@@ -121,10 +108,9 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * Get the attachment.
-     * This does not clone the attachment.
-     * To get a clone, use {@link #restoreAttachment(XWikiAttachment XWikiContext)}
-     *
+     * Get the attachment. This does not clone the attachment. To get a clone, use
+     * {@link #restoreAttachment(XWikiAttachment, XWikiContext)}
+     * 
      * @return the attachment which was deleted.
      */
     public XWikiAttachment getAttachment()
@@ -142,7 +128,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
 
     /**
      * Set the document reference for the document which this attachment is attached to.
-     *
+     * 
      * @param docReference the reference to the document.
      */
     protected void setDocumentReference(final DocumentReference docReference)
@@ -150,11 +136,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
         this.docReference = docReference;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.DeletedAttachment#restoreAttachment(XWikiAttachment, XWikiContext)
-     */
+    @Override
     public XWikiAttachment restoreAttachment(final XWikiAttachment attachment, final XWikiContext context)
         throws XWikiException
     {
@@ -164,13 +146,12 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
             // this toXML does not copy content.
             result.fromXML(this.attachment.toXML(context));
             if (this.attachment.getAttachment_content() != null) {
-                attachment.setAttachment_content(
-                    (XWikiAttachmentContent) this.attachment.getAttachment_content().clone());
+                attachment.setAttachment_content((XWikiAttachmentContent) this.attachment.getAttachment_content()
+                    .clone());
                 attachment.getAttachment_content().setAttachment(attachment);
             }
             if (this.attachment.getAttachment_archive() != null) {
-                result.setAttachment_archive(
-                    (XWikiAttachmentArchive) this.attachment.getAttachment_archive().clone());
+                result.setAttachment_archive((XWikiAttachmentArchive) this.attachment.getAttachment_archive().clone());
                 result.getAttachment_archive().setAttachment(result);
             }
         } else {
@@ -182,11 +163,11 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * Generate an ID which will be as collision resistant as possible.
-     * Because {@link con.xpn.xwiki.doc.XWikiAttachment#getId()} returns an int cast to a long,
-     * this ID is guaranteed to be unique unless the same attachment is deleted twice in the same
-     * second or again in a second which will come around in another 136 years.
-     *
+     * Generate an ID which will be as collision resistant as possible. Because
+     * {@link con.xpn.xwiki.doc.XWikiAttachment#getId()} returns an int cast to a long, this ID is guaranteed to be
+     * unique unless the same attachment is deleted twice in the same second or again in a second which will come around
+     * in another 136 years.
+     * 
      * @param attachment the attachment to get an ID number for.
      * @param deleteDate the Date the attachment was deleted.
      * @return an ID number for this deleted attachment.

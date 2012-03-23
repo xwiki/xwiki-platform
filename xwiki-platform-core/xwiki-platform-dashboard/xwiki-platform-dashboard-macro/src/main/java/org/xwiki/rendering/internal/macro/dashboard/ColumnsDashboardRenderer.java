@@ -133,12 +133,7 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.dashboard.DashboardRenderer#renderGadgets(java.util.List, GadgetRenderer,
-     *      MacroTransformationContext)
-     */
+    @Override
     public List<Block> renderGadgets(List<Gadget> gadgets, GadgetRenderer gadgetsRenderer,
         MacroTransformationContext context) throws MacroExecutionException
     {

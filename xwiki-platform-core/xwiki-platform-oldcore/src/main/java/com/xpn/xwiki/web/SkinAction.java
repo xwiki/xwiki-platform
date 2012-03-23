@@ -68,11 +68,6 @@ public class SkinAction extends XWikiAction
     /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
     private static final String ENCODING = "UTF-8";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

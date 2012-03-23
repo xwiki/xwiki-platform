@@ -34,8 +34,8 @@
     #end
   </tr>
 #end
-#set($commentsChanges = $util.arrayList)
-#set($objectsChanges = $util.arrayList)
+#set($commentsChanges = [])
+#set($objectsChanges = [])
 #foreach($objectDiff in $doc.getObjectDiff($origdoc, $newdoc))
   #if($objectDiff.get(0).getClassName() == 'XWiki.XWikiComments')
     #set($discard = $commentsChanges.add($objectDiff))

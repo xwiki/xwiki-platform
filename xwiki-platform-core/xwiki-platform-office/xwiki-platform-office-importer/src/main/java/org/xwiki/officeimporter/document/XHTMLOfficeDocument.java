@@ -54,25 +54,19 @@ public class XHTMLOfficeDocument implements OfficeDocument
         this.artifacts = artifacts;        
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Document getContentDocument()
     {
         return this.document;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getContentAsString()
     {
         return HTMLUtils.toString(this.document);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, byte[]> getArtifacts()
     {
         return this.artifacts;

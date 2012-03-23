@@ -341,13 +341,13 @@
                         'type'  : 'text'
                       , 'class' : 'key'
                       , 'value' : this.input.getAttribute("data-key-tip") || ''
-                      , 'style' : 'width:45%'
+                      , 'style' : 'width:42%'
                     })
         , valueInput = new Element("input", {
                         'type'  : 'text'
                       , 'class' : 'value'
                       , 'value' : this.input.getAttribute("data-value-tip") || ''
-                      , 'style' : 'width:45%'
+                      , 'style' : 'width:42%'
                     })
         , result = new Element(this.input.up("dd") ? "dd" : "div", {'class' : "property " + this.id})
                     .insert(keyInput).observe("change", this.updateValue.bind(this))

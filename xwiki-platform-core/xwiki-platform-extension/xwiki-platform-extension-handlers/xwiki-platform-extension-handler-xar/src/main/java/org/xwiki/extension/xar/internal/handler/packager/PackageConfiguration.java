@@ -19,30 +19,25 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.reference.DocumentReference;
 
-import org.xwiki.component.annotation.Role;
-
-import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 /**
- * Take care of parsing xar files and handling database actions.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
-@Role
-public interface Packager
+public interface PackageConfiguration
 {
-    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException;
+    String getWiki();
 
-    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
+    DocumentReference getUserReference();
 
-    List<XarEntry> getEntries(File xarFile) throws IOException;
+    boolean isInteractive();
 
-    void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
+    MergeConfiguration getMergeConfiguration();
+    
+    JobStatus getJobStatus();
 }

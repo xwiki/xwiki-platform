@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,7 +51,9 @@ import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
@@ -294,5 +297,25 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
         LocalExtension extension = (LocalExtension) this.localRepository.resolve(extensionId);
 
         return extension.getType().equals("xar") ? this.localRepository.getBackwardDependencies(extensionId) : null;
+    }
+
+    @Override
+    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
+    {
+        Pattern patternMatcher = Pattern.compile(".*" + pattern + ".*");
+
+        List<Extension> result = new ArrayList<Extension>();
+
+        for (XarLocalExtension extension : this.extensions.values()) {
+            if (patternMatcher.matcher(extension.getId().getId()).matches()
+                || patternMatcher.matcher(extension.getDescription()).matches()
+                || patternMatcher.matcher(extension.getSummary()).matches()
+                || patternMatcher.matcher(extension.getName()).matches()
+                || patternMatcher.matcher(extension.getFeatures().toString()).matches()) {
+                result.add(extension);
+            }
+        }
+
+        return new CollectionIterableResult<Extension>(this.extensions.size(), offset, result);
     }
 }

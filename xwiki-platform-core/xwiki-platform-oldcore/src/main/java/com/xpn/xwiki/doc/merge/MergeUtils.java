@@ -19,11 +19,17 @@
  */
 package com.xpn.xwiki.doc.merge;
 
+import java.io.StringReader;
 import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.diff.Diff;
 import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.util.ToString;
+
+import difflib.DiffUtils;
+import difflib.Patch;
 
 /**
  * Provide some 3 ways merging related methods.
@@ -56,9 +62,9 @@ public final class MergeUtils
         String result = currentStr;
 
         try {
-            Revision revision = Diff.diff(ToString.stringToArray(previousStr), ToString.stringToArray(newStr));
-            if (revision.size() > 0) {
-                result = ToString.arrayToString(revision.patch(ToString.stringToArray(currentStr)));
+            Patch patch = DiffUtils.diff(IOUtils.readLines(new StringReader(previousStr)), IOUtils.readLines(new StringReader(newStr)));
+            if (patch.getDeltas().size() > 0) {
+                result = StringUtils.join(patch.applyTo(IOUtils.readLines(new StringReader(currentStr))), '\n');
 
                 mergeResult.setModified(true);
             }

@@ -17,32 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.extension.script.internal.safe;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import java.net.URL;
 
-import org.xwiki.component.annotation.Role;
-
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.extension.CoreExtensionFile;
 
 /**
- * Take care of parsing xar files and handling database actions.
+ * Provide a readonly access to a core extension file.
  * 
+ * @param <T> the extension type
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
-@Role
-public interface Packager
+public class SafeCoreExtensionFile<T extends CoreExtensionFile> extends SafeExtensionFile<T> implements
+    CoreExtensionFile
 {
-    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException;
+    /**
+     * @param file he wrapped file
+     */
+    public SafeCoreExtensionFile(T file)
+    {
+        super(file);
+    }
 
-    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
+    // CoreExtensionFile
 
-    List<XarEntry> getEntries(File xarFile) throws IOException;
-
-    void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
+    @Override
+    public URL getURL()
+    {
+        return getWrapped().getURL();
+    }
 }

@@ -37,6 +37,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
@@ -49,9 +50,6 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.unmodifiable.UnmodifiableExtensionPlan;
-import org.xwiki.extension.unmodifiable.UnmodifiableJobStatus;
-import org.xwiki.extension.unmodifiable.UnmodifiableUtils;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
@@ -78,36 +76,69 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class ExtensionManagerScriptService implements ScriptService
 {
-    /** The key under which the last encountered error is stored in the current execution context. */
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
     private static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
 
-    /** The real extension manager bridged by this script service. */
+    /**
+     * The real extension manager bridged by this script service.
+     */
     @Inject
     private ExtensionManager extensionManager;
 
-    /** Needed for checking programming rights. */
+    /**
+     * Needed for checking programming rights.
+     */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /** The repository with custom installed extensions. */
+    /**
+     * The repository with custom installed extensions.
+     */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
 
-    /** The repository with core modules provided by the platform. */
+    /**
+     * The repository with core modules provided by the platform.
+     */
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
-    /** Repository manager, needed for cross-repository operations. */
+    /**
+     * Repository manager, needed for cross-repository operations.
+     */
     @Inject
     private ExtensionRepositoryManager repositoryManager;
 
-    /** Handles and provides status feedback on extension operations (installation, upgrade, removal). */
+    /**
+     * Handles and provides status feedback on extension operations (installation, upgrade, removal).
+     */
     @Inject
     private JobManager jobManager;
 
-    /** Provides access to the current context. */
+    /**
+     * Provides access to the current context.
+     */
     @Inject
     private Execution execution;
+
+    /**
+     * 
+     */
+    @Inject
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider scriptProvider;
+
+    /**
+     * @param <T> the type of the object
+     * @param unsafe the unsafe object
+     * @return the safe version of the passed object
+     */
+    private <T> T safe(T unsafe)
+    {
+        return (T) this.scriptProvider.get(unsafe);
+    }
 
     // Repositories
 
@@ -116,7 +147,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<ExtensionRepository> getRepositories()
     {
-        return UnmodifiableUtils.unmodifiableExtensionRepositories(this.repositoryManager.getRepositories());
+        return safe(this.repositoryManager.getRepositories());
     }
 
     // Extensions
@@ -153,9 +184,7 @@ public class ExtensionManagerScriptService implements ScriptService
         Extension extension = null;
 
         try {
-            extension =
-                UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(new ExtensionId(id,
-                    version)));
+            extension = safe(this.extensionManager.resolveExtension(new ExtensionId(id, version)));
         } catch (Exception e) {
             setError(e);
         }
@@ -178,8 +207,7 @@ public class ExtensionManagerScriptService implements ScriptService
         Extension extension = null;
 
         try {
-            extension =
-                UnmodifiableUtils.unmodifiableExtension(this.extensionManager.resolveExtension(extensionDependency));
+            extension = safe(this.extensionManager.resolveExtension(extensionDependency));
         } catch (Exception e) {
             setError(e);
         }
@@ -220,7 +248,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions()
     {
-        return UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions());
+        return safe(this.localExtensionRepository.getInstalledExtensions());
     }
 
     /**
@@ -235,8 +263,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getInstalledExtensions(String namespace)
     {
-        return UnmodifiableUtils
-            .unmodifiableExtensions(this.localExtensionRepository.getInstalledExtensions(namespace));
+        return safe(this.localExtensionRepository.getInstalledExtensions(namespace));
     }
 
     /**
@@ -253,8 +280,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public LocalExtension getInstalledExtension(String feature, String namespace)
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.localExtensionRepository.getInstalledExtension(feature,
-            namespace));
+        return safe(this.localExtensionRepository.getInstalledExtension(feature, namespace));
     }
 
     /**
@@ -264,7 +290,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return UnmodifiableUtils.unmodifiableExtensions(this.coreExtensionRepository.getCoreExtensions());
+        return safe(this.coreExtensionRepository.getCoreExtensions());
     }
 
     /**
@@ -277,7 +303,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public CoreExtension getCoreExtension(String feature)
     {
-        return UnmodifiableUtils.unmodifiableExtension(this.coreExtensionRepository.getCoreExtension(feature));
+        return safe(this.coreExtensionRepository.getCoreExtension(feature));
     }
 
     /**
@@ -289,7 +315,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository.getLocalExtensions());
+        return safe(this.localExtensionRepository.getLocalExtensions());
     }
 
     /**
@@ -308,9 +334,7 @@ public class ExtensionManagerScriptService implements ScriptService
         Map<String, Collection<LocalExtension>> extensions;
 
         try {
-            extensions =
-                UnmodifiableUtils.unmodifiableExtensions(this.localExtensionRepository
-                    .getBackwardDependencies(new ExtensionId(feature, version)));
+            extensions = safe(this.localExtensionRepository.getBackwardDependencies(new ExtensionId(feature, version)));
         } catch (Exception e) {
             setError(e);
 
@@ -386,8 +410,7 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(InstallPlanJob.JOBTYPE,
-                    installRequest).getStatus());
+                safe((ExtensionPlan) this.jobManager.executeJob(InstallPlanJob.JOBTYPE, installRequest).getStatus());
         } catch (JobException e) {
             setError(e);
 
@@ -499,8 +522,7 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE,
-                    uninstallRequest).getStatus());
+                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
         } catch (JobException e) {
             setError(e);
 
@@ -530,8 +552,7 @@ public class ExtensionManagerScriptService implements ScriptService
         ExtensionPlan status;
         try {
             status =
-                new UnmodifiableExtensionPlan((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE,
-                    uninstallRequest).getStatus());
+                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
         } catch (JobException e) {
             setError(e);
 
@@ -572,7 +593,7 @@ public class ExtensionManagerScriptService implements ScriptService
         if (job != null) {
             jobStatus = job.getStatus();
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                jobStatus = new UnmodifiableJobStatus<JobStatus>(jobStatus);
+                jobStatus = safe(jobStatus);
             }
         } else {
             jobStatus = null;

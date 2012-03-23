@@ -37,21 +37,24 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.jvnet.hudson</groupId>
+      <artifactId>org.suigeneris.jrcs.diff</artifactId>
+      <version>0.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson</groupId>
+      <artifactId>org.suigeneris.jrcs.rcs</artifactId>
+      <version>0.4.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.java-diff-utils</groupId>
+      <artifactId>diffutils</artifactId>
+      <version>1.2.1</version>
+    </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
-
-    <!-- The JRCS JARS are are in our repo till we get them published on the central repository.
-         JRCS home page: http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->
-    <dependency>
-      <groupId>org.suigeneris</groupId>
-      <artifactId>jrcs.diff</artifactId>
-      <version>0.4.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.suigeneris</groupId>
-      <artifactId>jrcs.rcs</artifactId>
-      <version>0.4.2</version>
-    </dependency>
 
     <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
          license allows it -->

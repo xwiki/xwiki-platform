@@ -17,32 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.extension.script.internal.safe;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Role;
-
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.job.event.status.JobStatus;
 
 /**
- * Take care of parsing xar files and handling database actions.
+ * Provide safe Extension.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
-@Role
-public interface Packager
+@Component
+@Singleton
+public class JobStatusScriptSafeProvider implements ScriptSafeProvider<JobStatus>
 {
-    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException;
+    /**
+     * The provider of instances safe for public scripts.
+     */
+    @Inject
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider defaultSafeProvider;
 
-    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
-
-    List<XarEntry> getEntries(File xarFile) throws IOException;
-
-    void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
+    @Override
+    public <S> S get(JobStatus unsafe)
+    {
+        return (S) new SafeJobStatus(unsafe, this.defaultSafeProvider);
+    }
 }

@@ -17,32 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.extension.xar.internal.script;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import javax.inject.Inject;
 
-import org.xwiki.component.annotation.Role;
+import org.xwiki.context.Execution;
+import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 
-import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Take care of parsing xar files and handling database actions.
- * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
-@Role
-public interface Packager
+// TODO: Move this to oldcore when ScriptSafeProvider is to a public package
+public class DocumentScriptSafeProvider implements ScriptSafeProvider<XWikiDocument>
 {
-    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException;
+    @Inject
+    private Execution execution;
 
-    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    }
 
-    List<XarEntry> getEntries(File xarFile) throws IOException;
-
-    void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
+    @Override
+    public <S> S get(XWikiDocument unsafe)
+    {
+        return (S) unsafe.newDocument(getXWikiContext());
+    }
 }

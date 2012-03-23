@@ -307,7 +307,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         XWikiDocument page1 =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
 
-        Assert.assertFalse("Document wiki:space2.page2 has not been saved in the database", page1.isNew());
+        Assert.assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
 
         // translated.translated.tr
         DocumentReference translatedReference = new DocumentReference("wiki", "translated", "translated");

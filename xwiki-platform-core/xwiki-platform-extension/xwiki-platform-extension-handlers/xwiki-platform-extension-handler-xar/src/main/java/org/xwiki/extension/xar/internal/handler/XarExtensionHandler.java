@@ -23,31 +23,34 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
+import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 /**
- * 
  * @version $Id$
  * @since 4.0M1
  */
@@ -58,6 +61,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 {
     private static final String WIKI_NAMESPACEPREFIX = "wiki:";
 
+    private static final String PROPERTY_USERREFERENCE = "user.reference";
+
     @Inject
     private Packager packager;
 
@@ -65,22 +70,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Named("xar")
     private LocalExtensionRepository xarRepository;
 
-    /**
-     * @param extra the extra parameters associated to the action
-     * @return true of the installation of the xar extension has been triggered by a remote event
-     */
-    private boolean isRemote(Map<String, ? > extra)
-    {
-        return ObjectUtils.equals(extra.get(Request.PROPERTY_REMOTE), Boolean.TRUE);
-    }
+    @Inject
+    private ComponentManager componentManager;
 
     // TODO: support question/answer with the UI to resolve conflicts
     @Override
-    public void install(LocalExtension localExtension, String namespace, Map<String, ? > extra) throws InstallException
+    public void install(LocalExtension localExtension, String namespace, Request request) throws InstallException
     {
         // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
         // probably not be in an expected state)
-        if (!isRemote(extra)) {
+        if (!request.isRemote()) {
             String wiki = namespace;
 
             if (wiki != null) {
@@ -92,18 +91,18 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 }
             }
 
-            install(null, localExtension, wiki);
+            install(null, localExtension, wiki, request);
         }
     }
 
     // TODO: support question/answer with the UI to resolve conflicts
     @Override
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace,
-        Map<String, ? > extra) throws InstallException
+        Request request) throws InstallException
     {
         // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
         // probably not be in an expected state)
-        if (!isRemote(extra)) {
+        if (!request.isRemote()) {
             String wiki = namespace;
 
             if (wiki != null) {
@@ -125,7 +124,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             }
 
             // Install new pages
-            install(previousXarExtension, newLocalExtension, wiki);
+            install(previousXarExtension, newLocalExtension, wiki, request);
 
             // Uninstall old version pages not anymore in the new version
             Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
@@ -149,36 +148,32 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             }
 
             try {
-                this.packager.unimportPages(previousPages, wiki);
+                this.packager.unimportPages(previousPages, createPackageConfiguration(request, wiki));
             } catch (Exception e) {
                 this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
             }
         }
     }
 
-    private void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki)
-        throws InstallException
+    private void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki,
+        Request request) throws InstallException
     {
-        // TODO: should be configurable
-        MergeConfiguration mergeConfiguration = new MergeConfiguration();
-
         // import xar into wiki (add new version when the page already exists)
         try {
             this.packager.importXAR(previousExtension != null ? new XarFile(new File(previousExtension.getFile()
                 .getAbsolutePath()), previousExtension.getPages()) : null, new File(localExtension.getFile()
-                .getAbsolutePath()), wiki, mergeConfiguration);
+                .getAbsolutePath()), createPackageConfiguration(request, wiki));
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
         }
     }
 
     @Override
-    public void uninstall(LocalExtension localExtension, String namespace, Map<String, ? > extra)
-        throws UninstallException
+    public void uninstall(LocalExtension localExtension, String namespace, Request request) throws UninstallException
     {
         // Only remove XAR when it's a local order (otherwise it will be deleted several times and the wiki will
         // probably not be in an expected state)
-        if (!isRemote(extra)) {
+        if (!request.isRemote()) {
             String wiki = namespace;
 
             if (wiki != null) {
@@ -200,12 +195,35 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 XarLocalExtension xarLocalExtension =
                     (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
                 List<XarEntry> pages = xarLocalExtension.getPages();
-                this.packager.unimportPages(pages, wiki);
+                this.packager.unimportPages(pages, createPackageConfiguration(request, wiki));
             } catch (Exception e) {
                 // Not supposed to be possible
                 throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
                     + "] from xar repository", e);
             }
         }
+    }
+
+    private PackageConfiguration createPackageConfiguration(Request request, String wiki)
+    {
+        DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
+
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+        configuration.setMergeConfiguration(mergeConfiguration);
+
+        configuration.setInteractive(request.isInteractive());
+        configuration.setUser((DocumentReference) request.getProperty(PROPERTY_USERREFERENCE));
+        configuration.setWiki(wiki);
+
+        try {
+            Job currentJob = this.componentManager.<JobContext> lookupComponent(JobContext.class).getCurrentJob();
+            if (currentJob != null) {
+                configuration.setJobStatus(currentJob.getStatus());
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
+        }
+
+        return configuration;
     }
 }

@@ -27,25 +27,26 @@ import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
+import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
- * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.0M2
  */
 public class DocumentImporterHandler extends DocumentHandler
 {
@@ -55,7 +56,7 @@ public class DocumentImporterHandler extends DocumentHandler
 
     private XarEntryMergeResult mergeResult;
 
-    private MergeConfiguration mergeConfiguration;
+    private PackageConfiguration configuration;
 
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
     {
@@ -69,9 +70,9 @@ public class DocumentImporterHandler extends DocumentHandler
         this.previousXarFile = previousXarFile;
     }
 
-    public void setMergeConfiguration(MergeConfiguration mergeConfiguration)
+    public void setConfiguration(PackageConfiguration configuration)
     {
-        this.mergeConfiguration = mergeConfiguration;
+        this.configuration = configuration;
     }
 
     public XarEntryMergeResult getMergeResult()
@@ -79,12 +80,77 @@ public class DocumentImporterHandler extends DocumentHandler
         return this.mergeResult;
     }
 
-    private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws XWikiException
+    private DocumentReference getUserReference(XWikiContext context)
     {
-        document.setAuthorReference(context.getUserReference());
-        document.setContentAuthorReference(context.getUserReference());
+        DocumentReference userReference = this.configuration.getUserReference();
 
-        context.getWiki().saveDocument(document, comment, context);
+        if (userReference == null) {
+            userReference = context.getUserReference();
+        }
+
+        return userReference;
+    }
+
+    private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws Exception
+    {
+        XWikiDocument currentDocument = getDatabaseDocument();
+        DocumentReference userReference = getUserReference(context);
+
+        if (!currentDocument.isNew()) {
+            if (document != currentDocument) {
+                if (document.isNew()) {
+                    currentDocument.apply(document);
+                } else {
+                    currentDocument = document;
+                }
+            }
+        } else {
+            currentDocument = document;
+            currentDocument.setCreatorReference(userReference);
+        }
+
+        currentDocument.setAuthorReference(userReference);
+        currentDocument.setContentAuthorReference(userReference);
+
+        context.getWiki().saveDocument(currentDocument, comment, context);
+    }
+
+    private XWikiDocument askDocumentToSave(XWikiDocument currentDocument, XWikiDocument previousDocument,
+        XWikiDocument nextDocument, XWikiDocument mergedDocument)
+    {
+        // Ask what to do
+        ConflictQuestion question =
+            new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument);
+
+        if (this.configuration != null && this.configuration.getJobStatus() != null) {
+            try {
+                this.configuration.getJobStatus().ask(question);
+            } catch (InterruptedException e) {
+                // TODO: log something ?
+            }
+        }
+
+        XWikiDocument documentToSave;
+
+        switch (question.getGlobalAction()) {
+            case CURRENT:
+                documentToSave = currentDocument;
+                break;
+            case NEXT:
+                documentToSave = nextDocument;
+                break;
+            case PREVIOUS:
+                documentToSave = previousDocument;
+                break;
+            case CUSTOM:
+                documentToSave = question.getCustomDocument() != null ? question.getCustomDocument() : mergedDocument;
+                break;
+            default:
+                documentToSave = mergedDocument;
+                break;
+        }
+
+        return documentToSave;
     }
 
     private void saveDocument(String comment) throws SAXException
@@ -92,30 +158,41 @@ public class DocumentImporterHandler extends DocumentHandler
         try {
             XWikiContext context = getXWikiContext();
 
-            XWikiDocument document = getDocument();
-            XWikiDocument dbDocument = getDatabaseDocument().clone();
-            XWikiDocument previousDocument = getPreviousDocument();
+            XWikiDocument currentDocument = getDatabaseDocument();
+            XWikiDocument nextDocument = getDocument();
 
             // Merge and save
-            if (dbDocument != null && !dbDocument.isNew()) {
+            if (currentDocument != null && !currentDocument.isNew()) {
+                XWikiDocument previousDocument = getPreviousDocument();
+
                 if (previousDocument != null) {
+                    XWikiDocument mergedDocument = currentDocument.clone();
+
                     MergeResult documentMergeResult =
-                        dbDocument.merge(previousDocument, document, this.mergeConfiguration, context);
+                        mergedDocument.merge(previousDocument, nextDocument,
+                            this.configuration.getMergeConfiguration(), context);
+
                     if (documentMergeResult.isModified()) {
-                        saveDocument(dbDocument, comment, context);
+                        if (this.configuration.isInteractive() && !documentMergeResult.getErrors().isEmpty()) {
+                            XWikiDocument documentToSave =
+                                askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument);
+
+                            if (documentToSave != currentDocument) {
+                                saveDocument(documentToSave, comment, context);
+                            }
+                        } else {
+                            saveDocument(mergedDocument, comment, context);
+                        }
                     }
+
                     this.mergeResult =
-                        new XarEntryMergeResult(new XarEntry(dbDocument.getDocumentReference(),
-                            dbDocument.getLanguage()), documentMergeResult);
+                        new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(),
+                            mergedDocument.getLanguage()), documentMergeResult);
                 } else {
-                    if (dbDocument.apply(document)) {
-                        saveDocument(dbDocument, comment, context);
-                    }
+                    saveDocument(nextDocument, comment, context);
                 }
             } else {
-                document.setCreatorReference(context.getUserReference());
-
-                saveDocument(document, comment, context);
+                saveDocument(nextDocument, comment, context);
             }
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);

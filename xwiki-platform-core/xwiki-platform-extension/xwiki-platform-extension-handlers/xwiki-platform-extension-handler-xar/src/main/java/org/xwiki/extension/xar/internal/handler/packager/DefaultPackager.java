@@ -62,7 +62,6 @@ import org.xwiki.observation.ObservationManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 
@@ -104,42 +103,42 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     @Override
-    public void importXAR(XarFile previousXarFile, File xarFile, String wiki, MergeConfiguration mergeConfiguration)
+    public void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration)
         throws IOException, XWikiException
     {
-        if (wiki == null) {
+        if (configuration.getWiki() == null) {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().isVirtualMode()) {
                 List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
 
                 if (!wikis.contains(context.getMainXWiki())) {
-                    importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), mergeConfiguration);
+                    importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), configuration);
                 }
 
                 for (String subwiki : wikis) {
-                    importXARToWiki(previousXarFile, xarFile, subwiki, mergeConfiguration);
+                    importXARToWiki(previousXarFile, xarFile, subwiki, configuration);
                 }
             } else {
-                importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), mergeConfiguration);
+                importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), configuration);
             }
         } else {
-            importXARToWiki(previousXarFile, xarFile, wiki, mergeConfiguration);
+            importXARToWiki(previousXarFile, xarFile, configuration.getWiki(), configuration);
         }
     }
 
-    public XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki,
-        MergeConfiguration mergeConfiguration) throws IOException
+    private XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki,
+        PackageConfiguration configuration) throws IOException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
-            return importXARToWiki(previousXarFile, fis, wiki, mergeConfiguration);
+            return importXARToWiki(previousXarFile, fis, wiki, configuration);
         } finally {
             fis.close();
         }
     }
 
-    public XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki,
-        MergeConfiguration mergeConfiguration) throws IOException
+    private XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki,
+        PackageConfiguration configuration) throws IOException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
@@ -159,7 +158,7 @@ public class DefaultPackager implements Packager, Initializable
                         DocumentImporterHandler documentHandler =
                             new DocumentImporterHandler(this, this.componentManager, wiki);
                         documentHandler.setPreviousXarFile(previousXarFile);
-                        documentHandler.setMergeConfiguration(mergeConfiguration);
+                        documentHandler.setConfiguration(configuration);
 
                         parseDocument(zis, documentHandler);
 
@@ -184,57 +183,57 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     @Override
-    public void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException
+    public void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException
     {
-        if (wiki == null) {
+        if (configuration.getWiki() == null) {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().isVirtualMode()) {
                 List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
 
                 if (!wikis.contains(context.getMainXWiki())) {
-                    unimportXARFromWiki(xarFile, context.getMainXWiki());
+                    unimportXARFromWiki(xarFile, context.getMainXWiki(), configuration);
                 }
 
                 for (String subwiki : wikis) {
-                    unimportXARFromWiki(xarFile, subwiki);
+                    unimportXARFromWiki(xarFile, subwiki, configuration);
                 }
             } else {
-                unimportXARFromWiki(xarFile, context.getMainXWiki());
+                unimportXARFromWiki(xarFile, context.getMainXWiki(), configuration);
             }
         } else {
-            unimportXARFromWiki(xarFile, wiki);
+            unimportXARFromWiki(xarFile, configuration.getWiki(), configuration);
         }
     }
 
-    public void unimportXARFromWiki(File xarFile, String wiki) throws IOException
+    private void unimportXARFromWiki(File xarFile, String wiki, PackageConfiguration configuration) throws IOException
     {
-        unimportPagesFromWiki(getEntries(xarFile), wiki);
+        unimportPagesFromWiki(getEntries(xarFile), wiki, configuration);
     }
 
     @Override
-    public void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException
+    public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException
     {
-        if (wiki == null) {
+        if (configuration.getWiki() == null) {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().isVirtualMode()) {
                 List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
 
                 if (!wikis.contains(context.getMainXWiki())) {
-                    unimportPagesFromWiki(pages, context.getMainXWiki());
+                    unimportPagesFromWiki(pages, context.getMainXWiki(), configuration);
                 }
 
                 for (String subwiki : wikis) {
-                    unimportPagesFromWiki(pages, subwiki);
+                    unimportPagesFromWiki(pages, subwiki, configuration);
                 }
             } else {
-                unimportPagesFromWiki(pages, context.getMainXWiki());
+                unimportPagesFromWiki(pages, context.getMainXWiki(), configuration);
             }
         } else {
-            unimportPagesFromWiki(pages, wiki);
+            unimportPagesFromWiki(pages, configuration.getWiki(), configuration);
         }
     }
 
-    public void unimportPagesFromWiki(Collection<XarEntry> pages, String wiki)
+    private void unimportPagesFromWiki(Collection<XarEntry> pages, String wiki, PackageConfiguration configuration)
     {
         WikiReference wikiReference = new WikiReference(wiki);
 

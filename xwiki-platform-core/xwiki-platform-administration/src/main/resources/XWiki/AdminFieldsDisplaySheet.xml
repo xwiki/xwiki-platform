@@ -91,7 +91,7 @@
           #end
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
-        #if($hint)&lt;span class="xHint"&gt;$hint#end
+        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
         &lt;/label&gt;
         &lt;/dt&gt;
         #if ($prop)

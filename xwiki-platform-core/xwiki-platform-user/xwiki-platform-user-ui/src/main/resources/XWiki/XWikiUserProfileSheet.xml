@@ -171,89 +171,85 @@
 </property>
 </object>
 <content>{{velocity}}
-#set($obj = $doc.getObject("XWiki.XWikiUsers"))
-## Allow $obfuscateEmail to be set in some other place.
-#if("$!obfuscateEmail" == '')
-  #set($obfuscateEmail = true)
-#end
-#if(!$obj)
+#set ($discard = $xwiki.ssx.use('XWiki.XWikiUserSheet'))
+##
+#set ($inEditMode = $xcontext.action == 'edit' || $xcontext.action == 'inline')
+#set ($xwikiUsersClassName = 'XWiki.XWikiUsers')
+#set ($obj = $doc.getObject($xwikiUsersClassName))
+##
+#if (!$obj)
 = $msg.get('xe.admin.users.sheet') =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+
 #else
-$doc.use($obj)
-{{html clean="false" wiki="true"}}
+##
+#set ($sheetDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'AdminUserProfileSheet'))
+#set ($sheetDocument = $xwiki.getDocument($sheetDocumentReference))
+#set ($xwikiUsersClass = $xwiki.getClass($xwikiUsersClassName))
+##
+#set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
+#set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
+##
+{{html clean='false' wiki='true'}}
 #set($username = $xwiki.getUserName($doc.fullName, false))
 = $msg.get('platform.core.profile.title', [$username]) =
 
-#if($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit')
+#if (!$inEditMode)
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
 #end
-$xwiki.ssx.use("XWiki.XWikiUserSheet")##
   &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
-    &lt;div class="userInfo"&gt;
-      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=profile')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-      #end
-      ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
-      &lt;h1&gt;$msg.get('platform.core.profile.section.personal')&lt;/h1&gt;
-      &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.firstname')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="given-name"#end&gt;$doc.display('first_name')&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.lastname')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="family-name"#end&gt;$doc.display('last_name')&lt;/dd&gt;
-        #if(($obj.getProperty('company') &amp;&amp; $obj.getProperty('company').getValue() != '') || $xcontext.action != 'view')
-          &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.company')&lt;/label&gt;&lt;/dt&gt;
-          &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="org"#end&gt;$doc.display('company')&lt;/dd&gt;
-        #end
-        #if (("$!{obj.getProperty('comment').value}" != '') || $xcontext.action != 'view')
-          &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.about')&lt;/label&gt;&lt;/dt&gt;
-          &lt;dd #if($xcontext.action == 'view')class="note"#end&gt;$doc.display('comment')&lt;/dd&gt;
-        #end
-      &lt;/dl&gt;
-      &lt;h1&gt;$msg.get('platform.core.profile.section.contact')&lt;/h1&gt;
-      &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.email')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="email"#end&gt;#if ($xcontext.action == 'inline' || $xcontext.action == 'edit' || !$obfuscateEmail)$doc.display('email')#else $doc.display('email').replaceAll('@.*', '@ ~-~-~-~-~-~-')#end&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.phone')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="tel"#end&gt;$doc.display('phone')&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.address')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd#if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit') class="adr"#end&gt;$doc.display('address')&lt;/dd&gt;
-      &lt;/dl&gt;
-      #set ($hasBlog = ("$!{obj.getProperty('blog').getValue()}" != ''))
-      #set ($hasBlogFeed = ("$!{obj.getProperty('blogfeed').getValue()}" != ''))
-      #if ($hasBlog || $hasBlogFeed || $xcontext.action == 'inline' || $xcontext.action == 'edit')
-       &lt;h1&gt;$msg.get('platform.core.profile.section.links')&lt;/h1&gt;
+    &lt;div class='userInfo'&gt;
+    #if($context.action == 'view' &amp;&amp; $hasEdit)
+      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+    #end
+    ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
+    #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
+    #set ($sectionsToDisplayString = $sectionsObject.getProperty('sections').value)
+    #set ($sectionsToDisplay = $sectionsToDisplayString.split('\s+'))
+    #foreach ($sectionName in $sectionsToDisplay)
+      #set ($sectionObject = $sheetDocument.getObject($sectionObjectClassName, 'name', $sectionName))
+      #set ($sectionPropertiesString = $sectionObject.getProperty('properties').value)
+      #set ($sectionProperties = $sectionPropertiesString.split('\s+'))
+      #if ($sectionProperties.size() &gt; 0)
+        &lt;h1&gt;$msg.get("platform.core.profile.section.${sectionName}")&lt;/h1&gt;
         &lt;dl&gt;
-          #if ($hasBlog || $xcontext.action == 'inline' || $xcontext.action == 'edit')
-            &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blog')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;$doc.display('blog')&lt;/dd&gt;
+        #foreach ($sectionProperty in $sectionProperties)
+          #set ($vCardData = $sectionProperty.split(':'))
+          #set ($vCardProperty = '')
+          #if ($vCardData.size() == 2)
+            #set ($vCardProperty = $vCardData[0])
+            #set ($sectionProperty = $vCardData[1])
           #end
-          #if ($hasBlogFeed || $xcontext.action == 'inline' || $xcontext.action == 'edit')
-            &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blogFeed')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;$doc.display('blogfeed')&lt;/dd&gt;
+          #if ("$!sectionProperty" != '' &amp;&amp; $xwikiUsersClass.get($sectionProperty))
+          &lt;dt class='label'&gt;
+            &lt;label #if($inEditMode)for="${xwikiUsersClassName}_${obj.number}_${sectionProperty}"#{end}&gt;$doc.displayPrettyName("${sectionProperty}")&lt;/label&gt;
+          &lt;/dt&gt;
+          &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;$doc.display($sectionProperty)&lt;/dd&gt;
           #end
+        #end
         &lt;/dl&gt;
       #end
+    #end
     &lt;/div&gt;
   &lt;/div&gt;
-  #if ($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit')
-    &lt;div class="half column"&gt;
-      &lt;div class="userRecentChanges"&gt;
+  #if (!$inEditMode)
+    &lt;div class='half column'&gt;
+      &lt;div class='userRecentChanges'&gt;
       #if ($context.user == $doc.fullName)
         &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;
       #else
         &lt;h1&gt;$msg.get('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
-        &lt;div class="activity-follow"&gt;
+        &lt;div class='activity-follow'&gt;
           #set ($xredirect = $doc.getURL($context.action, $request.queryString))
           #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
-          &lt;span class="following"&gt;$msg.get('xe.activity.messages.following')&lt;/span&gt;
-          &lt;a class="action unfollow" href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.unfollow')&lt;/a&gt;
+          &lt;span class='following'&gt;$msg.get('xe.activity.messages.following')&lt;/span&gt;
+          &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.unfollow')&lt;/a&gt;
           #else
-          &lt;a class="action follow" href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.follow')&lt;/a&gt;
+          &lt;a class='action follow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.follow')&lt;/a&gt;
           #end
         &lt;/div&gt;
         #end
@@ -262,16 +258,15 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 
 {{activity authors="${doc.fullName},${doc.prefixedFullName}" /}}
 
-{{html clean="false"}}
+{{html clean='false'}}
       &lt;/div&gt;
     &lt;/div&gt;
   #end
-  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-#if($xcontext.action != 'inline' &amp;&amp; $xcontext.action != 'edit')
+  &lt;div class='clearfloats'&gt;&amp;nbsp;&lt;/div&gt;
+#if(!$inEditMode)
   ## Close the vcard
   &lt;/div&gt;
 #end
 {{/html}}##
 #end
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

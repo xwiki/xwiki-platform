@@ -76,6 +76,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
+import org.apache.ecs.xhtml.em;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
@@ -3025,6 +3026,17 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
         needsUpdate |= bclass.addTextField("email", "e-Mail", 30);
+        // Email field custom display (email obfuscation).
+        PropertyClass emailProperty = (PropertyClass) bclass.get("email");
+        if (!emailProperty.isCustomDisplayed(context)) {
+            emailProperty.setCustomDisplay("{{velocity}}\n"
+                + "#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n"
+                + "  {{html}}<input type='text' name='$prefix$name' value='$value' />{{/html}}\n" + "#else\n"
+                + "  ## Allow $obfuscateEmail to be set in some other place.\n"
+                + "  #if(\"$obfuscateEmail\" == 'false')\n" + "    $value\n" + "  #else\n"
+                + "    $value.replaceAll('@.*', '@ xxxxxx')\n" + "  #end\n" + "#end\n" + "{{/velocity}}");
+            needsUpdate = true;
+        }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);
         needsUpdate |= bclass.addPasswordField("validkey", "Validation Key", 10);
         needsUpdate |= bclass.addBooleanField("active", "Active", "active");

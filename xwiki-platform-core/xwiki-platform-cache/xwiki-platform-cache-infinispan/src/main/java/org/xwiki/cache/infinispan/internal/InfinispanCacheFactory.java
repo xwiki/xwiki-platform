@@ -113,6 +113,14 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
     }
 
     /**
+     * @return the Infinispan cache manager
+     */
+    public EmbeddedCacheManager getCacheManager()
+    {
+        return this.cacheManager;
+    }
+
+    /**
      * @return the default Infinispan configuration file in the container as stream
      */
     private InputStream getConfigurationFileAsStream()

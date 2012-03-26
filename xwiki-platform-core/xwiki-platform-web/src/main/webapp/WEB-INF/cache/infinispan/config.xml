@@ -102,8 +102,8 @@
       -->
       <globalJmxStatistics
             enabled="true" 
-            jmxDomain="org.infinispan" 
-            cacheManagerName="SampleCacheManager"/>
+            jmxDomain="org.xwiki.infinispan" 
+            cacheManagerName="XWikiCacheManager"/>
 
       <!--
          Used to customize the marshaller used to serialize objects and deserialize byte streams.  Also allows you to

@@ -3445,7 +3445,8 @@ document.observe('xwiki:dom:loaded', function() {
        {'id' : 'Users'},
        {'id' : 'Groups'},
        {'id' : 'Rights', 'perSpace' : true},
-       {'id' : 'Registration'}
+       {'id' : 'Registration'},
+       {'id' : 'UserProfile'}
     ]
   },
   {

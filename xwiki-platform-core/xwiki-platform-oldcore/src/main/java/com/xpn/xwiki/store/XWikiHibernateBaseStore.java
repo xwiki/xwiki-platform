@@ -689,7 +689,7 @@ public class XWikiHibernateBaseStore implements Initializable
         //
         // Thus for Oracle we don't escape the schema.
         // TODO: Remove this when https://hibernate.onjira.com/browse/HHH-6888 is fixed
-        DatabaseProduct databaseProduct = getDatabaseProductName(context);
+        DatabaseProduct databaseProduct = getDatabaseProductName();
         if (DatabaseProduct.ORACLE == databaseProduct) {
             escapedSchema = schema;
         } else {

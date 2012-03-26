@@ -220,7 +220,7 @@
       // Add JS handlers for the extension menu
       this.addExtensionMenuBehavior(extensionItem);
       // Fix dependencies links
-      extensionItem.select(".extension-body-dependencies a.dependency-type-core, .extension-body-dependencies a.dependency-type-installed").each(function (link) {
+      extensionItem.select(".extension-body-dependencies a").each(function (link) {
          link.setAttribute('href', XWiki.currentDocument.getURL((XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view'), link.getAttribute('href').replace(/.*\?/, "")));
       });
     },
@@ -459,6 +459,9 @@
   font-size: .8em;
 }
 
+.extension-item:hover .extension-header {
+  background-color: $theme.highlightColor;
+}
 .extension-header .buttonwrapper {
   margin: 0 0 0 5px;
 }
@@ -478,7 +481,6 @@
   word-wrap: break-word;
 }
 .extension-body {
-  background-color: $theme.highlightColor;
   border: 1px dotted $theme.borderColor;;
   padding: 0 .8em .8em 1.8em !important;
   margin: 0 1em 1em;
@@ -493,41 +495,72 @@
 
 *[class^="extension-body-"] {
   display: none;
+  font-size: 0.9em;
 }
 *[id^="extension-body-"]:target + *[class^="extension-body-"] {
   display: block;
 }
-.extension-metadata {
-  margin: 0 !important;
-  -moz-column-width: 30em;
-  -webkit-column-width: 30em;
-  column-width: 30em;
+ul.extension-metadata {
+  list-style-type: none;
+  margin: 0;
 }
-.extension-metadata li {
-  display: block;
-  vertical-align: top;
-  padding: 0.5em 0;
-}
-
-*[class|="dependency-type"] {
-  padding-left: 20px;
-  background: transparent none no-repeat left;
+ul.extension-metadata li {
+  padding-top: 0.5em;
 }
 
 .extension-body-dependencies ul {
+  border-top: 1px dotted #E8E8E8;
   list-style-type: none;
+  margin: 0;
 }
-.dependency-type-core {
+.extension-body-dependencies li:hover {
+  background-color: $theme.highlightColor;
+}
+.extension-body-dependencies li&gt;div {
+  background: transparent none no-repeat left;
+  border-bottom: 1px dotted #E8E8E8;
+  border-right: 7px solid $theme.pageContentBackgroundColor;
+  padding: 0.3em 0 0.3em 20px;
+  position: relative;
+}
+.extension-body-dependencies li p {
+  margin: 0;
+}
+.extension-body-dependencies li&gt;div.dependency-type-core, .extension-body-dependencies li&gt;div.dependency-type-core-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
-.dependency-type-installed {
+.extension-body-dependencies li&gt;div.dependency-type-installed {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
-.dependency-type-remote {
+.extension-body-dependencies li&gt;div.dependency-type-remote, .extension-body-dependencies li&gt;div.dependency-type-remote-available {
   background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
-.dependency-type-unknown {
+.extension-body-dependencies li&gt;div.dependency-type-unknown {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
+}
+.extension-body-dependencies li&gt;div.dependency-type-installed, .extension-body-dependencies li&gt;div.dependency-type-core {
+  border-right-color: $theme.notificationSuccessColor;
+}
+.extension-body-dependencies li&gt;div.dependency-type-remote-available {
+  border-right-color: $theme.notificationWarningColor;
+}
+.extension-body-dependencies li&gt;div.dependency-type-core-incompatible {
+  border-right-color: $theme.notificationErrorColor;
+}
+.dependency-status {
+  font-size: 0.8em;
+  position: absolute;
+  right: 1.5em;
+  text-align: right;
+}
+.dependency-type-installed .dependency-status, .dependency-type-core .dependency-status {
+  color: $theme.notificationSuccessColor;
+}
+.dependency-type-remote-available .dependency-status {
+  color: $theme.notificationWarningColor;
+}
+.dependency-type-core-incompatible .dependency-status {
+  color: $theme.notificationErrorColor;
 }
 
 #advancedextensionsearch legend {
@@ -1164,7 +1197,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       {{/html}}
     )))
     (% class="extHeaderRight" %)(((
-      ## Advanced install form
+      ## Advanced search form
       {{html clean="false"}}
       &lt;form action="$escapetool.xml($doc.getURL($xcontext.action, $request.getQueryString()))" method="post" class="xform"&gt;
         &lt;fieldset id="advancedextensionsearch"&gt;
@@ -1182,7 +1215,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
                 &lt;dd&gt;&lt;input type="text" name="extensionwiki" id="advancedextensionsearch-wiki" value="" /&gt;&lt;/dd&gt;
               #end
             &lt;/dl&gt;
-            &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" name="actioninstall" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
+            &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;&lt;/span&gt;
                &lt;span class="buttonwrapper"&gt;&lt;a href="#searchextension" class="actioncancel secondary button"&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
           &lt;/div&gt;
         &lt;/fieldset&gt;
@@ -1204,176 +1237,230 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   $name##
 #end
 
-#macro (displayExtension $extension)
+#macro (displayExtensionActionButtons $extension)
+  #set ($actions = [])
+  #computeXBack()
+  #if(!$extensionStatus)
     #determineExtensionStatus($extension, $extensionStatus)
-    #set ($actions = [])
-    #computeXBack()
-    #if ($extensionStatus == 'core')
-      #getCoreExtensionButtons($extension, $actions)
-    #elseif ($extensionStatus == 'installed')
-      #getInstalledExtensionButtons($extension, $actions)
-    #elseif ($extensionStatus == 'remote')
-      #getRemoteExtensionButtons($extension, $actions)
-    #end
-    (% class="extension-item extension-item-${extensionStatus}" %)(((
-    (% class="extension-header" %)(((
-    (% class="extension-name" %)
-    ==#displayExtensionName($extension) (% class="extension-version %)$extension.id.version==
+  #end
+  #if ($extensionStatus == 'core')
+    #getCoreExtensionButtons($extension, $actions)
+  #elseif ($extensionStatus == 'installed')
+    #getInstalledExtensionButtons($extension, $actions)
+  #elseif ($extensionStatus == 'remote')
+    #getRemoteExtensionButtons($extension, $actions)
+  #end
+  {{html}}
+  #set ($action = 'view')
+  #if ($doc.name == 'XWikiPreferences')
+    #set ($action = 'admin')
+  #end
+  &lt;form method="post" action="$doc.getURL($action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
+    &lt;div class="extension-actions"&gt;
+      &lt;input type="hidden" name="extensionid" value="$extension.id.id" /&gt;
+      &lt;input type="hidden" name="extensionversion" value="$extension.id.version" /&gt;
+      #if ($extensionwiki)
+        &lt;input type="hidden" name="extensionwiki" value="$extensionwiki" /&gt;
+      #end
+      #foreach ($action in $actions)
+        ${action}##
+      #end
+    &lt;/div&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
 
-    {{html}}
-    #if ($doc.name == 'XWikiPreferences')
-      #set ($action = 'admin')
-    #else
-      #set ($action = 'view')
-    #end
-    &lt;form method="post" action="$doc.getURL($action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
-      &lt;div class="extension-actions"&gt;
-        &lt;input type="hidden" name="extensionid" value="$extension.id.id" /&gt;
-        &lt;input type="hidden" name="extensionversion" value="$extension.id.version" /&gt;
-        #if ($extensionwiki)
-          &lt;input type="hidden" name="extensionwiki" value="$extensionwiki" /&gt;
-        #end
-        #foreach ($action in $actions)
-          ${action}##
-        #end
-      &lt;/div&gt;
-    &lt;/form&gt;
-    {{/html}}
+#macro (displayExtensionAuthors $extension)
+  (% class="extension-authors" %)(((
+    $msg.get('extensions.info.authors') ##
+    #foreach ($author in $extension.authors)
+      #if ($author.name == 'devs')
+        [[$msg.get('extensions.info.authors.xwikiorg')&gt;&gt;http://www.xwiki.org/]]##
+      #elseif ("$!author.url" != '' &amp;&amp; "$!author.name" != '')
+        [[${author.name}&gt;&gt;${author.url}]]##
+      #else
+        ${author.name}##
+      #end
+      #if ($foreach.hasNext), ##
+      #else )))
 
-    #if ($extension.authors.size() &gt; 0)
-      (% class="extension-authors" %)(((
-      $msg.get('extensions.info.authors') ##
-      #foreach ($author in $extension.authors)
-        #if ($author.name == 'devs')
-          [[$msg.get('extensions.info.authors.xwikiorg')&gt;&gt;http://www.xwiki.org/]]##
-        #elseif ("$!author.url" != '' &amp;&amp; "$!author.name" != '')
-          [[${author.name}&gt;&gt;${author.url}]]##
-        #else
-          ${author.name}##
-        #end
-        #if ($foreach.hasNext), ##
-        #else )))
-
-        #end
       #end
     #end
-    #if ("$!{extension.summary}" != '')
-      (% class="extension-description" %)
-      {{{
-      $extension.summary.replaceAll('\s+', ' ')
-      }}}
+#end
+
+#macro (displayExtensionDetails_menu $extension)
+  (% class="innerMenu" %)
+  * [[$msg.get('extensions.info.category.description')&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
+  #if ("$!{extension.releaseNotes}" != '')
+    * [[$msg.get('extensions.info.category.releaseNotes')&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
+  #end
+  #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
+    * [[$msg.get('extensions.info.category.dependencies')&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
+  #end
+#end
+
+#macro (displayExtensionDetails_description $extension)
+  {{id name="extension-body-description-${extension.id.id}-${extension.id.version}" /}}
+  (% class="extension-body-description extension-body-section" %)(((
+    (% class="extension-metadata" %)
+    * $msg.get('extensions.info.license', [$extension.licenses.size()]) ##
+    #foreach ($license in $extension.licenses)
+      ${license.name}##
+      #if ($foreach.hasNext), #end
+    #end
+
+    #if ($extension.repository.id.URI &amp;&amp; $extension.repository.id.URI.scheme != 'file')
+      * $msg.get('extensions.info.repository') [[$extension.repository.id.id&gt;&gt;$extension.repository.id.URI]]
+    #end
+    #if ($extension.dependency)
+      * $msg.get('extensions.info.dependency')
+    #end
+    #if ("$!{extension.webSite}" != '')
+      * $msg.get('extensions.info.website') [[$extension.webSite.replaceAll('^[^/]++//([^/]++)/?.*+$', '$1')&gt;&gt;$extension.webSite]]
+    #end
+    #if ($extension.features.size() &gt; 0)
+      * $msg.get('extensions.info.features') $extension.features
+    #end
+    #if ($xwiki.virtualMode)
+      #if (!$extension.namespaces || $extension.namespaces.size() == 0)
+        * $msg.get('extensions.info.namespaces.global')
+      #else
+        * $msg.get('extensions.info.namespaces.list') #foreach ($namespace in $extension.namespaces)$namespace#if($foreach.hasNext), #end#end
+
+      #end
+    #end
+    ##
+    ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax, server side generated HTML, etc)
+    ## $!extension.description
+  )))
+#end
+
+#macro (displayExtensionDetails_releaseNotes $extension)
+  #if ("$!{extension.releaseNotes}" != '')
+
+    {{id name="extension-body-relnotes-${extension.id.id}-${extension.id.version}"/}}
+    (% class="extension-body-relnotes extension-body-section" %)(((
+      $!{extension.releaseNotes}
+    )))
+  #end
+#end
+
+#macro (displayExtensionDetails_dependencies_upstream $extension)
+  $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
+  #foreach ($dependency in $extension.dependencies)
+    #set ($dependencyType = 'unknown')
+    #set ($dependencyName = $dependency.id)
+    #set ($dependencyStatus = $NULL)
+    #set ($dependencyExtension = $extensionManager.resolve($dependency))
+    #if ($dependencyExtension)
+      #set ($sectionForType = {'core': 'XWiki.CoreExtensions', 'installed': 'XWiki.InstalledExtensions', 'remote': 'XWiki.AddExtensions'})
+      #determineExtensionStatus($dependencyExtension $dependencyType)
+      #set ($section = $sectionForType.get($dependencyType))
+      #set ($url = $doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=$section&amp;xback=${escapetool.url($xback)}"))
+      #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$url]]")
+      #if ($dependencyType == 'core')
+        ## Check if the available core extension satisfies the version constraint of the dependency.
+        #set ($availableVersion = $extensionManager.getCoreExtension($dependency.id).id.version)
+        #if (!$dependency.versionConstraint.containsVersion($availableVersion))
+          #set ($dependencyType = 'core-incompatible')
+          #set ($dependencyStatus = $msg.get("extensions.info.dependencies.status.coreIncompatible", [$availableVersion]))
+        #end
+      ## Check if a different version of the remote dependency is installed (only in single wiki mode).
+      #elseif ($dependencyType == 'remote' &amp;&amp; !$xwiki.virtualMode)
+        #set ($availableVersion = $extensionManager.getInstalledExtension($dependency.id, $NULL).id.version)
+        #if ($availableVersion)
+          #set ($dependencyType = 'remote-available')
+          #set ($dependencyStatus = $msg.get("extensions.info.dependencies.status.remoteAvailable", [$availableVersion]))
+        #end
+      #end
+      #if (!$dependencyStatus &amp;&amp; $dependencyType != 'remote')
+        #set ($dependencyStatus = $msg.get("extensions.info.dependencies.status.$dependencyType"))
+      #end
+    #end
+    * (% class="dependency-type-$dependencyType" %)(((
+        ${dependencyName}(% class="extension-version" %)$!{dependency.versionConstraint}(% class="dependency-status" %)$!dependencyStatus
+      )))
+    #if (!$foreach.hasNext)
 
     #end
-    (% class="clearfloats" %)((()))
+  #end
+#end
+
+#macro (displayExtensionDetails_dependencies_downstream $backwardDependencies)
+  $msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])
+  #foreach ($namespace in $backwardDependencies.entrySet())
+    #foreach ($dependency in $namespace.value)
+      #set ($queryString = "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")
+      * (% class="dependency-type-installed" %)(((
+          [[#displayExtensionName($dependency)&gt;&gt;path:$doc.getURL($xcontext.action, $queryString)]](% class="extension-version" %)$!{dependency.id.version}(%%)##
+          #if ("$!{namespace.key}" != '')
+            (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace.key])##
+          #end
+          (% class="dependency-status" %)$msg.get("extensions.info.dependencies.status.installed")
+        )))
+    #end
+  #end
+#end
+
+#macro (displayExtensionDetails_dependencies $extension $backwardDependencies)
+  #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
+
+    {{id name="extension-body-dependencies-${extension.id.id}-${extension.id.version}" /}}
+    #computeXBack()
+    (% class="extension-body-dependencies extension-body-section" %)(((
+      #displayExtensionDetails_dependencies_upstream($extension)
+      #displayExtensionDetails_dependencies_downstream($backwardDependencies)
+    )))
+  #end
+#end
+
+#macro (displayExtensionDetails $extension)
+  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version.value))
+  #if (!$backwardDependencies)
+    #set ($backwardDependencies = {})
+  #end
+  (% class="extension-body" %)(((
+    #displayExtensionDetails_menu($extension)
+
+    #displayExtensionDetails_description($extension)
+    #displayExtensionDetails_releaseNotes($extension)
+    #displayExtensionDetails_dependencies($extension $backwardDependencies)
+  )))
+#end
+
+#macro (displayExtension $extension)
+  #determineExtensionStatus($extension, $extensionStatus)
+  (% class="extension-item extension-item-${extensionStatus}" %)(((
+    (% class="extension-header" %)(((
+      (% class="extension-name" %)
+      == #displayExtensionName($extension) (% class="extension-version %)$extension.id.version ==
+
+      #displayExtensionActionButtons($extension)
+
+      #if ($extension.authors.size() &gt; 0)
+        #displayExtensionAuthors($extension)
+      #end
+      #if ("$!{extension.summary}" != '')
+        (% class="extension-description" %)
+        {{{
+          $extension.summary.replaceAll('\s+', ' ')
+        }}}
+
+      #end
+      (% class="clearfloats" %)((()))
     )))
     #if ($request.actionshowdetails)
-    #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version))
-    #if (!$backwardDependencies)
-      #set ($backwardDependencies = {})
+      #displayExtensionDetails($extension)
     #end
-    (% class="extension-body" %)(((
-      (% class="innerMenu" %)
-      * [[$msg.get('extensions.info.category.description')&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
-      #if ("$!{extension.releaseNotes}" != '')
-        * [[$msg.get('extensions.info.category.releaseNotes')&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
-      #end
-      #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
-        * [[$msg.get('extensions.info.category.dependencies')&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
-      #end
-
-      {{id name="extension-body-description-${extension.id.id}-${extension.id.version}" /}}
-      (% class="extension-body-description extension-body-section" %)(((
-        (% class="extension-metadata" %)
-        * $msg.get('extensions.info.license', [$extension.licenses.size()]) ##
-        #foreach ($license in $extension.licenses)
-          ${license.name}##
-          #if ($foreach.hasNext), #end
-        #end
-
-        #if ($extension.repository.id.URI &amp;&amp; $extension.repository.id.URI.scheme != 'file')
-          * $msg.get('extensions.info.repository') [[$extension.repository.id.id&gt;&gt;$extension.repository.id.URI]]
-        #end
-        #if ($extension.dependency)
-          * $msg.get('extensions.info.dependency')
-        #end
-        #if ("$!{extension.webSite}" != '')
-          * $msg.get('extensions.info.website') [[$extension.webSite.replaceAll('^[^/]++//([^/]++)/?.*+$', '$1')&gt;&gt;$extension.webSite]]
-        #end
-        #if ($extension.features.size() &gt; 0)
-          * $msg.get('extensions.info.features') $extension.features
-        #end
-        #if ($xwiki.virtualMode)
-          #if (!$extension.namespaces || $extension.namespaces.size() == 0)
-            * $msg.get('extensions.info.namespaces.global')
-          #else
-            * $msg.get('extensions.info.namespaces.list') #foreach ($namespace in $extension.namespaces)$namespace#if($foreach.hasNext), #end#end
-
-          #end
-        #end
-
-        ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax, server side generated HTML, etc)
-        ## $!extension.description
-      )))
-
-      #if ("$!{extension.releaseNotes}" != '')
-      {{id name="extension-body-relnotes-${extension.id.id}-${extension.id.version}"/}}
-      (% class="extension-body-relnotes extension-body-section" %)(((
-        $!{extension.releaseNotes}
-      )))
-      #end
-
-      {{id name="extension-body-dependencies-${extension.id.id}-${extension.id.version}" /}}
-      #computeXBack()
-      (% class="extension-body-dependencies extension-body-section" %)(((
-        $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
-        #foreach ($dependency in $extension.dependencies)
-          #set ($dependencyExtension = $extensionManager.resolve($dependency))
-          #set ($dependencyClass = "$!{dependencyExtension.class}")
-          #if ($dependencyExtension)
-            * [[#displayExtensionName($dependencyExtension)&gt;&gt;##
-            #if ($dependencyClass.endsWith('CoreExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]
-            #elseif ($dependencyClass.endsWith('LocalExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]
-            #else
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]
-            #end
-          #else
-            * (% class="dependency-type-unknown" %)${dependency.id}
-          #end
-          #if (!$foreach.hasNext)
-
-          #end
-        #end
-        $msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])
-        #foreach ($namespace in $backwardDependencies.entrySet())
-          #foreach ($dependency in $namespace.value)
-            #set ($dependencyClass = "${dependency.class}")
-            * [[#displayExtensionName($dependency)&gt;&gt;##
-            #if ($dependencyClass.endsWith('CoreExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.CoreExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-core"]]##
-            #elseif ($dependencyClass.endsWith('LocalExtension'))
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-installed"]]##
-            #else
-              path:$doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.AddExtensions&amp;xback=${escapetool.url($xback)}")||class="dependency-type-remote"]]##
-            #end
-            #if ("$!{namespace.key}" != '')
-              $msg.get('extensions.info.dependency.wiki', [$namespace.key])
-            #else
-
-            #end
-          #end
-        #end
-      )))
-    )))
-    #end
-    )))
+  )))
 #end
 
 #macro (handleInstallExtensionRequest)
   (% class="full column" %)(((
   #displayExtensionSearchBar()
-  = $msg.get('extensions.install.title', ["//#displayExtensionName($extensionManager.resolve($request.extensionid, $request.extensionversion))//"]) =
+  #set ($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
+  ##= $msg.get('extensions.install.title', ["//#displayExtensionName($extension)//"]) =
+  #displayExtension($extension)
 
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}$msg.get('extensions.install.error.missingIdOrVersion'){{/error}}
@@ -1462,14 +1549,12 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro (handleUninstallExtensionRequest)
   (% class="full column" %)(((
-  = $msg.get('extensions.uninstall.title', ["//#displayExtensionName($extensionManager.resolve($request.extensionid, $request.extensionversion))//"]) =
+  #set ($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
+  = $msg.get('extensions.uninstall.title', ["//#displayExtensionName($extension)//"]) =
 
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}$msg.get('extensions.uninstall.error.missingIdOrVersion'){{/error}}
   #else
-    #if ($xcontext.isMainWiki())
-      #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
-    #end
     #if ($request.confirm)
       #if ($xcontext.isMainWiki() &amp;&amp; !$extensionnamespace)
         #set($uninstallJob = $extensionManager.uninstall($extension.id))

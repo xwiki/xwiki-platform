@@ -185,7 +185,8 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
 {{velocity}}
 ## Ajax call for a single extension
 #if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
-  #displayExtension($extensionManager.resolve($request.extensionid, $request.extensionversion) $actions)
+  #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
+  #displayExtension($extension $actions)
 #else
   (% class="full column" %)(((
   #displayExtensionSearchBar()

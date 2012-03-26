@@ -21,9 +21,6 @@ Object.extend(XWiki, {
     /** URL Anchor separator. */
     anchorSeparator: "#",
 
-    /** URL Anchor for page annotations. */
-    docextraAnnotationsAnchor: "Annotations",
-
     /** URL Anchor for page comments. */
     docextraCommentsAnchor: "Comments",
 

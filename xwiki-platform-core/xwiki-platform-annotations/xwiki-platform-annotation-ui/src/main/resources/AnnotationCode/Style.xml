@@ -392,7 +392,7 @@ AABJRU5ErkJggg==
 #allAnnotations .annotation {
   margin: 0 0 8px;
 }
-#allAnnotations .annotation .annotationText {
+#allAnnotations .annotation .annotationText, #Commentspane .annotation .annotationText {
   padding: 0 36px 0 14px;
   background: transparent #attImgURL('notesmall') left 4px no-repeat;
   text-align: justify;

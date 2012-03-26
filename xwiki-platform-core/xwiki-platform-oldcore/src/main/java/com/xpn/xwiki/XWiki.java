@@ -109,6 +109,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
@@ -808,7 +809,11 @@ public class XWiki implements EventListener
         // that we need DB access to be available (at component initialization) to make this possible.
         registerWikiMacros();
 
-        Utils.<ObservationManager> getComponent((Type) ObservationManager.class).addListener(this);
+        ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
+        observationManager.addListener(this);
+
+        // Send Event to signal that the application is ready to service requests.
+        observationManager.notify(new ApplicationReadyEvent(), this);
     }
 
     /**

@@ -152,8 +152,9 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Retrieve the current database product name. If no current session is available, obtains a connection from the
-     * hibernate connection provider attached to the current session factory.
-     * @return the database product name
+     * Hibernate connection provider attached to the current Session Factory.
+     *
+     * @return the database product name, see {@link DatabaseProduct}
      * @since 4.0M1
      */
     public DatabaseProduct getDatabaseProductName()
@@ -185,7 +186,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * @return the database product name
-     * @deprecated since 4.0M1 use #getDatabaseProductName()
+     * @deprecated since 4.0M1 use {@link #getDatabaseProductName()}
      */
     @Deprecated
     public DatabaseProduct getDatabaseProductName(XWikiContext context)

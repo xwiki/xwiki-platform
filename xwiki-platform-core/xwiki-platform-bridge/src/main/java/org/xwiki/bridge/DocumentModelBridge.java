@@ -49,13 +49,6 @@ public interface DocumentModelBridge
     DocumentReference getDocumentReference();
 
     /**
-     * @return the full document's name, including Wiki, Space and Page
-     * @deprecated replaced by {@link #getDocumentReference()} since 2.2M1
-     */
-    @Deprecated
-    org.xwiki.bridge.DocumentName getDocumentName();
-
-    /**
      * Retrieve the actual language of the document variant. If this is a translation, then it is the language of the
      * translation. If this is the original variant of the document, then it it is the default language of the document.
      * 

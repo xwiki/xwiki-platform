@@ -1093,19 +1093,6 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentModelBridge#getDocumentName()
-     * @deprecated replaced by {@link #getDocumentReference()} since 2.2M1
-     */
-    @Deprecated
-    @Override
-    public org.xwiki.bridge.DocumentName getDocumentName()
-    {
-        return new org.xwiki.bridge.DocumentName(getWikiName(), getSpaceName(), getPageName());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see DocumentModelBridge#getWikiName()
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */

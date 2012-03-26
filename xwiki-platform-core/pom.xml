@@ -333,6 +333,14 @@
                 <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
                 <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
                 <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
+                <!-- START: Removed Deprecations -->
+                <exclude>org/xwiki/bridge/AttachmentName</exclude>
+                <exclude>org/xwiki/bridge/DocumentName</exclude>
+                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+                <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
+                <exclude>com/xpn/xwiki/doc/DefaultDocumentAccessBridge</exclude>
+                <exclude>com/xpn/xwiki/doc/XWikiDocument</exclude>
+                <!-- STOP: Removed Deprecations -->
               </excludes>
             </configuration>
           </plugin>

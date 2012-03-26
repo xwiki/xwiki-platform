@@ -101,33 +101,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
-    @Deprecated
-    public DocumentModelBridge getDocument(org.xwiki.bridge.DocumentName documentName) throws Exception
-    {
-        return getDocument(new DocumentReference(documentName.getWiki(), documentName.getSpace(),
-            documentName.getPage()));
-    }
-
-    @Override
-    @Deprecated
-    public org.xwiki.bridge.DocumentName getDocumentName(String documentReference)
-    {
-        DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(documentReference);
-        return new org.xwiki.bridge.DocumentName(docReference.getWikiReference().getName(), docReference
-            .getLastSpaceReference().getName(), docReference.getName());
-    }
-
-    @Override
-    @Deprecated
-    public org.xwiki.bridge.DocumentName getCurrentDocumentName()
-    {
-        XWikiDocument currentDocument = getContext().getDoc();
-
-        return currentDocument == null ? null : new org.xwiki.bridge.DocumentName(currentDocument.getWikiName(),
-            currentDocument.getSpaceName(), currentDocument.getPageName());
-    }
-
-    @Override
     public DocumentReference getCurrentDocumentReference()
     {
         XWikiDocument currentDocument = null;
@@ -485,15 +458,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
-    @Deprecated
-    public InputStream getAttachmentContent(org.xwiki.bridge.AttachmentName attachmentName) throws Exception
-    {
-        return getAttachmentContent(new AttachmentReference(attachmentName.getFileName(), new DocumentReference(
-            attachmentName.getDocumentName().getWiki(), attachmentName.getDocumentName().getSpace(), attachmentName
-                .getDocumentName().getPage())));
-    }
-
-    @Override
     public void setAttachmentContent(AttachmentReference attachmentReference, byte[] attachmentData) throws Exception
     {
         XWikiContext xcontext = getContext();
@@ -555,28 +519,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             attachmentReferences.add(new AttachmentReference(attachment.getFilename(), resolvedReference));
         }
         return attachmentReferences;
-    }
-
-    @Override
-    @Deprecated
-    public List<org.xwiki.bridge.AttachmentName> getAttachments(org.xwiki.bridge.DocumentName documentName)
-        throws Exception
-    {
-        List<org.xwiki.bridge.AttachmentName> results = new ArrayList<org.xwiki.bridge.AttachmentName>();
-        DocumentReference documentReference;
-        if (documentName == null) {
-            documentReference = this.currentMixedDocumentReferenceResolver.resolve(getContext().getDoc().getFullName());
-        } else {
-            documentReference =
-                new DocumentReference(documentName.getWiki(), documentName.getSpace(), documentName.getPage());
-        }
-        List<AttachmentReference> references = getAttachmentReferences(documentReference);
-        for (AttachmentReference reference : references) {
-            results.add(new org.xwiki.bridge.AttachmentName(new org.xwiki.bridge.DocumentName(reference
-                .getDocumentReference().getWikiReference().getName(), reference.getDocumentReference()
-                .getLastSpaceReference().getName(), reference.getDocumentReference().getName()), reference.getName()));
-        }
-        return results;
     }
 
     @Override
@@ -688,15 +630,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     @Override
     @Deprecated
-    public String getAttachmentURL(org.xwiki.bridge.AttachmentName attachmentName, boolean isFullURL)
-    {
-        return getAttachmentURL(new AttachmentReference(attachmentName.getFileName(), new DocumentReference(
-            attachmentName.getDocumentName().getWiki(), attachmentName.getDocumentName().getWiki(), attachmentName
-                .getDocumentName().getPage())), isFullURL);
-    }
-
-    @Override
-    @Deprecated
     public List<String> getAttachmentURLs(DocumentReference documentReference, boolean isFullURL) throws Exception
     {
         List<String> urls = new ArrayList<String>();
@@ -704,15 +637,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             urls.add(getAttachmentURL(attachmentReference, isFullURL));
         }
         return urls;
-    }
-
-    @Override
-    @Deprecated
-    public List<String> getAttachmentURLs(org.xwiki.bridge.DocumentName documentName, boolean isFullURL)
-        throws Exception
-    {
-        return getAttachmentURLs(
-            new DocumentReference(documentName.getWiki(), documentName.getSpace(), documentName.getPage()), isFullURL);
     }
 
     @Override

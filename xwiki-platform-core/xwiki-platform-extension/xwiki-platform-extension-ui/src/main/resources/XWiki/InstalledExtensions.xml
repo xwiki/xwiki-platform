@@ -198,7 +198,7 @@ RU5ErkJggg==
     #if ($xcontext.isMainWiki())
       #set($extensions = $extensionManager.getInstalledExtensions())
     #else
-      #set($extensions = $extensionManager.getInstalledExtensions($extensionnamespace))
+      #set($extensions = $extensionManager.getInstalledExtensions($extensionNamespace))
     #end
   #end
   #if ($extensions.isEmpty())

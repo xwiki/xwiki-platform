@@ -406,23 +406,9 @@
   margin-right: 1px;
   position: relative;
 }
-.extension-item-installed {
-  border-right-color: $theme.notificationSuccessColor;
-}
-.extension-item-update-available {
-  border-right-color: $theme.notificationWarningColor;
-}
-.extension-item-incompatible {
-  border-right-color: $theme.notificationErrorColor;
-}
-.extension-item-disabled {
-  border-right-color: $theme.borderColor;
-  opacity: .7;
-}
 .extension-item &gt; * {
   padding: 0.8em 1em 1em 2.7em;
 }
-
 .extension-item:last-of-type {
   border-bottom-color: $theme.borderColor;
 }
@@ -432,10 +418,11 @@
   font-size: 1.2em;
   font-weight: 700;
   border: none;
-  background: url("$xwiki.getSkinFile('icons/silk/cog.png')") no-repeat scroll 0.2em 0.3em transparent;
+  background: none no-repeat scroll 0.2em 0.3em transparent;
   margin: 0 0 0 -1.8em;
   padding: 2px 0 2px 1.8em;
 }
+
 .ui-progress-bar {
   background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
   background-repeat: repeat;
@@ -466,13 +453,31 @@
   margin: 0 0 0 5px;
 }
 
+.extension-header-right {
+  float: right;
+  text-align: right;
+}
+
+.extension-status {
+  font-size: 0.8em;
+}
+.extension-header-right .extension-status {
+  margin: -2em 0 1em;
+}
+
 .extension-authors {
   color: $theme.textSecondaryColor;
   font-size: .9em;
 }
 
-.extension-actions {
-  float: right;
+.extension-item-core .extension-status, .extension-item-installed .extension-status {
+  color: $theme.notificationSuccessColor;
+}
+.extension-item-remote-installed .extension-status {
+  color: $theme.notificationWarningColor;
+}
+.extension-item-remote-core .extension-status {
+  color: $theme.notificationErrorColor;
 }
 
 .extension-description {
@@ -480,6 +485,7 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
 .extension-body {
   border: 1px dotted $theme.borderColor;;
   padding: 0 .8em .8em 1.8em !important;
@@ -492,7 +498,6 @@
 *[id^="extension-body-"]:target {
   display: none;
 }
-
 *[class^="extension-body-"] {
   display: none;
   font-size: 0.9em;
@@ -500,6 +505,7 @@
 *[id^="extension-body-"]:target + *[class^="extension-body-"] {
   display: block;
 }
+
 ul.extension-metadata {
   list-style-type: none;
   margin: 0;
@@ -516,51 +522,43 @@ ul.extension-metadata li {
 .extension-body-dependencies li:hover {
   background-color: $theme.highlightColor;
 }
-.extension-body-dependencies li&gt;div {
+.dependency-item {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.extension-body-dependencies li p {
+.dependency-item &gt; p {
   margin: 0;
 }
-.extension-body-dependencies li&gt;div.dependency-type-core, .extension-body-dependencies li&gt;div.dependency-type-core-incompatible {
+.extension-item-core .extension-name, .extension-item-remote-core .extension-name,
+.dependency-item.extension-item-core, .dependency-item.extension-item-remote-core {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
-.extension-body-dependencies li&gt;div.dependency-type-installed {
+.extension-item-installed .extension-name, .extension-item-remote-installed .extension-name,
+.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
-.extension-body-dependencies li&gt;div.dependency-type-remote, .extension-body-dependencies li&gt;div.dependency-type-remote-available {
+.extension-item-remote .extension-name, .dependency-item.extension-item-remote {
   background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
-.extension-body-dependencies li&gt;div.dependency-type-unknown {
+.dependency-item.extension-item-unknown {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
 }
-.extension-body-dependencies li&gt;div.dependency-type-installed, .extension-body-dependencies li&gt;div.dependency-type-core {
-  border-right-color: $theme.notificationSuccessColor;
-}
-.extension-body-dependencies li&gt;div.dependency-type-remote-available {
-  border-right-color: $theme.notificationWarningColor;
-}
-.extension-body-dependencies li&gt;div.dependency-type-core-incompatible {
-  border-right-color: $theme.notificationErrorColor;
-}
-.dependency-status {
-  font-size: 0.8em;
+.dependency-item .extension-status {
   position: absolute;
   right: 1.5em;
-  text-align: right;
 }
-.dependency-type-installed .dependency-status, .dependency-type-core .dependency-status {
-  color: $theme.notificationSuccessColor;
+
+.extension-item-core, .extension-item-installed {
+  border-right-color: $theme.notificationSuccessColor;
 }
-.dependency-type-remote-available .dependency-status {
-  color: $theme.notificationWarningColor;
+.extension-item-remote-installed {
+  border-right-color: $theme.notificationWarningColor;
 }
-.dependency-type-core-incompatible .dependency-status {
-  color: $theme.notificationErrorColor;
+.extension-item-remote-core {
+  border-right-color: $theme.notificationErrorColor;
 }
 
 #advancedextensionsearch legend {
@@ -1182,7 +1180,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #if ($extensionwiki)
-  #set($extensionnamespace = "wiki:${extensionwiki}")
+  #set($extensionNamespace = "wiki:${extensionwiki}")
 #end
 
 #macro (displayExtensionSearchBar)
@@ -1234,20 +1232,20 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
     #end
   #end
-  $name##
+  ${name}##
 #end
 
 #macro (displayExtensionActionButtons $extension)
   #set ($actions = [])
   #computeXBack()
   #if(!$extensionStatus)
-    #determineExtensionStatus($extension, $extensionStatus)
+    #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   #end
-  #if ($extensionStatus == 'core')
+  #if ($extensionStatus.endsWith('core'))
     #getCoreExtensionButtons($extension, $actions)
   #elseif ($extensionStatus == 'installed')
     #getInstalledExtensionButtons($extension, $actions)
-  #elseif ($extensionStatus == 'remote')
+  #elseif ($extensionStatus.startsWith('remote'))
     #getRemoteExtensionButtons($extension, $actions)
   #end
   {{html}}
@@ -1348,37 +1346,19 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #macro (displayExtensionDetails_dependencies_upstream $extension)
   $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
   #foreach ($dependency in $extension.dependencies)
-    #set ($dependencyType = 'unknown')
+    #set ($dependencyStatus = 'unknown')
+    #set ($dependencyStatusMessage = $NULL)
     #set ($dependencyName = $dependency.id)
-    #set ($dependencyStatus = $NULL)
     #set ($dependencyExtension = $extensionManager.resolve($dependency))
     #if ($dependencyExtension)
-      #set ($sectionForType = {'core': 'XWiki.CoreExtensions', 'installed': 'XWiki.InstalledExtensions', 'remote': 'XWiki.AddExtensions'})
-      #determineExtensionStatus($dependencyExtension $dependencyType)
-      #set ($section = $sectionForType.get($dependencyType))
+      #set ($sectionForStatus = {'core': 'XWiki.CoreExtensions', 'installed': 'XWiki.InstalledExtensions', 'remote': 'XWiki.AddExtensions', 'remote-core': 'XWiki.AddExtensions', 'remote-installed': 'XWiki.AddExtensions'})
+      #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage)
+      #set ($section = $sectionForStatus.get($dependencyStatus))
       #set ($url = $doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionid=${dependency.id}&amp;extensionversion=${dependency.versionConstraint}&amp;section=$section&amp;xback=${escapetool.url($xback)}"))
       #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$url]]")
-      #if ($dependencyType == 'core')
-        ## Check if the available core extension satisfies the version constraint of the dependency.
-        #set ($availableVersion = $extensionManager.getCoreExtension($dependency.id).id.version)
-        #if (!$dependency.versionConstraint.containsVersion($availableVersion))
-          #set ($dependencyType = 'core-incompatible')
-          #set ($dependencyStatus = $msg.get("extensions.info.dependencies.status.coreIncompatible", [$availableVersion]))
-        #end
-      ## Check if a different version of the remote dependency is installed (only in single wiki mode).
-      #elseif ($dependencyType == 'remote' &amp;&amp; !$xwiki.virtualMode)
-        #set ($availableVersion = $extensionManager.getInstalledExtension($dependency.id, $NULL).id.version)
-        #if ($availableVersion)
-          #set ($dependencyType = 'remote-available')
-          #set ($dependencyStatus = $msg.get("extensions.info.dependencies.status.remoteAvailable", [$availableVersion]))
-        #end
-      #end
-      #if (!$dependencyStatus &amp;&amp; $dependencyType != 'remote')
-        #set ($dependencyStatus = $msg.get("extensions.info.dependencies.status.$dependencyType"))
-      #end
     #end
-    * (% class="dependency-type-$dependencyType" %)(((
-        ${dependencyName}(% class="extension-version" %)$!{dependency.versionConstraint}(% class="dependency-status" %)$!dependencyStatus
+    * (% class="dependency-item extension-item-$dependencyStatus" %)(((
+        ${dependencyName}(% class="extension-version" %)$!{dependency.versionConstraint}(% class="extension-status" %)$!dependencyStatusMessage
       )))
     #if (!$foreach.hasNext)
 
@@ -1391,12 +1371,12 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #foreach ($namespace in $backwardDependencies.entrySet())
     #foreach ($dependency in $namespace.value)
       #set ($queryString = "actionshowdetails=true&amp;extensionid=${dependency.id.id}&amp;extensionversion=${dependency.id.version}&amp;section=XWiki.InstalledExtensions&amp;xback=${escapetool.url($xback)}")
-      * (% class="dependency-type-installed" %)(((
+      * (% class="dependency-item extension-item-installed" %)(((
           [[#displayExtensionName($dependency)&gt;&gt;path:$doc.getURL($xcontext.action, $queryString)]](% class="extension-version" %)$!{dependency.id.version}(%%)##
           #if ("$!{namespace.key}" != '')
             (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace.key])##
           #end
-          (% class="dependency-status" %)$msg.get("extensions.info.dependencies.status.installed")
+          (% class="extension-status" %)$msg.get("extensions.info.status.installed")
         )))
     #end
   #end
@@ -1429,13 +1409,20 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (displayExtension $extension)
-  #determineExtensionStatus($extension, $extensionStatus)
+  #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   (% class="extension-item extension-item-${extensionStatus}" %)(((
     (% class="extension-header" %)(((
       (% class="extension-name" %)
       == #displayExtensionName($extension) (% class="extension-version %)$extension.id.version ==
 
-      #displayExtensionActionButtons($extension)
+      (% class="extension-header-right" %)(((
+        #if ($extensionStatusMessage)
+          (% class="extension-status" %)
+          $extensionStatusMessage
+
+        #end
+        #displayExtensionActionButtons($extension)
+      )))
 
       #if ($extension.authors.size() &gt; 0)
         #displayExtensionAuthors($extension)
@@ -1465,7 +1452,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}$msg.get('extensions.install.error.missingIdOrVersion'){{/error}}
   #elseif ($request.confirm)
-    #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionnamespace))
+    #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionNamespace))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       #if($extensionwiki)
@@ -1478,7 +1465,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       {{box}}#printJobLog($installJob){{/box}}
     #end
   #else
-    #set($installPlan = $extensionManager.createInstallPlan($request.extensionid, $request.extensionversion, $extensionnamespace))
+    #set($installPlan = $extensionManager.createInstallPlan($request.extensionid, $request.extensionversion, $extensionNamespace))
     #if (!$installPlan)
       {{error}}$msg.get('extensions.install.error.prepareFailure', [$request.extensionid, $request.extensionversion, $lasterror.message]){{/error}}
     #else
@@ -1556,10 +1543,10 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     {{error}}$msg.get('extensions.uninstall.error.missingIdOrVersion'){{/error}}
   #else
     #if ($request.confirm)
-      #if ($xcontext.isMainWiki() &amp;&amp; !$extensionnamespace)
+      #if ($xcontext.isMainWiki() &amp;&amp; !$extensionNamespace)
         #set($uninstallJob = $extensionManager.uninstall($extension.id))
       #else
-        #set($uninstallJob = $extensionManager.uninstall($request.extensionid, $extensionnamespace))
+        #set($uninstallJob = $extensionManager.uninstall($request.extensionid, $extensionNamespace))
       #end
       #set($lasterror = $extensionManager.lastError)
       #if ($lasterror)
@@ -1573,10 +1560,10 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         {{/box}}
       #end
     #else
-      #if ($xcontext.isMainWiki() &amp;&amp; !$extensionnamespace)
+      #if ($xcontext.isMainWiki() &amp;&amp; !$extensionNamespace)
         #set($uninstallPlan = $extensionManager.createUninstallPlan($extension.id))
       #else
-        #set($uninstallPlan = $extensionManager.createUninstallPlan($request.extensionid, $extensionnamespace))
+        #set($uninstallPlan = $extensionManager.createUninstallPlan($request.extensionid, $extensionNamespace))
       #end
       #if (!$uninstallPlan)
         {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$request.extensionid, $request.extensionversion, $lasterror.message]){{/error}}
@@ -1723,15 +1710,35 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
 #end
 
-#macro (determineExtensionStatus $extension $extensionStatus)
+#macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage)
+  #set ($currentVersion = $NULL)
   #if ($extension.isInstalled())
-    #set ($result = 'installed')
-  #elseif ($extensionManager.getCoreExtension($extension.id.id) == $extension)
-    #set ($result = 'core')
+    #set ($status = 'installed')
   #else
-    #set ($result = 'remote')
+    #set ($status = $extension.repository.id.id)
+    #if ($status != 'core')
+      ## An extension, either local or remote, that is available to install.
+      ## Check if a different version of this extension is installed or is a core dependency.
+      #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
+      #if ($currentVersion)
+        #set ($status = 'remote-core')
+      #else
+        #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+        #if ($currentVersion)
+          #set ($status = 'remote-installed')
+        #else
+          #set ($status = 'remote')
+        #end
+      #end
+    #end
+  #end
+  #set ($message = $NULL)
+  #if ($status != 'remote')
+    #set ($message = $msg.get("extensions.info.status.$status", [$currentVersion.id.version.value]))
   #end
   #set ($extensionStatus = $NULL)
-  #setVariable ("$extensionStatus" $result)
+  #setVariable ("$extensionStatus" $status)
+  #set ($extensionStatusMessage = $NULL)
+  #setVariable ("$extensionStatusMessage" $message)
 #end
 {{/velocity}}</content></xwikidoc>

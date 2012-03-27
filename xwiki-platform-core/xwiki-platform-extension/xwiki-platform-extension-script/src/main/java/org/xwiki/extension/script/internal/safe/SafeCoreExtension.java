@@ -26,7 +26,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingCoreExtension;
 
 /**
- * Provide a readonly access to a core extension.
+ * Provide a public script access to a core extension.
  * 
  * @param <T> the extension type
  * @version $Id$

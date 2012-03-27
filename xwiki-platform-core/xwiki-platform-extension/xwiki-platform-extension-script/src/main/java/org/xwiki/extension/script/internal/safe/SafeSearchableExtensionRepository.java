@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -27,7 +28,7 @@ import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 
 /**
- * Provide a readonly access to a {@link Searchable} extension repository.
+ * Provide a public script access to a {@link Searchable} extension repository.
  * 
  * @param <T>
  * @version $Id$
@@ -38,15 +39,22 @@ public class SafeSearchableExtensionRepository<T extends ExtensionRepository> ex
     /**
      * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
+     * @param execution provide access to the current context
      */
-    public SafeSearchableExtensionRepository(T repository, ScriptSafeProvider<Object> safeProvider)
+    public SafeSearchableExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
     {
-        super(repository, safeProvider);
+        super(repository, safeProvider, execution);
     }
 
     @Override
     public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
-        return this.safeProvider.get(((Searchable) getWrapped()).search(pattern, offset, nb));
+        try {
+            return safe(((Searchable) getWrapped()).search(pattern, offset, nb));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 }

@@ -30,7 +30,7 @@ import org.xwiki.extension.job.plan.ExtensionPlanNode;
 import org.xwiki.extension.version.VersionConstraint;
 
 /**
- * Provide a readonly access to an extension plan node.
+ * Provide a public script access to an extension plan node.
  * 
  * @version $Id$
  * @since 4.0M2
@@ -46,7 +46,7 @@ public class SafeExtensionPlanNode extends AbstractSafeObject<ExtensionPlanNode>
      * @param node the wrapped node
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeExtensionPlanNode(ExtensionPlanNode node, ScriptSafeProvider<Object> safeProvider)
+    public SafeExtensionPlanNode(ExtensionPlanNode node, ScriptSafeProvider< ? > safeProvider)
     {
         super(node, safeProvider);
     }

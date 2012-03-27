@@ -26,7 +26,7 @@ import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.wrap.AbstractWrappingObject;
 
 /**
- * Provide a readonly access to an extension plan action.
+ * Provide a public script access to an extension plan action.
  * 
  * @version $Id$
  * @since 4.0M2

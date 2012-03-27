@@ -27,7 +27,7 @@ import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.result.IterableResult;
 
 /**
- * Provide a readonly access to a iterable result.
+ * Provide a public script access to a iterable result.
  * 
  * @param <E> the extension type
  * @version $Id$
@@ -40,7 +40,7 @@ public class SafeIterableResult<E extends Extension> extends AbstractSafeObject<
      * @param result the wrapped result
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeIterableResult(IterableResult<E> result, ScriptSafeProvider<Object> safeProvider)
+    public SafeIterableResult(IterableResult<E> result, ScriptSafeProvider< ? > safeProvider)
     {
         super(result, safeProvider);
     }

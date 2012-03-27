@@ -26,7 +26,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingLocalExtension;
 
 /**
- * Provide a readonly access to a local extension.
+ * Provide a public script access to a local extension.
  * 
  * @param <T> the extension type
  * @version $Id$

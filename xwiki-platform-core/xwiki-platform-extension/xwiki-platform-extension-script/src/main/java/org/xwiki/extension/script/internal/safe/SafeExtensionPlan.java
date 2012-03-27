@@ -29,7 +29,7 @@ import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
 
 /**
- * Provide a readonly access to an extension plan.
+ * Provide a public script access to an extension plan.
  * 
  * @version $Id$
  * @since 4.0M2
@@ -50,7 +50,7 @@ public class SafeExtensionPlan extends SafeJobStatus<ExtensionPlan> implements E
      * @param plan the wrappeed plan
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeExtensionPlan(ExtensionPlan plan, ScriptSafeProvider<Object> safeProvider)
+    public SafeExtensionPlan(ExtensionPlan plan, ScriptSafeProvider< ? > safeProvider)
     {
         super(plan, safeProvider);
     }

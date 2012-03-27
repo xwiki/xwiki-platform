@@ -19,60 +19,83 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryId;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.Version;
 
 /**
- * Provide a readonly access to a repository.
+ * Provide a public script access to a repository.
  * 
  * @param <T>
  * @version $Id$
  * @since 4.0M2
  */
-public class SafeExtensionRepository<T extends ExtensionRepository> extends WrappingExtensionRepository<T>
+public class SafeExtensionRepository<T extends ExtensionRepository> extends AbstractNoExceptionSafeObject<T> implements
+    ExtensionRepository
 {
-    /**
-     * The provider of instances safe for public scripts.
-     */
-    protected ScriptSafeProvider<Object> safeProvider;
-
     /**
      * @param repository the wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
+     * @param execution provide access to the current context
      */
-    public SafeExtensionRepository(T repository, ScriptSafeProvider<Object> safeProvider)
+    public SafeExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
     {
-        super(repository);
-
-        this.safeProvider = safeProvider;
-    }
-
-    /**
-     * @param <S> the type of the object
-     * @param unsafe the unsafe object
-     * @return the safe version of the object
-     */
-    protected <S> S safe(S unsafe)
-    {
-        return this.safeProvider.get(unsafe);
+        super(repository, safeProvider, execution);
     }
 
     // ExtensionRepository
 
     @Override
-    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    public Extension resolve(ExtensionId extensionId)
     {
-        return safe(super.resolve(extensionId));
+        try {
+            return safe(getWrapped().resolve(extensionId));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 
     @Override
-    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    public Extension resolve(ExtensionDependency extensionDependency)
     {
-        return safe(super.resolve(extensionDependency));
+        try {
+            return safe(getWrapped().resolve(extensionDependency));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public ExtensionRepositoryId getId()
+    {
+        return getWrapped().getId();
+    }
+
+    @Override
+    public boolean exists(ExtensionId extensionId)
+    {
+        return getWrapped().exists(extensionId);
+    }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb)
+    {
+        try {
+            return getWrapped().resolveVersions(id, offset, nb);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 }

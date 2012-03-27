@@ -21,12 +21,13 @@ package org.xwiki.extension.script.internal.safe;
 
 import java.util.Collection;
 
+import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 
 /**
- * Provide a readonly access to a core extension repository.
+ * Provide a public script access to a core extension repository.
  * 
  * @param <T>
  * @version $Id$
@@ -38,10 +39,11 @@ public class SafeCoreExtensionRepository<T extends CoreExtensionRepository> exte
     /**
      * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
+     * @param execution provide access to the current context
      */
-    public SafeCoreExtensionRepository(T repository, ScriptSafeProvider<Object> safeProvider)
+    public SafeCoreExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
     {
-        super(repository, safeProvider);
+        super(repository, safeProvider, execution);
     }
 
     // CoreExtensionRepository

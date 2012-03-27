@@ -31,7 +31,7 @@ import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
 
 /**
- * Provide a readonly access to a job status.
+ * Provide a public script access to a job status.
  * 
  * @param <J> the type of the job status
  * @version $Id$
@@ -43,7 +43,7 @@ public class SafeJobStatus<J extends JobStatus> extends AbstractSafeObject<J> im
      * @param status the wrapped job status
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeJobStatus(J status, ScriptSafeProvider<Object> safeProvider)
+    public SafeJobStatus(J status, ScriptSafeProvider< ? > safeProvider)
     {
         super(status, safeProvider);
     }

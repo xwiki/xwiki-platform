@@ -24,7 +24,7 @@ import java.net.URL;
 import org.xwiki.extension.CoreExtensionFile;
 
 /**
- * Provide a readonly access to a core extension file.
+ * Provide a public script access to a core extension file.
  * 
  * @param <T> the extension type
  * @version $Id$

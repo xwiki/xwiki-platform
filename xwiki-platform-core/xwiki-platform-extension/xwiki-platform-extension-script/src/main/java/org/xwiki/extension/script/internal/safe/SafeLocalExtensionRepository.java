@@ -22,18 +22,15 @@ package org.xwiki.extension.script.internal.safe;
 import java.util.Collection;
 import java.util.Map;
 
+import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 
 /**
- * Provide a readonly access to a local extension repository.
+ * Provide a public script access to a local extension repository.
  * 
  * @param <T> the extension type
  * @version $Id$
@@ -45,10 +42,11 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     /**
      * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
+     * @param execution provide access to the current context
      */
-    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider<Object> safeProvider)
+    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
     {
-        super(repository, safeProvider);
+        super(repository, safeProvider, execution);
     }
 
     // LocalExtensionRepository
@@ -84,40 +82,50 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     }
 
     @Override
-    public LocalExtension storeExtension(Extension extension) throws LocalExtensionRepositoryException
+    public LocalExtension storeExtension(Extension extension)
     {
-        throw new UnsupportedOperationException("Calling storeExtension is forbidden in readonly proxy");
+        throw new UnsupportedOperationException("Calling storeExtension is forbidden in script proxy");
     }
 
     @Override
-    public void removeExtension(LocalExtension extension) throws ResolveException
+    public void removeExtension(LocalExtension extension)
     {
-        throw new UnsupportedOperationException("Calling removeExtension is forbidden in readonly proxy");
+        throw new UnsupportedOperationException("Calling removeExtension is forbidden in script proxy");
     }
 
     @Override
     public void installExtension(LocalExtension extension, String namespace, boolean dependency)
-        throws InstallException
     {
-        throw new UnsupportedOperationException("Calling installExtension is forbidden in readonly proxy");
+        throw new UnsupportedOperationException("Calling installExtension is forbidden in script proxy");
     }
 
     @Override
-    public void uninstallExtension(LocalExtension extension, String namespace) throws UninstallException
+    public void uninstallExtension(LocalExtension extension, String namespace)
     {
-        throw new UnsupportedOperationException("Calling uninstallExtension is forbidden in readonly proxy");
+        throw new UnsupportedOperationException("Calling uninstallExtension is forbidden in script proxy");
     }
 
     @Override
-    public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace) throws ResolveException
+    public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace)
     {
-        return safe(getWrapped().getBackwardDependencies(feature, namespace));
+        try {
+            return safe(getWrapped().getBackwardDependencies(feature, namespace));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 
     @Override
     public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
-        throws ResolveException
     {
-        return safe(getWrapped().getBackwardDependencies(extensionId));
+        try {
+            return safe(getWrapped().getBackwardDependencies(extensionId));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 }

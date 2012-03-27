@@ -26,7 +26,7 @@ import org.xwiki.extension.internal.safe.AbstractSafeObject;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 
 /**
- * Provide a readonly access to an iterator on an extension.
+ * Provide a public script access to an iterator on an extension.
  * 
  * @param <E> the extension type
  * @version $Id$
@@ -38,7 +38,7 @@ public class SafeExtensionIterator<E extends Extension> extends AbstractSafeObje
      * @param iterator the wrapped iterator
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeExtensionIterator(Iterator<E> iterator, ScriptSafeProvider<Object> safeProvider)
+    public SafeExtensionIterator(Iterator<E> iterator, ScriptSafeProvider< ? > safeProvider)
     {
         super(iterator, safeProvider);
     }

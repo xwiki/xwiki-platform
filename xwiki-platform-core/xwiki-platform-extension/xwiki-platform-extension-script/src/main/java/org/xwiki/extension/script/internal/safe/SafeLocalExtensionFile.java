@@ -22,7 +22,7 @@ package org.xwiki.extension.script.internal.safe;
 import org.xwiki.extension.LocalExtensionFile;
 
 /**
- * Provide a readonly access to a local extension file.
+ * Provide a public script access to a local extension file.
  * 
  * @param <T> the extension type
  * @version $Id$

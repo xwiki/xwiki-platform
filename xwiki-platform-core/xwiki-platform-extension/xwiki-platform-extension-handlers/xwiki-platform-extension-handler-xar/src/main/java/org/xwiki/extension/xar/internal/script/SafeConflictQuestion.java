@@ -40,7 +40,7 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
      * @param question the wrapped object
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeConflictQuestion(ConflictQuestion question, ScriptSafeProvider<Object> safeProvider)
+    public SafeConflictQuestion(ConflictQuestion question, ScriptSafeProvider< ? > safeProvider)
     {
         super(question, safeProvider);
     }

@@ -26,14 +26,13 @@ import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.internal.safe.AbstractSafeObject;
 
 /**
- * Provide a readonly access to an extension file.
+ * Provide a public script access to an extension file.
  * 
  * @param <T> the extension type
  * @version $Id$
  * @since 4.0M2
  */
-public class SafeExtensionFile<T extends ExtensionFile> extends AbstractSafeObject<T> implements
-    ExtensionFile
+public class SafeExtensionFile<T extends ExtensionFile> extends AbstractSafeObject<T> implements ExtensionFile
 {
     /**
      * @param file he wrapped file

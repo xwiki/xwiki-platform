@@ -79,7 +79,7 @@ public class ExtensionManagerScriptService implements ScriptService
     /**
      * The key under which the last encountered error is stored in the current execution context.
      */
-    private static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
+    public static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
 
     /**
      * The real extension manager bridged by this script service.

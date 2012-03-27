@@ -346,7 +346,19 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      */
     public EntityReference appendParent(EntityReference newParent)
     {
-        return this.replaceParent(null, newParent);
+        return new EntityReference(this, null, newParent);
+    }
+
+    /**
+     * Return a clone of this reference truncated to a null parent when it reach the given parent.
+     * It is very similar to replaceParent(parent, null), except that it is not overridden.
+     *
+     * @param oldParent the parent that will be replaced by a null
+     * @return a new reference with oldParent and its descendant removed from its parent chain
+     */
+    public EntityReference removeParent(EntityReference oldParent)
+    {
+        return new EntityReference(this, oldParent, null);
     }
 
     @Override

@@ -3029,12 +3029,21 @@ public class XWiki implements EventListener
         // Email field custom display (email obfuscation).
         PropertyClass emailProperty = (PropertyClass) bclass.get("email");
         if (!emailProperty.isCustomDisplayed(context)) {
-            emailProperty.setCustomDisplay("{{velocity}}\n"
-                + "#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n"
-                + "  {{html}}<input type='text' name='$prefix$name' value='$value' />{{/html}}\n" + "#else\n"
-                + "  ## Allow $obfuscateEmail to be set in some other place.\n"
-                + "  #if(\"$obfuscateEmail\" == 'false')\n" + "    $value\n" + "  #else\n"
-                + "    $value.replaceAll('@.*', '@ xxxxxx')\n" + "  #end\n" + "#end\n" + "{{/velocity}}");
+            StringBuilder builder = new StringBuilder();
+            builder.append("{{velocity}}\n");
+            builder.append("#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n");
+            // Line broken in 2 because it was too long.
+            builder.append("  {{html}}<input id='$prefix$name' type='text'");
+            builder.append(" name='$prefix$name' value='$value' />{{/html}}\n");
+            builder.append("#else\n");
+            builder.append("  ## Allow $obfuscateEmail to be set in some other place.\n");
+            builder.append("  #if(\"$obfuscateEmail\" == 'false')\n");
+            builder.append("    $value\n");
+            builder.append("  #else\n");
+            builder.append("    $value.replaceAll('@.*', '@ xxxxxx')\n");
+            builder.append("  #end\n");
+            builder.append("#end\n");
+            builder.append("{{/velocity}}");
             needsUpdate = true;
         }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);

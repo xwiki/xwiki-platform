@@ -183,6 +183,8 @@
 {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
 
 #else
+## Make sure we only care about properties of the user object and don't get polluted by other objects that might be in the user's profile page.
+#set ($discard = $doc.use($obj))
 ##
 #set ($sheetDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'AdminUserProfileSheet'))
 #set ($sheetDocument = $xwiki.getDocument($sheetDocumentReference))

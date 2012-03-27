@@ -797,7 +797,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                     if (newobject != null) {
                         newobject.setId(object.getId());
-                        newobject.setXClassReference(object.getXClassReference());
+                        // Only wiki relative reference are stored in this store, so remove the wiki from the reference
+                        newobject.setXClassReference(classReference.removeParent(classReference.getWikiReference()));
                         newobject.setDocumentReference(object.getDocumentReference());
                         newobject.setNumber(object.getNumber());
                         newobject.setGuid(object.getGuid());
@@ -959,6 +960,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         saveXWikiCollection(object, context, bTransaction);
     }
 
+    private void checkObjectClassIsLocal(BaseCollection object, XWikiContext context) throws XWikiException
+    {
+        DocumentReference xclass = object.getXClassReference();
+        WikiReference wikiReference = xclass.getWikiReference();
+        String db = context.getDatabase();
+        if (!wikiReference.getName().equals(db)) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
+                "XObject ({0}) is an instance of an external XClass and cannot be persisted in this wiki ({1}).",
+                null, new Object[]{this.localEntityReferenceSerializer.serialize(object.getReference()), db});
+        }
+    }
+    
     /**
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
@@ -972,7 +986,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             // We need a slightly different behavior here
             boolean stats = (object instanceof XWikiStats);
-
+            if (!stats) {
+                checkObjectClassIsLocal(object, context);
+            }
+ 
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);

@@ -340,9 +340,6 @@ public class XWiki implements EventListener
     private EntityReferenceValueProvider defaultEntityReferenceValueProvider = Utils
         .getComponent((Type) EntityReferenceValueProvider.class);
 
-    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_REFERENCE, "local");
-
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead.
@@ -3892,7 +3889,7 @@ public class XWiki implements EventListener
     public int createUser(String userName, Map<String, ? > map, EntityReference parentReference, String content,
         Syntax syntax, String userRights, XWikiContext context) throws XWikiException
     {
-        BaseClass baseclass = getUserClass(context);
+        BaseClass userClass = getUserClass(context);
 
         try {
             // TODO: Verify existing user
@@ -3903,10 +3900,10 @@ public class XWiki implements EventListener
                 return -3;
             }
 
+            DocumentReference userClassReference = userClass.getDocumentReference();
             BaseObject userObject =
-                doc.newXObject(
-                    this.localReferenceEntityReferenceSerializer.serialize(baseclass.getDocumentReference()), context);
-            baseclass.fromMap(map, userObject);
+                doc.newXObject(userClassReference.removeParent(userClassReference.getWikiReference()), context);
+            userClass.fromMap(map, userObject);
 
             doc.setParentReference(parentReference);
             doc.setContent(content);
@@ -3956,12 +3953,11 @@ public class XWiki implements EventListener
 
     protected void addUserToGroup(String userName, String groupName, XWikiContext context) throws XWikiException
     {
-        BaseClass groupClass = getGroupClass(context);
         XWikiDocument groupDoc = getDocument(groupName, context);
 
+        DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
         BaseObject memberObject =
-            groupDoc.newXObject(
-                this.localReferenceEntityReferenceSerializer.serialize(groupClass.getDocumentReference()), context);
+            groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
         memberObject.setStringValue("member", userName);
 
@@ -3995,18 +3991,18 @@ public class XWiki implements EventListener
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
-        BaseClass rclass = getRightsClass(context);
+        DocumentReference rightClassReference = getRightsClass(context).getDocumentReference();
 
-        EntityReference rightClassReference =
-            this.localReferenceEntityReferenceSerializer.serialize(rclass.getDocumentReference());
+        EntityReference relativeRightClassReference =
+            rightClassReference.removeParent(rightClassReference.getWikiReference());
 
         // Add protection to the page
-        BaseObject newrightsobject = doc.newXObject(rightClassReference, context);
+        BaseObject newrightsobject = doc.newXObject(relativeRightClassReference, context);
         newrightsobject.setLargeStringValue("groups", "XWiki.XWikiAdminGroup");
         newrightsobject.setStringValue("levels", userRights);
         newrightsobject.setIntValue("allow", 1);
 
-        BaseObject newuserrightsobject = doc.newXObject(rightClassReference, context);
+        BaseObject newuserrightsobject = doc.newXObject(relativeRightClassReference, context);
         newuserrightsobject.setLargeStringValue("users", userName);
         newuserrightsobject.setStringValue("levels", userRights);
         newuserrightsobject.setIntValue("allow", 1);

@@ -32,7 +32,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * 
  * @version $Id$
  * @since 4.0M1
- * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead
+ * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead or for the exact same purpose
+ *             use {@link EntityReference#removeParent(org.xwiki.model.reference.EntityReference)}
  */
 @Deprecated
 @Component("local")

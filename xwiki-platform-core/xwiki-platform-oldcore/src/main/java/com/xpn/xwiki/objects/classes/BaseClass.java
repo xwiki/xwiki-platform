@@ -38,7 +38,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -79,9 +78,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private String validationScript;
 
     private String nameField;
-
-    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_REFERENCE, "local");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -340,7 +336,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public BaseCollection newObject(XWikiContext context) throws XWikiException
     {
         BaseObject bobj = newCustomClassInstance(context);
-        bobj.setXClassReference(this.localReferenceEntityReferenceSerializer.serialize(getDocumentReference()));
+        DocumentReference classReference = getDocumentReference();
+        bobj.setXClassReference(classReference.removeParent(classReference.getWikiReference()));
 
         return bobj;
     }

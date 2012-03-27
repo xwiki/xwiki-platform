@@ -350,6 +350,57 @@ public class EntityReferenceTest
         Assert.assertNotSame(space,referenceWiki2.getParent());
         Assert.assertTrue(checkParamMap(referenceWiki2.getParent(), map2));
         Assert.assertSame(wiki2,referenceWiki2.getParent().getParent());
+
+        Assert.assertSame(reference.replaceParent(wiki, wiki), reference);
+        Assert.assertSame(reference.replaceParent(space, space), reference);
+    }
+
+    @Test
+    public void testAppendParent()
+    {
+        Map<String, Serializable> map1 = getParamMap(3);
+        Map<String, Serializable> map2 = getParamMap(2);
+
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null, map2);
+
+        EntityReference space = new EntityReference("space", EntityType.SPACE, wiki, map1);
+        EntityReference spaceAlone = new EntityReference("space", EntityType.SPACE, null, map1);
+
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space);
+        EntityReference referenceSpace = new EntityReference("page", EntityType.DOCUMENT).appendParent(space);
+        EntityReference referenceWiki = new EntityReference("page", EntityType.DOCUMENT, spaceAlone).appendParent(wiki);
+
+
+        Assert.assertNotSame(reference,referenceSpace);
+        Assert.assertEquals(reference,referenceSpace);
+        Assert.assertSame(reference.getParent(),referenceSpace.getParent());
+
+        Assert.assertNotSame(reference,referenceWiki);
+        Assert.assertEquals(reference,referenceWiki);
+        Assert.assertSame(reference.getParent().getParent(),referenceSpace.getParent().getParent());
+    }
+
+    @Test
+    public void testRemoveParent()
+    {
+        Map<String, Serializable> map1 = getParamMap(3);
+        Map<String, Serializable> map2 = getParamMap(2);
+
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
+        EntityReference space = new EntityReference("space", EntityType.SPACE, wiki, map2);
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space, map1);
+        EntityReference referenceSpace = reference.removeParent(space);
+        EntityReference referenceWiki = reference.removeParent(wiki);
+
+        Assert.assertEquals(reference.getName(),referenceSpace.getName());
+        Assert.assertTrue(checkParamMap(referenceSpace, map1));
+        Assert.assertNull(referenceSpace.getParent());
+        Assert.assertEquals(reference.getName(),referenceWiki.getName());
+
+        Assert.assertTrue(checkParamMap(referenceWiki, map1));
+        Assert.assertEquals(reference.getParent().getName(),referenceWiki.getParent().getName());
+        Assert.assertTrue(checkParamMap(referenceWiki.getParent(), map2));
+        Assert.assertNull(referenceWiki.getParent().getParent());
     }
 
     @Test

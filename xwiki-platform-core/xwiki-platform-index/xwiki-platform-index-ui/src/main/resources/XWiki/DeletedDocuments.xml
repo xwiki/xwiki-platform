@@ -358,13 +358,13 @@ document.observe('xwiki:dom:loaded', function() {
   background: transparent no-repeat center center;
 }
 .itemActions .delete {
-  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif')) !important;
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')") !important;
 }
 .itemActions .restore {
-   background-image: url($xwiki.getSkinFile('/icons/silk/arrow_refresh.gif')) !important;
+   background-image: url("$xwiki.getSkinFile('/icons/silk/arrow_refresh.png')") !important;
 }
 .itemActions .cannot-restore {
-   background-image: url($xwiki.getSkinFile('/icons/silk/page_error.gif')) !important;
+   background-image: url("$xwiki.getSkinFile('/icons/silk/page_error.png')") !important;
 }</code>
 </property>
 <property>

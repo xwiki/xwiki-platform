@@ -1908,7 +1908,7 @@ public class XWiki implements EventListener
     {
         // TODO: Do a better mapping between generic icon name and physical resource name, especially to be independent
         // of the underlying icon library. Right now we assume it's the Silk icon library.
-        return getSkinFile("icons/silk/" + iconName + ".gif", context);
+        return getSkinFile("icons/silk/" + iconName + ".png", context);
     }
 
     public String getSkinFile(String filename, XWikiContext context)

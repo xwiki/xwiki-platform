@@ -369,7 +369,7 @@ links</sections>
     &lt;h2&gt;$msg.get('platform.user.profileConfigureSectionsAllTitle')&lt;/h2&gt;
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;a class='hasIcon icon-button add-button' href="$sheetDocument.getURL('objectadd', "classname=${sectionObjectClassName}&amp;amp;xredirect=$escapetool.url(${xredirect})&amp;form_token=${formToken}")"&gt;$msg.get('platform.user.profileConfigureSectionAddButtonLabel')&lt;/a&gt;
+        &lt;a class='hasIcon icon-button add-button' href="$sheetDocument.getURL('objectadd', "classname=${sectionObjectClassName}&amp;amp;xredirect=$escapetool.url(${xredirect})&amp;amp;form_token=${formToken}")"&gt;$msg.get('platform.user.profileConfigureSectionAddButtonLabel')&lt;/a&gt;
       &lt;/dt&gt;
     #set ($sectionObjects = $sheetDocument.getObjects($sectionObjectClassName))
     #foreach ($sectionObject in $sectionObjects)

@@ -20,7 +20,7 @@
 package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.wrap.AbstractWrappingObject;
@@ -56,7 +56,7 @@ public class SafeExtensionPlanAction extends AbstractWrappingObject<ExtensionPla
     }
 
     @Override
-    public LocalExtension getPreviousExtension()
+    public InstalledExtension getPreviousExtension()
     {
         return this.safeProvider.get(getWrapped().getPreviousExtension());
     }

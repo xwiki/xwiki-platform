@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 
@@ -52,6 +53,9 @@ public class ExtensionScriptSafeProvider implements ScriptSafeProvider<Extension
 
         if (unsafe instanceof CoreExtension) {
             safe = new SafeCoreExtension<CoreExtension>((CoreExtension) unsafe, this.defaultSafeProvider);
+        } else if (unsafe instanceof InstalledExtension) {
+            safe =
+                new SafeInstalledExtension<InstalledExtension>((InstalledExtension) unsafe, this.defaultSafeProvider);
         } else if (unsafe instanceof LocalExtension) {
             safe = new SafeLocalExtension<LocalExtension>((LocalExtension) unsafe, this.defaultSafeProvider);
         } else {

@@ -28,6 +28,7 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.search.Searchable;
 
@@ -63,6 +64,10 @@ public class ExtensionRepositoryScriptSafeProvider implements ScriptSafeProvider
             safe =
                 new SafeCoreExtensionRepository<CoreExtensionRepository>((CoreExtensionRepository) unsafe,
                     this.defaultSafeProvider, this.execution);
+        } else if (unsafe instanceof LocalExtension) {
+            safe =
+                new SafeInstalledExtensionRepository<InstalledExtensionRepository>(
+                    (InstalledExtensionRepository) unsafe, this.defaultSafeProvider, this.execution);
         } else if (unsafe instanceof LocalExtension) {
             safe =
                 new SafeLocalExtensionRepository<LocalExtensionRepository>((LocalExtensionRepository) unsafe,

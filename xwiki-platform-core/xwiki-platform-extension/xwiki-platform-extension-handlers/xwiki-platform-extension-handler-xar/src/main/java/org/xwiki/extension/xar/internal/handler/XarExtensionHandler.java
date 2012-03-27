@@ -36,13 +36,13 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
-import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
-import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
@@ -68,7 +68,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     @Inject
     @Named("xar")
-    private LocalExtensionRepository xarRepository;
+    private InstalledExtensionRepository xarRepository;
 
     @Inject
     private ComponentManager componentManager;
@@ -114,9 +114,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 }
             }
 
-            XarLocalExtension previousXarExtension;
+            XarInstalledExtension previousXarExtension;
             try {
-                previousXarExtension = (XarLocalExtension) this.xarRepository.resolve(previousLocalExtension.getId());
+                previousXarExtension = (XarInstalledExtension) this.xarRepository.resolve(previousLocalExtension.getId());
             } catch (ResolveException e) {
                 // Not supposed to be possible
                 throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
@@ -131,8 +131,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
             List<XarEntry> newPages;
             try {
-                XarLocalExtension newXarExtension =
-                    (XarLocalExtension) this.xarRepository.resolve(newLocalExtension.getId());
+                XarInstalledExtension newXarExtension =
+                    (XarInstalledExtension) this.xarRepository.resolve(newLocalExtension.getId());
                 newPages = newXarExtension.getPages();
             } catch (ResolveException e) {
                 try {
@@ -155,7 +155,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void install(XarLocalExtension previousExtension, LocalExtension localExtension, String wiki,
+    private void install(XarInstalledExtension previousExtension, LocalExtension localExtension, String wiki,
         Request request) throws InstallException
     {
         // import xar into wiki (add new version when the page already exists)
@@ -192,8 +192,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             // implemented
 
             try {
-                XarLocalExtension xarLocalExtension =
-                    (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
+                XarInstalledExtension xarLocalExtension =
+                    (XarInstalledExtension) this.xarRepository.resolve(localExtension.getId());
                 List<XarEntry> pages = xarLocalExtension.getPages();
                 this.packager.unimportPages(pages, createPackageConfiguration(request, wiki));
             } catch (Exception e) {

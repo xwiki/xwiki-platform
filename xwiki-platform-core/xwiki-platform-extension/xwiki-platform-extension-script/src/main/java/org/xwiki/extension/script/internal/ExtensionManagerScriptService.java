@@ -35,6 +35,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
@@ -48,6 +49,7 @@ import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.Version;
@@ -94,7 +96,13 @@ public class ExtensionManagerScriptService implements ScriptService
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * The repository with custom installed extensions.
+     * The repository containing installed extensions.
+     */
+    @Inject
+    private InstalledExtensionRepository installedExtensionRepository;
+
+    /**
+     * The repository containing local extensions.
      */
     @Inject
     private LocalExtensionRepository localExtensionRepository;
@@ -246,9 +254,9 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
      *         installed
      */
-    public Collection<LocalExtension> getInstalledExtensions()
+    public Collection<InstalledExtension> getInstalledExtensions()
     {
-        return safe(this.localExtensionRepository.getInstalledExtensions());
+        return safe(this.installedExtensionRepository.getInstalledExtensions());
     }
 
     /**
@@ -261,9 +269,9 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
      *         installed in the target namespace
      */
-    public Collection<LocalExtension> getInstalledExtensions(String namespace)
+    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
-        return safe(this.localExtensionRepository.getInstalledExtensions(namespace));
+        return safe(this.installedExtensionRepository.getInstalledExtensions(namespace));
     }
 
     /**
@@ -278,9 +286,9 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         installed in the target namespace
      */
-    public LocalExtension getInstalledExtension(String feature, String namespace)
+    public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
-        return safe(this.localExtensionRepository.getInstalledExtension(feature, namespace));
+        return safe(this.installedExtensionRepository.getInstalledExtension(feature, namespace));
     }
 
     /**
@@ -327,14 +335,15 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return a map namespace -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
      *         the result, in which case {@link #getLastError()} contains the failure reason
      */
-    public Map<String, Collection<LocalExtension>> getBackwardDependencies(String feature, String version)
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
     {
         setError(null);
 
-        Map<String, Collection<LocalExtension>> extensions;
+        Map<String, Collection<InstalledExtension>> extensions;
 
         try {
-            extensions = safe(this.localExtensionRepository.getBackwardDependencies(new ExtensionId(feature, version)));
+            extensions =
+                safe(this.installedExtensionRepository.getBackwardDependencies(new ExtensionId(feature, version)));
         } catch (Exception e) {
             setError(e);
 

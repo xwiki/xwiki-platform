@@ -23,12 +23,12 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.xwiki.context.Execution;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**
  * Provide a public script access to a local extension repository.
@@ -37,15 +37,15 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
  * @version $Id$
  * @since 4.0M2
  */
-public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> extends
-    SafeSearchableExtensionRepository<T> implements LocalExtensionRepository
+public class SafeInstalledExtensionRepository<T extends InstalledExtensionRepository> extends
+    SafeSearchableExtensionRepository<T> implements InstalledExtensionRepository
 {
     /**
      * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
      * @param execution provide access to the current context
      */
-    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
+    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
     {
         super(repository, safeProvider, execution);
     }
@@ -59,43 +59,25 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     }
 
     @Override
-    public Collection<LocalExtension> getLocalExtensions()
-    {
-        return safe(getWrapped().getLocalExtensions());
-    }
-
-    @Override
-    public LocalExtension getInstalledExtension(String feature, String namespace)
+    public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
         return safe(getWrapped().getInstalledExtension(feature, namespace));
     }
 
     @Override
-    public LocalExtension storeExtension(Extension extension)
-    {
-        throw new UnsupportedOperationException("Calling storeExtension is forbidden in script proxy");
-    }
-
-    @Override
-    public void removeExtension(LocalExtension extension)
-    {
-        throw new UnsupportedOperationException("Calling removeExtension is forbidden in script proxy");
-    }
-
-    @Override
-    public void installExtension(LocalExtension extension, String namespace, boolean dependency)
+    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
     {
         throw new UnsupportedOperationException("Calling installExtension is forbidden in script proxy");
     }
 
     @Override
-    public void uninstallExtension(LocalExtension extension, String namespace)
+    public void uninstallExtension(InstalledExtension extension, String namespace)
     {
         throw new UnsupportedOperationException("Calling uninstallExtension is forbidden in script proxy");
     }
 
     @Override
-    public Collection<LocalExtension> getBackwardDependencies(String feature, String namespace)
+    public Collection<InstalledExtension> getBackwardDependencies(String feature, String namespace)
     {
         try {
             return safe(getWrapped().getBackwardDependencies(feature, namespace));
@@ -107,7 +89,7 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     }
 
     @Override
-    public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
     {
         try {
             return safe(getWrapped().getBackwardDependencies(extensionId));
@@ -119,14 +101,26 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     }
 
     @Override
-    public LocalExtension resolve(ExtensionDependency extensionDependency)
+    public InstalledExtension resolve(ExtensionDependency extensionDependency)
     {
-        return (LocalExtension) super.resolve(extensionDependency);
+        return (InstalledExtension) super.resolve(extensionDependency);
     }
 
     @Override
-    public LocalExtension resolve(ExtensionId extensionId)
+    public InstalledExtension resolve(ExtensionId extensionId)
     {
-        return (LocalExtension) super.resolve(extensionId);
+        return (InstalledExtension) super.resolve(extensionId);
+    }
+
+    @Override
+    public Collection<InstalledExtension> getInstalledExtensions()
+    {
+        return safe(getWrapped().getInstalledExtensions());
+    }
+
+    @Override
+    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
+    {
+        return safe(getWrapped().getInstalledExtensions(namespace));
     }
 }

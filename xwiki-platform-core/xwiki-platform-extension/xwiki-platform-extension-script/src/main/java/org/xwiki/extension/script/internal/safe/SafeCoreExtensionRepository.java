@@ -23,6 +23,8 @@ import java.util.Collection;
 
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 
@@ -70,5 +72,17 @@ public class SafeCoreExtensionRepository<T extends CoreExtensionRepository> exte
     public boolean exists(String id)
     {
         return getWrapped().exists(id);
+    }
+
+    @Override
+    public CoreExtension resolve(ExtensionDependency extensionDependency)
+    {
+        return (CoreExtension) super.resolve(extensionDependency);
+    }
+
+    @Override
+    public CoreExtension resolve(ExtensionId extensionId)
+    {
+        return (CoreExtension) super.resolve(extensionId);
     }
 }

@@ -34,9 +34,9 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
-import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
-import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
 import org.xwiki.logging.LogLevel;
@@ -70,7 +70,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private JobManager taskManager;
 
-    private LocalExtensionRepository localExtensionRepository;
+    private InstalledExtensionRepository xarExtensionRepository;
 
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
@@ -226,14 +226,14 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         // lookup
 
         this.taskManager = getComponentManager().lookupComponent(JobManager.class);
-        this.localExtensionRepository = getComponentManager().lookupComponent(LocalExtensionRepository.class, "xar");
+        this.xarExtensionRepository = getComponentManager().lookupComponent(InstalledExtensionRepository.class, "xar");
 
         // Get rid of wiki macro listener
         getComponentManager().<ObservationManager> lookupComponent(ObservationManager.class).removeListener(
             "RegisterMacrosOnImportListener");
     }
 
-    private XarLocalExtension install(ExtensionId extensionId, String wiki) throws Throwable
+    private XarInstalledExtension install(ExtensionId extensionId, String wiki) throws Throwable
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(extensionId);
@@ -247,7 +247,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             throw errors.get(0).getThrowable();
         }
 
-        return (XarLocalExtension) this.localExtensionRepository.resolve(extensionId);
+        return (XarInstalledExtension) this.xarExtensionRepository.resolve(extensionId);
     }
 
     private void uninstall(ExtensionId extensionId, String wiki) throws Throwable

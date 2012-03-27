@@ -23,27 +23,26 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingLocalExtension;
+import org.xwiki.extension.wrap.WrappingInstalledExtension;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 
 /**
- * 
  * @version $Id$
  * @since 4.0M1
  */
-public class XarLocalExtension extends WrappingLocalExtension<LocalExtension>
+public class XarInstalledExtension extends WrappingInstalledExtension<InstalledExtension>
 {
-    private XarLocalExtensionRepository repository;
+    private XarInstalledExtensionRepository repository;
 
     private List<XarEntry> pages;
 
-    public XarLocalExtension(LocalExtension localExtension, XarLocalExtensionRepository repository, Packager packager)
-        throws IOException
+    public XarInstalledExtension(InstalledExtension installedExtension, XarInstalledExtensionRepository repository,
+        Packager packager) throws IOException
     {
-        super(localExtension);
+        super(installedExtension);
 
         enumeratePages(packager);
     }

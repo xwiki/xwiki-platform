@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +40,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
@@ -49,8 +49,7 @@ import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
-import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
@@ -69,14 +68,14 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named("xar")
-public class XarLocalExtensionRepository extends AbstractExtensionRepository implements LocalExtensionRepository,
-    Initializable
+public class XarInstalledExtensionRepository extends AbstractExtensionRepository implements
+    InstalledExtensionRepository, Initializable
 {
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
 
     @Inject
-    private LocalExtensionRepository localRepository;
+    private InstalledExtensionRepository installedRepository;
 
     @Inject
     private Packager packager;
@@ -90,12 +89,13 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     @Inject
     private Logger logger;
 
-    private Map<ExtensionId, XarLocalExtension> extensions = new ConcurrentHashMap<ExtensionId, XarLocalExtension>();
+    private Map<ExtensionId, XarInstalledExtension> extensions =
+        new ConcurrentHashMap<ExtensionId, XarInstalledExtension>();
 
     @Override
     public void initialize() throws InitializationException
     {
-        setId(new ExtensionRepositoryId("xar", "xar", this.localRepository.getId().getURI()));
+        setId(new ExtensionRepositoryId("xar", "xar", this.installedRepository.getId().getURI()));
 
         loadExtensions();
 
@@ -117,7 +117,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
             @Override
             public String getName()
             {
-                return XarLocalExtensionRepository.class.getName();
+                return XarInstalledExtensionRepository.class.getName();
             }
 
             @Override
@@ -137,7 +137,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
         } else {
             if (extension.isInstalled()) {
                 try {
-                    addXarExtension(extension);
+                    addXarExtension((InstalledExtension) extension);
                 } catch (IOException e) {
                     this.logger.error("Failed to parse extension [" + extension + "]", e);
                 }
@@ -145,9 +145,9 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
         }
     }
 
-    private void addXarExtension(LocalExtension extension) throws IOException
+    private void addXarExtension(InstalledExtension extension) throws IOException
     {
-        XarLocalExtension xarExtension = new XarLocalExtension(extension, this, this.packager);
+        XarInstalledExtension xarExtension = new XarInstalledExtension(extension, this, this.packager);
 
         this.extensions.put(extension.getId(), xarExtension);
     }
@@ -159,7 +159,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
 
     private void loadExtensions()
     {
-        for (LocalExtension localExtension : this.localRepository.getLocalExtensions()) {
+        for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
             if (localExtension.getType().equalsIgnoreCase("xar")) {
                 try {
                     addXarExtension(localExtension);
@@ -173,9 +173,9 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     // ExtensionRepository
 
     @Override
-    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    public InstalledExtension resolve(ExtensionId extensionId) throws ResolveException
     {
-        Extension extension = this.extensions.get(extensionId);
+        InstalledExtension extension = this.extensions.get(extensionId);
 
         if (extension == null) {
             throw new ResolveException("Extension [" + extensionId + "] does not exists or is not a xar extension");
@@ -185,9 +185,9 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     }
 
     @Override
-    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    public InstalledExtension resolve(ExtensionDependency extensionDependency) throws ResolveException
     {
-        Extension extension = this.localRepository.resolve(extensionDependency);
+        InstalledExtension extension = this.installedRepository.resolve(extensionDependency);
         extension = this.extensions.get(extension.getId());
 
         if (extension == null) {
@@ -207,7 +207,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     @Override
     public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
     {
-        return this.localRepository.resolveVersions(id, offset, nb);
+        return this.installedRepository.resolveVersions(id, offset, nb);
     }
 
     // LocalExtensionRepository
@@ -219,16 +219,10 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     }
 
     @Override
-    public Collection<LocalExtension> getLocalExtensions()
+    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
-        return Collections.<LocalExtension> unmodifiableCollection(this.extensions.values());
-    }
-
-    @Override
-    public Collection<LocalExtension> getInstalledExtensions(String namespace)
-    {
-        List<LocalExtension> installedExtensions = new ArrayList<LocalExtension>(extensions.size());
-        for (LocalExtension localExtension : this.extensions.values()) {
+        List<InstalledExtension> installedExtensions = new ArrayList<InstalledExtension>(extensions.size());
+        for (InstalledExtension localExtension : this.extensions.values()) {
             if (localExtension.isInstalled(namespace)) {
                 installedExtensions.add(localExtension);
             }
@@ -238,15 +232,15 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     }
 
     @Override
-    public Collection<LocalExtension> getInstalledExtensions()
+    public Collection<InstalledExtension> getInstalledExtensions()
     {
-        return getLocalExtensions();
+        return (Collection<InstalledExtension>) this.extensions;
     }
 
     @Override
-    public LocalExtension getInstalledExtension(String id, String namespace)
+    public InstalledExtension getInstalledExtension(String id, String namespace)
     {
-        LocalExtension extension = this.localRepository.getInstalledExtension(id, namespace);
+        InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
         if (extension.getType().equals("xar")) {
             extension = this.extensions.get(extension.getId());
@@ -258,45 +252,34 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
     }
 
     @Override
-    public LocalExtension storeExtension(Extension extension) throws LocalExtensionRepositoryException
-    {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void removeExtension(LocalExtension extension) throws ResolveException
-    {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void installExtension(LocalExtension extension, String namespace, boolean dependency)
+    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
         throws InstallException
     {
-        throw new RuntimeException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public void uninstallExtension(LocalExtension extension, String namespace) throws UninstallException
+    public void uninstallExtension(InstalledExtension extension, String namespace) throws UninstallException
     {
-        throw new RuntimeException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public Collection<LocalExtension> getBackwardDependencies(String id, String namespace) throws ResolveException
+    public Collection<InstalledExtension> getBackwardDependencies(String id, String namespace) throws ResolveException
     {
-        LocalExtension extension = this.localRepository.getInstalledExtension(id, namespace);
+        InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals("xar") ? this.localRepository.getBackwardDependencies(id, namespace) : null;
+        return extension.getType().equals("xar") ? this.installedRepository.getBackwardDependencies(id, namespace)
+            : null;
     }
 
     @Override
-    public Map<String, Collection<LocalExtension>> getBackwardDependencies(ExtensionId extensionId)
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
         throws ResolveException
     {
-        LocalExtension extension = (LocalExtension) this.localRepository.resolve(extensionId);
+        InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals("xar") ? this.localRepository.getBackwardDependencies(extensionId) : null;
+        return extension.getType().equals("xar") ? this.installedRepository.getBackwardDependencies(extensionId) : null;
     }
 
     @Override
@@ -306,7 +289,7 @@ public class XarLocalExtensionRepository extends AbstractExtensionRepository imp
 
         List<Extension> result = new ArrayList<Extension>();
 
-        for (XarLocalExtension extension : this.extensions.values()) {
+        for (XarInstalledExtension extension : this.extensions.values()) {
             if (patternMatcher.matcher(extension.getId().getId()).matches()
                 || patternMatcher.matcher(extension.getDescription()).matches()
                 || patternMatcher.matcher(extension.getSummary()).matches()

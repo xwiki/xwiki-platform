@@ -276,6 +276,7 @@
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
+    <module>xwiki-platform-security</module>
     <module>xwiki-platform-selenium</module>
     <module>xwiki-platform-sheet</module>
     <module>xwiki-platform-skin</module>

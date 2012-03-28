@@ -1,0 +1,6 @@
+org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator
+org.xwiki.security.authorization.internal.DefaultSecurityEntryReader
+org.xwiki.security.authorization.internal.UserAndGroupReferenceResolver
+org.xwiki.security.internal.DefaultEntityBridge
+org.xwiki.security.internal.DefaultUserBridge
+org.xwiki.security.internal.DefaultXWikiBridge

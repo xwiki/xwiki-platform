@@ -158,6 +158,11 @@ public class ExtensionManagerScriptService implements ScriptService
         return safe(this.repositoryManager.getRepositories());
     }
 
+    public ExtensionRepository getRespository(String repositoryId)
+    {
+        return safe(this.extensionManager.getRepository(repositoryId));
+    }
+
     // Extensions
 
     /**

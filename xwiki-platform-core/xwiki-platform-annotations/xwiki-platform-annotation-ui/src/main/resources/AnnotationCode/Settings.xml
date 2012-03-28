@@ -376,7 +376,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 .criterion-label .clear {
   text-transform: lowercase;
   font-size: 80%;
-  color: #C00;
+  color: $theme.notificationErrorColor;
   font-weight: normal;
   cursor: pointer;
   display: none;

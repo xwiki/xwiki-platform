@@ -1375,7 +1375,7 @@ ul.hSortable li:hover .delete {
 }
 
 ul.hSortable li .delete:hover {
-  color: #C00;
+  color: $theme.notificationErrorColor;
 }
 
 ul.hSortable li .separator {

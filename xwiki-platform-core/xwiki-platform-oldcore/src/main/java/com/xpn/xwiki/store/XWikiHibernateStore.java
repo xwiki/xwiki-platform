@@ -968,7 +968,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (!wikiReference.getName().equals(db)) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
-                "XObject ({0}) is an instance of an external XClass and cannot be persisted in this wiki ({1}).",
+                "XObject [{0}] is an instance of an external XClass and cannot be persisted in this wiki [{1}].",
                 null, new Object[]{this.localEntityReferenceSerializer.serialize(object.getReference()), db});
         }
     }

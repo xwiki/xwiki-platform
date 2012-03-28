@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
- * Implements a authentication mecanism which is trusting the App Server authentication. If it fails it falls back to
+ * Implements an authentication mechanism which is trusting the App Server authentication. If it fails it falls back to
  * the standard XWiki authentication.
  * 
  * @version $Id$

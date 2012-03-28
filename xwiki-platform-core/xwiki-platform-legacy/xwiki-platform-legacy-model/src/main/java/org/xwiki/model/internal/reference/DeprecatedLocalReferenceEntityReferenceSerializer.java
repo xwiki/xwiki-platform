@@ -19,9 +19,8 @@
  */
 package org.xwiki.model.internal.reference;
 
-import javax.inject.Inject;
-
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -37,12 +36,26 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 @Component("local/reference")
 public class DeprecatedLocalReferenceEntityReferenceSerializer implements EntityReferenceSerializer
 {
-    @Inject
-    private EntityReferenceSerializer<EntityReference> serializer;
-
     @Override
     public EntityReference serialize(EntityReference reference, Object... parameters)
     {
-        return this.serializer.serialize(reference, parameters);
+        EntityReference newReference = null;
+        EntityReference parent;
+        for (EntityReference currentReference = reference; currentReference != null; currentReference =
+            currentReference.getParent())
+        {
+            if (currentReference.getType() == EntityType.WIKI) {
+                return newReference;
+            }
+
+            parent = new EntityReference(currentReference.getName(), currentReference.getType());
+            if (newReference != null) {
+                newReference = newReference.appendParent(parent);
+            } else {
+                newReference = parent;
+            }
+        }
+
+        return newReference;
     }
 }

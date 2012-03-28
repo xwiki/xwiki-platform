@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
@@ -30,18 +31,18 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
- * Unit tests for {@link LocalReferenceEntityReferenceSerializer}.
+ * Unit tests for {@link DeprecatedLocalReferenceEntityReferenceSerializer}.
  * 
  * @version $Id$
  */
-public class LocalReferenceEntityReferenceSerializerTest
+public class DeprecatedLocalReferenceEntityReferenceSerializerTest
 {
     private EntityReferenceSerializer<EntityReference> serializer;
 
     @Before
     public void setUp()
     {
-        this.serializer = new LocalReferenceEntityReferenceSerializer();
+        this.serializer = new DeprecatedLocalReferenceEntityReferenceSerializer();
     }
 
     @Test

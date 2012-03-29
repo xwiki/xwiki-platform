@@ -24,9 +24,10 @@ import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccess;
 
 /**
- * Please comment here
+ * Stub implementation for usage in the test code.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class TestSecurityAccessEntry extends AbstractSecurityAccessEntry
 {

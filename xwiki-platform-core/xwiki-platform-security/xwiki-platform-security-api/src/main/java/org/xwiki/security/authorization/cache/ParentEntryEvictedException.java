@@ -20,16 +20,14 @@
 package org.xwiki.security.authorization.cache;
 
 /**
- * All cache entries except wiki cache entries must have their parent
- * cached, so the {@link SecurityCacheLoader}  must insert the entries, if missing in
- * turn.
+ * All cache entries except wiki cache entries must have their parent cached, so the {@link SecurityCacheLoader} must
+ * insert the entries, if missing in turn.
  *
- * There is a chance, though, that the cache will evict a parent entry
- * of the entry that the {@link SecurityCacheLoader} is about to insert.
- * When this happens, this exception is thrown and the attempt to load
- * the cache must be restarted.
+ * There is a chance, though, that the cache will evict a parent entry of the entry that the {@link SecurityCacheLoader}
+ * is about to insert.  When this happens, this exception is thrown and the attempt to load the cache must be restarted.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class ParentEntryEvictedException extends Exception
 {

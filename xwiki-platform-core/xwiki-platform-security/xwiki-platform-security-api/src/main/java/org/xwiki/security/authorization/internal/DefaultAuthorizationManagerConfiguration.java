@@ -32,6 +32,7 @@ import org.xwiki.security.internal.AbstractSecurityConfiguration;
  * Configuration for the {@link org.xwiki.security.authorization.AuthorizationManager}.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton

@@ -21,10 +21,13 @@ package org.xwiki.security.authorization;
 
 import org.xwiki.model.EntityType;
 
+import java.util.Formatter;
+
 /**
  * Thrown when attempting to load a right for an unsupported entity type.
  * 
  * @version $Id$
+ * @since 4.0M2
  */
 public class EntityTypeNotSupportedException extends AuthorizationException
 {
@@ -37,10 +40,8 @@ public class EntityTypeNotSupportedException extends AuthorizationException
      */
     public EntityTypeNotSupportedException(EntityType entityType, SecurityEntryReader reader)
     {
-        super("Entities of type "
-            + entityType
-            + " are not supported by security reader of type "
-            + reader.getClass().getName()
-            + ".");
+        super(new Formatter().format("Entities of type %s are not supported by security reader of type %s.",
+                                     entityType,
+                                     reader.getClass().getName()).toString(), null);
     }
 }

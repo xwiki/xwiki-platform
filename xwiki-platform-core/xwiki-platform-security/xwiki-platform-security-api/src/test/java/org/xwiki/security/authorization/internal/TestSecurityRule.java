@@ -29,11 +29,15 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
+import org.xwiki.text.XWikiToStringStyle;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * Please comment here
+ * This security rule stub implementation is only used for testing.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class TestSecurityRule implements SecurityRule
 {
@@ -132,10 +136,13 @@ public class TestSecurityRule implements SecurityRule
     @Override
     public String toString()
     {
-        return "[State=" + state
-            + ", Rights=" + rights
-            + ", Users="  + users
-            + ", Groups=" + groups
-            + "]";
+        ToStringBuilder builder = new ToStringBuilder(this, new XWikiToStringStyle());
+
+        return builder
+            .append("State" , state)
+            .append("Rights", rights)
+            .append("Users" , users)
+            .append("Groups", groups)
+            .toString();
     }
 }

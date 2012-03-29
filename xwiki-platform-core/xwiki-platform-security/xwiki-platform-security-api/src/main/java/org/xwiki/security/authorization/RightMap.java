@@ -39,6 +39,7 @@ import java.util.Set;
  *
  * @param <V> the value type of this map
  * @version $Id$
+ * @since 4.0M2
  */
 public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, Cloneable
 {

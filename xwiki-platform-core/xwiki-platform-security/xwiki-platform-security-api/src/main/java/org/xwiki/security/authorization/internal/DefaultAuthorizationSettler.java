@@ -41,6 +41,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * Provide similar decision as the old xwiki right service.
  *
  * @version $Id$
+ * @since 4.0M2 
  */
 @Component
 @Singleton

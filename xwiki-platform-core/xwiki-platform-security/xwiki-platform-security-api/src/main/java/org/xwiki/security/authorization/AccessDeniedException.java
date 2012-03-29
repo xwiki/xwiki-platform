@@ -19,10 +19,14 @@
  */
 package org.xwiki.security.authorization;
 
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.DocumentReference;
+
 /**
- * Thrown by the AuthorizationManager when an access to be denied.
+ * Exception raised by the AuthorizationManager when denying access.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class AccessDeniedException extends AuthorizationException
 {
@@ -30,34 +34,21 @@ public class AccessDeniedException extends AuthorizationException
     private static final long serialVersionUID = 1L;
 
     /**
-     * Default constructor.
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
      */
-    public AccessDeniedException()
+    public AccessDeniedException(DocumentReference userReference, EntityReference entityReference)
     {
+        this(userReference, entityReference, null);
     }
 
     /**
-     * @param message a message with details about the underlying cause.
-     */
-    public AccessDeniedException(String message)
-    {
-        super(message);
-    }
-
-    /**
-     * @param message a message with details about the underlying cause.
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
      * @param t a Throwable providing details about the underlying cause.
      */
-    public AccessDeniedException(String message, Throwable t)
+    public AccessDeniedException(DocumentReference userReference, EntityReference entityReference, Throwable t)
     {
-        super(message, t);
-    }
-
-    /**
-     * @param t a Throwable providing details about the underlying cause.
-     */
-    public AccessDeniedException(Throwable t)
-    {
-        super(t);
+        super(userReference, entityReference, "Access denied", t);
     }
 }

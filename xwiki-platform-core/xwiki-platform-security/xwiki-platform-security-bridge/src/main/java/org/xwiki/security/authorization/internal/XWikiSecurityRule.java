@@ -33,15 +33,20 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
+import org.xwiki.text.XWikiToStringStyle;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+
 /**
  * Wrapper around xwiki rights objects to convert them into security rules.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class XWikiSecurityRule implements SecurityRule
 {
@@ -166,10 +171,13 @@ public class XWikiSecurityRule implements SecurityRule
     @Override
     public String toString()
     {
-        return "[State=" + state
-            + ", Rights=" + rights
-            + ", Users="  + users
-            + ", Groups=" + groups
-            + "]";
+        ToStringBuilder builder = new ToStringBuilder(this, new XWikiToStringStyle());
+
+        return builder
+            .append("State" , state)
+            .append("Rights", rights)
+            .append("Users" , users)
+            .append("Groups", groups)
+            .toString();
     }
 }

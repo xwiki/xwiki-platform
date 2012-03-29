@@ -26,6 +26,7 @@ import org.xwiki.security.UserSecurityReference;
  * A security rule, representing a declarative access right for some users, groups, and rights.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public interface SecurityRule
 {

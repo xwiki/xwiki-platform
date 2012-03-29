@@ -45,6 +45,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * level by prioritizing user rules, over group rules and all group rules in this order.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Named("priority")

@@ -30,8 +30,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
+/**
+ * Tests for assering the correctness of the {@link SecurityAccess} data structure.
+ *
+ * @version $Id$
+ * @since 4.0M2 
+ */
 public class SecurityAccessTest extends TestCase
 {
+
+    /**
+     * Assert that the default security access instance defines an access level for each defined right, and that the
+     * access level is the same as the defined default for the right.
+     */
     private void assertDefaultAccessLevel()
     {
         SecurityAccess access = XWikiSecurityAccess.getDefaultAccess();
@@ -43,6 +54,9 @@ public class SecurityAccessTest extends TestCase
         }
     }
 
+    /**
+     * Assert that access levels can be cleared and set on a SecurityAccess instance.
+     */
     public void testAccessLevel() throws Exception
     {
         assertDefaultAccessLevel();
@@ -131,12 +145,15 @@ public class SecurityAccessTest extends TestCase
         assertDefaultAccessLevel();
     }
 
+    /**
+     * Assert that the clone method works.
+     */
     public void testClone() throws Exception
     {
         XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();
         XWikiSecurityAccess k = l.clone();
-        Assert.assertEquals(l,k);
-        Assert.assertNotSame(l,k);
+        Assert.assertEquals(l, k);
+        Assert.assertNotSame(l, k);
         assertDefaultAccessLevel();
     }
 }

@@ -27,6 +27,7 @@ import org.xwiki.security.UserSecurityReference;
  *
  * @see org.xwiki.security.authorization.internal.AbstractSecurityAccessEntry
  * @version $Id$
+ * @since 4.0M2
  */
 public interface SecurityAccessEntry extends SecurityEntry
 {

@@ -33,6 +33,7 @@ import org.xwiki.security.authorization.SecurityAccessEntry;
  * access from rules.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface SecurityCacheLoader

@@ -22,10 +22,12 @@ package org.xwiki.security;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- * A reference to a security user.
+ * A user is represented internally in the authorization module by a UserSecurityReference corresponding
+ * to the DocumentReference of the user's profile document.
  *
  * @see {@link SecurityReferenceFactory}
  * @version $Id$
+ * @since 4.0M2
  */
 public class UserSecurityReference extends SecurityReference
 {

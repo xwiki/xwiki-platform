@@ -37,6 +37,7 @@ import com.xpn.xwiki.XWikiException;
  * Temporary implementation of the (@link XWikiBridge} interface to access xwiki information.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton

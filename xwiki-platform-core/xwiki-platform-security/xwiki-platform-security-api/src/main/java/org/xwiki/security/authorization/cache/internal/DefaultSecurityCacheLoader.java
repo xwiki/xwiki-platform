@@ -22,6 +22,7 @@ package org.xwiki.security.authorization.cache.internal;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Formatter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -54,6 +55,7 @@ import org.xwiki.security.internal.UserBridge;
  * access from rules.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -115,11 +117,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             } finally {
                 rulesInvalidator.resume();
             }
-            String message = "Failed to load the cache in "
-                + retries
-                + " attempts.  Giving up.";
+            String message = new Formatter().format("Failed to load the cache in %d attempts.  Giving up.",
+                                                    retries).toString();
             this.logger.error(message);
-            throw new AuthorizationException(message);
+            throw new AuthorizationException(user.getOriginalDocumentReference(),
+                                             entity.getOriginalReference(), message);
         }
     }
 

@@ -27,6 +27,7 @@ import org.xwiki.security.authorization.SecurityAccessEntry;
  * proper implementation of equals and hashCode.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public abstract class AbstractSecurityAccessEntry implements SecurityAccessEntry
 {

@@ -23,6 +23,7 @@ package org.xwiki.security.authorization.internal;
  * This class contains constants for accessing various xwiki elements.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 interface XWikiConstants
 {

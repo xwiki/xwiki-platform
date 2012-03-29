@@ -34,6 +34,7 @@ import org.xwiki.security.authorization.AuthorizationSettler;
  * Provide the configured authorization settler.
  *
  * @version $Id$
+ * @since 4.0M2 
  */
 @Component
 public class AuthorizationSettlerProvider implements Provider<AuthorizationSettler>, Initializable

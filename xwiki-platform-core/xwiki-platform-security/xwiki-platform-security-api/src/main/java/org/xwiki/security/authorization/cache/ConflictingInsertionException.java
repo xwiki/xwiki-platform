@@ -20,17 +20,15 @@
 package org.xwiki.security.authorization.cache;
 
 /**
- * This exception is thrown if two or more parallel threads have
- * attempted to load the cache with the same entry at the same time as
- * a right was updated, so the resulting entries are different.
+ * This exception is thrown if two or more parallel threads have attempted to load the cache with the same entry at the
+ * same time as a right was updated, so the resulting entries are different.
  *
- * When this happens, there must be a pending event waiting to be
- * delivered, which will remove the offending entry from the cache.
- * Thus, the appropriate action is to restart the attempt to load the
- * cache when catching this, after the lock that blocks the event
- * delivery has ben released and required.
+ * When this happens, there must be a pending event waiting to be delivered, which will remove the offending entry from
+ * the cache.  Thus, the appropriate action is to restart the attempt to load the cache when catching this, after the
+ * lock that blocks the event delivery has ben released and required.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class ConflictingInsertionException extends Exception
 {

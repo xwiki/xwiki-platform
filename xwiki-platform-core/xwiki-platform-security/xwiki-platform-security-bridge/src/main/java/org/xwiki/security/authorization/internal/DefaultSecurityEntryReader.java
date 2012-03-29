@@ -53,6 +53,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * The default implementation of the security rules reader, which reads rules from documents in a wiki.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -125,7 +126,6 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      * @return the access rules that could be loaded into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException if an issue arise while reading these rules
      *         from the wiki.
-
      */
     public SecurityRuleEntry read(SecurityReference entity) throws AuthorizationException
     {
@@ -154,9 +154,8 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                     classReference = new DocumentReference(XWikiConstants.LOCAL_CLASSNAME,
                         new SpaceReference(XWikiConstants.WIKI_SPACE, wikiReference));
                 } else {
-                    this.logger.debug("Rights on entities of type "
-                        + entity.getType()
-                        + " is not supported by this reader!");
+                    this.logger.debug("Rights on entities of type {} is not supported by this reader!",
+                                      entity.getType());
                     throw new EntityTypeNotSupportedException(entity.getType(), this);
                 }
         }
@@ -172,7 +171,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
             }
             baseObjects = doc.getXObjects(classReference);
         } catch (XWikiException e) {
-            throw new AuthorizationException(e);
+            throw new AuthorizationException(documentReference, "Couldn't read right objects", e);
         }
 
         if (baseObjects != null) {

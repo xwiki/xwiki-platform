@@ -29,10 +29,14 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
- * A reference to a security entity.
+ * SecurityReference is a variant of EntityReference used internally in the security-autorization module, for the
+ * purpose of conveniently maintaining a hierarchy where all entities are rooted by the main wiki.  This form of
+ * hierarchical view is required to deciding which access levels that should be enforced.  There is always a one-to-one
+ * correspondence between a SecurityReference and a Wiki-, Space-, or DocumentReference.
  *
  * @see {@link SecurityReferenceFactory}
  * @version $Id$
+ * @since 4.0M2
  */
 public class SecurityReference extends EntityReference
 {

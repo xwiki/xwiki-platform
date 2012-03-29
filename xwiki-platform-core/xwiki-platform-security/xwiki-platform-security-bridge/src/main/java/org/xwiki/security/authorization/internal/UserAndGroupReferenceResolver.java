@@ -34,6 +34,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * proper space is used to find user documents and allow overwriting the wiki only.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component(hints = { "user", "group" })
 @Singleton

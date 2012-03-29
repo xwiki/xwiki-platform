@@ -31,6 +31,7 @@ import org.xwiki.security.UserSecurityReference;
  * a list of groups, and a hierarchy of rights objects defining rights on a given entity.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface AuthorizationSettler

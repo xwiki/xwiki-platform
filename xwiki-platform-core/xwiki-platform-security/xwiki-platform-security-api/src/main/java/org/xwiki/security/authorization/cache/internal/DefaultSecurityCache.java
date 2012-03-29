@@ -54,6 +54,7 @@ import org.xwiki.security.authorization.cache.SecurityCache;
  * Default implementation of the security cache.
  *
  * @version $Id$
+ * @since 4.0M2 
  */
 @Component
 @Singleton

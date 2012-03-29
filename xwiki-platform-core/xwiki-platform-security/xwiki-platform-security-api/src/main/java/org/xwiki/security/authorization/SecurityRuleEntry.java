@@ -27,6 +27,7 @@ import java.util.Collection;
  *
  * @see org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry
  * @version $Id$
+ * @since 4.0M2
  */
 public interface SecurityRuleEntry extends SecurityEntry
 {

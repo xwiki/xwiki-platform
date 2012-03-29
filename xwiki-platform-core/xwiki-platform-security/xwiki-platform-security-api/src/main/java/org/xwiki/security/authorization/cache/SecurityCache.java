@@ -32,6 +32,7 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
  * A cache for fast access right rules checking.
  *
  * @version $Id$
+ * @since 4.0M2 
  */
 @Role
 public interface SecurityCache

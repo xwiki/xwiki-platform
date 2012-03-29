@@ -27,6 +27,7 @@ import org.xwiki.model.EntityType;
  * Describe a {@link Right}, allow adding new Rights, also implemented by the {@link Right} class.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public interface RightDescription
 {

@@ -54,6 +54,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
  * The instance of this class monitors updates and invalidates right
  * cache entries whenever necessary.
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -169,10 +170,10 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
             XWikiContext xwikiContext = getXWikiContext();
             XWikiGroupService groupService = xwikiContext.getWiki().getGroupService(xwikiContext);
             String groupName = serializer.serialize(group);
-            /*
-             * The group members inherit the wiki from the group
-             * itself, unless the wiki name is explicitly given.
-             */
+            
+            // The group members inherit the wiki from the group
+            // itself, unless the wiki name is explicitly given.
+
             WikiReference wikiReference = group.getWikiReference();
             final int nb = 100;
             int i = 0;
@@ -181,9 +182,9 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
                 memberNames = groupService.getAllMembersNamesForGroup(groupName, nb, i * nb, xwikiContext);
                 for (String member : memberNames) {
                     DocumentReference memberRef = userResolver.resolve(member, wikiReference);
-                    /*
-                     * Avoid infinite loops.
-                     */
+
+                    // Avoid infinite loops.
+
                     if (!memberRef.equals(group)) {
                         securityCache.remove(securityReferenceFactory.newUserReference(memberRef));
                     }
@@ -206,7 +207,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
                 invalidateGroupMembers(ref, securityCache);
             }
         } catch (AuthorizationException e) {
-            this.logger.error("Failed to invalidate group members on the document: " + ref, e);
+            this.logger.error("Failed to invalidate group members on the document: {}", ref, e);
         } finally {
             readWriteLock.writeLock().unlock();
         }

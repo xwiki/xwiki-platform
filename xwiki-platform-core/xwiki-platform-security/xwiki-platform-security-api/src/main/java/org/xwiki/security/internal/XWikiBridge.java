@@ -27,6 +27,7 @@ import org.xwiki.security.UserSecurityReference;
  * Temporary interface to access XWiki information without depending on oldcore.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface XWikiBridge

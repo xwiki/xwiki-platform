@@ -30,6 +30,7 @@ import org.xwiki.security.authorization.AuthorizationException;
  * Temporary interface to access user information without depending on oldcore.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface UserBridge

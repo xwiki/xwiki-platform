@@ -31,6 +31,7 @@ import org.xwiki.security.internal.XWikiBridge;
  * {@link SecurityReference} factory.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton

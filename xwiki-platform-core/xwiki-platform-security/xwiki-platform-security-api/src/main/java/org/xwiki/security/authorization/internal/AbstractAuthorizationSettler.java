@@ -43,6 +43,7 @@ import org.xwiki.security.internal.XWikiBridge;
 /**
  * Abstract super class for right resolvers.
  * @version $Id$
+ * @since 4.0M2
  */
 abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 {

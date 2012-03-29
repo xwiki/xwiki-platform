@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Temporary implementation of the (@link EntityBridge} interface to access entity information.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton

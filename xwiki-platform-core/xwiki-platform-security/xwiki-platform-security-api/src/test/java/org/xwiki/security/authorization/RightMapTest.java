@@ -30,6 +30,7 @@ import com.google.common.collect.testing.MapInterfaceTest;
  * Test Map interface of RightMap using guava test library
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class RightMapTest extends MapInterfaceTest<Right, Object>
 {

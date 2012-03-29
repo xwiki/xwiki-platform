@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
  * Optimized set of {@link Right}.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.Serializable
 {

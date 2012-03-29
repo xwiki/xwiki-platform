@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
  * The instance of this class monitors updates and invalidates right
  * cache entries whenever necessary.
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface SecurityCacheRulesInvalidator

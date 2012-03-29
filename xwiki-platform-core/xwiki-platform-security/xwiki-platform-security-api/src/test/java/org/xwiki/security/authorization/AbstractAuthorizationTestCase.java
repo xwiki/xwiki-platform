@@ -34,6 +34,7 @@ import static org.xwiki.security.authorization.RuleState.DENY;
  * A base class for authorization tests, defining some additional Rights.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class AbstractAuthorizationTestCase extends AbstractSecurityTestCase
 {

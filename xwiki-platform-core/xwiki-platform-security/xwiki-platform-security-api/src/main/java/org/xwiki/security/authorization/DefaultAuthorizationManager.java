@@ -42,6 +42,7 @@ import org.xwiki.security.internal.XWikiBridge;
  * Default implementation of the {@link AuthorizationManager}.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -93,10 +94,10 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     {
         try {
             if (!hasSecurityAccess(right, userReference, entityReference)) {
-                throw new AccessDeniedException();
+                throw new AccessDeniedException(userReference, entityReference);
             }
         } catch (Exception e) {
-            throw new AccessDeniedException(e);
+            throw new AccessDeniedException(userReference, entityReference, e);
         }
     }
 
@@ -106,7 +107,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         try {
             return hasSecurityAccess(right, userReference, entityReference);
         } catch (Exception e) {
-            this.logger.error("Failed to load rights for user " + userReference + ".", e);
+            this.logger.error("Failed to load rights for user {}.", userReference, e);
             return false;
         }
     }

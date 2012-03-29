@@ -63,6 +63,7 @@ import static org.junit.Assert.fail;
  * Default security cache Unit Test
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {

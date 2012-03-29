@@ -37,6 +37,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
  * A base class for security tests, defining some useful SecurityReference.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
 {

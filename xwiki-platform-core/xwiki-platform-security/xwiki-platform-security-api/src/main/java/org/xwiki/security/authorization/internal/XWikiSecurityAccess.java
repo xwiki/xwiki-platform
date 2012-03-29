@@ -29,6 +29,7 @@ import org.xwiki.security.authorization.RuleState;
  * Default implementation for an {@link org.xwiki.security.authorization.SecurityAccess}.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class XWikiSecurityAccess implements SecurityAccess
 {

@@ -26,9 +26,10 @@ import org.xwiki.security.SecurityReference;
 import org.xwiki.security.authorization.SecurityRule;
 
 /**
- * Please comment here
+ * This stub implementation of SecurityRuleEntry is only used for testing.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class TestSecurityRuleEntry extends AbstractSecurityRuleEntry
 {

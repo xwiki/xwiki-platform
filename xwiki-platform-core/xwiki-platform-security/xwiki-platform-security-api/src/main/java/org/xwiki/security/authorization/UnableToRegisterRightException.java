@@ -19,8 +19,13 @@
  */
 package org.xwiki.security.authorization;
 
+import java.util.Formatter;
+
 /**
+ * Raised when the authorization manager fails to register a new right for any reason.
+ * 
  * @version $Id$
+ * @since 4.0M2
  */
 public class UnableToRegisterRightException extends AuthorizationException
 {
@@ -33,6 +38,7 @@ public class UnableToRegisterRightException extends AuthorizationException
      */
     public UnableToRegisterRightException(RightDescription right, Throwable t)
     {
-        super("Unable to register right " + right.getName() + ".", t);
+        super(new Formatter()
+              .format("Unable to register right %s.", right.getName()).toString(), t);
     }
 }

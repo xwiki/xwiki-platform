@@ -42,6 +42,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Legacy bridge aimed to replace the current RightService until the new API is used in all places.
  * @version $Id$
+ * @since 4.0M2
  */
 public class XWikiCachingRightService implements XWikiRightService
 {
@@ -74,7 +75,6 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("loginsubmit", Right.LOGIN)
             .putAction("viewrev", Right.VIEW)
             .putAction("get", Right.VIEW)
-                // .putAction("downloadrev", "download"); Huh??
             .putAction("downloadrev", Right.VIEW)
             .putAction("plain", Right.VIEW)
             .putAction("raw", Right.VIEW)
@@ -85,7 +85,9 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("dot", Right.VIEW)
             .putAction("svg", Right.VIEW)
             .putAction("pdf", Right.VIEW)
-                // .putAction("undelete", "undelete"); Huh??
+            // TODO: The "undelete" action is mapped to the right "undelete" in the legacy
+            // implementation.  We should check whether the "undelete" right is actually used or not and
+            // if we need to introduce it here as well for compatiblity reasons.
             .putAction("undelete", Right.EDIT)
             .putAction("reset", Right.DELETE)
             .putAction("commentadd", Right.COMMENT)
@@ -182,7 +184,7 @@ public class XWikiCachingRightService implements XWikiRightService
      * assumed do be located, unless explicitly specified in docname.
      * @return the document reference.
      */
-    private DocumentReference resolveDocName(String docname, WikiReference wikiReference)
+    private DocumentReference resolveDocumentName(String docname, WikiReference wikiReference)
     {
         return documentReferenceResolver.resolve(docname, wikiReference);
     }
@@ -232,7 +234,7 @@ public class XWikiCachingRightService implements XWikiRightService
                 }
 
                 if ((user == null) && (needsAuth)) {
-                    LOGGER.info("Authentication needed for right " + right + " and entity " + entityReference + '.');
+                    LOGGER.info("Authentication needed for right {} and entity {}.", right, entityReference);
                     return null;
                 }
             } catch (XWikiException e) {
@@ -306,7 +308,7 @@ public class XWikiCachingRightService implements XWikiRightService
         Right right = actionToRight(action);
         EntityReference entityReference = doc.getDocumentReference();
 
-        LOGGER.debug("checkAccess for action " + right + " on entity " + entityReference + '.');
+        LOGGER.debug("checkAccess for action {} on entity {}.", right, entityReference);
 
         DocumentReference userReference = authenticateUser(right, entityReference, context);
         if (userReference == null) {
@@ -325,8 +327,8 @@ public class XWikiCachingRightService implements XWikiRightService
         // has to call checkAccess. This happen really often, and this why we should not redirect to login on failed
         // delete, since it would prevent most user to do anything.
         if (context.getUserReference() == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)) {
-            LOGGER.debug("Redirecting guest user to login, since it have been denied " + right + " on "
-                + entityReference + '.');
+            LOGGER.debug("Redirecting guest user to login, since it have been denied {} on {}.",
+                         right, entityReference);
             showLogin(context);
         }
 
@@ -338,8 +340,8 @@ public class XWikiCachingRightService implements XWikiRightService
         throws XWikiException
     {
         WikiReference wikiReference = new WikiReference(context.getDatabase());
-        DocumentReference document = resolveDocName(docname, wikiReference);
-        LOGGER.debug("Resolved '" + docname + "' into " + document);
+        DocumentReference document = resolveDocumentName(docname, wikiReference);
+        LOGGER.debug("Resolved '{}' into {}", docname, document);
         DocumentReference user = resolveUserName(username, wikiReference);
 
         return authorizationManager.hasAccess(Right.toRight(right), user, document);

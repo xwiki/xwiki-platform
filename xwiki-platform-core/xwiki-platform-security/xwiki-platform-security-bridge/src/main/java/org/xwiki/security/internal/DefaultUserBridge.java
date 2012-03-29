@@ -21,6 +21,7 @@ package org.xwiki.security.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Formatter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,6 +42,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
  * Temporary implementation of the (@link UserBridge} interface to access user information.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -98,8 +100,11 @@ public class DefaultUserBridge implements UserBridge
             xwikiContext.setDatabase(wiki.getName());
             return groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, xwikiContext);
         } catch (Exception e) {
-            throw new AuthorizationException("Failed to get groups for user or group [" + userOrGroupDocumentReference
-                + "] in wiki [" + wiki + "]",  e);
+            throw new AuthorizationException(new Formatter()
+                                             .format("Failed to get groups for user or group [%s] in wiki [%s]",
+                                                     userOrGroupDocumentReference,
+                                                     wiki)
+                                             .toString(), e);
         } finally {
             xwikiContext.setDatabase(currentWiki);
         }

@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Formatter;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
@@ -40,6 +41,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 /**
  * Enumeration of the possible rights.
  * @version $Id$
+ * @since 4.0M2
  */
 public class Right implements RightDescription, Serializable, Comparable<Right>
 {
@@ -233,17 +235,22 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private void checkIllegalArguments(String name, RuleState defaultState, RuleState tieResolutionPolicy)
     {
         if (name == null || ALL_RIGHTS.contains(name)) {
-            throw new IllegalArgumentException("Duplicate name for right [" + name + ']');
+            throw new IllegalArgumentException(new Formatter()
+                                               .format("Duplicate name for right [%s]", name).toString());
         }
 
         if (defaultState == null || defaultState == UNDETERMINED) {
-            throw new IllegalArgumentException("Invalid default state [" + defaultState
-                + ']' + " for right [" + name + ']');
+            throw new IllegalArgumentException(new Formatter()
+                                               .format("Invalid default state [%s] for right [%s]", defaultState, name)
+                                               .toString());
         }
 
         if (tieResolutionPolicy == null || tieResolutionPolicy == UNDETERMINED) {
-            throw new IllegalArgumentException("Invalid tie resolution policy [" + tieResolutionPolicy
-                + "] for right " + '[' + name + ']');
+            throw new IllegalArgumentException(new Formatter()
+                                               .format("Invalid tie resolution policy [%s] for right [%s]",
+                                                       tieResolutionPolicy,
+                                                       name)
+                                               .toString());
         }
     }
 

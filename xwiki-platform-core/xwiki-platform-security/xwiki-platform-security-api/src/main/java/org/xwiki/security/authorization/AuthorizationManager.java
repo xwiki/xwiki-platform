@@ -37,6 +37,7 @@ import org.xwiki.model.reference.EntityReference;
  * this purpose.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface AuthorizationManager

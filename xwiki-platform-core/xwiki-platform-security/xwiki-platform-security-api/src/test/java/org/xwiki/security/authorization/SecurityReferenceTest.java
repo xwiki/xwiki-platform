@@ -41,6 +41,7 @@ import static org.junit.Assert.assertThat;
  * Security Reference Unit Tests
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class SecurityReferenceTest extends AbstractMockingComponentTestCase
 {

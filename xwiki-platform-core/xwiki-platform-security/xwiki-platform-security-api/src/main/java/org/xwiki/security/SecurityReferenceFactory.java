@@ -27,6 +27,7 @@ import org.xwiki.model.reference.EntityReference;
  * Factory to create new {@link SecurityReference}, {@link UserSecurityReference} and {@link GroupSecurityReference}.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface SecurityReferenceFactory

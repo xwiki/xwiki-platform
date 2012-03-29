@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
  * Configuration of the {@link AuthorizationManager}.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface AuthorizationManagerConfiguration

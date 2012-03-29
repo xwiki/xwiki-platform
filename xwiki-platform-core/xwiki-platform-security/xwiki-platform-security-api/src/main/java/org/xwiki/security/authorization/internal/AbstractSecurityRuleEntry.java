@@ -28,6 +28,7 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
  * proper implementation of equals and hashCode.
  *
  * @version $Id$
+ * @since 4.0M2 
  */
 public abstract class AbstractSecurityRuleEntry implements SecurityRuleEntry
 {

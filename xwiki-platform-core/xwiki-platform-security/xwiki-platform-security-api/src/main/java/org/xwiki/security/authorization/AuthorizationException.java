@@ -19,31 +19,22 @@
  */
 package org.xwiki.security.authorization;
 
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.DocumentReference;
+
+import java.util.Formatter;
+
 /**
+ * This is the base exception raised for various reasons by the authorization module.
+ * 
  * @version $Id$
+ * @since 4.0M2
  */
 public class AuthorizationException extends Exception
 {
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @see java.lang.Exception
-     */
-    public AuthorizationException()
-    {
-        super();
-    }
-
-    /**
-     * @param message Message.
-     * @see java.lang.Exception
-     */
-    public AuthorizationException(String message)
-    {
-        super(message);
-    }
-    
     /**
      * @param message Message.
      * @param cause Original cause.
@@ -55,11 +46,68 @@ public class AuthorizationException extends Exception
     }
 
     /**
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(DocumentReference userReference, EntityReference entityReference)
+    {
+        this(userReference, entityReference, null, null);
+    }
+
+    /**
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
+     * @param message Message.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(DocumentReference userReference, EntityReference entityReference, String message)
+    {
+        this(userReference, entityReference, message, null);
+    }
+    
+    /**
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
+     * @param message Message.
      * @param cause Original cause.
      * @see java.lang.Exception
      */
-    public AuthorizationException(Throwable cause)
+    public AuthorizationException(DocumentReference userReference,
+                                  EntityReference entityReference,
+                                  String message,
+                                  Throwable cause)
     {
-        super(cause);
+        super(new Formatter().format("%s when checking access to %s for user %s",
+                                     message, 
+                                     userReference,
+                                     entityReference).toString(), cause);
     }
+
+    /**
+     * @param entityReference The entity, on which the query was attempted.
+     * @param message Message.
+     * @param cause Original cause.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(EntityReference entityReference,
+                                  String message,
+                                  Throwable cause)
+    {
+        super(new Formatter().format("%s when checking access to %s",
+                                     message, 
+                                     entityReference).toString(), cause);
+    }
+
+    /**
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
+     * @param cause Original cause.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(DocumentReference userReference, EntityReference entityReference, Throwable cause)
+    {
+        this(userReference, entityReference, null, cause);
+    }
+
 }

@@ -23,6 +23,7 @@ package org.xwiki.security.internal;
  * Base class for the security module configuration.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public abstract class AbstractSecurityConfiguration
 {

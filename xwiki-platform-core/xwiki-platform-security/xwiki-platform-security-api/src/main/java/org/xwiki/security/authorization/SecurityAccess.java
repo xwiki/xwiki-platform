@@ -23,6 +23,7 @@ package org.xwiki.security.authorization;
  * Provide the allow/deny/undetermined state of a full set of rights.
  *
  * @version $Id$
+ * @since 4.0M2 
  */
 public interface SecurityAccess extends Cloneable
 {

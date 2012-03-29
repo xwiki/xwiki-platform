@@ -26,6 +26,7 @@ import org.xwiki.security.SecurityReference;
  * declarative information for the security settler to compute the security access of users.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public interface SecurityEntry
 {

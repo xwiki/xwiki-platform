@@ -59,6 +59,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * Default authorization settler unit tests.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCase
 {

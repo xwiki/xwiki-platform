@@ -23,6 +23,7 @@ package org.xwiki.security.authorization;
  * The state of a particular right as determined by a security rule.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 public enum RuleState
 {

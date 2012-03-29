@@ -28,6 +28,7 @@ import org.xwiki.security.SecurityReference;
  * This interface decouple the rules storage from the security cache loader.
  *
  * @version $Id$
+ * @since 4.0M2
  */
 @Role
 public interface SecurityEntryReader

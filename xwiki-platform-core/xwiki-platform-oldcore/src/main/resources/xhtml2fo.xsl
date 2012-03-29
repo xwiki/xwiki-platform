@@ -473,6 +473,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:attribute-set name="q"/>
     <xsl:attribute-set name="q-nested"/>
+    <xsl:attribute-set name="label"/>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Image
@@ -1899,6 +1900,12 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         </fo:inline>
     </xsl:template>
 
+    <xsl:template match="html:label" mode="transform">
+        <fo:inline xsl:use-attribute-sets="label">
+            <xsl:call-template name="process-common-attributes-and-children"/>
+        </fo:inline>
+    </xsl:template>
+
     <xsl:template match="html:span[@dir]" mode="transform">
         <fo:bidi-override direction="{@dir}" unicode-bidi="embed">
             <xsl:call-template name="process-common-attributes-and-children"/>
@@ -2096,7 +2103,6 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:template match="html:param" mode="preprocess"/>
     <xsl:template match="html:map" mode="preprocess"/>
     <xsl:template match="html:area" mode="preprocess"/>
-    <xsl:template match="html:label" mode="preprocess"/>
     <xsl:template match="html:input" mode="preprocess"/>
     <xsl:template match="html:select" mode="preprocess"/>
     <xsl:template match="html:optgroup" mode="preprocess"/>

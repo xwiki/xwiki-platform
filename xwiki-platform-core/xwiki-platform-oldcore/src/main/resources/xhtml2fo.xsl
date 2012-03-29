@@ -18,6 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 -->
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:svg="http://www.w3.org/2000/svg"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
                 xmlns:html="http://www.w3.org/1999/xhtml">
 
@@ -2196,4 +2197,21 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
             </xsl:if>
         </fo:inline-container>
     </xsl:template>
-</xsl:stylesheet> 
+
+    <!-- Preserve inline SVG images as <fo:instream-foreign-object>s -->
+    <xsl:template match="html:*/svg:svg" mode="transform">
+        <fo:instream-foreign-object
+          content-width="scale-to-fit" content-height="scale-to-fit"
+          inline-progression-dimension.minimum="auto" inline-progression-dimension.maximum="100%"
+          block-progression-dimension.minimum="auto" block-progression-dimension.maximum="700px">
+            <xsl:copy>
+                <xsl:apply-templates select="@*|node()" mode="svg"/>
+            </xsl:copy>
+        </fo:instream-foreign-object>
+    </xsl:template>
+    <xsl:template match="@*|node()" mode="svg">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" mode="svg"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:stylesheet>

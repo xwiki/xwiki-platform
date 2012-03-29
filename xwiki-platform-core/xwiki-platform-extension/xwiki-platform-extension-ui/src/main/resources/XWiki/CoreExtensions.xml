@@ -180,40 +180,8 @@ mIOXEBZsDeaDZW/j4WPEk92XEEG7l6QsEy+qpnvvw7PCy5N6embGHpFlI5xEiN+T9NIV7xQChjQI
 2xG+mbecbY+YA1vR9BcQJFn40YRwItlcNaRjIzxhJp3kThR/zijENyab8su4WgfZQ/TS/w+hdHID
 KBfuuaQu/iwAAAAASUVORK5CYII=
 </content></attachment>
-<content>{{include document="ExtensionManagerMacros" /}}
+<content>{{velocity}}
+#set ($selectedRepositoryId = 'core')
+{{/velocity}}
 
-{{velocity}}
-## Ajax call for a single extension
-#if ($request.extensionid &amp;&amp; $request.extensionversion &amp;&amp; $request.ajax)
-  #set($extension = $extensionManager.resolve($request.extensionid, $request.extensionversion))
-  #displayExtension($extension $actions)
-#else
-  (% class="full column" %)(((
-  #displayExtensionSearchBar()
-
-  = $msg.get('extensions.core.title')
-
-  #if ($request.extensionid &amp;&amp; $request.extensionversion)
-    #set ($extensions = [$extensionManager.resolve($request.extensionid, $request.extensionversion)])
-  #else
-    #set($extensions = $extensionManager.getCoreExtensions())
-  #end
-  #if ($extensions.isEmpty())
-    {{info}}$msg.get('extensions.core.noExtensions'){{/info}}##
-  #else
-    #if ($extensions.size() &gt; 1)
-      #set ($paginationParams = {'totalItems': $extensions.size(), 'url': $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1'))})
-      {{html}}#pagination($paginationParams){{/html}}
-      #set ($extensions = $extensions.subList($paginationParams.firstItem, $mathtool.min($extensions.size(), $mathtool.add($paginationParams.firstItem, $paginationParams.itemsPerPage))))
-    #end
-    #foreach($extension in $extensions)
-      #displayExtension($extension $actions)
-    #end
-    #if ($paginationParams)
-      #set ($discard = $paginationParams.put('position', 'bottom'))
-      {{html}}#pagination($paginationParams){{/html}}
-    #end
-  #end
-  )))
-#end
-{{/velocity}}</content></xwikidoc>
+{{include document="AddExtensions" /}}</content></xwikidoc>

@@ -1,3 +1,4 @@
 org.xwiki.annotation.io.internal.DefaultIOService
 org.xwiki.annotation.io.internal.DefaultIOTargetService
+org.xwiki.annotation.io.internal.migration.hibernate.R40001XWIKI7540DataMigration
 org.xwiki.annotation.rights.internal.XWikiAnnotationRightService

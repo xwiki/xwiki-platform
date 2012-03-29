@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store.migration.hibernate;
+package org.xwiki.annotation.io.internal.migration.hibernate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +49,7 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
+import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Migration for XWIKI7540: Merging Annotations with Comments requires some extra fields to the XWiki.XWikiComments

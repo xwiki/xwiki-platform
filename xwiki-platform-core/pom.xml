@@ -260,7 +260,6 @@
     <module>xwiki-platform-jira</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>
-    <module>xwiki-platform-legacy</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-mailsender</module>
@@ -299,6 +298,21 @@
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>
+    <!-- We only build legacy modules in the "ci" or "release" profiles since they're not needed when developing
+         day to day and it speeds up the build -->
+    <profile>
+      <id>ci</id>
+      <activation>
+        <!-- This property is automatically defined by the Maven release plugin when executing
+             a release. Thus this profile will be automatically enabled when releasing -->
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <modules>
+        <module>xwiki-platform-legacy</module>
+      </modules>
+    </profile>
     <profile>
       <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
            Cobertura instrumentation in a special profile (when the Cobertura profile is

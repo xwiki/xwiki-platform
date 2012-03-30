@@ -2031,6 +2031,15 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Create and add a new object to the document with the provided class.
+     * <p>
+     * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)
+     * of the reference will be systematically removed.
+     * 
+     * @param classReference the reference of the class
+     * @param context the XWiki context
+     * @return the index of teh newly created object
+     * @throws XWikiException error when creating the new object
      * @since 2.2.3
      */
     public int createXObject(EntityReference classReference, XWikiContext context) throws XWikiException
@@ -7210,6 +7219,15 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Create, add and return a new object with the provided class.
+     * <p>
+     * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)
+     * of the reference will be systematically removed.
+     * 
+     * @param classReference the reference of the class
+     * @param context the XWiki context
+     * @return the newly created object
+     * @throws XWikiException error when creating the new object
      * @since 2.2.3
      */
     public BaseObject newXObject(EntityReference classReference, XWikiContext context) throws XWikiException

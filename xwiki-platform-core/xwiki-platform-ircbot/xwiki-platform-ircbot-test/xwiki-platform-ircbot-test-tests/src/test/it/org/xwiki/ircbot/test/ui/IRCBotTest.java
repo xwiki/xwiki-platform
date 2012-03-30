@@ -120,7 +120,12 @@ public class IRCBotTest extends AbstractTest
         // - our test listener will send "gotcha!" to the IRC channel
         getUtil().gotoPage(getTestClassName(), SERVER_PAGE, "view", "message", "hello");
         getUtil().gotoPage(getTestClassName(), SERVER_PAGE);
-        messagesPage.waitUntilContent(".*was modified by.*nick: gotcha!.*was modified.*");
+        // Note: We don't assume any order for the 3 messages we're asserting.
+        messagesPage.waitUntilContent(".*nick: gotcha!.*");
+        Assert.assertTrue(messagesPage.getContent().contains(
+            "xwiki:IRCBotTest.IRCServer was modified by xwiki:XWiki.superadmin (created)"));
+        Assert.assertTrue(messagesPage.getContent().contains(
+            "xwiki:IRCBotTest.IRCArchive was modified by xwiki:XWiki.superadmin (created)"));
 
         // Verify the Archive page (this tests the Log Bot Listener).
         // It may take some time for the IRC Server to send back the events thus we wait for the archive page to

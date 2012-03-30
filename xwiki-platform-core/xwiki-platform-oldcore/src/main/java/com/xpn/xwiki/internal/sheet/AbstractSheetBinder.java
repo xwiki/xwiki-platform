@@ -156,8 +156,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     public boolean bind(DocumentModelBridge document, DocumentReference sheetReference)
     {
         EntityReference sheetBindingClassReference =
-            this.relativeReferenceResolver.resolve(getSheetBindingClass(), EntityType.DOCUMENT,
-                document.getDocumentReference());
+            this.relativeReferenceResolver.resolve(getSheetBindingClass(), EntityType.DOCUMENT);
         List<BaseObject> sheetBindingObjects = ((XWikiDocument) document).getXObjects(sheetBindingClassReference);
         if (sheetBindingObjects != null) {
             for (BaseObject sheetBindingObject : sheetBindingObjects) {

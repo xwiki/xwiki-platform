@@ -115,12 +115,12 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
             if (artifacts.containsKey(imageReference)) {
                 try {
                     // Write the image into a temporary file.
-                    File tempFile =
-                        saveTemporaryFile(attachmentReference, imageReference, artifacts.get(imageReference));
+                    File tempFile = getTemporaryFile(attachmentReference, imageReference);
+                    createTemporaryFile(tempFile, artifacts.get(imageReference));
 
                     // Create a URL image reference which links to above temporary image file.
                     ResourceReference urlImageReference =
-                        new ResourceReference(buildURL(attachmentReference, tempFile.getName()), ResourceType.URL);
+                        new ResourceReference(buildURL(attachmentReference, imageReference), ResourceType.URL);
                     // XWiki 2.0 doesn't support typed image references. Note that the URL is absolute.
                     urlImageReference.setTyped(false);
 

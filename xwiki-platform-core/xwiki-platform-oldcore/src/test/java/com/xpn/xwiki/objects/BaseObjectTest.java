@@ -22,11 +22,13 @@ package com.xpn.xwiki.objects;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Unit tests for the {@link BaseElement} class.
- *
+ * 
  * @version $Id$
  */
 public class BaseObjectTest extends AbstractBridgedComponentTestCase
@@ -97,7 +99,7 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("otherspace", baseObject.getDocumentReference().getLastSpaceReference().getName());
         Assert.assertEquals("otherpage", baseObject.getDocumentReference().getName());
     }
-    
+
     @Test
     public void getReference()
     {
@@ -107,7 +109,23 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
         baseObject.setDocumentReference(documentReference);
         DocumentReference classReference = new DocumentReference("wiki", "space", "class");
         baseObject.setXClassReference(classReference);
-        
-        Assert.assertEquals(new BaseObjectReference(classReference, baseObject.getNumber(), documentReference), baseObject.getReference());
+
+        Assert.assertEquals(new BaseObjectReference(classReference, baseObject.getNumber(), documentReference),
+            baseObject.getReference());
+    }
+
+    @Test
+    public void setXClassReference()
+    {
+        BaseObject baseObject = new BaseObject();
+
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        baseObject.setDocumentReference(documentReference);
+        DocumentReference classReference = new DocumentReference("otherwiki", "space", "class");
+        baseObject.setXClassReference(classReference);
+
+        Assert.assertEquals(new DocumentReference("wiki", "space", "class"), baseObject.getXClassReference());
+        Assert.assertEquals(new EntityReference("class", EntityType.DOCUMENT, new EntityReference("space",
+            EntityType.SPACE)), baseObject.getRelativeXClassReference());
     }
 }

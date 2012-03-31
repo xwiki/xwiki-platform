@@ -6,14 +6,14 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>IRC.IRCBot</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.superadmin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.superadmin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1331654461000</creationDate>
 <date>1331901740000</date>
 <contentUpdateDate>1331901740000</contentUpdateDate>
-<version>3.4</version>
+<version>1.1</version>
 <title>JIRA Id Bot Listener</title>
 <template></template>
 <defaultTemplate></defaultTemplate>

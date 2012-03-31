@@ -79,7 +79,7 @@
     <mapping resource="$mapping"/>
 #end
 #end
-    
+
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
     <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>

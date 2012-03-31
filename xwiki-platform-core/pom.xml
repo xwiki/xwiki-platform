@@ -316,8 +316,14 @@
                 <exclude>**/internal/**</exclude>
                 <!-- Remove the following excludes after we release 3.5 -->
                 <exclude>org/xwiki/container/ContainerFactory</exclude>
+                <exclude>org/xwiki/gwt/user/client/ui/ListBox</exclude>
+                <exclude>org/xwiki/gwt/user/client/ui/ListBox$1</exclude>
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
                 <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/IELinePlugin</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/LinePlugin</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/LinePlugin$1</exclude>
+                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/list/ListBehaviorAdjuster</exclude>
                 <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
                 <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
                 <!-- Moved to another module -->

@@ -30,6 +30,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.KeyboardAdaptor;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
@@ -40,12 +41,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.regexp.shared.RegExp;
 
 /**
@@ -53,8 +48,7 @@ import com.google.gwt.regexp.shared.RegExp;
  * 
  * @version $Id$
  */
-public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpHandler, KeyPressHandler,
-    CommandListener
+public class LinePlugin extends AbstractPlugin implements CommandListener
 {
     /**
      * The command that stores the value of the rich text area in an HTML form field.
@@ -114,95 +108,36 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
     protected final DOMUtils domUtils = DOMUtils.getInstance();
 
     /**
-     * Flag used to avoid handling both KeyDown and KeyPress events. This flag is needed because of the inconsistencies
-     * between browsers regarding keyboard events. For instance IE doesn't generate the KeyPress event for backspace key
-     * and generates multiple KeyDown events while a key is hold down. On the contrary, FF generates the KeyPress event
-     * for the backspace key and generates just one KeyDown event while a key is hold down. FF generates multiple
-     * KeyPress events when a key is hold down.
+     * The object used to handle keyboard events.
      */
-    private boolean ignoreNextKeyPress;
+    private final KeyboardAdaptor keyboardAdaptor = new KeyboardAdaptor()
+    {
+        protected void handleRepeatableKey(Event event)
+        {
+            LinePlugin.this.handleRepeatableKey(event);
+        }
+    };
 
-    /**
-     * Flag used to prevent the default browser behavior for the KeyPress event when the KeyDown event has been
-     * canceled. This is needed only in functional tests where keyboard events (KeyDown, KeyPress, KeyUp) are triggered
-     * independently and thus canceling KeyDown doesn't prevent the default KeyPress behavior. Without this flag, and
-     * because we have to handle the KeyDown event besides the KeyPress in order to overcome cross-browser
-     * inconsistencies, simulating keyboard typing in functional tests would trigger our custom behavior but also the
-     * default browser behavior.
-     */
-    private boolean cancelNextKeyPress;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
 
-        saveRegistration(getTextArea().addKeyDownHandler(this));
-        saveRegistration(getTextArea().addKeyUpHandler(this));
-        saveRegistration(getTextArea().addKeyPressHandler(this));
+        saveRegistration(getTextArea().addKeyDownHandler(keyboardAdaptor));
+        saveRegistration(getTextArea().addKeyUpHandler(keyboardAdaptor));
+        saveRegistration(getTextArea().addKeyPressHandler(keyboardAdaptor));
         getTextArea().getCommandManager().addCommandListener(this);
 
         // Adjust the initial content of the rich text area.
         onReset();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         getTextArea().getCommandManager().removeCommandListener(this);
 
         super.destroy();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
-    public void onKeyDown(KeyDownEvent event)
-    {
-        if (event.getSource() == getTextArea()) {
-            ignoreNextKeyPress = true;
-            handleRepeatableKey((Event) event.getNativeEvent());
-            cancelNextKeyPress = ((Event) event.getNativeEvent()).isCancelled();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
-    public void onKeyPress(KeyPressEvent event)
-    {
-        if (event.getSource() == getTextArea()) {
-            if (!ignoreNextKeyPress) {
-                handleRepeatableKey((Event) event.getNativeEvent());
-            } else if (cancelNextKeyPress) {
-                ((Event) event.getNativeEvent()).xPreventDefault();
-            }
-            ignoreNextKeyPress = false;
-            cancelNextKeyPress = false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
-    public void onKeyUp(KeyUpEvent event)
-    {
-        ignoreNextKeyPress = false;
-        cancelNextKeyPress = false;
     }
 
     /**
@@ -212,10 +147,6 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      */
     protected void handleRepeatableKey(Event event)
     {
-        // Don't handle the key if the event was canceled by a different party.
-        if (event.isCancelled()) {
-            return;
-        }
         switch (event.getKeyCode()) {
             case KeyCodes.KEY_ENTER:
                 onEnter(event);

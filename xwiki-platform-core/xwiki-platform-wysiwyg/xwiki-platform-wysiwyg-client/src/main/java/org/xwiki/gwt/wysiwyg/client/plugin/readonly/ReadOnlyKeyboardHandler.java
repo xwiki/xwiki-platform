@@ -28,22 +28,17 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.KeyboardAdaptor;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 
 /**
  * Handles the keyboard events concerning read-only regions inside the rich text area.
  * 
  * @version $Id$
  */
-public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler, KeyUpHandler
+public class ReadOnlyKeyboardHandler extends KeyboardAdaptor
 {
     /**
      * The list of key codes that are allowed on the read-only regions.
@@ -62,90 +57,14 @@ public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler,
      */
     private final ReadOnlyUtils readOnlyUtils = new ReadOnlyUtils();
 
-    /**
-     * Flag used to avoid handling both KeyDown and KeyPress events. This flag is needed because of the inconsistencies
-     * between browsers regarding keyboard events. For instance IE doesn't generate the KeyPress event for backspace key
-     * and generates multiple KeyDown events while a key is hold down. On the contrary, FF generates the KeyPress event
-     * for the backspace key and generates just one KeyDown event while a key is hold down. FF generates multiple
-     * KeyPress events when a key is hold down.
-     */
-    private boolean ignoreNextKeyPress;
-
-    /**
-     * Flag used to prevent the default browser behavior for the KeyPress event when the KeyDown event has been
-     * canceled. This is needed only in functional tests where keyboard events (KeyDown, KeyPress, KeyUp) are triggered
-     * independently and thus canceling KeyDown doesn't prevent the default KeyPress behavior. Without this flag, and
-     * because we have to handle the KeyDown event besides the KeyPress in order to overcome cross-browser
-     * inconsistencies, simulating keyboard typing in functional tests would trigger our custom behavior but also the
-     * default browser behavior.
-     */
-    private boolean cancelNextKeyPress;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
-    public void onKeyDown(KeyDownEvent event)
+    @Override
+    protected void handleRepeatableKey(Event event)
     {
-        ignoreNextKeyPress = true;
-        handleRepeatableKey((Event) event.getNativeEvent());
-        cancelNextKeyPress = ((Event) event.getNativeEvent()).isCancelled();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
-    public void onKeyPress(KeyPressEvent event)
-    {
-        if (!ignoreNextKeyPress) {
-            handleRepeatableKey((Event) event.getNativeEvent());
-        } else if (cancelNextKeyPress) {
-            ((Event) event.getNativeEvent()).xPreventDefault();
+        if (event.getKeyCode() == KeyCodes.KEY_BACKSPACE || event.getKeyCode() == KeyCodes.KEY_DELETE) {
+            onDelete(event);
+        } else if (!NON_PRINTING_KEY_CODES.contains(event.getKeyCode())) {
+            onTyping(event);
         }
-        ignoreNextKeyPress = false;
-        cancelNextKeyPress = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
-    public void onKeyUp(KeyUpEvent event)
-    {
-        ignoreNextKeyPress = false;
-        cancelNextKeyPress = false;
-        handleKeyRelease((Event) event.getNativeEvent());
-    }
-
-    /**
-     * Handles a repeatable key press.
-     * 
-     * @param event the native event that was fired
-     */
-    private void handleRepeatableKey(Event event)
-    {
-        // Don't handle the key if the event was canceled by a different party.
-        if (!event.isCancelled()) {
-            if (event.getKeyCode() == KeyCodes.KEY_BACKSPACE || event.getKeyCode() == KeyCodes.KEY_DELETE) {
-                onDelete(event);
-            } else if (!NON_PRINTING_KEY_CODES.contains(event.getKeyCode())) {
-                onTyping(event);
-            }
-        }
-    }
-
-    /**
-     * Handles a key release.
-     * 
-     * @param event the native event that was fired
-     */
-    private void handleKeyRelease(Event event)
-    {
-        // Ignore.
     }
 
     /**

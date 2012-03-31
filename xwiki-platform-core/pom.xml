@@ -217,6 +217,42 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/internal/**</exclude>
+            <!-- Remove the following excludes after we release the current version as final -->
+            <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
+            <exclude>com/xpn/xwiki/objects/BaseObject</exclude>
+            <exclude>com/xpn/xwiki/objects/BaseProperty</exclude>
+            <exclude>com/xpn/xwiki/objects/PropertyInterface</exclude>
+            <exclude>com/xpn/xwiki/objects/classes/PropertyClass</exclude>
+            <exclude>com/xpn/xwiki/store/XWikiHibernateBaseStore</exclude>
+            <exclude>com/xpn/xwiki/stats/impl/XWikiStats</exclude>
+            <exclude>com/xpn/xwiki/store/migration/AbstractDataMigrationManager*</exclude>
+            <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration*</exclude>
+            <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigrationManager*</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
+            <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
+            <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
+            <exclude>org/xwiki/test/ui/po/DeleteConfirmationPage</exclude>
+            <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
+            <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
+            <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
+            <!-- START: Removed Deprecations -->
+            <exclude>org/xwiki/bridge/AttachmentName</exclude>
+            <exclude>org/xwiki/bridge/DocumentName</exclude>
+            <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+            <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
+            <exclude>com/xpn/xwiki/doc/DefaultDocumentAccessBridge</exclude>
+            <exclude>com/xpn/xwiki/doc/XWikiDocument</exclude>
+            <!-- STOP: Removed Deprecations -->
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
     <extensions>
       <!-- Needed to add support for the "xar" packaging -->
@@ -298,75 +334,16 @@
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>
-    <!-- We only build legacy modules in the "ci" or "release" profiles since they're not needed when developing
-         day to day and it speeds up the build -->
+    <!-- Profile to build Legacy modules -->
     <profile>
-      <id>ci</id>
-      <activation>
-        <!-- This property is automatically defined by the Maven release plugin when executing
-             a release. Thus this profile will be automatically enabled when releasing -->
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
+      <id>legacy</id>
       <modules>
         <module>xwiki-platform-legacy</module>
       </modules>
     </profile>
     <profile>
-      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
-           Cobertura instrumentation in a special profile (when the Cobertura profile is
-           executed, the Clirr one isn't). -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <!-- Remove the following excludes after we release 4.0 -->
-                <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
-                <exclude>com/xpn/xwiki/objects/BaseObject</exclude>
-                <exclude>com/xpn/xwiki/objects/BaseProperty</exclude>
-                <exclude>com/xpn/xwiki/objects/PropertyInterface</exclude>
-                <exclude>com/xpn/xwiki/objects/classes/PropertyClass</exclude>
-                <exclude>com/xpn/xwiki/store/XWikiHibernateBaseStore</exclude>
-                <exclude>com/xpn/xwiki/stats/impl/XWikiStats</exclude>
-                <exclude>com/xpn/xwiki/store/migration/AbstractDataMigrationManager*</exclude>
-                <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration*</exclude>
-                <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigrationManager*</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
-                <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
-                <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
-                <exclude>org/xwiki/test/ui/po/DeleteConfirmationPage</exclude>
-                <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
-                <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
-                <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
-                <!-- START: Removed Deprecations -->
-                <exclude>org/xwiki/bridge/AttachmentName</exclude>
-                <exclude>org/xwiki/bridge/DocumentName</exclude>
-                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
-                <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
-                <exclude>com/xpn/xwiki/doc/DefaultDocumentAccessBridge</exclude>
-                <exclude>com/xpn/xwiki/doc/XWikiDocument</exclude>
-                <!-- STOP: Removed Deprecations -->
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <xwiki.clirr.skip>false</xwiki.clirr.skip>
-      </properties>
-    </profile>
-    <profile>
-      <id>gwtTestManual</id>
+      <!-- Allows running GWT tests manually -->
+      <id>gwt-test-manual</id>
       <build>
         <plugins>
           <plugin>

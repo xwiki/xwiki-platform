@@ -33,9 +33,6 @@
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
-  <properties>
-    <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.jvnet.hudson</groupId>
@@ -1153,6 +1150,17 @@
           </excludes>
         </configuration>
       </plugin>
+      <!-- Since oldcore doesn't follow the "internal" package rule (for legacy reasons) we only run CLIRR on "api"
+           packages -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/api/**</include>
+          </includes>
+        </configuration>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -1188,26 +1196,6 @@
     </pluginManagement>
   </build>
   <profiles>
-    <profile>
-      <!-- See platform/core/pom.xml -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/api/**</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for
            debugging XWiki, especially in the case when you cannot debug the application (for

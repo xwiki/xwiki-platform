@@ -39,14 +39,7 @@
   </modules>
   <profiles>
     <profile>
-      <id>ci</id>
-      <activation>
-        <!-- This property is automatically defined by the Maven release plugin when executing
-             a release. Thus this profile will be automatically enabled when releasing -->
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
+      <id>integration-tests</id>
       <modules>
         <module>xwiki-platform-ircbot-test</module>
       </modules>

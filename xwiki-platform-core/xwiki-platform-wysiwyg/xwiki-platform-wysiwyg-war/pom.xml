@@ -196,6 +196,8 @@
   </build>
   <profiles>
     <profile>
+      <!-- Only build the WYSIWYG editor in English and for Firefox. If not specified it'll be built for all supported
+           languages and browsers which takes longer. -->
       <id>dev</id>
       <properties>
         <gwt.style>DETAILED</gwt.style>

@@ -91,24 +91,6 @@
     <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
-  <!-- List behavior adjuster -->
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-    <when-property-is name="user.agent" value="gecko1_8" />
-  </replace-with>
-
   <!-- PasteFilter -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter" />

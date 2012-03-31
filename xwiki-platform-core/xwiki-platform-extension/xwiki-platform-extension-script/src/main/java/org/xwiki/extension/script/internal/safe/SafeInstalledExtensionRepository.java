@@ -101,18 +101,6 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     }
 
     @Override
-    public InstalledExtension resolve(ExtensionDependency extensionDependency)
-    {
-        return (InstalledExtension) super.resolve(extensionDependency);
-    }
-
-    @Override
-    public InstalledExtension resolve(ExtensionId extensionId)
-    {
-        return (InstalledExtension) super.resolve(extensionId);
-    }
-
-    @Override
     public Collection<InstalledExtension> getInstalledExtensions()
     {
         return safe(getWrapped().getInstalledExtensions());
@@ -122,5 +110,17 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
         return safe(getWrapped().getInstalledExtensions(namespace));
+    }
+
+    @Override
+    public InstalledExtension resolve(ExtensionDependency extensionDependency)
+    {
+        return (InstalledExtension) super.resolve(extensionDependency);
+    }
+
+    @Override
+    public InstalledExtension resolve(ExtensionId extensionId)
+    {
+        return (InstalledExtension) super.resolve(extensionId);
     }
 }

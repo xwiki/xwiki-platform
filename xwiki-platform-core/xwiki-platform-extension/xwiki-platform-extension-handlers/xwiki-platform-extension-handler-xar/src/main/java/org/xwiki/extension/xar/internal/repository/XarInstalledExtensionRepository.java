@@ -131,11 +131,11 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     private void updateXarExtension(LocalExtension extension)
     {
         if (this.extensions.containsKey(extension.getId())) {
-            if (!extension.isInstalled()) {
+            if (!(extension instanceof InstalledExtension)) {
                 removeXarExtension(extension.getId());
             }
         } else {
-            if (extension.isInstalled()) {
+            if (extension instanceof InstalledExtension) {
                 try {
                     addXarExtension((InstalledExtension) extension);
                 } catch (IOException e) {

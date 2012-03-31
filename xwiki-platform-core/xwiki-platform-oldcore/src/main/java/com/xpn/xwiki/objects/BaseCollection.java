@@ -47,6 +47,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -79,10 +80,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * is defined.</li>
      * <li>If this BaseCollection instance represents an XClass then it's not used.</li>
      * </ul>
-     * Note that we're saving the XClass reference as a relative reference instead of an absolute one. This is because
-     * We want the ability (for example) to create an XObject relative to the current space or wiki so that a copy of
-     * that XObject would retain that relativity. This is for example useful when copying a Wiki into another Wiki so
-     * that the copied XObject have a XClassReference pointing in the new wiki.
      */
     private EntityReference xClassReference;
 
@@ -138,12 +135,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
+     * Get the absolute reference of the XClass.
+     * 
      * @since 2.2M2
      */
     public DocumentReference getXClassReference()
     {
-        // Ensure we always return an absolute references since we always want well-constructed to be used from outside
-        // this class.
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
             this.xClassReferenceCache =
                 this.currentReferenceDocumentReferenceResolver.resolve(getRelativeXClassReference(),
@@ -154,9 +151,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
-     * @since 2.2.3
+     * Get the actual reference to the XClass as stored in this instance.
+     * 
+     * @since 4.0M2
      */
-    private EntityReference getRelativeXClassReference()
+    public EntityReference getRelativeXClassReference()
     {
         return this.xClassReference;
     }
@@ -179,11 +178,41 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
+     * Set the reference to the XClass (used for an XObject).
+     * <p>
+     * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)
+     * of the reference will be systematically removed.
+     * 
+     * @param xClassReference the reference to the XClass of this XObject.
      * @since 2.2.3
      */
     public void setXClassReference(EntityReference xClassReference)
     {
-        this.xClassReference = xClassReference;
+        // Ensure that the reference to the XClass is always relative to the document wiki.
+        EntityReference ref = xClassReference;
+
+        if (ref != null) {
+            WikiReference wiki = (WikiReference) xClassReference.extractReference(EntityType.WIKI);
+            if (wiki != null) {
+                ref = xClassReference.removeParent(wiki);
+
+                // >>> TO BE REMOVED before 4.0 >>> and enable unit test
+                // XWikiDocumentTest#testCloneWithAbsoluteClassReference()
+                DocumentReference docRef = getDocumentReference();
+                WikiReference docWiki = (docRef != null) ? docRef.getWikiReference() : null;
+                if (docWiki != null && !wiki.equals(docWiki)) {
+                    LOGGER.error("Unsupported external ({}) XClass reference used for an XObject class reference."
+                        + " The reference has been changed to relative, and will used the document wiki ({}).",
+                        new Object[] {wiki.getName(), docWiki.getName(), new Throwable()});
+                } else {
+                    LOGGER.warn("Absolute XClass reference including a wiki reference ({}) used for an XObject class "
+                        + "reference. The reference has been changed to relative.", wiki.getName(), new Throwable());
+                }
+                // <<< TO BE REMOVED before 4.0 <<<
+            }
+        }
+
+        this.xClassReference = ref;
         this.xClassReferenceCache = null;
     }
 

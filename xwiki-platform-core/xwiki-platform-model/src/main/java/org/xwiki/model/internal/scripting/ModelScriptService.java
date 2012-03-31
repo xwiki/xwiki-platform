@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -47,14 +48,18 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("model")
 @Singleton
-//TODO: find a way to refactor this. The main issue is that the resolved type is not passed to #createDocumentReference
-//(the resolved type used to not be taken into account in the role type)
 public class ModelScriptService implements ScriptService
 {
     /**
-     * The default hint used when resolving string references.
+     * The default hint used when resolving references.
      */
-    private static final String DEFAULT_STRING_RESOLVER_HINT = "currentmixed";
+    private static final String DEFAULT_RESOLVER_HINT = "currentmixed";
+    
+    /**
+     * The object used to log messages.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Used to dynamically look up component implementations based on a given hint.
@@ -63,8 +68,8 @@ public class ModelScriptService implements ScriptService
     private ComponentManager componentManager;
 
     /**
-     * Create a Document Reference from a passed wiki, space and page names, which can be empty strings or null in which
-     * case they are resolved using a "currentmixed/reference" resolver.
+     * Create a Document Reference from a passed wiki, space and page names, which can be empty strings or {@code null}
+     * in which case they are resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver.
      * 
      * @param wiki the wiki reference name to use (can be empty or null)
      * @param space the space reference name to use (can be empty or null)
@@ -74,13 +79,13 @@ public class ModelScriptService implements ScriptService
      */
     public DocumentReference createDocumentReference(String wiki, String space, String page)
     {
-        return createDocumentReference(wiki, space, page, "currentmixed/reference");
+        return createDocumentReference(wiki, space, page, DEFAULT_RESOLVER_HINT);
     }
 
     /**
      * Create a Document Reference from a passed wiki, space and page names, which can be empty strings or null in which
      * case they are resolved against the Resolver having the hint passed as parameter. Valid hints are for example
-     * "default/reference", "current/reference", "currentmixed/reference".
+     * "default", "current", "currentmixed".
      * 
      * @param wiki the wiki reference name to use (can be empty or null)
      * @param space the space reference name to use (can be empty or null)
@@ -88,7 +93,6 @@ public class ModelScriptService implements ScriptService
      * @param hint the hint of the Resolver to use in case any parameter is empty or null
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
      */
-    @SuppressWarnings("unchecked")
     public DocumentReference createDocumentReference(String wiki, String space, String page, String hint)
     {
         EntityReference reference = null;
@@ -104,9 +108,20 @@ public class ModelScriptService implements ScriptService
 
         DocumentReference documentReference;
         try {
-            documentReference = this.componentManager.lookup(DocumentReferenceResolver.class, hint).resolve(reference);
+            DocumentReferenceResolver<EntityReference> resolver =
+                this.componentManager.lookupComponent(DocumentReferenceResolver.TYPE_REFERENCE, hint);
+            documentReference = resolver.resolve(reference);
         } catch (ComponentLookupException e) {
-            documentReference = null;
+            try {
+                // Ensure backward compatibility with older scripts that use hints like "default/reference" because at
+                // the time they were written we didn't have support for generic types in component role.
+                documentReference =
+                    this.componentManager.lookup(DocumentReferenceResolver.class, hint).resolve(reference);
+                logger.warn("Deprecated usage of DocumentReferenceResolver with hint [{}]. "
+                    + "Please consider using a DocumentReferenceResolver that takes into account generic types.", hint);
+            } catch (ComponentLookupException ex) {
+                documentReference = null;
+            }
         }
         return documentReference;
     }
@@ -127,12 +142,12 @@ public class ModelScriptService implements ScriptService
     /**
      * @param stringRepresentation the document reference specified as a String (using the "wiki:space.page" format and
      *            with special characters escaped where required)
-     * @return the typed Document Reference object (resolved using the {@value #DEFAULT_STRING_RESOLVER_HINT} resolver)
+     * @return the typed Document Reference object (resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 2.3M2
      */
     public DocumentReference resolveDocument(String stringRepresentation)
     {
-        return resolveDocument(stringRepresentation, DEFAULT_STRING_RESOLVER_HINT);
+        return resolveDocument(stringRepresentation, DEFAULT_RESOLVER_HINT);
     }
 
     /**
@@ -144,7 +159,6 @@ public class ModelScriptService implements ScriptService
      *            reference relative to another entity reference
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
      */
-    @SuppressWarnings("unchecked")
     public DocumentReference resolveDocument(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -160,12 +174,12 @@ public class ModelScriptService implements ScriptService
      * @param stringRepresentation an attachment reference specified as {@link String} (using the "wiki:space.page@file"
      *            format and with special characters escaped where required)
      * @return the corresponding typed {@link AttachmentReference} object (resolved using the
-     *         {@value #DEFAULT_STRING_RESOLVER_HINT} resolver)
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 2.5M2
      */
     public AttachmentReference resolveAttachment(String stringRepresentation)
     {
-        return resolveAttachment(stringRepresentation, DEFAULT_STRING_RESOLVER_HINT);
+        return resolveAttachment(stringRepresentation, DEFAULT_RESOLVER_HINT);
     }
 
     /**
@@ -178,7 +192,6 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link AttachmentReference} object
      * @since 2.5M2
      */
-    @SuppressWarnings("unchecked")
     public AttachmentReference resolveAttachment(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -194,12 +207,12 @@ public class ModelScriptService implements ScriptService
      * @param stringRepresentation an object reference specified as {@link String} (using the "wiki:space.page^object"
      *            format and with special characters escaped where required)
      * @return the corresponding typed {@link ObjectReference} object (resolved using the
-     *         {@value #DEFAULT_STRING_RESOLVER_HINT} resolver)
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 3.2M3
      */
     public ObjectReference resolveObject(String stringRepresentation)
     {
-        return resolveObject(stringRepresentation, DEFAULT_STRING_RESOLVER_HINT);
+        return resolveObject(stringRepresentation, DEFAULT_RESOLVER_HINT);
     }
     
     /**
@@ -212,7 +225,6 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link ObjectReference} object
      * @since 3.2M3
      */
-    @SuppressWarnings("unchecked")
     public ObjectReference resolveObject(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -228,12 +240,12 @@ public class ModelScriptService implements ScriptService
      * @param stringRepresentation an object property reference specified as {@link String} (using the 
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
      * @return the corresponding typed {@link ObjectReference} object (resolved using the
-     *         {@value #DEFAULT_STRING_RESOLVER_HINT} resolver)
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 3.2M3
      */
     public ObjectPropertyReference resolveObjectProperty(String stringRepresentation)
     {
-        return resolveObjectProperty(stringRepresentation, DEFAULT_STRING_RESOLVER_HINT);
+        return resolveObjectProperty(stringRepresentation, DEFAULT_RESOLVER_HINT);
     }
     
     /**
@@ -246,7 +258,6 @@ public class ModelScriptService implements ScriptService
      * @return the corresponding typed {@link ObjectReference} object
      * @since 3.2M3
      */
-    @SuppressWarnings("unchecked")
     public ObjectPropertyReference resolveObjectProperty(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -278,7 +289,9 @@ public class ModelScriptService implements ScriptService
     {
         String result;
         try {
-            result = (String) this.componentManager.lookup(EntityReferenceSerializer.class, hint).serialize(reference);
+            EntityReferenceSerializer<String> serializer =
+                this.componentManager.lookupComponent(EntityReferenceSerializer.TYPE_STRING, hint);
+            result = serializer.serialize(reference);
         } catch (ComponentLookupException e) {
             result = null;
         }

@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
-<web>XWiki</web>
-<name>AddExtensions</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.AdminSheet</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1321658413000</creationDate>
-<date>1331567255000</date>
-<contentUpdateDate>1331567255000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("admin.xwiki.addextensions")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.1</syntaxId>
-<hidden>false</hidden><attachment>
-<filename>icon.png</filename>
-<filesize>8529</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1326131999000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAhGElEQVR4XuydCZBkxZnf/5nvrPvo
+ <web>XWiki</web>
+ <name>AddExtensions</name>
+ <language/>
+ <defaultLanguage/>
+ <translation>0</translation>
+ <parent>XWiki.AdminSheet</parent>
+ <creator>xwiki:XWiki.Admin</creator>
+ <author>xwiki:XWiki.Admin</author>
+ <customClass/>
+ <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+ <creationDate>1321658413000</creationDate>
+ <date>1331567255000</date>
+ <contentUpdateDate>1331567255000</contentUpdateDate>
+ <version>1.1</version>
+ <title>$msg.get("admin.xwiki.addextensions")</title>
+ <template/>
+ <defaultTemplate/>
+ <validationScript/>
+ <comment/>
+ <minorEdit>false</minorEdit>
+ <syntaxId>xwiki/2.1</syntaxId>
+ <hidden>false</hidden> <attachment>
+  <filename>icon.png</filename>
+  <filesize>8529</filesize>
+  <author>xwiki:XWiki.Admin</author>
+  <date>1326131999000</date>
+  <version>1.1</version>
+  <comment/>  <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAhGElEQVR4XuydCZBkxZnf/5nvrPvo
 8xjm3plhgBnEaDkPQawAicUSti5bsmB9KGxLWjk2jDdWWmuNVl7tyrZW8sbKYVAoMELBrsUSOkAG
 IQkLwQCSVsAAwxwwZzNHz/RR3XW/I9PZWRkZnVTXVE9PMz2y5yM+8r18r+rV9K++I/N7Wc/G/3dy
 XpYJ+nm57777fEppihCSiuM4adt2UWiBc15wXStHqdUfhs2nP/KRj/3kNwD6eZizEH2fJ8PQTlvW
@@ -177,8 +177,8 @@ YoxVADQUeGn1i7L0RiN49Nlnt09Tap/YuXPnxGOPPTbTaDRmRkdHG2EYsiAISLVaJQAcpRQA+b/t
 l80KgCAQhC2WqFf0bX2q/rU9zCECEQxTaD4Y5rZ7+Ngw8yXE47pnSId447Mu3VrrtFzkST1qJvSg
 kWrCyQnxm2ZJfeIlY0GPBCzxmrX6lfPaT2RHZ1x6nICBGK7dgnDibwklpKMxXKkqnYRnJ/7T3y1p
 TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
-</content></attachment>
-<content>{{include document="ExtensionManagerMacros" /}}
+</content> </attachment>
+ <content>{{include document="ExtensionManagerMacros" /}}
 
 {{velocity}}
 ## Ajax call for a single extension

@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
- <web>XAppResources</web>
- <name>Translations</name>
- <language>ru</language>
- <defaultLanguage>en</defaultLanguage>
- <translation>1</translation>
- <parent>XAppResources.WebHome</parent>
- <creator>xwiki:XWiki.Admin</creator>
- <author>xwiki:XWiki.Admin</author>
- <customClass/>
- <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
- <creationDate>1192218584000</creationDate>
- <date>1278346254000</date>
- <contentUpdateDate>1278346254000</contentUpdateDate>
- <version>1.1</version>
- <title/>
- <template/>
- <defaultTemplate/>
- <validationScript/>
- <comment/>
- <minorEdit>false</minorEdit>
- <syntaxId>xwiki/2.0</syntaxId>
- <hidden>false</hidden>
- <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
+  <web>XAppResources</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>XAppResources.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1192218584000</creationDate>
+  <date>1278346254000</date>
+  <contentUpdateDate>1278346254000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
 </content></xwikidoc>

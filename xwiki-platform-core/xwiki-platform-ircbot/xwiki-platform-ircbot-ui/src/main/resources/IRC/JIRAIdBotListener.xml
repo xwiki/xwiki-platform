@@ -1,148 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>IRC</web>
-<name>JIRAIdBotListener</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>IRC.IRCBot</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1331654461000</creationDate>
-<date>1331901740000</date>
-<contentUpdateDate>1331901740000</contentUpdateDate>
-<version>1.1</version>
-<title>JIRA Id Bot Listener</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Updated class property</comment>
-<minorEdit>true</minorEdit>
-<syntaxId>xwiki/2.1</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>IRC.IRCBotListenerClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<description>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>description</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Description</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</description>
-<inactive>
-<customDisplay></customDisplay>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType></displayType>
-<name>inactive</name>
-<number>3</number>
-<prettyName>Inactive</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</inactive>
-<name>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-</class>
-<name>IRC.JIRAIdBotListener</name>
-<number>0</number>
-<className>IRC.IRCBotListenerClass</className>
-<guid>ee0847e7-db8f-4819-9b29-7a3eac2179b0</guid>
-<property>
-<description>Displays description + URL of a JIRA issue when encountering a JIRA id in a typed message in the IRC channel</description>
-</property>
-<property>
-<inactive></inactive>
-</property>
-<property>
-<name>JIRA Id</name>
-</property>
-</object>
-<object>
-<class>
-<name>IRC.IRCBotListenerEventClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<event>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>event</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Event</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</event>
-<script>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>script</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Script</prettyName>
-<rows>25</rows>
-<size>120</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</script>
-</class>
-<name>IRC.JIRAIdBotListener</name>
-<number>0</number>
-<className>IRC.IRCBotListenerEventClass</className>
-<guid>6d832e6f-7fe1-4bd5-9072-e87b1ba61ac1</guid>
-<property>
-<event>onMessage</event>
-</property>
-<property>
-<script>{{groovy}}
+ <web>IRC</web>
+ <name>JIRAIdBotListener</name>
+ <language/>
+ <defaultLanguage>en</defaultLanguage>
+ <translation>0</translation>
+ <parent>IRC.IRCBot</parent>
+ <creator>xwiki:XWiki.Admin</creator>
+ <author>xwiki:XWiki.Admin</author>
+ <customClass/>
+ <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+ <creationDate>1331654461000</creationDate>
+ <date>1331901740000</date>
+ <contentUpdateDate>1331901740000</contentUpdateDate>
+ <version>1.1</version>
+ <title>JIRA Id Bot Listener</title>
+ <template/>
+ <defaultTemplate/>
+ <validationScript/>
+ <comment>Updated class property</comment>
+ <minorEdit>true</minorEdit>
+ <syntaxId>xwiki/2.1</syntaxId>
+ <hidden>false</hidden>
+ <object>
+  <class>
+   <name>IRC.IRCBotListenerClass</name>
+   <customClass/>
+   <customMapping/>
+   <defaultViewSheet/>
+   <defaultEditSheet/>
+   <defaultWeb/>
+   <nameField/>
+   <validationScript/>
+   <description>
+    <customDisplay/>
+    <disabled>0</disabled>
+    <name>description</name>
+    <number>2</number>
+    <picker>0</picker>
+    <prettyName>Description</prettyName>
+    <size>30</size>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+   </description>
+   <inactive>
+    <customDisplay/>
+    <defaultValue/>
+    <disabled>0</disabled>
+    <displayFormType>select</displayFormType>
+    <displayType/>
+    <name>inactive</name>
+    <number>3</number>
+    <prettyName>Inactive</prettyName>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+   </inactive>
+   <name>
+    <customDisplay/>
+    <disabled>0</disabled>
+    <name>name</name>
+    <number>1</number>
+    <picker>0</picker>
+    <prettyName>Name</prettyName>
+    <size>30</size>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+   </name>
+  </class>
+  <name>IRC.JIRAIdBotListener</name>
+  <number>0</number>
+  <className>IRC.IRCBotListenerClass</className>
+  <guid>ee0847e7-db8f-4819-9b29-7a3eac2179b0</guid>
+  <property>
+   <description>Displays description + URL of a JIRA issue when encountering a JIRA id in a typed message in the IRC channel</description>
+  </property>
+  <property>
+   <inactive/>
+  </property>
+  <property>
+   <name>JIRA Id</name>
+  </property>
+ </object>
+ <object>
+  <class>
+   <name>IRC.IRCBotListenerEventClass</name>
+   <customClass/>
+   <customMapping/>
+   <defaultViewSheet/>
+   <defaultEditSheet/>
+   <defaultWeb/>
+   <nameField/>
+   <validationScript/>
+   <event>
+    <cache>0</cache>
+    <customDisplay/>
+    <disabled>0</disabled>
+    <displayType>select</displayType>
+    <multiSelect>0</multiSelect>
+    <name>event</name>
+    <number>1</number>
+    <picker>0</picker>
+    <prettyName>Event</prettyName>
+    <relationalStorage>0</relationalStorage>
+    <separator> </separator>
+    <separators> ,|</separators>
+    <size>1</size>
+    <sort>none</sort>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+    <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+   </event>
+   <script>
+    <customDisplay/>
+    <disabled>0</disabled>
+    <editor>---</editor>
+    <name>script</name>
+    <number>2</number>
+    <picker>0</picker>
+    <prettyName>Script</prettyName>
+    <rows>25</rows>
+    <size>120</size>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+   </script>
+  </class>
+  <name>IRC.JIRAIdBotListener</name>
+  <number>0</number>
+  <className>IRC.IRCBotListenerEventClass</className>
+  <guid>6d832e6f-7fe1-4bd5-9072-e87b1ba61ac1</guid>
+  <property>
+   <event>onMessage</event>
+  </property>
+  <property>
+   <script>{{groovy}}
 import java.util.regex.*
 
 def irccontext = services.get("ircbot").getContext() 
@@ -164,64 +165,64 @@ if (jiraPattern != null &amp;&amp; jiraURL != null) {
   }
 }
 {{/groovy}}</script>
-</property>
-</object>
-<object>
-<class>
-<name>IRC.IRCBotListenerEventClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<event>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>event</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Event</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</event>
-<script>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>script</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Script</prettyName>
-<rows>25</rows>
-<size>120</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</script>
-</class>
-<name>IRC.JIRAIdBotListener</name>
-<number>1</number>
-<className>IRC.IRCBotListenerEventClass</className>
-<guid>3687db2b-5e48-4b88-af6d-83326f13dac3</guid>
-<property>
-<event>onRegistration</event>
-</property>
-<property>
-<script>{{groovy}}
+  </property>
+ </object>
+ <object>
+  <class>
+   <name>IRC.IRCBotListenerEventClass</name>
+   <customClass/>
+   <customMapping/>
+   <defaultViewSheet/>
+   <defaultEditSheet/>
+   <defaultWeb/>
+   <nameField/>
+   <validationScript/>
+   <event>
+    <cache>0</cache>
+    <customDisplay/>
+    <disabled>0</disabled>
+    <displayType>select</displayType>
+    <multiSelect>0</multiSelect>
+    <name>event</name>
+    <number>1</number>
+    <picker>0</picker>
+    <prettyName>Event</prettyName>
+    <relationalStorage>0</relationalStorage>
+    <separator> </separator>
+    <separators> ,|</separators>
+    <size>1</size>
+    <sort>none</sort>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+    <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+   </event>
+   <script>
+    <customDisplay/>
+    <disabled>0</disabled>
+    <editor>---</editor>
+    <name>script</name>
+    <number>2</number>
+    <picker>0</picker>
+    <prettyName>Script</prettyName>
+    <rows>25</rows>
+    <size>120</size>
+    <unmodifiable>0</unmodifiable>
+    <validationMessage/>
+    <validationRegExp/>
+    <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+   </script>
+  </class>
+  <name>IRC.JIRAIdBotListener</name>
+  <number>1</number>
+  <className>IRC.IRCBotListenerEventClass</className>
+  <guid>3687db2b-5e48-4b88-af6d-83326f13dac3</guid>
+  <property>
+   <event>onRegistration</event>
+  </property>
+  <property>
+   <script>{{groovy}}
 import java.util.regex.*
 
 def object = xwiki.getDocument("IRC.IRCConfiguration").getObject("IRC.JIRAConfigurationClass")
@@ -243,6 +244,6 @@ if (pattern != null &amp;&amp; pattern.trim().length() &gt; 0) {
 
 xcontext.put("irclistener", mappings)
 {{/groovy}}</script>
-</property>
-</object>
-<content></content></xwikidoc>
+  </property>
+ </object>
+ <content/></xwikidoc>

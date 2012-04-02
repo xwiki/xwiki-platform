@@ -82,29 +82,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <!-- TODO: There's a bug here since it'll run only when no other profile is specified on the command line but I
-         have no clue why we're doing this. Thomas, please help! :) -->
-    <profile>
-      <id>normal</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <excludes>
-                  <exclude>**/JBossCacheLocalCacheEvictionsTest.java</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 </project>

@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Main</web>
-<name>WebHome</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent></parent>
-<creator>XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1166007764000</creationDate>
-<date>1301083063000</date>
-<contentUpdateDate>1301083063000</contentUpdateDate>
-<version>1.1</version>
-<title>#set($wikiDescriptor = $services.wikimanager.getWikiDocument($xcontext.database))#{if}("$!wikiDescriptor.getValue('wikiprettyname')" != '')$wikiDescriptor.getValue('wikiprettyname')#{else}$wikiDescriptor.wikiName#{end}</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{include document="Dashboard.WebHome" context="new" /}}</content></xwikidoc>
+  <web>Main</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1166007764000</creationDate>
+  <date>1301083063000</date>
+  <contentUpdateDate>1301083063000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#set($wikiDescriptor = $services.wikimanager.getWikiDocument($xcontext.database))#{if}("$!wikiDescriptor.getValue('wikiprettyname')" != '')$wikiDescriptor.getValue('wikiprettyname')#{else}$wikiDescriptor.wikiName#{end}</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{include document="Dashboard.WebHome" context="new" /}}</content>
+</xwikidoc>

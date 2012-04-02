@@ -33,6 +33,10 @@
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.jvnet.hudson</groupId>

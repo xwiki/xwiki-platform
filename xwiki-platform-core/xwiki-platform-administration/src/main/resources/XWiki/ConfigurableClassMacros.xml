@@ -19,30 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
- <web>XWiki</web>
- <name>ConfigurableClassMacros</name>
- <language/>
- <defaultLanguage/>
- <translation>0</translation>
- <parent>XWiki.ConfigurableClass</parent>
- <creator>xwiki:XWiki.Admin</creator>
- <author>xwiki:XWiki.Admin</author>
- <customClass/>
- <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
- <creationDate>1265775370000</creationDate>
- <date>1299713133000</date>
- <contentUpdateDate>1299713133000</contentUpdateDate>
- <version>1.1</version>
- <title>$msg.get("xe.admin.configurable.macros.title")</title>
- <template/>
- <defaultTemplate/>
- <validationScript/>
- <comment/>
- <minorEdit>false</minorEdit>
- <syntaxId>xwiki/2.0</syntaxId>
- <hidden>false</hidden>
- <content>{{velocity output="false"}}
+  <web>XWiki</web>
+  <name>ConfigurableClassMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.ConfigurableClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1265775370000</creationDate>
+  <date>1299713133000</date>
+  <contentUpdateDate>1299713133000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.admin.configurable.macros.title")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}
 ## Constants:
 #set($redirectParameter = 'xredirect')
 #set($nameOfThisDocument = 'XWiki.ConfigurableClass')

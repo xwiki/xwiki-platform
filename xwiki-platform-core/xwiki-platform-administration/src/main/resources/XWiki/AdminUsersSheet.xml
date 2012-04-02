@@ -19,30 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
- <web>XWiki</web>
- <name>AdminUsersSheet</name>
- <language/>
- <defaultLanguage/>
- <translation>0</translation>
- <parent>XWiki.AdminSheet</parent>
- <creator>xwiki:XWiki.Admin</creator>
- <author>xwiki:XWiki.Admin</author>
- <customClass/>
- <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
- <creationDate>1211801430000</creationDate>
- <date>1267456606000</date>
- <contentUpdateDate>1267456606000</contentUpdateDate>
- <version>1.1</version>
- <title>AdminUsersSheet</title>
- <template/>
- <defaultTemplate/>
- <validationScript/>
- <comment/>
- <minorEdit>false</minorEdit>
- <syntaxId>xwiki/2.0</syntaxId>
- <hidden>false</hidden>
- <content>{{velocity}}
+  <web>XWiki</web>
+  <name>AdminUsersSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.AdminSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1211801430000</creationDate>
+  <date>1267456606000</date>
+  <contentUpdateDate>1267456606000</contentUpdateDate>
+  <version>1.1</version>
+  <title>AdminUsersSheet</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
 ### Globally administrate the users in a wiki.
 #set($formname = "update")
 #set($saveaction = "save")

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>XWiki</web>
-<name>LiveTableResultsMacros</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1267453085000</date>
-<contentUpdateDate>1267453085000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("platform.livetable.resultsMacros")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity output="false"}}
+  <web>XWiki</web>
+  <name>LiveTableResultsMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1267453085000</date>
+  <contentUpdateDate>1267453085000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("platform.livetable.resultsMacros")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}
 #**
  * Macro to get the results of a livetable data call.
  * This page is called from live grids via Ajax with the argument xpage=plain. It returns a

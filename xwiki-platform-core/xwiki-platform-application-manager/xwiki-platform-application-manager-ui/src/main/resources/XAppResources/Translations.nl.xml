@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
   <web>XAppResources</web>
   <name>Translations</name>
@@ -52,4 +53,5 @@ xapp.successexportapp=Lietotnes "{0}" eksportēšana ir vieksmīga.
 xapp.successimportapp=Lietotnes "{0}" importēšana ir vieksmīga.
 xapp.successreloadapp=Lietotnes "{0}" pārlādēšana ir vieksmīga.
 xapp.totalnumberofapp=Kopējais lietotņus skaits
-</content></xwikidoc>
+</content>
+</xwikidoc>

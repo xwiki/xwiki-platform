@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
   <web>XAppTemplates</web>
   <name>WebHome</name>
@@ -22,4 +23,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
   <hidden>false</hidden>
-  <content/></xwikidoc>
+  <content/>
+</xwikidoc>

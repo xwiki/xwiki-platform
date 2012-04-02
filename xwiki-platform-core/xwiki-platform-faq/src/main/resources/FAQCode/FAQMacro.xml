@@ -1,143 +1,144 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>FAQCode</web>
-<name>FAQMacro</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>FAQCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1319799041000</creationDate>
-<date>1319804582000</date>
-<contentUpdateDate>1319804582000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.WikiMacroClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>8</number>
-<prettyName>Macro code</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<contentDescription>
-<disabled>0</disabled>
-<name>contentDescription</name>
-<number>7</number>
-<prettyName>Content description (Not applicable for "No content" type)</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</contentDescription>
-<contentType>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>contentType</name>
-<number>6</number>
-<prettyName>Macro content type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Mandatory|Optional|No content</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</contentType>
-<defaultCategory>
-<disabled>0</disabled>
-<name>defaultCategory</name>
-<number>4</number>
-<prettyName>Default category</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultCategory>
-<description>
-<disabled>0</disabled>
-<name>description</name>
-<number>3</number>
-<prettyName>Macro description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<id>
-<disabled>0</disabled>
-<name>id</name>
-<number>1</number>
-<prettyName>Macro id</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</id>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>2</number>
-<prettyName>Macro name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<supportsInlineMode>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>select</displayType>
-<name>supportsInlineMode</name>
-<number>5</number>
-<prettyName>Supports inline mode</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</supportsInlineMode>
-<visibility>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>visibility</name>
-<number>9</number>
-<prettyName>Macro visibility</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Current User|Current Wiki|Global</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</visibility>
-</class>
-<name>FAQCode.FAQMacro</name>
-<number>0</number>
-<className>XWiki.WikiMacroClass</className>
-<guid>05dec3e3-4eaf-4432-aecf-f1d7b40879b9</guid>
-<property>
-<code>{{velocity}}
+  <web>FAQCode</web>
+  <name>FAQMacro</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>FAQCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319799041000</creationDate>
+  <date>1319804582000</date>
+  <contentUpdateDate>1319804582000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>8</number>
+        <prettyName>Macro code</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <disabled>0</disabled>
+        <name>contentDescription</name>
+        <number>7</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Mandatory|Optional|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategory>
+        <disabled>0</disabled>
+        <name>defaultCategory</name>
+        <number>4</number>
+        <prettyName>Default category</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultCategory>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>select</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>9</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <name>FAQCode.FAQMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>05dec3e3-4eaf-4432-aecf-f1d7b40879b9</guid>
+    <property>
+      <code>{{velocity}}
 #set($columns = ["doc.title", "doc.creationDate", "doc.date"])
 #set($columnsProperties = {
   "doc.title" : { "type" : "text", "link" : "view" },
@@ -156,96 +157,97 @@
 })
 #livetable("faqs" $columns $columnsProperties $options)
 {{/velocity}}</code>
-</property>
-<property>
-<contentDescription></contentDescription>
-</property>
-<property>
-<contentType>No content</contentType>
-</property>
-<property>
-<defaultCategory></defaultCategory>
-</property>
-<property>
-<description>Lists FAQ entries</description>
-</property>
-<property>
-<id>faq</id>
-</property>
-<property>
-<name>FAQ</name>
-</property>
-<property>
-<supportsInlineMode>0</supportsInlineMode>
-</property>
-<property>
-<visibility>Current Wiki</visibility>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.WikiMacroParameterClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultValue>
-<disabled>0</disabled>
-<name>defaultValue</name>
-<number>4</number>
-<prettyName>Parameter default value</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultValue>
-<description>
-<disabled>0</disabled>
-<name>description</name>
-<number>2</number>
-<prettyName>Parameter description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<mandatory>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>select</displayType>
-<name>mandatory</name>
-<number>3</number>
-<prettyName>Parameter mandatory</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</mandatory>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Parameter name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-</class>
-<name>FAQCode.FAQMacro</name>
-<number>0</number>
-<className>XWiki.WikiMacroParameterClass</className>
-<guid>e7e63161-df41-4aa0-8ee6-7212633b9843</guid>
-<property>
-<defaultValue></defaultValue>
-</property>
-<property>
-<description>Provides ability to filter where the FAQ entries are looked for. For example the following will look for FAQ entries only in the FAQ space: filter="space=FAQ"</description>
-</property>
-<property>
-<mandatory>0</mandatory>
-</property>
-<property>
-<name>filter</name>
-</property>
-</object>
-<content>{{faq filter="space=FAQ"/}}</content></xwikidoc>
+    </property>
+    <property>
+      <contentDescription/>
+    </property>
+    <property>
+      <contentType>No content</contentType>
+    </property>
+    <property>
+      <defaultCategory/>
+    </property>
+    <property>
+      <description>Lists FAQ entries</description>
+    </property>
+    <property>
+      <id>faq</id>
+    </property>
+    <property>
+      <name>FAQ</name>
+    </property>
+    <property>
+      <supportsInlineMode>0</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>select</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>FAQCode.FAQMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>e7e63161-df41-4aa0-8ee6-7212633b9843</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Provides ability to filter where the FAQ entries are looked for. For example the following will look for FAQ entries only in the FAQ space: filter="space=FAQ"</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>filter</name>
+    </property>
+  </object>
+  <content>{{faq filter="space=FAQ"/}}</content>
+</xwikidoc>

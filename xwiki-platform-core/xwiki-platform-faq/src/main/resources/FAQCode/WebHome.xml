@@ -1,31 +1,33 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>FAQCode</web>
-<name>WebHome</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1319797123000</creationDate>
-<date>1319797696000</date>
-<contentUpdateDate>1319797696000</contentUpdateDate>
-<version>1.1</version>
-<title>FAQ Code Space</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>Contains technical pages for the FAQ application.
+  <web>FAQCode</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319797123000</creationDate>
+  <date>1319797696000</date>
+  <contentUpdateDate>1319797696000</contentUpdateDate>
+  <version>1.1</version>
+  <title>FAQ Code Space</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>Contains technical pages for the FAQ application.
 
 = Documents in this space =
 
 {{spaceindex/}}
 
-</content></xwikidoc>
+</content>
+</xwikidoc>

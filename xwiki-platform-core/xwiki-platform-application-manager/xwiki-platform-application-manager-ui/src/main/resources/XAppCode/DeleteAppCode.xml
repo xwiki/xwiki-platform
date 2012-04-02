@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
   <web>XAppCode</web>
   <name>DeleteAppCode</name>
@@ -36,4 +37,5 @@
     #xwikimessagebox($msg.get("xapp.answer.deleteapp.title", [$appname]) $msg.get("xapp.answer.deleteapp.msg", [$appname]) $doc.getURL("view", "action=$action&amp;amp;appname=$appname&amp;amp;confirm=1") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
   #end
 #end
-</content></xwikidoc>
+</content>
+</xwikidoc>

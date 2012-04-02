@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>LuceneSearchAdmin</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.SearchAdmin</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1272286749000</creationDate>
-<date>1326733733000</date>
-<contentUpdateDate>1326733733000</contentUpdateDate>
-<version>1.1</version>
-<title>Lucene search administration</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity output="false"}}
+  <web>XWiki</web>
+  <name>LuceneSearchAdmin</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.SearchAdmin</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1272286749000</creationDate>
+  <date>1326733733000</date>
+  <contentUpdateDate>1326733733000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Lucene search administration</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}
 #set ($lucene = $xwiki.lucene)
 {{/velocity}}
 
@@ -140,4 +141,5 @@
 #else## !$hasAdmin
   {{error}}$msg.get('needadminrights').{{/error}}
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

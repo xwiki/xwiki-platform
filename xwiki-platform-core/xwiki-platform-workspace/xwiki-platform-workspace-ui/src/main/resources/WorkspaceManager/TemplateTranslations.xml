@@ -51,4 +51,5 @@ workspacemanager.prop.secure.hint=If enabled, all this wiki's generated external
 
 # DESCRIPTIONS
 admin.xwiki.workspaceusers.description=Manage workspace members: add, remove, invite, accept or reject workspace members.
-</content></xwikidoc>
+</content>
+</xwikidoc>

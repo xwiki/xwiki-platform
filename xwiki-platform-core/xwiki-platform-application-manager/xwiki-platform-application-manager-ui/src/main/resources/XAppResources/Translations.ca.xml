@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
   <web>XAppResources</web>
   <name>Translations</name>
@@ -52,4 +53,5 @@ xapp.successexportapp=Acció d''exportar l''aplicació "{0}" amb vistiplau.
 xapp.successimportapp=Acció d''importar el paquet de l''aplicació "{0}" amb vistiplau.  
 xapp.successreloadapp=Acció de recarregar l''aplicació "{0}" amb vistiplau.  
 xapp.totalnumberofapp=Nombre total d'aplicacions
-</content></xwikidoc>
+</content>
+</xwikidoc>

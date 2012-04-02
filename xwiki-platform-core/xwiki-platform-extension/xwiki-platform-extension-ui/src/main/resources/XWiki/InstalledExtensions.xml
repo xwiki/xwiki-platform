@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
- <web>XWiki</web>
- <name>InstalledExtensions</name>
- <language/>
- <defaultLanguage/>
- <translation>0</translation>
- <parent>XWiki.AdminSheet</parent>
- <creator>xwiki:XWiki.Admin</creator>
- <author>xwiki:XWiki.Admin</author>
- <customClass/>
- <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
- <creationDate>1321058328000</creationDate>
- <date>1332153510000</date>
- <contentUpdateDate>1332153510000</contentUpdateDate>
- <version>1.1</version>
- <title>$msg.get("admin.xwiki.installedextensions")</title>
- <template/>
- <defaultTemplate/>
- <validationScript/>
- <comment/>
- <minorEdit>false</minorEdit>
- <syntaxId>xwiki/2.1</syntaxId>
- <hidden>false</hidden> <attachment>
-  <filename>icon.png</filename>
-  <filesize>8443</filesize>
+  <web>XWiki</web>
+  <name>InstalledExtensions</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.AdminSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
-  <date>1326131950000</date>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1321058328000</creationDate>
+  <date>1332153510000</date>
+  <contentUpdateDate>1332153510000</contentUpdateDate>
   <version>1.1</version>
-  <comment/>  <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgwklEQVR4XuydCZBd1Znf/+fub196
+  <title>$msg.get("admin.xwiki.installedextensions")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <attachment>
+    <filename>icon.png</filename>
+    <filesize>8443</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1326131950000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgwklEQVR4XuydCZBd1Znf/+fub196
 b4nWGkkGIbA1MywGgssGb8SQ8hiSMIaJJ85ie5xKhSSzeYLHiZdJPHYl41TAcQhmilkYYgy4BCTj
 DHHAGDAgNiGBFiS0tHp73f3Wu5yT01+duvfdt6m71XTLib6qj3PvuU/vPt6v/9/5znfOe8/A/3d2
 3tYI+nm75557HE3TUoyxVBAEScMwitILQoiCZek5TdMHPa/xk1tuufV//gJAPw9zAaLjiKTnGWld
@@ -176,9 +179,11 @@ Z8+euXq9Pnfs2LG653ncdV1WqVQYALP5d7v/bzvnjgIgEANRlSB6xb3tnsp/1hRTbKNFQCM4D4Z0
 TvEYsbJ5E6JY92SZK/HqWnpKKdvJF5/Ug2XE7S0SJpwcEL9C+u0rXhwFHVJQopYlfOVc+4FsuI6l
 X1NQslUl8cKJVilPSMfFw4046aR24vjnjKPkg7Ip/x55oOjjEKGAH0Dp5AQvUIbU4MVF3wAAAABJ
 RU5ErkJggg==
-</content> </attachment>
- <content>{{velocity}}
+</content>
+  </attachment>
+  <content>{{velocity}}
 #set ($selectedRepositoryId = 'installed')
 {{/velocity}}
 
-{{include document="AddExtensions" /}}</content></xwikidoc>
+{{include document="AddExtensions" /}}</content>
+</xwikidoc>

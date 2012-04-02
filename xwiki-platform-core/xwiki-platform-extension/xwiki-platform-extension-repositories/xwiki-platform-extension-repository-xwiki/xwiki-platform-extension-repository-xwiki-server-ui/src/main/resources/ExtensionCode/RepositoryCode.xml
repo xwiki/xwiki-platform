@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
- <web>ExtensionCode</web>
- <name>RepositoryCode</name>
- <language/>
- <defaultLanguage/>
- <translation>0</translation>
- <parent/>
- <creator>xwiki:XWiki.Admin</creator>
- <author>xwiki:XWiki.Admin</author>
- <customClass/>
- <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
- <creationDate>1320329126000</creationDate>
- <date>1326441647000</date>
- <contentUpdateDate>1326441647000</contentUpdateDate>
- <version>1.1</version>
- <title/>
- <template/>
- <defaultTemplate/>
- <validationScript/>
- <comment/>
- <minorEdit>false</minorEdit>
- <syntaxId>xwiki/2.0</syntaxId>
- <hidden>false</hidden>
- <content>{{velocity output="false"}}
+  <web>ExtensionCode</web>
+  <name>RepositoryCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1320329126000</creationDate>
+  <date>1326441647000</date>
+  <contentUpdateDate>1326441647000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}
 #set($repositoryConfigDoc = $xwiki.getDocument('ExtensionCode.RepositoryConfig'))
 #set($repositoryConfigClassName = 'ExtensionCode.RepositoryConfigClass')
 #set($repositoryConfigClass = $xwiki.getDocument($repositoryConfigClassName).xWikiClass)
@@ -49,4 +50,5 @@
     Caused by: #printThrowable($throwable.cause)
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

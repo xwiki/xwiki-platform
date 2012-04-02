@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>GlobalBlogRss</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1229906850000</creationDate>
-<date>1229907570000</date>
-<contentUpdateDate>1229907570000</contentUpdateDate>
-<version>1.1</version>
-<title>Global Blog RSS feed generator</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>true</hidden>
-<content>{{include document="Blog.BlogCode"/}}
+  <web>Blog</web>
+  <name>GlobalBlogRss</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1229906850000</creationDate>
+  <date>1229907570000</date>
+  <contentUpdateDate>1229907570000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Global Blog RSS feed generator</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Blog.BlogCode"/}}
 
 {{velocity filter="none"}}
 #if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')

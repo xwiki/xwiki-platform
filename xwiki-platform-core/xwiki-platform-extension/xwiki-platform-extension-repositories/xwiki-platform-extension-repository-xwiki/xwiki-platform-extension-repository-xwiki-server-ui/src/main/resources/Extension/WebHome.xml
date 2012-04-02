@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
- <web>Extension</web>
- <name>WebHome</name>
- <language/>
- <defaultLanguage/>
- <translation>0</translation>
- <parent>Main.WebHome</parent>
- <creator>xwiki:XWiki.Admin</creator>
- <author>xwiki:XWiki.Admin</author>
- <customClass/>
- <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
- <creationDate>1304962886000</creationDate>
- <date>1329838830000</date>
- <contentUpdateDate>1329838830000</contentUpdateDate>
- <version>1.1</version>
- <title>Extensions</title>
- <template/>
- <defaultTemplate/>
- <validationScript/>
- <comment/>
- <minorEdit>false</minorEdit>
- <syntaxId>xwiki/2.1</syntaxId>
- <hidden>false</hidden>
- <content>{{include document="ExtensionCode.RepositoryCode"/}}
+  <web>Extension</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1304962886000</creationDate>
+  <date>1329838830000</date>
+  <contentUpdateDate>1329838830000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Extensions</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{include document="ExtensionCode.RepositoryCode"/}}
 
 {{include document="ExtensionCode.CreateExtension"/}}
 
@@ -104,4 +105,5 @@ Temporary provide a link for robots to index all extension.
 In the future, this link will be provided via a sitemap.
 [[ExtensionCode.AllExtensionsList]]
 )))
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

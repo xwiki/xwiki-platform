@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
   <web>XAppResources</web>
   <name>Translations</name>
@@ -50,4 +51,5 @@ xapp.successexportapp=Úspěšný export aplikace "{0}".
 xapp.successimportapp=Úspěšný import aplikace "{0}".
 xapp.successreloadapp=Úspěšný reload aplikace "{0}".
 xapp.totalnumberofapp=Celkový počet aplikací
-</content></xwikidoc>
+</content>
+</xwikidoc>

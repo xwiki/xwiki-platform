@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WorkspaceManager</web>
-<name>LeaveWorkspaceCode</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WorkspaceManager.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1293832800000</creationDate>
-<date>1293832800000</date>
-<contentUpdateDate>1293832800000</contentUpdateDate>
-<version>1.1</version>
-<title>#if("$!{request.workspaceName}" == '')$msg.get('workspacemanager.title.leave.empty')#{else}$msg.get('workspacemanager.title.leave', ["${request.workspaceName}"])#end</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>WorkspaceManager</web>
+  <name>LeaveWorkspaceCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WorkspaceManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1293832800000</date>
+  <contentUpdateDate>1293832800000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if("$!{request.workspaceName}" == '')$msg.get('workspacemanager.title.leave.empty')#{else}$msg.get('workspacemanager.title.leave', ["${request.workspaceName}"])#end</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
 #set ($workspaceName = $request.workspaceName)
 #set ($workspaceId = $request.workspaceId)
 #set ($confirm = $request.confirm)
@@ -76,4 +77,5 @@
     #end
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

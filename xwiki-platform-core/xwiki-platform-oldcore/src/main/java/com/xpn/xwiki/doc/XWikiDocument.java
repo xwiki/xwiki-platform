@@ -5613,7 +5613,7 @@ public class XWikiDocument implements DocumentModelBridge
                         // TODO: Refactor this so that getDiff() accepts null Object as input.
                         // Only consider added objects, the other case was treated above.
                         originalObj = new BaseObject();
-                        originalObj.setXClassReference(newObj.getXClassReference());
+                        originalObj.setXClassReference(newObj.getRelativeXClassReference());
                         originalObj.setNumber(newObj.getNumber());
                         originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);

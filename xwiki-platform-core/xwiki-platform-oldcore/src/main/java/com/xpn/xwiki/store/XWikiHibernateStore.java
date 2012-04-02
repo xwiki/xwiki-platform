@@ -797,8 +797,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                     if (newobject != null) {
                         newobject.setId(object.getId());
-                        // Only wiki relative reference are stored in this store, so remove the wiki from the reference
-                        newobject.setXClassReference(classReference.removeParent(classReference.getWikiReference()));
+                        newobject.setXClassReference(object.getRelativeXClassReference());
                         newobject.setDocumentReference(object.getDocumentReference());
                         newobject.setNumber(object.getNumber());
                         newobject.setGuid(object.getGuid());

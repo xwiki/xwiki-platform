@@ -7296,7 +7296,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public BaseObject getObject(String className, boolean create, XWikiContext context)
     {
-        return getXObject(resolveClassReference(className), create, context);
+        return getXObject(
+            this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT, getDocumentReference()), create,
+            context);
     }
 
     public boolean validate(XWikiContext context) throws XWikiException

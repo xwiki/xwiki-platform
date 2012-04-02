@@ -1,3 +1,5 @@
+org.xwiki.annotation.internal.AnnotationConfigurationSource
+org.xwiki.annotation.internal.DefaultAnnotationConfiguration
 org.xwiki.annotation.internal.DefaultAnnotationService
 org.xwiki.annotation.internal.content.WhiteSpaceContentAlterer
 org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer

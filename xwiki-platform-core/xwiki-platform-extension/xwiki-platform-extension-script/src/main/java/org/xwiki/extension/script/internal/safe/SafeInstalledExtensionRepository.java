@@ -79,6 +79,8 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     @Override
     public Collection<InstalledExtension> getBackwardDependencies(String feature, String namespace)
     {
+        setError(null);
+
         try {
             return safe(getWrapped().getBackwardDependencies(feature, namespace));
         } catch (Exception e) {
@@ -91,6 +93,8 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     @Override
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
     {
+        setError(null);
+
         try {
             return safe(getWrapped().getBackwardDependencies(extensionId));
         } catch (Exception e) {

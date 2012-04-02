@@ -49,6 +49,8 @@ public class SafeSearchableExtensionRepository<T extends ExtensionRepository> ex
     @Override
     public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
+        setError(null);
+
         try {
             return safe(((Searchable) getWrapped()).search(pattern, offset, nb));
         } catch (Exception e) {

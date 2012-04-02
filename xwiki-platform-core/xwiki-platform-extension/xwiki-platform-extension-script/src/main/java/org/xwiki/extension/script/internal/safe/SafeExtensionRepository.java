@@ -54,6 +54,8 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
     @Override
     public Extension resolve(ExtensionId extensionId)
     {
+        setError(null);
+
         try {
             return safe(getWrapped().resolve(extensionId));
         } catch (Exception e) {
@@ -66,6 +68,8 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
     @Override
     public Extension resolve(ExtensionDependency extensionDependency)
     {
+        setError(null);
+
         try {
             return safe(getWrapped().resolve(extensionDependency));
         } catch (Exception e) {
@@ -90,6 +94,8 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
     @Override
     public IterableResult<Version> resolveVersions(String id, int offset, int nb)
     {
+        setError(null);
+
         try {
             return getWrapped().resolveVersions(id, offset, nb);
         } catch (Exception e) {

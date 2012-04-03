@@ -192,7 +192,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         EntityReference ref = xClassReference;
 
         if (ref != null) {
-            WikiReference wiki = (WikiReference) xClassReference.extractReference(EntityType.WIKI);
+            EntityReference wiki = xClassReference.extractReference(EntityType.WIKI);
             if (wiki != null) {
                 ref = xClassReference.removeParent(wiki);
 

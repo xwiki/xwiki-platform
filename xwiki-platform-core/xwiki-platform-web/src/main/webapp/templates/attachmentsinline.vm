@@ -23,7 +23,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     <span class="xwikibuttonlinks">
     #if($hasEdit || $hasAdmin)
       ## Delete attachment link
-      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.deleteTitle', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
+      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.delete.title', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
       ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
       ## the browser supports Dav Edit 
       #set($documentUrl=$doc.getExternalURL("download"))

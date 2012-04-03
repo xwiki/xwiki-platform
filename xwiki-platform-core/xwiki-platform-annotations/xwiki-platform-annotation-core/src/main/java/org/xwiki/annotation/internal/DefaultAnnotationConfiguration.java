@@ -69,7 +69,7 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     @Override
     public boolean isActivated()
     {
-        return configuration.get().getProperty("activated");
+        return configuration.get().getProperty("activated", 0) == 1;
     }
 
     @Override
@@ -88,13 +88,13 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     @Override
     public boolean isDisplayedByDefault()
     {
-        return configuration.get().getProperty("displayed");
+        return configuration.get().getProperty("displayed", 0) == 1;
     }
 
     @Override
     public boolean isDisplayedHighlightedByDefault()
     {
-        return configuration.get().getProperty("displayHighlight");
+        return configuration.get().getProperty("displayHighlight", 0) == 1;
     }
 
     @Override

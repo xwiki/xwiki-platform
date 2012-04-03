@@ -180,7 +180,7 @@
       <contentType>Optional</contentType>
     </property>
     <property>
-      <defaultCategory>content</defaultCategory>
+      <defaultCategory>Content</defaultCategory>
     </property>
     <property>
       <description>Displays a list of documents in a Livetable</description>

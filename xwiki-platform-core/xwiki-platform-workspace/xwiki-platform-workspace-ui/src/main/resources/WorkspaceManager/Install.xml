@@ -57,7 +57,7 @@
   #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestSourceClass', 'name', 'Workspaces'))
   #if (!$searchSuggestConfigObject)
     #if ($hasGlobalAdmin)
-      #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject("XWiki.SearchSuggestSourceClass"))
+      #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject('XWiki.SearchSuggestSourceClass'))
       #set ($discard = $searchSuggestConfigObject.set('name', 'Workspaces'))
       #set ($discard = $searchSuggestConfigObject.set('query', 'XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass'))
       #set ($discard = $searchSuggestConfigObject.set('resultsNumber', '3'))

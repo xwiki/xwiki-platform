@@ -153,9 +153,9 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         throws ComponentLookupException, IllegalArgumentException
     {
         try {
-            FormulaRenderer renderer = this.manager.lookup(FormulaRenderer.class, rendererHint);
+            FormulaRenderer renderer = this.manager.lookupComponent(FormulaRenderer.class, rendererHint);
             String imageName = renderer.process(formula, inline, fontSize, imageType);
-            String url = this.dab.getURL(null, "tex", null, null) + "/" + imageName;
+            String url = this.dab.getDocumentURL(null, "tex", null, null) + "/" + imageName;
             ResourceReference imageReference = new ResourceReference(url, ResourceType.URL);
             ImageBlock result = new ImageBlock(imageReference, false);
             // Set the alternative text for the image to be the original formula

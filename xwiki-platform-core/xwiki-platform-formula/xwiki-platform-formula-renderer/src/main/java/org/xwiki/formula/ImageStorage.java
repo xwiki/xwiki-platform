@@ -19,14 +19,14 @@
  */
 package org.xwiki.formula;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A component for storing generated images for later retrieval in a subsequent request.
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface ImageStorage
 {
     /**

@@ -10,9 +10,9 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1280310959000</creationDate>
-<date>1297439261000</date>
-<contentUpdateDate>1297439261000</contentUpdateDate>
+<creationDate>1280307359000</creationDate>
+<date>1333114062000</date>
+<contentUpdateDate>1333114062000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -63,7 +63,7 @@
 A suggest source is a URL that takes 3 parameters: query, input and nb. The query parameter must contain a ~_~_INPUT~_~_ placeholder. This URL must process the query with the given user input and return the result in the XML format expected by the suggest component.
 
 |= Name |= URL |= Query |= Results Number |= Icon |= Highlight matches |= Activated
-#foreach($srcObj in $doc.getObjects($searchSuggestSourceClassname))| $doc.display('name', $srcObj) | $doc.display('url', $srcObj) | #if($context.action == 'view') {{{ #end $doc.display('query', $srcObj) #if($context.action == 'view') }}} #end | $doc.display('resultsNumber', $srcObj) | $doc.display('icon', $srcObj) | $doc.display('highlight', $srcObj) | $doc.display('activated', $srcObj)
+#foreach($srcObj in $doc.getObjects($searchSuggestSourceClassname))| $doc.display('name', $srcObj) | $doc.display('url', $srcObj) | #if($context.action == 'view') {{{ #end $srcObj.getProperty('query').value #if($context.action == 'view') }}} #end | $doc.display('resultsNumber', $srcObj) | $doc.display('icon', $srcObj) | $doc.display('highlight', $srcObj) | $doc.display('activated', $srcObj)
 #end
 
 

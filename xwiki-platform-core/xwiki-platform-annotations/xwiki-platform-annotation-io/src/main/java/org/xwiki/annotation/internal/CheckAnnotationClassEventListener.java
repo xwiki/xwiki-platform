@@ -132,7 +132,7 @@ public class CheckAnnotationClassEventListener implements EventListener
             }
         } catch (Exception e) {
             logger.error("Failed to update the configured annotation class for wiki [{}] on event [{}]", new Object[] {
-            getXWikiContext().getDatabase(), event.getClass().getSimpleName(), e});
+                getXWikiContext().getDatabase(), event.getClass().getSimpleName(), e});
         }
     }
 

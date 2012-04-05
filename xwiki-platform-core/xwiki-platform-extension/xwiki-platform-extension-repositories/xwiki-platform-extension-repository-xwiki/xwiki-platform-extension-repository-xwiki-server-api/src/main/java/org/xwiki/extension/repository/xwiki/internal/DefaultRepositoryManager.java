@@ -417,6 +417,13 @@ public class DefaultRepositoryManager implements RepositoryManager
             lastVersion = version;
         }
 
+        if (lastVersion == null) {
+            throw new ResolveException("Can't find any verison for the extension [" + extensionId + "] on repository ["
+                + repository + "]");
+        } else if (versions.isEmpty()) {
+            versions.add(lastVersion);
+        }
+
         Extension extension = repository.resolve(new ExtensionId(extensionId, lastVersion));
 
         XWikiContext xcontext = getXWikiContext();
@@ -469,24 +476,30 @@ public class DefaultRepositoryManager implements RepositoryManager
 
         // Remove unexisting version
 
-        for (BaseObject versionObject : document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE)) {
-            if (versionObject != null) {
-                String version = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
+        List<BaseObject> versionObjects = document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+        if (versionObjects != null) {
+            for (BaseObject versionObject : versionObjects) {
+                if (versionObject != null) {
+                    String version = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
 
-                if (version == null || !versions.contains(new DefaultVersion(version))) {
-                    document.removeXObject(versionObject);
-                    needSave = true;
+                    if (version == null || !versions.contains(new DefaultVersion(version))) {
+                        document.removeXObject(versionObject);
+                        needSave = true;
+                    }
                 }
             }
         }
-        for (BaseObject dependencyObject : document
-            .getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE)) {
-            if (dependencyObject != null) {
-                String version = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION);
+        List<BaseObject> dependencyObjects =
+            document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
+        if (dependencyObjects != null) {
+            for (BaseObject dependencyObject : dependencyObjects) {
+                if (dependencyObject != null) {
+                    String version = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION);
 
-                if (version == null || !versions.contains(new DefaultVersion(version))) {
-                    document.removeXObject(dependencyObject);
-                    needSave = true;
+                    if (version == null || !versions.contains(new DefaultVersion(version))) {
+                        document.removeXObject(dependencyObject);
+                        needSave = true;
+                    }
                 }
             }
         }

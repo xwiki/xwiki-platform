@@ -50,17 +50,27 @@ public class SafeLocalExtension<T extends LocalExtension> extends WrappingLocalE
         this.safeProvider = safeProvider;
     }
 
+    /**
+     * @param <S> the type of the object
+     * @param unsafe the unsafe object
+     * @return the safe version of the object
+     */
+    protected <S> S safe(Object unsafe)
+    {
+        return this.safeProvider.get(unsafe);
+    }
+
     // Extension
 
     @Override
     public LocalExtensionFile getFile()
     {
-        return this.safeProvider.get(super.getRepository());
+        return safe(super.getRepository());
     }
 
     @Override
     public ExtensionRepository getRepository()
     {
-        return this.safeProvider.get(super.getRepository());
+        return safe(super.getRepository());
     }
 }

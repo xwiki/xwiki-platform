@@ -54,7 +54,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
         throws QueryException
     {
-        ExtensionsSearchResult result = this.objectFactory.createExtensionsSearchResult();
+        ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
 
         result.setOffset(offset);
         

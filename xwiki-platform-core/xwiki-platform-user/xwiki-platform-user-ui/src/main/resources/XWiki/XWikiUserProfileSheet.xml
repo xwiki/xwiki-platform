@@ -212,12 +212,23 @@
     #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
     #set ($sectionsToDisplayString = $sectionsObject.getProperty('sections').value)
     #set ($sectionsToDisplay = $sectionsToDisplayString.split('\s+'))
-    #foreach ($sectionName in $sectionsToDisplay)
-      #set ($sectionObject = $sheetDocument.getObject($sectionObjectClassName, 'name', $sectionName))
+    #foreach ($sectionId in $sectionsToDisplay)
+      #set ($sectionObject = $sheetDocument.getObject($sectionObjectClassName, 'id', $sectionId))
+      #set ($sectionName = "$!sectionObject.getProperty('name').value")
+      ## The section name will be evaluated. The admin can specify a static string or a call to $msg(...) to provide internationalization support.
+      #set ($sectionName = "#evaluate($!sectionName)")
+      ## If there is no section name specified, use the default translations prefix for the user profile, maybe we get lucky.
+      #if ("$!sectionName" == '')
+        #set ($sectionName = $msg.get("platform.core.profile.section.${sectionId}"))
+      #end
+      ## If that does not work either, just display the sectionID.
+      #if ("$!sectionName" == "platform.core.profile.section.${sectionId}")
+        #set ($sectionName = $sectionId)
+      #end
       #set ($sectionPropertiesString = $sectionObject.getProperty('properties').value)
       #set ($sectionProperties = $sectionPropertiesString.split('\s+'))
-      #if ($sectionProperties.size() &gt; 0)
-        &lt;h1&gt;$msg.get("platform.core.profile.section.${sectionName}")&lt;/h1&gt;
+      #if ($sectionProperties &amp;&amp; $sectionProperties.size() &gt; 0)
+        &lt;h1&gt;$sectionName&lt;/h1&gt;
         &lt;dl&gt;
         #foreach ($sectionProperty in $sectionProperties)
           #set ($vCardData = $sectionProperty.split(':'))

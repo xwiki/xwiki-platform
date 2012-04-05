@@ -159,11 +159,24 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <id>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Section ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
       <name>
         <customDisplay/>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <picker>0</picker>
         <prettyName>Section Name</prettyName>
         <size>30</size>
@@ -177,7 +190,7 @@
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>properties</name>
-        <number>2</number>
+        <number>3</number>
         <picker>0</picker>
         <prettyName>Properties to display</prettyName>
         <rows>5</rows>
@@ -193,7 +206,10 @@
     <className>XWiki.UserProfileSectionClass</className>
     <guid>5371585b-24cb-4cd4-b03c-02f82f3d0dc4</guid>
     <property>
-      <name>personal</name>
+      <id>personal</id>
+    </property>
+    <property>
+      <name>$msg.get('platform.core.profile.section.personal')</name>
     </property>
     <property>
       <properties>given-name:first_name
@@ -212,11 +228,24 @@ note:comment</properties>
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <id>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Section ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
       <name>
         <customDisplay/>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <picker>0</picker>
         <prettyName>Section Name</prettyName>
         <size>30</size>
@@ -230,7 +259,7 @@ note:comment</properties>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>properties</name>
-        <number>2</number>
+        <number>3</number>
         <picker>0</picker>
         <prettyName>Properties to display</prettyName>
         <rows>5</rows>
@@ -246,7 +275,10 @@ note:comment</properties>
     <className>XWiki.UserProfileSectionClass</className>
     <guid>f7f9f9a6-bd76-4eb8-8317-97c77a998227</guid>
     <property>
-      <name>contact</name>
+      <id>contact</id>
+    </property>
+    <property>
+      <name>$msg.get('platform.core.profile.section.contact')</name>
     </property>
     <property>
       <properties>email:email
@@ -264,11 +296,24 @@ adr:address</properties>
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <id>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Section ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
       <name>
         <customDisplay/>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <picker>0</picker>
         <prettyName>Section Name</prettyName>
         <size>30</size>
@@ -282,7 +327,7 @@ adr:address</properties>
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>properties</name>
-        <number>2</number>
+        <number>3</number>
         <picker>0</picker>
         <prettyName>Properties to display</prettyName>
         <rows>5</rows>
@@ -298,7 +343,10 @@ adr:address</properties>
     <className>XWiki.UserProfileSectionClass</className>
     <guid>182ff962-7e7c-4c58-90b2-db05d5b4479f</guid>
     <property>
-      <name>links</name>
+      <id>links</id>
+    </property>
+    <property>
+      <name>$msg.get('platform.core.profile.section.links')</name>
     </property>
     <property>
       <properties>blog
@@ -374,11 +422,16 @@ links</sections>
       &lt;/dt&gt;
     #set ($sectionObjects = $sheetDocument.getObjects($sectionObjectClassName))
     #foreach ($sectionObject in $sectionObjects)
-      #set ($sectionName = $sectionObject.getProperty('name').value)
       &lt;dt&gt;
         &lt;a class='hasIcon icon-button remove-button' href="$sheetDocument.getURL('objectremove', "classname=${sectionObjectClassName}&amp;amp;classid=${sectionObject.number}&amp;amp;xredirect=$escapetool.url(${xredirect})&amp;amp;form_token=${formToken}")"&gt;$msg.get('platform.user.profileConfigureSectionRemoveButtonLabel')&lt;/a&gt;
+        &lt;label for="${sectionObjectClassName}_${sectionObject.number}_id"&gt;$msg.get('platform.user.profileConfigureSectionIdLabel')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$msg.get('platform.user.profileConfigureSectionIdHint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;$sheetDocument.display('id', 'edit', $sectionObject)&lt;/dd&gt;
+
+      &lt;dt&gt;
         &lt;label for="${sectionObjectClassName}_${sectionObject.number}_name"&gt;$msg.get('platform.user.profileConfigureSectionNameLabel')&lt;/label&gt;
-        &lt;span class='xHint'&gt;$msg.get('platform.user.profileConfigureSectionNameHint')&lt;/span&gt;
+        &lt;span class='xHint'&gt;$msg.get('platform.user.profileConfigureSectionNameHint', 'http://platform.xwiki.org/xwiki/bin/view/DevGuide/InternationalizingApplications')&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;$sheetDocument.display('name', 'edit', $sectionObject)&lt;/dd&gt;
 

@@ -674,6 +674,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    @Deprecated
     public String getCurrentUser()
     {
         DocumentReference userReference = getContext().getUserReference();
@@ -684,6 +685,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         } else {
             return XWikiRightService.GUEST_USER_FULLNAME;
         }
+    }
+
+    @Override
+    public DocumentReference getCurrentUserReference()
+    {
+        return getContext().getUserReference();
     }
 
     @Override

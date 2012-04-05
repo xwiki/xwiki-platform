@@ -169,7 +169,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         DocumentReference classReference;
 
         try {
-            classReference = getDocumentReference();
+            classReference = getClassReference();
         } catch (Exception e) {
             // We verify that no error has happened and if one happened then we skip this configuration source. This
             // ensures the system will continue to work even if this source has a problem.

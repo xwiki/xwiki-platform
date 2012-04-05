@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1319452630000</creationDate>
-  <date>1329914184000</date>
-  <contentUpdateDate>1329914184000</contentUpdateDate>
+  <date>1333642532000</date>
+  <contentUpdateDate>1333642532000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -199,7 +199,7 @@
     <className>XWiki.StyleSheetExtension</className>
     <guid>31b45af1-f645-483e-a564-636ff470f4fc</guid>
     <property>
-      <cache>forbid</cache>
+      <cache>long</cache>
     </property>
     <property>
       <code>form#inline input[type="text"], form#inline input[type="password"], form#inline textarea, form#inline select {
@@ -214,6 +214,8 @@ div.extension-link {
   display: inline-block;
   margin: 0 1em 1em 1em;
   padding: 0 1em 0.5em;
+  min-height: 100px;
+  vertical-align: top;
   width: 350px;
 }
 

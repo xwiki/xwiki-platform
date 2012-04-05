@@ -35,7 +35,6 @@
   <description>XWiki Platform - Tools - Parent POM</description>
   <modules>
     <module>xwiki-platform-tool-configuration-resources</module>
-    <module>xwiki-platform-tool-functional-test-lifecycle</module>
     <module>xwiki-platform-tool-jetty-listener</module>
     <module>xwiki-platform-tool-jetty-resources</module>
     <module>xwiki-platform-tool-packager-plugin</module>

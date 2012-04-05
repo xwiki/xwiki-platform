@@ -589,7 +589,7 @@ public interface DocumentAccessBridge
      * Utility method to retrieve the current user.
      * 
      * @return the current user full reference.
-     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()}
+     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()} since 4.0RC1
      */
     @Deprecated
     String getCurrentUser();

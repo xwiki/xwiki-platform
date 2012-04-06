@@ -173,7 +173,7 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(componentManager).lookupMap((Type) IRCBotListener.class);
+            oneOf(componentManager).getInstanceMap((Type) IRCBotListener.class);
                 will(returnValue(Collections.singletonMap("docspace.docname", botListener)));
             oneOf(botListener).getName();
                 will(returnValue("name"));

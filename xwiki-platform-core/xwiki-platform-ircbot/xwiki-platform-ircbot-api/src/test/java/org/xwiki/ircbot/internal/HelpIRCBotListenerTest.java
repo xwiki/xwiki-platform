@@ -84,7 +84,7 @@ public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
                 oneOf(event).getMessage();
                 will(returnValue("!help"));
                 oneOf(event).respond("Available Bot listeners:");
-                oneOf(componentManager).lookupList((Type) IRCBotListener.class);
+                oneOf(componentManager).getInstanceList((Type) IRCBotListener.class);
                 will(returnValue(Arrays.asList(botListener, helpBotListener, reconnectBotListener)));
                 oneOf(botListener).getDescription();
                 will(returnValue("listener description"));

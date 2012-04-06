@@ -55,24 +55,24 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     @Override
     public boolean isInstalled()
     {
-        return safe(getWrapped().isInstalled());
+        return getWrapped().isInstalled();
     }
 
     @Override
     public boolean isInstalled(String namespace)
     {
-        return safe(getWrapped().isInstalled(namespace));
+        return getWrapped().isInstalled(namespace);
     }
 
     @Override
     public Collection<String> getNamespaces()
     {
-        return safe(getWrapped().getNamespaces());
+        return getWrapped().getNamespaces();
     }
 
     @Override
     public boolean isDependency()
     {
-        return safe(getWrapped().isDependency());
+        return getWrapped().isDependency();
     }
 }

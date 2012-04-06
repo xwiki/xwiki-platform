@@ -81,6 +81,7 @@ public class XWQLQueryExecutor implements QueryExecutor
             nativeQuery.setLimit(query.getLimit());
             nativeQuery.setOffset(query.getOffset());
             nativeQuery.setWiki(query.getWiki());
+            nativeQuery.setFilter(query.getFilter());
             for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
                 nativeQuery.bindValue(e.getKey(), e.getValue());
             }

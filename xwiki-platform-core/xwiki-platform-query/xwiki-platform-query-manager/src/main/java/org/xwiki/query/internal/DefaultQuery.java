@@ -26,6 +26,7 @@ import java.util.Map;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
 
 /**
  * Stores all information needed for execute a query.
@@ -35,6 +36,11 @@ import org.xwiki.query.QueryExecutor;
  */
 public class DefaultQuery implements Query
 {
+    /**
+     * field for {@link #isNamed()}.
+     */
+    protected boolean isNamed;
+
     /**
      * field for {@link Query#getStatement()}.
      */
@@ -71,9 +77,9 @@ public class DefaultQuery implements Query
     private int offset;
 
     /**
-     * field for {@link #isNamed()}.
+     * field for {@link #getFilter()}.
      */
-    private boolean isNamed;
+    private QueryFilter filter;
 
     /**
      * field for {@link #getExecuter()}.
@@ -198,6 +204,19 @@ public class DefaultQuery implements Query
     public Map<Integer, Object> getPositionalParameters()
     {
         return positionalParameters;
+    }
+
+    @Override
+    public QueryFilter getFilter()
+    {
+        return filter;
+    }
+
+    @Override
+    public Query setFilter(QueryFilter filter)
+    {
+        this.filter = filter;
+        return this;
     }
 
     @Override

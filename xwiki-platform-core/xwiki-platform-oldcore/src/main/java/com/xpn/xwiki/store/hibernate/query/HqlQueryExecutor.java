@@ -119,6 +119,11 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     {
         org.hibernate.Query hquery = query.isNamed() ? session.getNamedQuery(query.getStatement()) : session
             .createQuery(query.getStatement());
+
+        // Since we can't modify the hibernate query statement at this point we need to create a new one to apply the
+        // query filter. This comes with a performance cost, we could fix it by handling named queries ourselves and
+        // not delegate them to hibernate. This way we would always get a statement that we can transform before the
+        // execution.
         if (query.getFilter() != null) {
             hquery = session.createQuery(query.getFilter().filterStatement(hquery.getQueryString(), Query.HQL));
         }

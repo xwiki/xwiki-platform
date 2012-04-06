@@ -22,7 +22,10 @@ package org.xwiki.query;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Query Filter interface.
+ * Query Filter interface. A filter can be added to a query through {@link Query#setFilter(QueryFilter)}, it will be
+ * called by the {@link QueryExecutor} before the query is executed. An example of this is the
+ * {@link org.xwiki.query.internal.HiddenDocumentFilter} which transform statements in order to exclude hidden documents
+ * from query results.
  *
  * @version $Id$
  * @since 4.0RC1
@@ -31,9 +34,9 @@ import org.xwiki.component.annotation.Role;
 public interface QueryFilter
 {
     /**
-     * @param statement query statement to insert the filter in.
-     * @param language language of the query statement.
-     * @return the original statement, potentially including a new exclusion clause.
+     * @param statement the query statement to insert the filter in.
+     * @param language the language of the query statement.
+     * @return the original statement, potentially including new conditions.
      */
     String filterStatement(String statement, String language);
 }

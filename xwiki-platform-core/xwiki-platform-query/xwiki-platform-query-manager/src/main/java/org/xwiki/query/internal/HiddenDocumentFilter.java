@@ -113,7 +113,7 @@ public class HiddenDocumentFilter implements QueryFilter
         }
 
         if (!original.equals(result)) {
-            logger.debug("Query [" + original + "] has been transformed into [" + result + "]");
+            logger.debug("Query [{}] has been transformed into [{}]", original, result);
         }
 
         return result;

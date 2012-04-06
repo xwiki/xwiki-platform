@@ -67,7 +67,7 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     @Override
     public Collection<String> getNamespaces()
     {
-        return getWrapped().getNamespaces();
+        return safe(getWrapped().getNamespaces());
     }
 
     @Override

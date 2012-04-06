@@ -216,7 +216,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setWiki(wiki);
 
         try {
-            Job currentJob = this.componentManager.<JobContext> lookupComponent(JobContext.class).getCurrentJob();
+            Job currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
             if (currentJob != null) {
                 configuration.setJobStatus(currentJob.getStatus());
             }

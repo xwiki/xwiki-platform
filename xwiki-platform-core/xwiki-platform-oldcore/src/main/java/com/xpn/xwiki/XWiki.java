@@ -76,7 +76,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
-import org.apache.ecs.xhtml.em;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
@@ -833,7 +832,7 @@ public class XWiki implements EventListener
 
         try {
             WikiMacroInitializer wikiMacroInitializer =
-                Utils.getComponentManager().lookupComponent(WikiMacroInitializer.class);
+                Utils.getComponentManager().getInstance(WikiMacroInitializer.class);
             wikiMacroInitializer.installOrUpgradeWikiMacroClasses();
         } catch (Exception ex) {
             LOGGER.error("Error while installing / upgrading xwiki classes required for wiki macros.", ex);
@@ -855,7 +854,7 @@ public class XWiki implements EventListener
     {
         try {
             WikiMacroInitializer wikiMacroInitializer =
-                Utils.getComponentManager().lookupComponent(WikiMacroInitializer.class);
+                Utils.getComponentManager().getInstance(WikiMacroInitializer.class);
             wikiMacroInitializer.registerExistingWikiMacros();
         } catch (Exception ex) {
             LOGGER.error("Error while registering wiki macros.", ex);

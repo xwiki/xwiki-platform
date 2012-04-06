@@ -49,7 +49,7 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_REFERENCE, "currentmixed");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "currentmixed");
     }
 
     @Test

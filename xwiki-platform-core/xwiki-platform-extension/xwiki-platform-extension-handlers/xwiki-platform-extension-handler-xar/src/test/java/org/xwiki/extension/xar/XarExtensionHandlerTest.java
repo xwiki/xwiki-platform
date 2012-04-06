@@ -225,11 +225,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // lookup
 
-        this.taskManager = getComponentManager().lookupComponent(JobManager.class);
-        this.xarExtensionRepository = getComponentManager().lookupComponent(InstalledExtensionRepository.class, "xar");
+        this.taskManager = getComponentManager().getInstance(JobManager.class);
+        this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
 
         // Get rid of wiki macro listener
-        getComponentManager().<ObservationManager> lookupComponent(ObservationManager.class).removeListener(
+        getComponentManager().<ObservationManager>getInstance(ObservationManager.class).removeListener(
             "RegisterMacrosOnImportListener");
     }
 

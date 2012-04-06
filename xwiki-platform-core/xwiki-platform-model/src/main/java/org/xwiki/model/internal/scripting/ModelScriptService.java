@@ -109,7 +109,7 @@ public class ModelScriptService implements ScriptService
         DocumentReference documentReference;
         try {
             DocumentReferenceResolver<EntityReference> resolver =
-                this.componentManager.lookupComponent(DocumentReferenceResolver.TYPE_REFERENCE, hint);
+                this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, hint);
             documentReference = resolver.resolve(reference);
         } catch (ComponentLookupException e) {
             try {
@@ -163,7 +163,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new DocumentReference(resolver.resolve(stringRepresentation, EntityType.DOCUMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -196,7 +196,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new AttachmentReference(resolver.resolve(stringRepresentation, EntityType.ATTACHMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -229,7 +229,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectReference(resolver.resolve(stringRepresentation, EntityType.OBJECT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -262,7 +262,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY,
                 parameters));
         } catch (ComponentLookupException e) {
@@ -290,7 +290,7 @@ public class ModelScriptService implements ScriptService
         String result;
         try {
             EntityReferenceSerializer<String> serializer =
-                this.componentManager.lookupComponent(EntityReferenceSerializer.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, hint);
             result = serializer.serialize(reference);
         } catch (ComponentLookupException e) {
             result = null;

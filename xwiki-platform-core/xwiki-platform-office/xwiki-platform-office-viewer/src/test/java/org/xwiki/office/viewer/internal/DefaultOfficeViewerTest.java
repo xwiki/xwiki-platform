@@ -114,7 +114,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
         super.setUp();
 
         documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        entityReferenceSerializer = getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
+        entityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         officeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
     }
 

@@ -57,16 +57,16 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
 
     private void prepareStartBotTests(boolean isBotActive) throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
-        final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
+        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
         final BotData botData = new BotData("botName", "server", null, "channel", isBotActive);
         final ListenerManager listenerManager = getMockery().mock(ListenerManager.class);
         final Provider<List<IRCBotListener>> botListenerComponents =
-            getComponentManager().lookupComponent(new DefaultParameterizedType(null, Provider.class,
+            getComponentManager().getInstance(new DefaultParameterizedType(null, Provider.class,
                 new DefaultParameterizedType(null, List.class, IRCBotListener.class)));
         final IRCBotListener componentBotListener = getMockery().mock(IRCBotListener.class);
         final WikiIRCBotListenerManager botListenerManager =
-            getComponentManager().lookupComponent(WikiIRCBotListenerManager.class);
+            getComponentManager().getInstance(WikiIRCBotListenerManager.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -108,7 +108,7 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     {
         prepareStartBotTests(false);
 
-        final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
+        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
         getMockery().checking(new Expectations()
         {{
             // The real test is here
@@ -121,9 +121,9 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     @Test
     public void stopBot() throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
         final WikiIRCBotListenerManager botListenerManager =
-            getComponentManager().lookupComponent(WikiIRCBotListenerManager.class);
+            getComponentManager().getInstance(WikiIRCBotListenerManager.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -146,7 +146,7 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     @Test
     public void stopBotWhenNotStarted() throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -165,9 +165,9 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     @Test
     public void getBotListenerData() throws Exception
     {
-        final ComponentManager componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
+        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
         final IRCBotListener botListener = getMockery().mock(IRCBotListener.class, "test");
-        final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
+        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
         final List<BotListenerData> listenerData = Arrays.asList(
             new BotListenerData("wikiid", "wikiname", "wikidescription"));
 

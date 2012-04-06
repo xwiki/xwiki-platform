@@ -84,7 +84,7 @@ public class XWikiRightServiceTest extends AbstractTestCase
     protected void registerComponents() throws Exception
     {
         getComponentManager().unregisterComponent(Environment.class, "default");
-        documentReferenceResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
+        documentReferenceResolver = getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING);
     }
 
     @Test

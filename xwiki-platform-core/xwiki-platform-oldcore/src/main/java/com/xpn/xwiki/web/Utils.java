@@ -675,7 +675,7 @@ public class Utils
 
         if (componentManager != null) {
             try {
-                component = componentManager.lookupComponent(roleType, roleHint);
+                component = componentManager.getInstance(roleType, roleHint);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load component for type [" + roleType + "] for hint [" + roleHint
                     + "]", e);

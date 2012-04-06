@@ -29,7 +29,7 @@ public class ReferencesTest extends AbstractComponentTestCase
     @Test
     public void testLookup() throws ComponentLookupException, Exception
     {
-        getComponentManager().lookupComponent(DocumentReferenceResolver.class, "default/reference");
+        getComponentManager().getInstance(DocumentReferenceResolver.class, "default/reference");
         
     }
 }

@@ -54,7 +54,7 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
     @Test
     public void onEventWhenBotNotStarted() throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -72,7 +72,7 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
     @Test
     public void onEventWhenSourceIsNotAXWikiDocument() throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -90,14 +90,14 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
     @Test
     public void onEventWhenDocumentCreatedAndNotExcluded() throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
         final EntityReferenceSerializer<String> serializer =
-            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
         final DocumentModifiedEventListenerConfiguration configuration =
-            getComponentManager().lookupComponent(DocumentModifiedEventListenerConfiguration.class);
+            getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
-        final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
+        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
 
         Utils.setComponentManager(getComponentManager());
         final XWikiContext xwikiContext = new XWikiContext();
@@ -135,12 +135,12 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
     @Test
     public void onEventWhenDocumentCreatedButExcluded() throws Exception
     {
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
         final EntityReferenceSerializer<String> serializer =
-            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
         final DocumentModifiedEventListenerConfiguration configuration =
-            getComponentManager().lookupComponent(DocumentModifiedEventListenerConfiguration.class);
+            getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
 
         getMockery().checking(new Expectations()

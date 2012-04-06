@@ -44,7 +44,7 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
     {
         super.setUp();
 
-        this.serializer = getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
+        this.serializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
     }
 
     @Test

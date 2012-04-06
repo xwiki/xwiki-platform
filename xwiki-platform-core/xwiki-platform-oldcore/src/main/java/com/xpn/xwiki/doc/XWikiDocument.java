@@ -3158,6 +3158,11 @@ public class XWikiDocument implements DocumentModelBridge
         if (syntaxId != null) {
             setSyntaxId(syntaxId);
         }
+
+        // Read the hidden checkbox from the form
+        if (eform.getHidden() != null) {
+            setHidden("1".equals(eform.getHidden()));
+        }
     }
 
     /**
@@ -7471,8 +7476,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Indicates whether the document should be 'hidden' or not, meaning that it should not be returned in public search
-     * results. WARNING: this is a temporary hack until the new data model is designed and implemented. No code should
-     * rely on or use this property, since it will be replaced with a generic metadata.
+     * results.
      * 
      * @param hidden The new value of the {@link #hidden} property.
      */
@@ -7487,8 +7491,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Indicates whether the document is 'hidden' or not, meaning that it should not be returned in public search
-     * results. WARNING: this is a temporary hack until the new data model is designed and implemented. No code should
-     * rely on or use this property, since it will be replaced with a generic metadata.
+     * results.
      * 
      * @return <code>true</code> if the document is hidden and does not appear among the results of
      *         {@link com.xpn.xwiki.api.XWiki#searchDocuments(String)}, <code>false</code> otherwise.

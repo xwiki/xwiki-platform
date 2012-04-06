@@ -2499,6 +2499,28 @@ public class Document extends Api
     }
 
     /**
+     * Indicates whether the document is 'hidden' or not, meaning that it should not be returned in public search
+     * results or appear in the User Interface in general.
+     *
+     * @return <code>true</code> if the document is hidden, <code>false</code> otherwise.
+     */
+    public boolean isHidden()
+    {
+        return doc.isHidden();
+    }
+
+    /**
+     * Indicates whether the document should be 'hidden' or not, meaning that it should not be returned in public search
+     * results or appear in the User Interface in general.
+     *
+     * @param hidden <code>true</code> if the document should be 'hidden', <code>false</code> otherwise.
+     */
+    public void setHidden(boolean hidden)
+    {
+        doc.setHidden(hidden);
+    }
+
+    /**
      * Drop permissions for the remainder of the rendering cycle.
      * After this is called:
      * <ul>

@@ -55,10 +55,10 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
         Assert.assertEquals(
-            "select distinct doc.space, doc.name from XWikiDocument as doc where (doc.hidden <> true or doc.hidden is null)",
+            "select distinct doc.space, doc.name from XWikiDocument as doc",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
         Assert.assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
-            + "where (doc.hidden <> true or doc.hidden is null) and 1=1 order by doc.date desc", store.createSQLQuery(
+            + "where 1=1 order by doc.date desc", store.createSQLQuery(
             "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 

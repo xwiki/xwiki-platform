@@ -60,6 +60,8 @@ public class EditForm extends XWikiForm
 
     private String syntaxId;
 
+    private String hidden;
+
     @Override
     public void readRequest()
     {
@@ -79,6 +81,7 @@ public class EditForm extends XWikiForm
         setLockForce("1".equals(request.getParameter("force")));
         setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
+        setHidden(request.getParameter("xhidden"));
     }
 
     public void setTags(String[] parameter)
@@ -266,4 +269,15 @@ public class EditForm extends XWikiForm
     {
         this.syntaxId = syntaxId;
     }
+
+    public String getHidden()
+    {
+        return this.hidden;
+    }
+
+    public void setHidden(String hidden)
+    {
+        this.hidden = hidden;
+    }
+
 }

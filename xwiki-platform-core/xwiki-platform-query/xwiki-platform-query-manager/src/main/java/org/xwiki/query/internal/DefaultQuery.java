@@ -104,7 +104,7 @@ public class DefaultQuery implements Query
     /**
      * Create a named Query.
      *
-     * @param queryName name of the query.
+     * @param queryName the name of the query.
      * @param executor QueryExecutor component for execute the query.
      */
     public DefaultQuery(String queryName, QueryExecutor executor)

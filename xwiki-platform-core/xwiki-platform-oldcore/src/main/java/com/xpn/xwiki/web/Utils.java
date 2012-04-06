@@ -258,8 +258,7 @@ public class Utils
      */
     public static String getRedirect(String action, String queryString, String... redirectParameters)
     {
-        XWikiContext context =
-            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+        XWikiContext context = getContext();
         XWikiRequest request = context.getRequest();
         String redirect = null;
         for (String p : redirectParameters) {
@@ -268,9 +267,11 @@ public class Utils
                 break;
             }
         }
+
         if (StringUtils.isEmpty(redirect)) {
             redirect = context.getDoc().getURL(action, queryString, true, context);
         }
+
         return redirect;
     }
 

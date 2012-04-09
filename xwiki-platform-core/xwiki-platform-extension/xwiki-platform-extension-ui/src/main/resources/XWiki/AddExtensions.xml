@@ -189,10 +189,6 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 #if ($request.extensionId &amp;&amp; $request.extensionVersion &amp;&amp; $request.ajax)
   #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
   #displayExtension($extension)
-#elseif ($request.actionuninstall)
-  #handleUninstallExtensionRequest()
-#elseif($request.actioninstall)
-  #handleInstallExtensionRequest()
 #else
   (% class="full column" %)(((
   #displayExtensionSearchBar()

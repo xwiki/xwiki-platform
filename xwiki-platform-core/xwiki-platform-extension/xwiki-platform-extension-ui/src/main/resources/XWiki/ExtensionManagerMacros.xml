@@ -114,11 +114,11 @@
     /** Extension details */
     extensionBodySelector : ".extension-body",
     /** Extension details "menu" */
-    extensionMenuItemSelector : ".innerMenu li",
+    extensionMenuItemSelector : ".innerMenu li a",
     /** Extension details section */
     extensionDetailsSectionSelector : ".extension-body-section",
     /** CSS class of the menu item that is currently active */
-    crtExtensionMenuItemMarker : 'current',
+    extensionCurrentMenuItemMarker : 'current',
     /**
      * Initialization: Enable loading extension details via AJAX
      */ 
@@ -228,37 +228,41 @@
     },
 
     /**
-     * Add JS handlers for the extension menu
+     * Add JS handlers for the extension menu.
      */
     addExtensionMenuBehavior : function(extensionItem) {
-      // Expand the first menu item
-      var firstMenuItem = extensionItem.down(this.extensionMenuItemSelector);
-      if (firstMenuItem) {
-        this.activateExtensionMenuItem(firstMenuItem.down('a'));
-        // Make the activation of menu items persistent
-        $$(this.extensionMenuItemSelector + " a").invoke("observe", "click", function(event) {
-          // when a menu link is clicked...
+      // Expand the current menu item.
+      var currentMenuItem = extensionItem.down(this.extensionMenuItemSelector + "." + this.extensionCurrentMenuItemMarker);
+      if (!currentMenuItem) {
+        // Expand the first menu item.
+        currentMenuItem = extensionItem.down(this.extensionMenuItemSelector);
+      }
+      if (currentMenuItem) {
+        this.activateExtensionMenuItem(currentMenuItem);
+        // Make the activation of menu items persistent.
+        $$(this.extensionMenuItemSelector).invoke("observe", "click", function(event) {
+          // When a menu item is clicked..
           event.stop();
-          var menuLink = event.element();
-          this.activateExtensionMenuItem(menuLink);
+          var menuItem = event.element();
+          this.activateExtensionMenuItem(menuItem);
         }.bindAsEventListener(this));
       }
     },
-     
-    activateExtensionMenuItem : function (menuLink) {
-      var extensionItem = menuLink.up(this.extensionItemSelector);
-      // ... hide all sections ...
+
+    activateExtensionMenuItem : function (menuItem) {
+      var extensionItem = menuItem.up(this.extensionItemSelector);
+      // Hide all sections (each section is associated with a menu item).
       extensionItem.select(this.extensionDetailsSectionSelector).invoke("setStyle", {'display' : 'none'});
-      // ... unmark the currently active menu item ...
-      var crtMenuItem = extensionItem.down(this.extensionMenuItemSelector + "." + this.crtExtensionMenuItemMarker);
-      if (crtMenuItem) {
-         crtMenuItem.removeClassName(this.crtExtensionMenuItemMarker);
+      // Unmark the currently active menu item.
+      var currentMenuItem = extensionItem.down(this.extensionMenuItemSelector + "." + this.extensionCurrentMenuItemMarker);
+      if (currentMenuItem) {
+         currentMenuItem.removeClassName(this.extensionCurrentMenuItemMarker);
       }
-      // ... and display the one indicated by the clicked menu link
-      // (the href attribute is expected be "#id-of-an-anchor-placed-before-the-section-to-display
-      $(menuLink.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
-      // ... also marking the clicked menu item as current
-      menuLink.up(this.extensionMenuItemSelector).addClassName(this.crtExtensionMenuItemMarker);
+      // Display the section associated with the given menu item (the menu item that was clicked).
+      // (the href attribute is expected be "#id-of-an-anchor-placed-before-the-section-to-display)
+      $(menuItem.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
+      // Mark the given menu item as active (i.e. select the menu item that was cliked).
+      menuItem.addClassName(this.extensionCurrentMenuItemMarker);
     },
 
     prepareSimpleSearch : function() {
@@ -649,7 +653,7 @@ ul.extension-metadata li {
   margin-top: 0px;
 }
 
-.innerMenu li.current a {
+.innerMenu li a.current {
   background-color: $theme.panelCollapsedBackgroundColor;
   border: 0 none;
   border-top: 5px solid $theme.panelCollapsedBackgroundColor;
@@ -658,7 +662,7 @@ ul.extension-metadata li {
   box-shadow: 3px;
 }
 
-.innerMenu li.current a:after {
+.innerMenu li a.current:after {
   border-style: solid;
   border-color: transparent transparent  $theme.borderColor;
   border-width: 0 5px 5px 0;
@@ -671,7 +675,7 @@ ul.extension-metadata li {
   right: -5px;
 }
 
-.innerMenu li.current a {
+.innerMenu li a.current {
   color: $theme.panelCollapsedTextColor;
   text-decoration: none;
 }
@@ -1310,7 +1314,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #if ($doc.name == 'XWikiPreferences')
     #set ($action = 'admin')
   #end
-  &lt;form method="post" action="$doc.getURL($action, $request.getQueryString().replaceAll('(^|&amp;)actionshowdetails=[^&amp;]++', ''))"&gt;
+  &lt;form action=""&gt;
     &lt;div class="extension-actions"&gt;
       &lt;input type="hidden" name="extensionId" value="$extension.id.id" /&gt;
       &lt;input type="hidden" name="extensionVersion" value="$extension.id.version" /&gt;
@@ -1346,14 +1350,21 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
 #end
 
+#macro (displayExtensionDetails_menuLink $detail $selected)
+  [[$msg.get("extensions.info.category.$detail")&gt;&gt;||anchor="extension-body-${detail}-${extension.id.id}-${extension.id.version}"#if ($selected) class="current"#end]]
+#end
+
 #macro (displayExtensionDetails_menu $extension)
   (% class="innerMenu" %)
-  * [[$msg.get('extensions.info.category.description')&gt;&gt;||anchor="extension-body-description-${extension.id.id}-${extension.id.version}"]]
+  * #displayExtensionDetails_menuLink('description')
   #if ("$!{extension.releaseNotes}" != '')
-    * [[$msg.get('extensions.info.category.releaseNotes')&gt;&gt;||anchor="extension-body-relnotes-${extension.id.id}-${extension.id.version}"]]
+    * #displayExtensionDetails_menuLink('releaseNotes')
   #end
   #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
-    * [[$msg.get('extensions.info.category.dependencies')&gt;&gt;||anchor="extension-body-dependencies-${extension.id.id}-${extension.id.version}"]]
+    * #displayExtensionDetails_menuLink('dependencies')
+  #end
+  #if ($request.actioninstall || $request.actionuninstall)
+    * #displayExtensionDetails_menuLink('progress' true)
   #end
 #end
 
@@ -1396,8 +1407,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #macro (displayExtensionDetails_releaseNotes $extension)
   #if ("$!{extension.releaseNotes}" != '')
 
-    {{id name="extension-body-relnotes-${extension.id.id}-${extension.id.version}"/}}
-    (% class="extension-body-relnotes extension-body-section" %)(((
+    {{id name="extension-body-releaseNotes-${extension.id.id}-${extension.id.version}"/}}
+    (% class="extension-body-releaseNotes extension-body-section" %)(((
       $!{extension.releaseNotes}
     )))
   #end
@@ -1412,7 +1423,11 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #set ($dependencyExtension = $extensionManager.resolve($dependency))
     #if ($dependencyExtension)
       #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage)
-      #set ($url = $doc.getURL($xcontext.action, "actionshowdetails=true&amp;extensionId=${dependency.id}&amp;extensionVersion=${dependency.versionConstraint}&amp;section=$!escapetool.url($request.section)&amp;xback=${escapetool.url($xback)}"))
+      #set ($queryString = "extensionId=${dependency.id}&amp;extensionVersion=${dependency.versionConstraint}&amp;xback=$!escapetool.url($xback)")
+      #if ($request.section)
+        #set ($queryString = "${queryString}&amp;section=$escapetool.url($request.section)")
+      #end
+      #set ($url = $doc.getURL($xcontext.action, $queryString))
       #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$url]]")
     #end
     * (% class="dependency-item extension-item-$dependencyStatus" %)(((
@@ -1428,7 +1443,10 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   $msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])
   #foreach ($namespace in $backwardDependencies.entrySet())
     #foreach ($dependency in $namespace.value)
-      #set ($queryString = "actionshowdetails=true&amp;extensionId=${dependency.id.id}&amp;extensionVersion=${dependency.id.version}&amp;section=$!escapetool.url($request.section)&amp;xback=${escapetool.url($xback)}")
+      #set ($queryString = "extensionId=${dependency.id.id}&amp;extensionVersion=${dependency.id.version}&amp;xback=$escapetool.url($xback)")
+      #if ($request.section)
+        #set ($queryString = "$queryString&amp;section=$!escapetool.url($request.section)")
+      #end
       * (% class="dependency-item extension-item-installed" %)(((
           [[#displayExtensionName($dependency)&gt;&gt;path:$doc.getURL($xcontext.action, $queryString)]](% class="extension-version" %)$!{dependency.id.version}(%%)##
           #if ("$!{namespace.key}" != '')
@@ -1452,6 +1470,28 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
 #end
 
+#macro (displayExtensionDetails_progress $extension)
+  #if ($request.actioninstall || $request.actionuninstall)
+
+    {{id name="extension-body-progress-${extension.id.id}-${extension.id.version}" /}}
+    (% class="extension-body-progress extension-body-section" %)(((
+      #if ($request.actioninstall)
+        #if ($request.confirm)
+          #installExtension($extension.id.id $extension.id.version.value $extensionNamespace)
+        #else
+          #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
+        #end
+      #elseif ($request.actionuninstall)
+        #if ($request.confirm)
+          #uninstallExtension($extension.id.id $extension.id.version.value $extensionNamespace)
+        #else
+          #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
+        #end
+      #end
+    )))
+  #end
+#end
+
 #macro (displayExtensionDetails $extension)
   #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version.value))
   #if (!$backwardDependencies)
@@ -1463,6 +1503,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #displayExtensionDetails_description($extension)
     #displayExtensionDetails_releaseNotes($extension)
     #displayExtensionDetails_dependencies($extension $backwardDependencies)
+    #displayExtensionDetails_progress($extension)
   )))
 #end
 
@@ -1494,29 +1535,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #end
       (% class="clearfloats" %)((()))
     )))
-    #if ($request.actionshowdetails)
+    #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
       #displayExtensionDetails($extension)
-    #end
-  )))
-#end
-
-#macro (handleInstallExtensionRequest)
-  (% class="full column" %)(((
-    #displayExtensionSearchBar()
-
-    #if (!$request.extensionId || !$request.extensionVersion)
-      {{error}}$msg.get('extensions.install.error.missingIdOrVersion'){{/error}}
-    #else
-      #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
-      #if ($extension)
-        #displayExtension($extension)
-
-        #if ($request.confirm)
-          #installExtension($extension.id.id $extension.id.version.value $extensionNamespace)
-        #else
-          #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
-        #end
-      #end
     #end
   )))
 #end
@@ -1582,7 +1602,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
         #end
         {{html}}
-          &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
+          &lt;form action="" class="xform"&gt;
             &lt;div&gt;
               &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
               &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
@@ -1607,94 +1627,77 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
 #end
 
-#macro (handleUninstallExtensionRequest)
-  (% class="full column" %)(((
-  #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
-  = $msg.get('extensions.uninstall.title', ["//#displayExtensionName($extension)//"]) =
-
-  #if (!$request.extensionId || !$request.extensionVersion)
-    {{error}}$msg.get('extensions.uninstall.error.missingIdOrVersion'){{/error}}
+#macro (uninstallExtension $extensionId $extensionVersion $extensionNamespace)
+  #set($uninstallJob = $extensionManager.uninstall($extensionId, $extensionNamespace))
+  #set($lasterror = $extensionManager.lastError)
+  #if ($lasterror)
+    {{error}}
+      $msg.get('extensions.uninstall.error.uninstallFailure', [$extensionId, $extensionVersion]) ##
+      #printThrowable($lasterror)
+    {{/error}}
   #else
-    #if ($request.confirm)
-      #if ($xcontext.isMainWiki() &amp;&amp; !$extensionNamespace)
-        #set($uninstallJob = $extensionManager.uninstall($extension.id))
-      #else
-        #set($uninstallJob = $extensionManager.uninstall($request.extensionId, $extensionNamespace))
+    {{box}}
+      #printJobLog($uninstallJob)
+    {{/box}}
+  #end
+#end
+
+#macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
+  #set($uninstallPlan = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
+  #if (!$uninstallPlan)
+    {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$extensionId, $extensionVersion, $lasterror.message]){{/error}}
+  #else
+    #set($hasError = false)
+    #foreach($log in $uninstallPlan.log)
+      #if ($log.level.name() == 'ERROR')
+        #set($hasError = true)
       #end
-      #set($lasterror = $extensionManager.lastError)
-      #if ($lasterror)
-        {{error}}
-          $msg.get('extensions.uninstall.error.uninstallFailure', [$request.extensionId, $request.extensionVersion]) ##
-          #printThrowable($lasterror)
-        {{/error}}
-      #else
-        {{box}}
-          #printJobLog($uninstallJob)
-        {{/box}}
-      #end
+    #end
+    ##
+    #if ($hasError)
+      {{box}}#printStatusLog($uninstallPlan){{/box}}
     #else
-      #if ($xcontext.isMainWiki() &amp;&amp; !$extensionNamespace)
-        #set($uninstallPlan = $extensionManager.createUninstallPlan($extension.id))
-      #else
-        #set($uninstallPlan = $extensionManager.createUninstallPlan($request.extensionId, $extensionNamespace))
+      #set($extensionsToUninstall = [])
+      ##
+      #foreach($planAction in $uninstallPlan.actions)
+        #if ($planAction.action.name() == "UNINSTALL")
+          #set($void = $extensionsToUninstall.add($planAction))
+        #end
       #end
-      #if (!$uninstallPlan)
-        {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$request.extensionId, $request.extensionVersion, $lasterror.message]){{/error}}
+      ##
+      #if ($extensionsToUninstall.isEmpty())
+        {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
       #else
-        #set($hasError = false)
-        #foreach($log in $uninstallPlan.log)
-          #if ($log.level.name() == 'ERROR')
-            #set($hasError = true)
-          #end
-        #end
-        ##
-        #if ($hasError)
-          {{box}}#printStatusLog($installPlan){{/box}}
-        #else
-          #set($extensionsToUninstall = [])
-          ##
-          #foreach($planAction in $uninstallPlan.actions)
-            #if ($planAction.action.name() == "UNINSTALL")
-              #set($void = $extensionsToUninstall.add($planAction))
-            #end
-          #end
-          ##
-          #if ($extensionsToUninstall.isEmpty())
-            {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
-          #else
-            The following extensions will be removed:
-            #foreach ($planAction in $extensionsToUninstall)
-              * $planAction.extension.id.id ($planAction.extension.id.version)#if ($planAction.namespace) - $planAction.namespace#end
+        The following extensions will be removed:
+        #foreach ($planAction in $extensionsToUninstall)
+          * $planAction.extension.id.id ($planAction.extension.id.version)#if ($planAction.namespace) - $planAction.namespace#end
 
-            #end
-
-            {{html}}
-              &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
-                &lt;div&gt;
-                  &lt;input name="extensionId" value="${escapetool.xml($request.extensionId)}" type="hidden" /&gt;
-                  &lt;input name="extensionVersion" value="${escapetool.xml($request.extensionVersion)}" type="hidden" /&gt;
-                  #if ($extensionWiki)
-                    &lt;input name="extensionWiki" value="${extensionWiki}" type="hidden" /&gt;
-                  #end
-                  #if ($request.section)
-                    &lt;input type="hidden" name="section" value="$escapetool.xml($request.section)" /&gt;
-                  #end
-                  &lt;input name="actionuninstall" type="hidden" /&gt;
-                  &lt;p&gt;
-                    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
-                    #if ("$!{request.xback}" != '')
-                      &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
-                    #end
-                  &lt;/p&gt;
-                &lt;/div&gt;
-              &lt;/form&gt;
-            {{/html}}
-          #end
         #end
+
+        {{html}}
+          &lt;form action="" class="xform"&gt;
+            &lt;div&gt;
+              &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
+              &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
+              #if ($extensionWiki)
+                &lt;input name="extensionWiki" value="${extensionWiki}" type="hidden" /&gt;
+              #end
+              #if ($request.section)
+                &lt;input type="hidden" name="section" value="$escapetool.xml($request.section)" /&gt;
+              #end
+              &lt;input name="actionuninstall" type="hidden" /&gt;
+              &lt;p&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
+                #if ("$!{request.xback}" != '')
+                  &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
+                #end
+              &lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/form&gt;
+        {{/html}}
       #end
     #end
   #end
-  )))
 #end
 
 #macro (printThrowable $throwable)
@@ -1746,22 +1749,26 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (getCoreExtensionButtons $extension $actions)
-  #if ($request.extensionId &amp;&amp; $request.extensionVersion &amp;&amp; $request.ajax)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-  #elseif ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
+    #if ($request.ajax)
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #else
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+    #end
   #else
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
 #end
 
 #macro (getInstalledExtensionButtons $extension $actions)
-  #if ($request.extensionId &amp;&amp; $request.extensionVersion &amp;&amp; $request.ajax)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
-  #elseif ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
+    #if ($request.ajax)
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
+    #else
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+    #end
   #else
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end
@@ -1773,11 +1780,13 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (getRemoteExtensionButtons $extension $actions)
-  #if ($request.extensionId &amp;&amp; $request.extensionVersion &amp;&amp; $request.ajax)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
-  #elseif ($request.actionshowdetails)
-    #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+  #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
+    #if ($request.ajax)
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
+    #else
+      #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;a href=""${xback}"" class=""button""&gt;$msg.get('extensions.actions.back')&lt;/a&gt;&lt;/span&gt;"))
+    #end
   #else
     #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""actionshowdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button""/&gt;&lt;/span&gt;&lt;input type=""hidden"" name=""xback"" value=""${xback}"" /&gt;"))
   #end

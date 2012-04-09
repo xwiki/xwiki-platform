@@ -77,7 +77,7 @@
 ## Output JavaScript validation code
 ## ---------------------------------------------------------------------------------------------------------
 $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')##
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)##
 <script type="text/javascript">
 //<![CDATA[
   XWiki.createPage = {

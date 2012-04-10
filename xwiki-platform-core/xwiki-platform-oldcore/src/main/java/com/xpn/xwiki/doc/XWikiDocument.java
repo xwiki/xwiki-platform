@@ -52,6 +52,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -1515,11 +1516,19 @@ public class XWikiDocument implements DocumentModelBridge
         return context.getURLFactory().getURL(url, context);
     }
 
+    /**
+     * @param action the action
+     * @param params the URL query string
+     * @param redirect true if the URL is going to be used in {@link HttpServletResponse#sendRedirect(String)}
+     * @param context the XWiki context
+     * @return the URL
+     */
     public String getURL(String action, String params, boolean redirect, XWikiContext context)
     {
         URL url =
             context.getURLFactory().createURL(getSpace(), getName(), action, params, null, getDatabase(), context);
-        if (redirect) {
+
+        if (redirect && isRedirectAbsolute(context)) {
             if (url == null) {
                 return null;
             } else {
@@ -1528,6 +1537,11 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             return context.getURLFactory().getURL(url, context);
         }
+    }
+
+    private boolean isRedirectAbsolute(XWikiContext context)
+    {
+        return StringUtils.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context)

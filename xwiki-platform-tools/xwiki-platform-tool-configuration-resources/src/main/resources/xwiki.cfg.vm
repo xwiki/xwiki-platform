@@ -235,6 +235,14 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #-# Hide the /WebHome part of the URL when the document is the default one. Use 0 to hide, 1 to show.
 # xwiki.usedefaultaction=0
 
+#-# [Since 4.0RC1]
+#-# Indicate if the URL used in HTTPSevlet#sendRedirect should be made absolute by XWiki or left to application server.
+#-# Sending absolute URLs is a bad practice and generally not needed. This option is mostly here as retro-compatibility
+#-# switch and you should always make sure to properly configure your application server or any proxy behind it before
+#-# using this.
+#-# 0: send relative URLs (the default)
+#-# 1: send absolute URLs
+# xwiki.redirect.absoluteurl=0
 
 #---------------------------------------
 # Users

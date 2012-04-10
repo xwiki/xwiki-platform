@@ -219,7 +219,7 @@ public class AbstractHandler extends DefaultHandler
 
     protected ExecutionContext getExecutionContext() throws ComponentLookupException
     {
-        return getComponentManager().<Execution> lookupComponent(Execution.class).getContext();
+        return getComponentManager().<Execution>getInstance(Execution.class).getContext();
     }
 
     protected XWikiContext getXWikiContext() throws ComponentLookupException

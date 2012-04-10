@@ -17,19 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference;
+package org.xwiki.annotation.event;
 
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.observation.event.FilterableEvent;
 
-public class ReferencesTest extends AbstractComponentTestCase
+/**
+ * A base interface for all annotation events.
+ * 
+ * @version $Id$
+ * @since 4.0RC1
+ */
+public interface AnnotationEvent extends FilterableEvent
 {
-    @Test
-    public void testLookup() throws ComponentLookupException, Exception
-    {
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "default/reference");
-        
-    }
+    /**
+     * Retrieves the identifier of the annotation added/updated/deleted in the event.
+     * 
+     * @return identifier of the annotation
+     */
+    String getIdentifier();
 }

@@ -34,8 +34,10 @@ public class UserAndGroupReferenceResolverTest  extends AbstractComponentTestCas
     {
 
         try {
-            DocumentReferenceResolver<String> resolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "user");
-            DocumentReferenceResolver<String> defaultResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
+            DocumentReferenceResolver<String> resolver = getComponentManager().getInstance(
+                DocumentReferenceResolver.TYPE_STRING, "user");
+            DocumentReferenceResolver<String> defaultResolver = getComponentManager().getInstance(
+                DocumentReferenceResolver.TYPE_STRING);
             Assert.assertTrue(resolver.resolve("Bosse").equals(defaultResolver.resolve("xwiki:XWiki.Bosse")));
             Assert.assertTrue(
                 resolver.resolve("bossesSpace.Bosse").equals(defaultResolver.resolve("xwiki:bossesSpace.Bosse")));

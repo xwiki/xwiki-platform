@@ -88,8 +88,8 @@ public abstract class AbstractTestCase extends AbstractComponentTestCase
 
         settler = getComponentManager().lookup(AuthorizationSettler.class);
 
-        docRefResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
-        uResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "user");
+        docRefResolver = getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING);
+        uResolver = getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "user");
         rulesInvalidator = getComponentManager().lookup(SecurityCacheRulesInvalidator.class);
         referenceFactory = getComponentManager().lookup(SecurityReferenceFactory.class);
     }

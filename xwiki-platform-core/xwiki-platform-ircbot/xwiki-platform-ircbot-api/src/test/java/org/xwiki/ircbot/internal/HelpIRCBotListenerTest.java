@@ -70,13 +70,13 @@ public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
     public void onMessageWhenMessageStartsWithCommand() throws Exception
     {
         final MessageEvent event = getMockery().mock(MessageEvent.class);
-        final ComponentManager componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
+        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
         final IRCBotListener botListener = getMockery().mock(IRCBotListener.class);
 
         // With this we also verify that the default Bot Listeners are correctly registered in the Compnent Manager.
-        final IRCBotListener helpBotListener = getComponentManager().lookupComponent(IRCBotListener.class, "help");
+        final IRCBotListener helpBotListener = getComponentManager().getInstance(IRCBotListener.class, "help");
         final IRCBotListener reconnectBotListener =
-            getComponentManager().lookupComponent(IRCBotListener.class, "autoreconnect");
+            getComponentManager().getInstance(IRCBotListener.class, "autoreconnect");
 
         getMockery().checking(new Expectations()
         {
@@ -84,7 +84,7 @@ public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
                 oneOf(event).getMessage();
                 will(returnValue("!help"));
                 oneOf(event).respond("Available Bot listeners:");
-                oneOf(componentManager).lookupList((Type) IRCBotListener.class);
+                oneOf(componentManager).getInstanceList((Type) IRCBotListener.class);
                 will(returnValue(Arrays.asList(botListener, helpBotListener, reconnectBotListener)));
                 oneOf(botListener).getDescription();
                 will(returnValue("listener description"));

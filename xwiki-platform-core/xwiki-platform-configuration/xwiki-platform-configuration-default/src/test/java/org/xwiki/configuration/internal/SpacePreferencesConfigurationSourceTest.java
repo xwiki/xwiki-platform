@@ -47,8 +47,8 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractMockingComp
         final DocumentReference xwikiPreferencesReference = new DocumentReference("wiki", "XWiki", "XWikiPreferences");
         final DocumentReference currentDocument = new DocumentReference("wiki", "space", "page");
 
-        final DocumentAccessBridge dab = getComponentManager().lookupComponent(DocumentAccessBridge.class);
-        final ModelContext modelContext = getComponentManager().lookupComponent(ModelContext.class);
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
         getMockery().checking(new Expectations() {{
             allowing(dab).getCurrentDocumentReference();
                 will(returnValue(currentDocument));

@@ -49,7 +49,7 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_REFERENCE, "current");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "current");
     }
 
     @Test

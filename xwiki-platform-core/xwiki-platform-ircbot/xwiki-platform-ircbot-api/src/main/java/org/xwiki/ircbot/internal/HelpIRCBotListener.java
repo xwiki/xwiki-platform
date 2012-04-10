@@ -98,7 +98,7 @@ public class HelpIRCBotListener<T extends PircBotX> extends ListenerAdapter<T> i
     {
         List<IRCBotListener> result;
         try {
-            result = this.componentManager.lookupList((Type) IRCBotListener.class);
+            result = this.componentManager.getInstanceList((Type) IRCBotListener.class);
         } catch (ComponentLookupException e) {
             this.logger.warn("Failed to look up IRC Bot Listeners", e);
             result = Collections.emptyList();

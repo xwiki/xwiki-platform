@@ -33,21 +33,15 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
-import org.xwiki.annotation.event.AnnotationAddedEvent;
-import org.xwiki.annotation.event.AnnotationDeletedEvent;
-import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.io.IOServiceException;
 import org.xwiki.annotation.maintainer.AnnotationState;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -92,12 +86,6 @@ public class DefaultIOService implements IOService
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
-
-    /**
-     * Component manager to get the observation manager and send notifications.
-     */
-    @Inject
-    private ComponentManager componentManager;
 
     /**
      * The logger to use for logging.
@@ -160,16 +148,8 @@ public class DefaultIOService implements IOService
             document.setAuthor(deprecatedContext.getUser());
             deprecatedContext.getWiki().saveDocument(document,
                 "Added annotation on \"" + annotation.getSelection() + "\"", deprecatedContext);
-
-            // notify listeners that an annotation was added
-            ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new AnnotationAddedEvent(documentFullName, object.getNumber() + ""), document,
-                deprecatedContext);
-
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
-        } catch (ComponentLookupException exc) {
-            this.logger.warn("Could not get the observation manager to send notifications about the annotation add");
         }
     }
 
@@ -301,17 +281,11 @@ public class DefaultIOService implements IOService
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
                     deprecatedContext);
-                // notify listeners that an annotation was deleted
-                ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-                observationManager.notify(new AnnotationDeletedEvent(docName, annotationID), document,
-                    deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while removing the annotation", e);
-        } catch (ComponentLookupException exc) {
-            this.logger.warn("Could not get the observation manager to send notifications about the annotation delete");
         }
     }
 
@@ -358,17 +332,9 @@ public class DefaultIOService implements IOService
                 // set the author of the document to the current user
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
-                // send annotation update notifications for all annotations set to notify for
-                ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-                for (String updateNotif : updateNotifs) {
-                    observationManager.notify(new AnnotationUpdatedEvent(docName, updateNotif), document,
-                        deprecatedContext);
-                }
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
-        } catch (ComponentLookupException exc) {
-            this.logger.warn("Could not get the observation manager to send notifications about the annotation update");
         }
     }
 

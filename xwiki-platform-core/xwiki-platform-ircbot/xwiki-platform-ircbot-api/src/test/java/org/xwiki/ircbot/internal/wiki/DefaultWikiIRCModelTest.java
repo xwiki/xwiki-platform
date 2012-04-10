@@ -69,7 +69,7 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
 
         Utils.setComponentManager(getComponentManager());
 
-        final Execution execution = getComponentManager().lookupComponent(Execution.class);
+        final Execution execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext context = new ExecutionContext();
 
         this.xwiki = getMockery().mock(XWiki.class);
@@ -150,7 +150,7 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
     @Test
     public void getWikiBotListenerData() throws Exception
     {
-        final QueryManager queryManager = getComponentManager().lookupComponent(QueryManager.class);
+        final QueryManager queryManager = getComponentManager().getInstance(QueryManager.class);
         final Query query = getMockery().mock(Query.class);
 
         final List<Object[]> results = Collections.singletonList(new Object[] {

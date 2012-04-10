@@ -82,7 +82,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
         });
 
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING);
+            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING);
         getMockery().checking(new Expectations()
                     {
             {

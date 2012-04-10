@@ -138,7 +138,7 @@ public class CheckAnnotationClassEventListener implements EventListener
 
     /**
      * Ensures that the configured annotation class contains the minimum properties required by the Annotation
-     * Application to work properly.
+     * Application to work properly. This method also checks if the Annotations application is installed.
      * 
      * @throws AnnotationServiceException if anything goes wrong while updating the configured annotation class.
      * @see Annotation
@@ -148,6 +148,11 @@ public class CheckAnnotationClassEventListener implements EventListener
         DocumentReference annotationClassReference = null;
 
         try {
+            if (configuration.isInstalled()) {
+                // If the Annotations Application is not installed on the current wiki, do nothing.
+                return;
+            }
+
             annotationClassReference = configuration.getAnnotationClassReference();
 
             XWikiContext deprecatedContext = getXWikiContext();

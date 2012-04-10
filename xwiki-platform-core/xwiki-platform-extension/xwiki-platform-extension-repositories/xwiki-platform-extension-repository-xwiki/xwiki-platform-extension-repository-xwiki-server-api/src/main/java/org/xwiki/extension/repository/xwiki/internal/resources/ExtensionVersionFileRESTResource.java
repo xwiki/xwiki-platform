@@ -211,7 +211,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                     extensionResource.getRepositoryURI());
             try {
                 ExtensionRepositoryFactory repositoryFactory =
-                    this.componentManager.lookupComponent(ExtensionRepositoryFactory.class, repositoryId.getType());
+                    this.componentManager.getInstance(ExtensionRepositoryFactory.class, repositoryId.getType());
 
                 repository = repositoryFactory.createRepository(repositoryId);
             } catch (Exception e) {

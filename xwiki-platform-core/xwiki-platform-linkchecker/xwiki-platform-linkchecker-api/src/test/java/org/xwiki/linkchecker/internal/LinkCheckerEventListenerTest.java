@@ -49,7 +49,8 @@ public class LinkCheckerEventListenerTest extends AbstractMockingComponentTestCa
     public void testOnEvent() throws Exception
     {
         final DocumentModelBridge documentModelBridge = getMockery().mock(DocumentModelBridge.class);
-        final EntityReferenceSerializer serializer = getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
+        final EntityReferenceSerializer serializer = getComponentManager().getInstance(
+            EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
         final LinkStateManager linkStateManager = getComponentManager().lookup(LinkStateManager.class);
 

@@ -124,7 +124,7 @@ public class DefaultWikiIRCBotListenerManager implements WikiIRCBotListenerManag
         if (this.componentManager.hasComponent((Type) IRCBotListener.class, hint)) {
             IRCBotListener listener;
             try {
-                listener = this.componentManager.lookupComponent(IRCBotListener.class, hint);
+                listener = this.componentManager.getInstance(IRCBotListener.class, hint);
             } catch (ComponentLookupException e) {
                 throw new IRCBotException("Failed to unregister Wiki IRC Bot Listener", e);
             }

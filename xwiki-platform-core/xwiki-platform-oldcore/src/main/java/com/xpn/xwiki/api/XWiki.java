@@ -2783,7 +2783,7 @@ public class XWiki extends Api
 
         try {
             List<PrintRendererFactory> factories =
-                Utils.getComponentManager().lookupList((Type) PrintRendererFactory.class);
+                Utils.getComponentManager().getInstanceList((Type) PrintRendererFactory.class);
             for (PrintRendererFactory factory : factories) {
                 Syntax factorySyntax = factory.getSyntax();
                 if (syntaxVersion != null) {

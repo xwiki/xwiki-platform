@@ -272,7 +272,7 @@
 ## The error message when a field is entered incorrectly
 #set($failureMessageParams = { 'class' : 'LV_validation_message LV_invalid'})
 ## 'LV_validation_message LV_invalid' depends on this:
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
 ##
 ## The * next to the fields to denote they are mandatory.
 #set($fieldMandatoryStar = { 'class' : 'xRequired'})
@@ -597,7 +597,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 ##
 #if($useLiveValidation)
   $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
-  $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
+  $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
 #end
 ## This application's HTML is dynamically generated and editing in WYSIWYG would not work
 #if($xcontext.getAction() == 'edit')

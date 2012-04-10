@@ -46,8 +46,8 @@ public class UserPreferencesConfigurationSourceTest extends AbstractMockingCompo
         final DocumentReference userPreferencesReference = new DocumentReference("wiki", "XWiki", "XWikiUsers");
         final DocumentReference currentUserReference = new DocumentReference("wiki", "XWiki", "User");
 
-        final DocumentAccessBridge dab = getComponentManager().lookupComponent(DocumentAccessBridge.class);
-        final ModelContext modelContext = getComponentManager().lookupComponent(ModelContext.class);
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
         getMockery().checking(new Expectations() {{
             allowing(dab).getCurrentUserReference();
                 will(returnValue(currentUserReference));

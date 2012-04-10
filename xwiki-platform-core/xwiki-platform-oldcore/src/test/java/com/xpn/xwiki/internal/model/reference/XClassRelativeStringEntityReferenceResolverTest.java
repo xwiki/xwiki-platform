@@ -42,7 +42,7 @@ public class XClassRelativeStringEntityReferenceResolverTest extends AbstractBri
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "xclass");
     }
 
     @Test

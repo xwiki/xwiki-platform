@@ -139,7 +139,7 @@
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>
     <property name="jdbc.use_streams_for_binary">false</property>
-    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="xwiki.postgresql.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))

@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.annotation.AnnotationConfiguration;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
@@ -58,13 +59,30 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     @Named("currentmixed")
     protected DocumentReferenceResolver<String> resolver;
 
-    /** @see #getCurrentWikiReference() */
+    /**
+     * @see #getCurrentWikiReference()
+     */
     @Inject
-    private ModelContext modelContext;
+    protected ModelContext modelContext;
 
-    /** @see #getCurrentWikiReference() */
+    /**
+     * @see #getCurrentWikiReference()
+     */
     @Inject
-    private ModelConfiguration modelConfig;
+    protected ModelConfiguration modelConfig;
+
+    /**
+     * @see #isInstalled()
+     */
+    @Inject
+    protected DocumentAccessBridge dab;
+
+    @Override
+    public boolean isInstalled()
+    {
+        return dab.exists(new DocumentReference(getCurrentWikiReference().getName(),
+            AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME));
+    }
 
     @Override
     public boolean isActivated()

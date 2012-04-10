@@ -118,7 +118,7 @@ public class TargetDocumentDescriptor
     {
         try {
             EntityReferenceSerializer<String> serializer =
-                this.componentManager.lookupComponent(EntityReferenceSerializer.TYPE_STRING, serializerHint);
+                this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, serializerHint);
             return serializer.serialize(documentReference);
         } catch (ComponentLookupException ex) {
             // TODO: put a descriptive comment.

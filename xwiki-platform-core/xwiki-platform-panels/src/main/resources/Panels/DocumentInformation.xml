@@ -420,7 +420,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 &lt;/select&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
-#if($xwiki.getDocument($context.user).getValue("displayHiddenDocuments") == 1)
+#if($isAdvancedUser)
 
 {{html}}
 &lt;input id="xhidden" type="checkbox" name="xhidden" #if($doc.isHidden()) checked="checked"#end value="1"/&gt;&lt;label for="xhidden"&gt;$msg.get('panels.documentInformation.hiddenDocument')&lt;/label&gt;

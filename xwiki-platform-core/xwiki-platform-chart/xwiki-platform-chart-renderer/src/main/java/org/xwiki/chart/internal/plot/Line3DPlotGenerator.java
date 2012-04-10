@@ -20,19 +20,19 @@
 package org.xwiki.chart.internal.plot;
 
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.category.LineRenderer3D;
 
 /**
- * A {@link PlotGenerator} for generating line charts.
+ * A {@link org.xwiki.chart.internal.plot.PlotGenerator} for generating 3D line charts.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.1M1
  */
-public class LinePlotGenerator extends AbstractCategoryPlotGenerator
+public class Line3DPlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
     protected CategoryItemRenderer getRenderer()
     {
-        return new LineAndShapeRenderer();
+        return new LineRenderer3D();
     }
 }

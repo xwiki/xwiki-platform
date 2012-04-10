@@ -29,7 +29,9 @@ import org.jfree.chart.plot.Plot;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.chart.internal.plot.AreaPlotGenerator;
+import org.xwiki.chart.internal.plot.Bar3DPlotGenerator;
 import org.xwiki.chart.internal.plot.BarPlotGenerator;
+import org.xwiki.chart.internal.plot.Line3DPlotGenerator;
 import org.xwiki.chart.internal.plot.LinePlotGenerator;
 import org.xwiki.chart.internal.plot.PiePlotGenerator;
 import org.xwiki.chart.internal.plot.PlotGenerator;
@@ -61,6 +63,8 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
         plotGenerators.put("bar", new BarPlotGenerator());    
         plotGenerators.put("area", new AreaPlotGenerator());
         plotGenerators.put("pie", new PiePlotGenerator());
+        plotGenerators.put("line3D", new Line3DPlotGenerator());
+        plotGenerators.put("bar3D", new Bar3DPlotGenerator());
     }
 
     @Override

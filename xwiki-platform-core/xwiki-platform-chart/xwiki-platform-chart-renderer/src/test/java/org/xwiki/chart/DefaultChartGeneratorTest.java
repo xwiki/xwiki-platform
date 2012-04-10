@@ -57,11 +57,6 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         this.chartGenerator = getComponentManager().lookup(ChartGenerator.class);
     }
 
-    /**
-     * Test pie chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
     @Test
     public final void testPieChart() throws ChartGeneratorException
     {
@@ -74,11 +69,6 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         Assert.assertNotNull(chart);
     }
 
-    /**
-     * Test bar chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
     @Test
     public final void testBarChart() throws ChartGeneratorException
     {
@@ -91,11 +81,18 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         Assert.assertNotNull(chart);
     }
 
-    /**
-     * Test line chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
+    @Test
+    public final void testBar3DChart() throws ChartGeneratorException
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, "Test 3D bar chart");
+        parameters.put(ChartGenerator.TYPE_PARAM, "bar3D");
+        parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+
+        byte[] chart = chartGenerator.generate(model, parameters);
+        Assert.assertNotNull(chart);
+    }
+
     @Test
     public final void testLineChart() throws ChartGeneratorException
     {
@@ -108,11 +105,18 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         Assert.assertNotNull(chart);
     }
 
-    /**
-     * Test area chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
+    @Test
+    public final void testLine3DChart() throws ChartGeneratorException
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, "Test 3D line chart");
+        parameters.put(ChartGenerator.TYPE_PARAM, "line3D");
+        parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+
+        byte[] chart = chartGenerator.generate(model, parameters);
+        Assert.assertNotNull(chart);
+    }
+
     @Test
     public final void testAreaChart() throws ChartGeneratorException
     {

@@ -42,7 +42,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>This is the space for the Annotations scripts, powering the annotation feature.
 
 {{include document="Main.Dashboard" /}}</content>

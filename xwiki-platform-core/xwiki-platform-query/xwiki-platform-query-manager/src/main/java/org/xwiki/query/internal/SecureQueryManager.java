@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
@@ -47,12 +46,6 @@ public class SecureQueryManager extends AbstractQueryManager
     @Named("secure")
     protected QueryExecutorManager queryExecutorManager;
 
-    /**
-     * Required to instantiate {@link SecureQuery}.
-     */
-    @Inject
-    protected ComponentManager componentManager;
-
     @Override
     protected QueryExecutorManager getQueryExecutorManager()
     {
@@ -70,21 +63,5 @@ public class SecureQueryManager extends AbstractQueryManager
     public Query xwql(String statement) throws QueryException
     {
         return createQuery(statement, Query.XWQL);
-    }
-
-    @Override
-    public Query createQuery(String statement, String language) throws QueryException
-    {
-        if (hasLanguage(language)) {
-            return new SecureQuery(statement, language, getQueryExecutorManager(), componentManager);
-        } else {
-            throw new QueryException("Language [" + language + "] is not supported", null, null);
-        }
-    }
-
-    @Override
-    public Query getNamedQuery(String queryName) throws QueryException
-    {
-        return new SecureQuery(queryName, getQueryExecutorManager(), componentManager);
     }
 }

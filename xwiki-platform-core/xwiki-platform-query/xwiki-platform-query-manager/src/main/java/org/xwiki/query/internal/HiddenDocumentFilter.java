@@ -37,7 +37,7 @@ import javax.inject.Singleton;
  * @since 4.0RC1
  */
 @Component
-@Named("hiddenDocument")
+@Named("hidden")
 @Singleton
 public class HiddenDocumentFilter implements QueryFilter
 {

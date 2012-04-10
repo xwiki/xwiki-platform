@@ -1,0 +1,167 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.query.internal;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Query wrapper that allows to set filter from the filter component hint.
+ *
+ * @version $Id$
+ * @since 4.1M1
+ */
+public class ScriptQuery implements Query
+{
+    /**
+     * Used to retrieve {@link org.xwiki.query.QueryFilter} implementations.
+     */
+    private ComponentManager componentManager;
+
+    /**
+     * The wrapped {@link Query}.
+     */
+    private Query query;
+
+    /**
+     * Constructor.
+     *
+     * @param query the query object to wrap.
+     * @param cm the xwiki component manager.
+     */
+    public ScriptQuery(Query query, ComponentManager cm)
+    {
+        this.query = query;
+        this.componentManager = cm;
+    }
+
+    /**
+     * Set a filter in the wrapped query from the filter component hint.
+     *
+     * @param filter the hint of the component filter to set in the wrapped query.
+     * @return this query object.
+     */
+    public Query setFilter(String filter)
+    {
+        if (!StringUtils.isBlank(filter)) {
+            try {
+                setFilter(componentManager.lookup(QueryFilter.class, filter));
+            } catch (ComponentLookupException e) {
+                // We need to avoid throwing exceptions in the wiki if the filter does not exist.
+            }
+        } else {
+            query.setFilter(null);
+        }
+
+        return this;
+    }
+
+    @Override
+    public String getStatement() {
+        return query.getStatement();
+    }
+
+    @Override
+    public String getLanguage() {
+        return query.getLanguage();
+    }
+
+    @Override
+    public boolean isNamed() {
+        return query.isNamed();
+    }
+
+    @Override
+    public Query setWiki(String wiki) {
+        return query.setWiki(wiki);
+    }
+
+    @Override
+    public String getWiki() {
+        return query.getWiki();
+    }
+
+    @Override
+    public Query bindValue(String var, Object val) {
+        return query.bindValue(var, val);
+    }
+
+    @Override
+    public Query bindValue(int index, Object val) {
+        return query.bindValue(index, val);
+    }
+
+    @Override
+    public Query bindValues(List<Object> values) {
+        return query.bindValues(values);
+    }
+
+    @Override
+    public Map<String, Object> getNamedParameters() {
+        return query.getNamedParameters();
+    }
+
+    @Override
+    public Map<Integer, Object> getPositionalParameters() {
+        return query.getPositionalParameters();
+    }
+
+    @Override
+    public Query setFilter(QueryFilter filter) {
+        return query.setFilter(filter);
+    }
+
+    @Override
+    public QueryFilter getFilter() {
+        return query.getFilter();
+    }
+
+    @Override
+    public Query setLimit(int limit) {
+        return query.setLimit(limit);
+    }
+
+    @Override
+    public Query setOffset(int offset) {
+        return query.setOffset(offset);
+    }
+
+    @Override
+    public int getLimit() {
+        return query.getLimit();
+    }
+
+    @Override
+    public int getOffset() {
+        return query.getOffset();
+    }
+
+    @Override
+    public <T> List<T> execute() throws QueryException {
+        return query.execute();
+    }
+}

@@ -148,7 +148,7 @@ public class CheckAnnotationClassEventListener implements EventListener
         DocumentReference annotationClassReference = null;
 
         try {
-            if (configuration.isInstalled()) {
+            if (!configuration.isInstalled()) {
                 // If the Annotations Application is not installed on the current wiki, do nothing.
                 return;
             }

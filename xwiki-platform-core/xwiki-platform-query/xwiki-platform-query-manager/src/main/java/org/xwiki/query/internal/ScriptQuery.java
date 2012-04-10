@@ -79,7 +79,7 @@ public class ScriptQuery implements Query
                 setFilter(componentManager.lookup(QueryFilter.class, filter));
             } catch (ComponentLookupException e) {
                 // We need to avoid throwing exceptions in the wiki if the filter does not exist.
-                LOGGER.warn(String.format("Failed to load QueryFilter with component hint [%s]", filter));
+                LOGGER.warn("Failed to load QueryFilter with component hint [{}]", filter);
             }
         } else {
             query.setFilter(null);

@@ -84,6 +84,11 @@ public class ExtensionManagerScriptService implements ScriptService
     public static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
 
     /**
+     * The prefix put behind all job ids.
+     */
+    public static final String EXTENSION_JOBID_PREFIX = "extension_";
+
+    /**
      * The real extension manager bridged by this script service.
      */
     @Inject
@@ -382,7 +387,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(id);
+        installRequest.setId(EXTENSION_JOBID_PREFIX + id);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -496,7 +501,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(extensionId.getId());
+        uninstallRequest.setId(EXTENSION_JOBID_PREFIX + extensionId.getId());
         uninstallRequest.addExtension(extensionId);
 
         Job job;
@@ -593,6 +598,17 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return this.jobManager.getCurrentJob();
+    }
+
+    /**
+     * Return job status corresponding to the provided extension id from the current executed job or stored history.
+     * 
+     * @param extensionId the extension identifier
+     * @return the job status corresponding to the provided extension
+     */
+    public JobStatus getExtensionJobStatus(String extensionId)
+    {
+        return this.jobManager.getJobStatus(EXTENSION_JOBID_PREFIX + extensionId);
     }
 
     /**

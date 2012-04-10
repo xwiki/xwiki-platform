@@ -20,6 +20,8 @@
 package org.xwiki.query.internal;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
@@ -33,10 +35,15 @@ import java.util.Map;
  * Query wrapper that allows to set filter from the filter component hint.
  *
  * @version $Id$
- * @since 4.1M1
+ * @since 4.0RC1
  */
 public class ScriptQuery implements Query
 {
+    /**
+     * Used to log possible warnings.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptQuery.class);
+
     /**
      * Used to retrieve {@link org.xwiki.query.QueryFilter} implementations.
      */
@@ -72,6 +79,7 @@ public class ScriptQuery implements Query
                 setFilter(componentManager.lookup(QueryFilter.class, filter));
             } catch (ComponentLookupException e) {
                 // We need to avoid throwing exceptions in the wiki if the filter does not exist.
+                LOGGER.warn(String.format("Failed to load QueryFilter with component hint [%s]", filter));
             }
         } else {
             query.setFilter(null);

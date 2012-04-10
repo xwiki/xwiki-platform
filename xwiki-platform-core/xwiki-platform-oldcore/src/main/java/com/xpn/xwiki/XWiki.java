@@ -112,7 +112,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;

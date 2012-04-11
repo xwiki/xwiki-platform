@@ -294,7 +294,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
     private XDOM getXDOM(String content) throws Exception
     {
-        return getComponentManager().getInstance(Parser.class, "xwiki/2.0").parse(new StringReader(content));
+        Parser xwiki20Parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        return xwiki20Parser.parse(new StringReader(content));
     }
 
     private List<Block> runDisplayMacroWithPreVelocity(String velocity, String displayedContent)

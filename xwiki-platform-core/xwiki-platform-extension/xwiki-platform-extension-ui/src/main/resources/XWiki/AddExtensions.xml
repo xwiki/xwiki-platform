@@ -185,8 +185,8 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
   <content>{{include document="ExtensionManagerMacros" /}}
 
 {{velocity}}
-## Ajax call for a single extension
-#if ($request.extensionId &amp;&amp; $request.extensionVersion &amp;&amp; $request.ajax)
+## AJAX call for a single extension.
+#if ($xcontext.action == 'get' &amp;&amp; $request.extensionId &amp;&amp; $request.extensionVersion)
   #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
   #displayExtension($extension)
 #else

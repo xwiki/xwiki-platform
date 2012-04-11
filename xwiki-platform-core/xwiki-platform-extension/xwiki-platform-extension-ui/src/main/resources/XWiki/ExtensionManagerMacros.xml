@@ -105,44 +105,50 @@
     <property>
       <code>var XWiki = (function (XWiki) {
   var admin = XWiki.admin = XWiki.admin || {};
+
  /**
-  * Javascript enhancements for the Extension Manager.
+  * JavaScript enhancements for the Extension Manager.
   */
   admin.ExtensionManager = Class.create({
     /** How to find an element corresponding to a displayed extension in the UI: */
     extensionItemSelector : ".extension-item",
+
     /** Extension details */
     extensionBodySelector : ".extension-body",
+
     /** Extension details "menu" */
     extensionMenuItemSelector : ".innerMenu li a",
+
     /** Extension details section */
     extensionDetailsSectionSelector : ".extension-body-section",
+
     /** CSS class of the menu item that is currently active */
     extensionCurrentMenuItemMarker : 'current',
+
     /**
-     * Initialization: Enable loading extension details via AJAX
+     * Initialization: Enable loading extension details via AJAX.
      */ 
     initialize : function () {
       $$(this.extensionItemSelector + " form input[name='actionshowdetails']").invoke("observe", "click", this.loadExtensionDetails.bindAsEventListener(this));
       this.prepareSimpleSearch();
       this.prepareAdvancedSearch();
     },
+
     /**
-     * Ajax loading of Extension details
+     * AJAX loading of Extension details.
      */
     loadExtensionDetails : function(event) {
-      var form = event.element().form;
-      var originalAction = form.action;
-
       event.stop();
-      // Ignore consecutive requests, just handle the first one
+
+      // Ignore consecutive requests, just handle the first one.
+      var form = event.element().form;
       if (form.__disabled) {
         return false;
       }
       form.__disabled = true;
-      // Prepare the data for the ajax call
+
+      // Prepare the data for the AJAX call.
       var formData = new Hash(form.serialize(true));
-      formData.set('ajax', '1');
 
       // Prepare the URL for the AJAX call.
       var targetDocument = formData.get('section');
@@ -154,51 +160,49 @@
       }
       var targetDocumentURL = targetDocument.getURL('get');
 
-      // Launch the ajax call to fetch extension details
+      // Launch the AJAX call to fetch extension details.
       new Ajax.Request(
-            // Ajax request URL
-            targetDocumentURL,
-            // Ajax request parameters
-            {
-              method: 'post',
-              parameters : formData,
-              onCreate : function() {
-                // Don't panic, the content is loading...
-                form.up(this.extensionItemSelector).insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
-              }.bind(this),
-              onSuccess : function(response) {
-                // Replace the old Extension data element with the one that was just fetched
-                var originalExtensionItem = form.up(this.extensionItemSelector);
-                originalExtensionItem.addClassName('hidden');
-                originalExtensionItem.insert({after : response.responseText});
-                var newExtensionItem = originalExtensionItem.next();
-                originalExtensionItem.remove();
-                // Attach behavior to the new element
-                newExtensionItem.down('form').action = originalAction;
-                this.addExtensionElementBehavior(newExtensionItem);
-              }.bind(this),
-              onFailure : function (response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
-                new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
-              }.bind(this),
-              on0 : function (response) {
-                response.request.options.onFailure(response);
-              },
-              onComplete : function() {
-                // In the end: re-enable the button
-                form.__disabled = false;
-                // Remove the loading marker if it's still there (i.e. fetching failed)
-                if (form &amp;&amp; form.down(".extension-body.loading")) {
-                  form.down(".extension-body.loading").remove();
-                }
-              }
+        // AJAX request URL.
+        targetDocumentURL,
+        // AJAX request parameters.
+        {
+          parameters : formData,
+          onCreate : function() {
+            // Don't panic, the content is loading.
+            form.up(this.extensionItemSelector).insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
+          }.bind(this),
+          onSuccess : function(response) {
+            // Replace the old Extension data element with the one that was just fetched.
+            var originalExtensionItem = form.up(this.extensionItemSelector);
+            originalExtensionItem.addClassName('hidden');
+            originalExtensionItem.insert({after : response.responseText});
+            var newExtensionItem = originalExtensionItem.next();
+            originalExtensionItem.remove();
+            // Attach behaviour to the new element.
+            this.addExtensionElementBehavior(newExtensionItem);
+          }.bind(this),
+          onFailure : function (response) {
+            var failureReason = response.statusText;
+            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+              failureReason = 'Server not responding';
             }
-          );
+            new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
+          }.bind(this),
+          on0 : function (response) {
+            response.request.options.onFailure(response);
+          },
+          onComplete : function() {
+            // In the end: re-enable the button.
+            form.__disabled = false;
+            // Remove the loading marker if it's still there (i.e. fetching failed).
+            if (form &amp;&amp; form.down(".extension-body.loading")) {
+              form.down(".extension-body.loading").remove();
+            }
+          }
+        }
+      );
     },
-    
+
     /**
      * Add JS enhancement to the UI of an extension
      */ 
@@ -212,7 +216,7 @@
       extensionItem.select('.visibilityAction').invoke('observe', 'click', function(event) {
         event.stop();
         var button = event.element().up('span');
-//        button.__otherButton.toggleClassName('hidden');
+        // button.__otherButton.toggleClassName('hidden');
         button.__targetElement.toggleClassName('hidden');
         button.replace(button.__otherButton);
       }.bindAsEventListener(this));
@@ -226,7 +230,7 @@
     },
 
     /**
-     * Add JS handlers for the extension menu.
+     * Add JavaScript handlers for the extension menu.
      */
     addExtensionMenuBehavior : function(extensionItem) {
       // Expand the current menu item.
@@ -314,7 +318,7 @@
     return em;
   }
 
-  // When the document is loaded, trigger the ExtensionManager form enhancements.
+  // When the document is loaded, trigger the Extension Manager form enhancements.
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
 
   // End XWiki augmentation.
@@ -1744,7 +1748,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro (getCoreExtensionButtons $extension $actions)
   #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
-    #if ($request.ajax)
+    #if ($xcontext.action == 'get')
       #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
       #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
     #else
@@ -1757,7 +1761,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro (getInstalledExtensionButtons $extension $actions)
   #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
-    #if ($request.ajax)
+    #if ($xcontext.action == 'get')
       #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
       #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction""/&gt;&lt;/span&gt;"))
     #else
@@ -1775,7 +1779,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro (getRemoteExtensionButtons $extension $actions)
   #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
-    #if ($request.ajax)
+    #if ($xcontext.action == 'get')
       #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""showdetails"" value=""$msg.get('extensions.actions.showDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
       #set ($discard = $actions.add("&lt;span class=""buttonwrapper""&gt;&lt;input type=""submit"" name=""hidedetails"" value=""$msg.get('extensions.actions.hideDetails')"" class=""button visibilityAction"" /&gt;&lt;/span&gt;"))
     #else

@@ -96,8 +96,8 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (PrintRendererFactory factory :
-                this.componentManager.<PrintRendererFactory>getInstanceList(PrintRendererFactory.class))
+            for (PrintRendererFactory factory
+                : this.componentManager.<PrintRendererFactory>getInstanceList(PrintRendererFactory.class))
             {
                 syntaxes.add(factory.getSyntax());
             }

@@ -76,7 +76,8 @@ public class ScriptQuery implements Query
     {
         if (!StringUtils.isBlank(filter)) {
             try {
-                setFilter(componentManager.getInstance(QueryFilter.class, filter));
+                QueryFilter queryFilter = this.componentManager.getInstance(QueryFilter.class, filter);
+                setFilter(queryFilter);
             } catch (ComponentLookupException e) {
                 // We need to avoid throwing exceptions in the wiki if the filter does not exist.
                 LOGGER.warn("Failed to load QueryFilter with component hint [{}]", filter);

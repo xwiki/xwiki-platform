@@ -115,8 +115,9 @@ public class ModelScriptService implements ScriptService
             try {
                 // Ensure backward compatibility with older scripts that use hints like "default/reference" because at
                 // the time they were written we didn't have support for generic types in component role.
-                documentReference =
-                    this.componentManager.getInstance(DocumentReferenceResolver.class, hint).resolve(reference);
+                DocumentReferenceResolver drr =
+                    this.componentManager.getInstance(DocumentReferenceResolver.class, hint);
+                documentReference = drr.resolve(reference);
                 logger.warn("Deprecated usage of DocumentReferenceResolver with hint [{}]. "
                     + "Please consider using a DocumentReferenceResolver that takes into account generic types.", hint);
             } catch (ComponentLookupException ex) {

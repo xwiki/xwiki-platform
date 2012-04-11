@@ -42,7 +42,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 #if ("$!section" != '')

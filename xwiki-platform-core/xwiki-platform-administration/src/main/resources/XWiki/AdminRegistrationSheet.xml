@@ -42,7 +42,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ### Globally administrate the registration of new users in a wiki.
 #set($legend = ['registration'])

@@ -95,8 +95,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         Map<String, Object> xcontext = new HashMap<String, Object>();
         Execution execution = getComponentManager().getInstance(Execution.class);
         execution.getContext().setProperty("xwikicontext", xcontext);
-        getComponentManager().getInstance(ScriptContextManager.class).getScriptContext()
-            .setAttribute("xcontext", xcontext, ScriptContext.ENGINE_SCOPE);
+        ScriptContextManager scm = getComponentManager().getInstance(ScriptContextManager.class);
+        scm.getScriptContext().setAttribute("xcontext", xcontext, ScriptContext.ENGINE_SCOPE);
 
         getMockery().checking(new Expectations() {{
             allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));

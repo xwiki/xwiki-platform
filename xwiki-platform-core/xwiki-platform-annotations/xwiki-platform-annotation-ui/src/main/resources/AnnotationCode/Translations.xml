@@ -42,7 +42,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>annotations.title=Annotations
 annotations.menu.loading=Loading annotations settings
 annotations.menu.loaderror=Failed: 

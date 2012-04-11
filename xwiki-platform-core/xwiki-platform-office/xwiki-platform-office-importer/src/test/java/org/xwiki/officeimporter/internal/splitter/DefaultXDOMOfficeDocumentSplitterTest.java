@@ -59,8 +59,8 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
     {
         super.setUp();
 
-        this.xwikiSyntaxParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
-        this.officeDocumentSplitter = getComponentManager().lookup(XDOMOfficeDocumentSplitter.class);
+        this.xwikiSyntaxParser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        this.officeDocumentSplitter = getComponentManager().getInstance(XDOMOfficeDocumentSplitter.class);
     }
 
     /**

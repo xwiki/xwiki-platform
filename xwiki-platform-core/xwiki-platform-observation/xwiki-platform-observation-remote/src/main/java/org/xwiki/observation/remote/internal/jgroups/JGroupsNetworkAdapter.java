@@ -173,9 +173,9 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         // get Receiver
         JGroupsReceiver channelReceiver;
         try {
-            channelReceiver = this.componentManager.lookup(JGroupsReceiver.class, channelId);
+            channelReceiver = this.componentManager.getInstance(JGroupsReceiver.class, channelId);
         } catch (ComponentLookupException e) {
-            channelReceiver = this.componentManager.lookup(JGroupsReceiver.class);
+            channelReceiver = this.componentManager.getInstance(JGroupsReceiver.class);
         }
 
         // create channel
@@ -202,7 +202,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
 
         InputStream is = null;
         try {
-            Environment environment = this.componentManager.lookup(Environment.class);
+            Environment environment = this.componentManager.getInstance(Environment.class);
             is = environment.getResourceAsStream(path);
         } catch (ComponentLookupException e) {
             // Environment not found, continue by fallbacking on JGroups's standard configuration.

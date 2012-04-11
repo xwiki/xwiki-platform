@@ -88,7 +88,7 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
         // environments when there's no container.
 
         try {
-            this.environment = this.componentManager.lookup(Environment.class);
+            this.environment = this.componentManager.getInstance(Environment.class);
         } catch (ComponentLookupException e) {
             this.logger.debug("Can't find any Environment", e);
         }

@@ -63,7 +63,7 @@ public class SecurityReferenceTest extends AbstractMockingComponentTestCase
     {
         super.setUp();
 
-        final XWikiBridge wikiBridge = getComponentManager().lookup(XWikiBridge.class);
+        final XWikiBridge wikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
         getMockery().checking(new Expectations()
         {{

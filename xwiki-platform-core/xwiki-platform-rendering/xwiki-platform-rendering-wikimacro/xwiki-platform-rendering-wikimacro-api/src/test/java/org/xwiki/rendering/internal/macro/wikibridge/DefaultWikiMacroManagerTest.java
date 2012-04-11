@@ -78,10 +78,10 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
     {
         super.setUp();
 
-        this.xwiki20Parser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
+        this.xwiki20Parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
 
-        this.macroManager = getComponentManager().lookup(MacroManager.class);
-        this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
+        this.macroManager = getComponentManager().getInstance(MacroManager.class);
+        this.wikiMacroManager = getComponentManager().getInstance(WikiMacroManager.class);
     }
     
     @Test

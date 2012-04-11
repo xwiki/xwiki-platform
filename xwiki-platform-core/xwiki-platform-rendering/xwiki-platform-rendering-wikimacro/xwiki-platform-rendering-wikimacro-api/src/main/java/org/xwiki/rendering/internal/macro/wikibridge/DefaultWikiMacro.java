@@ -182,16 +182,16 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Execute the macro
         ObservationManager observation = null;
         try {
-            observation = this.componentManager.lookup(ObservationManager.class);
+            observation = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             // TODO: maybe log something
         }
 
         try {
-            Transformation macroTransformation = this.componentManager.lookup(Transformation.class, MACRO_HINT);
+            Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, MACRO_HINT);
 
             // Place macro context inside xwiki context ($context.macro).
-            Execution execution = this.componentManager.lookup(Execution.class);
+            Execution execution = this.componentManager.getInstance(Execution.class);
             Map<String, Object> xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
             xwikiContext.put(MACRO_KEY, macroBinding);
 

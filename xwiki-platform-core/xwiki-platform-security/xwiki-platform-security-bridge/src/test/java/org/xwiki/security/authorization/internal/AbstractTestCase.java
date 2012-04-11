@@ -83,15 +83,15 @@ public abstract class AbstractTestCase extends AbstractComponentTestCase
         this.xwikiContext.put(ComponentManager.class.getName(), getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
-        Execution execution = getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().getInstance(Execution.class);
         execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xwikiContext);
 
-        settler = getComponentManager().lookup(AuthorizationSettler.class);
+        settler = getComponentManager().getInstance(AuthorizationSettler.class);
 
         docRefResolver = getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING);
         uResolver = getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "user");
-        rulesInvalidator = getComponentManager().lookup(SecurityCacheRulesInvalidator.class);
-        referenceFactory = getComponentManager().lookup(SecurityReferenceFactory.class);
+        rulesInvalidator = getComponentManager().getInstance(SecurityCacheRulesInvalidator.class);
+        referenceFactory = getComponentManager().getInstance(SecurityReferenceFactory.class);
     }
 
     @After

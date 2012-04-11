@@ -60,7 +60,7 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
     public void configure() throws Exception
     {
         // Mock macro manager returns a script macro for "script" and null otherwise.
-        final MacroManager macroManager = getComponentManager().lookup(MacroManager.class);
+        final MacroManager macroManager = getComponentManager().getInstance(MacroManager.class);
         final ScriptMacro scriptMacro = new DefaultScriptMacro();
         final TestNestedScriptMacroEnabled nestedScriptMacroEnabled = new TestNestedScriptMacroEnabled();
         getMockery().checking(new Expectations() {{

@@ -105,9 +105,10 @@ public class LocalEventListener implements EventListener
         if (this.remoteObservationManager == null) {
             try {
                 // Make sure to not receive events until RemoteObservationManager is ready
-                this.componentManager.lookup(ObservationManager.class).removeListener(getName());
-                this.remoteObservationManager = this.componentManager.lookup(RemoteObservationManager.class);
-                this.componentManager.lookup(ObservationManager.class).addListener(this);
+                ObservationManager om = this.componentManager.getInstance(ObservationManager.class);
+                om.removeListener(getName());
+                this.remoteObservationManager = this.componentManager.getInstance(RemoteObservationManager.class);
+                om.addListener(this);
 
                 this.remoteObservationManager.notify(new LocalEventData(event, source, data));
             } catch (ComponentLookupException e) {

@@ -76,7 +76,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
         CacheMacroParameters params = new CacheMacroParameters();
         MacroTransformationContext context = createMacroTransformationContext();
 
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($var = 'content')");
@@ -114,7 +114,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
         CacheMacroParameters params = new CacheMacroParameters();
         MacroTransformationContext context = createMacroTransformationContext();
 
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($var = 'content')");
@@ -144,7 +144,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
         params.setId("uniqueid");
         MacroTransformationContext context = createMacroTransformationContext();
 
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($var = 'content')");
@@ -161,7 +161,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
     @Test
     public void testExecuteWithIdGeneratedByVelocityMacro() throws Exception
     {
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($var = 'generatedid')");

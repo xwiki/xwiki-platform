@@ -46,12 +46,12 @@ public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
     public void configure() throws Exception
     {
         final QueryExecutorManager nestedQueryExecutorManager =
-            getComponentManager().lookup(QueryExecutorManager.class);
+            getComponentManager().getInstance(QueryExecutorManager.class);
         getMockery().checking(new Expectations() {{
             allowing(nestedQueryExecutorManager).execute(with(any(Query.class)));
         }});
 
-        this.dab = getComponentManager().lookup(DocumentAccessBridge.class);
+        this.dab = getComponentManager().getInstance(DocumentAccessBridge.class);
     }
 
     @Test

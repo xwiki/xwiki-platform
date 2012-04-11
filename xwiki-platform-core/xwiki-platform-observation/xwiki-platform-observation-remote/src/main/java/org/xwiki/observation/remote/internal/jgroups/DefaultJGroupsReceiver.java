@@ -67,7 +67,7 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     {
         if (this.remoteObservationManager == null) {
             try {
-                this.remoteObservationManager = componentManager.lookup(RemoteObservationManager.class);
+                this.remoteObservationManager = componentManager.getInstance(RemoteObservationManager.class);
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to lookup the Remote Observation Manager.", e);
             }
@@ -81,7 +81,7 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     {
         RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
 
-        this.logger.debug("Received JGroups remote event [" + remoteEvent + "]");
+        this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
 
         getRemoteObservationManager().notify(remoteEvent);
     }

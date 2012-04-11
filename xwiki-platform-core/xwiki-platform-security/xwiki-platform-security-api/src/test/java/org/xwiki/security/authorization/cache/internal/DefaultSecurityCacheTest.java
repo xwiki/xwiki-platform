@@ -199,7 +199,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (cache == null) {
             cache = new TestCache();
 
-            final CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
+            final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
 
             getMockery().checking(new Expectations() {{
                 oneOf (cacheManager).createNewCache(with(any(CacheConfiguration.class))); will(returnValue(cache));

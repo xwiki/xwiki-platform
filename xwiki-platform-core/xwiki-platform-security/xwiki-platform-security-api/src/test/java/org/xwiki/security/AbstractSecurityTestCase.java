@@ -118,7 +118,7 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     {
         super.setUp();
 
-        final XWikiBridge xwikiBridge = getComponentManager().lookup(XWikiBridge.class);
+        final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
         getMockery().checking(new Expectations() {{
             allowing (xwikiBridge).getMainWikiReference(); will(returnValue(new WikiReference("xwiki")));

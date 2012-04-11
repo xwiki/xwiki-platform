@@ -54,8 +54,8 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
         // Mock components
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class);
         final DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "page");
         getMockery().checking(new Expectations() {{
             allowing(dab).getCurrentDocumentReference();

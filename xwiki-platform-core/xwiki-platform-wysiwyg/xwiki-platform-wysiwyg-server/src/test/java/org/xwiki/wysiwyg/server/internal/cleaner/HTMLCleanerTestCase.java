@@ -64,7 +64,7 @@ public class HTMLCleanerTestCase extends TestCase
     @Override
     protected void runTest() throws Exception
     {
-        HTMLCleaner cleaner = getComponentManager().lookup(HTMLCleaner.class);
+        HTMLCleaner cleaner = getComponentManager().getInstance(HTMLCleaner.class);
         assertEquals(xhtmlFragment(expected), cleaner.clean(input));
     }
 

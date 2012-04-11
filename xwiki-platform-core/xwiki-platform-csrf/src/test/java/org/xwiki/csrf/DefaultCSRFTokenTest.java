@@ -66,7 +66,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         // set up mocked dependencies
 
         // document access bridge
-        final DocumentAccessBridge mockDocumentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            getComponentManager().getInstance(DocumentAccessBridge.class);
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
         getMockery().checking(new Expectations()
         {
@@ -84,7 +85,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // configuration
-        final CSRFTokenConfiguration mockConfiguration = getComponentManager().lookup(CSRFTokenConfiguration.class);
+        final CSRFTokenConfiguration mockConfiguration =
+            getComponentManager().getInstance(CSRFTokenConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -118,7 +120,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // container
-        final Container mockContainer = getComponentManager().lookup(Container.class);
+        final Container mockContainer = getComponentManager().getInstance(Container.class);
         getMockery().checking(new Expectations()
         {
             {

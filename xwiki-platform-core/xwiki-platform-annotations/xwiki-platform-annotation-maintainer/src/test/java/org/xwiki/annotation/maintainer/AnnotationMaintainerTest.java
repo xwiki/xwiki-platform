@@ -187,7 +187,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
     {
         super.setUp();
 
-        annotationMaintainer = getComponentManager().lookup(AnnotationMaintainer.class);
+        annotationMaintainer = getComponentManager().getInstance(AnnotationMaintainer.class);
     }
 
     @Override

@@ -62,7 +62,8 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        final DocumentAccessBridge mockDocumentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -72,7 +73,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
         });
 
         final ExecutionContext context = new ExecutionContext();
-        final Execution mockExecution = getComponentManager().lookup(Execution.class);
+        final Execution mockExecution = getComponentManager().getInstance(Execution.class);
         getMockery().checking(new Expectations()
                     {
             {

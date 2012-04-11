@@ -145,9 +145,9 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
 
         // run transformations -> although it's going to be at least strange to handle rendered content since there
         // is no context
-        SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
         Syntax sourceSyntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
-        TransformationManager transformationManager = componentManager.lookup(TransformationManager.class);
+        TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, sourceSyntax);
 
         // render

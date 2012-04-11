@@ -113,9 +113,9 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     {
         super.setUp();
 
-        documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         entityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        officeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
+        officeDocumentBuilder = getComponentManager().getInstance(XDOMOfficeDocumentBuilder.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -124,7 +124,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     {
         super.configure();
 
-        final CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
+        final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
         cache = getMockery().mock(Cache.class);
         getMockery().checking(new Expectations()
         {
@@ -312,7 +312,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testGetTemporaryFile() throws Exception
     {
-        final Environment environment = getComponentManager().lookup(Environment.class);
+        final Environment environment = getComponentManager().getInstance(Environment.class);
 
         getMockery().checking(new Expectations()
         {

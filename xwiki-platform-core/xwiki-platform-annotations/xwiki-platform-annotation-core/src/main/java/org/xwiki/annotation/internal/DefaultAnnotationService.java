@@ -122,15 +122,15 @@ public class DefaultAnnotationService implements AnnotationService
             XDOM xdom = parser.parse(new StringReader(source));
 
             // run transformations
-            SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
+            SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
             Syntax sSyntax = syntaxFactory.createSyntaxFromIdString(sourceSyntaxId);
-            TransformationManager transformationManager = componentManager.lookup(TransformationManager.class);
+            TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
             transformationManager.performTransformations(xdom, sSyntax);
 
             // build the annotations renderer hint for the specified output syntax
             String outputSyntaxId = "annotations-" + outputSyntax;
             AnnotationPrintRenderer annotationsRenderer =
-                componentManager.lookup(AnnotationPrintRenderer.class, outputSyntaxId);
+                componentManager.getInstance(AnnotationPrintRenderer.class, outputSyntaxId);
             WikiPrinter printer = new DefaultWikiPrinter();
             annotationsRenderer.setPrinter(printer);
             // set the annotations for this renderer

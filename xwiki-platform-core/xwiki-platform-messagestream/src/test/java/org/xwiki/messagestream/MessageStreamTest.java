@@ -256,9 +256,9 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     public void testGetRecentPersonalMessagesWhenQueryFails() throws Exception
     {
         final Query mockQuery = getMockQuery();
-        final QueryManager mockQueryManager = getComponentManager().lookup(QueryManager.class);
-        final EventStream mockEventStream = getComponentManager().lookup(EventStream.class);
-        final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final QueryManager mockQueryManager = getComponentManager().getInstance(QueryManager.class);
+        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
             getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
@@ -292,11 +292,11 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
 
     private Event setupForNewMessage() throws ComponentLookupException, Exception
     {
-        final EventFactory mockEventFactory = getComponentManager().lookup(EventFactory.class);
+        final EventFactory mockEventFactory = getComponentManager().getInstance(EventFactory.class);
         final Event e = new DefaultEvent();
         e.setId(UUID.randomUUID().toString());
-        final ModelContext mockContext = getComponentManager().lookup(ModelContext.class);
-        final EventStream mockEventStream = getComponentManager().lookup(EventStream.class);
+        final ModelContext mockContext = getComponentManager().getInstance(ModelContext.class);
+        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -310,10 +310,10 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         return e;
     }
 
-    private Event setupForPublicMessage() throws ComponentLookupException, Exception
+    private Event setupForPublicMessage() throws Exception
     {
         final Event e = setupForNewMessage();
-        final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
             getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
@@ -334,10 +334,10 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         return e;
     }
 
-    private Event setupForPersonalMessage() throws ComponentLookupException, Exception
+    private Event setupForPersonalMessage() throws Exception
     {
         final Event e = setupForNewMessage();
-        final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
             getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
@@ -394,9 +394,9 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         throws ComponentLookupException, Exception
     {
         final Query mockQuery = getMockQuery();
-        final QueryManager mockQueryManager = getComponentManager().lookup(QueryManager.class);
-        final EventStream mockEventStream = getComponentManager().lookup(EventStream.class);
-        final DocumentAccessBridge mockBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final QueryManager mockQueryManager = getComponentManager().getInstance(QueryManager.class);
+        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         final EntityReferenceResolver<String> mockResolver =
             getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
         @SuppressWarnings("unchecked")

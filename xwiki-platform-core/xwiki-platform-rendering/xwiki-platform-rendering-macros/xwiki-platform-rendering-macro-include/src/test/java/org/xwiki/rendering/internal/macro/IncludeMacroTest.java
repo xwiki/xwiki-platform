@@ -76,8 +76,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         super.setUp();
 
         // Put a fake XWiki context on the execution context.
-        getComponentManager().lookup(Execution.class).getContext()
-            .setProperty("xwikicontext", new HashMap<Object, Object>());
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        execution.getContext().setProperty("xwikicontext", new HashMap<Object, Object>());
     }
 
     @Override
@@ -86,8 +86,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         super.registerComponents();
         
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-        this.includeMacro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        this.rendererFactory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
+        this.includeMacro = (IncludeMacro) getComponentManager().getInstance(Macro.class, "include");
+        this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
@@ -350,7 +350,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     private List<Block> runIncludeMacroWithPreVelocity(Context context, String velocity, String includedContent)
         throws Exception
     {
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer,
             "wiki:Space.IncludingPage", velocity);

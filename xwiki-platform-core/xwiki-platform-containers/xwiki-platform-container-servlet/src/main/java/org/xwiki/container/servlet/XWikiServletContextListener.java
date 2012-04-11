@@ -73,7 +73,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // Initialize the Environment
         try {
             ServletEnvironment servletEnvironment =
-                (ServletEnvironment) this.componentManager.lookup(Environment.class);
+                (ServletEnvironment) this.componentManager.getInstance(Environment.class);
             servletEnvironment.setServletContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Servlet Environment", e);
@@ -86,7 +86,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // below in an Event Listener and move it to the legacy module.
         try {
             ServletContainerInitializer containerInitializer =
-                this.componentManager.lookup(ServletContainerInitializer.class);
+                this.componentManager.getInstance(ServletContainerInitializer.class);
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Application Context", e);
@@ -96,7 +96,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // something on startup to do it.
         ObservationManager observationManager;
         try {
-            observationManager = this.componentManager.lookup(ObservationManager.class);
+            observationManager = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to find the Observation Manager component", e);
         }
@@ -116,7 +116,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // Send an Observation event to signal the XWiki application is stopped. This allows components who need to do
         // something on stop to do it.
         try {
-            ObservationManager observationManager = this.componentManager.lookup(ObservationManager.class);
+            ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
             observationManager.notify(new ApplicationStoppedEvent(), this);
         } catch (ComponentLookupException e) {
             // Nothing to do here.
@@ -129,8 +129,8 @@ public class XWikiServletContextListener implements ServletContextListener
         // below in an Event Listener and move it to the legacy module.
         try {
             ApplicationContextListenerManager applicationContextListenerManager =
-                this.componentManager.lookup(ApplicationContextListenerManager.class);
-            Container container = this.componentManager.lookup(Container.class);
+                this.componentManager.getInstance(ApplicationContextListenerManager.class);
+            Container container = this.componentManager.getInstance(Container.class);
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         } catch (ComponentLookupException ex) {
             // Nothing to do here.

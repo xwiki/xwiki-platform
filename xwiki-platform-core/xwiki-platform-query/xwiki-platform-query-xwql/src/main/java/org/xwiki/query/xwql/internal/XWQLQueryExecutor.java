@@ -55,8 +55,8 @@ public class XWQLQueryExecutor implements QueryExecutor
 
     public QueryManager getQueryManager() throws ComponentLookupException
     {
-        // we can't inject QueryManager because of cyclic dependency.
-        return this.componentManager.lookup(QueryManager.class);
+        // We can't inject QueryManager because of cyclic dependency.
+        return this.componentManager.getInstance(QueryManager.class);
     }
 
     @Override

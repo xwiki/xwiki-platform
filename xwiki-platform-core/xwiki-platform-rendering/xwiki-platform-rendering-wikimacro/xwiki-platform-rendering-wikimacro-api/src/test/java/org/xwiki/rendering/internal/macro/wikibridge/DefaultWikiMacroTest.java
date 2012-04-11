@@ -88,14 +88,14 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         this.mockWikiModel = scriptMockSetup.wikiModel;
 
         this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");
-        this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
+        this.wikiMacroManager = getComponentManager().getInstance(WikiMacroManager.class);
 
         // Make sure the old XWiki Context is set up in the Execution Context since it's used in
         // DefaultWikiMacro.execute().
         Map<String, Object> xcontext = new HashMap<String, Object>();
-        Execution execution = getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().getInstance(Execution.class);
         execution.getContext().setProperty("xwikicontext", xcontext);
-        getComponentManager().lookup(ScriptContextManager.class).getScriptContext()
+        getComponentManager().getInstance(ScriptContextManager.class).getScriptContext()
             .setAttribute("xcontext", xcontext, ScriptContext.ENGINE_SCOPE);
 
         getMockery().checking(new Expectations() {{
@@ -124,7 +124,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     {
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         converter.convert(new StringReader("{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}"), Syntax.XWIKI_2_0,
@@ -144,7 +144,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
         registerWikiMacro("wikimacro2", "{{wikimacro1 param1=\"v1\" param2=\"v2\"/}}", Syntax.XWIKI_2_0);
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         // Note: We're putting the macro after the "Hello" text to force it as an inline macro.
@@ -170,7 +170,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
             will(returnValue("url"));
         }});
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         converter.convert(new StringReader("= heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}"),
@@ -191,7 +191,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     {
         registerWikiMacro("wikimacro", "{{groovy}}println \"[[path:/some/path]]\"{{/groovy}}", Syntax.XWIKI_2_1);
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         converter.convert(new StringReader("{{wikimacro param1=\"value1\" param2=\"value2\"/}}"),
@@ -217,7 +217,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
                 + "xcontext.macro.result = java.util.Collections.singletonList(new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
                 + "{{/groovy}}", Syntax.XWIKI_2_0);
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         // Note: We're putting the macro after the "Hello" text to force it as an inline macro.
@@ -241,13 +241,13 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         getComponentManager().registerComponent(descriptorVM, mockVelocityManager);
 
         // Initialize velocity engine.
-        final VelocityEngine vEngine = getComponentManager().lookup(VelocityEngine.class);
+        final VelocityEngine vEngine = getComponentManager().getInstance(VelocityEngine.class);
         Properties properties = new Properties();
         properties.setProperty("resource.loader", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
-        Execution execution = getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().getInstance(Execution.class);
         Map< ? , ? > xwikiContext = (Map< ? , ? >) execution.getContext().getProperty("xwikicontext");
         final VelocityContext vContext = new VelocityContext();
         vContext.put("xcontext", xwikiContext);
@@ -264,7 +264,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.param1{{/velocity}}", Syntax.XWIKI_2_0, parameterDescriptors);
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);

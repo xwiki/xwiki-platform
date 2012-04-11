@@ -63,7 +63,7 @@ public class CSRFTokenInvalidatorTest extends AbstractMockingComponentTestCase
     @Test
     public void testInvalidationOnLogout() throws ComponentLookupException, Exception
     {
-        final CSRFToken mockCSRFTokenManager = getComponentManager().lookup(CSRFToken.class);
+        final CSRFToken mockCSRFTokenManager = getComponentManager().getInstance(CSRFToken.class);
         getMockery().checking(new Expectations()
         {
             {

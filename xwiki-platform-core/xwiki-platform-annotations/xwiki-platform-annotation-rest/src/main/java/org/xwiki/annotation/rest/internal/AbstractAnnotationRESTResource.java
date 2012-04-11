@@ -233,7 +233,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     private void setUpDocuments(String docName, String language) throws XWikiException
     {
         try {
-            VelocityManager velocityManager = componentManager.lookup(VelocityManager.class);
+            VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
 
             XWikiContext context = org.xwiki.rest.Utils.getXWikiContext(componentManager);

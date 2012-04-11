@@ -84,7 +84,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Verify we can lookup the component from the Context CM
         ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.lookup(Role.class));
+        Assert.assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context
         state.become("otheruser");
@@ -96,7 +96,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         //@formatter:on
 
         try {
-            contextCM.lookup(Role.class);
+            contextCM.getInstance(Role.class);
             Assert.fail("Should have raised an exception");
         } catch (ComponentLookupException expected) {
             // No need to assert the message, we just want to ensure an exception is raised.
@@ -126,7 +126,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Verify we can lookup the component from the context CM.
         ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.lookup(Role.class));
+        Assert.assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another wiki in the context
         state.become("otherwiki");
@@ -139,7 +139,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         //@formatter:on
 
         try {
-            contextCM.lookup(Role.class);
+            contextCM.getInstance(Role.class);
             Assert.fail("Should have raised an exception");
         } catch (ComponentLookupException expected) {
             // No need to assert the message, we just want to ensure an exception is raised.
@@ -168,13 +168,13 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Verify we can lookup the component from the context CM.
         ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.lookup(Role.class));
+        Assert.assertNotNull(contextCM.getInstance(Role.class));
     }
 
     @Test
     public void testRegisterComponentInContextComponentManagerThrowsException() throws Exception
     {
-        ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
         try {
             contextCM.registerComponent(new DefaultComponentDescriptor<Role>());
             Assert.fail("Should have thrown an exception error");

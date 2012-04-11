@@ -75,8 +75,8 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
     {
         super.setUp();
 
-        final EntityBridge entityBridge= getComponentManager().lookup(EntityBridge.class);
-        final XWikiBridge xwikiBridge = getComponentManager().lookup(XWikiBridge.class);
+        final EntityBridge entityBridge= getComponentManager().getInstance(EntityBridge.class);
+        final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
         getMockery().checking(new Expectations() {{
             allowing (entityBridge).isDocumentCreator(with(creatorRef),

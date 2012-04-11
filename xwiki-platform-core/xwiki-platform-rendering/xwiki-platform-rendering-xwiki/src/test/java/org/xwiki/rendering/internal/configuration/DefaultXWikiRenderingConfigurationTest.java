@@ -46,7 +46,7 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     public void setUp() throws Exception
     {
         super.setUp();
-        this.source = getComponentManager().lookup(ConfigurationSource.class);
+        this.source = getComponentManager().getInstance(ConfigurationSource.class);
     }
 
     @Test

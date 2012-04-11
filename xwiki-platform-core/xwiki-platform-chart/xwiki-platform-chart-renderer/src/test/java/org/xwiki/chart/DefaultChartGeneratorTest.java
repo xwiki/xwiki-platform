@@ -54,7 +54,7 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         String rowHeaders[] = {"1", "2"};
         String columnHeaders[] = {"1", "2", "3"};
         this.model = new DefaultChartModel(dataArray, rowHeaders, columnHeaders);
-        this.chartGenerator = getComponentManager().lookup(ChartGenerator.class);
+        this.chartGenerator = getComponentManager().getInstance(ChartGenerator.class);
     }
 
     @Test

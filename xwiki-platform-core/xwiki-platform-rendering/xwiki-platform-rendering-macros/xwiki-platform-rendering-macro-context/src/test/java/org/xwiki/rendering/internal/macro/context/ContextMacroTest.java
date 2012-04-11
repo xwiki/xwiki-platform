@@ -77,7 +77,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     {
         final DocumentReferenceResolver<String> resolver =
             getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-        final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
             oneOf(resolver).resolve("wiki:space.page");
             will(returnValue(new DocumentReference("wiki", "space", "page")));
@@ -111,7 +111,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
 
         final DocumentReferenceResolver<String> drr =
             getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-        final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("wiki:space.page");
             will(returnValue(new DocumentReference("wiki", "space", "page")));
@@ -153,7 +153,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
 
         final DocumentReferenceResolver<String> drr =
             getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-        final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("wiki:space.page");
             will(returnValue(docReference));

@@ -47,7 +47,7 @@ public class DefaultSyncEngineTest extends AbstractComponentTestCase
     @Override
     public void setUp() throws Exception
     {
-        this.syncEngine = getComponentManager().lookup(SyncEngine.class);
+        this.syncEngine = getComponentManager().getInstance(SyncEngine.class);
     }
 
     @Test

@@ -52,7 +52,7 @@ public class LinkCheckerEventListenerTest extends AbstractMockingComponentTestCa
         final EntityReferenceSerializer serializer = getComponentManager().getInstance(
             EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final LinkStateManager linkStateManager = getComponentManager().lookup(LinkStateManager.class);
+        final LinkStateManager linkStateManager = getComponentManager().getInstance(LinkStateManager.class);
 
         final Map<String, Map<String, LinkState>> states = new HashMap<String, Map<String, LinkState>>();
         Map<String, LinkState> referenceStates1 = new HashMap<String, LinkState>();

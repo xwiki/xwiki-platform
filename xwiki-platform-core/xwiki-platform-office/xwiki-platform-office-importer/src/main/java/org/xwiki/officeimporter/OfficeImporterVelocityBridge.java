@@ -121,16 +121,16 @@ public class OfficeImporterVelocityBridge
         throws OfficeImporterException
     {
         try {
-            this.execution = componentManager.lookup(Execution.class);
-            this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
+            this.execution = componentManager.getInstance(Execution.class);
+            this.docBridge = componentManager.getInstance(DocumentAccessBridge.class);
             this.currentMixedDocumentReferenceResolver =
                 componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-            this.officeManager = componentManager.lookup(OpenOfficeManager.class);
-            this.officeConfiguration = componentManager.lookup(OpenOfficeConfiguration.class);
-            this.xhtmlBuilder = componentManager.lookup(XHTMLOfficeDocumentBuilder.class);
-            this.xdomBuilder = componentManager.lookup(XDOMOfficeDocumentBuilder.class);
-            this.presentationBuilder = componentManager.lookup(PresentationBuilder.class);
-            this.xdomSplitter = componentManager.lookup(XDOMOfficeDocumentSplitter.class);
+            this.officeManager = componentManager.getInstance(OpenOfficeManager.class);
+            this.officeConfiguration = componentManager.getInstance(OpenOfficeConfiguration.class);
+            this.xhtmlBuilder = componentManager.getInstance(XHTMLOfficeDocumentBuilder.class);
+            this.xdomBuilder = componentManager.getInstance(XDOMOfficeDocumentBuilder.class);
+            this.presentationBuilder = componentManager.getInstance(PresentationBuilder.class);
+            this.xdomSplitter = componentManager.getInstance(XDOMOfficeDocumentSplitter.class);
         } catch (Exception ex) {
             throw new OfficeImporterException("Error while initializing office importer velocity bridge.", ex);
         }

@@ -142,13 +142,11 @@
       form.__disabled = true;
       // Prepare the data for the ajax call
       var formData = new Hash(form.serialize(true));
-      formData.set('actionshowdetails', '1');
       formData.set('ajax', '1');
 
-      // Prepare the url for the ajax call
-      var targetDocument;
-      if (XWiki.currentDocument.page == 'XWikiPreferences') {
-        targetDocument = form.action.replace(/^.*(&amp;|\?)section=/, "").replace(/&amp;.*$/, "");
+      // Prepare the URL for the AJAX call.
+      var targetDocument = formData.get('section');
+      if (targetDocument) {
         targetDocument = XWiki.getResource(targetDocument);
         targetDocument = new XWiki.Document(targetDocument.name, targetDocument.space, targetDocument.wiki);
       } else {
@@ -1310,10 +1308,6 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #getRemoteExtensionButtons($extension, $actions)
   #end
   {{html}}
-  #set ($action = 'view')
-  #if ($doc.name == 'XWikiPreferences')
-    #set ($action = 'admin')
-  #end
   &lt;form action=""&gt;
     &lt;div class="extension-actions"&gt;
       &lt;input type="hidden" name="extensionId" value="$extension.id.id" /&gt;

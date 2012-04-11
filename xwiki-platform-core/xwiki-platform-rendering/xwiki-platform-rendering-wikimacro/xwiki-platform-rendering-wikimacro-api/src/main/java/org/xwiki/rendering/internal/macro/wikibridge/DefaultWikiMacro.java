@@ -169,7 +169,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Extension point to add more wiki macro bindings
         try {
             List<WikiMacroBindingInitializer> bindingInitializers =
-                this.componentManager.lookupList(WikiMacroBindingInitializer.class);
+                this.componentManager.getInstanceList(WikiMacroBindingInitializer.class);
 
             for (WikiMacroBindingInitializer bindingInitializer : bindingInitializers) {
                 bindingInitializer.initialize(this.macroDocumentReference, parameters, macroContent, context,

@@ -79,7 +79,7 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (Parser parser : this.componentManager.lookupList(Parser.class)) {
+            for (Parser parser : this.componentManager.<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -96,7 +96,9 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (PrintRendererFactory factory : this.componentManager.lookupList(PrintRendererFactory.class)) {
+            for (PrintRendererFactory factory :
+                this.componentManager.<PrintRendererFactory>getInstanceList(PrintRendererFactory.class))
+            {
                 syntaxes.add(factory.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -148,7 +150,8 @@ public class RenderingScriptService implements ScriptService
         String result;
         WikiPrinter printer = new DefaultWikiPrinter();
         try {
-            this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId).render(block, printer);
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId);
+            renderer.render(block, printer);
             result = printer.toString();
         } catch (Exception e) {
             result = null;

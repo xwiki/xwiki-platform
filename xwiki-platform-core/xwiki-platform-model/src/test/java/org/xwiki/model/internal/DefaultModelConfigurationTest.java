@@ -57,7 +57,7 @@ public class DefaultModelConfigurationTest
         final ComponentManager mockCM = this.mockery.mock(ComponentManager.class);
         ReflectionUtils.setFieldValue(this.configuration, "componentManager", mockCM);
         this.mockery.checking(new Expectations() {{
-            allowing(mockCM).lookup(ConfigurationSource.class, "xwikiproperties"); will(returnValue(mockSource));
+            allowing(mockCM).getInstance(ConfigurationSource.class, "xwikiproperties"); will(returnValue(mockSource));
         }});
     }
 

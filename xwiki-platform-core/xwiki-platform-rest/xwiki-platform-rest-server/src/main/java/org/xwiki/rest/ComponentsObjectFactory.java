@@ -61,7 +61,7 @@ public class ComponentsObjectFactory implements ObjectFactory
     {
         try {
             /* Use the component manager to lookup the class. This ensure that injections are properly executed */
-            XWikiRestComponent component = componentManager.lookup(XWikiRestComponent.class, clazz.getName());
+            XWikiRestComponent component = componentManager.getInstance(XWikiRestComponent.class, clazz.getName());
 
             /*
              * JAX-RS resources and providers must be declared as components whose hint is the FQN of the class

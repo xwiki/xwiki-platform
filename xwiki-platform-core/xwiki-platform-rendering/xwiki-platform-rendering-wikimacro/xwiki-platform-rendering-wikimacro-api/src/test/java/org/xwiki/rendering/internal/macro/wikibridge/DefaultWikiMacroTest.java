@@ -288,7 +288,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
             new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description", "Test",
                 WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
-        Parser parser = getComponentManager().lookup(Parser.class, syntax.toIdString());
+        Parser parser = getComponentManager().getInstance(Parser.class, syntax.toIdString());
         
         DefaultWikiMacro wikiMacro =
             new DefaultWikiMacro(wikiMacroDocumentReference, true, descriptor,

@@ -99,7 +99,7 @@ public class XWikiImportService implements ImportService
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         try {
-            HTMLCleaner cleaner = componentManager.lookup(HTMLCleaner.class, cleanerHint);
+            HTMLCleaner cleaner = componentManager.getInstance(HTMLCleaner.class, cleanerHint);
             HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
             configuration.setParameters(cleaningParams);
             Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);

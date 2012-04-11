@@ -118,7 +118,7 @@ public class DefaultAnnotationService implements AnnotationService
                 sourceSyntaxId = targetIoService.getSourceSyntax(sourceReference);
             }
 
-            Parser parser = componentManager.lookup(Parser.class, sourceSyntaxId);
+            Parser parser = componentManager.getInstance(Parser.class, sourceSyntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
             // run transformations

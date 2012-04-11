@@ -64,7 +64,7 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
                 will(returnValue("wiki:space.page"));
             allowing(dab).getDocumentSyntaxId("wiki:space.page");
                 will(returnValue("xwiki/2.0"));
-            allowing(cm).lookup(Parser.class, "xwiki/2.0");
+            allowing(cm).getInstance(Parser.class, "xwiki/2.0");
                 will(returnValue(new Parser() {
                     @Override
                     public Syntax getSyntax()

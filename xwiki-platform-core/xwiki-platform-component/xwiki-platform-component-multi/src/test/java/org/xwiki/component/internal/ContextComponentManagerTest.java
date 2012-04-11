@@ -74,7 +74,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         }});
         //@formatter:on
 
-        ComponentManager userCM = getComponentManager().lookup(ComponentManager.class, "user");
+        ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "user");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
         cd.setRole(Role.class);
         cd.setImplementation(RoleImpl.class);
@@ -83,7 +83,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         userCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
-        ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context
@@ -118,14 +118,14 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         //@formatter:on
 
         // Register in the current wiki.
-        ComponentManager wikiCM = getComponentManager().lookup(ComponentManager.class, "wiki");
+        ComponentManager wikiCM = getComponentManager().getInstance(ComponentManager.class, "wiki");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
         cd.setRole(Role.class);
         cd.setImplementation(RoleImpl.class);
         wikiCM.registerComponent(cd);
 
         // Verify we can lookup the component from the context CM.
-        ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another wiki in the context
@@ -167,7 +167,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getComponentManager().registerComponent(cd);
 
         // Verify we can lookup the component from the context CM.
-        ComponentManager contextCM = getComponentManager().lookup(ComponentManager.class, "context");
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.getInstance(Role.class));
     }
 

@@ -58,7 +58,7 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
     {
         CaptchaVerifier captchaVerifier;
         try {
-            captchaVerifier = componentManager.lookup(CaptchaVerifier.class, captchaName);
+            captchaVerifier = componentManager.getInstance(CaptchaVerifier.class, captchaName);
         } catch (ComponentLookupException e) {
             throw new CaptchaVerifierNotFoundException("The CaptchaVerifier " + captchaName
                                                        + " could not be found, try listCaptchaNames()"
@@ -72,7 +72,7 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
     {
         List<String> captchaNames = new ArrayList<String>();
         try {
-            captchaNames.addAll(componentManager.lookupMap(CaptchaVerifier.class).keySet());
+            captchaNames.addAll(componentManager.getInstanceMap(CaptchaVerifier.class).keySet());
         } catch (ComponentLookupException e) {
             this.logger.error("Couldn't get list of CaptchaVerifier names " + e.getMessage());
         }

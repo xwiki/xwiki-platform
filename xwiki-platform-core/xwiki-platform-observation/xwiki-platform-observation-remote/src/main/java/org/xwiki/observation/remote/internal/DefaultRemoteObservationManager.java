@@ -110,7 +110,7 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
     {
         try {
             String networkAdapterHint = this.configuration.getNetworkAdapter();
-            this.networkAdapter = this.componentManager.lookup(NetworkAdapter.class, networkAdapterHint);
+            this.networkAdapter = this.componentManager.getInstance(NetworkAdapter.class, networkAdapterHint);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to initialize network adapter ["
                 + this.configuration.getNetworkAdapter() + "]", e);

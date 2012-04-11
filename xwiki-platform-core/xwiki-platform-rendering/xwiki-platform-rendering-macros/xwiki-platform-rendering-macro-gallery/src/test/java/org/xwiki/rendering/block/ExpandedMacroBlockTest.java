@@ -47,7 +47,7 @@ public class ExpandedMacroBlockTest extends AbstractComponentTestCase
     @Test
     public void testRenderExpandedMacroBlock() throws Exception
     {
-        BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, "xwiki/2.0");
+        BlockRenderer renderer = getComponentManager().getInstance(BlockRenderer.class, "xwiki/2.0");
 
         Map<String, String> parameters = Collections.emptyMap();
         ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", parameters, renderer, false);
@@ -82,7 +82,7 @@ public class ExpandedMacroBlockTest extends AbstractComponentTestCase
     @Test
     public void testRenderExpandedMacroBlockWithXDOM() throws Exception
     {
-        BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, "xwiki/2.0");
+        BlockRenderer renderer = getComponentManager().getInstance(BlockRenderer.class, "xwiki/2.0");
 
         XDOM content = new XDOM(Arrays.<Block> asList(new WordBlock("1"), new SpaceBlock(), new WordBlock("2")));
 
@@ -101,7 +101,7 @@ public class ExpandedMacroBlockTest extends AbstractComponentTestCase
     @Test
     public void testRenderEmptyExpandedMacroBlock() throws Exception
     {
-        BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, "xwiki/2.0");
+        BlockRenderer renderer = getComponentManager().getInstance(BlockRenderer.class, "xwiki/2.0");
         Map<String, String> parameters = Collections.emptyMap();
         ExpandedMacroBlock macro = new ExpandedMacroBlock("empty", parameters, renderer, false);
         WikiPrinter printer = new DefaultWikiPrinter();

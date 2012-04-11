@@ -225,7 +225,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     {
         try {
             String syntaxId = documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
-            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
+            BlockRenderer renderer = componentManager.getInstance(BlockRenderer.class, syntaxId);
 
             Map<String, String> galleryParameters = Collections.emptyMap();
             ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);

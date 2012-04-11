@@ -262,10 +262,10 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
         switch (visibility) {
             case USER:
-                cm = this.rootComponentManager.lookup(ComponentManager.class, "user");
+                cm = this.rootComponentManager.getInstance(ComponentManager.class, "user");
                 break;
             case WIKI:
-                cm = this.rootComponentManager.lookup(ComponentManager.class, "wiki");
+                cm = this.rootComponentManager.getInstance(ComponentManager.class, "wiki");
                 break;
             default:
                 cm = this.rootComponentManager;

@@ -137,10 +137,10 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      */
     private String renderPlainText(String content, String syntaxId) throws Exception
     {
-        PrintRenderer renderer = componentManager.lookup(PrintRenderer.class, "normalizer-plain/1.0");
+        PrintRenderer renderer = componentManager.getInstance(PrintRenderer.class, "normalizer-plain/1.0");
 
         // parse
-        Parser parser = componentManager.lookup(Parser.class, syntaxId);
+        Parser parser = componentManager.getInstance(Parser.class, syntaxId);
         XDOM xdom = parser.parse(new StringReader(content));
 
         // run transformations -> although it's going to be at least strange to handle rendered content since there

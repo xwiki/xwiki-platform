@@ -46,7 +46,7 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         new ScriptMockSetup(getMockery(), getComponentManager());
-        this.velocityMacro = getComponentManager().lookup(Macro.class, "velocity");
+        this.velocityMacro = getComponentManager().getInstance(Macro.class, "velocity");
     }
 
     @Test
@@ -73,6 +73,6 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
         // And then in the context of a second independent page
         context.setId("page2");
         assertBlocks(expected, this.velocityMacro.execute(params, "#testMacrosAreLocal()", context),
-            getComponentManager().lookup(PrintRendererFactory.class, "event/1.0"));
+            getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0"));
     }
 }

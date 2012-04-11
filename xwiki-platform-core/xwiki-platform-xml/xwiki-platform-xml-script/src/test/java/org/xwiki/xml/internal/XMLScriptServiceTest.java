@@ -46,7 +46,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
     @Override
     public void setUp() throws Exception
     {
-        this.xml = (XMLScriptService) getComponentManager().lookup(ScriptService.class, "xml");
+        this.xml = (XMLScriptService) getComponentManager().getInstance(ScriptService.class, "xml");
     }
 
 

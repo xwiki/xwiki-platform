@@ -344,7 +344,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
     private XDOM getXDOM(String content) throws Exception
     {
-        return getComponentManager().lookup(Parser.class, "xwiki/2.0").parse(new StringReader(content));
+        Parser parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        return parser.parse(new StringReader(content));
     }
 
     private List<Block> runIncludeMacroWithPreVelocity(Context context, String velocity, String includedContent)
@@ -385,7 +386,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
         MacroTransformation macroTransformation =
-            (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
+            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext macroContext = createMacroTransformationContext(includedDocStringRef, false);
         macroContext.setId("wiki:Space.IncludingPage");
         macroContext.setTransformation(macroTransformation);

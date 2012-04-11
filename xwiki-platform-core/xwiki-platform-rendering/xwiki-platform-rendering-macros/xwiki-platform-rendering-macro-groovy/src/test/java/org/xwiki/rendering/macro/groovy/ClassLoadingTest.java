@@ -50,7 +50,7 @@ public class ClassLoadingTest extends AbstractComponentTestCase
         super.registerComponents();
         this.mockSetup = new ScriptMockSetup(getComponentManager());
         
-        this.macro = getComponentManager().lookup(Macro.class, "groovy");
+        this.macro = getComponentManager().getInstance(Macro.class, "groovy");
         
         this.context = new MacroTransformationContext();
         // The script macro checks the current block (which is a macro block) to see what engine to use

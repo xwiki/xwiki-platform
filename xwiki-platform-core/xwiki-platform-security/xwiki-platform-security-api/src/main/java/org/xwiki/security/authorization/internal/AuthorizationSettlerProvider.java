@@ -55,7 +55,7 @@ public class AuthorizationSettlerProvider implements Provider<AuthorizationSettl
     {
         String settlerHint = authorizationManagerConfiguration.getAuthorizationSettler();
         try {
-            authorizationSettler = componentManager.lookup(AuthorizationSettler.class, settlerHint);
+            authorizationSettler = componentManager.getInstance(AuthorizationSettler.class, settlerHint);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Unable to lookup the authorization settler hinted '"
                 + settlerHint + "'.", e);

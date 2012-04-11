@@ -42,7 +42,7 @@ public class RenderingScriptServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.rss = (RenderingScriptService) getComponentManager().lookup(ScriptService.class, "rendering");
+        this.rss = (RenderingScriptService) getComponentManager().getInstance(ScriptService.class, "rendering");
     }
 
     @Test

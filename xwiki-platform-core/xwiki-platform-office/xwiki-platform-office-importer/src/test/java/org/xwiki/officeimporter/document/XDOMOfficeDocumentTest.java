@@ -64,7 +64,7 @@ public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
     
     private XDOMOfficeDocument createOfficeDocument(String content, String syntax) throws Exception
     {
-        Parser parser = getComponentManager().lookup(Parser.class, syntax);
+        Parser parser = getComponentManager().getInstance(Parser.class, syntax);
         XDOM xdom = parser.parse(new StringReader(content));        
         return new XDOMOfficeDocument(xdom, new HashMap<String, byte[]>(), getComponentManager());
     }

@@ -38,7 +38,8 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractOfficeImporterTe
     @Test
     public void testDefaultConfiguration() throws Exception
     {
-        OpenOfficeConfiguration configuration = getComponentManager().lookup(OpenOfficeConfiguration.class, "default");
+        OpenOfficeConfiguration configuration =
+            getComponentManager().getInstance(OpenOfficeConfiguration.class, "default");
         Assert.assertEquals(OpenOfficeConfiguration.SERVER_TYPE_INTERNAL, configuration.getServerType());
         Assert.assertEquals(8100, configuration.getServerPort());
         Assert.assertNull(configuration.getProfilePath());

@@ -127,7 +127,8 @@ public class RenderingScriptService implements ScriptService
     {
         XDOM result;
         try {
-            result = this.componentManager.lookup(Parser.class, syntaxId).parse(new StringReader(text));
+            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
+            result = parser.parse(new StringReader(text));
         } catch (Exception e) {
             result = null;
         }
@@ -147,7 +148,7 @@ public class RenderingScriptService implements ScriptService
         String result;
         WikiPrinter printer = new DefaultWikiPrinter();
         try {
-            this.componentManager.lookup(BlockRenderer.class, outputSyntaxId).render(block, printer);
+            this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId).render(block, printer);
             result = printer.toString();
         } catch (Exception e) {
             result = null;

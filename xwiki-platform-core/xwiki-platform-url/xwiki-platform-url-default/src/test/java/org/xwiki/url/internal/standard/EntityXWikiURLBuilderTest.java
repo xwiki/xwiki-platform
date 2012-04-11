@@ -48,7 +48,7 @@ public class EntityXWikiURLBuilderTest extends AbstractComponentTestCase
 
     @Override protected void registerComponents() throws Exception
     {
-        this.builder = getComponentManager().lookup(XWikiURLBuilder.class, "entity");
+        this.builder = getComponentManager().getInstance(XWikiURLBuilder.class, "entity");
     }
 
     @Test

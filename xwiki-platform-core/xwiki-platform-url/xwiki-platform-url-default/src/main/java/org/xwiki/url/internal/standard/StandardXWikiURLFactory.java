@@ -144,7 +144,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         // Try to find a builder component matching the XWiki URL type and build the XWiki URL.
         XWikiURLBuilder builder;
         try {
-            builder = this.componentManager.lookup(XWikiURLBuilder.class, state.urlType.toString().toLowerCase());
+            builder = this.componentManager.getInstance(XWikiURLBuilder.class, state.urlType.toString().toLowerCase());
         } catch (ComponentLookupException e) {
             throw new InvalidURLException("URL type [" + state.urlType + "] not supported yet!");
         }

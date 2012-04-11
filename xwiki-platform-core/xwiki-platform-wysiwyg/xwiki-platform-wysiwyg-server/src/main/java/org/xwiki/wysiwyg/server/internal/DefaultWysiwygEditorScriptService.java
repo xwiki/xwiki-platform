@@ -89,8 +89,8 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
-            this.componentManager.lookup(Parser.class, syntaxId);
-            this.componentManager.lookup(PrintRendererFactory.class, syntaxId);
+            this.componentManager.getInstance(Parser.class, syntaxId);
+            this.componentManager.getInstance(PrintRendererFactory.class, syntaxId);
             return true;
         } catch (Exception e) {
             return false;

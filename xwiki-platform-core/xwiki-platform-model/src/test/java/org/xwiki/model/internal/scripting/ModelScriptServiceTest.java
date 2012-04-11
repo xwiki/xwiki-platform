@@ -166,7 +166,7 @@ public class ModelScriptServiceTest
                 allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "invalid");
                 will(throwException(new ComponentLookupException("error")));
                 // Make sure backward compatibility is preserved.
-                allowing(mockComponentManager).lookup(DocumentReferenceResolver.class, "invalid");
+                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.class, "invalid");
                 will(throwException(new ComponentLookupException("error")));
             }
         });

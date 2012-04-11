@@ -148,7 +148,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         String source = paramsMap.get("source");
         File chartFile;
         try {
-            ChartDataSource dataSource = this.componentManager.lookup(ChartDataSource.class, source);
+            ChartDataSource dataSource = this.componentManager.getInstance(ChartDataSource.class, source);
             byte[] chart =
                 this.chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
             chartFile = getChartImageFile(parameters);

@@ -66,7 +66,7 @@ public class WhiteSpaceContentAltererTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        alterer = getComponentManager().lookup(ContentAlterer.class, "whitespace");
+        alterer = getComponentManager().getInstance(ContentAlterer.class, "whitespace");
     }
 
     /**

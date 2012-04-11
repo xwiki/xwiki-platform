@@ -61,7 +61,7 @@ public class DefaultXWikiURLFactory implements XWikiURLFactory<URL>
     {
         XWikiURLFactory factory;
         try {
-            factory = this.componentManager.lookup(XWikiURLFactory.class, this.configuration.getURLFormatId());
+            factory = this.componentManager.getInstance(XWikiURLFactory.class, this.configuration.getURLFormatId());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Invalid configuration hint [" + this.configuration.getURLFormatId()
                 + "]. Cannot create XWiki URL.", e);

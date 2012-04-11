@@ -40,7 +40,7 @@ public class IndentVelocityMacroFilterTest extends AbstractComponentTestCase
     @Override
     protected void registerComponents() throws Exception
     {
-        this.filter = getComponentManager().lookup(VelocityMacroFilter.class, "indent");
+        this.filter = getComponentManager().getInstance(VelocityMacroFilter.class, "indent");
         this.context = new VelocityContext();
     }
 

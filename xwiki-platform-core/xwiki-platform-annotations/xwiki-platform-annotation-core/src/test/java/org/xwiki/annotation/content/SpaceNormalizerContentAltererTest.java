@@ -68,7 +68,7 @@ public class SpaceNormalizerContentAltererTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        alterer = getComponentManager().lookup(ContentAlterer.class, "space-normalizer");
+        alterer = getComponentManager().getInstance(ContentAlterer.class, "space-normalizer");
     }
 
     /**

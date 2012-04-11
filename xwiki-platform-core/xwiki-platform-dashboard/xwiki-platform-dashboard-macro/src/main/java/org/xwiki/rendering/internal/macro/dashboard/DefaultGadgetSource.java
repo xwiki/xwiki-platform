@@ -156,7 +156,7 @@ public class DefaultGadgetSource implements GadgetSource
         }
         VelocityEngine velocityEngine = velocityManager.getVelocityEngine();
         // prepare the parser to parse the title and content of the gadget into blocks
-        Parser contentParser = (Parser) componentManager.lookup(Parser.class, sourceSyntax.toIdString());
+        Parser contentParser = (Parser) componentManager.getInstance(Parser.class, sourceSyntax.toIdString());
         ParserUtils parserUtils = new ParserUtils();
 
         for (BaseObject xObject : objects) {

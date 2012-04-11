@@ -328,7 +328,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
     private XDOM parseContent(String content, String syntaxId)
     {
         try {
-            Parser parser = componentManager.lookup(Parser.class, syntaxId);
+            Parser parser = componentManager.getInstance(Parser.class, syntaxId);
             return parser.parse(new StringReader(content));
         } catch (Exception e) {
             throw new RuntimeException(e);

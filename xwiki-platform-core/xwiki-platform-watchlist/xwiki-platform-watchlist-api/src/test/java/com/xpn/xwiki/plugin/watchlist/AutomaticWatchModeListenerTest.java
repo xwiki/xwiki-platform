@@ -49,7 +49,7 @@ public class AutomaticWatchModeListenerTest extends AbstractBridgedComponentTest
         this.listener = new AutomaticWatchModeListener(this.mockStore);
 
         this.observationContextListener =
-            getComponentManager().lookup(EventListener.class, "ObservationContextListener");
+            getComponentManager().getInstance(EventListener.class, "ObservationContextListener");
     }
 
     @Test

@@ -58,8 +58,8 @@ public class CacheMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-        this.cacheMacro = (CacheMacro) getComponentManager().lookup(Macro.class, "cache");
-        this.rendererFactory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
+        this.cacheMacro = (CacheMacro) getComponentManager().getInstance(Macro.class, "cache");
+        this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
@@ -218,7 +218,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
     private MacroTransformationContext createMacroTransformationContext() throws Exception
     {
         MacroTransformation macroTransformation =
-            (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
+            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
         context.setTransformation(macroTransformation);
         context.setSyntax(Syntax.XWIKI_2_0);

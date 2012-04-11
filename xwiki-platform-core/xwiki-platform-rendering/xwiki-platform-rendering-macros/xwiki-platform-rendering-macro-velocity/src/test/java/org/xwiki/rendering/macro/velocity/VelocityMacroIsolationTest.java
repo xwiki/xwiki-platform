@@ -72,7 +72,9 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
 
         // And then in the context of a second independent page
         context.setId("page2");
-        assertBlocks(expected, this.velocityMacro.execute(params, "#testMacrosAreLocal()", context),
-            getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0"));
+        PrintRendererFactory eventRendererFactory =
+            getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
+        assertBlocks(expected,
+            this.velocityMacro.execute(params, "#testMacrosAreLocal()", context), eventRendererFactory);
     }
 }

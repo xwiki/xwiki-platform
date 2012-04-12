@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content># Home page
 platform.appwithinminutes.homePageTitle=App Within Minutes
 platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.

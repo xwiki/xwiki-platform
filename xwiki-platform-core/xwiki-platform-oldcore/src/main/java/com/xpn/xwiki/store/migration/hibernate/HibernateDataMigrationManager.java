@@ -74,7 +74,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     public XWikiHibernateBaseStore getStore() throws DataMigrationException
     {
         try {
-            return (XWikiHibernateBaseStore) componentManager.lookup(XWikiStoreInterface.class, "hibernate");
+            return (XWikiHibernateBaseStore) componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new DataMigrationException(String.format("Unable to reach the store for database %s",
                 getXWikiContext().getDatabase()), e);
@@ -304,7 +304,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     protected List<? extends DataMigration> getAllMigrations() throws DataMigrationException
     {
         try {
-            return componentManager.lookupList(HibernateDataMigration.class);
+            return componentManager.getInstanceList(HibernateDataMigration.class);
         } catch (ComponentLookupException e) {
             throw new DataMigrationException("Unable to retrieve the list of hibernate data migrations", e);
         }

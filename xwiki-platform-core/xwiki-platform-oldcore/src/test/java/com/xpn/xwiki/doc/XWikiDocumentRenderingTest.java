@@ -349,7 +349,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
         // called in the execution flow.
-        VelocityManager originalVelocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager originalVelocityManager = getComponentManager().getInstance(VelocityManager.class);
         VelocityContext vcontext = originalVelocityManager.getVelocityContext();
         vcontext.put("doc", new Document(this.document, getContext()));
 
@@ -357,7 +357,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
         mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
 
-        VelocityEngine vengine = getComponentManager().lookup(VelocityFactory.class).createVelocityEngine(
+        VelocityFactory velocityFactory = getComponentManager().getInstance(VelocityFactory.class);
+        VelocityEngine vengine = velocityFactory.createVelocityEngine(
             "default", new Properties());
         // Save the number of cached macro templates in the Velocity engine so that we can compare after the
         // document is rendered.

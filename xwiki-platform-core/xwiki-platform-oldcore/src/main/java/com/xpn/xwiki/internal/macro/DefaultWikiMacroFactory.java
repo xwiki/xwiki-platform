@@ -234,7 +234,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
         XDOM xdom;
         try {
-            Parser parser = componentManager.lookup(Parser.class, doc.getSyntax().toIdString());
+            Parser parser = componentManager.getInstance(Parser.class, doc.getSyntax().toIdString());
             xdom = parser.parse(new StringReader(macroCode));
         } catch (ComponentLookupException ex) {
             throw new WikiMacroException("Could not find a parser for macro content", ex);

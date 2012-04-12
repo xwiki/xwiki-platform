@@ -45,7 +45,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
     {
         super.setUp();
 
-        this.executionContextManager = getComponentManager().lookup(ExecutionContextManager.class);
+        this.executionContextManager = getComponentManager().getInstance(ExecutionContextManager.class);
     }
 
     public void testWithAndWithoutXWikiContext() throws Exception
@@ -61,7 +61,9 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
         ExecutionContext context = new ExecutionContext();
         context.setProperty("xwikicontext", xcontext);
 
-        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(xcontext);
+        XWikiStubContextProvider stubContextProvider =
+            getComponentManager().getInstance(XWikiStubContextProvider.class);
+        stubContextProvider.initialize(xcontext);
 
         final ExecutionContext daemonContext = new ExecutionContext();
 

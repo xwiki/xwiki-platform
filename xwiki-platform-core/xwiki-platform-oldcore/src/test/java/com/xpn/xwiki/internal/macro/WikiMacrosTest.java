@@ -64,8 +64,8 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.macroManager = getComponentManager().lookup(WikiMacroManager.class);
-        this.wikiMacroEventListener = getComponentManager().lookup(EventListener.class, "wikimacrolistener");
+        this.macroManager = getComponentManager().getInstance(WikiMacroManager.class);
+        this.wikiMacroEventListener = getComponentManager().getInstance(EventListener.class, "wikimacrolistener");
 
         this.xwiki = getMockery().mock(XWiki.class);
         this.rightService = getMockery().mock(XWikiRightService.class);
@@ -91,12 +91,12 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
     private ComponentManager getWikiComponentManager() throws Exception
     {
-        return getComponentManager().lookup(ComponentManager.class, "wiki");
+        return getComponentManager().getInstance(ComponentManager.class, "wiki");
     }
 
     private ComponentManager getUserComponentManager() throws Exception
     {
-        return getComponentManager().lookup(ComponentManager.class, "user");
+        return getComponentManager().getInstance(ComponentManager.class, "user");
     }
 
     @Test
@@ -121,12 +121,12 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
 
-        Macro testMacro = getWikiComponentManager().lookup(Macro.class, "macroid");
+        Macro testMacro = getWikiComponentManager().getInstance(Macro.class, "macroid");
 
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         try {
-            testMacro = getComponentManager().lookup(Macro.class, "macroid");
+            testMacro = getComponentManager().getInstance(Macro.class, "macroid");
 
             Assert.fail("Found macro with wiki visibility in global componenet manager");
         } catch (ComponentLookupException expected) {
@@ -159,7 +159,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
 
-        Macro testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
+        Macro testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
@@ -170,7 +170,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
 
-        testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
+        testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
@@ -179,7 +179,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         getContext().setUser("XWiki.user");
 
         try {
-            testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
+            testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
             Assert.fail("The macro has not been properly unregistered");
         } catch (ComponentLookupException expected) {

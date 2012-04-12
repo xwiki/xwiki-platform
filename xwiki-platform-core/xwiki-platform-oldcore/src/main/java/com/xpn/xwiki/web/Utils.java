@@ -716,7 +716,7 @@ public class Utils
         List<T> components;
         if (componentManager != null) {
             try {
-                components = componentManager.lookupList(role);
+                components = componentManager.getInstanceList(role);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load components with role [" + role.getName() + "]", e);
             }

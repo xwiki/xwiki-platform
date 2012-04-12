@@ -82,7 +82,7 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 
         final String storeName = context.getWiki().Param("xwiki.store.main.hint", "default");
         try {
-            this.queryExecutor = this.manager.lookup(QueryExecutor.class, storeName);
+            this.queryExecutor = this.manager.getInstance(QueryExecutor.class, storeName);
         } catch (ComponentLookupException e) {
             this.logger.warn(
                 "Could not find a QueryExecutor with hint " + storeName + " which is the hint for the storage engine. "

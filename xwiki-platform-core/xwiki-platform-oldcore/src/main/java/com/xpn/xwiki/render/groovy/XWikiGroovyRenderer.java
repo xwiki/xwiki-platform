@@ -138,7 +138,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     public void initCache(int iCapacity, int iClassCapacity, XWikiContext context) throws XWikiException
     {
         try {
-            CacheManager cacheManager = Utils.getComponentManager().lookup(CacheManager.class);
+            CacheManager cacheManager = Utils.getComponentManager().getInstance(CacheManager.class);
 
             CacheConfiguration configuration = new CacheConfiguration();
             configuration.setConfigurationId("xwiki.groovy.content");

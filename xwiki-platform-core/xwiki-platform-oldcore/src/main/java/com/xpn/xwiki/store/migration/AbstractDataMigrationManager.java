@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.store.migration;
 
 import java.util.ArrayList;
@@ -560,7 +559,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         SortedMap<XWikiDBVersion, XWikiMigration> forcedMigrations = new TreeMap<XWikiDBVersion, XWikiMigration>();
         for (String hint : getXWikiConfig().getPropertyAsList("xwiki.store.migration.force")) {
             try {
-                DataMigration dataMigration = componentManager.lookup(DataMigration.class, hint);
+                DataMigration dataMigration = componentManager.getInstance(DataMigration.class, hint);
                 forcedMigrations.put(dataMigration.getVersion(), new XWikiMigration(dataMigration, true));
             } catch (ComponentLookupException e) {
                 throw new DataMigrationException("Forced dataMigration " + hint + " component could not be found", e);

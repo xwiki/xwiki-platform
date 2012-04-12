@@ -1851,15 +1851,21 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #else
     #set ($status = $extension.repository.id.id)
     #if ($status != 'core')
-      ## An extension, either local or remote, that is available to install.
+      ## An extension, either local or remote, that might be available to install.
       ## Check if a different version of this extension is installed or is a core dependency.
       #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
       #if ($currentVersion)
         #set ($status = 'remote-core')
+        #if ($currentVersion.id.equals($extension.id))
+          #set ($status = 'core')
+        #end
       #else
         #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
         #if ($currentVersion)
           #set ($status = 'remote-installed')
+          #if ($currentVersion.id.equals($extension.id))
+            #set ($status = 'installed')
+          #end
         #else
           #set ($status = 'remote')
         #end

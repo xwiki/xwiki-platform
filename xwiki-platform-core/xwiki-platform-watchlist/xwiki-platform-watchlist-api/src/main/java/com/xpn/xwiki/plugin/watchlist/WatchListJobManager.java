@@ -163,6 +163,10 @@ public class WatchListJobManager
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
 
         if (needsUpdate) {
             context.getWiki().saveDocument(doc, "", true, context);
@@ -292,6 +296,11 @@ public class WatchListJobManager
                 needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
+            }
+
+            if (!doc.isHidden()) {
+                needsUpdate = true;
+                doc.setHidden(true);
             }
 
             if (needsUpdate) {

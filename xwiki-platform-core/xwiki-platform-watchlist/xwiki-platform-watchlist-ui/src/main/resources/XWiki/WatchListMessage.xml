@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <attachment>
     <filename>groups.png</filename>
     <filesize>498</filesize>

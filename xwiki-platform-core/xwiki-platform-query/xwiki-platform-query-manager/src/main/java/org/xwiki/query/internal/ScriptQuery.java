@@ -106,7 +106,8 @@ public class ScriptQuery implements Query
 
     @Override
     public Query setWiki(String wiki) {
-        return query.setWiki(wiki);
+        query.setWiki(wiki);
+        return this;
     }
 
     @Override
@@ -116,17 +117,20 @@ public class ScriptQuery implements Query
 
     @Override
     public Query bindValue(String var, Object val) {
-        return query.bindValue(var, val);
+        query.bindValue(var, val);
+        return this;
     }
 
     @Override
     public Query bindValue(int index, Object val) {
-        return query.bindValue(index, val);
+        query.bindValue(index, val);
+        return this;
     }
 
     @Override
     public Query bindValues(List<Object> values) {
-        return query.bindValues(values);
+        query.bindValues(values);
+        return this;
     }
 
     @Override
@@ -141,7 +145,8 @@ public class ScriptQuery implements Query
 
     @Override
     public Query setFilter(QueryFilter filter) {
-        return query.setFilter(filter);
+        query.setFilter(filter);
+        return this;
     }
 
     @Override
@@ -151,12 +156,14 @@ public class ScriptQuery implements Query
 
     @Override
     public Query setLimit(int limit) {
-        return query.setLimit(limit);
+        query.setLimit(limit);
+        return this;
     }
 
     @Override
     public Query setOffset(int offset) {
-        return query.setOffset(offset);
+        query.setOffset(offset);
+        return this;
     }
 
     @Override

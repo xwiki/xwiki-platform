@@ -21,6 +21,8 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiGlobalRights</name>

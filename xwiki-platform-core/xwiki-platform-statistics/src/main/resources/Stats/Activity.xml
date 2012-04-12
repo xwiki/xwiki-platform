@@ -21,6 +21,8 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>true</hidden>
   <content>#if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($chartWidth = 380)
   #displayPanelLayout(2 ['Stats.CurrentWeekActivity', 'Stats.CurrentMonthActivity', 'Stats.CurrentYearActivity', 'Stats.AllTimeActivity'])

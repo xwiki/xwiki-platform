@@ -290,6 +290,10 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             }
+            if (!doc.isHidden()) {
+                needsUpdate = true;
+                doc.setHidden(true);
+            }
 
             if (needsUpdate) {
                 context.getWiki().saveDocument(doc, context);

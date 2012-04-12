@@ -281,12 +281,10 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 needsUpdate = true;
                 doc.setParent("XWiki.XWikiClasses");
             }
-            if (StringUtils.isBlank(doc.getTitle())) {
+            if (StringUtils.isBlank(doc.getTitle())
+                    || StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
                 needsUpdate = true;
                 doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
-            }
-            if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-                needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             }

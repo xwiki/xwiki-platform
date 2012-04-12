@@ -243,6 +243,44 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
+     * Set the meta-information fields of the given extension class document.
+     *
+     * @param doc the document representing the extension class.
+     * @return true if the document has been modified, false otherwise.
+     */
+    private boolean setExtensionClassDocumentFields(XWikiDocument doc)
+    {
+        boolean needsUpdate = false;
+
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator("superadmin");
+        }
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(doc.getTitle())) {
+            needsUpdate = true;
+            doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setSyntax(Syntax.XWIKI_2_0);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
+
+        return needsUpdate;
+    }
+
+    /**
      * Creates or updates the XClass used for this type of extension. Usually called on {@link #init(XWikiContext)} and
      * {@link #virtualInit(XWikiContext)}.
      * 
@@ -268,30 +306,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
             needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
-
-            if (StringUtils.isBlank(doc.getCreator())) {
-                needsUpdate = true;
-                doc.setCreator("superadmin");
-            }
-            if (StringUtils.isBlank(doc.getAuthor())) {
-                needsUpdate = true;
-                doc.setAuthor(doc.getCreator());
-            }
-            if (StringUtils.isBlank(doc.getParent())) {
-                needsUpdate = true;
-                doc.setParent("XWiki.XWikiClasses");
-            }
-            if (StringUtils.isBlank(doc.getTitle())
-                    || StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-                needsUpdate = true;
-                doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
-                doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-                doc.setSyntax(Syntax.XWIKI_2_0);
-            }
-            if (!doc.isHidden()) {
-                needsUpdate = true;
-                doc.setHidden(true);
-            }
+            needsUpdate |= setExtensionClassDocumentFields(doc);
 
             if (needsUpdate) {
                 context.getWiki().saveDocument(doc, context);

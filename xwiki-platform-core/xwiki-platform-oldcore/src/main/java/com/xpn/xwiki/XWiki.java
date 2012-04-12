@@ -112,6 +112,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -6098,7 +6099,8 @@ public class XWiki implements EventListener
     public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
         try {
-            return getStore().getQueryManager().getNamedQuery("getSpaces").execute();
+            return getStore().getQueryManager().getNamedQuery("getSpaces")
+                    .setFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -6107,8 +6109,9 @@ public class XWiki implements EventListener
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
         try {
-            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName)
-                    .execute();
+            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
+                    .setFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"))
+                    .bindValue("space", spaceName).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -6188,7 +6191,8 @@ public class XWiki implements EventListener
     {
         try {
             // refreshes all Links of each doc of the wiki
-            List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments").execute();
+            List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments")
+                    .setFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
             for (int i = 0; i < docs.size(); i++) {
                 XWikiDocument myDoc = this.getDocument(docs.get(i), context);
                 myDoc.getStore().saveLinks(myDoc, context, true);
@@ -7133,6 +7137,10 @@ public class XWiki implements EventListener
         if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
             doc.setTitle(title);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         // Use ClassSheet to display the class document if no other sheet is explicitly specified.

@@ -287,13 +287,9 @@ public class WatchListJobManager
             needsUpdate |= createWatchListJobObject(doc, emailTemplate, context);
             needsUpdate |= setWatchListCommonDocumentsFields(doc);
 
-            if (StringUtils.isBlank(doc.getTitle())) {
+            if (StringUtils.isBlank(doc.getTitle()) || StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setTitle("$msg.get(\"" + nameResource + "\")");
-            }
-
-            if (StringUtils.isBlank(doc.getContent())) {
-                needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             }

@@ -187,19 +187,13 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 {{velocity}}
 ## AJAX call for a single extension.
 #if ($xcontext.action == 'get' &amp;&amp; $request.extensionId &amp;&amp; $request.extensionVersion)
-  #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
-  #displayExtension($extension)
+  #handleExtensionRequest()
 #else
   (% class="full column" %)(((
   #displayExtensionSearchBar()
   #if ($request.extensionId &amp;&amp; $request.extensionVersion)
     ## Advanced search.
-    #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
-    #if ($extension)
-      #displayExtension($extension)
-    #else
-      {{info}}$msg.get('extensions.advancedSearch.noResults', ["**{{{$!request.extensionId}}}**", "**{{{$!request.extensionVersion}}}**"]){{/info}}
-    #end
+    #handleExtensionRequest()
   #else
     ## Simple search.
     #set ($paginationParams = {})

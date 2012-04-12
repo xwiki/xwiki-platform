@@ -1361,8 +1361,11 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #if ($extension.dependencies.size() &gt; 0 || $backwardDependencies.size() &gt; 0)
     * #displayExtensionDetails_menuLink('dependencies')
   #end
-  #if ($request.actioninstall || $request.actionuninstall)
-    * #displayExtensionDetails_menuLink('progress' true)
+  ## Display the progress tab if the install/uninstall plan is requested or if there is 
+  ## a previously stored job status for this extension (a previous install or uninstall).
+  #set ($planRequested = $request.actioninstall || $request.actionuninstall)
+  #if ($planRequested || $extensionManager.getExtensionJobStatus($extension.id.id))
+    * #displayExtensionDetails_menuLink('progress' $planRequested)
   #end
 #end
 
@@ -1421,12 +1424,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #set ($dependencyExtension = $extensionManager.resolve($dependency))
     #if ($dependencyExtension)
       #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage)
-      #set ($queryString = "extensionId=${dependency.id}&amp;extensionVersion=${dependency.versionConstraint}&amp;xback=$!escapetool.url($xback)")
-      #if ($request.section)
-        #set ($queryString = "${queryString}&amp;section=$escapetool.url($request.section)")
-      #end
-      #set ($url = $doc.getURL($xcontext.action, $queryString))
-      #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$url]]")
+      #set ($dependencyURL = "#getExtensionURL($dependency.id $dependency.versionConstraint)")
+      #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$dependencyURL]]")
     #end
     * (% class="dependency-item extension-item-$dependencyStatus" %)(((
         ${dependencyName}(% class="extension-version" %)$!{dependency.versionConstraint}(% class="extension-status" %)$!dependencyStatusMessage
@@ -1441,12 +1440,9 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   $msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])
   #foreach ($namespace in $backwardDependencies.entrySet())
     #foreach ($dependency in $namespace.value)
-      #set ($queryString = "extensionId=${dependency.id.id}&amp;extensionVersion=${dependency.id.version}&amp;xback=$escapetool.url($xback)")
-      #if ($request.section)
-        #set ($queryString = "$queryString&amp;section=$!escapetool.url($request.section)")
-      #end
+      #set ($dependencyURL = "#getExtensionURL($dependency.id.id $dependency.id.version)")
       * (% class="dependency-item extension-item-installed" %)(((
-          [[#displayExtensionName($dependency)&gt;&gt;path:$doc.getURL($xcontext.action, $queryString)]](% class="extension-version" %)$!{dependency.id.version}(%%)##
+          [[#displayExtensionName($dependency)&gt;&gt;path:$dependencyURL]](% class="extension-version" %)$!{dependency.id.version}(%%)##
           #if ("$!{namespace.key}" != '')
             (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace.key])##
           #end
@@ -1469,22 +1465,17 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (displayExtensionDetails_progress $extension)
-  #if ($request.actioninstall || $request.actionuninstall)
+  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
+  #if ($jobStatus || $request.actioninstall || $request.actionuninstall)
 
     {{id name="extension-body-progress-${extension.id.id}-${extension.id.version}" /}}
     (% class="extension-body-progress extension-body-section" %)(((
       #if ($request.actioninstall)
-        #if ($request.confirm)
-          #installExtension($extension.id.id $extension.id.version.value $extensionNamespace)
-        #else
-          #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
-        #end
+        #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
       #elseif ($request.actionuninstall)
-        #if ($request.confirm)
-          #uninstallExtension($extension.id.id $extension.id.version.value $extensionNamespace)
-        #else
-          #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
-        #end
+        #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
+      #else
+        {{box}}#printStatusLog($jobStatus){{/box}}
       #end
     )))
   #end
@@ -1540,17 +1531,23 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (installExtension $extensionId $extensionVersion $extensionNamespace)
-  #set ($installJob = $extensionManager.install($extensionId, $extensionVersion, $extensionNamespace))
+  #set ($discard = $extensionManager.install($extensionId, $extensionVersion, $extensionNamespace))
   #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
     #if ($extensionWiki)
-      {{error}}$msg.get('extensions.install.error.installFailure.onWiki', [$extensionId, $extensionVersion, $extensionWiki]) ##
+      #set ($errorMessage = $msg.get('extensions.install.error.installFailure.onWiki', [$extensionId, $extensionVersion, $extensionWiki]))
     #else
-      {{error}}$msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]) ##
+      #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
     #end
-    #printThrowable($lastError){{/error}}
+    #if ($xcontext.action == 'get')
+      ## AJAX request. Send error back.
+      $response.sendError(400, $errorMessage)
+    #else
+      {{error}}$errorMessage #printThrowable($lastError){{/error}}
+    #end
   #else
-    {{box}}#printJobLog($installJob){{/box}}
+    ## Redirect to extension display.
+    $response.sendRedirect("#getExtensionURL()")
   #end
 #end
 
@@ -1602,6 +1599,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         {{html}}
           &lt;form action="" class="xform"&gt;
             &lt;div&gt;
+              &lt;input name="form_token" value="$!services.csrf.getToken()" type="hidden" /&gt;
               &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
               &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
               #if ($extensionWiki)
@@ -1626,17 +1624,19 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (uninstallExtension $extensionId $extensionVersion $extensionNamespace)
-  #set($uninstallJob = $extensionManager.uninstall($extensionId, $extensionNamespace))
-  #set($lasterror = $extensionManager.lastError)
-  #if ($lasterror)
-    {{error}}
-      $msg.get('extensions.uninstall.error.uninstallFailure', [$extensionId, $extensionVersion]) ##
-      #printThrowable($lasterror)
-    {{/error}}
+  #set($discard = $extensionManager.uninstall($extensionId, $extensionNamespace))
+  #set($lastError = $extensionManager.lastError)
+  #if ($lastError)
+    #set ($errorMessage = $msg.get('extensions.uninstall.error.uninstallFailure', [$extensionId, $extensionVersion]))
+    #if ($xcontext.action == 'get')
+      ## AJAX request. Send error back.
+      $response.sendError(400, $errorMessage)
+    #else
+      {{error}}$errorMessage #printThrowable($lastError){{/error}}
+    #end
   #else
-    {{box}}
-      #printJobLog($uninstallJob)
-    {{/box}}
+    ## Redirect to extension display.
+    $response.sendRedirect("#getExtensionURL()")
   #end
 #end
 
@@ -1675,6 +1675,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         {{html}}
           &lt;form action="" class="xform"&gt;
             &lt;div&gt;
+              &lt;input name="form_token" value="$!services.csrf.getToken()" type="hidden" /&gt;
               &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
               &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
               #if ($extensionWiki)
@@ -1698,6 +1699,60 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
 #end
 
+#macro (getExtensionURL $extensionId $extensionVersion)
+  #set ($parameters = {})
+  #if ($extensionId)
+    #set ($discard = $parameters.put('extensionId', $extensionId))
+  #elseif ($request.extensionId)
+    #set ($discard = $parameters.put('extensionId', $request.extensionId))
+  #end
+  #if ($extensionVersion)
+    #set ($discard = $parameters.put('extensionVersion', $extensionVersion))
+  #elseif ($request.extensionVersion)
+    #set ($discard = $parameters.put('extensionVersion', $request.extensionVersion))
+  #end
+  #if ($xback)
+    #set ($discard = $parameters.put('xback', $xback))
+  #elseif ($request.xback)
+    #set ($discard = $parameters.put('xback', $request.xback))
+  #end
+  #if ($request.section)
+    #set ($discard = $parameters.put('section', $request.section))
+  #end
+  #set ($queryString = '')
+  #foreach ($entry in $parameters.entrySet())
+    #set ($queryString = "$queryString&amp;$escapetool.url($entry.key)=$escapetool.url($entry.value)")
+  #end
+$doc.getURL($xcontext.action, $queryString.substring(1))##
+#end
+
+#macro (handleExtensionRequest)
+  #if ($request.confirm)
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #if ($request.actioninstall)
+        #installExtension($request.extensionId $request.extensionVersion $extensionNamespace)
+      #elseif ($request.actionuninstall)
+        #uninstallExtension($request.extensionId $request.extensionVersion $extensionNamespace)
+      #else
+        $response.sendRedirect("#getExtensionURL()")
+      #end
+    #elseif ($xcontext.action == 'get')
+      # AJAX request. The CSRF token expired. We only redisplay the extension because the resubmission confirmation doesn't fit nicely in-line.
+      $response.sendRedirect("#getExtensionURL()")
+    #else
+      $response.sendRedirect($services.csrf.getResubmissionURL())
+    #end
+  #else
+    ## Display the extension.
+    #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
+    #if ($extension)
+      #displayExtension($extension)
+    #else
+      {{info}}$msg.get('extensions.advancedSearch.noResults', ["**{{{$!request.extensionId}}}**", "**{{{$!request.extensionVersion}}}**"]){{/info}}
+    #end
+  #end
+#end
+
 #macro (printThrowable $throwable)
   $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
 
@@ -1707,10 +1762,6 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #if ($throwable.cause)
     Caused by: #printThrowable($throwable.cause)
   #end
-#end
-
-#macro (printJobLog $job)
-  #printStatusLog($job.status)
 #end
 
 #macro (printStatusLog $status)

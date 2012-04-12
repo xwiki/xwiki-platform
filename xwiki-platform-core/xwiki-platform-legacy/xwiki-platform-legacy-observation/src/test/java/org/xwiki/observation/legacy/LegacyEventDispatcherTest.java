@@ -50,7 +50,7 @@ public class LegacyEventDispatcherTest extends AbstractComponentTestCase
     @Before
     public void setUp() throws Exception
     {
-        this.om = getComponentManager().lookup(ObservationManager.class);
+        this.om = getComponentManager().getInstance(ObservationManager.class);
     }
 
     @Test

@@ -57,7 +57,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
         this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
 
-        this.handler = getComponentManager().lookup(ExtendedURLStreamHandler.class, "attachmentjar");
+        this.handler = getComponentManager().getInstance(ExtendedURLStreamHandler.class, "attachmentjar");
     }
 
     @Test

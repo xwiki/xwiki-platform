@@ -227,6 +227,8 @@
       extensionItem.select(".extension-body-dependencies a").each(function (link) {
          link.setAttribute('href', XWiki.currentDocument.getURL((XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view'), link.getAttribute('href').replace(/.*\?/, "")));
       });
+      // Enhance the progress tab, if present.
+      this.addExtensionProgressBehavior(extensionItem);
     },
 
     /**
@@ -265,6 +267,19 @@
       $(menuItem.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
       // Mark the given menu item as active (i.e. select the menu item that was cliked).
       menuItem.addClassName(this.extensionCurrentMenuItemMarker);
+    },
+
+    addExtensionProgressBehavior : function(extensionItem) {
+      // Toggle stack trace display in extension log.
+      extensionItem.select('.extension-log-item').each(function (logItem) {
+        // If the log item has details.
+        if (logItem.down('div')) {
+          var logMessage = logItem.down('p');
+          logMessage.observe('click', function() {
+            logItem.toggleClassName('extension-log-item-expanded');
+          });
+        }
+      });
     },
 
     prepareSimpleSearch : function() {
@@ -312,8 +327,10 @@
 
   function init() {
     var em =  new admin.ExtensionManager();
-    if ($$(em.extensionItemSelector).length == 1 &amp;&amp; $$(em.extensionBodySelector).length == 1) {
-      em.addExtensionMenuBehavior($$(em.extensionItemSelector)[0]);
+    var extensionItems = $$(em.extensionItemSelector);
+    if (extensionItems.length == 1 &amp;&amp; $$(em.extensionBodySelector).length == 1) {
+      em.addExtensionMenuBehavior(extensionItems[0]);
+      em.addExtensionProgressBehavior(extensionItems[0]);
     }
     return em;
   }
@@ -519,22 +536,22 @@ ul.extension-metadata li {
   padding-top: 0.5em;
 }
 
-.extension-body-dependencies ul {
+.extension-body-dependencies ul, .extension-body-progress ul {
   border-top: 1px dotted #E8E8E8;
   list-style-type: none;
   margin: 0;
 }
-.extension-body-dependencies li:hover {
+.extension-body-dependencies li:hover, .extension-body-progress li:hover {
   background-color: $theme.highlightColor;
 }
-.dependency-item {
+.dependency-item, .extension-log-item {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.dependency-item &gt; p {
+.dependency-item &gt; p, .extension-log-item &gt; p {
   margin: 0;
 }
 .extension-item-core .extension-name, .extension-item-remote-core .extension-name,
@@ -564,6 +581,32 @@ ul.extension-metadata li {
 }
 .extension-item-remote-core {
   border-right-color: $theme.notificationErrorColor;
+}
+
+.extension-body-progress ul {
+  margin-top: .5em;
+}
+.extension-log-item {
+  background-position: left .3em;
+}
+.extension-log-item-info {
+  background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
+  color: $theme.notificationInfoColor;
+}
+.extension-log-item-warn {
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
+  color: $theme.notificationWarningColor;
+}
+.extension-log-item-error {
+  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
+  color: $theme.notificationErrorColor;
+}
+.extension-log-item &gt; div {
+  /* Hide log details by default */
+  display: none;
+}
+.extension-log-item-expanded &gt; div {
+  display: block;
 }
 
 .extension-search-bar {
@@ -1506,7 +1549,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #elseif ($request.actionuninstall)
         #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
       #else
-        {{box}}#printStatusLog($jobStatus){{/box}}
+        #printStatusLog($jobStatus)
       #end
     )))
   #end
@@ -1595,7 +1638,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
     ##
     #if ($hasError)
-      {{box}}#printStatusLog($installPlan){{/box}}
+      #printStatusLog($installPlan)
     #else
       #set($extensionsToInstall = [])
       #set($extensionsToUpgrade = [])
@@ -1684,7 +1727,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #end
     ##
     #if ($hasError)
-      {{box}}#printStatusLog($uninstallPlan){{/box}}
+      #printStatusLog($uninstallPlan)
     #else
       #set($extensionsToUninstall = [])
       ##
@@ -1795,18 +1838,32 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #end
 #end
 
+#macro (getThrowableRootCauseMessage $throwable)
+  #if ($throwable.cause)
+    #getThrowableRootCauseMessage($throwable.cause)
+  #else
+    $!{throwable.message}##
+  #end
+#end
+
 #macro (printStatusLog $status)
   #foreach ($log in $status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
-    #if ($logLevel == 'warn')
-      #set ($logLevel = 'warning')
-    #end
-    {{$logLevel}}
-      $log.formattedMessage
-      #if ($log.throwable)
-        #printThrowable($log.throwable)
-      #end
-    {{/$logLevel}}
+    * (% class="extension-log-item extension-log-item-$logLevel" %)(((
+        #if ($log.throwable)
+          #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
+          #if ($message.trim() == '')
+            #set ($message = $log.formattedMessage)
+          #end
+          $message
+
+          (((
+            #printThrowable($log.throwable)
+          )))
+        #else
+          $log.formattedMessage
+        #end
+      )))
   #end
 #end
 

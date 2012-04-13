@@ -534,7 +534,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param events events to wrap
      * @return list of wrapped events
      */
-    private List<ActivityEvent> wrapEvents(List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events)
+    protected List<ActivityEvent> wrapEvents(List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events)
     {
         List<ActivityEvent> result = new ArrayList<ActivityEvent>();
         if (events != null) {
@@ -553,7 +553,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param events events to unwrap
      * @return list of unwrapped events
      */
-    private List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> unwrapEvents(List<ActivityEvent> events)
+    protected List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> unwrapEvents(List<ActivityEvent> events)
     {
         List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> result =
             new ArrayList<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent>();

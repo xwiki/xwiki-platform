@@ -151,7 +151,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * @param doc document which fired the event
      * @param context the XWiki context
      */
-    private void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
+    protected void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
     {
         if (event.getUser() == null) {
             event.setUser(context.getUser());
@@ -187,7 +187,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * @param context the XWiki context
      * @return the generated ID
      */
-    private String generateEventId(ActivityEvent event, XWikiContext context)
+    protected String generateEventId(ActivityEvent event, XWikiContext context)
     {
         String keySeparator = EVENT_ID_ELEMENTS_SEPARATOR;
         String wikiSpaceSeparator = ":";
@@ -211,7 +211,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * @return a new instance of {@link ActivityEventImpl}.
      */
-    private ActivityEvent newActivityEvent()
+    protected ActivityEvent newActivityEvent()
     {
         return new ActivityEventImpl();
     }

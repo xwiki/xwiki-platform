@@ -93,12 +93,6 @@ public class ContextComponentManager extends DelegateComponentManager implements
         throwException();
     }
 
-    @Override
-    public <T> void unregisterComponent(Class<T> role, String roleHint)
-    {
-        throwException();
-    }
-
     /**
      * Exception to throw when trying to access a write method since this Component Manager is a chaining Component
      * Manager and should only be used for read-only access.

@@ -1489,21 +1489,39 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
 #end
 
+#macro (displayDependency $dependencyOrExtension $namespace)
+  #if ($dependencyOrExtension.versionConstraint)
+    ## Dependency object.
+    #set ($dependencyId = $dependencyOrExtension.id)
+    #set ($dependencyVersion = $dependencyOrExtension.versionConstraint)
+    #set ($dependencyExtension = $extensionManager.resolve($dependencyOrExtension))
+  #else
+    ## Extension object.
+    #set ($dependencyId = $dependencyOrExtension.id.id)
+    #set ($dependencyVersion = $dependencyOrExtension.id.version.value)
+    #set ($dependencyExtension = $dependencyOrExtension)
+  #end
+  #set ($dependencyStatus = 'unknown')
+  #set ($dependencyStatusMessage = $NULL)
+  #set ($dependencyName = $dependencyId)
+  #if ($dependencyExtension)
+    #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage)
+    #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
+    #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$dependencyURL]]")
+  #end
+  (% class="dependency-item extension-item-$dependencyStatus" %)(((
+    ${dependencyName}(% class="extension-version" %)$!{dependencyVersion}##
+    #if ("$!namespace" != '')
+      (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace])##
+    #end
+    (% class="extension-status" %)$!dependencyStatusMessage
+  )))
+#end
+
 #macro (displayExtensionDetails_dependencies_upstream $extension)
   $msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])
   #foreach ($dependency in $extension.dependencies)
-    #set ($dependencyStatus = 'unknown')
-    #set ($dependencyStatusMessage = $NULL)
-    #set ($dependencyName = $dependency.id)
-    #set ($dependencyExtension = $extensionManager.resolve($dependency))
-    #if ($dependencyExtension)
-      #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage)
-      #set ($dependencyURL = "#getExtensionURL($dependency.id $dependency.versionConstraint)")
-      #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$dependencyURL]]")
-    #end
-    * (% class="dependency-item extension-item-$dependencyStatus" %)(((
-        ${dependencyName}(% class="extension-version" %)$!{dependency.versionConstraint}(% class="extension-status" %)$!dependencyStatusMessage
-      )))
+    * #displayDependency($dependency)
     #if (!$foreach.hasNext)
 
     #end
@@ -1514,14 +1532,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   $msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])
   #foreach ($namespace in $backwardDependencies.entrySet())
     #foreach ($dependency in $namespace.value)
-      #set ($dependencyURL = "#getExtensionURL($dependency.id.id $dependency.id.version)")
-      * (% class="dependency-item extension-item-installed" %)(((
-          [[#displayExtensionName($dependency)&gt;&gt;path:$dependencyURL]](% class="extension-version" %)$!{dependency.id.version}(%%)##
-          #if ("$!{namespace.key}" != '')
-            (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace.key])##
-          #end
-          (% class="extension-status" %)$msg.get("extensions.info.status.installed")
-        )))
+      * #displayDependency($dependency $namespace.key)
     #end
   #end
 #end
@@ -1657,16 +1668,14 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #if (!$extensionsToInstall.isEmpty())
           $msg.get('extensions.install.list.new')
           #foreach ($planAction in $extensionsToInstall)
-            * $planAction.extension.id.id ($planAction.extension.id.version)#if ($planAction.namespace) - $planAction.namespace#end
-
+            * #displayDependency($planAction.extension $planAction.namespace)
           #end
 
         #end
         #if (!$extensionsToUpgrade.isEmpty())
           $msg.get('extensions.install.list.upgrade')
           #foreach ($planAction in $extensionsToUpgrade)
-            * $planAction.extension.id.id ($planAction.extension.id.version)#if ($planAction.namespace) - $planAction.namespace#end
-
+            * #displayDependency($planAction.extension $planAction.namespace)
           #end
 
         #end
@@ -1742,8 +1751,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #else
         The following extensions will be removed:
         #foreach ($planAction in $extensionsToUninstall)
-          * $planAction.extension.id.id ($planAction.extension.id.version)#if ($planAction.namespace) - $planAction.namespace#end
-
+          * #displayDependency($planAction.extension $planAction.namespace)
         #end
 
         {{html}}

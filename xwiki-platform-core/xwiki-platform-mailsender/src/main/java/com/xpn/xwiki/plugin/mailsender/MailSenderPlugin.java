@@ -251,6 +251,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
 
         if (needsUpdate) {
             xwiki.saveDocument(doc, context);
@@ -334,8 +338,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Add attachments to a multipart message
      * 
-     * @param multipart Multipart message
-     * @param attachments List of attachments
+     * @param attachment the attachment to create the body part for.
+     * @param context the XWiki context.
+     * @return the body part for the given attachment.
      */
     public MimeBodyPart createAttachmentBodyPart(Attachment attachment, XWikiContext context) throws XWikiException,
         IOException, MessagingException

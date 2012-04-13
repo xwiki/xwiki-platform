@@ -604,6 +604,39 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         return context.getDatabase() + ":" + object.getName() + "_" + object.getNumber();
     }
 
+    private boolean setSchedulerClassesDocumentFields(XWikiDocument doc, String title)
+    {
+        boolean needsUpdate = false;
+
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator("superadmin");
+        }
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(doc.getTitle())) {
+            needsUpdate = true;
+            doc.setTitle(title);
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
+            needsUpdate = true;
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setSyntax(Syntax.XWIKI_2_0);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
+
+        return needsUpdate;
+    }
+
     /**
      * Creates the XWiki SchedulerJob XClass if it does not exist in the wiki. Update it if it exists but is missing
      * some properties.
@@ -643,28 +676,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextField("contextUser", "Job execution context user", 30);
         needsUpdate |= bclass.addTextField("contextLang", "Job execution context lang", 30);
         needsUpdate |= bclass.addTextField("contextDatabase", "Job execution context database", 30);
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator("superadmin");
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle("XWiki Scheduler Job Class");
-        }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
+        needsUpdate |= setSchedulerClassesDocumentFields(doc, "XWiki Scheduler Job Class");
 
         if (needsUpdate) {
             try {

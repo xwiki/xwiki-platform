@@ -679,6 +679,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
+
         if (needsUpdate) {
             context.getWiki().saveDocument(doc, context);
         }
@@ -742,6 +747,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
+        }
+
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         if (needsUpdate) {

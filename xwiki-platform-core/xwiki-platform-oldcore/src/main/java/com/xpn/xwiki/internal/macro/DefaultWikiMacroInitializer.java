@@ -257,6 +257,10 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
 
         return needsUpdate;
     }

@@ -42,6 +42,14 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Uncomment this line to overload the languages to search
 ## #set($languages = "default,en,de")
 #set ($rssmode = ("$!request.xpage" == 'plain'))
+## --------------------------
+## Hidden documents filtering
+## --------------------------
+#set($hiddenClause = ' AND hidden:false')
+## TODO: rewrite this when we'll have a user configuration script service
+#if($xwiki.getDocument($xcontext.user).getValue('displayHiddenDocuments') == 1)
+  #set($hiddenClause = '')
+#end
 ## ---------------
 ## Space filtering
 ## ---------------
@@ -181,7 +189,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     ## ---------------
     ## Lucene search
     ## ---------------
-    #set($searchresults = $lucene.getSearchResults("${query}${extraClause}", '', $wikinames, $!languages))
+    #set($searchresults = $lucene.getSearchResults("(${query}${extraClause})${hiddenClause}", '', $wikinames, $!languages))
     #if($searchresults &amp;&amp; $searchresults.getHitcount() &gt; 0)
       ## -----------------
       ## Pagination (top)

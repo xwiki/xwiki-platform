@@ -84,6 +84,9 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     /** The importance of the document last modification date. **/
     protected static final float DATE_BOOST = 0.1f;
 
+    /** The importance of the document hidden flag. **/
+    protected static final float HIDDEN_BOOST = 0.01f;
+
     private String version;
 
     private String documentTitle;
@@ -196,6 +199,9 @@ public abstract class AbstractDocumentData extends AbstractIndexData
 
         addFieldToDocument(IndexFields.DOCUMENT_FULLNAME, getDocumentFullName(), Field.Store.YES, Field.Index.ANALYZED,
             FULL_NAME_BOOST, luceneDoc);
+
+        addFieldToDocument(IndexFields.DOCUMENT_HIDDEN, doc.isHidden().toString(), Field.Store.YES,
+            Field.Index.NOT_ANALYZED, HIDDEN_BOOST, luceneDoc);
 
         // Large text fields: tokenized and indexed, but not stored
         // No reconstruction of the original content will be possible from the search result

@@ -66,6 +66,8 @@ public class SearchResult
 
     private String creator;
 
+    private boolean hidden;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResult.class);
 
     /**
@@ -89,6 +91,7 @@ public class SearchResult
         this.language = doc.get(IndexFields.DOCUMENT_LANGUAGE);
         this.date = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_DATE));
         this.creationDate = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_CREATIONDATE));
+        this.hidden = IndexFields.stringToBoolean(doc.get(IndexFields.DOCUMENT_HIDDEN));
         if (LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type)) {
             this.filename = doc.get(IndexFields.FILENAME);
             Document document;
@@ -250,6 +253,14 @@ public class SearchResult
     public boolean isWikiContent()
     {
         return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(this.type) || LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type));
+    }
+
+    /**
+     * @return true if the result is marked as "hidden", false otherwise.
+     */
+    public boolean isHidden()
+    {
+        return hidden;
     }
 
 }

@@ -116,6 +116,11 @@ public abstract class IndexFields
     public static final String DOCUMENT_CREATIONDATE = "creationdate";
 
     /**
+     * Document hidden flag.
+     */
+    public static final String DOCUMENT_HIDDEN = "hidden";
+
+    /**
      * Fulltext content, not stored (and can therefore not be restored from the index).
      */
     public static final String FULLTEXT = "ft";
@@ -147,6 +152,11 @@ public abstract class IndexFields
         }
 
         return null;
+    }
+
+    public static final boolean stringToBoolean(String booleanValue)
+    {
+        return Boolean.parseBoolean(booleanValue);
     }
 
     private IndexFields()

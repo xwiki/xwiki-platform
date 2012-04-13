@@ -24,6 +24,9 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+## ------------------------
+## URL parameters retrieval
+## ------------------------
 #set($query = "$!request.query")
 #set($input = "$!request.input")
 #set($nb = "$!request.nb")
@@ -32,11 +35,22 @@
 #else
   #set($nb = 6)
 #end
+## --------------------------
+## Hidden documents filtering
+## --------------------------
+#set($hiddenClause = ' AND hidden:false')
+## TODO: rewrite this when we'll have a user configuration script service
+#if($xwiki.getDocument($xcontext.user).getValue('displayHiddenDocuments') == 1)
+  #set($hiddenClause = '')
+#end
+## -----------------------------------
+## Query execution, results formatting
+## -----------------------------------
 #if($query != '' &amp;&amp; $input != '')
   #set($query = $query.replaceAll('__INPUT__', $input))
   #set($discard = $response.setContentType("text/xml"))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-  #set($rawresults = $xwiki.lucene.getSearchResults($query, '', $xcontext.database, $NULL))
+  #set($rawresults = $xwiki.lucene.getSearchResults("(${query})${hiddenClause}", '', $xcontext.database, $NULL))
   #set($results = $rawresults.getResults("1", "$nb"))
   &lt;results&gt;
     #foreach($item in $results)

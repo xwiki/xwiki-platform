@@ -35,107 +35,107 @@ public class ActivityEventImpl implements ActivityEvent
     /**
      * ID.
      */
-    private String eventId;
+    protected String eventId;
 
     /**
      * Request ID.
      */
-    private String requestId;
+    protected String requestId;
 
     /**
      * Priority.
      */
-    private int priority;
+    protected int priority;
 
     /**
      * Date the event occured.
      */
-    private Date date;
+    protected Date date;
 
     /**
      * Stream the event belongs to.
      */
-    private String stream;
+    protected String stream;
 
     /**
      * Application which fired the event (as of august 2009 this application is always "xwiki").
      */
-    private String application;
+    protected String application;
 
     /**
      * Type of the event, see {@link ActivityEventType}.
      */
-    private String type;
+    protected String type;
 
     /**
      * Context user at the time the event has been fired.
      */
-    private String user;
+    protected String user;
 
     /**
      * Wiki in which the event occured, example: "xwiki".
      */
-    private String wiki;
+    protected String wiki;
 
     /**
      * Space in which the event occured, example: "Main".
      */
-    private String space;
+    protected String space;
 
     /**
      * Name of the document which fired the event, example: "Main.WebHome".
      */
-    private String page;
+    protected String page;
 
     /**
      * URL of the document which fired the event, example: "/xwiki/bin/view/Main/WebHome".
      */
-    private String url;
+    protected String url;
 
     /**
      * Title of the event.
      */
-    private String title;
+    protected String title;
 
     /**
      * Body message of the event.
      */
-    private String body = "";
+    protected String body = "";
 
     /**
      * Version of the document at the time the event occured.
      */
-    private String version = "";
+    protected String version = "";
 
     /**
      * Free param 1.
      */
-    private String param1 = "";
+    protected String param1 = "";
 
     /**
      * Free param 2.
      */
-    private String param2 = "";
+    protected String param2 = "";
 
     /**
      * Free param 3.
      */
-    private String param3 = "";
+    protected String param3 = "";
 
     /**
      * Free param 4.
      */
-    private String param4 = "";
+    protected String param4 = "";
 
     /**
      * Free param 5.
      */
-    private String param5 = "";
+    protected String param5 = "";
 
     /**
      * Named parameters.
      */
-    private Map<String, String> parameters;
+    protected Map<String, String> parameters;
     
     @Override
     public String getDisplayTitle(XWikiContext context)

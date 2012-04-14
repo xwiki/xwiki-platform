@@ -20,7 +20,7 @@
 package org.xwiki.display.internal;
 
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Component used to display documents.
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.2M3
  */
-@ComponentRole
+@Role
 public interface DocumentDisplayer extends Displayer<DocumentModelBridge, DocumentDisplayerParameters>
 {
 }

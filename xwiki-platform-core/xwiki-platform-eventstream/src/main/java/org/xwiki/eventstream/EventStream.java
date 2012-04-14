@@ -21,7 +21,7 @@ package org.xwiki.eventstream;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -31,7 +31,7 @@ import org.xwiki.query.QueryException;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole
+@Role
 public interface EventStream
 {
     /**

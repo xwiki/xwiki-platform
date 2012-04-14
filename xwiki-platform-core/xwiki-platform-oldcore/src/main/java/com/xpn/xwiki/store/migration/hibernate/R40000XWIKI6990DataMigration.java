@@ -150,13 +150,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         @Override
         public String getName()
         {
-            return name;
+            return this.name;
         }
 
         @Override
         public int getNumber()
         {
-            return number;
+            return this.number;
         }
     }
 
@@ -177,7 +177,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          */
         void setOldId(long oldId);
     }
-    
+
     /**
      * Base implementation of the hibernate callback to convert identifier.
      */
@@ -185,10 +185,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     {
         /** Name for the id column. */
         public static final String ID = "id";
-        
+
         /** Name for the subid column. */
-        public static  final String IDID = "id.id";
-        
+        public static final String IDID = "id.id";
+
         /** Name for the docid column. */
         public static final String DOCID = "docId";
 
@@ -243,7 +243,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         {
             executeIdUpdate(klass.getName(), field);
         }
-        
+
         /**
          * Update object id in a given field of a given table.
          *
@@ -256,9 +256,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("update ").append(name)
                 .append(" klass set klass.").append(field).append('=').append(':').append(NEWID)
                 .append(" where klass.").append(field).append('=').append(':').append(OLDID);
-            session.createQuery(sb.toString())
-                .setLong(NEWID, newId)
-                .setLong(OLDID, oldId)
+            this.session.createQuery(sb.toString())
+                .setLong(NEWID, this.newId)
+                .setLong(OLDID, this.oldId)
                 .executeUpdate();
         }
 
@@ -274,9 +274,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("UPDATE ").append(name)
                 .append(" SET ").append(field).append('=').append(':').append(NEWID)
                 .append(" WHERE ").append(field).append('=').append(':').append(OLDID);
-            session.createSQLQuery(sb.toString())
-                .setLong(NEWID, newId)
-                .setLong(OLDID, oldId)
+            this.session.createSQLQuery(sb.toString())
+                .setLong(NEWID, this.newId)
+                .setLong(OLDID, this.oldId)
                 .executeUpdate();
         }
     }
@@ -286,8 +286,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private interface CustomMappingCallback
     {
-        /** 
-         * Callback to process a custom mapped class. 
+        /**
+         * Callback to process a custom mapped class.
          * 
          * @param store the hibernate store
          * @param name the name of the Xclass
@@ -312,7 +312,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> resolver;
-    
+
     /** Serialize references to identifiers. */
     @Inject
     @Named("local/uid")
@@ -342,15 +342,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private void logProgress(String message, Object... params)
     {
         if (params.length > 0) {
-            logger.info("[{}] - {}", getName(), String.format(message, params));
+            this.logger.info("[{}] - {}", getName(), String.format(message, params));
         } else {
-            logger.info("[{}] - {}", getName(), message);
+            this.logger.info("[{}] - {}", getName(), message);
         }
     }
 
     /**
-     * Calls callback for each custom mapped XClass defined. If needed, the mapping is added and
-     * injected at the end of the processing into the hibernate session factory.
+     * Calls callback for each custom mapped XClass defined. If needed, the mapping is added and injected at the end of
+     * the processing into the hibernate session factory.
      * 
      * @param store the hibernate store
      * @param callback the callback to be called
@@ -360,7 +360,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @throws XWikiException when an unexpected error occurs
      */
     private void processCustomMappings(final XWikiHibernateStore store, final CustomMappingCallback callback,
-        final XWikiContext context) 
+        final XWikiContext context)
         throws DataMigrationException, XWikiException
     {
         if (store.executeRead(context, true, new HibernateCallback<Boolean>()
@@ -457,15 +457,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 Property property = (Property) it.next();
                 if (property.getType().isCollectionType()) {
                     org.hibernate.mapping.Collection coll = (org.hibernate.mapping.Collection) property.getValue();
-                    list.add(new String[]{ coll.getCollectionTable().getName(), 
-                        ((Column) coll.getKey().getColumnIterator().next()).getName() });
+                    list.add(new String[] {coll.getCollectionTable().getName(),
+                        ((Column) coll.getKey().getColumnIterator().next()).getName()});
                 }
             }
         }
-        
+
         return list;
     }
-    
+
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
@@ -473,7 +473,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         final List<String> customMappedClasses = new ArrayList<String>();
         final Map<Long, Long> objs = new HashMap<Long, Long>();
         final Queue<Map<Long, Long>> stats = new LinkedList<Map<Long, Long>>();
-        
+
         // Get ids conversion list
         getStore().executeRead(getXWikiContext(), true, new HibernateCallback<Object>()
         {
@@ -505,8 +505,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         map.put(oldId, newId);
                     }
                 }
-                
-                logProgress("Retrieved %d document IDs to be converted.",map.size());
+
+                logProgress("Retrieved %d document IDs to be converted.", map.size());
             }
 
             @SuppressWarnings("unchecked")
@@ -531,7 +531,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 }
 
-                logProgress("Retrieved %d object IDs to be converted.",map.size());
+                logProgress("Retrieved %d object IDs to be converted.", map.size());
             }
 
             private void fillCustomMappingMap(XWikiHibernateStore store, XWikiContext context)
@@ -563,14 +563,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     String statsName = (String) result[1];
                     Integer number = (Integer) result[2];
 
-                    long newId = statsIdComputer.getId(statsName, number);
+                    long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
 
                     if (oldId != newId) {
                         map.put(oldId, newId);
                     }
                 }
 
-                String klassName = klass.getName().substring(klass.getName().lastIndexOf('.') + 1);            
+                String klassName = klass.getName().substring(klass.getName().lastIndexOf('.') + 1);
                 logProgress("Retrieved %d %s statistics IDs to be converted.", map.size(),
                     klassName.substring(0, klassName.length() - 5).toLowerCase());
             }
@@ -616,8 +616,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             for (Class<?> docClass : DOCLINK_CLASSES) {
                 docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
             }
-    
-            logProgress("Converting %d document IDs in %d tables and %d collection tables...", 
+
+            logProgress("Converting %d document IDs in %d tables and %d collection tables...",
                 docs.size(), DOC_CLASSES.length + DOCLINK_CLASSES.length, docsColl.size());
             convertDbId(docs, new AbstractIdConversionHibernateCallback()
             {
@@ -650,7 +650,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             for (String customClass : customMappedClasses) {
                 objsColl.addAll(getCollectionProperties(configuration.getClassMapping(customClass)));
             }
-    
+
             logProgress("Converting %d object IDs in %d tables, %d custom mapped tables and %d collection tables...",
                 objs.size(), PROPERTY_CLASS.length + 1, customMappedClasses.size(), objsColl.size());
             convertDbId(objs, new AbstractIdConversionHibernateCallback()
@@ -661,7 +661,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     for (String[] coll : objsColl) {
                         executeSqlIdUpdate(coll[0], coll[1]);
                     }
-    
+
                     for (String customMappedClass : customMappedClasses) {
                         executeIdUpdate(customMappedClass, ID);
                     }
@@ -669,7 +669,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     for (Class<?> propertyClass : PROPERTY_CLASS) {
                         executeIdUpdate(propertyClass, IDID);
                     }
-    
+
                     executeIdUpdate(BaseObject.class, ID);
                 }
             });
@@ -680,7 +680,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Proceed to statistics id conversions
         for (final Class<?> statsClass : STATS_CLASSES) {
-            Map<Long,Long> map = stats.poll();
+            Map<Long, Long> map = stats.poll();
             String klassName = statsClass.getName().substring(statsClass.getName().lastIndexOf('.') + 1);
             klassName = klassName.substring(0, klassName.length() - 5).toLowerCase();
 
@@ -707,7 +707,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
         }
     }
-    
+
     /**
      * Create liquibase change log to modify column type to BIGINT (except for Oracle).
      * 
@@ -718,14 +718,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private void appendModifyColumn(StringBuilder sb, String table, String column)
     {
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", logCount++)).append("\" author=\"dgervalle\">\n")
+            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"dgervalle\">\n")
             .append("    <preConditions onFail=\"MARK_RAN\"><not><dbms type=\"oracle\" /></not></preConditions>\n")
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(table)
             .append("] to BIGINT type</comment >\n")
             .append("    <modifyDataType tableName=\"").append(table)
             .append("\"  columnName=\"").append(column)
             .append("\" newDataType=\"BIGINT\"/>\n")
-            .append("  </changeSet>");
+            .append("  </changeSet>\n");
     }
 
     /**
@@ -756,8 +756,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         classes.add(BaseObject.class);
         Collections.addAll(classes, PROPERTY_CLASS);
         Collections.addAll(classes, STATS_CLASSES);
-        
-        logCount = 0;
+
+        this.logCount = 0;
 
         // Process internal classes
         for (Class<?> klass : classes) {
@@ -783,7 +783,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             throw new DataMigrationException("Unable to process custom mapped classes during schema updated", e);
         }
 
-        logProgress("%d schema updates required.", logCount);
+        logProgress("%d schema updates required.", this.logCount);
         return sb.toString();
     }
 }

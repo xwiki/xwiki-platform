@@ -22,7 +22,7 @@ package org.xwiki.chart;
 import java.util.Map;
 
 import org.xwiki.chart.model.ChartModel;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A component interface for defining various chart generators.
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentRole
+@Role
 public interface ChartGenerator
 {
     /**

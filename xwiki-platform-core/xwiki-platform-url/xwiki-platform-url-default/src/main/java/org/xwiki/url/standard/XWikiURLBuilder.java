@@ -19,9 +19,8 @@
  */
 package org.xwiki.url.standard;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.url.InvalidURLException;
 import org.xwiki.url.XWikiURL;
 
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface XWikiURLBuilder
 {
     /**

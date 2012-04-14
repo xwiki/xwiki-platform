@@ -20,7 +20,7 @@
 package org.xwiki.cache;
 
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.component.manager.ComponentLookupException;
 
 /**
@@ -29,7 +29,7 @@ import org.xwiki.component.manager.ComponentLookupException;
  * @version $Id$
  * @since 1.7M1
  */
-@ComponentRole
+@Role
 public interface CacheManager
 {
     /**

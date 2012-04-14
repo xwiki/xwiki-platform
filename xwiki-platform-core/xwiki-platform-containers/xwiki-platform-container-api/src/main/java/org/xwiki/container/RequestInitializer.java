@@ -19,7 +19,7 @@
  */
 package org.xwiki.container;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Let any component that need to perform further initializations involving the Request
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface RequestInitializer
 {
     /**

@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -36,7 +36,7 @@ import org.xwiki.model.reference.ObjectReference;
  * @version $Id$
  * @since 1.6M1
  */
-@ComponentRole
+@Role
 public interface DocumentAccessBridge
 {
     /**

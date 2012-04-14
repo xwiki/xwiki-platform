@@ -147,4 +147,10 @@ public final class DatabaseProduct
     {
         return getProductName().hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return getProductName();
+    }
 }

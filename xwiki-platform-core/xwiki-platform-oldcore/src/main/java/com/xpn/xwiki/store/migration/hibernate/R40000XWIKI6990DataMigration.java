@@ -39,6 +39,7 @@ import org.dom4j.io.SAXReader;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
+import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
@@ -70,8 +71,9 @@ import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.stats.impl.RefererStats;
 import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.XWikiStats;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.util.Util;
@@ -665,9 +667,19 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     for (String customMappedClass : customMappedClasses) {
                         executeIdUpdate(customMappedClass, ID);
                     }
-    
-                    for (Class<?> propertyClass : PROPERTY_CLASS) {
-                        executeIdUpdate(propertyClass, IDID);
+
+                    try {
+                        if (getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+                            executeIdUpdate(BaseProperty.class, IDID);
+                        } else {
+                            for (Class< ? > propertyClass : PROPERTY_CLASS) {
+                                executeIdUpdate(propertyClass, IDID);
+                            }
+                        }
+                    } catch (DataMigrationException ex) {
+                        // We're doing a migration right now, this shouldn't fail
+                        R40000XWIKI6990DataMigration.this.logger.warn(
+                            "DataMigrationException thrown while performing a migration! Message: {}", ex.getMessage());
                     }
 
                     executeIdUpdate(BaseObject.class, ID);
@@ -746,6 +758,71 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
     }
 
+    /**
+     * Append change log to make foreign keys do CASCADEd updates.
+     *
+     * @param sb the string builder to append to
+     * @param pClass the persistent class to process
+     */
+    @SuppressWarnings("unchecked")
+    private void appendForeignKeyChangeLog(StringBuilder sb, PersistentClass pClass)
+    {
+        Iterator<ForeignKey> fki = pClass.getTable().getForeignKeyIterator();
+        if (!fki.hasNext()) {
+            // Fast exit path, if there aren't any foreign keys at all, there's nothing to change
+            return;
+        }
+
+        // Preamble
+        String table = pClass.getTable().getName();
+        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
+            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
+            .append("    <preConditions onFail=\"MARK_RAN\"><dbms type=\"postgresql\" /></preConditions>\n")
+            .append("    <comment>Upgrade foreign keys on table [").append(table)
+            .append("] to use ON UPDATE CASCADE</comment >\n");
+
+        // Concrete Property types should each have a foreign key referencing the BaseProperty
+        // Other classes don't have any foreign keys at all, in which case the fast exit path above was used
+        while (fki.hasNext()) {
+            ForeignKey fk = fki.next();
+            // Drop the old constraint
+            sb.append("    <dropForeignKeyConstraint baseTableName=\"").append(table).append("\" constraintName=\"")
+                .append(fk.getName()).append("\" />\n");
+            // Recreate the constraint
+            sb.append("    <addForeignKeyConstraint constraintName=\"").append(fk.getName()).append(
+                "\" baseTableName=\"").append(table).append("\"  baseColumnNames=\"");
+            // Reuse the data from the old foreign key
+            // Columns in the current table
+            Iterator<Column> columns = fk.getColumnIterator();
+            while (columns.hasNext()) {
+                Column column = columns.next();
+                sb.append(column.getName());
+                if (columns.hasNext()) {
+                    sb.append(",");
+                }
+            }
+            sb.append("\" referencedTableName=\"").append(fk.getReferencedTable().getName()).append(
+                "\" referencedColumnNames=\"");
+            // Columns in the referenced table
+            if (fk.isReferenceToPrimaryKey()) {
+                columns = fk.getReferencedTable().getPrimaryKey().getColumnIterator();
+            } else {
+                columns = fk.getReferencedColumns().iterator();
+            }
+            while (columns.hasNext()) {
+                Column column = columns.next();
+                sb.append(column.getName());
+                if (columns.hasNext()) {
+                    sb.append(",");
+                }
+            }
+            // The important part: cascaded updates
+            sb.append("\" onUpdate=\"CASCADE\"/>\n");
+        }
+        // All done!
+        sb.append("  </changeSet>\n");
+    }
+
     @Override
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
@@ -762,6 +839,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Process internal classes
         for (Class<?> klass : classes) {
             appendClassChangeLog(sb, configuration.getClassMapping(klass.getName()));
+        }
+
+        // The ID update will fail if the foreign key constraints are imposed on each UPDATE command
+        if (getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            for (Class< ? > klass : PROPERTY_CLASS) {
+                appendForeignKeyChangeLog(sb, configuration.getClassMapping(klass.getName()));
+            }
         }
 
         // Process dynamic and custom mapping

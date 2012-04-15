@@ -34,6 +34,8 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.xwiki.component.annotation.Component;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
@@ -119,7 +121,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
 
             for (String[] table : tablesToFix) {
                 stmt.execute("ALTER TABLE " + table[0] + " MODIFY (" + table[1] + " blob)");
-                getIndexesQuery.setString(1, Utils.getContext().getDatabase().toUpperCase());
+                getIndexesQuery.setString(1, getSchemaFromWikiName(Utils.getContext().getDatabase()));
                 getIndexesQuery.setString(2, table[0]);
                 ResultSet indexes = getIndexesQuery.executeQuery();
                 while (indexes.next()) {
@@ -128,5 +130,45 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
                 }
             }
         }
+
+        /**
+         * The actual schema name isn't always the same as the virtual wiki name. Two settings in xwiki.cfg can change
+         * this. For the main wiki, by default "xwiki" is used as the schema name, but the {@code xwiki.db} setting can
+         * override this. Also, the {@code xwiki.db.prefix} can define a prefix that should be appended to all schema
+         * names, so that all the wikis in a farm can have a common prefix. And on Oracle, the schema name is always
+         * uppercased.
+         *
+         * @param wikiName the name of the virtual wiki for which to compute the schema name
+         * @return the schema name corresponding to the virtual wiki, in UPPERCASE
+         */
+        private String getSchemaFromWikiName(String wikiName)
+        {
+            if (wikiName == null) {
+                return null;
+            }
+
+            XWikiContext context = Utils.getContext();
+            XWiki wiki = context.getWiki();
+
+            String schema;
+            if (context.isMainWiki(wikiName)) {
+                // Main wiki database, by default is "xwiki", but can be changed in xwiki.cfg
+                schema = wiki.Param("xwiki.db");
+                if (schema == null) {
+                    schema = wikiName;
+                }
+            } else {
+                // Virtual wiki database name is the name of the wiki
+                schema = wikiName.replace('-', '_');
+            }
+
+            // Apply an optional prefix defined in xwiki.cfg
+            String prefix = wiki.Param("xwiki.db.prefix", "");
+            schema = prefix + schema;
+
+            // Oracle schema names are UPPERCASE
+            return schema.toUpperCase();
+        }
+
     }
 }

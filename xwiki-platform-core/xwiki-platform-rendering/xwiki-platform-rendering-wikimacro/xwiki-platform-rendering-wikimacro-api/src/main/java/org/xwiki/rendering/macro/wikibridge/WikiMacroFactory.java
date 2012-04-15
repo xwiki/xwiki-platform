@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Create a Wiki Macro object by gathering the Macro metadata from a document. 
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0RC1
  */
-@ComponentRole
+@Role
 public interface WikiMacroFactory
 {
     /**

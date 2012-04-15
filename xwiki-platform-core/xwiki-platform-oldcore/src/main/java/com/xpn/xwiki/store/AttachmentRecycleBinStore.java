@@ -22,7 +22,7 @@ package com.xpn.xwiki.store;
 import java.util.Date;
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 1.4M1
  */
-@ComponentRole
+@Role
 public interface AttachmentRecycleBinStore
 {
     /**

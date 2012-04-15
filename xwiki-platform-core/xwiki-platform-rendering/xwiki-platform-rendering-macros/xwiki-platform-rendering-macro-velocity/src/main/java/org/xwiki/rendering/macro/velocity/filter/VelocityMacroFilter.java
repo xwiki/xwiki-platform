@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro.velocity.filter;
 
 import org.apache.velocity.VelocityContext;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Component called before and after velocity execution in velocity macro to modify the content to execute or parse. It
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface VelocityMacroFilter
 {
     /**

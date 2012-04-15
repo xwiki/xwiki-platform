@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.builder;
 
 import java.io.InputStream;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -34,7 +34,7 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
  * @version $Id$
  * @since 2.1M1
  */
-@ComponentRole
+@Role
 public interface PresentationBuilder
 {
     /**

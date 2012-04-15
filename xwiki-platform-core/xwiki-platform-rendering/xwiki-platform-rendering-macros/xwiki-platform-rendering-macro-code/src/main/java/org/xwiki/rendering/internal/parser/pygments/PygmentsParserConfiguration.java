@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.pygments;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Configuration properties for the Pygments based highlight parser.
@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentRole
+@Role
 public interface PygmentsParserConfiguration
 {
     /**

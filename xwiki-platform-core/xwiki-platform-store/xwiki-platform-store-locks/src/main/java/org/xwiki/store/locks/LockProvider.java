@@ -21,7 +21,7 @@ package org.xwiki.store.locks;
 
 import java.util.concurrent.locks.ReadWriteLock;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A means of getting a lock for a specific object.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.1M2
  */
-@ComponentRole
+@Role
 public interface LockProvider
 {
     /**

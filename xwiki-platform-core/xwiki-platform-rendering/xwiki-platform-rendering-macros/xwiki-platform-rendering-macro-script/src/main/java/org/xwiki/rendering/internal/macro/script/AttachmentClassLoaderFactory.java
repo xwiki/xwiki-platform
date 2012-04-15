@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.macro.script;
 
 import org.xwiki.classloader.ExtendedURLClassLoader;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Create a classloader that can load classes and resources from JARs specified as attachments of wiki pages.
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0.1
  */
-@ComponentRole
+@Role
 public interface AttachmentClassLoaderFactory
 {
     /**

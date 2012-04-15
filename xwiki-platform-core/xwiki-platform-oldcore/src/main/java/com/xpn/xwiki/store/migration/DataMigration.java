@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.store.migration;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Interface for data migration.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.4M1
  */
-@ComponentRole
+@Role
 public interface DataMigration
 {
     /**

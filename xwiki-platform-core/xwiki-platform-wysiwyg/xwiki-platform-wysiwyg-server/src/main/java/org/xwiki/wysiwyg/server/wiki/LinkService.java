@@ -19,7 +19,7 @@
  */
 package org.xwiki.wysiwyg.server.wiki;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
@@ -29,7 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface LinkService
 {
     /**

@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.sync;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -30,7 +30,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 @RemoteServiceRelativePath("SyncService.gwtrpc")
 public interface SyncService extends RemoteService
 {

@@ -21,7 +21,7 @@ package org.xwiki.wysiwyg.server.filter;
 
 import javax.servlet.ServletRequest;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface MutableServletRequestFactory
 {
     /**

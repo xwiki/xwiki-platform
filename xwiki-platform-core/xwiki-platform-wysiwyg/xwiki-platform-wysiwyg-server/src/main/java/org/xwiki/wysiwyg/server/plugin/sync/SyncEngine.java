@@ -19,7 +19,7 @@
  */
 package org.xwiki.wysiwyg.server.plugin.sync;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
 import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncStatus;
@@ -29,7 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncStatus;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface SyncEngine
 {
     /**

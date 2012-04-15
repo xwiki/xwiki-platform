@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * This interface encapsulates methods for the management of search queries and is similar to JCR's
- * <a href="http://www.day.com/maven/jsr170/javadocs/jcr-2.0/javax/jcr/query/QueryManager.html">QueryManager</a>
+ * <a href="http://www.day.com/maven/jsr170/javadocs/jcr-2.0/javax/jcr/query/QueryManager.html">QueryManager</a>.
  *
  * @version $Id$
  * @since 1.6M1

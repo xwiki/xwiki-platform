@@ -106,7 +106,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#set ($recentlyModified = $xwiki.searchDocuments('where 1=1 order by doc.date desc', 5, 0))
+#set ($recentlyModified = $services.query.xwql('order by doc.date desc').setFilter('hidden').setLimit(5).setOffset(0).execute())
 #if ($recentlyModified.size() &gt; 0 || $showEmptyPanels)
   #panelheader($msg.get('panels.recentlyModified.title'))
   #foreach ($docname in $recentlyModified)

@@ -549,8 +549,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
       (% id="draganddroptooltip" class="hastooltip" title="${escapetool.xml($msg.get('panelwizard.tip'))}"%)$msg.get('panelwizard.draganddrop')(%%)
       #set ($panelClass = $xwiki.getDocument('Panels.PanelClass').xWikiClass)
       #set ($categoryList = $panelClass.category.getProperty('values').value.split('[|]'))
-      #set ($sql = ', BaseObject as obj where obj.name=doc.fullName and obj.className=''Panels.PanelClass'' and doc.fullName != ''Panels.PanelTemplate''')
-      #set ($panelsList = $xwiki.searchDocuments($sql))
+      #set ($panelsList = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName &lt;&gt; ''Panels.PanelTemplate''').execute())
       #set ($categoryMap = {})
       #foreach ($category in $categoryList)
         $!categoryMap.put($category, [])##

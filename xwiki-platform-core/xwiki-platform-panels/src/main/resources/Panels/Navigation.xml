@@ -126,7 +126,7 @@
     (((=${space}=)))
     (% id="xwikinav${space}Content" class="accordionTabContentBox" %)
     (((
-    #set ($spaceDocs = $xwiki.searchDocuments('doc.space=? order by doc.name', [$space]))
+    #set ($spaceDocs = $services.query.xwql('where doc.space=?1 order by doc.name').setFilter('hidden').bindValue(1, $space).execute())
     #foreach ($page in $spaceDocs)
       #if (!$hiddenPages.contains($page) || $hasAdmin)
         #set($dotIndex = $page.indexOf('.')+1)

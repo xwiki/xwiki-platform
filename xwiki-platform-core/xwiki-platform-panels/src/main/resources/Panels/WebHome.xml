@@ -33,8 +33,7 @@
 #end
 = $msg.get('xe.panels.viewer') =
 
-#set ($sql = ', BaseObject as obj where obj.name=doc.fullName and obj.className=? and doc.fullName!=? order by doc.name')
-#set ($searchResults = $xwiki.searchDocuments($sql, ['Panels.PanelClass', 'Panels.PanelTemplate']))
+#set ($searchResults = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName&lt;&gt;?1 order by doc.name').bindValue(1, 'Panels.PanelTemplate').execute())
 #foreach ($item in $searchResults)
   #set ($pdoc = $xwiki.getDocument($item))
   #set ($obj = $pdoc.getObject("Panels.PanelClass"))

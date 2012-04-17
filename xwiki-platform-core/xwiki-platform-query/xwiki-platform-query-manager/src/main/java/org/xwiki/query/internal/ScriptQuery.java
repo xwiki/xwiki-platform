@@ -72,17 +72,16 @@ public class ScriptQuery implements Query
      * @param filter the hint of the component filter to set in the wrapped query.
      * @return this query object.
      */
-    public Query setFilter(String filter)
+    public Query addFilter(String filter)
     {
         if (!StringUtils.isBlank(filter)) {
             try {
-                setFilter(componentManager.lookup(QueryFilter.class, filter));
+                QueryFilter queryFilter = this.componentManager.getInstance(QueryFilter.class, filter);
+                addFilter(queryFilter);
             } catch (ComponentLookupException e) {
                 // We need to avoid throwing exceptions in the wiki if the filter does not exist.
                 LOGGER.warn("Failed to load QueryFilter with component hint [{}]", filter);
             }
-        } else {
-            query.setFilter(null);
         }
 
         return this;
@@ -143,14 +142,14 @@ public class ScriptQuery implements Query
     }
 
     @Override
-    public Query setFilter(QueryFilter filter) {
-        query.setFilter(filter);
+    public Query addFilter(QueryFilter filter) {
+        query.addFilter(filter);
         return this;
     }
 
     @Override
-    public QueryFilter getFilter() {
-        return query.getFilter();
+    public List<QueryFilter> getFilters() {
+        return query.getFilters();
     }
 
     @Override

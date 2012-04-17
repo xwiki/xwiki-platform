@@ -36,7 +36,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiException;
@@ -65,6 +67,16 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Named("R40001XWIKI7540")
 public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
+    /** The comment class reference. */
+    private static final EntityReference XWIKI_COMMENT_CLASS_REFERENCE =
+        new EntityReference("XWikiComments", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE));
+
+    /** The annotation class reference. */
+    private static final EntityReference XWIKI_ANNOTATION_CLASS_REFERENCE =
+        new EntityReference("AnnotationClass", EntityType.DOCUMENT,
+            new EntityReference("AnnotationCode", EntityType.SPACE));
+
     /** Everybody logs... sometimes. */
     @Inject
     protected Logger logger;
@@ -276,18 +288,13 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
          */
         private BaseObject getMigratedObject(BaseObject deletedObject, int newObjectNumber)
         {
-            DocumentReference xwikiCommentsClassReference =
-                new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "XWikiComments");
-            DocumentReference annotationClassReference =
-                new DocumentReference(getXWikiContext().getDatabase(), "AnnotationCode", "AnnotationClass");
-
             // Clone the deleted object and use the new number.
             BaseObject newComment = deletedObject.clone();
             newComment.setNumber(newObjectNumber);
 
             // If the deleted object is an annotation, make sure to use the comments class instead.
-            if (deletedObject.getXClassReference().equals(annotationClassReference)) {
-                newComment.setXClassReference(xwikiCommentsClassReference);
+            if (deletedObject.getRelativeXClassReference().equals(XWIKI_ANNOTATION_CLASS_REFERENCE)) {
+                newComment.setXClassReference(XWIKI_COMMENT_CLASS_REFERENCE);
             }
 
             return newComment;

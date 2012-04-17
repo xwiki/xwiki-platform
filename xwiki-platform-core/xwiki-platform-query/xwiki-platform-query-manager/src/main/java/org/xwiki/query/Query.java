@@ -117,15 +117,15 @@ public interface Query
     Map<Integer, Object> getPositionalParameters();
 
     /**
-     * @param filter {@link QueryFilter} to use for this query.
+     * @param filter the {@link QueryFilter} to add to this query.
      * @return this query.
      */
-    Query setFilter(QueryFilter filter);
+    Query addFilter(QueryFilter filter);
 
     /**
-     * @return filter {@link QueryFilter} used for this query, <code>null</code> if none.
+     * @return the list of {@link QueryFilter}s that will be applied to this query.
      */
-    QueryFilter getFilter();
+    List<QueryFilter> getFilters();
 
     /**
      * @param limit limit of result list to set (so {@link #execute()}.size() will be <= limit).

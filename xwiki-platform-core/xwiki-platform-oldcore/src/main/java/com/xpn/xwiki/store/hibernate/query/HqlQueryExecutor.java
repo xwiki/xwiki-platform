@@ -43,6 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
+import org.xwiki.query.QueryFilter;
 
 /**
  * QueryExecutor implementation for Hibernate Store.
@@ -117,16 +118,31 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected org.hibernate.Query createHibernateQuery(Session session, Query query)
     {
-        org.hibernate.Query hquery = query.isNamed() ? session.getNamedQuery(query.getStatement()) : session
-            .createQuery(query.getStatement());
+        org.hibernate.Query hquery;
+        String statement = query.getStatement();
 
-        // Since we can't modify the hibernate query statement at this point we need to create a new one to apply the
-        // query filter. This comes with a performance cost, we could fix it by handling named queries ourselves and
-        // not delegate them to hibernate. This way we would always get a statement that we can transform before the
-        // execution.
-        if (query.getFilter() != null) {
-            hquery = session.createQuery(query.getFilter().filterStatement(hquery.getQueryString(), Query.HQL));
+        if (!query.isNamed()) {
+            if (query.getFilters() != null) {
+                for (QueryFilter filter : query.getFilters()) {
+                    statement = filter.filterStatement(statement, Query.HQL);
+                }
+            }
+            hquery = session.createQuery(statement);
+        } else {
+            hquery = session.getNamedQuery(query.getStatement());
+            if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+                // Since we can't modify the hibernate query statement at this point we need to create a new one to
+                // apply the query filter. This comes with a performance cost, we could fix it by handling named queries
+                // ourselves and not delegate them to hibernate. This way we would always get a statement that we can
+                // transform before the execution.
+                statement = hquery.getQueryString();
+                for (QueryFilter filter : query.getFilters()) {
+                    statement = filter.filterStatement(statement, Query.HQL);
+                }
+                hquery = session.createQuery(statement);
+            }
         }
+
         return hquery;
     }
 

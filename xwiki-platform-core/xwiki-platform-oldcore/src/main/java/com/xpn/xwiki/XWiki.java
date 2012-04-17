@@ -6106,7 +6106,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaces")
-                    .setFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
+                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -6116,7 +6116,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
-                    .setFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"))
+                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"))
                     .bindValue("space", spaceName).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
@@ -6198,7 +6198,7 @@ public class XWiki implements EventListener
         try {
             // refreshes all Links of each doc of the wiki
             List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments")
-                    .setFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
+                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
             for (int i = 0; i < docs.size(); i++) {
                 XWikiDocument myDoc = this.getDocument(docs.get(i), context);
                 myDoc.getStore().saveLinks(myDoc, context, true);

@@ -22,13 +22,14 @@ package com.xpn.xwiki.store.migration.hibernate;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,12 +37,15 @@ import javax.inject.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Table;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -72,8 +76,9 @@ import com.xpn.xwiki.stats.impl.RefererStats;
 import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.DatabaseProduct;
-import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.util.Util;
@@ -323,6 +328,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /** Counter for change log rules. */
     private int logCount;
 
+    /** Tables in which update of foreign keys will be cascade from primary keys by a constraints. */
+    private Set<Table> fkTables = new HashSet();
+
     @Override
     public String getDescription()
     {
@@ -357,7 +365,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @param store the hibernate store
      * @param callback the callback to be called
      * @param context th current XWikiContext
-     * @return the ORed boolean result of the callbacks
      * @throws DataMigrationException when an migration error occurs
      * @throws XWikiException when an unexpected error occurs
      */
@@ -449,8 +456,27 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 getName() + " migration failed. Unresolved circular reference during id migration.");
         }
     }
-    
+
+    /**
+     * Retrieve the list of table that store collections of the provided persisted class, and that need to
+     * be manually updated, since no cascaded update has been added for them.
+     *
+     * @param pClass the persisted class to analyse
+     * @return a list of dual string, the first is the table name, and the second is the key in that table.
+     */
     private List<String[]> getCollectionProperties(PersistentClass pClass) {
+        return getCollectionProperties(pClass, false);
+    }
+
+    /**
+     * Retrieve the list of table that store collections of the provided persisted class.
+     *
+     * @param pClass the persisted class to analyse
+     * @param all if false, return only collection that need manual updates,
+     *            see {@link #getCollectionProperties(PersistentClass pClass)}
+     * @return a list of dual string, the first is the table name, and the second is the key in that table.
+     */
+    private List<String[]> getCollectionProperties(PersistentClass pClass, boolean all) {
         List<String[]> list = new ArrayList<String[]>();
 
         if (pClass != null) {
@@ -459,8 +485,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 Property property = (Property) it.next();
                 if (property.getType().isCollectionType()) {
                     org.hibernate.mapping.Collection coll = (org.hibernate.mapping.Collection) property.getValue();
-                    list.add(new String[] {coll.getCollectionTable().getName(),
-                        ((Column) coll.getKey().getColumnIterator().next()).getName()});
+                    Table collTable = coll.getCollectionTable();
+                    if (all || !fkTables.contains(collTable)) {
+                        list.add(new String[] {collTable.getName(),
+                            ((Column) coll.getKey().getColumnIterator().next()).getName()});
+                    }
                 }
             }
         }
@@ -644,17 +673,40 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Proceed to object id conversion
         if (!objs.isEmpty()) {
+            // Name of classes that need manual updates
+            final List<String> classToProcess = new ArrayList<String>();
+            // Name of custom classes that need manual updates
+            final List<String> customClassToProcess = new ArrayList<String>();
+            // Pair table,key for collection table that need manual updates
             final List<String[]> objsColl = new ArrayList<String[]>();
+
             objsColl.addAll(getCollectionProperties(configuration.getClassMapping(BaseObject.class.getName())));
             for (Class<?> propertyClass : PROPERTY_CLASS) {
-                objsColl.addAll(getCollectionProperties(configuration.getClassMapping(propertyClass.getName())));
+                String className = propertyClass.getName();
+                PersistentClass klass = configuration.getClassMapping(className);
+
+                // Add collection table that will not be updated by cascaded updates
+                objsColl.addAll(getCollectionProperties(klass));
+
+                // Skip classes that will be updated by cascaded updates
+                if (!fkTables.contains(klass.getTable())) {
+                    classToProcess.add(className);
+                }
             }
             for (String customClass : customMappedClasses) {
-                objsColl.addAll(getCollectionProperties(configuration.getClassMapping(customClass)));
+                PersistentClass klass = configuration.getClassMapping(customClass);
+
+                // Add collection table that will not be updated by cascaded updates
+                objsColl.addAll(getCollectionProperties(klass));
+
+                // Skip classes that will be updated by cascaded updates
+                if (!fkTables.contains(klass.getTable())) {
+                    customClassToProcess.add(customClass);
+                }
             }
 
             logProgress("Converting %d object IDs in %d tables, %d custom mapped tables and %d collection tables...",
-                objs.size(), PROPERTY_CLASS.length + 1, customMappedClasses.size(), objsColl.size());
+                objs.size(), classToProcess.size() + 1, customClassToProcess.size(), objsColl.size());
             convertDbId(objs, new AbstractIdConversionHibernateCallback()
             {
                 @Override
@@ -664,22 +716,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         executeSqlIdUpdate(coll[0], coll[1]);
                     }
 
-                    for (String customMappedClass : customMappedClasses) {
+                    for (String customMappedClass : customClassToProcess) {
                         executeIdUpdate(customMappedClass, ID);
                     }
 
-                    try {
-                        if (getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-                            executeIdUpdate(BaseProperty.class, IDID);
-                        } else {
-                            for (Class< ? > propertyClass : PROPERTY_CLASS) {
-                                executeIdUpdate(propertyClass, IDID);
-                            }
-                        }
-                    } catch (DataMigrationException ex) {
-                        // We're doing a migration right now, this shouldn't fail
-                        R40000XWIKI6990DataMigration.this.logger.warn(
-                            "DataMigrationException thrown while performing a migration! Message: {}", ex.getMessage());
+                    for (String propertyClass : classToProcess) {
+                        executeIdUpdate(propertyClass, IDID);
                     }
 
                     executeIdUpdate(BaseObject.class, ID);
@@ -741,7 +783,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Append change log to fix identifier type of a given persistent class.
+     * Append change log to fix identifier type of a given persistent class. Collection table storing properties
+     * of this persistent class will also be updated.
      * 
      * @param sb the string builder to append to
      * @param pClass the persistent class to process
@@ -752,99 +795,223 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             appendModifyColumn(sb, pClass.getTable().getName(),
                 ((Column) pClass.getKey().getColumnIterator().next()).getName());
 
-            for (String[] collProp : getCollectionProperties(pClass)) {
+            // Update identifiers in ALL collection tables
+            for (String[] collProp : getCollectionProperties(pClass, true)) {
                 appendModifyColumn(sb, collProp[0], collProp[1]);
             }
         }
     }
 
     /**
-     * Append change log to make foreign keys do CASCADEd updates.
+     * Check that a table contains at least a foreign key that refer to a primary key in its reference table.
      *
-     * @param sb the string builder to append to
-     * @param pClass the persistent class to process
+     * @param table the table to analyse
+     * @return true if the table contains at least a FK that refer to a PK
      */
-    @SuppressWarnings("unchecked")
-    private void appendForeignKeyChangeLog(StringBuilder sb, PersistentClass pClass)
-    {
-        Iterator<ForeignKey> fki = pClass.getTable().getForeignKeyIterator();
-        if (!fki.hasNext()) {
-            // Fast exit path, if there aren't any foreign keys at all, there's nothing to change
-            return;
+    private boolean checkFKtoPKinTable(Table table) {
+        Iterator<ForeignKey> fki = table.getForeignKeyIterator();
+        while (fki.hasNext()) {
+            ForeignKey fk = fki.next();
+            if (fk.isReferenceToPrimaryKey()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Retrieve a list of tables used to store the given persistent class, that need to be processed for FK constraints.
+     * The list include the main table use to persist the class, if this table has FK, as well as, all the collection
+     * table used for storing this persisted class properties.
+     * @param pClass the persistent class to analyze
+     * @return a list of table
+     */
+    private List<Table> getForeignKeyTables(PersistentClass pClass) {
+        List<Table> list = new ArrayList<Table>();
+
+        if (pClass != null) {
+            Table table = pClass.getTable();
+            if (checkFKtoPKinTable(table)) {
+                list.add(table);
+            }
+
+            Iterator it = pClass.getPropertyIterator();
+            while (it.hasNext()) {
+                Property property = (Property) it.next();
+                if (property.getType().isCollectionType()) {
+                    org.hibernate.mapping.Collection coll = (org.hibernate.mapping.Collection) property.getValue();
+                    Table collTable = coll.getCollectionTable();
+                    if (checkFKtoPKinTable(collTable)) {
+                        list.add(collTable);
+                    }
+               }
+            }
         }
 
+        return list;
+    }
+
+    /**
+     * Append commands to drop all foreign keys of a given table.
+     *
+     * @param sb the string builder to append to
+     * @param table the table to process
+     */
+    @SuppressWarnings("unchecked")
+    private void appendDropForeignKeyChangeLog(StringBuilder sb, Table table)
+    {
+        Iterator<ForeignKey> fki = table.getForeignKeyIterator();
+
         // Preamble
-        String table = pClass.getTable().getName();
+        String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
             .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
-            .append("    <preConditions onFail=\"MARK_RAN\"><dbms type=\"postgresql\" /></preConditions>\n")
-            .append("    <comment>Upgrade foreign keys on table [").append(table)
-            .append("] to use ON UPDATE CASCADE</comment >\n");
+            .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
 
         // Concrete Property types should each have a foreign key referencing the BaseProperty
         // Other classes don't have any foreign keys at all, in which case the fast exit path above was used
         while (fki.hasNext()) {
             ForeignKey fk = fki.next();
             // Drop the old constraint
-            sb.append("    <dropForeignKeyConstraint baseTableName=\"").append(table).append("\" constraintName=\"")
-                .append(fk.getName()).append("\" />\n");
-            // Recreate the constraint
-            sb.append("    <addForeignKeyConstraint constraintName=\"").append(fk.getName()).append(
-                "\" baseTableName=\"").append(table).append("\"  baseColumnNames=\"");
-            // Reuse the data from the old foreign key
-            // Columns in the current table
-            Iterator<Column> columns = fk.getColumnIterator();
-            while (columns.hasNext()) {
-                Column column = columns.next();
-                sb.append(column.getName());
-                if (columns.hasNext()) {
-                    sb.append(",");
-                }
-            }
-            sb.append("\" referencedTableName=\"").append(fk.getReferencedTable().getName()).append(
-                "\" referencedColumnNames=\"");
-            // Columns in the referenced table
             if (fk.isReferenceToPrimaryKey()) {
-                columns = fk.getReferencedTable().getPrimaryKey().getColumnIterator();
-            } else {
-                columns = fk.getReferencedColumns().iterator();
+                sb.append("    <dropForeignKeyConstraint baseTableName=\"")
+                    .append(tableName)
+                    .append("\" constraintName=\"").append(fk.getName()).append("\" />\n");
             }
-            while (columns.hasNext()) {
-                Column column = columns.next();
-                sb.append(column.getName());
-                if (columns.hasNext()) {
-                    sb.append(",");
-                }
-            }
-            // The important part: cascaded updates
-            sb.append("\" onUpdate=\"CASCADE\"/>\n");
         }
         // All done!
         sb.append("  </changeSet>\n");
     }
 
+    /**
+     * Append change log to add foreign keys with CASCADEd updates.
+     *
+     * @param sb the string builder to append to the add tasks
+     * @param table the table to process
+     */
+    @SuppressWarnings("unchecked")
+    private void appendAddForeignKeyChangeLog(StringBuilder sb, Table table)
+    {
+        Iterator<ForeignKey> fki = table.getForeignKeyIterator();
+
+        // Preamble
+        String tableName = table.getName();
+        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
+            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
+            .append("    <comment>Add foreign keys on table [").append(tableName)
+            .append("] to use ON UPDATE CASCADE</comment>\n");
+
+        // Concrete Property types should each have a foreign key referencing the BaseProperty
+        // Other classes don't have any foreign keys at all, in which case the fast exit path above was used
+        while (fki.hasNext()) {
+            ForeignKey fk = fki.next();
+
+            if (fk.isReferenceToPrimaryKey()) {
+                // Recreate the constraint
+                sb.append("    <addForeignKeyConstraint constraintName=\"").append(fk.getName()).append(
+                    "\" baseTableName=\"").append(tableName).append("\"  baseColumnNames=\"");
+
+                // Reuse the data from the old foreign key
+                // Columns in the current table
+                Iterator<Column> columns = fk.getColumnIterator();
+                while (columns.hasNext()) {
+                    Column column = columns.next();
+                    sb.append(column.getName());
+                    if (columns.hasNext()) {
+                        sb.append(",");
+                    }
+                }
+                sb.append("\" referencedTableName=\"").append(fk.getReferencedTable().getName()).append(
+                    "\" referencedColumnNames=\"");
+
+                // Columns in the referenced table
+                columns = fk.getReferencedTable().getPrimaryKey().getColumnIterator();
+                while (columns.hasNext()) {
+                    Column column = columns.next();
+                    sb.append(column.getName());
+                    if (columns.hasNext()) {
+                        sb.append(",");
+                    }
+                }
+
+                // The important part: cascaded updates
+                sb.append("\" onUpdate=\"CASCADE\"/>\n");
+            }
+        }
+        // All done!
+        sb.append("  </changeSet>\n");
+    }
+
+    /**
+     * Check if the data are stored in a MySQL using MyISAM engine. The check is done on the xwikidoc table only.
+     * Using a mix of engines for tables is not supported.
+     *
+     * @param store the store to be checked
+     * @return true if the xwikidoc table use the MyISAM engine in MySQL, false otherwise or on any failure.
+     */
+    private boolean isMySQLMyISAM(XWikiHibernateBaseStore store)
+    {
+        if (store.getDatabaseProductName() != DatabaseProduct.MYSQL) {
+            return false;
+        }
+        String createTable = store.failSafeExecuteRead(getXWikiContext(),
+            new HibernateCallback<String>()
+            {
+                @Override
+                public String doInHibernate(Session session) throws HibernateException
+                {
+                    Query query = session.createSQLQuery("SHOW CREATE TABLE xwikidoc");
+                    return (String) ((Object []) query.uniqueResult())[1];
+                }
+            });
+
+        return (createTable != null && createTable.contains("ENGINE=MyISAM"));
+    }
+
     @Override
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
-        final Configuration configuration = getStore().getConfiguration();
-        final StringBuilder sb = new StringBuilder(6000);
-        final List<Class<?>> classes = new ArrayList<Class<?>>();
-        
-        classes.add(BaseObject.class);
-        Collections.addAll(classes, PROPERTY_CLASS);
-        Collections.addAll(classes, STATS_CLASSES);
+        final XWikiHibernateBaseStore store = getStore();
+        final Configuration configuration = store.getConfiguration();
+        final StringBuilder sb = new StringBuilder(12000);
+        final List<PersistentClass> classes = new ArrayList<PersistentClass>();
+        final boolean isMySQLMyISAM = isMySQLMyISAM(store);
 
-        this.logCount = 0;
-
-        // Process internal classes
-        for (Class<?> klass : classes) {
-            appendClassChangeLog(sb, configuration.getClassMapping(klass.getName()));
+        // Build the list of classes to check for updates
+        classes.add(configuration.getClassMapping(BaseObject.class.getName()));
+        for (Class< ? > klass : PROPERTY_CLASS) {
+            classes.add(configuration.getClassMapping(klass.getName()));
+        }
+        for (Class< ? > klass : STATS_CLASSES) {
+            classes.add(configuration.getClassMapping(klass.getName()));
         }
 
-        // The ID update will fail if the foreign key constraints are imposed on each UPDATE command
-        if (getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-            for (Class< ? > klass : PROPERTY_CLASS) {
-                appendForeignKeyChangeLog(sb, configuration.getClassMapping(klass.getName()));
+        // Initialize the counter of Change Logs
+        this.logCount = 0;
+
+        // Manual updates of PK and FK will fails if any FK constraints are active on these keys in most decent DBs.
+        // Since Hibernate does not activate cascaded updates, we need to rewrite FK constrains. Moreover, some DBs
+        // does not allow changing field types of fields involved in FK constraints, so we will drop FK constraints
+        // during type updates.
+        // Since FK constraints does not fail in MySQL on a MyISAM table, but MyISAM do not support FK constraints, and
+        // do not prevent type changes, we skip all this processing for MySQL table stored using the MyISAM engine.
+        if (!isMySQLMyISAM) {
+            for (PersistentClass klass : classes) {
+                fkTables.addAll(getForeignKeyTables(klass));
+            }
+        }
+
+        // Drop all FK constraints
+        for (Table table : fkTables) {
+            appendDropForeignKeyChangeLog(sb, table);
+        }
+
+        // Process internal classes
+        for (PersistentClass klass : classes) {
+            // The same table mapped for StringListProperty and LargeStringProperty
+            if (klass.getMappedClass() != StringListProperty.class) {
+                // Update key types
+                appendClassChangeLog(sb, klass);
             }
         }
 
@@ -852,19 +1019,37 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         final XWikiContext context = getXWikiContext();
 
         try {
-            processCustomMappings((XWikiHibernateStore) getStore(), new CustomMappingCallback()
+            processCustomMappings((XWikiHibernateStore) store, new CustomMappingCallback()
             {
                 @Override
                 public void processCustomMapping(XWikiHibernateStore store, String name, String mapping,
                     boolean hasDynamicMapping) throws XWikiException
                 {
                     if (INTERNAL.equals(mapping) || hasDynamicMapping) {
-                        appendClassChangeLog(sb, configuration.getClassMapping(name));
+                        PersistentClass klass = configuration.getClassMapping(name);
+                        if (!isMySQLMyISAM) {
+                            List<Table> tables = getForeignKeyTables(klass);
+                            for (Table table : tables) {
+                                if (!fkTables.contains(table)) {
+                                    // Drop FK constraints for custom mapped class
+                                    appendDropForeignKeyChangeLog(sb, table);
+                                    fkTables.add(table);
+                                }
+                            }
+                        }
+
+                        // Update key types for custom mapped class
+                        appendClassChangeLog(sb, klass);
                     }
                 }
             }, context);
         } catch (XWikiException e) {
             throw new DataMigrationException("Unable to process custom mapped classes during schema updated", e);
+        }
+
+        // Add FK constraints back, activating cascaded updates
+        for (Table table : fkTables) {
+            appendAddForeignKeyChangeLog(sb, table);
         }
 
         logProgress("%d schema updates required.", this.logCount);

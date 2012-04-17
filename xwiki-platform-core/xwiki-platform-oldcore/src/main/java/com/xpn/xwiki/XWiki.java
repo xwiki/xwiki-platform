@@ -87,6 +87,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
@@ -811,7 +812,7 @@ public class XWiki implements EventListener
         observationManager.addListener(this);
 
         // Send Event to signal that the application is ready to service requests.
-        observationManager.notify(new ApplicationReadyEvent(), this);
+        observationManager.notify(new ApplicationReadyEvent(), this, context);
     }
 
     /**
@@ -929,6 +930,11 @@ public class XWiki implements EventListener
             // Add initdone which will allow to
             // bypass some initializations
             context.put("initdone", "1");
+
+            // Send event to notify listeners that the subwiki is ready
+            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
+            observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
+
         } finally {
             context.setDatabase(database);
         }

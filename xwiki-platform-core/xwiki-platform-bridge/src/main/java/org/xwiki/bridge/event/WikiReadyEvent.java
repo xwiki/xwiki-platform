@@ -19,16 +19,15 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all wiki related {@link org.xwiki.observation.event.Event}.
+ * An event triggered when a (sub)wiki is ready to service requests.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 4.1M1
  */
-public abstract class AbstractWikiEvent extends AbstractFilterableEvent implements WikiEvent
+public class WikiReadyEvent extends AbstractWikiEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -37,38 +36,33 @@ public abstract class AbstractWikiEvent extends AbstractFilterableEvent implemen
     private static final long serialVersionUID = 1L;
 
     /**
-     * This event will match any other document event of the same type.
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other document delete event.
      */
-    public AbstractWikiEvent()
+    public WikiReadyEvent()
     {
         // Voluntarily empty, default constructor is called automatically.
     }
 
     /**
-     * This event will match only events of the same type affecting the same document.
-     * 
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
+     * meaning that this event will match only events affecting the same wiki.
+     *
      * @param wikiId the wiki identifier
      */
-    public AbstractWikiEvent(String wikiId)
+    public WikiReadyEvent(String wikiId)
     {
         super(wikiId);
     }
 
     /**
-     * Constructor using a custom {@link EventFilter}.
-     * 
+     * Constructor using a custom {@link org.xwiki.observation.event.filter.EventFilter}.
+     *
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractWikiEvent(EventFilter eventFilter)
+    public WikiReadyEvent(EventFilter eventFilter)
     {
         super(eventFilter);
-    }
-    
-    // WikiEvent
-    
-    @Override
-    public String getWikiId()
-    {
-        return getEventFilter().getFilter();
     }
 }

@@ -109,28 +109,28 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   ## -----------------------------------------------------------
   ## Search in the page names
   ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("where $webClause upper(doc.fullName) like ?1 order by doc.date desc").setFilter("hidden").bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #set($query = $services.query.xwql("where $webClause upper(doc.fullName) like ?1 order by doc.date desc").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
   #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
   ## -----------------------------------------------------------
   ## Search in page content
   ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("where $webClause upper(doc.content) like ?1 order by doc.date desc").setFilter("hidden").bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #set($query = $services.query.xwql("where $webClause upper(doc.content) like ?1 order by doc.date desc").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
   #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
   ## -----------------------------------------------------------
   ## Search in text fields (simple String properties)
   ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("from BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").setFilter("hidden").bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #set($query = $services.query.xwql("from BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
   #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
   ## -----------------------------------------------------------
   ## Search in big text fields (textarea properties)
   ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("from BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").setFilter("hidden").bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #set($query = $services.query.xwql("from BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
   #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end

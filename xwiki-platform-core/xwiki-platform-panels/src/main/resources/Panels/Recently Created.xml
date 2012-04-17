@@ -106,7 +106,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#set ($recentlyCreated = $services.query.xwql('order by doc.creationDate desc').setFilter('hidden').setLimit(5).setOffset(0).execute())
+#set ($recentlyCreated = $services.query.xwql('order by doc.creationDate desc').addFilter('hidden').setLimit(5).setOffset(0).execute())
 #if ($recentlyCreated.size() &gt; 0 || $showEmptyPanels)
   #panelheader($msg.get('panels.recentlyCreated.title'))
   #foreach ($docname in $recentlyCreated)

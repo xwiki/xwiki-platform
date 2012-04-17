@@ -19,10 +19,13 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
@@ -36,6 +39,11 @@ import org.xwiki.query.QueryFilter;
  */
 public class DefaultQuery implements Query
 {
+    /**
+     * Used to log possible warnings.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultQuery.class);
+
     /**
      * field for {@link #isNamed()}.
      */
@@ -77,9 +85,9 @@ public class DefaultQuery implements Query
     private int offset;
 
     /**
-     * field for {@link #getFilter()}.
+     * field for {@link #getFilters()}.
      */
-    private QueryFilter filter;
+    private List<QueryFilter> filters = new ArrayList<QueryFilter>();
 
     /**
      * field for {@link #getExecuter()}.
@@ -207,15 +215,20 @@ public class DefaultQuery implements Query
     }
 
     @Override
-    public QueryFilter getFilter()
+    public List<QueryFilter> getFilters()
     {
-        return filter;
+        return filters;
     }
 
     @Override
-    public Query setFilter(QueryFilter filter)
+    public Query addFilter(QueryFilter filter)
     {
-        this.filter = filter;
+        if (!filters.contains(filter)) {
+            this.filters.add(filter);
+        } else {
+            LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter.toString(), this.getStatement());
+        }
+
         return this;
     }
 

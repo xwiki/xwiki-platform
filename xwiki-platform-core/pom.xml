@@ -224,6 +224,7 @@
           <excludes>
             <exclude>**/internal/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <exclude>org/xwiki/query/Query</exclude>
           </excludes>
         </configuration>
       </plugin>

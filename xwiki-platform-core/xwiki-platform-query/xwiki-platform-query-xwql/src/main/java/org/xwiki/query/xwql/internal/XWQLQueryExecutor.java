@@ -36,6 +36,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 
 @Component
@@ -81,7 +82,11 @@ public class XWQLQueryExecutor implements QueryExecutor
             nativeQuery.setLimit(query.getLimit());
             nativeQuery.setOffset(query.getOffset());
             nativeQuery.setWiki(query.getWiki());
-            nativeQuery.setFilter(query.getFilter());
+            if (query.getFilters() != null) {
+                for (QueryFilter filter : query.getFilters()) {
+                    nativeQuery.addFilter(filter);
+                }
+            }
             for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
                 nativeQuery.bindValue(e.getKey(), e.getValue());
             }

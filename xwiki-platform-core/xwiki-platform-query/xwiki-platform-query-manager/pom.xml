@@ -45,6 +45,12 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${platform.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

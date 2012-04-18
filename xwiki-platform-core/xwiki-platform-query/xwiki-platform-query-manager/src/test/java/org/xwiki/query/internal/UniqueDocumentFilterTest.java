@@ -61,14 +61,14 @@ public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterMismatchingSelectStatement() throws Exception
+    public void filterSelectStatementWithMismatchingDocAlias() throws Exception
     {
         assertEquals("select mydoc.fullName from XWikiDocument mydoc",
                 filter.filterStatement("select mydoc.fullName from XWikiDocument mydoc", Query.HQL));
     }
 
-        @Test
-    public void filterSelectDistinctStatement() throws Exception
+    @Test
+    public void filterStatementWhenStatementAlreadyContainsDistinct() throws Exception
     {
         assertEquals("select distinct doc.fullName from XWikiDocument doc",
                 filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));

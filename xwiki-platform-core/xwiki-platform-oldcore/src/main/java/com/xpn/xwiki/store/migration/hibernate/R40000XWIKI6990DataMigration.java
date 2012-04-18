@@ -773,7 +773,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     {
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
             .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"dgervalle\">\n")
-            .append("    <preConditions onFail=\"MARK_RAN\"><not><dbms type=\"oracle\" /></not></preConditions>\n")
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(table)
             .append("] to BIGINT type</comment >\n")
             .append("    <modifyDataType tableName=\"").append(table)
@@ -935,7 +934,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 }
 
                 // The important part: cascaded updates
-                sb.append("\" onUpdate=\"CASCADE\"/>\n");
+                if (isOracle()) {
+                    // Oracle doesn't really support cascaded updates, we'll just defer the constraint checks until the
+                    // actual commit of all the ID updates
+                    sb.append("\" initiallyDeferred=\"true\"/>\n");
+                } else {
+                    sb.append("\" onUpdate=\"CASCADE\"/>\n");
+                }
             }
         }
         // All done!
@@ -956,16 +961,33 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
         String createTable = store.failSafeExecuteRead(getXWikiContext(),
             new HibernateCallback<String>()
-            {
-                @Override
-                public String doInHibernate(Session session) throws HibernateException
-                {
-                    Query query = session.createSQLQuery("SHOW CREATE TABLE xwikidoc");
-                    return (String) ((Object []) query.uniqueResult())[1];
-                }
-            });
+                    {
+            @Override
+            public String doInHibernate(Session session) throws HibernateException
+                        {
+                Query query = session.createSQLQuery("SHOW CREATE TABLE xwikidoc");
+                return (String) ((Object[]) query.uniqueResult())[1];
+            }
+        });
 
         return (createTable != null && createTable.contains("ENGINE=MyISAM"));
+    }
+
+    /**
+     * Check if the underlying RDBMS is Oracle.
+     * 
+     * @return {@code true} if the RDMBS is Oracle, {@code false} otherwise or on any failure
+     */
+    private boolean isOracle()
+    {
+        try {
+            if (getStore().getDatabaseProductName() == DatabaseProduct.ORACLE) {
+                return true;
+            }
+        } catch (DataMigrationException ex) {
+            // We are currently in the "running migrations" phase, such an error will never be thrown here
+        }
+        return false;
     }
 
     @Override
@@ -1050,6 +1072,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Add FK constraints back, activating cascaded updates
         for (Table table : fkTables) {
             appendAddForeignKeyChangeLog(sb, table);
+        }
+
+        // Oracle doesn't support cascaded updates, so we still need to manually update each table
+        if (isOracle()) {
+            this.fkTables.clear();
         }
 
         logProgress("%d schema updates required.", this.logCount);

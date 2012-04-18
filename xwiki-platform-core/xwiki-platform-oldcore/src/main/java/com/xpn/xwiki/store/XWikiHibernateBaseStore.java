@@ -173,8 +173,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 if (connection != null) {
                     try {
                         connectionProvider.closeConnection(connection);
-                    }
-                    catch (SQLException ignored) {
+                    } catch (SQLException ignored) {
                         // do not care, return UNKNOWN
                     }
                 }
@@ -182,7 +181,7 @@ public class XWikiHibernateBaseStore implements Initializable
         }
 
         return product;
-   }
+    }
 
     /**
      * @return the database product name
@@ -887,7 +886,7 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         endTransaction(context, commit);
     }
-    
+
     /**
      * Ends a transaction and close the session.
      *
@@ -1163,13 +1162,13 @@ public class XWikiHibernateBaseStore implements Initializable
         setSession(null, context);
         setTransaction(null, context);
 
-        loggerManager.pushLogListener(null);
+        this.loggerManager.pushLogListener(null);
         try {
             return execute(context, doCommit, cb);
         } catch (Exception ignored) {
             return null;
         } finally {
-            loggerManager.popLogListener();
+            this.loggerManager.popLogListener();
             setSession(originalSession, context);
             setTransaction(originalTransaction, context);
         }

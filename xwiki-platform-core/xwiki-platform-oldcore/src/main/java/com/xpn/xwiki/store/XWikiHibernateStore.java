@@ -550,12 +550,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         for (int i = 0; i < classes.length; i++) {
                             String oldclass = classes[i];
                             if (!oldclass.equals(lc.newProperty().getClass().getName())) {
-                                Query q =
-                                    session
-                                        .createQuery(
-                                            "select p from " + oldclass + " as p, BaseObject as o"
-                                                + " where o.className=? and p.id=o.id and p.name=?")
-                                        .setString(0, bclass.getName()).setString(1, lc.getName());
+                                Query q = session.createQuery("select p from " + oldclass + " as p, BaseObject as o"
+                                    + " where o.className=? and p.id=o.id and p.name=?");
+                                q.setString(0, bclass.getName()).setString(1, lc.getName());
                                 for (Iterator it = q.list().iterator(); it.hasNext();) {
                                     BaseProperty lp = (BaseProperty) it.next();
                                     BaseProperty lp1 = lc.newProperty();
@@ -593,12 +590,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         for (int i = 0; i < classes.length; i++) {
                             String oldclass = classes[i];
                             if (!oldclass.equals(nc.newProperty().getClass().getName())) {
-                                Query q =
-                                    session
-                                        .createQuery(
-                                            "select p from " + oldclass + " as p, BaseObject as o"
-                                                + " where o.className=?" + "  and p.id=o.id and p.name=?")
-                                        .setString(0, bclass.getName()).setString(1, nc.getName());
+                                Query q = session.createQuery("select p from " + oldclass + " as p, BaseObject as o"
+                                    + " where o.className=?" + "  and p.id=o.id and p.name=?");
+                                q.setString(0, bclass.getName()).setString(1, nc.getName());
                                 for (BaseProperty np : (List<BaseProperty>) q.list()) {
                                     BaseProperty np1 = nc.newProperty();
                                     np1.setId(np.getId());
@@ -619,9 +613,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                     } else {
                         // General migration of properties
-                        Query q =
-                            session.createQuery("select p from BaseProperty as p, BaseObject as o"
-                                + " where o.className=? and p.id=o.id and p.name=? and p.classType <> ?");
+                        Query q = session.createQuery("select p from BaseProperty as p, BaseObject as o"
+                            + " where o.className=? and p.id=o.id and p.name=? and p.classType <> ?");
                         q.setString(0, bclass.getName());
                         q.setString(1, prop.getName());
                         q.setString(2, prop.newProperty().getClassType());
@@ -760,19 +753,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             context.addBaseClass(bclass);
 
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-                Query query =
-                    session.createQuery("from BaseObject as bobject where bobject.name = :name order by "
-                        + "bobject.number");
+                Query query = session.createQuery("from BaseObject as bobject where bobject.name = :name order by "
+                    + "bobject.number");
                 query.setText("name", doc.getFullName());
                 @SuppressWarnings("unchecked")
                 Iterator<BaseObject> it = query.list().iterator();
 
-                EntityReference localGroupEntityReference =
-                    new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference("XWiki",
-                        EntityType.SPACE));
-                DocumentReference groupsDocumentReference =
-                    new DocumentReference(context.getDatabase(), localGroupEntityReference.getParent().getName(),
-                        localGroupEntityReference.getName());
+                EntityReference localGroupEntityReference = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
+                    new EntityReference("XWiki", EntityType.SPACE));
+                DocumentReference groupsDocumentReference = new DocumentReference(context.getDatabase(),
+                    localGroupEntityReference.getParent().getName(), localGroupEntityReference.getName());
 
                 boolean hasGroups = false;
                 while (it.hasNext()) {
@@ -818,11 +808,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // as each group object (each group member) would otherwise cost 2 database queries.
                 // This will do every group member in a single query.
                 if (hasGroups) {
-                    Query query2 =
-                        session
-                            .createQuery("select bobject.number, prop.value from StringProperty as prop,"
-                                + "BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' "
-                                + "and bobject.id=prop.id.id and prop.id.name='member' order by bobject.number");
+                    Query query2 = session.createQuery("select bobject.number, prop.value from StringProperty as prop,"
+                        + "BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' "
+                        + "and bobject.id=prop.id.id and prop.id.name='member' order by bobject.number");
                     query2.setText("name", doc.getFullName());
                     @SuppressWarnings("unchecked")
                     Iterator<Object[]> it2 = query2.list().iterator();
@@ -968,10 +956,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
                 "XObject [{0}] is an instance of an external XClass and cannot be persisted in this wiki [{1}].",
-                null, new Object[]{this.localEntityReferenceSerializer.serialize(object.getReference()), db});
+                null, new Object[] {this.localEntityReferenceSerializer.serialize(object.getReference()), db});
         }
     }
-    
+
     /**
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
@@ -988,7 +976,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (!stats) {
                 checkObjectClassIsLocal(object, context);
             }
- 
+
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
@@ -998,9 +986,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Verify if the property already exists
             Query query;
             if (stats) {
-                query =
-                    session.createQuery("select obj.id from " + object.getClass().getName()
-                        + " as obj where obj.id = :id");
+                query = session.createQuery("select obj.id from " + object.getClass().getName()
+                    + " as obj where obj.id = :id");
             } else {
                 query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
             }
@@ -1180,9 +1167,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 // Load strings, integers, dates all at once
 
-                Query query =
-                    session.createQuery("select prop.name, prop.classType from BaseProperty as prop where "
-                        + "prop.id.id = :id");
+                Query query = session.createQuery(
+                    "select prop.name, prop.classType from BaseProperty as prop where prop.id.id = :id");
                 query.setLong("id", object.getId());
                 for (Object[] result : (List<Object[]>) query.list()) {
                     String name = (String) result[0];
@@ -1771,9 +1757,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // the select clause is compulsory to reach the fullName i.e. the page pointed
-            Query query =
-                session.createQuery("select backlink.fullName from XWikiLink as backlink where "
-                    + "backlink.id.link = :backlink");
+            Query query = session.createQuery(
+                "select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink");
             query.setString("backlink", this.localEntityReferenceSerializer.serialize(documentReference));
 
             @SuppressWarnings("unchecked")
@@ -1868,7 +1853,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         List<String> links;
         try {
             // Create new clean context to avoid wiki manager plugin requests in same session
-            XWikiContext renderContext = (XWikiContext) context.clone();
+            XWikiContext renderContext = context.clone();
 
             renderContext.setDoc(doc);
             econtext.setProperty("xwikicontext", renderContext);
@@ -1945,9 +1930,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
 
-            Query query =
-                session.createQuery("select doc.fullName from XWikiDocument as doc "
-                    + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')");
+            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc "
+                + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')");
             List<String> list = new ArrayList<String>();
             list.addAll(query.list());
 
@@ -2281,9 +2265,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         for (Object[] result : searchGenericInternal(sql, nb, start, parameterValues, context)) {
             // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
             // name is not stored in the database for document references.
-            DocumentReference reference =
-                new DocumentReference((String) result[1], new SpaceReference((String) result[0], new WikiReference(
-                    context.getDatabase())));
+            DocumentReference reference = new DocumentReference((String) result[1],
+                new SpaceReference((String) result[0], new WikiReference(context.getDatabase())));
             documentReferences.add(reference);
         }
         return documentReferences;
@@ -2589,9 +2572,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         List<XWikiDocument> list;
-        list =
-            searchDocuments(" where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')", true, false,
-                false, 0, 0, context);
+        list = searchDocuments(" where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')", true, false,
+            false, 0, 0, context);
         boolean result = false;
 
         for (XWikiDocument doc : list) {
@@ -2633,8 +2615,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @param className the name of the class to map
      * @param custommapping the custom mapping to inject for this class
      * @param context the current XWikiContext
-     * @return a boolean indicating if the mapping has been added to the current hibernate configuration,
-     * and a reload of the factory is required.
+     * @return a boolean indicating if the mapping has been added to the current hibernate configuration, and a reload
+     *         of the factory is required.
      * @throws XWikiException if an error occurs
      * @since 4.0M1
      */
@@ -2809,9 +2791,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String hql =
-            "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
-                + "and (doc.language <> '' or (doc.language is not null and '' is null))";
+        String hql = "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
+            + "and (doc.language <> '' or (doc.language is not null and '' is null))";
         ArrayList<String> params = new ArrayList<String>();
         params.add(doc.getSpace());
         params.add(doc.getName());

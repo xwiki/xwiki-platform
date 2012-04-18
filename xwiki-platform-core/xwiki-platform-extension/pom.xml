@@ -33,9 +33,6 @@
   <name>XWiki Platform - Extension - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Parent POM</description>
-  <properties>
-    <maven.version>3.0.4</maven.version>
-  </properties>
   <modules>
     <module>xwiki-platform-extension-handlers</module>
     <module>xwiki-platform-extension-repositories</module>

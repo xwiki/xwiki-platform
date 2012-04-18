@@ -35,9 +35,6 @@
   <description>XWiki Platform - Extension - Parent POM</description>
   <properties>
     <maven.version>3.0.4</maven.version>
-
-    <!-- Remove when 4.0 is released -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <modules>
     <module>xwiki-platform-extension-handlers</module>

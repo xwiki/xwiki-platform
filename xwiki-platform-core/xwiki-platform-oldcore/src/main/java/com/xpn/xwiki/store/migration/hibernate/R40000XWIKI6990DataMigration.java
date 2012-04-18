@@ -77,8 +77,8 @@ import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.util.Util;
@@ -94,21 +94,21 @@ import com.xpn.xwiki.util.Util;
 @Named("R40000XWIKI6990")
 public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 {
-    /** Document classes to migrate.*/
-    private static final Class<?>[] DOC_CLASSES = new Class<?>[] {
+    /** Document classes to migrate. */
+    private static final Class< ? >[] DOC_CLASSES = new Class< ? >[] {
         XWikiDocument.class,
         XWikiRCSNodeInfo.class,
-    };
+        };
 
     /** Document related classes to migrate. (DOCID is the document identifier) */
-    private static final Class<?>[] DOCLINK_CLASSES = new Class<?>[] {
+    private static final Class< ? >[] DOCLINK_CLASSES = new Class< ? >[] {
         XWikiLink.class,
         XWikiAttachment.class,
         DeletedAttachment.class
-    };
+        };
 
     /** Property classes to migrate. (ID is the object identifier) */
-    private static final Class<?>[] PROPERTY_CLASS = new Class<?>[] {
+    private static final Class< ? >[] PROPERTY_CLASS = new Class< ? >[] {
         DateProperty.class,
         DBStringListProperty.class,
         DoubleProperty.class,
@@ -119,14 +119,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         StringListProperty.class,
         StringProperty.class,
         BaseProperty.class
-    };
+        };
 
     /** Statistics classes to migrate. (ID is the stats identifier) */
-    private static final Class<?>[] STATS_CLASSES = new Class<?>[] {
+    private static final Class< ? >[] STATS_CLASSES = new Class< ? >[] {
         DocumentStats.class,
         RefererStats.class,
         VisitStats.class
-    };
+        };
 
     /** Mark internal mapping. */
     private static final String INTERNAL = "internal";
@@ -174,12 +174,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     {
         /**
          * Set the new identifier.
+         *
          * @param newId the new identifier
          */
         void setNewId(long newId);
 
         /**
          * Set the old identifier.
+         *
          * @param oldId the old identifier
          */
         void setOldId(long oldId);
@@ -246,7 +248,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          * @param klass the class of the persisted object
          * @param field the field name of the persisted object
          */
-        public void executeIdUpdate(Class<?> klass, String field)
+        public void executeIdUpdate(Class< ? > klass, String field)
         {
             executeIdUpdate(klass.getName(), field);
         }
@@ -329,7 +331,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private int logCount;
 
     /** Tables in which update of foreign keys will be cascade from primary keys by a constraints. */
-    private Set<Table> fkTables = new HashSet();
+    private Set<Table> fkTables = new HashSet<Table>();
 
     @Override
     public String getDescription()
@@ -464,7 +466,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @param pClass the persisted class to analyse
      * @return a list of dual string, the first is the table name, and the second is the key in that table.
      */
-    private List<String[]> getCollectionProperties(PersistentClass pClass) {
+    private List<String[]> getCollectionProperties(PersistentClass pClass)
+    {
         return getCollectionProperties(pClass, false);
     }
 
@@ -476,7 +479,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      *            see {@link #getCollectionProperties(PersistentClass pClass)}
      * @return a list of dual string, the first is the table name, and the second is the key in that table.
      */
-    private List<String[]> getCollectionProperties(PersistentClass pClass, boolean all) {
+    private List<String[]> getCollectionProperties(PersistentClass pClass, boolean all)
+    {
         List<String[]> list = new ArrayList<String[]>();
 
         if (pClass != null) {
@@ -486,7 +490,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 if (property.getType().isCollectionType()) {
                     org.hibernate.mapping.Collection coll = (org.hibernate.mapping.Collection) property.getValue();
                     Table collTable = coll.getCollectionTable();
-                    if (all || !fkTables.contains(collTable)) {
+                    if (all || !this.fkTables.contains(collTable)) {
                         list.add(new String[] {collTable.getName(),
                             ((Column) coll.getKey().getColumnIterator().next()).getName()});
                     }
@@ -584,7 +588,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
 
             @SuppressWarnings("unchecked")
-            private void fillStatsConversionMap(Session session, Class<?> klass, Map<Long, Long> map)
+            private void fillStatsConversionMap(Session session, Class< ? > klass, Map<Long, Long> map)
             {
                 for (Object[] result : (List<Object[]>) (session.createQuery(
                     "select stats.id, stats.name, stats.number from " + klass.getName() + " as stats")
@@ -621,7 +625,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
 
                     // Retrieve statistics ID conversion
-                    for (Class<?> statsClass : STATS_CLASSES) {
+                    for (Class< ? > statsClass : STATS_CLASSES) {
                         Map<Long, Long> map = new HashMap<Long, Long>();
                         fillStatsConversionMap(session, statsClass, map);
                         stats.add(map);
@@ -641,10 +645,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Proceed to document id conversion
         if (!docs.isEmpty()) {
             final List<String[]> docsColl = new ArrayList<String[]>();
-            for (Class<?> docClass : DOC_CLASSES) {
+            for (Class< ? > docClass : DOC_CLASSES) {
                 docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
             }
-            for (Class<?> docClass : DOCLINK_CLASSES) {
+            for (Class< ? > docClass : DOCLINK_CLASSES) {
                 docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
             }
 
@@ -658,8 +662,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     for (String[] coll : docsColl) {
                         executeSqlIdUpdate(coll[0], coll[1]);
                     }
-    
-                    for (Class<?> doclinkClass : DOCLINK_CLASSES) {
+
+                    for (Class< ? > doclinkClass : DOCLINK_CLASSES) {
                         executeIdUpdate(doclinkClass, DOCID);
                     }
                     executeIdUpdate(XWikiRCSNodeInfo.class, ID + '.' + DOCID);
@@ -681,7 +685,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             final List<String[]> objsColl = new ArrayList<String[]>();
 
             objsColl.addAll(getCollectionProperties(configuration.getClassMapping(BaseObject.class.getName())));
-            for (Class<?> propertyClass : PROPERTY_CLASS) {
+            for (Class< ? > propertyClass : PROPERTY_CLASS) {
                 String className = propertyClass.getName();
                 PersistentClass klass = configuration.getClassMapping(className);
 
@@ -689,7 +693,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 objsColl.addAll(getCollectionProperties(klass));
 
                 // Skip classes that will be updated by cascaded updates
-                if (!fkTables.contains(klass.getTable())) {
+                if (!this.fkTables.contains(klass.getTable())) {
                     classToProcess.add(className);
                 }
             }
@@ -700,7 +704,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 objsColl.addAll(getCollectionProperties(klass));
 
                 // Skip classes that will be updated by cascaded updates
-                if (!fkTables.contains(klass.getTable())) {
+                if (!this.fkTables.contains(klass.getTable())) {
                     customClassToProcess.add(customClass);
                 }
             }
@@ -733,7 +737,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         // Proceed to statistics id conversions
-        for (final Class<?> statsClass : STATS_CLASSES) {
+        for (final Class< ? > statsClass : STATS_CLASSES) {
             Map<Long, Long> map = stats.poll();
             String klassName = statsClass.getName().substring(statsClass.getName().lastIndexOf('.') + 1);
             klassName = klassName.substring(0, klassName.length() - 5).toLowerCase();
@@ -783,8 +787,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Append change log to fix identifier type of a given persistent class. Collection table storing properties
-     * of this persistent class will also be updated.
+     * Append change log to fix identifier type of a given persistent class. Collection table storing properties of this
+     * persistent class will also be updated.
      * 
      * @param sb the string builder to append to
      * @param pClass the persistent class to process
@@ -808,7 +812,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @param table the table to analyse
      * @return true if the table contains at least a FK that refer to a PK
      */
-    private boolean checkFKtoPKinTable(Table table) {
+    private boolean checkFKtoPKinTable(Table table)
+    {
         Iterator<ForeignKey> fki = table.getForeignKeyIterator();
         while (fki.hasNext()) {
             ForeignKey fk = fki.next();
@@ -823,10 +828,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * Retrieve a list of tables used to store the given persistent class, that need to be processed for FK constraints.
      * The list include the main table use to persist the class, if this table has FK, as well as, all the collection
      * table used for storing this persisted class properties.
+     *
      * @param pClass the persistent class to analyze
      * @return a list of table
      */
-    private List<Table> getForeignKeyTables(PersistentClass pClass) {
+    private List<Table> getForeignKeyTables(PersistentClass pClass)
+    {
         List<Table> list = new ArrayList<Table>();
 
         if (pClass != null) {
@@ -844,7 +851,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     if (checkFKtoPKinTable(collTable)) {
                         list.add(collTable);
                     }
-               }
+                }
             }
         }
 
@@ -997,12 +1004,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // do not prevent type changes, we skip all this processing for MySQL table stored using the MyISAM engine.
         if (!isMySQLMyISAM) {
             for (PersistentClass klass : classes) {
-                fkTables.addAll(getForeignKeyTables(klass));
+                this.fkTables.addAll(getForeignKeyTables(klass));
             }
         }
 
         // Drop all FK constraints
-        for (Table table : fkTables) {
+        for (Table table : this.fkTables) {
             appendDropForeignKeyChangeLog(sb, table);
         }
 
@@ -1030,10 +1037,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         if (!isMySQLMyISAM) {
                             List<Table> tables = getForeignKeyTables(klass);
                             for (Table table : tables) {
-                                if (!fkTables.contains(table)) {
+                                if (!R40000XWIKI6990DataMigration.this.fkTables.contains(table)) {
                                     // Drop FK constraints for custom mapped class
                                     appendDropForeignKeyChangeLog(sb, table);
-                                    fkTables.add(table);
+                                    R40000XWIKI6990DataMigration.this.fkTables.add(table);
                                 }
                             }
                         }
@@ -1048,7 +1055,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         // Add FK constraints back, activating cascaded updates
-        for (Table table : fkTables) {
+        for (Table table : this.fkTables) {
             appendAddForeignKeyChangeLog(sb, table);
         }
 

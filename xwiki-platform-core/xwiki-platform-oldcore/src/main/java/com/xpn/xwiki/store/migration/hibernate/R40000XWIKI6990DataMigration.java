@@ -330,6 +330,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /** Counter for change log rules. */
     private int logCount;
 
+    /** True if migrating MySQL tables using MyISAM engine. */
+    private boolean isMySQLMyISAM = false;
+
+    /** True if migrating Oracle database. */
+    private boolean isOracle = false;
+
     /** Tables in which update of foreign keys will be cascade from primary keys by a constraints. */
     private Set<Table> fkTables = new HashSet<Table>();
 
@@ -419,7 +425,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         {
             store.injectUpdatedCustomMappings(context);
         }
-
     }
 
     /**
@@ -941,9 +946,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 }
 
                 // The important part: cascaded updates
-                if (isOracle()) {
-                    // Oracle doesn't really support cascaded updates, we'll just defer the constraint checks until the
-                    // actual commit of all the ID updates
+                if (isOracle) {
+                    // Oracle doesn't support cascaded updates, but allow the constraint to be checked
+                    // at the commit level (normal checking is done at the statement level).
                     sb.append("\" initiallyDeferred=\"true\"/>\n");
                 } else {
                     sb.append("\" onUpdate=\"CASCADE\"/>\n");
@@ -955,16 +960,18 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Check if the data are stored in a MySQL using MyISAM engine. The check is done on the xwikidoc table only.
-     * Using a mix of engines for tables is not supported.
+     * Detect database products and initialize isMySQLMyISAM and isOracle.
+     * isMySQLMyISAM is true if the xwikidoc table use the MyISAM engine in MySQL, false otherwise or on any failure.
+     * isOracle is true if the we access an Oracle database.
      *
      * @param store the store to be checked
-     * @return true if the xwikidoc table use the MyISAM engine in MySQL, false otherwise or on any failure.
      */
-    private boolean isMySQLMyISAM(XWikiHibernateBaseStore store)
+    private void detectDatabaseProducts(XWikiHibernateBaseStore store)
     {
-        if (store.getDatabaseProductName() != DatabaseProduct.MYSQL) {
-            return false;
+        DatabaseProduct product = store.getDatabaseProductName();
+        if (product != DatabaseProduct.MYSQL) {
+            isOracle = (product == DatabaseProduct.ORACLE);
+            return;
         }
         String createTable = store.failSafeExecuteRead(getXWikiContext(),
             new HibernateCallback<String>()
@@ -977,24 +984,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
         });
 
-        return (createTable != null && createTable.contains("ENGINE=MyISAM"));
-    }
-
-    /**
-     * Check if the underlying RDBMS is Oracle.
-     * 
-     * @return {@code true} if the RDMBS is Oracle, {@code false} otherwise or on any failure
-     */
-    private boolean isOracle()
-    {
-        try {
-            if (getStore().getDatabaseProductName() == DatabaseProduct.ORACLE) {
-                return true;
-            }
-        } catch (DataMigrationException ex) {
-            // We are currently in the "running migrations" phase, such an error will never be thrown here
-        }
-        return false;
+        isMySQLMyISAM = (createTable != null && createTable.contains("ENGINE=MyISAM"));
     }
 
     @Override
@@ -1004,7 +994,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         final Configuration configuration = store.getConfiguration();
         final StringBuilder sb = new StringBuilder(12000);
         final List<PersistentClass> classes = new ArrayList<PersistentClass>();
-        final boolean isMySQLMyISAM = isMySQLMyISAM(store);
+
+        detectDatabaseProducts(store);
 
         // Build the list of classes to check for updates
         classes.add(configuration.getClassMapping(BaseObject.class.getName()));
@@ -1082,7 +1073,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         // Oracle doesn't support cascaded updates, so we still need to manually update each table
-        if (isOracle()) {
+        if (isOracle) {
             this.fkTables.clear();
         }
 

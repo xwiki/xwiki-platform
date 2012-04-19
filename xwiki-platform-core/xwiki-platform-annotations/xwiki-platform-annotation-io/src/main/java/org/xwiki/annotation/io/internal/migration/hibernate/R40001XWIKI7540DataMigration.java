@@ -68,14 +68,12 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
     /** The comment class reference. */
-    private static final EntityReference XWIKI_COMMENT_CLASS_REFERENCE =
-        new EntityReference("XWikiComments", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
+    private static final EntityReference XWIKI_COMMENT_CLASS_REFERENCE = new EntityReference("XWikiComments",
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     /** The annotation class reference. */
-    private static final EntityReference XWIKI_ANNOTATION_CLASS_REFERENCE =
-        new EntityReference("AnnotationClass", EntityType.DOCUMENT,
-            new EntityReference("AnnotationCode", EntityType.SPACE));
+    private static final EntityReference XWIKI_ANNOTATION_CLASS_REFERENCE = new EntityReference("AnnotationClass",
+        EntityType.DOCUMENT, new EntityReference("AnnotationCode", EntityType.SPACE));
 
     /** Everybody logs... sometimes. */
     @Inject
@@ -201,10 +199,18 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         /** @see #setDocumentReference(DocumentReference) */
         private DocumentReference documentReference;
 
+        /** @see #getMigratedObject(BaseObject, int) */
+        private Map<BaseObject, BaseObject> oldToNewObjectMap;
+
+        /** @see #processObjects(Session) */
+        private Map<Integer, Integer> oldToNewCommentNumberMap;
+
         /** @param documentReference the document on which to work */
         public void setDocumentReference(DocumentReference documentReference)
         {
             this.documentReference = documentReference;
+            this.oldToNewObjectMap = new HashMap<BaseObject, BaseObject>();
+            this.oldToNewCommentNumberMap = new HashMap<Integer, Integer>();
         }
 
         @Override
@@ -269,9 +275,26 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 
                 BaseObject newComment = getMigratedObject(deletedObject, newObjectNumber);
 
-                session.save(newComment);
+                // Only for simple comments, keeps track of converted object numbers. Used when migrating a comment's
+                // "replyto" property.
+                if (deletedObject.getRelativeXClassReference().equals(XWIKI_COMMENT_CLASS_REFERENCE)) {
+                    oldToNewCommentNumberMap.put(deletedObject.getNumber(), newComment.getNumber());
+                }
 
-                // Migrate each of the deleted object's properties and link the new properties to the new object.
+                // Remember the corresponding new objects generated in this phase to be used below, when migrating the
+                // properties.
+                oldToNewObjectMap.put(deletedObject, newComment);
+
+                session.save(newComment);
+            }
+
+            // Migrate each of the deleted object's properties and link the new properties to the new objects.
+            for (int newObjectNumber = 0; newObjectNumber < datedObjects.size(); newObjectNumber++) {
+                BaseObject deletedObject = datedObjects.get(newObjectNumber).getValue();
+
+                // Use the corresponding new object created above.
+                BaseObject newComment = oldToNewObjectMap.get(deletedObject);
+
                 List<BaseProperty> deletedProperties = objectToPropertiesMap.get(deletedObject);
                 for (BaseProperty deletedProperty : deletedProperties) {
                     BaseProperty newProperty = getMigratedProperty(deletedProperty, newComment);
@@ -289,15 +312,15 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         private BaseObject getMigratedObject(BaseObject deletedObject, int newObjectNumber)
         {
             // Clone the deleted object and use the new number.
-            BaseObject newComment = deletedObject.clone();
-            newComment.setNumber(newObjectNumber);
+            BaseObject newObject = deletedObject.clone();
+            newObject.setNumber(newObjectNumber);
 
             // If the deleted object is an annotation, make sure to use the comments class instead.
             if (deletedObject.getRelativeXClassReference().equals(XWIKI_ANNOTATION_CLASS_REFERENCE)) {
-                newComment.setXClassReference(XWIKI_COMMENT_CLASS_REFERENCE);
+                newObject.setXClassReference(XWIKI_COMMENT_CLASS_REFERENCE);
             }
 
-            return newComment;
+            return newObject;
         }
 
         /**
@@ -338,10 +361,20 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             }
             newProperty.setId(newComment.getId());
 
-            // If the deleted property was "annotation" (from AnnotationClass), then use the new
-            // property "comment" for (XWikiComments).
             if ("annotation".equals(deletedProperty.getName())) {
+                // If the deleted property was "annotation" (from AnnotationClass), then use the new
+                // property "comment" for (XWikiComments).
                 newProperty.setName("comment");
+            } else if ("replyto".equals(deletedProperty.getName())) {
+                // XWIKI-7745: We need to handle the fact that the "replyto" property needs to point to the new object
+                // number of the comment it was previously assigned to, since the comment can now have a new number
+                // assigned to it.
+                if (deletedProperty.getValue() != null) {
+                    int oldValue = (Integer) deletedProperty.getValue();
+                    int newValue = oldToNewCommentNumberMap.get(oldValue);
+
+                    newProperty.setValue(newValue);
+                }
             }
             return newProperty;
         }

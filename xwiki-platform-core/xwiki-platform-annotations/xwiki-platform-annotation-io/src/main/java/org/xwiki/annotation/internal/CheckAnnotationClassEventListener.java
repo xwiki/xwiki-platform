@@ -31,6 +31,7 @@ import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.annotation.AnnotationServiceException;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.context.Execution;
@@ -68,7 +69,8 @@ public class CheckAnnotationClassEventListener implements EventListener
      * The matched events.
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent(),
-        new DocumentUpdatedEvent(CONFIGURATION_DOCUMENT_REFERENCE));
+        new DocumentUpdatedEvent(CONFIGURATION_DOCUMENT_REFERENCE), new DocumentCreatedEvent(
+            CONFIGURATION_DOCUMENT_REFERENCE));
 
     /**
      * Logging framework.

@@ -112,6 +112,27 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     }
 
     /**
+     * Append the required select clause to HQL short query statements. Short statements are the only way for users
+     * without programming rights to perform queries. Such statements can be for example:
+     * <ul>
+     *     <li><code>, BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.MyClass'</code></li>
+     *     <li><code>where doc.creationDate > '2008-01-01'</code></li>
+     * </ul>
+     *
+     * @param statement the statement to complete if required.
+     * @return the complete statement if it had to be completed, the original one otherwise.
+     */
+    protected String completeShortFormStatement(String statement)
+    {
+        String lcStatement = statement.toLowerCase().trim();
+        if (lcStatement.startsWith("where") || lcStatement.startsWith(",") || lcStatement.startsWith("order")) {
+            return "select doc.fullName from XWikiDocument doc " + statement.trim();
+        }
+
+        return statement;
+    }
+
+    /**
      * @param session hibernate session
      * @param query Query object
      * @return hibernate query
@@ -122,6 +143,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         String statement = query.getStatement();
 
         if (!query.isNamed()) {
+            // handle short queries
+            statement = completeShortFormStatement(statement);
+
+            // Handle query filters
             if (query.getFilters() != null) {
                 for (QueryFilter filter : query.getFilters()) {
                     statement = filter.filterStatement(statement, Query.HQL);

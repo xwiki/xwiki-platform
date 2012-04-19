@@ -122,7 +122,12 @@ public class DefaultIOService implements IOService
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
             // create a new object in this document to hold the annotation
-            int id = document.createXObject(configuration.getAnnotationClassReference(), deprecatedContext);
+            // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
+            // for an object's class. This avoids ugly log warning messages.
+            EntityReference annotationClassReference = configuration.getAnnotationClassReference();
+            annotationClassReference =
+                annotationClassReference.removeParent(annotationClassReference.extractReference(EntityType.WIKI));
+            int id = document.createXObject(annotationClassReference, deprecatedContext);
             BaseObject object = document.getXObject(configuration.getAnnotationClassReference(), id);
             updateObject(object, annotation, deprecatedContext);
             // and set additional data: author to annotation author, date to now and the annotation target

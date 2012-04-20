@@ -99,7 +99,7 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetFullTextFromPDF() throws IOException
     {
-        assertGetFullText("pdf content\n\n", "pdf.pdf");
+        assertGetFullText("\npdf content\n\n\n", "pdf.pdf");
     }
 
     public void testGetFullTextFromZIP() throws IOException

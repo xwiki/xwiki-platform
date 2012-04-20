@@ -49,7 +49,7 @@
     <dependency>
       <groupId>pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.4-xwiki</version>
+      <version>1.5-xwiki</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

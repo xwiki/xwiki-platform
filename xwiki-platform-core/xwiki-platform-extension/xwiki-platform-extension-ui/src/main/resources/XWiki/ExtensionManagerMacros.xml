@@ -100,250 +100,271 @@
     <className>XWiki.JavaScriptExtension</className>
     <guid>ce6647d0-aa85-4972-a890-a76e852f7be6</guid>
     <property>
-      <cache>forbid</cache>
+      <cache>long</cache>
     </property>
     <property>
       <code>var XWiki = (function (XWiki) {
-  var admin = XWiki.admin = XWiki.admin || {};
+// Start XWiki augmentation.
+/**
+ * Enhances the behaviour of an extension.
+ */
+XWiki.ExtensionBehaviour = Class.create({
+  initialize : function (container) {
+    // Make sure the extension is not already initialized.
+    this.finalize();
 
- /**
-  * JavaScript enhancements for the Extension Manager.
-  */
-  admin.ExtensionManager = Class.create({
-    /** How to find an element corresponding to a displayed extension in the UI: */
-    extensionItemSelector : ".extension-item",
+    this.container = container;
 
-    /** Extension details */
-    extensionBodySelector : ".extension-body",
+    // Handle extension details.
+    this._enhanceShowDetailsBehaviour();
 
-    /** Extension details "menu" */
-    extensionMenuItemSelector : ".innerMenu li a",
+    // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
+    this._enhanceMenuBehaviour();
 
-    /** Extension details section */
-    extensionDetailsSectionSelector : ".extension-body-section",
+    // Enhances the behaviour of the Dependencies section.
+    this._enhanceDependenciesBehaviour();
 
-    /** CSS class of the menu item that is currently active */
-    extensionCurrentMenuItemMarker : 'current',
+    // Enhances the behaviour of the Progress section.
+    this._enhanceProgressBehaviour();
+  },
 
-    /**
-     * Initialization: Enable loading extension details via AJAX.
-     */ 
-    initialize : function () {
-      $$(this.extensionItemSelector + " form input[name='actionshowdetails']").invoke("observe", "click", this.loadExtensionDetails.bindAsEventListener(this));
-      this.prepareSimpleSearch();
-      this.prepareAdvancedSearch();
-    },
+  /**
+   * Releases the event listeners and detaches the extension.
+   */
+  finalize : function() {
+    this.container &amp;&amp; this.container.remove();
+    this.container = undefined;
+  },
 
-    /**
-     * AJAX loading of Extension details.
-     */
-    loadExtensionDetails : function(event) {
-      event.stop();
+  /**
+   * Load the extension details asynchronously.
+   */
+  _onShowDetails : function(event) {
+    event.stop();
 
-      // Ignore consecutive requests, just handle the first one.
-      var form = event.element().form;
-      if (form.__disabled) {
-        return false;
-      }
-      form.__disabled = true;
+    // Ignore consecutive requests, just handle the first one.
+    var form = event.element().form;
+    if (form.__disabled) {
+      return false;
+    }
+    form.__disabled = true;
 
-      // Prepare the data for the AJAX call.
-      var formData = new Hash(form.serialize(true));
+    // Prepare the data for the AJAX call.
+    var formData = new Hash(form.serialize(true));
 
-      // Prepare the URL for the AJAX call.
-      var targetDocument = formData.get('section');
-      if (targetDocument) {
-        targetDocument = XWiki.getResource(targetDocument);
-        targetDocument = new XWiki.Document(targetDocument.name, targetDocument.space, targetDocument.wiki);
-      } else {
-        targetDocument = XWiki.currentDocument;
-      }
-      var targetDocumentURL = targetDocument.getURL('get');
+    // Prepare the URL for the AJAX call.
+    var targetDocument = formData.get('section');
+    if (targetDocument) {
+      targetDocument = XWiki.getResource(targetDocument);
+      targetDocument = new XWiki.Document(targetDocument.name, targetDocument.space, targetDocument.wiki);
+    } else {
+      targetDocument = XWiki.currentDocument;
+    }
+    var targetDocumentURL = targetDocument.getURL('get');
 
-      // Launch the AJAX call to fetch extension details.
-      new Ajax.Request(
-        // AJAX request URL.
-        targetDocumentURL,
-        // AJAX request parameters.
-        {
-          parameters : formData,
-          onCreate : function() {
-            // Don't panic, the content is loading.
-            form.up(this.extensionItemSelector).insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
-          }.bind(this),
-          onSuccess : function(response) {
-            // Replace the old Extension data element with the one that was just fetched.
-            var originalExtensionItem = form.up(this.extensionItemSelector);
-            originalExtensionItem.addClassName('hidden');
-            originalExtensionItem.insert({after : response.responseText});
-            var newExtensionItem = originalExtensionItem.next();
-            originalExtensionItem.remove();
-            // Attach behaviour to the new element.
-            this.addExtensionElementBehavior(newExtensionItem);
-          }.bind(this),
-          onFailure : function (response) {
-            var failureReason = response.statusText;
-            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              failureReason = 'Server not responding';
-            }
-            new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
-          }.bind(this),
-          on0 : function (response) {
-            response.request.options.onFailure(response);
-          },
-          onComplete : function() {
-            // In the end: re-enable the button.
-            form.__disabled = false;
-            // Remove the loading marker if it's still there (i.e. fetching failed).
-            if (form &amp;&amp; form.down(".extension-body.loading")) {
-              form.down(".extension-body.loading").remove();
-            }
+    // Launch the AJAX call to fetch extension details.
+    new Ajax.Request(
+      // AJAX request URL.
+      targetDocumentURL,
+      // AJAX request parameters.
+      {
+        parameters : formData,
+        onCreate : function() {
+          // Don't panic, the content is loading.
+          this.container.insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
+        }.bind(this),
+        onSuccess : function(response) {
+          // Replace the current extension container element with the one that was just fetched.
+          this.container.addClassName('hidden');
+          this.container.insert({after : response.responseText});
+          // Attach behaviour to the new element.
+          this.initialize(this.container.next());
+        }.bind(this),
+        onFailure : function (response) {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
           }
-        }
-      );
-    },
+          new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
+        }.bind(this),
+        on0 : function (response) {
+          response.request.options.onFailure(response);
+        },
+        onComplete : function() {
+          // Re-enable the button.
+          form.__disabled = false;
+          // Remove the loading marker if it's still there (i.e. fetching failed).
+          var loadingMarker = this.container.down('.extension-body.loading');
+          loadingMarker &amp;&amp; loadingMarker.remove();
+        }.bind(this)
+      }
+    );
+  },
 
-    /**
-     * Add JS enhancement to the UI of an extension
-     */ 
-    addExtensionElementBehavior : function(extensionItem) {
-      // Show/hide extension details
-      var showDetailsButton = extensionItem.down('input[name="showdetails"]').up();
-      var hideDetailsButton = extensionItem.down('input[name="hidedetails"]').up();
+  /**
+   * Enables the asynchronous loading of extension details and the show/hide extension details toggle.
+   */
+  _enhanceShowDetailsBehaviour : function() {
+    var showDetailsButton = this.container.down('input[name="actionshowdetails"]');
+    if (showDetailsButton) {
+      // Load the extension details asynchronously.
+      showDetailsButton.observe('click', this._onShowDetails.bindAsEventListener(this));
+    } else {
+      showDetailsButton = this.container.down('input[name="showdetails"]');
+      if (!showDetailsButton) {
+        return;
+      }
+      // Show/hide extension details toggle.
+      showDetailsButton = showDetailsButton.up();
+      var hideDetailsButton = this.container.down('input[name="hidedetails"]').up();
       showDetailsButton.__otherButton = hideDetailsButton;
       hideDetailsButton.__otherButton = showDetailsButton;
-      showDetailsButton.__targetElement = hideDetailsButton.__targetElement = extensionItem.down(this.extensionBodySelector);
-      extensionItem.select('.visibilityAction').invoke('observe', 'click', function(event) {
+      this.container.select('.visibilityAction').invoke('observe', 'click', function(event) {
         event.stop();
         var button = event.element().up('span');
-        // button.__otherButton.toggleClassName('hidden');
-        button.__targetElement.toggleClassName('hidden');
+        this.container.down('.extension-body').toggleClassName('hidden');
         button.replace(button.__otherButton);
       }.bindAsEventListener(this));
       showDetailsButton.remove();
-      // Add JS handlers for the extension menu
-      this.addExtensionMenuBehavior(extensionItem);
-      // Fix dependencies links
-      extensionItem.select(".extension-body-dependencies a").each(function (link) {
-         link.setAttribute('href', XWiki.currentDocument.getURL((XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view'), link.getAttribute('href').replace(/.*\?/, "")));
-      });
-      // Enhance the progress tab, if present.
-      this.addExtensionProgressBehavior(extensionItem);
-    },
+    }
+  },
 
-    /**
-     * Add JavaScript handlers for the extension menu.
-     */
-    addExtensionMenuBehavior : function(extensionItem) {
-      // Expand the current menu item.
-      var currentMenuItem = extensionItem.down(this.extensionMenuItemSelector + "." + this.extensionCurrentMenuItemMarker);
-      if (!currentMenuItem) {
-        // Expand the first menu item.
-        currentMenuItem = extensionItem.down(this.extensionMenuItemSelector);
-      }
-      if (currentMenuItem) {
-        this.activateExtensionMenuItem(currentMenuItem);
-        // Make the activation of menu items persistent.
-        $$(this.extensionMenuItemSelector).invoke("observe", "click", function(event) {
-          // When a menu item is clicked..
-          event.stop();
-          var menuItem = event.element();
-          this.activateExtensionMenuItem(menuItem);
-        }.bindAsEventListener(this));
-      }
-    },
-
-    activateExtensionMenuItem : function (menuItem) {
-      var extensionItem = menuItem.up(this.extensionItemSelector);
-      // Hide all sections (each section is associated with a menu item).
-      extensionItem.select(this.extensionDetailsSectionSelector).invoke("setStyle", {'display' : 'none'});
-      // Unmark the currently active menu item.
-      var currentMenuItem = extensionItem.down(this.extensionMenuItemSelector + "." + this.extensionCurrentMenuItemMarker);
-      if (currentMenuItem) {
-         currentMenuItem.removeClassName(this.extensionCurrentMenuItemMarker);
-      }
-      // Display the section associated with the given menu item (the menu item that was clicked).
-      // (the href attribute is expected be "#id-of-an-anchor-placed-before-the-section-to-display)
-      $(menuItem.getAttribute('href').substring(1)).next(this.extensionDetailsSectionSelector).setStyle({'display' : 'block'});
-      // Mark the given menu item as active (i.e. select the menu item that was cliked).
-      menuItem.addClassName(this.extensionCurrentMenuItemMarker);
-    },
-
-    addExtensionProgressBehavior : function(extensionItem) {
-      // Toggle stack trace display in extension log.
-      extensionItem.select('.extension-log-item').each(function (logItem) {
-        // If the log item has details.
-        if (logItem.down('div')) {
-          var logMessage = logItem.down('p');
-          logMessage.observe('click', function() {
-            logItem.toggleClassName('extension-log-item-expanded');
-          });
-        }
-      });
-    },
-
-    prepareSimpleSearch : function() {
-      var simpleSearchBox = $('extension-search-simple');
-      if (!simpleSearchBox) {
-        return;
-      }
-      // Submit the search form whenever the user selects a different repository.
-      $('extensionSearchRepositoryList').observe('change', function(event) {
-        // Make sure we don't submit the search tip.
-        $('extensionSearchInput').focus();
-        event.element().up('form').submit();
+  /**
+   * Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
+   */
+  _enhanceMenuBehaviour : function() {
+    var menuItemSelector = '.innerMenu li a';
+    // Expand the current menu item.
+    var currentMenuItem = this.container.down(menuItemSelector + '.current');
+    if (!currentMenuItem) {
+      // Expand the first menu item.
+      currentMenuItem = this.container.down(menuItemSelector);
+    }
+    if (currentMenuItem) {
+      this._activateMenuItem(currentMenuItem);
+      // Make the activation of menu items persistent.
+      this.container.select(menuItemSelector).invoke('observe', 'click', function(event) {
+        event.stop();
+        this._activateMenuItem(event.element());
       }.bindAsEventListener(this));
-    },
+    }
+  },
 
-    prepareAdvancedSearch : function() {
-      var advancedSearchBox = $('extension-search-advanced');
-      if (!advancedSearchBox) {
-        return;
+  _activateMenuItem : function(menuItem) {
+    // Hide all sections (each section is associated with a menu item).
+    this.container.select('.extension-body-section').invoke('setStyle', {'display' : 'none'});
+    // Unmark the currently active menu item.
+    var currentMenuItem = this.container.down('.innerMenu li a.current');
+    if (currentMenuItem) {
+       currentMenuItem.removeClassName('current');
+    }
+    // Display the section associated with the given menu item (the menu item that was clicked).
+    // (the href attribute is expected be "#id-of-an-anchor-placed-before-the-section-to-display)
+    $(menuItem.getAttribute('href').substring(1)).next('.extension-body-section').setStyle({'display' : 'block'});
+    // Mark the given menu item as active (i.e. select the menu item that was clicked).
+    menuItem.addClassName('current');
+  },
+
+  /**
+   * Enhances the behaviour of the Dependencies section within the extension details.
+   */
+  _enhanceDependenciesBehaviour : function() {
+    // Fix dependencies links when the extension details are loaded asynchronously in the administration section.
+    this.container.select(".extension-body-dependencies a").each(function (link) {
+      var action = XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view';
+      var queryString = link.getAttribute('href').replace(/.*\?/, '');
+      link.setAttribute('href', XWiki.currentDocument.getURL(action, queryString));
+    });
+  },
+
+  /**
+   * Enhances the behaviour of the Progress section within the extension details.
+   */
+  _enhanceProgressBehaviour : function() {
+    // Toggle stack trace display in extension log.
+    this.container.select('.extension-log-item').each(function (logItem) {
+      // If the log item has details.
+      if (logItem.down('div')) {
+        var logMessage = logItem.down('p');
+        logMessage.observe('click', function() {
+          logItem.toggleClassName('extension-log-item-expanded');
+        });
       }
-      var advancedSearchTrigger = advancedSearchBox.down('legend a');//ry :)
-      if (advancedSearchTrigger) {
-        var target = advancedSearchTrigger.up('legend').next();
-        if (target) {
-          advancedSearchTrigger.observe('click', function(event) {
+    });
+  }
+});
+
+
+/**
+ * Enhances the behaviour of the extension search form.
+ */
+XWiki.ExtensionSearchFormBehaviour = Class.create({
+  initialize : function () {
+    this._enhanceSimpleSearch();
+    this._enhanceAdvancedSearch();
+  },
+
+  _enhanceSimpleSearch : function() {
+    var simpleSearchBox = $('extension-search-simple');
+    if (!simpleSearchBox) {
+      return;
+    }
+    // Submit the search form whenever the user selects a different repository.
+    $('extensionSearchRepositoryList').observe('change', function(event) {
+      // Make sure we don't submit the search tip.
+      $('extensionSearchInput').focus();
+      event.element().up('form').submit();
+    }.bindAsEventListener(this));
+  },
+
+  _enhanceAdvancedSearch : function() {
+    var advancedSearchBox = $('extension-search-advanced');
+    if (!advancedSearchBox) {
+      return;
+    }
+    var advancedSearchTrigger = advancedSearchBox.down('legend a');//ry :)
+    if (advancedSearchTrigger) {
+      var target = advancedSearchTrigger.up('legend').next();
+      if (target) {
+        advancedSearchTrigger.observe('click', function(event) {
+          event.stop();
+          advancedSearchTrigger.blur();
+          target.toggleClassName('hidden');
+          advancedSearchTrigger.toggleClassName('expanded');
+        });
+        var cancelTrigger = target.down('a.actioncancel');
+        if (cancelTrigger) {
+          cancelTrigger.observe('click', function(event) {
             event.stop();
-            advancedSearchTrigger.blur();
-            target.toggleClassName('hidden');
-            advancedSearchTrigger.toggleClassName('expanded');
+            cancelTrigger.up('form').select('input[type=text]').each(function(input) {
+              input.value = '';
+            });
+            advancedSearchTrigger.click();
           });
-          var cancelTrigger = target.down('a.actioncancel');
-          if (cancelTrigger) {
-            cancelTrigger.observe('click', function(event) {
-              event.stop();
-              cancelTrigger.up('form').select('input[type=text]').each(function(input) {
-                input.value = '';
-              });
-              advancedSearchTrigger.click();
-          });
-         }
         }
       }
     }
-  });
-
-  function init() {
-    var em =  new admin.ExtensionManager();
-    var extensionItems = $$(em.extensionItemSelector);
-    if (extensionItems.length == 1 &amp;&amp; $$(em.extensionBodySelector).length == 1) {
-      em.addExtensionMenuBehavior(extensionItems[0]);
-      em.addExtensionProgressBehavior(extensionItems[0]);
-    }
-    return em;
   }
+});
 
-  // When the document is loaded, trigger the Extension Manager form enhancements.
-  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
 
-  // End XWiki augmentation.
-  return XWiki;
+function init() {
+  new XWiki.ExtensionSearchFormBehaviour();
+  $$('.extension-item').each(function (extension) {
+    new XWiki.ExtensionBehaviour(extension);
+  });
+  return true;
+}
+
+// When the document is loaded, trigger the Extension Manager form enhancements.
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+
+// End XWiki augmentation.
+return XWiki;
 }(XWiki || {}));</code>
     </property>
     <property>
-      <name/>
+      <name>Code</name>
     </property>
     <property>
       <parse>1</parse>

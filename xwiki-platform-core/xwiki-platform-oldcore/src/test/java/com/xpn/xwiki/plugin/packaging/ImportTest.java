@@ -256,6 +256,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
             this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"), getContext());
         assertFalse(foundOverwritingDoc.isNew());
         assertEquals(foundOverwritingDoc.getContent(), newContent);
+        assertEquals(foundDocument, foundOverwritingDoc.getOriginalDocument());
     }
 
     /**

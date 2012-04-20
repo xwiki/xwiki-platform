@@ -691,6 +691,7 @@ public class Package
                     }
                 }
                 doc.getDoc().addXObjectsToRemoveFromVersion(previousdoc);
+                doc.getDoc().setOriginalDocument(previousdoc);
             }
             try {
                 if (!backup) {

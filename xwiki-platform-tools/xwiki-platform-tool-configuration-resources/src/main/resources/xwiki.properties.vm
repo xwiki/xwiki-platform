@@ -138,6 +138,10 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-------------------------------------------------------------------------------------
+# Rendering Transformations
+#-------------------------------------------------------------------------------------
+
 #-# [Since 2.6RC1]
 #-# Controls what transformations will be executed when rendering content.
 #-# A transformation modifies the parsed content. For example the Icon transformation replaces some characters with
@@ -179,6 +183,23 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Defines the time (in ms) after which an external link should be checked again for validity.
 #-# the default configuration is:
 # rendering.transformation.linkchecker.timeout = 3600000
+
+#-------------------------------------------------------------------------------------
+# Rendering Macros
+#-------------------------------------------------------------------------------------
+
+#-# Velocity Macro
+
+#-# [Since 2.0M1]
+#-# Defines which Velocity Filter to use by default. This offers the possibility to filter the Velocity macro content
+#-# before and after the Velocity Engine execution.
+#-# The following filters are available:
+#-# - indent (the default): Remove all first whites spaces of lines to support source code indentation without
+#-#          generating whitespaces in the resulting XDOM.
+#-# - none: Doesn't change the content
+#-# - html: Removes all leading and trailing white spaces and new lines. If you need a space you'll need to use
+#-#         \$sp and if you need a new line you'll need to use \$nl
+#-# rendering.macro.velocity.filter = indent
 
 #-------------------------------------------------------------------------------------
 # Cache

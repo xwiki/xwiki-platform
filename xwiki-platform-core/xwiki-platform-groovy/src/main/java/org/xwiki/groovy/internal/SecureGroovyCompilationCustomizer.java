@@ -19,6 +19,7 @@
  */
 package org.xwiki.groovy.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,6 +28,7 @@ import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.groovy.GroovyCompilationCustomizer;
 
@@ -41,6 +43,12 @@ import org.xwiki.groovy.GroovyCompilationCustomizer;
 @Singleton
 public class SecureGroovyCompilationCustomizer implements GroovyCompilationCustomizer
 {
+    /**
+     * Used to check for Programming Rights; if the document has Programming Rights then don't perform any check.
+     */
+    @Inject
+    private DocumentAccessBridge dab;
+
     /**
      * Prevents executing {@code System.exit}.
      */
@@ -70,8 +78,12 @@ public class SecureGroovyCompilationCustomizer implements GroovyCompilationCusto
     @Override
     public CompilationCustomizer createCustomizer()
     {
-        SecureASTCustomizer customizer = new SecureASTCustomizer();
-        customizer.addExpressionCheckers(new SystemExitChecker());
+        CompilationCustomizer customizer = null;
+        if (!this.dab.hasProgrammingRights()) {
+            SecureASTCustomizer secureCustomizer = new SecureASTCustomizer();
+            secureCustomizer.addExpressionCheckers(new SystemExitChecker());
+            customizer = secureCustomizer;
+        }
         return customizer;
     }
 }

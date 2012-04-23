@@ -295,10 +295,11 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# - secure: runs Groovy in a security sandbox
 #-# groovy.compilationCustomizers=<list of customizer ids here>
 
+#-# Timed Interrupt Customizer
+
 #-# [Since 4.1M1]
-#-# Default execution time for a script before a timeout occurs (if the "timedinterrupt" customizer is active), in
-#-# seconds.
-#-# groovy.customizer.timedinterrupt.scriptTimeout=60
+#-# Default execution time for a script before a timeout occurs, in seconds.
+#-# groovy.customizer.timedInterrupt.timeout=60
 
 #-------------------------------------------------------------------------------------
 # Events distribution

@@ -290,8 +290,9 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 4.1M1]
 #-# Allows to specify Compiler customization for the Groovy execution engine.
-#-# There's no customizers defined by default. Available customizers:
+#-# There's no customizers defined by default. Available customizer ids:
 #-# - timedinterrupt: interrupt script execution if it takes longer than a given time (default to 1 minute)
+#-# - secure: runs Groovy in a security sandbox
 #-# groovy.compilationCustomizers=<list of customizer ids here>
 
 #-# [Since 4.1M1]

@@ -33,10 +33,12 @@
   <name>XWiki Platform - Rendering - Macro - Groovy</name>
   <description>XWiki Platform - Rendering - Macro - Groovy</description>
   <dependencies>
+    <!-- Note: We could only depend on xwiki-commons-groovy but since we want everyone to depend on the Groovy Macro
+         to also have all customizers defined in xwiki-platform-groovy we have added a dependency on it instead -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-groovy</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-groovy</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

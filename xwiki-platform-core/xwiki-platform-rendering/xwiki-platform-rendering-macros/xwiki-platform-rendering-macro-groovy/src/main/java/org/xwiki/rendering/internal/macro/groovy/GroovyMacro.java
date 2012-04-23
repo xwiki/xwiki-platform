@@ -19,16 +19,19 @@
  */
 package org.xwiki.rendering.internal.macro.groovy;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.ScriptEngineFactory;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 
 /**
- * Execute script in provided script language.
+ * Execute script in the provided script language.
  * 
  * @version $Id$
  * @since 1.7M3
@@ -49,10 +52,27 @@ public class GroovyMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroPara
     private static final String CONTENT_DESCRIPTION = "the groovy script to execute";
 
     /**
+     * A specific XWiki Groovy Script Engine Factory.
+     */
+    @Inject
+    @Named("groovy")
+    private ScriptEngineFactory groovyScriptEngineFactory;
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public GroovyMacro()
     {
         super("Groovy", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+
+        // Register Groovy Compilation Customizers by registering the XWiki Groovy Script Engine Factory which extends
+        // the default Groovy Script Engine Factory and registers Compilation Customizers.
+        this.scriptEngineManager.registerEngineName("groovy", this.groovyScriptEngineFactory);
     }
 }

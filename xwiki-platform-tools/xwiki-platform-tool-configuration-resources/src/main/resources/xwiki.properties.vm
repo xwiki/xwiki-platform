@@ -285,6 +285,15 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector
 
 #-------------------------------------------------------------------------------------
+# Groovy
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.1M1]
+#-# Allows to specify Compiler customization for the Groovy execution engine.
+#-# There's no customizers defined by default.
+#-# groovy.compilationCustomizers=<list of customizer ids here>
+
+#-------------------------------------------------------------------------------------
 # Events distribution
 #-------------------------------------------------------------------------------------
 

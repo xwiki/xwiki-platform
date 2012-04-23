@@ -64,9 +64,7 @@ public class ClassLoadingTest extends AbstractComponentTestCase
     {
         // First execution: define a class
         JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();
-        // TODO: Groovy bug: We need to have a statement after the class declaration, see
-        // http://jira.codehaus.org/browse/GROOVY-3711
-        this.macro.execute(params, "class MyClass {}\ndef var", this.context);
+        this.macro.execute(params, "class MyClass {}", this.context);
 
         // Second execution: use the defined class
         this.macro.execute(params, "def var = new MyClass()", this.context);
@@ -111,9 +109,7 @@ public class ClassLoadingTest extends AbstractComponentTestCase
     @Test
     public void testDefineClassInFirstExecutionAndJarParamsInAnother() throws Exception
     {
-        // TODO: Groovy bug: We need to have a statement after the class declaration, see
-        // http://jira.codehaus.org/browse/GROOVY-3711
-        this.macro.execute(new JSR223ScriptMacroParameters(), "class MyClass {}\ndef var", this.context);
+        this.macro.execute(new JSR223ScriptMacroParameters(), "class MyClass {}", this.context);
 
         // Second execution: use the defined class but with different jar params
         JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();

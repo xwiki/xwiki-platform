@@ -171,7 +171,17 @@ public class DefaultQuery implements Query
     public Query bindValues(List<Object> values)
     {
         for (int i = 0; i < values.size(); i++) {
-            bindValue(i + 1, values.get(i));
+            // There's a difference in the way positional parameters are handled:
+            // - HQL (jdbc-like), the index of positional parameters must start at 0
+            // - XWQL (jpql-like), the index of positional parameters must start at 1
+            //
+            // This difference is also hardcoded in HqlQueryExecutor#populateParameters(), a better solution could
+            // be to replace the current DefaultQuery with distinct implementations: XwqlQuery, HqlQuery, NamedQuery.
+            if (Query.HQL.equals(getLanguage())) {
+                bindValue(i, values.get(i));
+            } else {
+                bindValue(i + 1, values.get(i));
+            }
         }
         return this;
     }

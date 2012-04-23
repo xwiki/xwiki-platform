@@ -84,19 +84,19 @@ public interface Query
     Query bindValue(String var, Object val);
 
     /**
-     * Bind positional parameter (?index in JPQL) with value val in query statement. It is recommended to use named
-     * parameters if it acceptable. see {@link #bindValue(String, Object)}
+     * Bind a positional parameter present in the statement (?index in XWQL) with a value. It is recommended to use
+     * named parameters if it acceptable, see {@link #bindValue(String, Object)}.
      *
-     * @param index index of positional parameter. Index starting number is depends on store system. According JPQL
-     * standard index should start from 1.
+     * @param index index of positional parameter. Index starting number depends on the query language. According to the
+     * JPQL standard index should start from 1.
      * @param val value of the variable.
      * @return this query.
      */
     Query bindValue(int index, Object val);
 
     /**
-     * Bind list of positional parameters values. values[i] became  i+1 positional parameter according JPQL. So it works
-     * only for "?index" parameters.
+     * Bind a list of positional parameters values. This method is a convenience method allowing passing a list of
+     * values in one call instead of multiple calls to {@link #bindValue(int, Object)}.
      *
      * @param values list of positional parameters values.
      * @return this query.

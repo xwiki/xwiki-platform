@@ -298,7 +298,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 4.1M1]
 #-# Default execution time for a script before a timeout occurs (if the "timedinterrupt" customizer is active), in
 #-# seconds.
-#-# groovy.scriptTimeout=60
+#-# groovy.customizer.timedinterrupt.scriptTimeout=60
 
 #-------------------------------------------------------------------------------------
 # Events distribution

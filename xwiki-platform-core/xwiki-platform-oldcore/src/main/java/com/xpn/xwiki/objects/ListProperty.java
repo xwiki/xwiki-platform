@@ -30,7 +30,7 @@ import org.hibernate.collection.PersistentCollection;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {

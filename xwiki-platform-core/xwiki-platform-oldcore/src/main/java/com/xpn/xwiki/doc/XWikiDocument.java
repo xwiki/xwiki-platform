@@ -132,9 +132,9 @@ import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -8039,9 +8039,6 @@ public class XWikiDocument implements DocumentModelBridge
      * to this method.</li>
      * 
      * @param document the document to apply
-     * @param context the XWiki context
-     * @param attachments indicate if attachment has to be taken into account (this can be pretty expensive and sometime
-     *            done another way)
      * @return false is nothing changed
      */
     public boolean apply(XWikiDocument document)

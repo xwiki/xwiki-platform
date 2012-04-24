@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.qarks.util.files.diff.Diff;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
@@ -113,14 +114,14 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
     @Test
     public void testContentModified() throws Exception
-    {
+    {   
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some new content");
-        this.document.setContent("some content\nwith additionnal line");
+        this.newDocument.setContent("some content\nafter");
+        this.document.setContent("before\nsome content");
 
         merge();
 
-        Assert.assertEquals("some new content\nwith additionnal line", this.document.getContent());
+        Assert.assertEquals("before\nsome content\nafter", this.document.getContent());
     }
 
     @Test

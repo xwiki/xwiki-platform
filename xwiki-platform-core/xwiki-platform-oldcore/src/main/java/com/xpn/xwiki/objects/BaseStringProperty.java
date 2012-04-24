@@ -20,7 +20,7 @@
 package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$

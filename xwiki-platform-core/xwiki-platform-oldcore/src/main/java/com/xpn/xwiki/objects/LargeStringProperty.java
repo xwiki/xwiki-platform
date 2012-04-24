@@ -19,7 +19,14 @@
  */
 package com.xpn.xwiki.objects;
 
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.merge.MergeUtils;
+
 public class LargeStringProperty extends BaseStringProperty
 {
-    
+    @Override
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, getValue(), mergeResult));
+    }
 }

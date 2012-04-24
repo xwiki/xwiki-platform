@@ -50,9 +50,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.java-diff-utils</groupId>
-      <artifactId>diffutils</artifactId>
-      <version>1.2.1</version>
+      <groupId>com.qarks</groupId>
+      <artifactId>jdiff</artifactId>
+      <version>1.4.2-xwiki</version>
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->

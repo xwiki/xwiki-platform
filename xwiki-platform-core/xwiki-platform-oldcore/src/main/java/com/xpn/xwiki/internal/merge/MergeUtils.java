@@ -17,22 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc.merge;
+package com.xpn.xwiki.internal.merge;
 
-import java.io.StringReader;
 import java.util.Collection;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import difflib.DiffUtils;
-import difflib.Patch;
+import com.qarks.util.files.diff.Diff;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
  * Provide some 3 ways merging related methods.
  * 
  * @version $Id$
- * @since 3.2M1
+ * @since 4.1M1
  */
 public final class MergeUtils
 {
@@ -51,27 +50,45 @@ public final class MergeUtils
      * @param newStr new version of the string
      * @param currentStr current version of the string
      * @param mergeResult the merge report
-     * @return the merged string
+     * @return the merged string or the provided current string if the merge fail
      */
     // TODO: add support for line merge
     public static String mergeString(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
     {
-        String result = currentStr;
-
-        try {
-            Patch patch =
-                DiffUtils.diff(IOUtils.readLines(new StringReader(previousStr)),
-                    IOUtils.readLines(new StringReader(newStr)));
-            if (patch.getDeltas().size() > 0) {
-                result = StringUtils.join(patch.applyTo(IOUtils.readLines(new StringReader(currentStr))), '\n');
-
-                mergeResult.setModified(true);
-            }
-        } catch (Exception e) {
-            mergeResult.getErrors().add(e);
+        if (StringUtils.equals(previousStr, newStr)) {
+            // No change so nothing to do
+            return currentStr;
         }
 
-        return result;
+        String resultStr;
+
+        if (StringUtils.isEmpty(currentStr)) {
+            // The current version is empty
+            if (StringUtils.equals(previousStr, currentStr)) {
+                // Simply because the previous version was empty too
+                resultStr = newStr;
+            } else {
+                // The current version has been replaced by an empty string
+                mergeResult.getErrors().add(
+                    new CollisionException("The current value has been replaced by empty string"));
+                resultStr = currentStr;
+            }
+        } else {
+
+            com.qarks.util.files.diff.MergeResult result = Diff.quickMerge(previousStr, newStr, currentStr, false);
+
+            if (result.isConflict()) {
+                mergeResult.getErrors().add(
+                    new CollisionException(String.format(
+                        "Failed to merge with previous string [%s], new string [%s] and current string [%s]",
+                        previousStr, newStr, currentStr)));
+                resultStr = currentStr;
+            } else {
+                resultStr = result.getDefaultMergedResult();
+            }
+        }
+
+        return resultStr;
     }
 
     /**

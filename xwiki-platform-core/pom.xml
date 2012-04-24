@@ -226,6 +226,7 @@
             <!-- Remove the following exclude after the 4.0 final release and the update of clirr.previous.version -->
             <exclude>org/xwiki/query/Query</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <exclude>com/xpn/xwiki/doc/merge/MergeUtils</exclude>
           </excludes>
         </configuration>
       </plugin>

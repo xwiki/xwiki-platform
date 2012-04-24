@@ -431,7 +431,9 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
     $('extensionSearchRepositoryList').observe('change', function(event) {
       // Make sure we don't submit the search tip.
       $('extensionSearchInput').focus();
-      event.element().up('form').submit();
+      // Defer the submit so that the search input is properly focused.
+      var form = event.element().form;
+      form.submit.bind(form).defer();
     }.bindAsEventListener(this));
   },
 

@@ -118,6 +118,10 @@ XWiki.ExtensionBehaviour = Class.create({
     // Handle extension details.
     this._enhanceShowDetailsBehaviour();
 
+    // Asynchronous fetch of install/uninstall plan.
+    this._enhanceInstallBehaviour();
+    this._enhanceUninstallBehaviour();
+
     // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
     this._enhanceMenuBehaviour();
 
@@ -137,9 +141,22 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
-   * Load the extension details asynchronously.
+   * Returns the URL of the service used to retrieve extension details and to install/uninstall extensions.
    */
-  _onShowDetails : function(event) {
+  _getServiceURL : function(serviceDocument) {
+    if (serviceDocument) {
+      serviceDocument = XWiki.getResource(serviceDocument);
+      serviceDocument = new XWiki.Document(serviceDocument.name, serviceDocument.space, serviceDocument.wiki);
+    } else {
+      serviceDocument = XWiki.currentDocument;
+    }
+    return serviceDocument.getURL('get');
+  },
+
+  /**
+   * Submit a form asynchronously.
+   */
+  _submit : function(event, ajaxRequestParameters) {
     event.stop();
 
     // Ignore consecutive requests, just handle the first one.
@@ -150,55 +167,63 @@ XWiki.ExtensionBehaviour = Class.create({
     form.__disabled = true;
 
     // Prepare the data for the AJAX call.
-    var formData = new Hash(form.serialize(true));
+    var formData = new Hash(form.serialize({submit: event.element().name}));
 
-    // Prepare the URL for the AJAX call.
-    var targetDocument = formData.get('section');
-    if (targetDocument) {
-      targetDocument = XWiki.getResource(targetDocument);
-      targetDocument = new XWiki.Document(targetDocument.name, targetDocument.space, targetDocument.wiki);
-    } else {
-      targetDocument = XWiki.currentDocument;
-    }
-    var targetDocumentURL = targetDocument.getURL('get');
-
-    // Launch the AJAX call to fetch extension details.
-    new Ajax.Request(
-      // AJAX request URL.
-      targetDocumentURL,
-      // AJAX request parameters.
-      {
-        parameters : formData,
-        onCreate : function() {
-          // Don't panic, the content is loading.
-          this.container.insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
-        }.bind(this),
-        onSuccess : function(response) {
-          // Replace the current extension container element with the one that was just fetched.
-          this.container.addClassName('hidden');
-          this.container.insert({after : response.responseText});
-          // Attach behaviour to the new element.
-          this.initialize(this.container.next());
-        }.bind(this),
-        onFailure : function (response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
-          new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
-        }.bind(this),
-        on0 : function (response) {
-          response.request.options.onFailure(response);
-        },
-        onComplete : function() {
-          // Re-enable the button.
-          form.__disabled = false;
-          // Remove the loading marker if it's still there (i.e. fetching failed).
-          var loadingMarker = this.container.down('.extension-body.loading');
-          loadingMarker &amp;&amp; loadingMarker.remove();
-        }.bind(this)
+    // Default AJAX request parameters.
+    var defaultAJAXRequestParameters = {
+      parameters : formData,
+      onFailure : function (response) {
+        var failureReason = response.statusText;
+        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+          failureReason = 'Server not responding';
+        }
+        new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
+      },
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      },
+      onComplete : function() {
+        // Re-enable the button.
+        form.__disabled = false;
       }
-    );
+    }
+
+    // Inject a reference to the (cloned) default AJAX request parameters to be able
+    // to access the defaults even when they are overwritten by the provided values.
+    defaultAJAXRequestParameters.default = Object.clone(defaultAJAXRequestParameters);
+
+    // Launch the AJAX call.
+    new Ajax.Request(this._getServiceURL(formData.get('section')), Object.extend(defaultAJAXRequestParameters, ajaxRequestParameters));
+  },
+
+  _update : function(html) {
+    // Replace the current extension container element with the one that was just fetched.
+    this.container.addClassName('hidden');
+    this.container.insert({after : html});
+    // Attach behaviour to the new element.
+    this.initialize(this.container.next());
+  },
+
+  /**
+   * Load the extension details asynchronously.
+   */
+  _onShowDetails : function(event) {
+    // Launch the AJAX call to fetch extension details.
+    this._submit(event, {
+      onCreate : function() {
+        // Don't panic, the content is loading.
+        this.container.insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
+      }.bind(this),
+      onSuccess : function(response) {
+        this._update(response.responseText);
+      }.bind(this),
+      onComplete : function(response) {
+        response.request.options.default.onComplete(response);
+        // Remove the loading marker if it's still there (i.e. fetching failed).
+        var loadingMarker = this.container.down('.extension-body.loading');
+        loadingMarker &amp;&amp; loadingMarker.remove();
+      }.bind(this)
+    });
   },
 
   /**
@@ -219,14 +244,107 @@ XWiki.ExtensionBehaviour = Class.create({
       var hideDetailsButton = this.container.down('input[name="hidedetails"]').up();
       showDetailsButton.__otherButton = hideDetailsButton;
       hideDetailsButton.__otherButton = showDetailsButton;
-      this.container.select('.visibilityAction').invoke('observe', 'click', function(event) {
-        event.stop();
-        var button = event.element().up('span');
-        this.container.down('.extension-body').toggleClassName('hidden');
-        button.replace(button.__otherButton);
-      }.bindAsEventListener(this));
+      this.container.select('.visibilityAction').invoke('observe', 'click', this._onToggleShowHideDetails.bindAsEventListener(this));
       showDetailsButton.remove();
     }
+  },
+
+  /**
+   * Toggles the visibility of the extension details.
+   */
+  _onToggleShowHideDetails : function(event) {
+    event.stop();
+    var button = event.element().up('span');
+    this.container.down('.extension-body').toggleClassName('hidden');
+    button.replace(button.__otherButton);
+  },
+
+  /**
+   * Enhances the behaviour of the install button: computes the install plan asynchronously.
+   */
+  _enhanceInstallBehaviour : function() {
+    var installButton = this.container.down('input[name="actioninstall"]');
+    installButton &amp;&amp; installButton.observe('click', this._retrieveInstallOrUninstallPlan.bindAsEventListener(this));
+  },
+
+  /**
+   * Enhances the behaviour of the uninstall button: computes the uninstall plan asynchronously.
+   */
+  _enhanceUninstallBehaviour : function() {
+    var uninstallButton = this.container.down('input[name="actionuninstall"]');
+    uninstallButton &amp;&amp; uninstallButton.observe('click', this._retrieveInstallOrUninstallPlan.bindAsEventListener(this));
+  },
+
+  /**
+   * Indicate to the user that the install/uninstall plan is being fetched.
+   */
+  _onBeforeRetrieveInstallOrUninstallPlan : function() {
+    // Check if the extension details have been fetched.
+    var extensionBody = this.container.down('.extension-body');
+    if (extensionBody) {
+      // Make sure the extension details are visible.
+      extensionBody.hasClassName('hidden') &amp;&amp; this._onToggleShowHideDetails({
+        stop : function() {},
+        element : function() {return this.container.down('input[name="showdetails"]')}.bind(this)
+      });
+      // Check if the progress section is available.
+      var progressSection = extensionBody.down('.extension-body-progress');
+      if (!progressSection) {
+        // Add an empty progress section.
+        var lastSection = extensionBody.select('.extension-body-section').last();
+        progressSection = new Element('div', {'class': 'extension-body-progress extension-body-section loading'});
+        lastSection.insert({after: progressSection});
+        // Add the section anchor.
+        var progressSectionAnchor = 'extension-body-progress' + lastSection.previous().id.substr($w(lastSection.className)[0].length);
+        lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
+        // Add the progress menu.
+        extensionBody.down('.innerMenu').insert('&lt;li&gt;&lt;span class="wikilink"&gt;&lt;a href="#' + progressSectionAnchor + '"&gt;$msg.get('extensions.info.category.progress')&lt;/a&gt;&lt;/span&gt;&lt;/li&gt;');
+      } else {
+        // Hide the contents of the progress section and display the loading animation.
+        progressSection.insert({before: progressSection.clone(false)});
+        progressSection = progressSection.previous();
+        progressSection.addClassName('loading');
+      }
+      // Activate the progress section.
+      this._activateMenuItem(extensionBody.down('.innerMenu li a[href="#' + progressSection.previous().id + '"]'));
+    } else {
+      this.container.insert({bottom: new Element('div', {'class' : 'extension-body loading'})});
+    }
+  },
+
+  _onAfterRetrieveInstallOrUninstallPlan : function(response) {
+    response.request.options.default.onComplete(response);
+    // Remove the loading markers if they are still present (i.e. request failed).
+    var extensionBodyLoading = this.container.down('.extension-body.loading');
+    if (extensionBodyLoading) {
+      extensionBodyLoading.remove();
+    } else {
+      var progressSectionLoading = this.container.down('.extension-body-progress.loading');
+      if (progressSectionLoading) {
+        // If the progress section is hidden, re-display it.
+        var progressSection = progressSectionLoading.previous();
+        if (progressSection.hasClassName('extension-body-progress')) {
+          progressSectionLoading.remove();
+          progressSection.show();
+        } else {
+          progressSectionLoading.removeClassName('loading');
+        }
+      }
+    }
+  },
+
+  /**
+   * Retrieves the install or uninstall plan asynchronously.
+   */
+  _retrieveInstallOrUninstallPlan : function(event) {
+    // Launch the AJAX call to fetch the install/uninstall plan.
+    this._submit(event, {
+      onCreate : this._onBeforeRetrieveInstallOrUninstallPlan.bind(this),
+      onSuccess : function(response) {
+        this._update(response.responseText);
+      }.bind(this),
+      onComplete : this._onAfterRetrieveInstallOrUninstallPlan.bind(this)
+    });
   },
 
   /**
@@ -544,6 +662,8 @@ return XWiki;
 *[class^="extension-body-"] {
   display: none;
   font-size: 0.9em;
+  /* Make sure we have space for the loading animation. */
+  min-height: 16px;
 }
 *[id^="extension-body-"]:target + *[class^="extension-body-"] {
   display: block;

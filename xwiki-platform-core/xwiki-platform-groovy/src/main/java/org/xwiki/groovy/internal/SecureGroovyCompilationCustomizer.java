@@ -19,13 +19,17 @@
  */
 package org.xwiki.groovy.internal;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.groovy.ast.expr.ClassExpression;
 import org.codehaus.groovy.ast.expr.Expression;
-import org.codehaus.groovy.ast.expr.MethodCallExpression;
+import org.codehaus.groovy.ast.stmt.SynchronizedStatement;
+import org.codehaus.groovy.classgen.BytecodeExpression;
+import org.codehaus.groovy.classgen.BytecodeSequence;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -49,39 +53,39 @@ public class SecureGroovyCompilationCustomizer implements GroovyCompilationCusto
     @Inject
     private DocumentAccessBridge dab;
 
-    /**
-     * Prevents executing {@code System.exit}.
-     */
-    private class SystemExitChecker implements SecureASTCustomizer.ExpressionChecker
-    {
-        @Override
-        public boolean isAuthorized(Expression expression)
-        {
-            boolean result = true;
-
-            if (expression instanceof MethodCallExpression) {
-                MethodCallExpression methodCallExpression = (MethodCallExpression) expression;
-                if (methodCallExpression.getObjectExpression() instanceof ClassExpression) {
-                    ClassExpression classExpression = (ClassExpression) methodCallExpression.getObjectExpression();
-                    if (classExpression.getType().getName().equals(System.class.getName())
-                        && methodCallExpression.getMethodAsString().equals("exit"))
-                    {
-                        result = false;
-                    }
-                }
-            }
-
-            return result;
-        }
-    }
-
     @Override
     public CompilationCustomizer createCustomizer()
     {
         CompilationCustomizer customizer = null;
         if (!this.dab.hasProgrammingRights()) {
             SecureASTCustomizer secureCustomizer = new SecureASTCustomizer();
-            secureCustomizer.addExpressionCheckers(new SystemExitChecker());
+
+            secureCustomizer.setStarImportsWhitelist(Collections.<String>emptyList());
+            secureCustomizer.setStaticStarImportsWhitelist(Collections.<String>emptyList());
+            secureCustomizer.setImportsWhitelist(Collections.<String>emptyList());
+            secureCustomizer.setStaticStarImportsWhitelist(Collections.<String>emptyList());
+            secureCustomizer.setMethodDefinitionAllowed(false);
+            secureCustomizer.setReceiversClassesWhiteList(Collections.<Class>emptyList());
+            secureCustomizer.setReceiversWhiteList(Collections.<String>emptyList());
+            secureCustomizer.setTokensWhitelist(Collections.<Integer>emptyList());
+            secureCustomizer.setPackageAllowed(false);
+
+            // Note: no whitelist on Constants because that's not dangerous
+            // TODO: Check if it's really not dangerous!
+            //secureCustomizer.setConstantTypesClassesWhiteList(Collections.<Class>emptyList());
+            //secureCustomizer.setConstantTypesWhiteList(Collections.<String>emptyList());
+
+            // Only remove the dangerous Expressions
+            secureCustomizer.setExpressionsBlacklist(Arrays.<Class<? extends Expression>>asList(
+                BytecodeExpression.class
+            ));
+
+            // Only remove the dangerous Statements
+            secureCustomizer.setStatementsBlacklist(Arrays.asList(
+                BytecodeSequence.class,
+                SynchronizedStatement.class
+            ));
+
             customizer = secureCustomizer;
         }
         return customizer;

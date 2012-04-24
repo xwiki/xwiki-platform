@@ -19,7 +19,6 @@
  */
 package org.xwiki.groovy.internal;
 
-import java.security.Permission;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -43,56 +42,17 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTestCase
 {
-    private static class NoExitSecurityManager extends SecurityManager
-    {
-        @Override
-        public void checkPermission(Permission perm)
-        {
-            // Allow anything.
-        }
-
-        @Override
-        public void checkPermission(Permission perm, Object context)
-        {
-            // Allow anything.
-        }
-
-        @Override
-        public void checkExit(int status)
-        {
-            super.checkExit(status);
-            throw new RuntimeException("System.exit called!");
-        }
-    }
+    private ScriptEngine engine;
 
     @Test
     public void executeWithSecureCustomizerWhenNoProgrammingRights() throws Exception
     {
-        final ConfigurationSource source = registerMockComponent(ConfigurationSource.class);
-        final DocumentAccessBridge dab = registerMockComponent(DocumentAccessBridge.class);
+        setUpWhenNoProgrammingRights();
 
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(source).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Arrays.asList("secure")));
-            oneOf(dab).hasProgrammingRights();
-                will(returnValue(false));
-        }});
+        assertProtectedScript("synchronized(this) { }");
+        assertProtectedScript("System.exit(0)");
 
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngineFactory groovyScriptEngineFactory =
-            getComponentManager().getInstance(ScriptEngineFactory.class, "groovy");
-        manager.registerEngineName("groovy", groovyScriptEngineFactory);
-
-        final ScriptEngine engine = manager.getEngineByName("groovy");
-
-        try {
-            engine.eval("System.exit(0)");
-            Assert.fail("Should have thrown an exception here");
-        } catch (ScriptException e) {
-            Assert.assertTrue(e.getMessage().contains(
-                "Expression [MethodCallExpression] is not allowed: java.lang.System.exit(0)"));
-        }
+        assertSafeScript("new Integer(6)");
     }
 
     @Test
@@ -116,17 +76,44 @@ public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTest
 
         final ScriptEngine engine = manager.getEngineByName("groovy");
 
-        // Run with a special Security Manager so that calling System.exit() will not exit the JVM.
-        SecurityManager sm = System.getSecurityManager();
-        System.setSecurityManager(new NoExitSecurityManager());
+        // Verify that the Secure AST Customizer is not active by running a Groovy script that raise an exception
+        // when the Secure AST Customizer is active
+        engine.eval("synchronized(this) { }");
+    }
 
+    private void setUpWhenNoProgrammingRights() throws Exception
+    {
+        final ConfigurationSource source = registerMockComponent(ConfigurationSource.class);
+        final DocumentAccessBridge dab = registerMockComponent(DocumentAccessBridge.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            oneOf(source).getProperty("groovy.compilationCustomizers", Collections.emptyList());
+                will(returnValue(Arrays.asList("secure")));
+            oneOf(dab).hasProgrammingRights();
+                will(returnValue(false));
+        }});
+
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngineFactory groovyScriptEngineFactory =
+            getComponentManager().getInstance(ScriptEngineFactory.class, "groovy");
+        manager.registerEngineName("groovy", groovyScriptEngineFactory);
+
+        this.engine = manager.getEngineByName("groovy");
+    }
+
+    private void assertProtectedScript(String script)
+    {
         try {
-            engine.eval("System.exit(0)");
+            engine.eval(script);
             Assert.fail("Should have thrown an exception here");
         } catch (ScriptException e) {
-            Assert.assertTrue(e.getMessage().contains("System.exit called!"));
-        } finally {
-            System.setSecurityManager(sm);
+            // Expected, test passed!
         }
+    }
+
+    private void assertSafeScript(String script) throws Exception
+    {
+        engine.eval(script);
     }
 }

@@ -49,9 +49,14 @@ public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTest
     {
         setUpWhenNoProgrammingRights();
 
+        // Verify synchronized statements are not authorized
         assertProtectedScript("synchronized(this) { }");
+        // Verify we can't call System methods
         assertProtectedScript("System.exit(0)");
+        // Verify we can't access private variables
+        assertProtectedScript("\"Hello World\".value[0]");
 
+        // Verify we can do a new and use Integer class
         assertSafeScript("new Integer(6)");
     }
 

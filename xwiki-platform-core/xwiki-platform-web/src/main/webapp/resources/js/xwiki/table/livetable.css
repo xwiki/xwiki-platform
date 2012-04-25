@@ -240,6 +240,9 @@ tbody.xwiki-livetable-display-body td a.actionrights {
 tbody.xwiki-livetable-display-body td a.actionedit {
   background-image: url($xwiki.getSkinFile("icons/silk/page_white_edit.png"));
 }
+tbody.xwiki-livetable-display-body td._images img {
+  margin-right: 2px;
+}
 /* </ Live Table Body> */
 /* <Dialog Box> */
 div.dialog-loading {

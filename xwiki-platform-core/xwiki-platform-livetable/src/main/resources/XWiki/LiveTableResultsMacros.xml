@@ -462,8 +462,10 @@
   #set($imagesList = '')
   #foreach ($attachment in $itemDoc.attachmentList)
     #if($attachment.isImage())
-      #set($attachmentUrl = $itemDoc.getAttachmentURL($attachment.filename))
-      #set($imagesList = "${imagesList}&lt;img src='${attachmentUrl}' alt='${attachment.filename}' width='50'/&gt;&lt;br/&gt;")
+      ## Create a thumbnail by resizing the image on the server side, if needed, to fit inside a 50x50 pixel square.
+      #set($thumbnailURL = $itemDoc.getAttachmentURL($attachment.filename, 'download', "width=50&amp;height=50&amp;keepAspectRatio=true"))
+      #set($imageURL = $itemDoc.getAttachmentURL($attachment.filename))
+      #set($imagesList = "${imagesList}&lt;a href=""$imageURL""&gt;&lt;img src=""$thumbnailURL"" alt=""$attachment.filename"" title=""$attachment.filename"" /&gt;&lt;/a&gt;")
     #end
   #end
 #end

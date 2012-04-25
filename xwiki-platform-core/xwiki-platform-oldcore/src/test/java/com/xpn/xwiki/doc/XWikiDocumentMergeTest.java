@@ -122,6 +122,14 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         merge();
 
         Assert.assertEquals("before\nsome content\nafter", this.document.getContent());
+        
+        this.previousDocument.setContent("some content");
+        this.newDocument.setContent("some content\nafter");
+        this.document.setContent("some content");
+
+        merge();
+
+        Assert.assertEquals("some content\nafter", this.document.getContent());
     }
 
     @Test

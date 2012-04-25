@@ -85,6 +85,7 @@ public final class MergeUtils
                 resultStr = currentStr;
             } else {
                 resultStr = result.getDefaultMergedResult();
+                mergeResult.setModified(true);
             }
         }
 

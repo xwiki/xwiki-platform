@@ -19,15 +19,29 @@
  */
 package org.xwiki.rendering.macro.script;
 
-/**
- * An interface used to distinguish privileged macros (those that need programming rights to run) from the normal ones.
- * 
- * @version $Id$
- * @since 2.5M1
- * @deprecated starting with 4.1M1 use {@link MacroPermissionPolicy} instead
- */
-@Deprecated
-public interface PrivilegedScriptMacro extends ScriptMacro
-{
-}
+import javax.inject.Inject;
 
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+
+/**
+ * Default Script Macro Permission policy that Script Macro implementations can extends: allow script execution only
+ * if the current document has Programming Rights.
+ *
+ * @version $Id$
+ * @since 4.1M1
+ */
+public abstract class AbstractScriptMacroPermissionPolicy implements MacroPermissionPolicy
+{
+    /**
+     * Used to verify if the current doc has programming rights.
+     */
+    @Inject
+    private DocumentAccessBridge dab;
+
+    @Override
+    public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
+    {
+        return this.dab.hasProgrammingRights();
+    }
+}

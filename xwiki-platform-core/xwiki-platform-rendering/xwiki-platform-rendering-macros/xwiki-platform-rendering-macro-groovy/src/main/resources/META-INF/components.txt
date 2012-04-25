@@ -1,1 +1,2 @@
 org.xwiki.rendering.internal.macro.groovy.GroovyMacro
+org.xwiki.rendering.internal.macro.groovy.GroovyMacroPermissionPolicy

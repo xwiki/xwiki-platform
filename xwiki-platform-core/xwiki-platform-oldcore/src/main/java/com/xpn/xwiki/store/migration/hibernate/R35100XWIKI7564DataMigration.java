@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -117,6 +118,15 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
                     stmt.addBatch(line);
                 }
                 stmt.executeBatch();
+            } catch (BatchUpdateException ex) {
+                if (ex.getNextException() != null
+                    && ex.getNextException().getMessage().contains("function lowrite(integer, oid)")) {
+                    // This exception is thrown when this migrator isn't really needed. This happens when migrating from
+                    // a version between 3.2 and 3.5, which do use the proper table structure, but we can't easily
+                    // distinguish between a pre-3.2 database and a post-3.2 database.
+                    return;
+                }
+                throw ex;
             } catch (UnsupportedEncodingException ex) {
                 // Should never happen, UTF-8 is always available
             } catch (IOException ex) {

@@ -246,13 +246,6 @@
       <version>2.0.3</version>
     </dependency>
 
-    <!-- UnexpectedException -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-store-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Authentication -->
     <dependency>
       <groupId>securityfilter</groupId>

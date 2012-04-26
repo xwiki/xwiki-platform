@@ -85,13 +85,11 @@ public class GadgetWizardApi implements WizardListener
     /**
      * The javascript callback called when the insert is done.
      */
-    @SuppressWarnings("unused")
     private JavaScriptObject insertCallback;
 
     /**
      * The javascript callback called when the edit is done.
      */
-    @SuppressWarnings("unused")
     private JavaScriptObject editCallback;
 
     /**

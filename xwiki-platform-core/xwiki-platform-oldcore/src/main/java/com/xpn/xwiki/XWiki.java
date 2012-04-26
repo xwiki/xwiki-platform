@@ -3959,12 +3959,9 @@ public class XWiki implements EventListener
 
         memberObject.setStringValue("member", userName);
 
-        if (groupDoc.isNew()) {
-            saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
-        } else {
-            // TODO Fix use of deprecated call.
-            getHibernateStore().saveXWikiObject(memberObject, context, true);
-        }
+        this.saveDocument(groupDoc,
+                          context.getMessageTool().get("core.comment.addedUserToGroup"),
+                          context);
 
         try {
             XWikiGroupService gservice = getGroupService(context);

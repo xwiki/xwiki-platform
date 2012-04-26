@@ -519,7 +519,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Remove objects planned for removal
             if (doc.getXObjectsToRemove().size() > 0) {
                 for (BaseObject removedObject : doc.getXObjectsToRemove()) {
-                    deleteXWikiObject(removedObject, context, false);
+                    deleteXWikiCollection(removedObject, context, false, false);
                 }
                 doc.setXObjectsToRemove(new ArrayList<BaseObject>());
             }
@@ -798,7 +798,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         // Groups objects are handled differently.
                         hasGroups = true;
                     } else {
-                        loadXWikiCollection(object, doc, context, false, true);
+                        loadXWikiCollectionInternal(object, doc, context, false, true);
                     }
                     doc.setXObject(object.getNumber(), object);
                 }
@@ -896,7 +896,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (doc.getXObjectsToRemove().size() > 0) {
                 for (BaseObject bobj : doc.getXObjectsToRemove()) {
                     if (bobj != null) {
-                        deleteXWikiObject(bobj, context, false);
+                        deleteXWikiCollection(bobj, context, false, false);
                     }
                 }
                 doc.setXObjectsToRemove(new ArrayList<BaseObject>());
@@ -904,7 +904,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             for (List<BaseObject> objects : doc.getXObjects().values()) {
                 for (BaseObject obj : objects) {
                     if (obj != null) {
-                        deleteXWikiObject(obj, context, false);
+                        deleteXWikiCollection(obj, context, false, false);
                     }
                 }
             }
@@ -936,15 +936,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException
-    {
-        saveXWikiCollection(object, context, bTransaction);
     }
 
     private void checkObjectClassIsLocal(BaseCollection object, XWikiContext context) throws XWikiException
@@ -1052,7 +1043,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     String pname = prop.getName();
                     if (pname != null && !pname.trim().equals("") && !handledProps.contains(pname)) {
-                        saveXWikiProperty(prop, context, false);
+                        saveXWikiPropertyInternal(prop, context, false);
                     }
                 }
             }
@@ -1081,36 +1072,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
     @Deprecated
-    public void loadXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException
-    {
-        loadXWikiCollection(object, null, context, bTransaction, false);
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
     public void loadXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        loadXWikiCollection(object, null, context, bTransaction, false);
+        loadXWikiCollectionInternal(object, null, context, bTransaction, false);
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void loadXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction,
+    private void loadXWikiCollectionInternal(BaseCollection object, XWikiContext context, boolean bTransaction,
         boolean alreadyLoaded) throws XWikiException
     {
-        loadXWikiCollection(object, null, context, bTransaction, alreadyLoaded);
+        loadXWikiCollectionInternal(object, null, context, bTransaction, alreadyLoaded);
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void loadXWikiCollection(BaseCollection object1, XWikiDocument doc, XWikiContext context,
+    private void loadXWikiCollectionInternal(BaseCollection object1, XWikiDocument doc, XWikiContext context,
         boolean bTransaction, boolean alreadyLoaded) throws XWikiException
     {
         BaseCollection object = object1;
@@ -1254,16 +1228,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
     @Deprecated
-    public void deleteXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction)
-        throws XWikiException
-    {
-        deleteXWikiCollection(object, context, bTransaction, false);
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
     public void deleteXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction, boolean evict)
         throws XWikiException
     {
@@ -1344,25 +1308,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void deleteXWikiObject(BaseObject baseObject, XWikiContext context, boolean bTransaction, boolean bEvict)
-        throws XWikiException
-    {
-        deleteXWikiCollection(baseObject, context, bTransaction, bEvict);
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void deleteXWikiObject(BaseObject baseObject, XWikiContext context, boolean b) throws XWikiException
-    {
-        deleteXWikiCollection(baseObject, context, b);
-    }
-
     private void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
@@ -1419,12 +1364,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveXWikiProperty(final PropertyInterface property, final XWikiContext context,
-        final boolean runInOwnTransaction) throws XWikiException
+    private void saveXWikiPropertyInternal(final PropertyInterface property,
+                                           final XWikiContext context,
+                                           final boolean runInOwnTransaction) throws XWikiException
     {
         // Clone runInOwnTransaction so the value passed is not altered.
         boolean bTransaction = runInOwnTransaction;

@@ -549,19 +549,6 @@ public class Context extends Api
     }
 
     /**
-     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
-     * 
-     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
-     * @see Util
-     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
-     */
-    @Deprecated
-    public Util getUtil()
-    {
-        return this.context.getUtil();
-    }
-
-    /**
      * Sets the default field display mode, when using {@link Document#display(String)} or
      * {@link Document#display(String, Object)}. It is automatically set to "edit" when the action is "edit" or
      * "inline", and to "view" in all other cases.

@@ -37,4 +37,17 @@ public privileged aspect ContextCompatibilityAspect
     {
         return !this.isMainWiki();
     }
+
+    /**
+     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
+     * 
+     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
+     * @see Util
+     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
+     */
+    @Deprecated
+    public Util getUtil()
+    {
+        return this.context.getUtil();
+    }
 }

@@ -24,15 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wysiwyg</artifactId>
+    <artifactId>xwiki-platform-wysiwyg-plugin-sync</artifactId>
     <version>4.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-  <name>XWiki Platform - WYSIWYG Editor - Client Side</name>
+  <artifactId>xwiki-platform-wysiwyg-plugin-sync-client</artifactId>
+  <name>XWiki Platform - WYSIWYG Editor - Sync Plugin - Client Side</name>
   <packaging>jar</packaging>
-  <description>The client side of XWiki's WYSIWYG editor. This is a reusable rich text editor all written in GWT.</description>
+  <description>The actual WYSIWYG editor plugin that provides the real-time editing mode (the client-side).</description>
+  
   <dependencies>
-    <!-- GWT libraries -->
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
@@ -58,11 +58,6 @@
       <!-- Only needed at build time -->
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <!-- SmartGWT is used only for its tree widget. -->
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-    </dependency>
     <!-- XWiki dependencies -->
     <dependency>
       <!--
@@ -72,21 +67,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-gwt-user</artifactId>
-      <type>test-jar</type>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-plugin-api</artifactId>
-      <type>test-jar</type>
-      <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -102,37 +82,20 @@
         <directory>src/main/java</directory>
       </resource>
     </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <!--
+          We need to include the tests source files in the generated test JAR because they are needed by the GWT module
+          that depends on this module with test scope as the GWT compiler needs the sources to generate the JS files for
+          unit tests.
+        -->
+        <directory>src/test/java</directory>
+      </testResource>
+    </testResources>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <configuration>
-          <includes>org/xwiki/gwt/wysiwyg/WysiwygTestSuite.java</includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Build the jar that needs to be shared with the server side. -->
-            <id>build-shared-jar</id>
-            <configuration>
-              <classifier>shared</classifier>
-              <includes>
-                <!--
-                  We need to share only the classes that are used on the server (e.g. GWT-RPC service interfaces and
-                  GWT-RPC parameter types)
-                -->
-                <include>**/*.class</include>
-              </includes>
-            </configuration>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
         <groupId>org.apache.maven.plugins</groupId>
@@ -140,8 +103,9 @@
         <configuration>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/gwt/wysiwyg/client/Images.java,
-            org/xwiki/gwt/wysiwyg/client/Strings.java
+            org/xwiki/gwt/wysiwyg/client/diff/**/*,
+            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncPlugin.java,
+            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncTools.java
           </excludes>
         </configuration>
       </plugin>

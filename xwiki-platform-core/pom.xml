@@ -227,6 +227,11 @@
             <exclude>org/xwiki/query/Query</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
             <exclude>com/xpn/xwiki/doc/merge/MergeUtils</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/diff/**</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/sync/**</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/Images</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
+            <exclude>org/xwiki/wysiwyg/server/plugin/sync/**</exclude>
           </excludes>
         </configuration>
       </plugin>

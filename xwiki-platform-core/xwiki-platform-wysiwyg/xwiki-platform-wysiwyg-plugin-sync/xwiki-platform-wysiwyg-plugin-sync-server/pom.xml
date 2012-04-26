@@ -24,18 +24,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wysiwyg</artifactId>
+    <artifactId>xwiki-platform-wysiwyg-plugin-sync</artifactId>
     <version>4.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wysiwyg-server</artifactId>
-  <name>XWiki Platform - WYSIWYG Editor - Server Side</name>
+  <artifactId>xwiki-platform-wysiwyg-plugin-sync-server</artifactId>
+  <name>XWiki Platform - WYSIWYG Editor - Sync Plugin - Server Side</name>
   <packaging>jar</packaging>
-  <description>The server side of XWiki's WYSIWYG editor.</description>
+  <description>Provides the services needed by the sync plugin.</description>
   <dependencies>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
     <!-- GWT core dependencies -->
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -49,19 +45,13 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!-- XWiki dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-plugin-sync-client</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-xml</artifactId>
-      <version>${commons.version}</version>
-      <scope>provided</scope>
-    </dependency>
+    <!-- XWiki dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
@@ -71,12 +61,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -97,7 +81,7 @@
         <configuration>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/wysiwyg/server/internal/cleaner/ComponentManagerTestSetup.java
+            org/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngineTest.java
           </excludes>
         </configuration>
       </plugin>

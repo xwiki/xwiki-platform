@@ -28,8 +28,6 @@ import org.xwiki.gwt.user.client.Console;
 import org.xwiki.gwt.user.client.Timer;
 import org.xwiki.gwt.user.client.TimerListener;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.wysiwyg.client.Images;
-import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.diff.Diff;
 import org.xwiki.gwt.wysiwyg.client.diff.DifferentiationFailedException;
 import org.xwiki.gwt.wysiwyg.client.diff.Revision;

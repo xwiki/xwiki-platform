@@ -1,0 +1,2 @@
+org.xwiki.wysiwyg.server.internal.plugin.sync.XWikiSyncService
+org.xwiki.wysiwyg.server.internal.plugin.sync.DefaultSyncEngine

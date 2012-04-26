@@ -94,8 +94,6 @@ public final class WysiwygEditorFactory
         pfm.addPluginFactory(FormatPluginFactory.getInstance());
         pfm.addPluginFactory(FontPluginFactory.getInstance());
         pfm.addPluginFactory(ColorPluginFactory.getInstance());
-        // The experimental real-time editing feature.
-        // pfm.addPluginFactory(SyncPluginFactory.getInstance());
         pfm.addPluginFactory(SymbolPluginFactory.getInstance());
         pfm.addPluginFactory(LinkPluginFactory.getInstance());
         pfm.addPluginFactory(TablePluginFactory.getInstance());

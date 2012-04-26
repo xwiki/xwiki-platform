@@ -9,8 +9,6 @@ org.xwiki.wysiwyg.server.internal.filter.http.MutableHttpServletRequestFactory
 org.xwiki.wysiwyg.server.internal.plugin.macro.XWikiMacroService
 org.xwiki.wysiwyg.server.internal.plugin.macro.XWikiMacroDescriptorTranslator
 org.xwiki.wysiwyg.server.internal.plugin.importer.XWikiImportService
-org.xwiki.wysiwyg.server.internal.plugin.sync.XWikiSyncService
-org.xwiki.wysiwyg.server.internal.plugin.sync.DefaultSyncEngine
 org.xwiki.wysiwyg.server.internal.wiki.DefaultWikiService
 org.xwiki.wysiwyg.server.internal.wiki.DefaultLinkService
 org.xwiki.wysiwyg.server.internal.DefaultWysiwygEditorScriptService

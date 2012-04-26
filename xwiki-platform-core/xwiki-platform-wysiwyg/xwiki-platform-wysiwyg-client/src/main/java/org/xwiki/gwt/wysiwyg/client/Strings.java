@@ -186,8 +186,6 @@ public interface Strings extends Constants
 
     String superscript();
 
-    String sync();
-
     String teletype();
 
     String ul();

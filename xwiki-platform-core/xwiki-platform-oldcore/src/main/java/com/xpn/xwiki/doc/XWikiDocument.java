@@ -6177,12 +6177,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public boolean isCurrentLocalUserPage(XWikiContext context)
     {
-        String username = context.getLocalUser();
-        if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
-            return false;
-        }
-
-        return context.getUserReference().equals(getDocumentReference());
+        final DocumentReference userRef = context.getUserReference();
+        return userRef != null && userRef.equals(this.getDocumentReference());
     }
 
     public void resetArchive(XWikiContext context) throws XWikiException

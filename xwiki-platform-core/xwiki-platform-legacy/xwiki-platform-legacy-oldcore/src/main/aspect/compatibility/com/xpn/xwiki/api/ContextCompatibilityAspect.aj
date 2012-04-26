@@ -20,6 +20,7 @@
 package compatibility.com.xpn.xwiki.api;
 
 import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Add a backward compatibility layer to the {@link Context} class.
@@ -46,7 +47,7 @@ public privileged aspect ContextCompatibilityAspect
      * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
      */
     @Deprecated
-    public Util getUtil()
+    public Util Context.getUtil()
     {
         return this.context.getUtil();
     }

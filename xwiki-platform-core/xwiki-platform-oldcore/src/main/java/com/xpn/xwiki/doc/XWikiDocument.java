@@ -1897,15 +1897,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1, use {@link #setXClass(BaseClass)} instead
-     */
-    @Deprecated
-    public void setxWikiClass(BaseClass xwikiClass)
-    {
-        setXClass(xwikiClass);
-    }
-
-    /**
      * @since 2.2M1
      */
     public Map<DocumentReference, List<BaseObject>> getXObjects()

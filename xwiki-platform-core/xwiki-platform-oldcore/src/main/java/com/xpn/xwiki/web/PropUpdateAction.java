@@ -73,7 +73,7 @@ public class PropUpdateAction extends XWikiAction
             }
         }
 
-        doc.setxWikiClass(bclass2);
+        doc.setXClass(bclass2);
         doc.renameProperties(bclass.getName(), fieldsToRename);
         doc.setMetaDataDirty(true);
         if (doc.isNew()) {

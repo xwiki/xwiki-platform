@@ -174,4 +174,13 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         setXObjectsToRemove(objectsToRemove);
     }
+
+    /**
+     * @deprecated since 2.2M1, use {@link #setXClass(BaseClass)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setxWikiClass(BaseClass xwikiClass)
+    {
+        setXClass(xwikiClass);
+    }
 }

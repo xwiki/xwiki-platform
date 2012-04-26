@@ -120,7 +120,7 @@ public class WatchListJobManager
     private boolean initWatchListJobClassProperties(XWikiDocument watchListJobClass, XWikiContext context)
     {
         boolean needsUpdate = false;
-        BaseClass bclass = watchListJobClass.getxWikiClass();
+        BaseClass bclass = watchListJobClass.getXClass();
 
         bclass.setName(WATCHLIST_JOB_CLASS);
         needsUpdate |= bclass.addTextField(WATCHLIST_JOB_EMAIL_PROP, "Email template to use", 30);
@@ -270,11 +270,10 @@ public class WatchListJobManager
         try {
             doc = context.getWiki().getDocument(docName, context);
 
-            job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
+            job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             if (job == null) {
                 needsUpdate = true;
-                int index = doc.createNewObject(SchedulerPlugin.XWIKI_JOB_CLASS, context);
-                job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, index);
+                job = doc.newXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, context);
                 job.setStringValue("jobName", name);
                 job.setStringValue("jobClass", WatchListJob.class.getName());
                 job.setStringValue("cron", cron);

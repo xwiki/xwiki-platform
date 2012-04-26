@@ -19,34 +19,13 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.util.List;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.classes.BaseClass;
-
 /**
- * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.BaseCollection} class.
- * 
+ * Add a backward compatibility layer to the {@link ObjectInterface} interface.
+ *
  * @version $Id$
+ * @since 4.1M1
  */
-public aspect BaseCollectionCompatibiityAspect
+public privileged aspect ObjectInterfaceCompatibilityAspect
 {
-    /**
-     * @deprecated use setStringListValue or setDBStringListProperty
-     */
-    @Deprecated
-    public void BaseCollection.setListValue(String name, List value)
-    {
-        ListProperty property = (ListProperty) safeget(name);
-        if (property == null)
-            property = new StringListProperty();
-        property.setValue(value);
-        safeput(name, property);
-    }
-
-    @Deprecated
-    public BaseClass BaseCollection.getxWikiClass(XWikiContext context)
-    {
-        return getXClass(context);
-    }
+    declare parents : ObjectInterface implements CompatibilityObjectInterface;
 }

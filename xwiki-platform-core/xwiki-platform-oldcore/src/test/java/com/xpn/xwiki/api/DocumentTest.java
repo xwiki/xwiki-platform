@@ -53,8 +53,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         XWikiContext context = new XWikiContext();
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
 
-        doc.getxWikiClass().addNumberField("prop", "prop", 5, "long");
-        BaseObject obj = (BaseObject) doc.getxWikiClass().newObject(context);
+        doc.getXClass().addNumberField("prop", "prop", 5, "long");
+        BaseObject obj = (BaseObject) doc.getXClass().newObject(context);
         obj.setLongValue("prop", 1);
         doc.addObject(doc.getFullName(), obj);
 

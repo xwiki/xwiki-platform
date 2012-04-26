@@ -43,7 +43,7 @@ public class PropUpdateAction extends XWikiAction
         XWikiMessageTool msg = context.getMessageTool();
 
         // Prepare new class
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         BaseClass bclass2 = bclass.clone();
         bclass2.setFields(new HashMap());
 
@@ -54,7 +54,7 @@ public class PropUpdateAction extends XWikiAction
             PropertyClass newProperty = originalProperty.clone();
             String name = newProperty.getName();
             Map<String, ? > map = ((EditForm) form).getObject(name);
-            newProperty.getxWikiClass(context).fromMap(map, newProperty);
+            newProperty.getXClass(context).fromMap(map, newProperty);
             String newName = newProperty.getName();
 
             if (StringUtils.isBlank(newName) || !newName.matches("[\\w\\.\\-\\_]+")) {

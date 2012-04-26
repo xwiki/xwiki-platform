@@ -75,6 +75,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         return new ClassPropertyReference(getName(), this.xclass.getReference());
     }
 
+    @Override
+    public BaseClass getXClass(XWikiContext context)
+    {
+        return getxWikiClass();
+    }
+    
     public BaseClass getxWikiClass()
     {
         if (this.pMetaClass == null) {
@@ -254,12 +260,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
         }
         buffer.append(content);
-    }
-
-    @Override
-    public BaseClass getxWikiClass(XWikiContext context)
-    {
-        return getxWikiClass();
     }
 
     @Override

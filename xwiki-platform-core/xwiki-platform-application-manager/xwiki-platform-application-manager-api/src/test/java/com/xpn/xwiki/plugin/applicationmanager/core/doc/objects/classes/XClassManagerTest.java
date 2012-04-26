@@ -96,7 +96,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 
                 XWikiDocument doc = context.getWiki().getDocument(classFullName, context);
 
-                return doc.getxWikiClass();
+                return doc.getXClass();
             }
         });
         mockXWiki.stubs().method("getXClass").will(new CustomStub("Implements XWiki.getClass")
@@ -110,7 +110,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
                 XWikiDocument doc = context.getWiki().getDocument(
                     classReference.getLastSpaceReference().getName() + "." + classReference.getName(), context);
 
-                return doc.getxWikiClass();
+                return doc.getXClass();
             }
         });
         mockXWiki.stubs().method("clearName").will(new CustomStub("Implements XWiki.clearName")
@@ -433,7 +433,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         assertFalse(doc.isNew());
 
-        BaseClass baseclass = doc.getxWikiClass();
+        BaseClass baseclass = doc.getXClass();
 
         assertEquals(xclass.getClassFullName(), baseclass.getName());
 

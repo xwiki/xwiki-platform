@@ -223,7 +223,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(EMAIL_XWIKI_CLASS_NAME);
         needsUpdate |= bclass.addTextField("subject", "Subject", 40);
         needsUpdate |= bclass.addTextField("language", "Language", 5);

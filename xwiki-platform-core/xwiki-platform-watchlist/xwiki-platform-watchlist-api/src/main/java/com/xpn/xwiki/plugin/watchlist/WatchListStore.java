@@ -187,7 +187,7 @@ public class WatchListStore implements EventListener
         throws XWikiException
     {
         boolean needsUpdate = false;
-        BaseClass bclass = watchListClass.getxWikiClass();
+        BaseClass bclass = watchListClass.getXClass();
         bclass.setName(WATCHLIST_CLASS);
 
         needsUpdate |= bclass.addStaticListField(WATCHLIST_CLASS_INTERVAL_PROP, "Email notifications interval", "");

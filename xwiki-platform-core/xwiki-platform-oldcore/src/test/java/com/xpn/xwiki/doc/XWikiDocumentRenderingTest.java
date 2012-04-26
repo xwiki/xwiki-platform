@@ -144,7 +144,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
-        this.baseClass = this.document.getxWikiClass();
+        this.baseClass = this.document.getXClass();
         this.baseClass.addTextField("string", "String", 30);
         this.baseClass.addTextAreaField("area", "Area", 10, 10);
         this.baseClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);

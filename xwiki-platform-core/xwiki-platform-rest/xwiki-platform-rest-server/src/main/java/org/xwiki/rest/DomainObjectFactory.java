@@ -657,7 +657,7 @@ public class DomainObjectFactory
         Object object = objectFactory.createObject();
         fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject);
 
-        BaseClass xwikiClass = xwikiObject.getxWikiClass(xwikiContext);
+        BaseClass xwikiClass = xwikiObject.getXClass(xwikiContext);
 
         for (java.lang.Object propertyClassObject : xwikiClass.getProperties()) {
             com.xpn.xwiki.objects.classes.PropertyClass propertyClass =

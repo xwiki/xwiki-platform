@@ -1887,15 +1887,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1, use {@link #getXClass()} instead
-     */
-    @Deprecated
-    public BaseClass getxWikiClass()
-    {
-        return getXClass();
-    }
-
-    /**
      * @since 2.2M1
      */
     public void setXClass(BaseClass xwikiClass)
@@ -2237,6 +2228,15 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * @since 4.1M1
+     */
+    public BaseObject getXObject(EntityReference classReference, int nb)
+    {
+        return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(classReference,
+            getDocumentReference(), nb));
     }
 
     /**

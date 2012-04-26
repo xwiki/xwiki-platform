@@ -209,7 +209,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         XWikiDocument doc = getContext().getWiki().getDocument(ARTICLE_CLASS_NAME, getContext());
         boolean needsUpdate = doc.isNew();
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(ARTICLE_CLASS_NAME);
 
         needsUpdate |= bclass.addTextField("title", "Title", 64);

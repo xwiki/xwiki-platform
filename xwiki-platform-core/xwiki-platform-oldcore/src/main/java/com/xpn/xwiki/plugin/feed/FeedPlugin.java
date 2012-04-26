@@ -641,7 +641,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         doc = context.getWiki().getDocument("XWiki.AggregatorURLClass", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -698,7 +698,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         doc = context.getWiki().getDocument("XWiki.FeedEntryClass", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }

@@ -28,6 +28,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 
@@ -145,5 +146,14 @@ public aspect XWikiDocumentCompatibilityAspect
     public String XWikiDocument.getDisplayTitle(XWikiContext context)
     {
         return getRenderedTitle(Syntax.XHTML_1_0, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1, use {@link #getXClass()} instead
+     */
+    @Deprecated
+    public BaseClass XWikiDocument.getxWikiClass()
+    {
+        return getXClass();
     }
 }

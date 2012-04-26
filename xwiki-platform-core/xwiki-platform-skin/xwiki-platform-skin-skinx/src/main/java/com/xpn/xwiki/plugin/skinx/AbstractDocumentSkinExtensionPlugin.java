@@ -294,7 +294,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             boolean needsUpdate = false;
             String useOptions = "currentPage=Always on this page|onDemand=On demand|always=Always on this wiki";
 
-            BaseClass bclass = doc.getxWikiClass();
+            BaseClass bclass = doc.getXClass();
             if (context.get("initdone") != null) {
                 return bclass;
             }

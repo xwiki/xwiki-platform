@@ -57,6 +57,7 @@ import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -256,5 +257,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             .will(throwException(new XWikiVelocityException("message")));
 
         assertEquals("Page", this.document.getDisplayTitle(getContext()));
+    }
+
+    public void testGetxWikiClass()
+    {
+        this.document.getxWikiClass();
+        ((PropertyClass)this.baseObject.getxWikiClass(getContext()).get("string")).getxWikiClass(getContext());
     }
 }

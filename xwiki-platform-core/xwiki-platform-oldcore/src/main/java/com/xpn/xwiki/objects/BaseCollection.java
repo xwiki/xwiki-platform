@@ -274,19 +274,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return baseClass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
-     * @deprecated since 2.2M1 use {@link #getXClass(com.xpn.xwiki.XWikiContext)}
-     */
-    @Override
-    @Deprecated
-    public BaseClass getxWikiClass(XWikiContext context)
-    {
-        return getXClass(context);
-    }
-
     public String getStringValue(String name)
     {
         BaseProperty prop = (BaseProperty) safeget(name);

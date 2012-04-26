@@ -4797,15 +4797,6 @@ public class XWikiDocument implements DocumentModelBridge
         setContentDirty(true);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #setXObjectsToRemove(List)} instead
-     */
-    @Deprecated
-    public void setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
-    {
-        setXObjectsToRemove(objectsToRemove);
-    }
-
     public List<String> getIncludedPages(XWikiContext context)
     {
         if (is10Syntax()) {

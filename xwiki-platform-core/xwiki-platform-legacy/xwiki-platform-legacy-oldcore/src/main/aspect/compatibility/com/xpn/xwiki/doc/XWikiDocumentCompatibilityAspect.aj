@@ -165,4 +165,13 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         return addXObjectFromRequest(context);
     }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #setXObjectsToRemove(List)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
+    {
+        setXObjectsToRemove(objectsToRemove);
+    }
 }

@@ -267,6 +267,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testExtractTitle()
     {
+        this.mockXWiki.stubs().method("exists").will(returnValue(false));
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"

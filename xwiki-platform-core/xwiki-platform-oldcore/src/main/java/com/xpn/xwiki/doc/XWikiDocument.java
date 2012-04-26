@@ -5888,6 +5888,17 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead
+     * Hibernate uses this through reflection.
+     * It cannot be removed without altering hibernate.cfg.xml
+     */
+    @Deprecated
+    public String getxWikiClassXML()
+    {
+        return getXClassXML();
+    }
+
+    /**
      * @since 2.2M1
      */
     public void setXClassXML(String xClassXML)

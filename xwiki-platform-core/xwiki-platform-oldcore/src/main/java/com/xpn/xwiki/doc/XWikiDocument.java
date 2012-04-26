@@ -6369,15 +6369,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(XWikiContext)}
-     */
-    @Deprecated
-    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException
-    {
-        return addXObjectFromRequest(context);
-    }
-
-    /**
      * Adds an object from an new object creation form.
      * 
      * @since 2.2.3

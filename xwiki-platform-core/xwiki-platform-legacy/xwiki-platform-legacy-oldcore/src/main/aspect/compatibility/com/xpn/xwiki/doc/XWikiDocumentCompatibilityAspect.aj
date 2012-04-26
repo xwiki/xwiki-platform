@@ -156,4 +156,13 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         return getXClass();
     }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject XWikiDocument.addObjectFromRequest(XWikiContext context) throws XWikiException
+    {
+        return addXObjectFromRequest(context);
+    }
 }

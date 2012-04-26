@@ -2026,7 +2026,7 @@ public class Document extends Api
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
     {
         // Call to getDoc() ensures that we are working on a clone()
-        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(getXWikiContext()), getXWikiContext());
+        return new com.xpn.xwiki.api.Object(getDoc().addXObjectFromRequest(getXWikiContext()), getXWikiContext());
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest(String className) throws XWikiException

@@ -53,6 +53,7 @@ public class OperaSelection extends DefaultSelection
      * 
      * @see DefaultSelection#getRangeAt(int)
      */
+    @Override
     public Range getRangeAt(int index)
     {
         if (index < 0 || index >= getRangeCount()) {

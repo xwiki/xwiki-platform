@@ -71,7 +71,7 @@
           #set ($title = $msg.get("${obj.xWikiClass.name}_${field}"))
         #end
         #set($hint = $msg.get("${obj.xWikiClass.name}_${field}.hint"))
-        #if($hint == "${obj.xWikiClass.name}_${field}.hint") #set($hint = $util.null) #end
+        #if($hint == "${obj.xWikiClass.name}_${field}.hint") #set($hint = $NULL) #end
         &lt;dt&gt;
         &lt;label #if($prop)for="${prefsClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
         #if($field == 'skin')

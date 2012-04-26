@@ -1,6 +1,9 @@
 ## get the number of columns from the parameter
-#set($columns = "$request.columns")
-#set($columnsNumber = $util.parseInt("$!columns"))
+#set ($columns = "$!request.columns")
+#set ($columnsNumber = $mathtool.toInteger($columns))
+#if (!$columnsNumber || $columnsNumber <= 0)
+  #set ($columnsNumber = 1)
+#end
 ## don't fill 100% because IE doesn't fit things properly in
 #set($columnsTotalWidth = 99)
 ## 1.5% padding right to all the columns except last one

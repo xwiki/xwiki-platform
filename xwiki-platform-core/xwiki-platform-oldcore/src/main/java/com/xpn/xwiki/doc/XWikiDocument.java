@@ -362,16 +362,16 @@ public class XWikiDocument implements DocumentModelBridge
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks.
      */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Used to resolve a string into a proper Document Reference.
      */
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "explicit");
 
-    private EntityReferenceResolver<String> xClassEntityReferenceResolver = Utils.getComponent(
+    protected EntityReferenceResolver<String> xClassEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "xclass");
 
     /**
@@ -379,75 +379,75 @@ public class XWikiDocument implements DocumentModelBridge
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
 
     /**
      * Used to resolve parent references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+    protected EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
 
     /**
      * Used to convert a proper Document Reference to string (compact form).
      */
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> compactEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compact");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
+    protected EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to compute document identifier.
      */
-    private EntityReferenceSerializer<String> uidStringEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> uidStringEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "uid");
 
     /**
      * Used to compute document identifier.
      */
-    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "local/uid");
 
     /**
      * Used to normalize references.
      */
-    private ObjectReferenceResolver<EntityReference> currentReferenceObjectReferenceResolver = Utils.getComponent(
+    protected ObjectReferenceResolver<EntityReference> currentReferenceObjectReferenceResolver = Utils.getComponent(
         ObjectReferenceResolver.TYPE_REFERENCE, "current");
 
     /**
      * Used to create proper {@link Syntax} objects.
      */
-    private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
+    protected SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
     /**
      * Use to store rendered documents in #getRenderedContent(). Do not inject the component here to avoid any simple
@@ -1905,46 +1905,11 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObjects()} instead. Warning: if you used to modify the returned Map note
-     *             that since 2.2M1 this will no longer work and you'll need to call the setXObject methods instead (or
-     *             setxWikiObjects()). Obviously the best is to move to the new API.
-     */
-    @Deprecated
-    public Map<String, Vector<BaseObject>> getxWikiObjects()
-    {
-        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
-        Map<String, Vector<BaseObject>> objects = new LinkedHashMap<String, Vector<BaseObject>>();
-
-        for (Map.Entry<DocumentReference, List<BaseObject>> entry : getXObjects().entrySet()) {
-            objects.put(this.compactWikiEntityReferenceSerializer.serialize(entry.getKey()), new Vector<BaseObject>(
-                entry.getValue()));
-        }
-
-        return objects;
-    }
-
-    /**
      * @since 2.2M1
      */
     public void setXObjects(Map<DocumentReference, List<BaseObject>> objects)
     {
         this.xObjects = objects;
-    }
-
-    /**
-     * @deprecated since 2.2M1 use {@link #setXObjects(Map)} instead
-     */
-    @Deprecated
-    public void setxWikiObjects(Map<String, Vector<BaseObject>> objects)
-    {
-        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
-        Map<DocumentReference, List<BaseObject>> newObjects = new LinkedHashMap<DocumentReference, List<BaseObject>>();
-
-        for (Map.Entry<String, Vector<BaseObject>> entry : objects.entrySet()) {
-            newObjects.put(resolveClassReference(entry.getKey()), new ArrayList<BaseObject>(entry.getValue()));
-        }
-
-        setXObjects(newObjects);
     }
 
     /**

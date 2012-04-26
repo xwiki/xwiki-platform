@@ -20,8 +20,12 @@
 package com.xpn.xwiki.doc;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -182,5 +186,40 @@ public aspect XWikiDocumentCompatibilityAspect
     public void XWikiDocument.setxWikiClass(BaseClass xwikiClass)
     {
         setXClass(xwikiClass);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #getXObjects()} instead. Warning: if you used to modify the returned Map note
+     *             that since 2.2M1 this will no longer work and you'll need to call the setXObject methods instead (or
+     *             setxWikiObjects()). Obviously the best is to move to the new API.
+     */
+    @Deprecated
+    public Map<String, Vector<BaseObject>> XWikiDocument.getxWikiObjects()
+    {
+        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
+        Map<String, Vector<BaseObject>> objects = new LinkedHashMap<String, Vector<BaseObject>>();
+
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : getXObjects().entrySet()) {
+            objects.put(this.compactWikiEntityReferenceSerializer.serialize(entry.getKey()), new Vector<BaseObject>(
+                entry.getValue()));
+        }
+
+        return objects;
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setXObjects(Map)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setxWikiObjects(Map<String, Vector<BaseObject>> objects)
+    {
+        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
+        Map<DocumentReference, List<BaseObject>> newObjects = new LinkedHashMap<DocumentReference, List<BaseObject>>();
+
+        for (Map.Entry<String, Vector<BaseObject>> entry : objects.entrySet()) {
+            newObjects.put(resolveClassReference(entry.getKey()), new ArrayList<BaseObject>(entry.getValue()));
+        }
+
+        setXObjects(newObjects);
     }
 }

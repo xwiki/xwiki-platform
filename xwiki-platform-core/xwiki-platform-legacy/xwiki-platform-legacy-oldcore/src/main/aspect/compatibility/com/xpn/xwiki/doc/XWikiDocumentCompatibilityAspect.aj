@@ -231,4 +231,13 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         return getXClasses(context);
     }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead
+     */
+    @Deprecated
+    public String XWikiDocument.getxWikiClassXML()
+    {
+        return getXClassXML();
+    }
 }

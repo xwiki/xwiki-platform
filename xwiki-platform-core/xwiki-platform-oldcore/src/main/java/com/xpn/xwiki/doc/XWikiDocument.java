@@ -5959,15 +5959,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead
-     */
-    @Deprecated
-    public String getxWikiClassXML()
-    {
-        return getXClassXML();
-    }
-
-    /**
      * @since 2.2M1
      */
     public void setXClassXML(String xClassXML)

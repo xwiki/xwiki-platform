@@ -133,4 +133,17 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria, context);
     }
+
+    /**
+     * @param context the XWiki context used to get access to the com.xpn.xwiki.render.XWikiRenderingEngine object
+     * @return the document title. If a title has not been provided, look for a section title in the document's content
+     *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
+     *         use Velocity, Groovy, etc syntax within a title.
+     * @deprecated use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWikiDocument.getDisplayTitle(XWikiContext context)
+    {
+        return getRenderedTitle(Syntax.XHTML_1_0, context);
+    }
 }

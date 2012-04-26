@@ -1136,19 +1136,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @param context the XWiki context used to get access to the com.xpn.xwiki.render.XWikiRenderingEngine object
-     * @return the document title. If a title has not been provided, look for a section title in the document's content
-     *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
-     *         use Velocity, Groovy, etc syntax within a title.
-     * @deprecated use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getDisplayTitle(XWikiContext context)
-    {
-        return getRenderedTitle(Syntax.XHTML_1_0, context);
-    }
-
-    /**
      * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
      * the title from the document content. If this fails then the document name is used as title. The Velocity code
      * from the title is evaluated if the title is specified or if it is extracted from the document content.

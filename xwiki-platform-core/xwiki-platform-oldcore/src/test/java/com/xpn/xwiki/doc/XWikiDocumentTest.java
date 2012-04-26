@@ -250,32 +250,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("wiki", doc.getWikiName());
     }
 
-    public void testGetDisplayTitleWhenNoTitleAndNoContent()
-    {
-        this.document.setContent("Some content");
-
-        assertEquals("Page", this.document.getDisplayTitle(getContext()));
-    }
-
-    public void testGetDisplayWhenTitleExists()
-    {
-        this.document.setContent("Some content");
-        this.document.setTitle("Title");
-        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
-            .will(velocityEngineEvaluateStub);
-
-        assertEquals("Title", this.document.getDisplayTitle(getContext()));
-    }
-
-    public void testGetDisplayWhenNoTitleButSectionExists()
-    {
-        this.document.setContent("Some content\n1 Title");
-        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
-            .will(velocityEngineEvaluateStub);
-
-        assertEquals("Title", this.document.getDisplayTitle(getContext()));
-    }
-
     public void testGetRenderedTitleWhenMatchingTitleHeaderDepth()
     {
         this.document.setContent("=== level3");
@@ -293,19 +267,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-    }
-
-    /**
-     * Verify that if an error happens when evaluation the title, we fallback to the computed title.
-     */
-    public void testGetDisplayTitleWhenVelocityError()
-    {
-        this.document.setContent("Some content");
-        this.document.setTitle("some content that generate a velocity error");
-        this.mockVelocityEngine.expects(once()).method("evaluate")
-            .will(throwException(new XWikiVelocityException("message")));
-
-        assertEquals("Page", this.document.getDisplayTitle(getContext()));
     }
 
     public void testMinorMajorVersions()

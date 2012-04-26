@@ -42,6 +42,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it -->
       <scope>provided</scope>
     </dependency>
 

@@ -36,8 +36,6 @@
   <properties>
     <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-oldcore,com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
-    <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
     <dependency>

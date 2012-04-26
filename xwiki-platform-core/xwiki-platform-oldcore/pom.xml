@@ -36,6 +36,8 @@
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+    <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
     <dependency>

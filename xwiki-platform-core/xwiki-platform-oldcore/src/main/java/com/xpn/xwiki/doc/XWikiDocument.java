@@ -175,14 +175,6 @@ public class XWikiDocument implements DocumentModelBridge
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
 
-    /**
-     * Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title.
-     * 
-     * @deprecated since 3.2M3
-     **/
-    @Deprecated
-    private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
-
     private String title;
 
     /**
@@ -1155,60 +1147,6 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (XWikiException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * @deprecated since 3.2M3, use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
-     */
-    @Deprecated
-    public String extractTitle()
-    {
-        String title = "";
-
-        try {
-            if (is10Syntax()) {
-                title = extractTitle10();
-            } else {
-                List<HeaderBlock> blocks =
-                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
-                if (!blocks.isEmpty()) {
-                    HeaderBlock header = blocks.get(0);
-                    if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
-                        XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
-
-                        // transform
-                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
-                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
-
-                        // render
-                        Block headerBlock = headerXDOM.getChildren().get(0);
-                        if (headerBlock instanceof HeaderBlock) {
-                            title = renderXDOM(new XDOM(headerBlock.getChildren()), Syntax.XHTML_1_0);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // Don't stop when there's a problem rendering the title.
-        }
-
-        return title;
-    }
-
-    /**
-     * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
-     * @deprecated since 3.2M3
-     */
-    @Deprecated
-    private String extractTitle10()
-    {
-        String content = getContent();
-        Matcher m = HEADING_PATTERN_10.matcher(content);
-        if (m.find()) {
-            return m.group(1).trim();
-        }
-
-        return "";
     }
 
     public void setTitle(String title)
@@ -7609,7 +7547,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the rendered content
      * @throws XWikiException if an exception occurred during the rendering process
      */
-    private static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
+    protected static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
         try {
             BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, targetSyntax.toIdString());

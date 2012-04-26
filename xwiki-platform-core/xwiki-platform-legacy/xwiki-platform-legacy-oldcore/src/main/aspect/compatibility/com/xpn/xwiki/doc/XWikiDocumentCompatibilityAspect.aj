@@ -20,13 +20,23 @@
 package com.xpn.xwiki.doc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -35,6 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.doc.XWikiDocument} class.
@@ -257,5 +268,67 @@ public aspect XWikiDocumentCompatibilityAspect
     public void XWikiDocument.setObjects(String className, Vector<BaseObject> objects)
     {
         setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
+    }
+
+    /**
+     * @deprecated since 3.2M3, use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWikiDocument.extractTitle()
+    {
+        String title = "";
+
+        try {
+            if (is10Syntax()) {
+                title = extractTitle10();
+            } else {
+                List<HeaderBlock> blocks =
+                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
+                if (!blocks.isEmpty()) {
+                    HeaderBlock header = blocks.get(0);
+                    if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
+                        XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
+
+                        // transform
+                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
+                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
+
+                        // render
+                        Block headerBlock = headerXDOM.getChildren().get(0);
+                        if (headerBlock instanceof HeaderBlock) {
+                            title = renderXDOM(new XDOM(headerBlock.getChildren()), Syntax.XHTML_1_0);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Don't stop when there's a problem rendering the title.
+        }
+
+        return title;
+    }
+
+    /**
+     * Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title.
+     * 
+     * @deprecated since 3.2M3
+     **/
+    @Deprecated
+    private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
+
+    /**
+     * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
+     * @deprecated since 3.2M3
+     */
+    @Deprecated
+    private String XWikiDocument.extractTitle10()
+    {
+        String content = getContent();
+        Matcher m = HEADING_PATTERN_10.matcher(content);
+        if (m.find()) {
+            return m.group(1).trim();
+        }
+
+        return "";
     }
 }

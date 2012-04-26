@@ -222,4 +222,13 @@ public aspect XWikiDocumentCompatibilityAspect
 
         setXObjects(newObjects);
     }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #getXClasses(XWikiContext)} instead
+     */
+    @Deprecated
+    public List<BaseClass> XWikiDocument.getxWikiClasses(XWikiContext context)
+    {
+        return getXClasses(context);
+    }
 }

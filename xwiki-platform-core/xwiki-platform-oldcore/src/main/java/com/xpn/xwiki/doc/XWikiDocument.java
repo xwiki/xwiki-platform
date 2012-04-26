@@ -1956,15 +1956,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXClasses(XWikiContext)} instead
-     */
-    @Deprecated
-    public List<BaseClass> getxWikiClasses(XWikiContext context)
-    {
-        return getXClasses(context);
-    }
-
-    /**
      * Create and add a new object to the document with the provided class.
      * <p>
      * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)

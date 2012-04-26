@@ -444,4 +444,16 @@ public privileged aspect XWikiCompatibilityAspect
 
         return result;
     }
+
+    @Deprecated
+    public String XWiki.getDocLanguagePreference(XWikiContext context)
+    {
+        return getLanguagePreference(context);
+    }
+
+    @Deprecated
+    public void XWiki.flushCache()
+    {
+        flushCache(getXWikiContext());
+    }
 }

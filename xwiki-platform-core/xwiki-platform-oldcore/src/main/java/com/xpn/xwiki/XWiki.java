@@ -2342,15 +2342,6 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link #getLanguagePreference(XWikiContext)} instead
-     */
-    @Deprecated
-    public String getDocLanguagePreference(XWikiContext context)
-    {
-        return getLanguagePreference(context);
-    }
-
-    /**
      * First try to find the current language in use from the XWiki context. If none is used and if the wiki is not
      * multilingual use the default language defined in the XWiki preferences. If the wiki is multilingual try to get
      * the language passed in the request. If none was passed try to get it from a cookie. If no language cookie exists
@@ -2756,15 +2747,6 @@ public class XWiki implements EventListener
         ExecutionContext ec = execution.getContext();
 
         return ec != null ? (XWikiContext) ec.getProperty("xwikicontext") : null;
-    }
-
-    /**
-     * @deprecated user {@link #flushCache(XWikiContext)} instead
-     */
-    @Deprecated
-    public void flushCache()
-    {
-        flushCache(getXWikiContext());
     }
 
     public void flushCache(XWikiContext context)

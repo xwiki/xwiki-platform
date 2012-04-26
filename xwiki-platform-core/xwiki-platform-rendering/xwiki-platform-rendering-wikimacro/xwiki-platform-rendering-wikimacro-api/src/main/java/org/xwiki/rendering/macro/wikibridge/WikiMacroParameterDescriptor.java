@@ -110,6 +110,7 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     }
 
     @Override
+    @Deprecated
     public Class< ? > getType()
     {
         return String.class;

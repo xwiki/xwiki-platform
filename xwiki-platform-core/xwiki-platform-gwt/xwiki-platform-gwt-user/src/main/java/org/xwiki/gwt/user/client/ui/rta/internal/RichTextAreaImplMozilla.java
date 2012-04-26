@@ -41,6 +41,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#setHTMLImpl(String)
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
+    @Override
     protected void setHTMLImpl(String html)
     {
         if (elem.getPropertyBoolean(RichTextArea.DIRTY)) {

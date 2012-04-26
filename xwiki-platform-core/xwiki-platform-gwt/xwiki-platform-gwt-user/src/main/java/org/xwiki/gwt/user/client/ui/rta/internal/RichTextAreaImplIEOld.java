@@ -46,6 +46,7 @@ public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.Ri
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
+    @Override
     protected void setHTMLImpl(String html)
     {
         if (elem.getPropertyBoolean(RichTextArea.DIRTY)) {
@@ -110,6 +111,7 @@ public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.Ri
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#uninitElement()
      */
+    @Override
     public void uninitElement()
     {
         if (!elem.getPropertyBoolean(RichTextArea.LOADED)) {

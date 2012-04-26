@@ -2077,15 +2077,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setXObjects(DocumentReference, List)} instead
-     */
-    @Deprecated
-    public void setObjects(String className, Vector<BaseObject> objects)
-    {
-        setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
-    }
-
-    /**
      * @since 3.3M1
      */
     public BaseObject getXObject(EntityReference reference)

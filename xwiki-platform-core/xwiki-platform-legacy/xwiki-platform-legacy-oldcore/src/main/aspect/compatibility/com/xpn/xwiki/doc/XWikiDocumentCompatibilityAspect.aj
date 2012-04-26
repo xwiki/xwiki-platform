@@ -249,4 +249,13 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         setXClassXML(xClassXML);
     }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setXObjects(DocumentReference, List)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setObjects(String className, Vector<BaseObject> objects)
+    {
+        setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
+    }
 }

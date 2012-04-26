@@ -240,4 +240,13 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         return getXClassXML();
     }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setxWikiClassXML(String xClassXML)
+    {
+        setXClassXML(xClassXML);
+    }
 }

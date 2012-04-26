@@ -492,28 +492,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job uninstall(ExtensionId extensionId)
     {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to uninstall an extension"));
-
-            return null;
-        }
-
-        setError(null);
-
-        UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(EXTENSION_JOBID_PREFIX + extensionId.getId());
-        uninstallRequest.addExtension(extensionId);
-
-        Job job;
-        try {
-            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
-        } catch (Exception e) {
-            setError(e);
-
-            job = null;
-        }
-
-        return job;
+        return uninstall(extensionId.getId(), null);
     }
 
     /**
@@ -563,22 +542,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
     {
-        setError(null);
-
-        UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.addExtension(extensionId);
-
-        ExtensionPlan status;
-        try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
-        } catch (JobException e) {
-            setError(e);
-
-            status = null;
-        }
-
-        return status;
+        return this.createUninstallPlan(extensionId.getId(), null);
     }
 
     // Jobs

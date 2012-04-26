@@ -30,11 +30,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.PluginFactoryManager;
  */
 public class DefaultPluginFactoryManagerTest extends AbstractPluginFactoryManagerTest
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactoryManagerTest#newPluginFactoryManager()
-     */
+    @Override
     protected PluginFactoryManager newPluginFactoryManager()
     {
         return new DefaultPluginFactoryManager();

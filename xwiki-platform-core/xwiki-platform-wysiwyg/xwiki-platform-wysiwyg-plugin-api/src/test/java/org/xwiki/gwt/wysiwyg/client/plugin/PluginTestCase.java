@@ -34,11 +34,7 @@ public class PluginTestCase extends GWTTestCase
      */
     public static final String MODULE_NAME = "org.xwiki.gwt.wysiwyg.Plugin";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#getModuleName()
-     */
+    @Override
     public String getModuleName()
     {
         return MODULE_NAME;

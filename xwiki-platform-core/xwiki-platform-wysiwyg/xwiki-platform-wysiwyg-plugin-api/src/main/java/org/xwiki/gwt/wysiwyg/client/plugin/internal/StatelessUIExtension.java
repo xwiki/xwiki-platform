@@ -36,21 +36,13 @@ public class StatelessUIExtension extends AbstractUIExtension
         super(role);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractUIExtension#isEnabled(String)
-     */
+    @Override
     public boolean isEnabled(String feature)
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractUIExtension#setEnabled(String, boolean)
-     */
+    @Override
     public void setEnabled(String feature, boolean enabled)
     {
         // ignore

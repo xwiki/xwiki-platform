@@ -44,11 +44,7 @@ public abstract class AbstractPluginFactory implements PluginFactory
         this.pluginName = pluginName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactory#getPluginName()
-     */
+    @Override
     public String getPluginName()
     {
         return pluginName;

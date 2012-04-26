@@ -153,11 +153,6 @@ public class MenuItemUIExtensionAdaptor extends MenuItemUIExtension implements A
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MenuItemUIExtension#clearFeatures()
-     */
     @Override
     public void clearFeatures()
     {
@@ -165,11 +160,7 @@ public class MenuItemUIExtensionAdaptor extends MenuItemUIExtension implements A
         handlerRegistrations.removeHandlers();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AttachEvent.Handler#onAttachOrDetach(AttachEvent)
-     */
+    @Override
     public void onAttachOrDetach(AttachEvent event)
     {
         if (event.isAttached()) {

@@ -5895,6 +5895,15 @@ public class XWikiDocument implements DocumentModelBridge
         this.xClassXML = xClassXML;
     }
 
+    /**
+     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead
+     */
+    @Deprecated
+    public void setxWikiClassXML(String xClassXML)
+    {
+        setXClassXML(xClassXML);
+    }
+
     public int getElements()
     {
         return this.elements;

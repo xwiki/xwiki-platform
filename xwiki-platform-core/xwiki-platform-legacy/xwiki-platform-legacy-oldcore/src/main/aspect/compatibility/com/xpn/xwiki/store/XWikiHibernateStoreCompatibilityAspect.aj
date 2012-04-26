@@ -52,7 +52,7 @@ public privileged aspect XWikiHibernateStoreCompatibilityAspect
                                                     XWikiContext context,
                                                     boolean bTransaction) throws XWikiException
     {
-        this.loadXWikiCollection(object, null, context, bTransaction, false);
+        this.loadXWikiCollectionInternal(object, null, context, bTransaction, false);
     }
 
     /**
@@ -119,9 +119,10 @@ public privileged aspect XWikiHibernateStoreCompatibilityAspect
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
     @Deprecated
-    public void saveXWikiProperty(PropertyInterface property,
-                                  XWikiContext context,
-                                  boolean runInOwnTransaction) throws XWikiException
+    public void XWikiHibernateStore.saveXWikiProperty(PropertyInterface property,
+                                                      XWikiContext context,
+                                                      boolean runInOwnTransaction)
+        throws XWikiException
     {
         this.saveXWikiPropertyInternal(property, context, runInOwnTransaction);
     }

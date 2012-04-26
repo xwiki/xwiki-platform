@@ -186,7 +186,7 @@ public class SecHibernateQuery extends HibernateQuery
             } else if (element instanceof BaseObject) {
 
                 // TODO Fix use of deprecated call.
-                getHibernateStore().loadXWikiObject((BaseObject) element, getContext(), true);
+                getHibernateStore().loadXWikiCollection((BaseObject) element, getContext(), true);
 
                 result.add(new com.xpn.xwiki.api.Object((BaseObject) element, getContext()));
             } else if (element instanceof XWikiAttachment) { // TODO: get document. Impossible for now

@@ -21,19 +21,22 @@ package com.xpn.xwiki.util;
 
 import java.io.Reader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.List;
 
+import com.xpn.xwiki.XWiki;
 import org.apache.oro.text.regex.MalformedPatternException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Add a backward compatibility layer to the {@link com.xpn.xwiki.store.XWikiHibernateStore} class.
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.util.Util} class.
  * 
  * @version $Id$
  */
 public privileged aspect UtilCompatibilityAspect
 {
-
     /**
      * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
      */

@@ -639,7 +639,7 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- XWiki syntax parsers -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -828,11 +828,7 @@
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
               **/pdf/impl/PdfExportImpl.java,
-              **/plugin/autotag/AutoTagPluginAPI.java,
-              **/plugin/autotag/AutoTagPlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
-              **/plugin/autotag/TagCloud.java,
-              **/plugin/autotag/Tag.java,
               **/plugin/charts/actions/ChartingAction.java,
               **/plugin/charts/actions/ChartWizardAction.java,
               **/plugin/charts/actions/CreateChartAction.java,

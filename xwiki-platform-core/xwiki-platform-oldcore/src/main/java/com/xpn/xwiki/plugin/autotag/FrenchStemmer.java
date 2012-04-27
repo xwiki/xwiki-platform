@@ -24,6 +24,7 @@ package com.xpn.xwiki.plugin.autotag;
  * refer to http://snowball.sourceforge.net/french/stemmer.html<br>
  * (French stemming algorithm) for details
  * 
+ * @version $Id$
  * @author Patrick Talbot
  */
 public class FrenchStemmer
@@ -34,41 +35,41 @@ public class FrenchStemmer
     private StringBuilder sb = new StringBuilder();
 
     /**
-     * A temporary buffer, used to reconstruct R2
+     * A temporary buffer, used to reconstruct R2.
      */
     private StringBuilder tb = new StringBuilder();
 
     /**
-     * Region R0 is equal to the whole buffer
+     * Region R0 is equal to the whole buffer.
      */
     private String R0;
 
     /**
      * Region RV "If the word begins with two vowels, RV is the region after the third letter, otherwise the region
      * after the first vowel not at the beginning of the word, or the end of the word if these positions cannot be
-     * found."
+     * found.".
      */
     private String RV;
 
     /**
      * Region R1 "R1 is the region after the first non-vowel following a vowel or is the null region at the end of the
-     * word if there is no such non-vowel"
+     * word if there is no such non-vowel".
      */
     private String R1;
 
     /**
      * Region R2 "R2 is the region after the first non-vowel in R1 following a vowel or is the null region at the end of
-     * the word if there is no such non-vowel"
+     * the word if there is no such non-vowel".
      */
     private String R2;
 
     /**
-     * Set to true if we need to perform step 2
+     * Set to true if we need to perform step 2.
      */
     private boolean suite;
 
     /**
-     * Set to true if the buffer was modified
+     * Set to true if the buffer was modified.
      */
     private boolean modified;
 
@@ -124,8 +125,7 @@ public class FrenchStemmer
     }
 
     /**
-     * Sets the search region Strings<br>
-     * it needs to be done each time the buffer was modified
+     * Sets the search region Strings. It needs to be done each time the buffer was modified.
      */
     private void setStrings()
     {
@@ -143,13 +143,12 @@ public class FrenchStemmer
     }
 
     /**
-     * First step of the Porter Algorithmn<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * First step of the Porter Algorithmn. Refer to http://snowball.sourceforge.net/french/stemmer.html for an
+     * explanation.
      */
     private void step1()
     {
-        String[] suffix =
-            {"ances", "iqUes", "ismes", "ables", "istes", "ance", "iqUe", "isme", "able", "iste"};
+        String[] suffix = {"ances", "iqUes", "ismes", "ables", "istes", "ance", "iqUe", "isme", "able", "iste"};
         deleteFrom(this.R2, suffix);
 
         replaceFrom(this.R2, new String[] {"logies", "logie"}, "log");
@@ -190,25 +189,23 @@ public class FrenchStemmer
         // if one of the next steps is performed, we will need to perform step2a
         boolean temp = false;
         temp = replaceFrom(this.RV, new String[] {"amment"}, "ant");
-        if (temp == true) {
+        if (temp) {
             this.suite = true;
         }
         temp = replaceFrom(this.RV, new String[] {"emment"}, "ent");
-        if (temp == true) {
+        if (temp) {
             this.suite = true;
         }
         temp = deleteFromIfTestVowelBeforeIn(this.RV, new String[] {"ments", "ment"}, true, this.RV);
-        if (temp == true) {
+        if (temp) {
             this.suite = true;
         }
-
     }
 
     /**
-     * Second step (A) of the Porter Algorithmn<br>
-     * Will be performed if nothing changed from the first step or changed were done in the amment, emment, ments or
-     * ment suffixes<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * Second step (A) of the Porter Algorithmn. Will be performed if nothing changed from the first step or changed
+     * were done in the amment, emment, ments or ment suffixes. Refer to
+     * http://snowball.sourceforge.net/french/stemmer.html for an explanation.
      * 
      * @return boolean - true if something changed in the StringBuffer
      */
@@ -224,9 +221,8 @@ public class FrenchStemmer
     }
 
     /**
-     * Second step (B) of the Porter Algorithmn<br>
-     * Will be performed if step 2 A was performed unsuccessfully<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * Second step (B) of the Porter Algorithmn. Will be performed if step 2 A was performed unsuccessfully. Refer to
+     * http://snowball.sourceforge.net/french/stemmer.html for an explanation.
      */
     private void step2b()
     {
@@ -246,8 +242,8 @@ public class FrenchStemmer
     }
 
     /**
-     * Third step of the Porter Algorithmn<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * Third step of the Porter Algorithmn. Refer to http://snowball.sourceforge.net/french/stemmer.html for an
+     * explanation.
      */
     private void step3()
     {
@@ -264,8 +260,8 @@ public class FrenchStemmer
     }
 
     /**
-     * Fourth step of the Porter Algorithmn<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * Fourth step of the Porter Algorithmn. Refer to http://snowball.sourceforge.net/french/stemmer.html for an
+     * explanation.
      */
     private void step4()
     {
@@ -290,8 +286,8 @@ public class FrenchStemmer
     }
 
     /**
-     * Fifth step of the Porter Algorithmn<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * Fifth step of the Porter Algorithmn. Refer to http://snowball.sourceforge.net/french/stemmer.html for an
+     * explanation.
      */
     private void step5()
     {
@@ -305,8 +301,8 @@ public class FrenchStemmer
     }
 
     /**
-     * Sixth (and last!) step of the Porter Algorithmn<br>
-     * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
+     * Sixth (and last!) step of the Porter Algorithmn. Refer to http://snowball.sourceforge.net/french/stemmer.html for
+     * an explanation.
      */
     private void step6()
     {
@@ -339,7 +335,7 @@ public class FrenchStemmer
     }
 
     /**
-     * Delete a suffix searched in zone "source" if zone "from" contains prefix + search string
+     * Delete a suffix searched in zone "source" if zone "from" contains prefix + search string.
      * 
      * @param source java.lang.String - the primary source zone for search
      * @param search java.lang.String[] - the strings to search for suppression
@@ -521,18 +517,18 @@ public class FrenchStemmer
             case 'o':
             case 'u':
             case 'y':
-            case '\u00E2': // \u00e2
-            case '\u00E0': // \u00e0
-            case '\u00EB': // \u00eb
-            case '\u00E9': // \u00e9
-            case '\u00EA': // \u00ea
-            case '\u00E8': // \u00e8
-            case '\u00EF': // \u00ef
-            case '\u00EE': // \u00ee
-            case '\u00F4': // \u00f4
-            case '\u00FC': // \u00fc
-            case '\u00F9': // \u00f9
-            case '\u00FB': // \u00fb
+            case '\u00E0': // A WITH GRAVE
+            case '\u00E2': // A WITH CIRCUMFLEX
+            case '\u00E8': // E WITH GRAVE
+            case '\u00E9': // E WITH ACUTE
+            case '\u00EA': // E WITH CIRCUMFLEX
+            case '\u00EB': // E WITH DIAERESIS
+            case '\u00EE': // I WITH CIRCUMFLEX
+            case '\u00EF': // I WITH DIAERESIS
+            case '\u00F4': // O WITH CIRCUMFLEX
+            case '\u00F9': // U WITH GRAVE
+            case '\u00FB': // U WITH CIRCUMFLEX
+            case '\u00FC': // U WITH DIAERESIS
                 return true;
             default:
                 return false;

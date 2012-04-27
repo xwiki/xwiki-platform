@@ -22,23 +22,49 @@ package com.xpn.xwiki.plugin.autotag;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.PluginApi;
 
+/**
+ * Plugin which extracts a set of tags from a text.
+ *
+ * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
+ */
+@Deprecated
 public class AutoTagPluginAPI extends PluginApi<AutoTagPlugin>
 {
-    public AutoTagPluginAPI(XWikiContext context)
+    /**
+     * API constructor. The API must know the plugin object it wraps, and the request context.
+     *
+     * @param plugin The wrapped plugin object.
+     * @param context Context of the request.
+     */
+    public AutoTagPluginAPI(AutoTagPlugin plugin, XWikiContext context)
     {
-        super(null, context);
+        super(plugin, context);
     }
 
-    public AutoTagPluginAPI(AutoTagPlugin autoTagPlugin, XWikiContext context)
-    {
-        super(autoTagPlugin, context);
-    }
-
+    /**
+     * Analyze a piece of text, and extract the most common words into a "tag cloud". In detail, this splits the text
+     * into tokens, counts how many times each token appears in the text, removes the "stop-words", joins together words
+     * from the same root (stemming), and prepares an HTML tag cloud which can be printed in the response.
+     *
+     * @param text the text to analyze
+     * @param lang the language in which the text is written, {@code 0} for French or {@code 1} for English
+     * @return the resulting TagCloud with all the analyzed data, including the HTML tag cloud
+     */
     public TagCloud generateTagCloud(String text, int lang)
     {
         return getProtectedPlugin().generateTagCloud(text, lang);
     }
 
+    /**
+     * Analyze a piece of text, and extract the most common words into a "tag cloud". In detail, this splits the text
+     * into tokens, counts how many times each token appears in the text, removes the "stop-words", joins together words
+     * from the same root (stemming), and prepares an HTML tag cloud which can be printed in the response.
+     *
+     * @param text the text to analyze
+     * @param lang the language in which the text is written, one of {@code en} or {@code fr}
+     * @return the resulting TagCloud with all the analyzed data, including the HTML tag cloud
+     */
     public TagCloud generateTagCloud(String text, String lang)
     {
         return getProtectedPlugin().generateTagCloud(text, getProtectedPlugin().getLanguageConstant(lang));

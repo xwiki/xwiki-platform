@@ -19,26 +19,49 @@
  */
 package com.xpn.xwiki.plugin.autotag;
 
+import org.xwiki.xml.XMLUtils;
+
+/**
+ * Data structure used by the {@link AutoTagPlugin}, holding information about a particular tag, or a frequent word
+ * appearing in a collection of documents.
+ *
+ * @version $Id$
+ * @deprecated the entire Autotag plugin is deprecated, along with its data structures
+ */
+@Deprecated
 public class Tag implements Comparable<Tag>
 {
-    String name;
+    /** The keyword represented by this object. */
+    private String name;
 
-    long size;
+    /** The visual size of this tag in the HTML {@link TagCloud}. */
+    private long size;
 
+    /**
+     * Default constructor, specifying both the keyword and its target size.
+     *
+     * @param tagName the keyword that's represented
+     * @param tagSize the tag size
+     */
     public Tag(String tagName, long tagSize)
     {
         this.size = tagSize;
         this.name = tagName;
     }
 
+    /**
+     * Get the HTML markup to represent this tag in a {@link TagCloud}.
+     *
+     * @return HTML markup
+     */
+    public String getHtml()
+    {
+        return "<a class=\"f" + this.size + "\">" + XMLUtils.escapeElementContent(this.name) + "</a> ";
+    }
+
     @Override
     public int compareTo(Tag o)
     {
         return -o.name.compareTo(this.name);
-    }
-
-    public String getHtml()
-    {
-        return "<a class=\"f" + this.size + "\">" + this.name + "</a> ";
     }
 }

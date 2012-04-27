@@ -53,50 +53,6 @@ public class Util extends Api
     }
 
     /**
-     * Protect Text from Wiki transformation. This method is useful for preventing content generated with Velocity from
-     * being interpreted in the xwiki/1.0 rendering engine, and should not be used in xwiki/2.0 code. The result is
-     * valid only in HTML or XML documents.
-     * 
-     * @param text the text to escape
-     * @return the escaped text
-     * @since 1.3 Milestone 2
-     */
-    public String escapeText(String text)
-    {
-        return com.xpn.xwiki.util.Util.escapeText(text);
-    }
-
-    /**
-     * Protect URLs from Wiki transformation. This method is useful for preventing content generated with Velocity from
-     * being interpreted in the xwiki/1.0 rendering engine, and should not be used in xwiki/2.0 code. The result is
-     * valid only in HTML or XML documents.
-     * 
-     * @param url the url to escape
-     * @return the encoded URL, which can be used in the HTML output
-     * @since 1.3 Milestone 2
-     */
-    public String escapeURL(String url)
-    {
-        return com.xpn.xwiki.util.Util.escapeURL(url);
-    }
-
-    /**
-     * Translates a string into <code>application/x-www-form-urlencoded</code> format, so that it can be safely used in
-     * a query string as a parameter value.
-     * 
-     * @param text the non encoded text
-     * @return encoded text
-     * @since 1.3 Milestone 2
-     * @see #decodeURI(String)
-     * @deprecated use {@code $escapetool.url($string)} ({@link org.xwiki.velocity.tools.EscapeTool#url(Object)})
-     */
-    @Deprecated
-    public String encodeURI(String text)
-    {
-        return com.xpn.xwiki.util.Util.encodeURI(text, this.context);
-    }
-
-    /**
      * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of {@link #encodeURI(String)}.
      * 
      * @param text the encoded text

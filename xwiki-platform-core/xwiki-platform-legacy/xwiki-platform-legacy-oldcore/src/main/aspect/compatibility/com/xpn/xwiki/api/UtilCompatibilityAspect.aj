@@ -283,7 +283,7 @@ public privileged aspect UtilCompatibilityAspect
 
     /**
      * Add two integer numbers. Useful in Velocity, since arithmetical operations are not always working.
-     * 
+     *
      * @param a the first number to add
      * @param b the second number to add
      * @return the sum of the two parameters
@@ -299,7 +299,7 @@ public privileged aspect UtilCompatibilityAspect
 
     /**
      * Add two long numbers. Useful in Velocity, since arithmetical operations are not always working.
-     * 
+     *
      * @param a the first number to add
      * @param b the second number to add
      * @return the sum of the two parameters
@@ -327,5 +327,53 @@ public privileged aspect UtilCompatibilityAspect
     {
         long c = Long.parseLong(a) + Long.parseLong(b);
         return "" + c;
+    }
+
+    /**
+     * Protect Text from Wiki transformation. This method is useful for preventing content generated with Velocity from
+     * being interpreted in the xwiki/1.0 rendering engine, and should not be used in xwiki/2.0 code. The result is
+     * valid only in HTML or XML documents.
+     *
+     * @param text the text to escape
+     * @return the escaped text
+     * @since 1.3 Milestone 2
+     * @deprecated this method only works for {@code xwiki/1.0} wiki syntax, and it doesn't even escape all the syntax
+     */
+    @Deprecated
+    public String escapeText(String text)
+    {
+        return com.xpn.xwiki.util.Util.escapeText(text);
+    }
+
+    /**
+     * Protect URLs from Wiki transformation. This method is useful for preventing content generated with Velocity from
+     * being interpreted in the xwiki/1.0 rendering engine, and should not be used in xwiki/2.0 code. The result is
+     * valid only in HTML or XML documents.
+     *
+     * @param url the url to escape
+     * @return the encoded URL, which can be used in the HTML output
+     * @since 1.3 Milestone 2
+     * @deprecated this method only works for {@code xwiki/1.0} wiki syntax when outputting HTML
+     */
+    @Deprecated
+    public String escapeURL(String url)
+    {
+        return com.xpn.xwiki.util.Util.escapeURL(url);
+    }
+
+    /**
+     * Translates a string into <code>application/x-www-form-urlencoded</code> format, so that it can be safely used in
+     * a query string as a parameter value.
+     *
+     * @param text the non encoded text
+     * @return encoded text
+     * @since 1.3 Milestone 2
+     * @see #decodeURI(String)
+     * @deprecated use {@code $escapetool.url($string)} ({@link org.xwiki.velocity.tools.EscapeTool#url(Object)})
+     */
+    @Deprecated
+    public String Util.encodeURI(String text)
+    {
+        return com.xpn.xwiki.util.Util.encodeURI(text, this.context);
     }
 }

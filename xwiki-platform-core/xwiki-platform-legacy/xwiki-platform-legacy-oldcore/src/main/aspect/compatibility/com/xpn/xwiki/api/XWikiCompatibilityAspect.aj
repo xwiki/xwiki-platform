@@ -62,6 +62,30 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
+     * API to protect Text from Wiki transformation
+     * @param text
+     * @return escaped text
+     * @deprecated replaced by Util#escapeText since 1.3M2
+     */
+    @Deprecated
+    public String XWiki.escapeText(String text)
+    {
+        return this.util.escapeText(text);
+    }
+
+    /**
+     * API to protect URLs from Wiki transformation
+     * @param url
+     * @return encoded URL
+     * @deprecated replaced by Util#escapeURL since 1.3M2
+     */
+    @Deprecated
+    public String XWiki.escapeURL(String url)
+    {
+        return this.util.escapeURL(url);
+    }
+
+    /**
      * @deprecated use {@link #getLanguagePreference()} instead
      */
     @Deprecated

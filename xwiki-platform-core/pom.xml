@@ -240,6 +240,7 @@
             <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
             <exclude>com/xpn/xwiki/objects/BaseElement</exclude>
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
+            <exclude>com/xpn/xwiki/plugin/autotag/**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -261,6 +262,7 @@
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application-manager</module>
     <module>xwiki-platform-appwithinminutes</module>
+    <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-cache</module>

@@ -340,7 +340,7 @@ public privileged aspect UtilCompatibilityAspect
      * @deprecated this method only works for {@code xwiki/1.0} wiki syntax, and it doesn't even escape all the syntax
      */
     @Deprecated
-    public String escapeText(String text)
+    public String Util.escapeText(String text)
     {
         return com.xpn.xwiki.util.Util.escapeText(text);
     }
@@ -356,7 +356,7 @@ public privileged aspect UtilCompatibilityAspect
      * @deprecated this method only works for {@code xwiki/1.0} wiki syntax when outputting HTML
      */
     @Deprecated
-    public String escapeURL(String url)
+    public String Util.escapeURL(String url)
     {
         return com.xpn.xwiki.util.Util.escapeURL(url);
     }

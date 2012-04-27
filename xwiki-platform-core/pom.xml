@@ -237,6 +237,7 @@
             <exclude>com/xpn/xwiki/XWiki</exclude>
             <exclude>com/xpn/xwiki/XWiki*</exclude>
             <exclude>com/xpn/xwiki/api/XWiki</exclude>
+            <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
             <exclude>com/xpn/xwiki/objects/BaseElement</exclude>
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
           </excludes>

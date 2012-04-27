@@ -91,13 +91,24 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Exclude the generic HTML cleaner test. -->
+            <exclude>**/HTMLCleanerTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/wysiwyg/server/internal/cleaner/ComponentManagerTestSetup.java
+            <!-- Class Fan-Out Complexity is 24 (max allowed is 20) -->
+            org/xwiki/wysiwyg/server/filter/XWikiContextInitializationFilter.java
           </excludes>
         </configuration>
       </plugin>

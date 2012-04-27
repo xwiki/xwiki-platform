@@ -120,7 +120,18 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
                 "SELECT index_name FROM all_indexes WHERE table_owner=? AND table_name=? AND index_type='NORMAL'");
 
             for (String[] table : tablesToFix) {
-                stmt.execute("ALTER TABLE " + table[0] + " MODIFY (" + table[1] + " blob)");
+                try {
+                    stmt.execute("ALTER TABLE " + table[0] + " MODIFY (" + table[1] + " blob)");
+                } catch (SQLException ex) {
+                    // This exception is thrown when this migrator isn't really needed. This happens when migrating from
+                    // a version between 3.2 and 3.5, which do use the proper table structure, but we can't easily
+                    // distinguish between a pre-3.2 database and a post-3.2 database.
+                    if (ex.getMessage().contains("ORA-22859")) {
+                        return;
+                    } else {
+                        throw ex;
+                    }
+                }
                 getIndexesQuery.setString(1, getSchemaFromWikiName(Utils.getContext().getDatabase()));
                 getIndexesQuery.setString(2, table[0]);
                 ResultSet indexes = getIndexesQuery.executeQuery();

@@ -117,7 +117,7 @@ var XWiki = function(XWiki){
         bindEventListeners: function(eventListeners) {
           var events = Object.keys(eventListeners);
           for (var i=0;i<events.length;i++) {
-            this.listItemElement.observe(events[i], eventListeners[events[i]].bind(this.options.eventCallbackScope ? this.options.eventCallbackScope : this));
+            this.listItemElement.observe(events[i], eventListeners[events[i]].bindAsEventListener(this.options.eventCallbackScope ? this.options.eventCallbackScope : this));
           }
         }
     });

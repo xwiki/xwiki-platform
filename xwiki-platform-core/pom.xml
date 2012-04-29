@@ -233,11 +233,8 @@
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
             <exclude>org/xwiki/wysiwyg/server/plugin/sync/**</exclude>
             <exclude>com/xpn/xwiki/objects/ObjectInterface</exclude>
-            <exclude>com/xpn/xwiki/util/Util</exclude>
             <exclude>com/xpn/xwiki/XWiki</exclude>
-            <exclude>com/xpn/xwiki/XWiki*</exclude>
             <exclude>com/xpn/xwiki/api/XWiki</exclude>
-            <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
             <exclude>com/xpn/xwiki/objects/BaseElement</exclude>
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
             <exclude>com/xpn/xwiki/plugin/autotag/**</exclude>

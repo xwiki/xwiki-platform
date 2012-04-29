@@ -49,28 +49,28 @@ public privileged aspect UtilCompatibilityAspect
 
     /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File, String)} */
     @Deprecated
-    public static String getFileContent(File file) throws IOException
+    public static String Util.getFileContent(File file) throws IOException
     {
         return FileUtils.readFileToString(file, XWiki.DEFAULT_ENCODING);
     }
 
     /** @deprecated Use {@link org.apache.commons.io.IOUtils#toString(Reader)} */
     @Deprecated
-    public static String getFileContent(Reader reader) throws IOException
+    public static String Util.getFileContent(Reader reader) throws IOException
     {
         return IOUtils.toString(reader);
     }
 
     /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToByteArray(File)} */
     @Deprecated
-    public static byte[] getFileContentAsBytes(File file) throws IOException
+    public static byte[] Util.getFileContentAsBytes(File file) throws IOException
     {
         return FileUtils.readFileToByteArray(file);
     }
 
     /** @deprecated Use {@link org.apache.commons.io.IOUtils#toByteArray(InputStream)} */
     @Deprecated
-    public static byte[] getFileContentAsBytes(InputStream is) throws IOException
+    public static byte[] Util.getFileContentAsBytes(InputStream is) throws IOException
     {
         return IOUtils.toByteArray(is);
     }

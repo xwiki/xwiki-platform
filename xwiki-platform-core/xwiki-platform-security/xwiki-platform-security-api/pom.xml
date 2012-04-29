@@ -45,6 +45,13 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
+    <!-- Test Dependencies -->
+    <!-- TODO: Modify tests in the this module to work with Hamcrest 1.2+ -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.1</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

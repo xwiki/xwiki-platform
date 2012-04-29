@@ -78,7 +78,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
         try {
             getStore().beginTransaction(getXWikiContext());
             // Run this migration if the database isn't new
-            shouldExecute = getStore().getDatabaseProductName(getXWikiContext()) == DatabaseProduct.ORACLE;
+            shouldExecute = getStore().getDatabaseProductName() == DatabaseProduct.ORACLE;
             getStore().endTransaction(getXWikiContext(), false);
         } catch (XWikiException ex) {
             // Shouldn't happen, ignore
@@ -91,7 +91,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException

@@ -19,10 +19,12 @@
  */
 package com.xpn.xwiki.api;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -133,7 +135,12 @@ public class Attachment extends Api
 
     public byte[] getContentAsBytes() throws XWikiException
     {
-        return this.attachment.getContent(getXWikiContext());
+        try {
+            return IOUtils.toByteArray(this.attachment.getContentInputStream(getXWikiContext()));
+        } catch (IOException ex) {
+            // This really shouldn't happen, but it's not nice to throw exceptions from scriptable APIs
+            return new byte[0];
+        }
     }
 
     public String getContentAsString() throws XWikiException

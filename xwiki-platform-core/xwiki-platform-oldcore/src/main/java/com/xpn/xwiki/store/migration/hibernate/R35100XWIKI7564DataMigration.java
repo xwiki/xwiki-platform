@@ -75,7 +75,7 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
             getStore().beginTransaction(getXWikiContext());
             // Run this migration if the database isn't new
             shouldExecute = (startupVersion.getVersion() > 0
-                && getStore().getDatabaseProductName(getXWikiContext()) == DatabaseProduct.POSTGRESQL);
+                && getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL);
             getStore().endTransaction(getXWikiContext(), false);
         } catch (XWikiException ex) {
             // Shouldn't happen, ignore
@@ -88,7 +88,7 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException

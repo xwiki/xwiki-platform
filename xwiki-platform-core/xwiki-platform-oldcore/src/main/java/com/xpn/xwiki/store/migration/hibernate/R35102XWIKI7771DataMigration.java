@@ -39,7 +39,7 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.DatabaseProduct;
@@ -53,7 +53,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @version $Id$
  * @since 3.5.1
  */
-@ComponentRole
+@Component
 @Named("R35102XWIKI7771")
 @Singleton
 public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
@@ -78,7 +78,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
             getStore().beginTransaction(getXWikiContext());
             // Run this migration if the database isn't new
             shouldExecute = (startupVersion.getVersion() > 0
-                && getStore().getDatabaseProductName(getXWikiContext()) == DatabaseProduct.POSTGRESQL);
+                && getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL);
             getStore().endTransaction(getXWikiContext(), false);
         } catch (XWikiException ex) {
             // Shouldn't happen, ignore
@@ -91,7 +91,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException

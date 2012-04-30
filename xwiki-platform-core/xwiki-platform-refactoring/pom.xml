@@ -59,7 +59,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

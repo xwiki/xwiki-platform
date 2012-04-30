@@ -68,7 +68,6 @@
       <artifactId>xwiki-platform-rendering-macro-context</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -104,7 +103,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
@@ -112,6 +111,12 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
       <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

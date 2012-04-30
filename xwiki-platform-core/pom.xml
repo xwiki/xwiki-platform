@@ -224,7 +224,39 @@
           <excludes>
             <exclude>**/internal/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
+            <exclude>com/xpn/xwiki/objects/BaseObject</exclude>
+            <exclude>com/xpn/xwiki/objects/BaseProperty</exclude>
+            <exclude>com/xpn/xwiki/objects/PropertyInterface</exclude>
+            <exclude>com/xpn/xwiki/objects/classes/PropertyClass</exclude>
+            <exclude>com/xpn/xwiki/store/XWikiHibernateBaseStore</exclude>
+            <exclude>com/xpn/xwiki/stats/impl/XWikiStats</exclude>
+            <exclude>com/xpn/xwiki/store/migration/AbstractDataMigrationManager*</exclude>
+            <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration*</exclude>
+            <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigrationManager*</exclude>
+            <exclude>org/xwiki/gwt/user/client/ui/ListBox</exclude>
+            <exclude>org/xwiki/gwt/user/client/ui/ListBox$1</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/IELinePlugin</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/LinePlugin</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/line/LinePlugin$1</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/list/ListBehaviorAdjuster</exclude>
+            <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
+            <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
+            <exclude>org/xwiki/test/ui/po/DeleteConfirmationPage</exclude>
+            <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
+            <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
+            <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
             <exclude>org/xwiki/query/Query</exclude>
+            <!-- START: Removed Deprecations -->
+            <exclude>org/xwiki/bridge/AttachmentName</exclude>
+            <exclude>org/xwiki/bridge/DocumentName</exclude>
+            <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+            <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
+            <exclude>com/xpn/xwiki/doc/DefaultDocumentAccessBridge</exclude>
+            <exclude>com/xpn/xwiki/doc/XWikiDocument</exclude>
+            <!-- STOP: Removed Deprecations -->
           </excludes>
         </configuration>
       </plugin>

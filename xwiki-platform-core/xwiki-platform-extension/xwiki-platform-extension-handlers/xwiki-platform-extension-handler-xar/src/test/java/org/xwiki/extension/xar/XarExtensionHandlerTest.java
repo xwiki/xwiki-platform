@@ -52,6 +52,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 {
@@ -218,10 +219,15 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));
+
+                allowing(mockXWiki).prepareResources(with(any(XWikiContext.class)));
             }
         });
 
         getContext().setUserReference(this.contextUser);
+
+        ((XWikiStubContextProvider) getComponentManager().getInstance(XWikiStubContextProvider.class))
+            .initialize(getContext());
 
         // lookup
 
@@ -229,13 +235,14 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
 
         // Get rid of wiki macro listener
-        getComponentManager().<ObservationManager>getInstance(ObservationManager.class).removeListener(
+        getComponentManager().<ObservationManager> getInstance(ObservationManager.class).removeListener(
             "RegisterMacrosOnImportListener");
     }
 
     private XarInstalledExtension install(ExtensionId extensionId, String wiki) throws Throwable
     {
         InstallRequest installRequest = new InstallRequest();
+        installRequest.setProperty("user.reference", getContext().getUserReference());
         installRequest.addExtension(extensionId);
         if (wiki != null) {
             installRequest.addNamespace("wiki:" + wiki);
@@ -253,6 +260,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private void uninstall(ExtensionId extensionId, String wiki) throws Throwable
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setProperty("user.reference", getContext().getUserReference());
         uninstallRequest.addExtension(extensionId);
         if (wiki != null) {
             uninstallRequest.addNamespace("wiki:" + wiki);

@@ -398,6 +398,8 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(namespace);
         }
 
+        installRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
+
         Job job;
         try {
             job = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
@@ -473,6 +475,8 @@ public class ExtensionManagerScriptService implements ScriptService
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
         }
+
+        uninstallRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
 
         Job job;
         try {

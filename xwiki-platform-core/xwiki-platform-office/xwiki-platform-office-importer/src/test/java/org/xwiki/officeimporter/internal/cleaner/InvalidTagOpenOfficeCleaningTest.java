@@ -21,10 +21,10 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 /**
  * Test case for tag removing in {@link OpenOfficeHTMLCleaner}.
@@ -33,9 +33,9 @@ import org.junit.Test;
  * @since 1.8
  */
 public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
-{ 
+{
     /**
-     * {@code <style>} tags should be stripped from html content.
+     * {@code STYLE} tags should be stripped from HTML content.
      */
     @Test
     public void testStyleTagRemoving()
@@ -47,9 +47,9 @@ public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         NodeList nodes = doc.getElementsByTagName("style");
         Assert.assertEquals(0, nodes.getLength());
     }
-    
+
     /**
-     * {@code <style>} tags should be stripped from html content.
+     * {@code STYLE} tags should be stripped from HTML content.
      */
     @Test
     public void testScriptTagRemoving()

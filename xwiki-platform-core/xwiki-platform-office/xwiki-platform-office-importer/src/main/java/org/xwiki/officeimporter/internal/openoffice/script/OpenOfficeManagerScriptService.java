@@ -17,30 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.openoffice;
+package org.xwiki.officeimporter.internal.openoffice.script;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.ModelContext;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
+import org.xwiki.script.service.ScriptService;
 
 /**
- * A bridge between {@link OpenOfficeManager} and velocity scripts.
+ * Exposes the office manager APIs to server-side scripts.
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 4.1M1
  */
-public class OpenOfficeManagerVelocityBridge
+@Component
+@Named("officemanager")
+@Singleton
+public class OpenOfficeManagerScriptService implements ScriptService
 {
     /**
      * The key used to place any error messages while trying to control the oo server instance.
      */
     public static final String OFFICE_MANAGER_ERROR = "OFFICE_MANAGER_ERROR";
-
-    /**
-     * The logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeManagerVelocityBridge.class);
 
     /**
      * Error message used to indicate that openoffice server administration is restricted for main xwiki.
@@ -53,39 +60,45 @@ public class OpenOfficeManagerVelocityBridge
     private static final String ERROR_PRIVILEGES = "Inadequate privileges.";
 
     /**
+     * The object used to log messages.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Provides access to the request context.
      */
+    @Inject
     private Execution execution;
+
+    /**
+     * The component used to access the current wiki.
+     */
+    @Inject
+    private ModelContext modelContext;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
+    @Inject
     private OpenOfficeManager ooManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
      */
+    @Inject
     private DocumentAccessBridge docBridge;
 
     /**
-     * Creates a new {@link OpenOfficeManagerVelocityBridge} with the provided {@link OpenOfficeManager} component.
-     * 
-     * @param oomanager openoffice manager component.
-     * @param docBridge document access bridge component.
-     * @param execution current execution.
+     * The office server configuration.
      */
-    public OpenOfficeManagerVelocityBridge(OpenOfficeManager oomanager, DocumentAccessBridge docBridge,
-        Execution execution)
-    {
-        this.ooManager = oomanager;
-        this.docBridge = docBridge;
-        this.execution = execution;
-    }
+    @Inject
+    private OpenOfficeConfiguration config;
 
     /**
      * Tries to start the oo server process.
      * 
-     * @return true if the operation succeeds, false otherwise.
+     * @return true if the operation succeeds, false otherwise
      */
     public boolean startServer()
     {
@@ -98,7 +111,7 @@ public class OpenOfficeManagerVelocityBridge
                 this.ooManager.start();
                 return true;
             } catch (OpenOfficeManagerException ex) {
-                LOGGER.error(ex.getMessage(), ex);
+                logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
         }
@@ -108,7 +121,7 @@ public class OpenOfficeManagerVelocityBridge
     /**
      * Tries to stop the oo server process.
      * 
-     * @return true if the operation succeeds, false otherwise.
+     * @return true if the operation succeeds, false otherwise
      */
     public boolean stopServer()
     {
@@ -121,7 +134,7 @@ public class OpenOfficeManagerVelocityBridge
                 this.ooManager.stop();
                 return true;
             } catch (OpenOfficeManagerException ex) {
-                LOGGER.error(ex.getMessage(), ex);
+                logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
         }
@@ -129,7 +142,7 @@ public class OpenOfficeManagerVelocityBridge
     }
 
     /**
-     * @return current status of the oo server process as a string.
+     * @return current status of the oo server process as a string
      */
     public String getServerState()
     {
@@ -137,7 +150,15 @@ public class OpenOfficeManagerVelocityBridge
     }
 
     /**
-     * @return any error messages encountered.
+     * @return the office server configuration
+     */
+    public OpenOfficeConfiguration getConfig()
+    {
+        return config;
+    }
+
+    /**
+     * @return any error messages encountered
      */
     public String getLastErrorMessage()
     {
@@ -148,7 +169,7 @@ public class OpenOfficeManagerVelocityBridge
     /**
      * Sets an error message inside the execution context.
      * 
-     * @param message error message.
+     * @param message error message
      */
     private void setErrorMessage(String message)
     {
@@ -158,11 +179,11 @@ public class OpenOfficeManagerVelocityBridge
     /**
      * Utility method for checking if current context document is from main xwiki.
      * 
-     * @return true if the current context document is from main xwiki.
+     * @return true if the current context document is from main xwiki
      */
     private boolean isMainXWiki()
     {
-        String currentWiki = this.docBridge.getCurrentWiki();
+        String currentWiki = this.modelContext.getCurrentEntityReference().getName();
         // TODO: Remove the hard-coded main wiki name when a fix becomes available.
         return (currentWiki != null) && currentWiki.equals("xwiki");
     }

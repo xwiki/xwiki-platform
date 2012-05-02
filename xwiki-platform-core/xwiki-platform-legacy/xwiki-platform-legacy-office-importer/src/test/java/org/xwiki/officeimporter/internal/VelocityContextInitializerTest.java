@@ -19,8 +19,17 @@
  */
 package org.xwiki.officeimporter.internal;
 
+import java.util.Properties;
+
 import org.apache.velocity.VelocityContext;
+import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -30,7 +39,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.9RC2
  */
-public class VelocityContextInitializerTest extends AbstractOfficeImporterTest
+public class VelocityContextInitializerTest extends AbstractMockingComponentTestCase
 {
     /**
      * Test the presence of velocity bridges.
@@ -40,14 +49,25 @@ public class VelocityContextInitializerTest extends AbstractOfficeImporterTest
     @Test
     public void testVelocityBridges() throws Exception
     {
+        registerMockComponent(ScriptService.class, "officeimporter", "importer");
+        registerMockComponent(ScriptService.class, "officemanager", "manager");
+        final ConfigurationSource configurationSource = registerMockComponent(ConfigurationSource.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(configurationSource).getProperty("velocity.tools", Properties.class);
+                will(returnValue(new Properties()));
+            }
+        });
+
+        // Make sure the execution context is not null when velocity bridges are initialized.
+        getComponentManager().<Execution> getInstance(Execution.class).setContext(new ExecutionContext());
+
         VelocityContextFactory factory = getComponentManager().getInstance(VelocityContextFactory.class);
         VelocityContext context = factory.createContext();
 
-        /*
-        TODO: Asiri needs to verify this. I think it should be replaced by the new velocity bridge but not sure.
         Assert.assertNotNull(context.get("officeimporter"));
         Assert.assertNotNull(context.get("ooconfig"));
         Assert.assertNotNull(context.get("oomanager"));
-        */
     }
 }

@@ -29,87 +29,38 @@
     <artifactId>xwiki-platform-legacy</artifactId>
     <version>4.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-legacy-oldcore</artifactId>
-  <name>XWiki Platform - Legacy - Old Core</name>
+  <artifactId>xwiki-platform-legacy-office-importer</artifactId>
+  <name>XWiki Platform - Legacy - Office Importer</name>
   <packaging>jar</packaging>
-  <description>xwiki-platform-oldcore repackaging including legacy aspects</description>
+  <description>Repackages xwiki-platform-office-importer including the legacy code/APIs</description>
   <properties>
-    <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-oldcore,com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+    <!-- The features provided by this module so that it's found when resolving extension -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-importer</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-office-importer</artifactId>
       <version>${project.version}</version>
-      <!-- We don't want to draw this dependency since we're wrapping it -->
+      <!-- We don't want to draw this dependency since we're wrapping it. -->
       <scope>provided</scope>
     </dependency>
-
-    <!-- Version 1.1 of jackrabbit core needs to be uploaded to central repository. In addition there was a  POM
-         issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
-    <!-- TODO: Version 1.4.2 is published in the central repo, can we use that? -->
     <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-core</artifactId>
-      <version>1.1-xwiki</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
+      <version>${commons.version}</version>
     </dependency>
-    
-    <!-- There's no release of Graffito yet (http://incubator.apache.org/graffito/jcr-mapping/index.html) -->
+    <!-- Build dependencies -->
     <dependency>
-      <groupId>org.apache.portals</groupId>
-      <artifactId>graffito-jcr-mapping</artifactId>
-      <version>1.0-a1-amelentev-dev</version>
-    </dependency>
-    
-    <!-- VMA: I'm not sure if we have the right to distribute this jar. It's not on the central repository because
-         of licensing issues. -->
-    <!-- Sergiu: No, we cannot redistribute it. And we definitely shouldn't put it in our repo.
-         We can redistribute version 1.1, but we should make users approve their License Agreement.
-         Can we drop this completely? Why is it needed? -->
-    <!-- TODO: Version 1.1 is available, should we upgrade? -->
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.0.1B</version>
-    </dependency>
-
-    <!-- See http://jira.codehaus.org/browse/MEV-488 -->
-    <dependency>
-      <groupId>javax.jcr</groupId>
-      <artifactId>jcr</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <!-- Build tools -->
-    <!-- Needed for backward compatibility Aspects -->
-    <dependency>
+      <!-- Needed for backward compatibility Aspects -->
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
     </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test</artifactId>
       <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -127,7 +78,7 @@
               <weaveDependencies>
                 <weaveDependency>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-oldcore</artifactId>
+                  <artifactId>xwiki-platform-office-importer</artifactId>
                 </weaveDependency>
               </weaveDependencies>
             </configuration>
@@ -139,6 +90,23 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
       </plugin>
+      <!-- We need to compare against the xwiki-platform-office-importer since this module is new in 4.1M1 and thus
+           there's no previous version of it.
+           TODO: Remove this after 4.1M1 is released!
+      -->
+      <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>clirr-maven-plugin</artifactId>
+         <configuration>
+           <comparisonArtifacts>
+             <comparisonArtifact>
+               <groupId>org.xwiki.platform</groupId>
+               <artifactId>xwiki-platform-office-importer</artifactId>
+               <version>${xwiki.clirr.previous.version}</version>
+             </comparisonArtifact>
+           </comparisonArtifacts>
+         </configuration>
+       </plugin>
     </plugins>
   </build>
 </project>

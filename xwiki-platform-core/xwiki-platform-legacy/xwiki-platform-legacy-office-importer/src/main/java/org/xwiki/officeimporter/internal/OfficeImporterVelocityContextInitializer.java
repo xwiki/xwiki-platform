@@ -17,51 +17,55 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfigurationVelocityBridge;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.OfficeImporterVelocityBridge;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
- * Puts a reference to {@link OpenOfficeConfigurationVelocityBridge} in newly created velocity contexts.
+ * Puts a reference to office importer in newly created velocity contexts.
  * 
  * @version $Id$
- * @since 1.9RC1
+ * @since 1.8M1
  */
 @Component
-@Named("ooconfig")
+@Named("officeimporter")
 @Singleton
-public class OpenOfficeConfigurationVelocityContextInitializer implements VelocityContextInitializer
+public class OfficeImporterVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
-     * The key to use for {@link OpenOfficeConfigurationVelocityBridge} in the velocity context.
+     * The key to use for office importer in the velocity context.
      */
-    public static final String VELOCITY_CONTEXT_KEY = "ooconfig";
+    public static final String VELOCITY_CONTEXT_KEY = "officeimporter";
 
     /**
-     * The {@link OpenOfficeConfiguration} component.
+     * Used to lookup other components.
      */
     @Inject
-    private OpenOfficeConfiguration ooConfig;
+    private ComponentManager componentManager;
 
     /**
-     * The {@link OpenOfficeConfigurationVelocityBridge}.
+     * The logger to log.
      */
-    private OpenOfficeConfigurationVelocityBridge veloBridge;
+    @Inject
+    private Logger logger;
 
     @Override
-    public void initialize(VelocityContext velocityContext)
+    public void initialize(VelocityContext context)
     {
-        if (null == this.veloBridge) {
-            this.veloBridge = new OpenOfficeConfigurationVelocityBridge(this.ooConfig);
+        try {
+            context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(this.componentManager));
+        } catch (OfficeImporterException ex) {
+            this.logger.error("Unrecoverable error, office importer will not be available for velocity scripts.", ex);
         }
-        velocityContext.put(VELOCITY_CONTEXT_KEY, this.veloBridge);
     }
 }

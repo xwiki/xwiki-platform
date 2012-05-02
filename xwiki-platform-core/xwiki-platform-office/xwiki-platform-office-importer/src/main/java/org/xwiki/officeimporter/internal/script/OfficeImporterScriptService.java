@@ -17,21 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter;
+package org.xwiki.officeimporter.internal.script;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
@@ -39,24 +43,23 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
+import org.xwiki.script.service.ScriptService;
 
 /**
- * A bridge between velocity and office importer.
+ * Exposes the office importer APIs to server-side scripts.
  * 
  * @version $Id$
- * @since 1.8M1
+ * @since 4.1M1
  */
-public class OfficeImporterVelocityBridge
+@Component
+@Named("officeimporter")
+@Singleton
+public class OfficeImporterScriptService implements ScriptService
 {
-    /**
-     * The logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OfficeImporterVelocityBridge.class);
-
     /**
      * File extensions corresponding to slide presentations.
      */
@@ -68,86 +71,77 @@ public class OfficeImporterVelocityBridge
     public static final String OFFICE_IMPORTER_ERROR = "OFFICE_IMPORTER_ERROR";
 
     /**
+     * The object used to log messages.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * The {@link Execution} component.
      */
+    @Inject
     private Execution execution;
 
     /**
      * The {@link DocumentAccessBridge} component.
      */
+    @Inject
     private DocumentAccessBridge docBridge;
 
     /**
      * Used for converting string document names to objects.
      */
+    @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
      * Used to query openoffice server status.
      */
+    @Inject
     private OpenOfficeManager officeManager;
 
     /**
      * Used to query the OpenOffice server configuration.
      */
+    @Inject
     private OpenOfficeConfiguration officeConfiguration;
 
     /**
      * Used for building {@link XHTMLOfficeDocument} instances from office documents.
      */
+    @Inject
     private XHTMLOfficeDocumentBuilder xhtmlBuilder;
 
     /**
      * Used for building {@link XDOMOfficeDocument} instances from office documents.
      */
+    @Inject
     private XDOMOfficeDocumentBuilder xdomBuilder;
 
     /**
      * Used for building {@link XDOMOfficeDocument} instances from office presentations.
      */
+    @Inject
     private PresentationBuilder presentationBuilder;
 
     /**
      * Used to split {@link XDOMOfficeDocument} documents.
      */
+    @Inject
     private XDOMOfficeDocumentSplitter xdomSplitter;
-
-    /**
-     * Default constructor.
-     * 
-     * @param componentManager used to lookup for other necessary components.
-     * @throws OfficeImporterException if an error occurs while looking up for other required components.
-     */
-    public OfficeImporterVelocityBridge(ComponentManager componentManager)
-        throws OfficeImporterException
-    {
-        try {
-            this.execution = componentManager.getInstance(Execution.class);
-            this.docBridge = componentManager.getInstance(DocumentAccessBridge.class);
-            this.currentMixedDocumentReferenceResolver =
-                componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-            this.officeManager = componentManager.getInstance(OpenOfficeManager.class);
-            this.officeConfiguration = componentManager.getInstance(OpenOfficeConfiguration.class);
-            this.xhtmlBuilder = componentManager.getInstance(XHTMLOfficeDocumentBuilder.class);
-            this.xdomBuilder = componentManager.getInstance(XDOMOfficeDocumentBuilder.class);
-            this.presentationBuilder = componentManager.getInstance(PresentationBuilder.class);
-            this.xdomSplitter = componentManager.getInstance(XDOMOfficeDocumentSplitter.class);
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Error while initializing office importer velocity bridge.", ex);
-        }
-    }
 
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
      * 
-     * @param officeFileStream binary data stream corresponding to input office document.
+     * @param officeFileStream binary data stream corresponding to input office document
      * @param officeFileName name of the input office document, this argument is mainly used for determining input
-     *        document format where necessary.
-     * @param referenceDocument reference wiki document w.r.t which import process is carried out. This argument affects
+     *        document format where necessary
+     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this argument affects
      *        the attachment URLs generated during the import process where all references to attachments will be
-     *        calculated assuming that the attachments are contained on the reference document.
-     * @param filterStyles whether to filter styling information associated with the office document's content or not.
-     * @return {@link XHTMLOfficeDocument} containing xhtml result of the import operation or null if an error occurs.
+     *        calculated assuming that the attachments are contained on the reference document
+     * @param filterStyles whether to filter styling information associated with the office document's content or not
+     * @return {@link XHTMLOfficeDocument} containing xhtml result of the import operation or null if an error occurs
      * @since 2.2M1
      */
     public XHTMLOfficeDocument officeToXHTML(InputStream officeFileStream, String officeFileName,
@@ -159,7 +153,7 @@ public class OfficeImporterVelocityBridge
                 .resolve(referenceDocument), filterStyles);
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
-            LOGGER.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -167,10 +161,9 @@ public class OfficeImporterVelocityBridge
     /**
      * Imports the given {@link XHTMLOfficeDocument} into an {@link XDOMOfficeDocument}.
      * 
-     * @param xhtmlOfficeDocument {@link XHTMLOfficeDocument} to be imported.
+     * @param xhtmlOfficeDocument {@link XHTMLOfficeDocument} to be imported
      * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
-     *         operation or null if an error occurs.
-     * @since 2.2M1
+     *         operation or null if an error occurs
      */
     public XDOMOfficeDocument xhtmlToXDOM(XHTMLOfficeDocument xhtmlOfficeDocument)
     {
@@ -178,7 +171,7 @@ public class OfficeImporterVelocityBridge
             return this.xdomBuilder.build(xhtmlOfficeDocument);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            LOGGER.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -186,16 +179,15 @@ public class OfficeImporterVelocityBridge
     /**
      * Imports the given office document into an {@link XDOMOfficeDocument}.
      * 
-     * @param officeFileStream binary data stream corresponding to input office document.
+     * @param officeFileStream binary data stream corresponding to input office document
      * @param officeFileName name of the input office document, this argument is mainly is used for determining input
-     *        document format where necessary.
-     * @param referenceDocument reference wiki document w.r.t which import process is carried out. This srgument affects
+     *        document format where necessary
+     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this srgument affects
      *        the attachment URLs generated during the import process where all references to attachments will be
-     *        calculated assuming that the attachments are contained on the reference document.
-     * @param filterStyles whether to filter styling information associated with the office document's content or not.
+     *        calculated assuming that the attachments are contained on the reference document
+     * @param filterStyles whether to filter styling information associated with the office document's content or not
      * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
-     *         operation or null if an error occurs.
-     * @since 2.2M1
+     *         operation or null if an error occurs
      */
     public XDOMOfficeDocument officeToXDOM(InputStream officeFileStream, String officeFileName,
         String referenceDocument, boolean filterStyles)
@@ -210,7 +202,7 @@ public class OfficeImporterVelocityBridge
             }
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
-            LOGGER.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -221,15 +213,14 @@ public class OfficeImporterVelocityBridge
      * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
      * {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor} entry.
      * 
-     * @param xdomDocument {@link XDOMOfficeDocument} to be split.
-     * @param headingLevels heading levels defining the split points on the original document.
-     * @param namingCriterionHint hint indicating the child pages naming criterion.
-     * @param rootDocumentName name of the root document w.r.t which splitting will occur. In the results set the entry
+     * @param xdomDocument {@link XDOMOfficeDocument} to be split
+     * @param headingLevels heading levels defining the split points on the original document
+     * @param namingCriterionHint hint indicating the child pages naming criterion
+     * @param rootDocumentName name of the root document w.r.t which splitting will occur; in the results set the entry
      *        corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated TOC
-     *        structure.
+     *        structure
      * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
-     *         instances or null if an error occurs.
-     * @since 2.2M1
+     *         instances or null if an error occurs
      */
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
         String[] headingLevels, String namingCriterionHint, String rootDocumentName)
@@ -243,7 +234,7 @@ public class OfficeImporterVelocityBridge
                 this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            LOGGER.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
         return null;
     }
@@ -251,13 +242,13 @@ public class OfficeImporterVelocityBridge
     /**
      * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments.
      * 
-     * @param doc {@link XDOMOfficeDocument} to be saved.
-     * @param target name of the target wiki page.
-     * @param syntaxId syntax of the target wiki page.
-     * @param parent name of the parent wiki page or null.
-     * @param title title of the target wiki page or null.
-     * @param append whether to append content if the target wiki page exists.
-     * @return true if the operation completes successfully, false otherwise.
+     * @param doc {@link XDOMOfficeDocument} to be saved
+     * @param target name of the target wiki page
+     * @param syntaxId syntax of the target wiki page
+     * @param parent name of the parent wiki page or null
+     * @param title title of the target wiki page or null
+     * @param append whether to append content if the target wiki page exists
+     * @return true if the operation completes successfully, false otherwise
      */
     public boolean save(XDOMOfficeDocument doc, String target, String syntaxId, String parent, String title,
         boolean append)
@@ -311,18 +302,18 @@ public class OfficeImporterVelocityBridge
             return true;
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            LOGGER.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         } catch (Exception ex) {
             String message = "Error while saving document [%s].";
             message = String.format(message, target);
             setErrorMessage(message);
-            LOGGER.error(message, ex);
+            logger.error(message, ex);
         }
         return false;
     }
 
     /**
-     * @return an error message set inside current execution (during import process) or null.
+     * @return an error message set inside current execution (during import process) or null
      */
     public String getErrorMessage()
     {
@@ -332,7 +323,7 @@ public class OfficeImporterVelocityBridge
     /**
      * Utility method for setting an error message inside current execution.
      * 
-     * @param message error message.
+     * @param message error message
      */
     private void setErrorMessage(String message)
     {
@@ -367,8 +358,8 @@ public class OfficeImporterVelocityBridge
     /**
      * Utility method for checking if a file name corresponds to an office presentation.
      * 
-     * @param officeFileName office file name.
-     * @return true if the file name / extension represents an office presentation format.
+     * @param officeFileName office file name
+     * @return true if the file name / extension represents an office presentation format
      */
     private boolean isPresentation(String officeFileName)
     {
@@ -379,8 +370,8 @@ public class OfficeImporterVelocityBridge
     /**
      * Utility method for attaching artifacts into a wiki page.
      * 
-     * @param artifacts map of artifact content against their names.
-     * @param targetDocumentReference target wiki page into which artifacts are to be attached.
+     * @param artifacts map of artifact content against their names
+     * @param targetDocumentReference target wiki page into which artifacts are to be attached
      */
     private void attachArtifacts(Map<String, byte[]> artifacts, DocumentReference targetDocumentReference)
     {
@@ -391,7 +382,7 @@ public class OfficeImporterVelocityBridge
                 this.docBridge.setAttachmentContent(attachmentReference, artifact.getValue());
             } catch (Exception ex) {
                 // Log the error and skip the artifact.
-                LOGGER.error("Error while attaching artifact.", ex);
+                logger.error("Error while attaching artifact.", ex);
             }
         }
     }

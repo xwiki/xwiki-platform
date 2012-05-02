@@ -24,11 +24,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManagerVelocityBridge;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
@@ -47,35 +47,20 @@ public class OpenOfficeManagerVelocityContextInitializer implements VelocityCont
      */
     public static final String VELOCITY_CONTEXT_KEY = "oomanager";
 
-    /**
-     * The {@link Execution} component.
-     */
     @Inject
     private Execution execution;
 
-    /**
-     * The {@link OpenOfficeManager} component.
-     */
     @Inject
-    private OpenOfficeManager ooManager;
-
-    /**
-     * The {@link DocumentAccessBridge} component.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * The velocity bridge.
-     */
-    private OpenOfficeManagerVelocityBridge veloBridge;
+    @Named("officemanager")
+    private ScriptService officeManagerScriptService;
 
     @Override
     public void initialize(VelocityContext context)
     {
-        if (null == this.veloBridge) {
-            this.veloBridge = new OpenOfficeManagerVelocityBridge(this.ooManager, this.docBridge, this.execution);
-        }
-        context.put(VELOCITY_CONTEXT_KEY, this.veloBridge);
+        // Put the office manager script service on the execution context to be available to the velocity bridge.
+        this.execution.getContext().setProperty("OpenOfficeManagerScriptService", this.officeManagerScriptService);
+        // The first two parameters are not needed anymore since the velocity bridge is now just a wrapper of the office
+        // manager script service which is taken from the execution context.
+        context.put(VELOCITY_CONTEXT_KEY, new OpenOfficeManagerVelocityBridge(null, null, this.execution));
     }
 }

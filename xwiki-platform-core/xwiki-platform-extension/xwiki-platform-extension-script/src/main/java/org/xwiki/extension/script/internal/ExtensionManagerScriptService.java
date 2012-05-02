@@ -89,6 +89,11 @@ public class ExtensionManagerScriptService implements ScriptService
     public static final String EXTENSION_JOBID_PREFIX = "extension_";
 
     /**
+     * The prefix put behind all job ids.
+     */
+    public static final String EXTENSIONPLAN_JOBID_PREFIX = EXTENSION_JOBID_PREFIX + "_plan_";
+
+    /**
      * The real extension manager bridged by this script service.
      */
     @Inject
@@ -421,6 +426,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(EXTENSIONPLAN_JOBID_PREFIX + id);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -512,6 +518,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(EXTENSIONPLAN_JOBID_PREFIX + id);
         uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -542,7 +549,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
     {
-        return this.createUninstallPlan(extensionId.getId(), null);
+        return createUninstallPlan(extensionId.getId(), null);
     }
 
     // Jobs
@@ -564,6 +571,17 @@ public class ExtensionManagerScriptService implements ScriptService
         return this.jobManager.getCurrentJob();
     }
 
+    private JobStatus getJobStatus(String jobId)
+    {
+        JobStatus jobStatus = this.jobManager.getJobStatus(jobId);
+
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            jobStatus = safe(jobStatus);
+        }
+
+        return jobStatus;
+    }
+
     /**
      * Return job status corresponding to the provided extension id from the current executed job or stored history.
      * 
@@ -572,7 +590,18 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public JobStatus getExtensionJobStatus(String extensionId)
     {
-        return this.jobManager.getJobStatus(EXTENSION_JOBID_PREFIX + extensionId);
+        return getJobStatus(EXTENSION_JOBID_PREFIX + extensionId);
+    }
+
+    /**
+     * Return extension plan corresponding to the provided extension id from the current executed job or stored history.
+     * 
+     * @param extensionId the extension identifier
+     * @return the extension plan corresponding to the provided extension
+     */
+    public JobStatus getExtensionPlanJobStatus(String extensionId)
+    {
+        return getJobStatus(EXTENSIONPLAN_JOBID_PREFIX + extensionId);
     }
 
     /**

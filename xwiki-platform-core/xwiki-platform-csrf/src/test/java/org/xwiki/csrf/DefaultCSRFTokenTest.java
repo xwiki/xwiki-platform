@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.util.Random;
+import java.security.SecureRandom;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -58,7 +60,29 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 
     /** Tested CSRF token component. */
     @MockingRequirement
-    private DefaultCSRFToken csrf;
+    private InsecureCSRFToken csrf;
+
+    /**
+     * This class is here because it doesn't require a SecureRandom generator
+     * seed on each startup. Seeding a SecureRandom generator can take a very long time,
+     * especially many time over which depleats the random pool on the server.
+     */
+    public static class InsecureCSRFToken extends DefaultCSRFToken
+    {
+        @Override
+        public void initialize()
+        {
+            final Random random = new Random(System.nanoTime());
+            this.setRandom(new SecureRandom() {
+                private static final long serialVersionUID = 3;
+                @Override
+                public void nextBytes(byte[] out)
+                {
+                    random.nextBytes(out);
+                }
+            });
+        }
+    }
 
     @Override
     public void configure() throws Exception

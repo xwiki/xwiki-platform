@@ -19,9 +19,9 @@
  */
 package org.xwiki.officeimporter.splitter;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**

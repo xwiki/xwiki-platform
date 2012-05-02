@@ -68,6 +68,6 @@ public class OfficeImporterVelocityContextInitializer implements VelocityContext
         } catch (OfficeImporterException ex) {
             String message = "Unrecoverable error, office importer will not be available for velocity scripts.";
             this.logger.error(message, ex);
-        }        
+        }
     }
 }

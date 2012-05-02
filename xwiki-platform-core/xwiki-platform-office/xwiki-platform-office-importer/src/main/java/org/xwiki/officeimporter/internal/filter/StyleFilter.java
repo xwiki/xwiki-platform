@@ -58,11 +58,11 @@ public class StyleFilter extends AbstractHTMLFilter
      */
     public StyleFilter()
     {
-        attributeMappingsStrict = new HashMap<String, String>();
-        attributeMappingsStrict.put(TAG_A, "|href|name|");
-        attributeMappingsStrict.put(TAG_IMG, "|alt|src|height|width|");
-        attributeMappingsStrict.put(TAG_TD, "|colspan|rowspan|");
-        attributeMappingsStrict.put(TAG_TH, "|colspan|");
+        this.attributeMappingsStrict = new HashMap<String, String>();
+        this.attributeMappingsStrict.put(TAG_A, "|href|name|");
+        this.attributeMappingsStrict.put(TAG_IMG, "|alt|src|height|width|");
+        this.attributeMappingsStrict.put(TAG_TD, "|colspan|rowspan|");
+        this.attributeMappingsStrict.put(TAG_TH, "|colspan|");
     }
 
     @Override
@@ -70,7 +70,7 @@ public class StyleFilter extends AbstractHTMLFilter
     {
         String mode = cleaningParams.get("filterStyles");
         if (null != mode && mode.equals("strict")) {
-            filter(document.getDocumentElement(), attributeMappingsStrict);
+            filter(document.getDocumentElement(), this.attributeMappingsStrict);
         }
     }
 
@@ -91,9 +91,9 @@ public class StyleFilter extends AbstractHTMLFilter
                 while (currentAttributes.getLength() > 0) {
                     currentAttributes.removeNamedItem(currentAttributes.item(0).getNodeName());
                 }
-            } else {                
+            } else {
                 // Collect those attributes that need to be removed.
-                List<String> attributesToBeRemoved = new ArrayList<String>();                                
+                List<String> attributesToBeRemoved = new ArrayList<String>();
                 for (int i = 0; i < currentAttributes.getLength(); i++) {
                     String attributeName = currentAttributes.item(i).getNodeName();
                     String pattern = ATTRIBUTE_SEPARATOR + attributeName.toLowerCase() + ATTRIBUTE_SEPARATOR;
@@ -101,7 +101,7 @@ public class StyleFilter extends AbstractHTMLFilter
                         attributesToBeRemoved.add(attributeName);
                     }
                 }
-                
+
                 // Remove those attributes collected above.
                 for (String attribute : attributesToBeRemoved) {
                     currentAttributes.removeNamedItem(attribute);

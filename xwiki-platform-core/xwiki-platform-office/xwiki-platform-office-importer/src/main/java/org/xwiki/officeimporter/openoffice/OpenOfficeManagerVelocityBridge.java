@@ -91,11 +91,11 @@ public class OpenOfficeManagerVelocityBridge
     {
         if (!isMainXWiki()) {
             setErrorMessage(ERROR_FORBIDDEN);
-        } else if (!docBridge.hasProgrammingRights()) {
+        } else if (!this.docBridge.hasProgrammingRights()) {
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
-                ooManager.start();
+                this.ooManager.start();
                 return true;
             } catch (OpenOfficeManagerException ex) {
                 LOGGER.error(ex.getMessage(), ex);
@@ -114,11 +114,11 @@ public class OpenOfficeManagerVelocityBridge
     {
         if (!isMainXWiki()) {
             setErrorMessage(ERROR_FORBIDDEN);
-        } else if (!docBridge.hasProgrammingRights()) {
+        } else if (!this.docBridge.hasProgrammingRights()) {
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
-                ooManager.stop();
+                this.ooManager.stop();
                 return true;
             } catch (OpenOfficeManagerException ex) {
                 LOGGER.error(ex.getMessage(), ex);
@@ -133,7 +133,7 @@ public class OpenOfficeManagerVelocityBridge
      */
     public String getServerState()
     {
-        return ooManager.getState().toString();
+        return this.ooManager.getState().toString();
     }
 
     /**
@@ -141,7 +141,7 @@ public class OpenOfficeManagerVelocityBridge
      */
     public String getLastErrorMessage()
     {
-        Object error = execution.getContext().getProperty(OFFICE_MANAGER_ERROR);
+        Object error = this.execution.getContext().getProperty(OFFICE_MANAGER_ERROR);
         return (error != null) ? (String) error : null;
     }
 
@@ -152,7 +152,7 @@ public class OpenOfficeManagerVelocityBridge
      */
     private void setErrorMessage(String message)
     {
-        execution.getContext().setProperty(OFFICE_MANAGER_ERROR, message);
+        this.execution.getContext().setProperty(OFFICE_MANAGER_ERROR, message);
     }
 
     /**
@@ -162,7 +162,7 @@ public class OpenOfficeManagerVelocityBridge
      */
     private boolean isMainXWiki()
     {
-        String currentWiki = docBridge.getCurrentWiki();
+        String currentWiki = this.docBridge.getCurrentWiki();
         // TODO: Remove the hard-coded main wiki name when a fix becomes available.
         return (currentWiki != null) && currentWiki.equals("xwiki");
     }

@@ -48,7 +48,7 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public int getServerType()
     {
-        return ooConfig.getServerType();
+        return this.ooConfig.getServerType();
     }
 
     /**
@@ -57,7 +57,7 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public int getServerPort()
     {
-        return ooConfig.getServerPort();
+        return this.ooConfig.getServerPort();
     }
 
     /**
@@ -65,7 +65,7 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public boolean isAutoStart()
     {
-        return ooConfig.isAutoStart();
+        return this.ooConfig.isAutoStart();
     }
 
     /**
@@ -74,7 +74,7 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public String getHomePath()
     {
-        return ooConfig.getHomePath();
+        return this.ooConfig.getHomePath();
     }
 
     /**
@@ -83,7 +83,7 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public String getProfilePath()
     {
-        return ooConfig.getProfilePath();
+        return this.ooConfig.getProfilePath();
     }
 
     /**
@@ -92,7 +92,7 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public int getMaxTasksPerProcess()
     {
-        return ooConfig.getMaxTasksPerProcess();
+        return this.ooConfig.getMaxTasksPerProcess();
     }
 
     /**
@@ -101,6 +101,6 @@ public class OpenOfficeConfigurationVelocityBridge
      */
     public long getTaskExecutionTimeout()
     {
-        return ooConfig.getTaskExecutionTimeout();
+        return this.ooConfig.getTaskExecutionTimeout();
     }
 }

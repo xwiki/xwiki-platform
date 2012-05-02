@@ -114,5 +114,5 @@ public class OpenOfficeManagerLifecycleListener implements EventListener
         } catch (OpenOfficeManagerException ex) {
             this.logger.error(ex.getMessage(), ex);
         }
-    }        
+    }
 }

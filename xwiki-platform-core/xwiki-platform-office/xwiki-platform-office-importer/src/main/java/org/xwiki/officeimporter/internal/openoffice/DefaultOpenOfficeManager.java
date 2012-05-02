@@ -32,7 +32,7 @@ import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
@@ -63,7 +63,7 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
      * Used to query global temporary working directory.
      */
     @Inject
-    private Container container;
+    private Environment environment;
 
     /**
      * The logger to log.
@@ -123,7 +123,7 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
             configuration.setMaxTasksPerProcess(this.conf.getMaxTasksPerProcess());
             configuration.setTaskExecutionTimeout(this.conf.getTaskExecutionTimeout());
             this.jodOOManager = configuration.buildOfficeManager();
-        } else if (conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
+        } else if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
             ExternalOfficeManagerConfiguration externalProcessOfficeManager = new ExternalOfficeManagerConfiguration();
             externalProcessOfficeManager.setPortNumber(this.conf.getServerPort());
             externalProcessOfficeManager.setConnectOnStart(true);
@@ -133,28 +133,27 @@ public class DefaultOpenOfficeManager implements OpenOfficeManager
             throw new OpenOfficeManagerException("Invalid openoffice server configuration.");
         }
 
-        jodConverter = null;
+        this.jodConverter = null;
         // Try to use the JSON document format registry to configure the office document conversion.
         InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH);
         if (input != null) {
             try {
-                jodConverter = new OfficeDocumentConverter(jodOOManager, new JsonDocumentFormatRegistry(input));
+                this.jodConverter =
+                    new OfficeDocumentConverter(this.jodOOManager, new JsonDocumentFormatRegistry(input));
             } catch (Exception e) {
-                this.logger.warn(
-                    String.format("Failed to parse %s . The default document format registry will be used instead.",
-                        DOCUMENT_FORMATS_PATH), e);
+                this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
+                    DOCUMENT_FORMATS_PATH, e);
             }
         } else {
-            this.logger.debug(
-                String.format("%s is missing. The default document format registry will be used instead.",
-                    DOCUMENT_FORMATS_PATH));
+            this.logger.debug("{} is missing. The default document format registry will be used instead.",
+                DOCUMENT_FORMATS_PATH);
         }
-        if (jodConverter == null) {
+        if (this.jodConverter == null) {
             // Use the default document format registry.
-            jodConverter = new OfficeDocumentConverter(jodOOManager);
+            this.jodConverter = new OfficeDocumentConverter(this.jodOOManager);
         }
 
-        File workDir = container.getApplicationContext().getTemporaryDirectory();
+        File workDir = this.environment.getTemporaryDirectory();
         this.converter = new DefaultOpenOfficeConverter(this.jodConverter, workDir);
     }
 

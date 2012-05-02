@@ -37,13 +37,13 @@ public interface OpenOfficeConverter
      * </p>
      * 
      * @param inputStreams input streams corresponding to the input document. It's possible that some document types
-     *            (e.g. html) consists of more than one input stream corresponding to different artifacts embedded
-     *            within document content.
+     *        (e.g. html) consists of more than one input stream corresponding to different artifacts embedded within
+     *        document content.
      * @param inputFileName name of the main input file within <b>inputStreams</b> map. This argument is used to
-     *            determine the format of the input document.
+     *        determine the format of the input document.
      * @param outputFileName name of the main output file. An entry corresponding to this name will be available in the
-     *            results map if the conversion succeeds. This argument is used to determine the format of the output
-     *            document.
+     *        results map if the conversion succeeds. This argument is used to determine the format of the output
+     *        document.
      * @return map of file names to file contents resulting from the conversion.
      * @throws OpenOfficeConverterException if an error occurs during the conversion.
      * @since 2.2M1

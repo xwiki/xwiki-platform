@@ -56,6 +56,7 @@ public class OfficeImporterVelocityBridge
      * The logger to log.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OfficeImporterVelocityBridge.class);
+
     /**
      * File extensions corresponding to slide presentations.
      */
@@ -141,10 +142,10 @@ public class OfficeImporterVelocityBridge
      * 
      * @param officeFileStream binary data stream corresponding to input office document.
      * @param officeFileName name of the input office document, this argument is mainly used for determining input
-     *            document format where necessary.
+     *        document format where necessary.
      * @param referenceDocument reference wiki document w.r.t which import process is carried out. This argument affects
-     *            the attachment URLs generated during the import process where all references to attachments will be
-     *            calculated assuming that the attachments are contained on the reference document.
+     *        the attachment URLs generated during the import process where all references to attachments will be
+     *        calculated assuming that the attachments are contained on the reference document.
      * @param filterStyles whether to filter styling information associated with the office document's content or not.
      * @return {@link XHTMLOfficeDocument} containing xhtml result of the import operation or null if an error occurs.
      * @since 2.2M1
@@ -154,7 +155,7 @@ public class OfficeImporterVelocityBridge
     {
         try {
             assertConnected();
-            return xhtmlBuilder.build(officeFileStream, officeFileName, currentMixedDocumentReferenceResolver
+            return this.xhtmlBuilder.build(officeFileStream, officeFileName, this.currentMixedDocumentReferenceResolver
                 .resolve(referenceDocument), filterStyles);
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
@@ -174,7 +175,7 @@ public class OfficeImporterVelocityBridge
     public XDOMOfficeDocument xhtmlToXDOM(XHTMLOfficeDocument xhtmlOfficeDocument)
     {
         try {
-            return xdomBuilder.build(xhtmlOfficeDocument);
+            return this.xdomBuilder.build(xhtmlOfficeDocument);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             LOGGER.error(ex.getMessage(), ex);
@@ -187,10 +188,10 @@ public class OfficeImporterVelocityBridge
      * 
      * @param officeFileStream binary data stream corresponding to input office document.
      * @param officeFileName name of the input office document, this argument is mainly is used for determining input
-     *            document format where necessary.
+     *        document format where necessary.
      * @param referenceDocument reference wiki document w.r.t which import process is carried out. This srgument affects
-     *            the attachment URLs generated during the import process where all references to attachments will be
-     *            calculated assuming that the attachments are contained on the reference document.
+     *        the attachment URLs generated during the import process where all references to attachments will be
+     *        calculated assuming that the attachments are contained on the reference document.
      * @param filterStyles whether to filter styling information associated with the office document's content or not.
      * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
      *         operation or null if an error occurs.
@@ -201,11 +202,11 @@ public class OfficeImporterVelocityBridge
     {
         try {
             assertConnected();
-            DocumentReference reference = currentMixedDocumentReferenceResolver.resolve(referenceDocument);
+            DocumentReference reference = this.currentMixedDocumentReferenceResolver.resolve(referenceDocument);
             if (isPresentation(officeFileName)) {
-                return presentationBuilder.build(officeFileStream, officeFileName, reference);
+                return this.presentationBuilder.build(officeFileStream, officeFileName, reference);
             } else {
-                return xdomBuilder.build(officeFileStream, officeFileName, reference, filterStyles);
+                return this.xdomBuilder.build(officeFileStream, officeFileName, reference, filterStyles);
             }
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
@@ -224,8 +225,8 @@ public class OfficeImporterVelocityBridge
      * @param headingLevels heading levels defining the split points on the original document.
      * @param namingCriterionHint hint indicating the child pages naming criterion.
      * @param rootDocumentName name of the root document w.r.t which splitting will occur. In the results set the entry
-     *            corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated
-     *            TOC structure.
+     *        corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated TOC
+     *        structure.
      * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
      *         instances or null if an error occurs.
      * @since 2.2M1
@@ -238,8 +239,8 @@ public class OfficeImporterVelocityBridge
             splitLevels[i] = Integer.parseInt(headingLevels[i]);
         }
         try {
-            return xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint,
-                currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
+            return this.xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint,
+                this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             LOGGER.error(ex.getMessage(), ex);
@@ -262,19 +263,19 @@ public class OfficeImporterVelocityBridge
         boolean append)
     {
         try {
-            DocumentReference docReference = currentMixedDocumentReferenceResolver.resolve(target);
-            DocumentReference parentReference = currentMixedDocumentReferenceResolver.resolve(parent);
+            DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(target);
+            DocumentReference parentReference = this.currentMixedDocumentReferenceResolver.resolve(parent);
 
             // First check if the user has edit rights on the target document.
-            if (!docBridge.isDocumentEditable(docReference)) {
+            if (!this.docBridge.isDocumentEditable(docReference)) {
                 String message = "You do not have edit rights on [%s] document.";
                 throw new OfficeImporterException(String.format(message, target));
             }
 
             // Save.
-            if (docBridge.exists(docReference) && append) {
+            if (this.docBridge.exists(docReference) && append) {
                 // Check whether existing document's syntax is same as target syntax.
-                String currentSyntaxId = docBridge.getDocument(docReference).getSyntax().toIdString();
+                String currentSyntaxId = this.docBridge.getDocument(docReference).getSyntax().toIdString();
                 if (!currentSyntaxId.equals(syntaxId)) {
                     String message =
                         "Target document [%s] exists but it's sytax [%s] is different from specified syntax [%s]";
@@ -282,17 +283,17 @@ public class OfficeImporterVelocityBridge
                 }
 
                 // Append the content.
-                String currentContent = docBridge.getDocumentContent(docReference, null);
+                String currentContent = this.docBridge.getDocumentContent(docReference, null);
                 String newContent = currentContent + "\n" + doc.getContentAsString(syntaxId);
-                docBridge.setDocumentContent(docReference, newContent, "Updated by office importer.", false);
+                this.docBridge.setDocumentContent(docReference, newContent, "Updated by office importer.", false);
             } else {
-                docBridge.setDocumentSyntaxId(docReference, syntaxId);
-                docBridge.setDocumentContent(docReference, doc.getContentAsString(syntaxId),
+                this.docBridge.setDocumentSyntaxId(docReference, syntaxId);
+                this.docBridge.setDocumentContent(docReference, doc.getContentAsString(syntaxId),
                     "Created by office importer.", false);
 
                 // Set parent if provided.
                 if (null != parent) {
-                    docBridge.setDocumentParentReference(docReference, parentReference);
+                    this.docBridge.setDocumentParentReference(docReference, parentReference);
                 }
 
                 // If no title is specified, try to extract one.
@@ -300,7 +301,7 @@ public class OfficeImporterVelocityBridge
 
                 // Set title if applicable.
                 if (null != docTitle) {
-                    docBridge.setDocumentTitle(docReference, docTitle);
+                    this.docBridge.setDocumentTitle(docReference, docTitle);
                 }
             }
 
@@ -325,7 +326,7 @@ public class OfficeImporterVelocityBridge
      */
     public String getErrorMessage()
     {
-        return (String) execution.getContext().getProperty(OFFICE_IMPORTER_ERROR);
+        return (String) this.execution.getContext().getProperty(OFFICE_IMPORTER_ERROR);
     }
 
     /**
@@ -335,7 +336,7 @@ public class OfficeImporterVelocityBridge
      */
     private void setErrorMessage(String message)
     {
-        execution.getContext().setProperty(OFFICE_IMPORTER_ERROR, message);
+        this.execution.getContext().setProperty(OFFICE_IMPORTER_ERROR, message);
     }
 
     /**
@@ -348,14 +349,14 @@ public class OfficeImporterVelocityBridge
      */
     private void assertConnected() throws OfficeImporterException, OpenOfficeManagerException
     {
-        boolean connected = officeManager.getState().equals(ManagerState.CONNECTED);
+        boolean connected = this.officeManager.getState().equals(ManagerState.CONNECTED);
         if (!connected) {
             // Check if the OpenOffice server was configured to start automatically.
-            if (officeConfiguration.isAutoStart()) {
+            if (this.officeConfiguration.isAutoStart()) {
                 // The OpenOffice server probably failed to start automatically when XE started. Try one more time to
                 // connect.
-                officeManager.start();
-                connected = officeManager.getState().equals(ManagerState.CONNECTED);
+                this.officeManager.start();
+                connected = this.officeManager.getState().equals(ManagerState.CONNECTED);
             }
             if (!connected) {
                 throw new OfficeImporterException("OpenOffice server unavailable.");
@@ -387,7 +388,7 @@ public class OfficeImporterVelocityBridge
             AttachmentReference attachmentReference =
                 new AttachmentReference(artifact.getKey(), targetDocumentReference);
             try {
-                docBridge.setAttachmentContent(attachmentReference, artifact.getValue());
+                this.docBridge.setAttachmentContent(attachmentReference, artifact.getValue());
             } catch (Exception ex) {
                 // Log the error and skip the artifact.
                 LOGGER.error("Error while attaching artifact.", ex);

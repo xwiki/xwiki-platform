@@ -59,9 +59,9 @@ public class OpenOfficeConfigurationVelocityContextInitializer implements Veloci
     @Override
     public void initialize(VelocityContext velocityContext)
     {
-        if (null == veloBridge) {
-            veloBridge = new OpenOfficeConfigurationVelocityBridge(ooConfig);
+        if (null == this.veloBridge) {
+            this.veloBridge = new OpenOfficeConfigurationVelocityBridge(this.ooConfig);
         }
-        velocityContext.put(VELOCITY_CONTEXT_KEY, veloBridge);
+        velocityContext.put(VELOCITY_CONTEXT_KEY, this.veloBridge);
     }
 }

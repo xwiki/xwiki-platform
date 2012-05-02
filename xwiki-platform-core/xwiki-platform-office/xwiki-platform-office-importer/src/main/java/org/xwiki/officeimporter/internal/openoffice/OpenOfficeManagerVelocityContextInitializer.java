@@ -73,9 +73,9 @@ public class OpenOfficeManagerVelocityContextInitializer implements VelocityCont
     @Override
     public void initialize(VelocityContext context)
     {
-        if (null == veloBridge) {
-            veloBridge = new OpenOfficeManagerVelocityBridge(ooManager, docBridge, execution);
+        if (null == this.veloBridge) {
+            this.veloBridge = new OpenOfficeManagerVelocityBridge(this.ooManager, this.docBridge, this.execution);
         }
-        context.put(VELOCITY_CONTEXT_KEY, veloBridge);
+        context.put(VELOCITY_CONTEXT_KEY, this.veloBridge);
     }
 }

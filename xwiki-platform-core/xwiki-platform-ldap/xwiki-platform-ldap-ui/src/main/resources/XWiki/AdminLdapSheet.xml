@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1296125380000</creationDate>
-  <date>1336063858000</date>
-  <contentUpdateDate>1336063858000</contentUpdateDate>
+  <date>1336064952000</date>
+  <contentUpdateDate>1336064952000</contentUpdateDate>
   <version>1.1</version>
   <title>LDAP Admin sheet</title>
   <template/>
@@ -665,11 +665,11 @@ $msg.get('platform.ldap.ldapAuthenticationIsNotEnabledWarning')
 #end
 {{/velocity}}
 
-= Configuration =
+= {{velocity}}$msg.get('platform.ldap.adminHeadingConfiguration'){{/velocity}} =
 
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}
 
-= Miscelaneous =
+= {{velocity}}$msg.get('platform.ldap.adminHeadingMiscellaneous'){{/velocity}} =
 
 {{velocity}}
 #if ($request.action_resetgroupcache)

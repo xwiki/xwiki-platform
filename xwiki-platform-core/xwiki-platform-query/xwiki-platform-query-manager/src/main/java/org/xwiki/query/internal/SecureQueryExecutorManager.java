@@ -77,9 +77,6 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
-        if (query.getWiki() != null && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Query#setWiki requires programming right", query, null);
-        }
         if (query.isNamed() && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Named queries requires programming right", query, null);
         }

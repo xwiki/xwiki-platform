@@ -55,9 +55,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
@@ -67,12 +65,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -119,8 +113,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 @Named("hibernate")
 @Singleton
-public class XWikiHibernateStore extends XWikiHibernateBaseStore
-    implements XWikiStoreInterface, Initializable
+public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
     private static final Logger log = LoggerFactory.getLogger(XWikiHibernateStore.class);
 
@@ -131,10 +124,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore
      */
     @Inject
     private QueryManager queryManager;
-
-    /** Needed so we can register an event to trap logout and delete held locks. */
-    @Inject
-    private ObservationManager observationManager;
 
     /**
      * Used to convert a string into a proper Document Reference.
@@ -212,12 +201,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore
     public XWikiHibernateStore()
     {
         initValidColumTypes();
-    }
-
-    @Override
-    public void initialize()
-    {
-        this.registerLogoutListener();
     }
 
     /**
@@ -1572,10 +1555,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore
         }
     }
 
-    // ---------------------------------------
-    // Locks
-    // ---------------------------------------
-
     @Override
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
@@ -1672,80 +1651,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore
             }
         }
     }
-
-    private void registerLogoutListener()
-    {
-        this.observationManager.addListener(new EventListener() {
-            private final Event ev = new ActionExecutingEvent();
-
-            public String getName()
-            {
-                return "deleteLocksOnLogoutListener";
-            }
-
-            public List<Event> getEvents()
-            {
-                return Collections.<Event> singletonList(this.ev);
-            }
-
-            public void onEvent(Event event, Object source, Object data)
-            {
-                if ("logout".equals(((ActionExecutingEvent) event).getActionName())) {
-                    final XWikiContext ctx = (XWikiContext) data;
-                    if (ctx.getUserReference() != null) {
-                        releaseAllLocksForCurrentUser(ctx);
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Release all of the locks held by the currently logged in user.
-     *
-     * @param ctx the XWikiContext, used to start the connection and get the user name.
-     */
-    private void releaseAllLocksForCurrentUser(final XWikiContext ctx)
-    {
-        try {
-            this.beginTransaction(ctx);
-            Session session = this.getSession(ctx);
-            final Query query =
-                session.createQuery("delete from XWikiLock as lock where lock.userName=:userName");
-            // Using deprecated getUser() because this is how locks are created.
-            // It would be a maintainibility disaster to use different code paths
-            // for calculating names when creating and removing.
-            query.setString("userName", ctx.getUser());
-            query.executeUpdate();
-            this.endTransaction(ctx, true);
-        } catch (Exception e) {
-            String msg = "Error while deleting active locks held by user.";
-            try {
-                this.endTransaction(ctx, false);
-            } catch (Exception utoh) {
-                msg += " Failed to commit OR rollback [" + utoh.getMessage() + "]";
-            }
-            throw new UnexpectedException(msg, e);
-        }
-
-        // If we're in a non-main wiki & the user is global,
-        // switch to the global wiki and delete locks held there.
-        if (ctx.isMainWiki()
-            && ctx.isMainWiki(ctx.getUserReference().getWikiReference().getName()))
-        {
-            final String cdb = ctx.getDatabase();
-            try {
-                ctx.setDatabase(ctx.getMainXWiki());
-                this.releaseAllLocksForCurrentUser(ctx);
-            } finally {
-                ctx.setDatabase(cdb);
-            }
-        }
-    }
-
-    // ---------------------------------------
-    // Links
-    // ---------------------------------------
 
     @Override
     public List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException

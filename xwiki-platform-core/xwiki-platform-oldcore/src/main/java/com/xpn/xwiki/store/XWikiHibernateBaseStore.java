@@ -80,6 +80,10 @@ public class XWikiHibernateBaseStore implements Initializable
     @Named("hibernate")
     private DataMigrationManager dataMigrationManager;
 
+    /** Need to get the xcontext to get the path tho the hibernate.cfg.xml. */
+    @Inject
+    private Execution execution;
+
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
     /**
@@ -127,9 +131,8 @@ public class XWikiHibernateBaseStore implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        Execution execution = Utils.getComponent(Execution.class);
-        XWikiContext context = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-        setPath(context.getWiki().getConfig().getProperty("xwiki.store.hibernate.path", getPath()));
+        XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        setPath(context.getWiki().Param("xwiki.store.hibernate.path", getPath()));
     }
 
     /**

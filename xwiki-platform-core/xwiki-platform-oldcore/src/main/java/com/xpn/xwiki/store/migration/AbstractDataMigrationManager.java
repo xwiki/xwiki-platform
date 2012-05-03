@@ -36,12 +36,16 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +64,12 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     @Inject
     protected ComponentManager componentManager;
+
+    /**
+     * Component manager used to access stores and data migrations.
+     */
+    @Inject
+    protected ObservationManager observationManager;
 
     /**
      * Ordered list of migrators that may be applied.
@@ -168,6 +178,30 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     private XWikiDBVersion targetVersion;
 
     /**
+     * Internal class used to clean the database version cache on wiki deletion.
+     */
+    private class WikiDeletedEventListener implements EventListener
+    {
+        @Override
+        public String getName()
+        {
+            return "dbversioncache";
+        }
+
+        @Override
+        public List<Event> getEvents()
+        {
+            return Arrays.<Event>asList(new WikiDeletedEvent());
+        }
+
+        @Override
+        public void onEvent(Event event, Object source, Object data)
+        {
+            versionCache.remove(((WikiDeletedEvent) event).getWikiId());
+        }
+    }
+
+    /**
      * Unified constructor for all subclasses.
      */
     public AbstractDataMigrationManager()
@@ -250,6 +284,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         } catch (Exception e) {
             throw new InitializationException("Migration Manager initialization failed", e);
         }
+
+        observationManager.addListener(new WikiDeletedEventListener());
     }
 
     /**

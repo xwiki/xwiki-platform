@@ -380,7 +380,6 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         try {
             xwiki.getStore().deleteWiki(workspaceName, deprecatedContext);
             observationManager.notify(new WikiDeletedEvent(workspaceName), workspaceName, deprecatedContext);
-            xwiki.getVirtualWikiList().remove(workspaceName);
         } catch (Exception e) {
             throw new WorkspaceException(String.format("Failed to delete wiki '%s' from database", workspaceName), e);
         }

@@ -26,6 +26,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.ldap.XWikiLDAPUtils;
 
 /**
  * Script service to expose LDAP utilities to script and templating languages.
@@ -43,16 +44,6 @@ public class LDAPScriptService implements ScriptService
     private Execution execution;
 
     /**
-     * @return {@code true} if the currently configured authentication class extends or is an instance of
-     *         {@link com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl}. Returns {@code false} otherwise.
-     */
-    public boolean isXWikiLDAPAuthenticator()
-    {
-        return com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl.class.isAssignableFrom(
-            getXWikiContext().getWiki().getAuthService().getClass());
-    }
-
-    /**
      * @return the XWiki context associated with this execution.
      */
     private XWikiContext getXWikiContext()
@@ -60,4 +51,25 @@ public class LDAPScriptService implements ScriptService
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
+    // API
+
+    /**
+     * @return {@code true} if the currently configured authentication class extends or is an instance of
+     *         {@link com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl}. Returns {@code false} otherwise.
+     */
+    public boolean isXWikiLDAPAuthenticator()
+    {
+        return com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl.class.isAssignableFrom(getXWikiContext().getWiki()
+            .getAuthService().getClass());
+    }
+
+    /**
+     * Force to empty the cache containing LDAP groups.
+     * 
+     * @since 4.1M1
+     */
+    public void resetGroupCache()
+    {
+        XWikiLDAPUtils.resetGroupCache();
+    }
 }

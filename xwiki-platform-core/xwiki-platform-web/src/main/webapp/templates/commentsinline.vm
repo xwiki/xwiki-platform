@@ -183,7 +183,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
           <label for="${xCommentClass}_author">$msg.get('core.viewers.comments.add.guestName.prompt') <input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author"/></label>
-          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())")'>$msg.get('login')</a></strong>
+          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")'>$msg.get('login')</a></strong>
         #end
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

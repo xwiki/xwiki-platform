@@ -39,10 +39,10 @@
 #end
 #if(!$xcontext.action.startsWith("login"))
   #if($isGuest)
-    #set($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+    #set($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
       <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get('login')</a>#sep()
   #else
-    #set($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+    #set($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
       <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get('logout')</a>#sep()
   #end
 #end

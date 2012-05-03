@@ -65,7 +65,7 @@
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
       #set ($loginDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiLogin'))
       #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
-      #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+      #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
       {{error}}In order to continue, you need to [[log in&gt;&gt;$loginUrl]] first.{{/error}}
     #else
       ## The user is not already a member of the workspace.

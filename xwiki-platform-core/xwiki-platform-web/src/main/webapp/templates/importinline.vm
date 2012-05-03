@@ -14,7 +14,7 @@
 #if($request.xredirect)
   #set($redirect = $request.xredirect)
 #else
-  #set($redirect = $xwiki.getRequestURL())
+  #set($redirect = $xwiki.relativeRequestURL)
 #end
 #if(!$redirect)
   #set($redirect = $importDoc.getURL('import', 'section=Import'))

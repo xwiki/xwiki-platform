@@ -104,7 +104,7 @@
 #set ($skin = $xwiki.getSkin())
 #set ($copyright = $xwiki.getSpaceCopyright())
 #set ($xwikimode = $xcontext.getMode())
-#set ($logredir = $escapetool.xml($xwiki.getRequestURL()))
+#set ($logredir = $escapetool.xml($xwiki.relativeRequestURL))
 ##
 #if ($xwiki.exists('XWiki.MaintenanceInfo'))
   #set ($maintenanceinfo = 'XWiki.MaintenanceInfo')

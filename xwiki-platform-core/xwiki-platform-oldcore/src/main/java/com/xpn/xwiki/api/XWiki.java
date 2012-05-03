@@ -50,6 +50,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWiki extends Api
 {
@@ -128,14 +129,28 @@ public class XWiki extends Api
     }
 
     /**
-     * API Allowing to access the current request URL being requested
+     * API Allowing to access the current request URL being requested.
      * 
-     * @return URL
-     * @throws XWikiException
+     * @return the URL
+     * @throws XWikiException failed to create the URL
      */
     public String getRequestURL() throws XWikiException
     {
         return getXWikiContext().getURLFactory().getRequestURL(getXWikiContext()).toString();
+    }
+
+    /**
+     * API Allowing to access the current request URL being requested as a relative URL.
+     * 
+     * @return the URL
+     * @throws XWikiException failed to create the URL
+     * @since 4.0M1
+     */
+    public String getRelativeRequestURL() throws XWikiException
+    {
+        XWikiURLFactory urlFactory = getXWikiContext().getURLFactory();
+
+        return urlFactory.getURL(urlFactory.getRequestURL(getXWikiContext()), getXWikiContext());
     }
 
     /**

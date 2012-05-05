@@ -748,7 +748,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                 logProgress("Converting %d %s statistics IDs in 1 tables and %d collection tables...",
                     map.size(), klassName, statsColl.size());
-                convertDbId(stats.poll(), new AbstractIdConversionHibernateCallback()
+                convertDbId(map, new AbstractIdConversionHibernateCallback()
                 {
                     @Override
                     public void doUpdate()

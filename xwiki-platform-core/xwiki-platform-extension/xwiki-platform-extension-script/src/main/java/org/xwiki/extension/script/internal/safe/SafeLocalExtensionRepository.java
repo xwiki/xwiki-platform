@@ -68,13 +68,13 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     @Override
     public LocalExtension storeExtension(Extension extension)
     {
-        throw new UnsupportedOperationException("Calling storeExtension is forbidden in script proxy");
+        throw new UnsupportedOperationException(FORBIDDEN);
     }
 
     @Override
     public void removeExtension(LocalExtension extension)
     {
-        throw new UnsupportedOperationException("Calling removeExtension is forbidden in script proxy");
+        throw new UnsupportedOperationException(FORBIDDEN);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     public void setProperties(LocalExtension localExtension, Map<String, Object> properties)
         throws LocalExtensionRepositoryException
     {
-        throw new UnsupportedOperationException("Calling setProperties is forbidden in script proxy");
+        throw new UnsupportedOperationException("Operation forbidden in script proxy");
     }
 }

@@ -45,6 +45,7 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.InstallPlanJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.job.internal.UninstallPlanJob;
+import org.xwiki.extension.job.internal.UpgradePlanJob;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -371,8 +372,7 @@ public class ExtensionManagerScriptService implements ScriptService
     // Actions
 
     /**
-     * Start the asynchronous installation process for an extension if the context document has programming rights and
-     * no other job is in progress already.
+     * Start the asynchronous installation process for an extension if the context document has programming rights.
      * 
      * @param id the identifier of the extension to install
      * @param version the version to install
@@ -413,8 +413,7 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous installation plan creation process for an extension if no other job is in progress
-     * already.
+     * Start the asynchronous installation plan creation process for an extension.
      * 
      * @param id the identifier of the extension to install
      * @param version the version to install
@@ -448,8 +447,7 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
-     * other job is in progress already.
+     * Start the asynchronous uninstall process for an extension if the context document has programming rights.
      * <p>
      * Only uninstall from the provided namespace.
      * 
@@ -491,8 +489,7 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous uninstall process for an extension if the context document has programming rights and no
-     * other job is in progress already.
+     * Start the asynchronous uninstall process for an extension if the context document has programming rights.
      * <p>
      * Uninstall from all namepspace.
      * 
@@ -506,8 +503,7 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous uninstallation plan creation process for an extension if no other job is in progress
-     * already.
+     * Start the asynchronous uninstallation plan creation process for an extension.
      * <p>
      * Only uninstall from the provided namespace.
      * 
@@ -554,6 +550,37 @@ public class ExtensionManagerScriptService implements ScriptService
     public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
     {
         return createUninstallPlan(extensionId.getId(), null);
+    }
+
+    /**
+     * Start the asynchronous upgrade plan creation process.
+     * 
+     * @param namespace the (optional) namespace where to upgrade the extensions; if {@code null} or empty, the
+     *            extension will be installed globally
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public ExtensionPlan createUpgradePlan(String namespace)
+    {
+        setError(null);
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(EXTENSIONPLAN_JOBID_PREFIX);
+        if (StringUtils.isNotBlank(namespace)) {
+            installRequest.addNamespace(namespace);
+        }
+
+        ExtensionPlan status;
+        try {
+            status =
+                safe((ExtensionPlan) this.jobManager.executeJob(UpgradePlanJob.JOBTYPE, installRequest).getStatus());
+        } catch (JobException e) {
+            setError(e);
+
+            status = null;
+        }
+
+        return status;
     }
 
     // Jobs

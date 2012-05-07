@@ -19,54 +19,64 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
-import java.util.Iterator;
+import java.lang.reflect.Constructor;
+import java.util.ListIterator;
 
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.internal.safe.AbstractSafeObject;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.repository.result.IterableResult;
 
 /**
- * Provide a public script access to a iterable result.
+ * Provide a public script access to an iterator.
  * 
- * @param <E> the extension type
+ * @param <E> the type of the iterated value
  * @version $Id$
- * @since 4.0M2
+ * @since 4.1M1
  */
-public class SafeIterableResult<E extends Extension> extends AbstractSafeObject<IterableResult<E>> implements
-    IterableResult<E>
+public class SafeListIterator<E> extends SafeIterator<E, ListIterator<E>> implements ListIterator<E>
 {
     /**
-     * @param result the wrapped result
+     * @param it the wrapped iterator
      * @param safeProvider the provider of instances safe for public scripts
+     * @param safeConstructor the constructor used to create new safe wrapper for iterator elements
      */
-    public SafeIterableResult(IterableResult<E> result, ScriptSafeProvider< ? > safeProvider)
+    public SafeListIterator(ListIterator<E> it, ScriptSafeProvider< ? > safeProvider,
+        Constructor< ? extends E> safeConstructor)
     {
-        super(result, safeProvider);
+        super(it, safeProvider, safeConstructor);
     }
 
     @Override
-    public Iterator<E> iterator()
+    public boolean hasPrevious()
     {
-        return new SafeIterator<E, Iterator<E>>(getWrapped().iterator(), this.safeProvider, null);
+        return getWrapped().hasPrevious();
     }
 
     @Override
-    public int getTotalHits()
+    public E previous()
     {
-        return getWrapped().getTotalHits();
+        return safeElement(getWrapped().previous());
     }
 
     @Override
-    public int getOffset()
+    public int nextIndex()
     {
-        return getWrapped().getOffset();
+        return getWrapped().nextIndex();
     }
 
     @Override
-    public int getSize()
+    public int previousIndex()
     {
-        return getWrapped().getSize();
+        return getWrapped().previousIndex();
     }
 
+    @Override
+    public void set(E e)
+    {
+        throw new UnsupportedOperationException(FORBIDDEN);
+    }
+
+    @Override
+    public void add(E e)
+    {
+        throw new UnsupportedOperationException(FORBIDDEN);
+    }
 }

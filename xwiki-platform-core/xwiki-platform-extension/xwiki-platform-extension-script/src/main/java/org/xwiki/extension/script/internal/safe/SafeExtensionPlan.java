@@ -26,7 +26,7 @@ import java.util.Collections;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
-import org.xwiki.extension.job.plan.ExtensionPlanNode;
+import org.xwiki.extension.job.plan.ExtensionPlanTree;
 
 /**
  * Provide a public script access to an extension plan.
@@ -37,17 +37,12 @@ import org.xwiki.extension.job.plan.ExtensionPlanNode;
 public class SafeExtensionPlan extends SafeJobStatus<ExtensionPlan> implements ExtensionPlan
 {
     /**
-     * @see #getTree()
-     */
-    private Collection<ExtensionPlanNode> wrappedTree;
-
-    /**
      * @see #getActions()
      */
     private Collection<ExtensionPlanAction> wrappedActions;
 
     /**
-     * @param plan the wrappeed plan
+     * @param plan the wrapped plan
      * @param safeProvider the provider of instances safe for public scripts
      */
     public SafeExtensionPlan(ExtensionPlan plan, ScriptSafeProvider< ? > safeProvider)
@@ -56,21 +51,14 @@ public class SafeExtensionPlan extends SafeJobStatus<ExtensionPlan> implements E
     }
 
     @Override
-    public Collection<ExtensionPlanNode> getTree()
+    public ExtensionPlanTree getTree()
     {
-        if (this.wrappedTree == null) {
-            Collection<ExtensionPlanNode> nodes = getWrapped().getTree();
-            if (nodes.isEmpty()) {
-                this.wrappedTree = Collections.emptyList();
-            } else {
-                this.wrappedTree = new ArrayList<ExtensionPlanNode>(nodes.size());
-                for (ExtensionPlanNode node : nodes) {
-                    this.wrappedTree.add(new SafeExtensionPlanNode(node, this.safeProvider));
-                }
-            }
+        try {
+            return new SafeExtensionPlanTree(getWrapped().getTree(), this.safeProvider);
+        } catch (Exception e) {
+            // should never happen
+            return null;
         }
-
-        return this.wrappedTree;
     }
 
     @Override

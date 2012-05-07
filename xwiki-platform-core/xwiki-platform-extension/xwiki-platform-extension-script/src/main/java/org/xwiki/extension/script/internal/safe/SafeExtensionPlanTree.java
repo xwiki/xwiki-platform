@@ -19,45 +19,27 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
-import java.util.Iterator;
-
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.internal.safe.AbstractSafeObject;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.extension.job.plan.ExtensionPlanNode;
+import org.xwiki.extension.job.plan.ExtensionPlanTree;
 
 /**
- * Provide a public script access to an iterator on an extension.
+ * Provide a public script access to an extension plan tree.
  * 
- * @param <E> the extension type
  * @version $Id$
- * @since 4.0M2
+ * @since 4.1M1
  */
-public class SafeExtensionIterator<E extends Extension> extends AbstractSafeObject<Iterator<E>> implements Iterator<E>
+public class SafeExtensionPlanTree extends SafeCollection<ExtensionPlanNode, ExtensionPlanTree> implements
+    ExtensionPlanTree
 {
     /**
-     * @param iterator the wrapped iterator
+     * @param tree the wrapped tree
      * @param safeProvider the provider of instances safe for public scripts
+     * @throws Exception failed to create a new SafeExtensionPlanTree
      */
-    public SafeExtensionIterator(Iterator<E> iterator, ScriptSafeProvider< ? > safeProvider)
+    public SafeExtensionPlanTree(ExtensionPlanTree tree, ScriptSafeProvider< ? > safeProvider) throws Exception
     {
-        super(iterator, safeProvider);
-    }
-
-    @Override
-    public boolean hasNext()
-    {
-        return getWrapped().hasNext();
-    }
-
-    @Override
-    public E next()
-    {
-        return safe(getWrapped().next());
-    }
-
-    @Override
-    public void remove()
-    {
-        throw new UnsupportedOperationException("Calling remove is forbidden in readonly proxy");
+        super(tree, safeProvider, SafeExtensionPlanNode.class.getConstructor(ExtensionPlanNode.class,
+            ScriptSafeProvider.class));
     }
 }

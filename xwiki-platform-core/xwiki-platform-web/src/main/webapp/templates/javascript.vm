@@ -59,6 +59,7 @@ XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";
 XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
+XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
@@ -69,61 +70,11 @@ window.docsaveurl = "${doc.getURL('save')}";
 window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
-#if(($xcontext.action=="inline")||($xcontext.action=="edit") || ($xcontext.action=="admin"))
+#set($editActions = ['edit', 'inline', 'admin'])
+#if($editActions.contains($xcontext.action))
+$xwiki.get('jsfx').use('uicomponents/lock/lock.js')
 $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
-<script type="text/javascript">
-// <![CDATA[
-var cancelEditNextOnunload;
-var cancelCancelEditFlag = true;
-var lockEditFlag = false;
-
-function cancelEditResponse() {
-}
-
-function cancelEdit() {
-  if (cancelCancelEditFlag) {
-    var surl = "$doc.getExternalURL('cancel', 'ajax=1')";
-    var myAjax = new Ajax.Request(surl, {
-      method: 'get',
-      parameters: "",
-      asynchronous: true,
-      discardResponse: true
-    });
-    cancelCancelEditFlag = false;
-  }
-  if (cancelEditNextOnunload) {
-    cancelEditNextOnunload();
-  }
-}
-
-function lockEdit() {
-  if (!lockEditFlag) {
-#if ($xcontext.action == 'inline')
-    var surl = "$doc.getExternalURL('lock', "action=inline&ajax=1&${docvariant.replace('&amp;', '&')}")";
-#else
-    var surl = "$doc.getExternalURL('lock', "ajax=1&${docvariant.replace('&amp;', '&')}")";
-#end
-    var myAjax = new Ajax.Request(surl, {
-      method: 'get',
-      parameters: "",
-      asynchronous: true
-    });
-    lockEditFlag = false;
-  }
-}
-
-function prepareCancelEdit() {
-  lockEdit();
-}
-function cancelCancelEdit() {
-  cancelCancelEditFlag = false;
-}
-Event.observe(window, "unload", cancelEdit);
-Event.observe(window, "pagehide", cancelEdit);
-Event.observe(document, "dom:loaded", prepareCancelEdit);
-// ]]>
-</script>
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions

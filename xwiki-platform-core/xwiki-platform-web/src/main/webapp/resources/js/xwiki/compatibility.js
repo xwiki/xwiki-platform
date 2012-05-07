@@ -188,4 +188,28 @@ window.togglePanelVisibility = XWiki.togglePanelVisibility.wrap(
   }
 );
 
+/**
+ * Deprecated since 4.1M1
+ */
+window.cancelEdit = function(){
+  warn("window.cancelEdit is deprecated since XWiki 4.1M1. Use XWiki.EditLock.unlock instead.");
+  XWiki.EditLock.unlock();
+}
+
+/**
+ * Deprecated since 4.1M1
+ */
+window.lockEdit = function(){
+  warn("window.lockEdit is deprecated since XWiki 4.1M1. Use XWiki.EditLock.lock instead.");
+  XWiki.EditLock.lock();
+}
+
+/**
+ * Deprecated since 4.1M1
+ */
+window.cancelCancelEdit = function(){
+  warn("window.cancelCancelEdit is deprecated since XWiki 4.1M1. Use XWiki.EditLock.setLocked(false) instead.");
+  XWiki.EditLock.setLocked(false);
+}
+
 })();

@@ -39,7 +39,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ##
 ## Can edit. Display the form
 ##
-<form id="inline" method="post" action="$doc.getURL("preview")">
+<form id="inline" method="post" action="$doc.getURL("preview")" class="withLock">
 <div>
 <input type="hidden" name="xcontinue" value="$doc.getURL($doc.getDefaultEditMode(), 'editor=inline')"/>
 ## CSRF prevention

@@ -60,7 +60,7 @@
   #template("menuview.vm")
   #template("header.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
-    <form id="edit" method="post" action="$doc.getURL('preview')" >
+    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock">
     <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

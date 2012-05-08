@@ -190,7 +190,7 @@ XWiki.ExtensionBehaviour = Class.create({
 
     // Inject a reference to the (cloned) default AJAX request parameters to be able
     // to access the defaults even when they are overwritten by the provided values.
-    defaultAJAXRequestParameters.default = Object.clone(defaultAJAXRequestParameters);
+    defaultAJAXRequestParameters.defaultValues = Object.clone(defaultAJAXRequestParameters);
 
     // Launch the AJAX call.
     new Ajax.Request(this._getServiceURL(formData.get('section')), Object.extend(defaultAJAXRequestParameters, ajaxRequestParameters));
@@ -218,7 +218,7 @@ XWiki.ExtensionBehaviour = Class.create({
         this._update(response.responseText);
       }.bind(this),
       onComplete : function(response) {
-        response.request.options.default.onComplete(response);
+        response.request.options.defaultValues.onComplete(response);
         // Remove the loading marker if it's still there (i.e. fetching failed).
         var loadingMarker = this.container.down('.extension-body.loading');
         loadingMarker &amp;&amp; loadingMarker.remove();
@@ -313,7 +313,7 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   _onAfterRetrieveInstallOrUninstallPlan : function(response) {
-    response.request.options.default.onComplete(response);
+    response.request.options.defaultValues.onComplete(response);
     // Remove the loading markers if they are still present (i.e. request failed).
     var extensionBodyLoading = this.container.down('.extension-body.loading');
     if (extensionBodyLoading) {

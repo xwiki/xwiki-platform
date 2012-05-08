@@ -55,7 +55,6 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;/dd&gt;
   &lt;/dl&gt;
-  #template('tagedit.vm')
   #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $xcontext.user)

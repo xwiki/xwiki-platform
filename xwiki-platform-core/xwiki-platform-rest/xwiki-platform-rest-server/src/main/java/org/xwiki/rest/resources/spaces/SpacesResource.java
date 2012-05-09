@@ -28,7 +28,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -48,7 +50,7 @@ public class SpacesResource extends XWikiResource
     @GET
     public Spaces getSpaces(@PathParam("wikiName") String wikiName,
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
-        throws XWikiException, QueryException
+        throws XWikiException, QueryException, ComponentLookupException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -59,7 +61,9 @@ public class SpacesResource extends XWikiResource
             Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             List<String> spaceNames =
-                queryManager.getNamedQuery("getSpaces").setOffset(start).setLimit(number).execute();
+                queryManager.getNamedQuery("getSpaces")
+                    .addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
+                    .setOffset(start).setLimit(number).execute();
 
             for (String spaceName : spaceNames) {
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");

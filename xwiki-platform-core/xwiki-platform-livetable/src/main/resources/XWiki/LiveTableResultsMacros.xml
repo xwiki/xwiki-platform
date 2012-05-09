@@ -217,8 +217,9 @@
   #if (!$limit)
     #set ($limit = 15)
   #end
-  #set($items = $xwiki.searchDocuments($sql, $limit, $offset, $sqlParams))
-  #set($discard = $map.put('totalrows', $xwiki.countDocuments($countSql, $sqlParams)))
+  #set($query = $services.query.hql($sql).addFilter('hidden').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($items = $query.execute())
+  #set($discard = $map.put('totalrows', $query.count()))
   #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
   #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
   #set($rows = [])

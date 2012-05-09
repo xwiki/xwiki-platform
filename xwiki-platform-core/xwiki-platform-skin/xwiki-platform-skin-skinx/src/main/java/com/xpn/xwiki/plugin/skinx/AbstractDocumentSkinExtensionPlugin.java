@@ -27,14 +27,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.model.reference.RegexEntityReference;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -43,10 +42,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
-import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
@@ -95,14 +90,11 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         super(name, className, context);
 
-        RegexEntityReference usePropertyReference =
-            new RegexEntityReference(Pattern.compile(USE_FIELDNAME), EntityType.OBJECT_PROPERTY,
-                new RegexEntityReference(Pattern.compile(".*:" + getExtensionClassName() + "\\[\\d*\\]"),
-                    EntityType.OBJECT));
+        this.events.add(new DocumentCreatedEvent());
+        this.events.add(new DocumentDeletedEvent());
+        this.events.add(new DocumentCreatedEvent());
 
-        this.events.add(new XObjectPropertyAddedEvent(usePropertyReference));
-        this.events.add(new XObjectPropertyDeletedEvent(usePropertyReference));
-        this.events.add(new XObjectPropertyUpdatedEvent(usePropertyReference));
+        this.events.add(new WikiDeletedEvent());
     }
 
     @Override
@@ -244,7 +236,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * Set the meta-information fields of the given extension class document.
-     *
+     * 
      * @param doc the document representing the extension class.
      * @return true if the document has been modified, false otherwise.
      */
@@ -329,25 +321,44 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XObjectPropertyEvent propertyEvent = (XObjectPropertyEvent) event;
-        XWikiDocument document = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
-
-        boolean remove;
-        if (propertyEvent instanceof XObjectPropertyDeletedEvent) {
-            remove = true;
+        if (event instanceof WikiDeletedEvent) {
+            this.alwaysUsedExtensions.remove(((WikiDeletedEvent) event).getWikiId());
         } else {
-            remove =
-                !StringUtils.equals(
-                    (String) document.getXObjectProperty((ObjectPropertyReference) propertyEvent.getReference())
-                        .getValue(), "always");
+            onDocumentEvent((XWikiDocument) source, (XWikiContext) data);
+        }
+    }
+
+    /**
+     * A document related event has been received.
+     * 
+     * @param document the modified document
+     * @param context the XWiki context
+     */
+    private void onDocumentEvent(XWikiDocument document, XWikiContext context)
+    {
+        boolean remove = false;
+        if (document.getObject(getExtensionClassName()) != null) {
+            // new or already existing object
+            if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
+                if (context.getWiki().getRightService().hasProgrammingRights(document, context)) {
+                    getAlwaysUsedExtensions(context).add(document.getFullName());
+
+                    return;
+                } else {
+                    // in case the extension lost its programming rights upon this save.
+                    remove = true;
+                }
+            } else {
+                // remove if exists but use onDemand
+                remove = true;
+            }
+        } else if (document.getOriginalDocument().getObject(getExtensionClassName()) != null) {
+            // object removed
+            remove = true;
         }
 
-        Set<String> extensions = getAlwaysUsedExtensions(context);
         if (remove) {
-            extensions.remove(document.getFullName());
-        } else {
-            extensions.add(document.getFullName());
+            getAlwaysUsedExtensions(context).remove(document.getFullName());
         }
     }
 }

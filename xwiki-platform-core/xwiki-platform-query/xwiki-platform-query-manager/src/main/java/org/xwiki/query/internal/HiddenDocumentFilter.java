@@ -19,6 +19,8 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
@@ -117,5 +119,11 @@ public class HiddenDocumentFilter implements QueryFilter
         }
 
         return result;
+    }
+
+    @Override
+    public List filterResults(List results)
+    {
+        return results;
     }
 }

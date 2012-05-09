@@ -101,7 +101,19 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 {
                     org.hibernate.Query hquery = createHibernateQuery(session, query);
                     populateParameters(hquery, query);
-                    return hquery.list();
+
+
+                    if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+                        List results = hquery.list();
+
+                        for (QueryFilter filter : query.getFilters()) {
+                            results = filter.filterResults(results);
+                        }
+
+                        return (List<T>) results;
+                    } else {
+                        return hquery.list();
+                    }
                 }
             });
         } catch (XWikiException e) {

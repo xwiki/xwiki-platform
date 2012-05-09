@@ -19,13 +19,21 @@
  */
 package org.xwiki.query;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 
 /**
- * Query Filter interface. A filter can be added to a query through {@link Query#setFilter(QueryFilter)}, it will be
- * called by the {@link QueryExecutor} before the query is executed. An example of this is the
- * {@link org.xwiki.query.internal.HiddenDocumentFilter} which transform statements in order to exclude hidden documents
- * from query results.
+ * Query Filter interface. A filter can be added to a query through {@link Query#addFilter(QueryFilter)}, it will be
+ * called by the {@link QueryExecutor} before the query is executed. Queries can be filtered during 2 stages:
+ * <ul>
+ *   <li>Before the execution, by modifying the statement</li>
+ *   <li>After the execution, by modifying list of results</li>
+ * </ul>
+ *
+ * An example of this is the {@link org.xwiki.query.internal.UniqueDocumentFilter} which transform statements in order
+ * to make them return distinct documents names and which also filters query results in order to return only those
+ * names.
  *
  * @version $Id$
  * @since 4.0RC1
@@ -34,9 +42,19 @@ import org.xwiki.component.annotation.Role;
 public interface QueryFilter
 {
     /**
-     * @param statement the query statement to insert the filter in.
+     * Transform a query statement. The statement can be returned without modification.
+     *
+     * @param statement the query statement to transform.
      * @param language the language of the query statement.
-     * @return the original statement, potentially including new conditions.
+     * @return the transformed statement.
      */
     String filterStatement(String statement, String language);
+
+    /**
+     * Filter a list of query results. The result list can be returned without modification.
+     *
+     * @param results the original result list.
+     * @return a filtered result list.
+     */
+    List filterResults(List results);
 }

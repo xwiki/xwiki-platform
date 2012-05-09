@@ -238,6 +238,7 @@
             <exclude>com/xpn/xwiki/objects/BaseElement</exclude>
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
             <exclude>com/xpn/xwiki/plugin/autotag/**</exclude>
+            <exclude>org/xwiki/query/QueryFilter</exclude>
           </excludes>
         </configuration>
       </plugin>

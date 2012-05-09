@@ -19,17 +19,20 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Query filter making sure unique results are retrieved by a {@link org.xwiki.query.Query}.
+ * Query filter making sure unique results are retrieved by a {@link org.xwiki.query.Query}. This transformation only
+ * works on queries selecting full names of XWikiDocuments.
  *
  * @version $Id$
  * @since 4.1M1
@@ -37,13 +40,8 @@ import javax.inject.Singleton;
 @Component
 @Named("unique")
 @Singleton
-public class UniqueDocumentFilter implements QueryFilter
+public class UniqueDocumentFilter extends AbstractQueryFilter
 {
-    /**
-     * Select part to find and replace if it is present.
-     */
-    private static final String SELECT_CLAUSE = " doc.fullname from xwikidocument ";
-
     /**
      * Used to log debug information.
      */
@@ -56,26 +54,62 @@ public class UniqueDocumentFilter implements QueryFilter
      */
     private boolean isFilterable(String statement)
     {
-        return statement.indexOf(SELECT_CLAUSE) > -1 && statement.indexOf("distinct doc.fullname") == -1;
+        return getSelectColumns(statement).contains(FULLNAME_COLUMN)
+            && !getSelectColumns(statement).contains("distinct doc.fullName");
     }
 
     @Override
     public String filterStatement(String statement, String language)
     {
-        String result = statement.trim();
-        String lowerStatement = result.toLowerCase();
-        String original = result;
+        StringBuilder builder = new StringBuilder();
+        String result = statement;
+        String original = statement;
 
-        if (Query.HQL.equals(language) && isFilterable(lowerStatement)) {
-            int idx = lowerStatement.indexOf(SELECT_CLAUSE);
-            result = result.substring(0, idx) + " distinct doc.fullName from XWikiDocument "
-                    + result.substring(idx + 33);
+        if (Query.HQL.equals(language) && isFilterable(statement)) {
+            String prettySeparator = ", ";
+            builder.append("select distinct doc.fullName");
+
+            // Put back original select columns.
+            List<String> selectColumns = getSelectColumns(statement);
+            for (String column : selectColumns) {
+                if (!FULLNAME_COLUMN.equals(column)) {
+                    builder.append(prettySeparator);
+                    builder.append(column);
+                }
+            }
+            // Put the order by columns in the select clause to circumvent HQL limitations (distinct+order by).
+            for (String column : getOrderByColumns(statement)) {
+                if (!FULLNAME_COLUMN.equals(column) && !selectColumns.contains(column)) {
+                    builder.append(prettySeparator);
+                    builder.append(column);
+                }
+            }
+            builder.append(" ");
+            builder.append(statement.substring(statement.indexOf(" from ")).trim());
+            result = builder.toString();
         }
 
-        if (!original.equals(result)) {
+        if (!statement.equals(result)) {
             logger.debug("Query [{}] has been transformed into [{}]", original, result);
         }
 
         return result;
+    }
+
+    @Override
+    public List filterResults(List results)
+    {
+        // If we had to put multiple columns in the select we need to remove them.
+        if (results.size() > 0 && results.get(0).getClass().isArray()) {
+            List filteredResults = new ArrayList<Object>();
+            for (Object result : results) {
+                Object[] actualResult = (Object[]) result;
+                filteredResults.add(actualResult[0]);
+            }
+
+            return filteredResults;
+        }
+
+        return results;
     }
 }

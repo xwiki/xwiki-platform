@@ -38,6 +38,10 @@
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -38,19 +38,20 @@ public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
     @MockingRequirement
     private UniqueDocumentFilter filter;
 
+    @Test
+    public void filterSelectStatement() throws Exception
+    {
+        assertEquals("select distinct doc.fullName from XWikiDocument doc",
+            filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
+    }
+
     @Override
     public void configure() throws Exception
     {
         getMockery().checking(new Expectations() {{
             ignoring(any(Logger.class)).method("debug");
+            ignoring(any(Logger.class)).method("warn");
         }});
-    }
-
-    @Test
-    public void filterSelectStatement() throws Exception
-    {
-        assertEquals("select distinct doc.fullName from XWikiDocument doc",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
@@ -72,5 +73,20 @@ public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         assertEquals("select distinct doc.fullName from XWikiDocument doc",
                 filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
+    }
+
+    @Test
+    public void filterStatementWhenStatementContainsAnotherOrderBy() throws Exception
+    {
+        assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
+            filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name asc", Query.HQL));
+    }
+
+    @Test
+    public void filterStatementWhenTheFirstSelectColumnIsNotFullName() throws Exception
+    {
+        assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
+            filter.filterStatement("select doc.name, doc.fullName from XWikiDocument doc order by doc.name asc",
+                Query.HQL));
     }
 }

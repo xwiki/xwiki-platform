@@ -30,9 +30,10 @@ public class Constants
     public static final String XWIKI_COMPONENT_MANAGER = "xwikiComponentManager";
 
     /**
-     * The key used to store the list of components that have to be released in the current Restlet context.
+     * The key used to store the the list of JAX-RS resources that are implemented as components with per-lookup policy
+     * and that have been instantiated during this request. These components are released at the end of the request.
      */
-    public static final String RELEASABLE_COMPONENT_REFERENCES = "currentComponentReference";
+    public static final String RELEASABLE_COMPONENT_REFERENCES = "rest.releasableComponentReferences";
 
     /**
      * The key used to store allowed values for an object property in an XWiki object representation.

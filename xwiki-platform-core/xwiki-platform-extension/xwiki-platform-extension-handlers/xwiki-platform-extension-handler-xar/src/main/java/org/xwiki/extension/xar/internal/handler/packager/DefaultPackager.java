@@ -64,6 +64,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Default implementation of {@link Packager}.
@@ -93,6 +94,9 @@ public class DefaultPackager implements Packager, Initializable
 
     @Inject
     private ObservationManager observation;
+
+    @Inject
+    private XWikiStubContextProvider contextProvider;
 
     private SAXParserFactory parserFactory;
 
@@ -320,6 +324,13 @@ public class DefaultPackager implements Packager, Initializable
 
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) getExecutionContext().getProperty("xwikicontext");
+        XWikiContext context = (XWikiContext) getExecutionContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+        if (context == null) {
+            context = this.contextProvider.createStubContext();
+            getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+        }
+
+        return context;
     }
 }

@@ -5,3 +5,4 @@ org.xwiki.query.internal.SecureQueryExecutorManager
 org.xwiki.query.internal.QueryManagerScriptService
 org.xwiki.query.internal.HiddenDocumentFilter
 org.xwiki.query.internal.UniqueDocumentFilter
+org.xwiki.query.internal.CountFilter

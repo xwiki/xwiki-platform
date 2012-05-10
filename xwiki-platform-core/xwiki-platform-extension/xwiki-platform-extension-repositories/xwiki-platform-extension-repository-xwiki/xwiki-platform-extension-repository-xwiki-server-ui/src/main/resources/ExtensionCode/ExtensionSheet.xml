@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1312816151000</creationDate>
-  <date>1333640220000</date>
-  <contentUpdateDate>1333640220000</contentUpdateDate>
+  <date>1336650505000</date>
+  <contentUpdateDate>1336650505000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
   <template/>
@@ -202,13 +202,11 @@
     ## Viewing
     ##
     {{box cssClass="floatinginfobox"}}
-      #if ($hasEdit)
-        #set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
-        #if ($proxyExtensionObject)
-          #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
-          #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)
-          {{info}}Extension imported from repository [[$repositoryId&gt;&gt;$repositoryURI]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
-        #end
+      #set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
+      #if ($proxyExtensionObject)
+        #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
+        #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)
+        {{info}}Extension imported from repository [[$repositoryId&gt;&gt;$repositoryURI]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
       #end
 
       (% class="extensionInfo" %)
@@ -228,7 +226,8 @@
       ##------- Features --------
       #set($features = $doc.getValue("features"))
       #if ($features &amp;&amp; $features.size() &gt; 0)
-        |(% class="label" %)Features(%%)|#foreach($feature in $features)#if($velocityCount &gt; 1), #end${feature}#end 
+        |(% class="label" %)Features(%%)|#foreach($feature in $features)#if($velocityCount &gt; 1), #end${feature}#end
+
       #end
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
@@ -279,9 +278,7 @@
         #else
           #set($download = $latestVersion.getProperty("download").getValue())
           #if ("$!download" == '')
-            #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="extension-link small-extension-link download-extension"]]
-            #end
+            [[Download v$version&gt;&gt;attach:${id}-$version.$type||class="extension-link small-extension-link download-extension"]]
           #else
             [[Download v$version&gt;&gt;$latestVersion.getProperty("download").getValue()||class="extension-link small-extension-link download-extension"]]
           #end

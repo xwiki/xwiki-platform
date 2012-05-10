@@ -69,6 +69,8 @@ public interface XWikiRepositoryModel
 
     public static final String PROP_EXTENSION_FEATURES = "features";
 
+    public final static String PROP_VERSION_ID = "id";
+
     public final static String PROP_VERSION_VERSION = "version";
 
     public final static String PROP_VERSION_DOWNLOAD = "download";

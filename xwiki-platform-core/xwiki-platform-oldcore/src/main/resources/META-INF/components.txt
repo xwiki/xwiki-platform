@@ -40,10 +40,8 @@ com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
-com.xpn.xwiki.internal.sheet.DefaultSheetManager
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
-com.xpn.xwiki.internal.sheet.SheetDocumentDisplayer
-com.xpn.xwiki.internal.sheet.SheetRequestInitializer
+com.xpn.xwiki.internal.sheet.DefaultModelBridge
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer

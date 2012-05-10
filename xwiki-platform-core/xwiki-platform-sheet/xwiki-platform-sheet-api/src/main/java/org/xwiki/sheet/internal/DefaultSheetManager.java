@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.sheet;
+package org.xwiki.sheet.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,8 +38,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.sheet.SheetManager;
-
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Default {@link SheetManager} implementation.
@@ -87,6 +85,12 @@ public class DefaultSheetManager implements SheetManager
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * The component used to access the XWiki model.
+     */
+    @Inject
+    private ModelBridge modelBridge;
+
+    /**
      * The component used to retrieve the list of sheets bound to a XWiki document.
      */
     @Inject
@@ -120,7 +124,7 @@ public class DefaultSheetManager implements SheetManager
 
             // (3) Look for class sheets.
             sheets = new ArrayList<DocumentReference>();
-            for (DocumentReference classReference : ((XWikiDocument) document).getXObjects().keySet()) {
+            for (DocumentReference classReference : modelBridge.getXObjectClassReferences(document)) {
                 sheets.addAll(getClassSheets(classReference, action));
             }
         }

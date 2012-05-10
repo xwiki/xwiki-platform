@@ -47,18 +47,6 @@
   #set($whereParams = [])
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
-  ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
-  ##
-  #if($blacklistedSpaces.size() &gt; 0)
-    #set($whereSql = "${whereSql} and doc.space not in (")
-    #foreach ($blacklistedSpace in $blacklistedSpaces)
-      #if($velocityCount &gt; 1)#set ($whereSql = "${whereSql},")#end
-      #set($whereSql = "${whereSql}?")
-      #set($discard = $whereParams.add("$!{blacklistedSpace}"))
-    #end
-    #set($whereSql = "${whereSql})")
-  #end
-  ##
   ## Add the columns needed for the actual data
   ##
   #set($tablelist = [])

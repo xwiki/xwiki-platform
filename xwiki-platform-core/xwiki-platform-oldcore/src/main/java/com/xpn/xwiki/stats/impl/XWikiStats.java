@@ -168,8 +168,10 @@ public class XWikiStats extends BaseCollection
             }
             sb.append(getLocalUidStringEntityReferenceSerializer().serialize(ref));
         }
-        
-        if (nb > 0) {
+
+        // if number used, serialize it as well. It may happened that the hash is 0, but this is really unlikely
+        // and it will not hurt anyway.
+        if (nb != 0) {
             // TODO: Avoid the hashed number, and use the original info (referer, period, etc...)
             String str = Integer.toString(nb);
             sb.append(str.length()).append(':').append(str);

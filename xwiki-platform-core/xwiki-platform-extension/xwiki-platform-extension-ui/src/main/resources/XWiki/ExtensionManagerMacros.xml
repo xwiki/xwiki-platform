@@ -197,11 +197,20 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   _update : function(html) {
+    // Save the current state of the extension display so that it can be restored afterwards.
+    var extensionBodyHidden = this.container.down('.extension-body').hasClassName('hidden');
+    var currentMenuItem = this.container.down('.innerMenu li a.current');
+    currentMenuItem &amp;&amp; (this._previouslySelectedMenuItem = currentMenuItem.getAttribute('href'));
     // Replace the current extension container element with the one that was just fetched.
     this.container.addClassName('hidden');
     this.container.insert({after : html});
     // Attach behaviour to the new element.
     this.initialize(this.container.next());
+    // Restore the state of the extension display.
+    extensionBodyHidden &amp;&amp; this._onToggleShowHideDetails({
+      stop : function() {},
+      element : function() {return this.container.down('input[name="hidedetails"]')}.bind(this)
+    });
   },
 
   /**
@@ -264,7 +273,7 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _enhanceInstallBehaviour : function() {
     var installButton = this.container.down('input[name="actioninstall"]');
-    installButton &amp;&amp; installButton.observe('click', this._retrieveInstallOrUninstallPlan.bindAsEventListener(this));
+    installButton &amp;&amp; installButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
   /**
@@ -272,13 +281,13 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _enhanceUninstallBehaviour : function() {
     var uninstallButton = this.container.down('input[name="actionuninstall"]');
-    uninstallButton &amp;&amp; uninstallButton.observe('click', this._retrieveInstallOrUninstallPlan.bindAsEventListener(this));
+    uninstallButton &amp;&amp; uninstallButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
   /**
-   * Indicate to the user that the install/uninstall plan is being fetched.
+   * Indicate to the user that a job has been started.
    */
-  _onBeforeRetrieveInstallOrUninstallPlan : function() {
+  _onBeforeStartJob : function() {
     // Check if the extension details have been fetched.
     var extensionBody = this.container.down('.extension-body');
     if (extensionBody) {
@@ -287,24 +296,8 @@ XWiki.ExtensionBehaviour = Class.create({
         stop : function() {},
         element : function() {return this.container.down('input[name="showdetails"]')}.bind(this)
       });
-      // Check if the progress section is available.
-      var progressSection = extensionBody.down('.extension-body-progress');
-      if (!progressSection) {
-        // Add an empty progress section.
-        var lastSection = extensionBody.select('.extension-body-section').last();
-        progressSection = new Element('div', {'class': 'extension-body-progress extension-body-section loading'});
-        lastSection.insert({after: progressSection});
-        // Add the section anchor.
-        var progressSectionAnchor = 'extension-body-progress' + lastSection.previous().id.substr($w(lastSection.className)[0].length);
-        lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
-        // Add the progress menu.
-        extensionBody.down('.innerMenu').insert('&lt;li&gt;&lt;span class="wikilink"&gt;&lt;a href="#' + progressSectionAnchor + '"&gt;$msg.get('extensions.info.category.progress')&lt;/a&gt;&lt;/span&gt;&lt;/li&gt;');
-      } else {
-        // Hide the contents of the progress section and display the loading animation.
-        progressSection.insert({before: progressSection.clone(false)});
-        progressSection = progressSection.previous();
-        progressSection.addClassName('loading');
-      }
+      // Prepare the progress section: create one if it is missing, clear its contents otherwise.
+      var progressSection = this._prepareProgressSectionForLoading();
       // Activate the progress section.
       this._activateMenuItem(extensionBody.down('.innerMenu li a[href="#' + progressSection.previous().id + '"]'));
     } else {
@@ -312,39 +305,106 @@ XWiki.ExtensionBehaviour = Class.create({
     }
   },
 
-  _onAfterRetrieveInstallOrUninstallPlan : function(response) {
+  /**
+   * This method is called before a request related to the progress section is made. Creates an empty
+   * progress section if none is found, otherwise hides its contents and displays the loading animation.
+   * @see #_restoreProgressSection()
+   */
+  _prepareProgressSectionForLoading : function() {
+    // Check if the progress section is available.
+    var progressSection = this.container.down('.extension-body-progress');
+    if (!progressSection) {
+      // Add an empty progress section.
+      var lastSection = this.container.select('.extension-body-section').last();
+      progressSection = new Element('div', {'class': 'extension-body-progress extension-body-section loading'});
+      lastSection.insert({after: progressSection});
+      // Add the section anchor.
+      var progressSectionAnchor = 'extension-body-progress' + lastSection.previous().id.substr($w(lastSection.className)[0].length);
+      lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
+      // Add the progress menu.
+      this.container.down('.innerMenu').insert('&lt;li&gt;&lt;span class="wikilink"&gt;&lt;a href="#' + progressSectionAnchor + '"&gt;$msg.get('extensions.info.category.progress')&lt;/a&gt;&lt;/span&gt;&lt;/li&gt;');
+    } else {
+      // Hide the contents of the progress section and display the loading animation.
+      progressSection.insert({before: progressSection.clone(false)});
+      progressSection.hide();
+      progressSection = progressSection.previous();
+      progressSection.addClassName('loading');
+    }
+    return progressSection;
+  },
+
+  /**
+   * Removes the loading markers if the request for starting an Extension Manager job failed.
+   */
+  _onAfterStartJob : function(response) {
     response.request.options.defaultValues.onComplete(response);
     // Remove the loading markers if they are still present (i.e. request failed).
     var extensionBodyLoading = this.container.down('.extension-body.loading');
     if (extensionBodyLoading) {
       extensionBodyLoading.remove();
     } else {
-      var progressSectionLoading = this.container.down('.extension-body-progress.loading');
-      if (progressSectionLoading) {
-        // If the progress section is hidden, re-display it.
-        var progressSection = progressSectionLoading.previous();
-        if (progressSection.hasClassName('extension-body-progress')) {
-          progressSectionLoading.remove();
-          progressSection.show();
-        } else {
-          progressSectionLoading.removeClassName('loading');
-        }
+      this._restoreProgressSection();
+    }
+  },
+
+  /**
+   * This method is called when a request related to the progress section fails. Removes the loading
+   * animation and restores the previous contents of the progress section is they were saved.
+   * @see #_prepareProgressSectionForLoading()
+   */
+  _restoreProgressSection : function() {
+    var progressSectionLoading = this.container.down('.extension-body-progress.loading');
+    if (progressSectionLoading) {
+      // If the progress section is hidden, re-display it.
+      var progressSection = progressSectionLoading.previous();
+      if (progressSection.hasClassName('extension-body-progress')) {
+        progressSectionLoading.remove();
+        progressSection.show();
+      } else {
+        progressSectionLoading.removeClassName('loading');
       }
     }
   },
 
   /**
-   * Retrieves the install or uninstall plan asynchronously.
+   * Starts an Extension Manager asynchronous job. Examples of Extension Manager jobs are: compute install plan, install.
    */
-  _retrieveInstallOrUninstallPlan : function(event) {
-    // Launch the AJAX call to fetch the install/uninstall plan.
+  _startJob : function(event) {
+    // Launch the AJAX call to start the asynchronous job.
     this._submit(event, {
-      onCreate : this._onBeforeRetrieveInstallOrUninstallPlan.bind(this),
+      onCreate : this._onBeforeStartJob.bind(this),
+      onSuccess : function(response) {
+        this._update(response.responseText);
+        // Refresh the extension display until the job is done.
+        this._maybeScheduleRefresh();
+      }.bind(this),
+      onComplete : this._onAfterStartJob.bind(this)
+    });
+  },
+
+  /**
+   * Redisplays the extension using updated information from the server.
+   */
+  _refresh : function() {
+    // Prepare the data for the AJAX call.
+    var form = this.container.down('.extension-actions').up('form');
+    var formData = new Hash(form.serialize({submit: false}));
+
+    // Launch the AJAX call.
+    new Ajax.Request(this._getServiceURL(formData.get('section')), {
+      parameters : formData,
       onSuccess : function(response) {
         this._update(response.responseText);
       }.bind(this),
-      onComplete : this._onAfterRetrieveInstallOrUninstallPlan.bind(this)
+      onComplete : this._maybeScheduleRefresh.bind(this)
     });
+  },
+
+  /**
+   * Schedule a new refresh if the extension has a job running.
+   */
+  _maybeScheduleRefresh : function() {
+    this.container.hasClassName('loading') &amp;&amp; this._refresh.bind(this).delay(1);
   },
 
   /**
@@ -355,8 +415,13 @@ XWiki.ExtensionBehaviour = Class.create({
     // Expand the current menu item.
     var currentMenuItem = this.container.down(menuItemSelector + '.current');
     if (!currentMenuItem) {
-      // Expand the first menu item.
-      currentMenuItem = this.container.down(menuItemSelector);
+      // Expand the previously selected menu item, if specified, to preserve the state of the extension display.
+      if (this._previouslySelectedMenuItem) {
+        currentMenuItem = this.container.down(menuItemSelector + '[href="' + this._previouslySelectedMenuItem + '"]');
+      } else {
+        // Expand the first menu item.
+        currentMenuItem = this.container.down(menuItemSelector);
+      }
     }
     if (currentMenuItem) {
       this._activateMenuItem(currentMenuItem);
@@ -409,6 +474,9 @@ XWiki.ExtensionBehaviour = Class.create({
         });
       }
     });
+    // Execute Extension Manager jobs asynchronously.
+    var confirmJobButton = this.container.down('input[name="confirm"]');
+    confirmJobButton &amp;&amp; confirmJobButton.observe('click', this._startJob.bindAsEventListener(this));
   }
 });
 
@@ -570,7 +638,7 @@ return XWiki;
     <className>XWiki.StyleSheetExtension</className>
     <guid>9a7ab38c-4990-415a-beed-6968710f3b02</guid>
     <property>
-      <cache>forbid</cache>
+      <cache>long</cache>
     </property>
     <property>
       <code>#template('colorThemeInit.vm')

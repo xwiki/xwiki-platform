@@ -883,7 +883,6 @@ ul.extension-metadata li {
   width: 40%;
   z-index: 200;
 }
-/****************************** &lt;Inner Menu&gt; *************************/
 
 .innerMenu {
   color: $theme.textSecondaryColor;
@@ -894,7 +893,6 @@ ul.extension-metadata li {
   margin: 0 0 0 0 !important;
   margin-top: -5px !important;
 }
-
 .innerMenu li {
   display: inline-block;
   sborder: 1px solid red;
@@ -915,7 +913,6 @@ ul.extension-metadata li {
   border-top: 5px solid $theme.borderColor;
   margin-top: 0px;
 }
-
 .innerMenu li a.current {
   background-color: $theme.panelCollapsedBackgroundColor;
   border: 0 none;
@@ -924,7 +921,6 @@ ul.extension-metadata li {
   border-radius: 0 0 5px 5px;
   box-shadow: 3px;
 }
-
 .innerMenu li a.current:after {
   border-style: solid;
   border-color: transparent transparent  $theme.borderColor;
@@ -937,13 +933,31 @@ ul.extension-metadata li {
   top: -5px;
   right: -5px;
 }
-
 .innerMenu li a.current {
   color: $theme.panelCollapsedTextColor;
   text-decoration: none;
 }
 
-/****************************** &lt;/ Clean&gt; *************************/
+#xwikicontent .controlPagination {
+  height: 15px;
+  line-height: 1.6em !important;
+  margin: 0.35em 0 0 1em !important;
+  vertical-align: bottom;
+  width: 27px;
+}
+#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination, #xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
+  height: 13px;
+  width: 13px;
+}
+#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination {
+  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowleft.gif");
+  background-position: left top;
+}
+#xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
+  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowright.gif");
+  background-position: right top;
+  left: 14px;
+}
 
 .ui-progress-bar {
   background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
@@ -975,7 +989,6 @@ ul.extension-metadata li {
 }
 
 .ui-progress-bar.green {
-
   -webkit-box-shadow:
     inset 0 2px 9px  rgba(255,255,255,0.3),
     inset 0 -2px 6px rgba(0,0,0,0.4);
@@ -1011,456 +1024,7 @@ ul.extension-metadata li {
   color: $theme.textSecondaryColor;
   font-size: .85em;
   min-width: 100px;
-}
-
-/****************************** &lt;/ Progress &gt; *************************/
-
-/***************** Selection Menus **************/
-
-.selection {
-  display: inline-block;
-  float: left;
-  font-size: 1.05em;
-  position: relative;
-}
-
-.selection .menuarrow {
-    color: $theme.textSecondaryColor;
-    font-size: 0.6em;
-    font-weight: bold;
-    margin: 0;
-    padding-left: 2px;
-    padding-right: 3px;
-    position: relative;
-    top: -3px;
-}
-.selection .menuarrow .tooltipHint {
-    color: $theme.textSecondaryColor;
-}
-.selection .rightmenu {
-    display: block;
-    padding: 0;
-    position: relative;
-}
-.selection .submenu {
-    -moz-box-shadow: 1px 1px 1px rgba(80, 80, 80, 0.8);
-    background: none repeat scroll 0 0 $theme.panelCollapsedBackgroundColor;
-    border: 1px solid $theme.borderColor;
-    display: block;
-    margin-left: 16px;
-    margin-top: 3px;
-    padding: 2px;
-    position: absolute;
-    width: 120px;
-    z-index: 998;
-}
-.rightmenu .icon img:hover, .tools .tool img:hover {
-    background-color: $theme.panelCollapsedBackgroundColor;
-}
-
-.selection .submenuitem {
-    cursor: pointer;
-    display: block;
-    padding-left: 20px;
-}
-
-.selection .rightmenu .topmenuentry {
-  display: inline-block;
-  float: none;
-  margin: 0;
-}
-
-.changedRight {
-    background: url("$xwiki.getSkinFile('icons/silk/bullet_black.png')") no-repeat scroll 0 center transparent;
-    font-weight: bold;
-}
-
-.selection .topmenuentry {
-  min-height: 1em;
-}
-
-.extHeaderRight .selection .submenu, .extHeaderLeft .selection .submenu  {
-  margin-left: 10px;
-  width: 100px;
-}
-
-.extHeaderLeft .selection .submenu  {
-  margin-left: 6px;
-}
-
-/***********************   Extension Manager ****************/
-
-.extHeader {
-  /*background: -moz-linear-gradient(270deg, #FFFFFF, #EFEFEF) repeat scroll 0 0 #EFEFEF;*/
-  background-color: $theme.panelCollapsedBackgroundColor;
-  border: 1px solid $theme.borderColor;
-  color: $theme.panelCollapsedTextColor;
-  padding: 3px 1.2em 3px 0.7em;
-  font-size: .8em;
-}
-
-.extHeader:first-of-type {
-  border-bottom: 0;
-}
-
-.extHeaderLeft {
-  float: left;
-  width: 50%;
-}
-.extHeaderLeft .xform label {
-  display: block;
-  font-weight: bold;
-}
-.extHeaderLeft .xform .globalsearch {
-  text-align: left;
-}
-
-.extHeaderBottom  .extHeaderLeft{
-  padding-left: 2.5em;
-  margin-top: 3px;
-}
-
-.extHeaderRight {
-  float: right;
-  cursor: pointer;
-  margin: 3px 0 -3px;
-  position: relative;
-  width: 40%;
-}
-
-.extHeaderBottom  .extHeaderRight {
-  margin: 0 0.4em;
-}
-
-.type{
-  display: inline-block;
-  height: 16px;
-  text-indent: -9999px;
-  width: 16px;
-}
-
-.type {
-  background: url("$xwiki.getSkinFile('icons/silk/bricks.png')") no-repeat scroll 0 0 transparent;
-}
-
-.extFilter {
-  color: $theme.textColor;
-  padding: 0 4px;
-  cursor: pointer;
-}
-
-.extHeaderLeftSearch {
-  float: left;
-  margin-left: .2em;
-}
-
-.extHeaderLeftInput {
-  font-size: 1.1em;
-  padding: 0 .5em;
-  min-width: 340px;
-}
-
-.extMiniName {
-
-}
-
-.extMeta {
-  padding: 1.3em 1.5em 0 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  font-size: .8em;
-  color: $theme.textSecondaryColor;
-  text-align: right;
-}
-
-.extMiniMeta {
-
-}
-
-.extButtons {
-  padding: 0 1.55em 1.6em 0;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  font-size: .8em;
-  color: $theme.textSecondaryColor;
-}
-
-.extButtons .button {
-  min-width: 5em;
-  text-align: center;
-}
-
-.progressButtons {
-  padding-bottom: 2.4em;
-}
-
-.extUpdateTitle {
-  margin-right: .5em;
-}
-
-.secondary {
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-}
-
-.extItem.statusInstalled, .extItem.statusUpgradable, .extItem.statusIncompatible, .extItem.statusDisable {
-  border-right: 7px solid transparent;
-}
-
-.extItem.statusInstalled .extButtons, .extItem.statusUpgradable .extButtons, .extItem.statusIncompatible .extButtons, .extItem.statusDisable .extButtons{
-  padding: 0 1em 1.6em 0;
-}
-
-.typeApp{
-  background-image: url("$xwiki.getSkinFile('icons/silk/application.png')");
-}
-
-.typeModule{
-  background-image: url("$xwiki.getSkinFile('icons/silk/connect.png')");
-}
-
-.typeSkin{
-  background-image: url("$xwiki.getSkinFile('icons/silk/layout_content.png')");
-}
-
-.typeMacro{
-  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
-}
-
-.typePlugin{
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
-}
-
-.extItem.statusInstalled  {
-  border-right-color: $theme.notificationSuccessColor;
-}
-
-.statusInstalled  .extStatus, .extItem .statusInstalled  .extMiniStatus{
-  color: $theme.notificationSuccessColor;
-}
-
-.extItem.statusUpgradable  {
-  border-right-color: $theme.notificationWarningColor;
-}
-
-.statusUpgradable  .extStatus, .extItem .statusUpgradable .extMiniStatus{
-  color: $theme.notificationWarningColor;
-}
-
-.extItem.statusIncompatible  {
-  border-right-color: $theme.notificationErrorColor;
-}
-
-.statusIncompatible  .extStatus, .extItem .statusIncompatible  .extMiniStatus{
-  color: $theme.notificationErrorColor;
-}
-
-.extItem.statusDisable  {
-  border-right-color: $theme.backgroundSecondaryColor;
-}
-
-.extItem.statusDisable  .extItemHeader{
-  background-image: -moz-linear-gradient(center top , $theme.backgroundSecondaryColor , $theme.pageContentBackgroundColor);
-}
-
-.statusDisable  .extStatus, .statusDisable  .extDescription, .statusDisable  .extName, .statusDisable  .extAuthor a{
-  color: $theme.textSecondaryColor;
-}
-
-.expandTool {
-  border-style: solid;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  width: 5px;
-  z-index: 2;
-}
-
-.expandedExt .expandTool{
-  border-color: transparent $theme.borderColor transparent transparent;
-  border-width: 0 7px 7px 0;
-  float: right;
-}
-
-.collapsedExt:hover  .expandTool {
-  border-color: transparent transparent $theme.panelHeaderBackgroundColor transparent;
-  border-width: 0 7px 7px 0;
-  display: block; /* Content is hidden but keep at least the activator */
-  float: right;
-  width: 0;
-}
-
-.collapsedExt  .extItemContent {
-  display: none; /* Hide inside content when collapsed */
-}
-
-.extItemHeader {
-  padding: 0.8em 1em 1em 2.7em;
-  position: relative;
-}
-
-.extItemContent h6 {
-  border: 0 none;
-  font-size: 1em;
-  margin: 1.5em 0 0;
-}
-
-.dependencies {
-  border-top: 1px dotted $theme.borderColor;
-}
-
-.dependencies .extItem {
-  padding: 0.3em 0;
-  border-style: solid solid dotted;
-  border-width: 0 7px 1px 0;
-  border-bottom-color: $theme.borderColor;
-  box-shadow: none;
-}
-
-.dependencies .extItem:hover {
-  background-color: $theme.highlightColor;
-}
-
-.dependencies .extMeta {
-  padding-top: .8em;
-}
-
-.zone {
-  display: none;
-}
-
-.zone.current {
-  display: block;
-}
-
-#extensions .releasenotesZone ul, #extensions .descriptionZone ul  {
-  float: none;
-  list-style-type: circle;
-  margin-left: 1.3em;
-}
-
-.extHeaderBottom .xwiki-livetable-pagination {
-  font-size: 1.1em;
-  line-height: 1.8em;
-  padding-left: 0.5em;
-}
-
-.extHeaderBottom .pagination {
-  line-height: 1.8em; 
-  margin: 0;
-}
-
-.pagenumber.selected {
-  font-weight: 700;
-}
-
-.extHeaderBottom .pagesizeselect {
-  font-size: .9em;
-}
-
-.leftmetadata {
-  float: left;
-}
-
-.rightmetadata {
-  float: right;
-}
-
-/*********** Pagination *********/
-#xwikicontent .controlPagination {
-  height: 15px;
-  line-height: 1.6em !important;
-  margin: 0.35em 0 0 1em !important;
-  vertical-align: bottom;
-  width: 27px;
-}
-#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination, #xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
-  height: 13px;
-  width: 13px;
-}
-
-#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination {
-  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowleft.gif");
-  background-position: left top;
-}
-#xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
-  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowright.gif");
-  background-position: right top;
-  left: 14px;
-}
-
-/*********** /Pagination *********/
-
-/*********** Repositories *********/
-ul.repositories {
-  background-color: #F7F7F7;
-  font-size: .9em;
-  list-style-type: none;
-  margin: 0;
-  padding: 0.5em;
-}
-
-ul.repositories li {
-  padding: 2px;
-  position: relative;
-}
-
-ul.repositories span {
-  display: block;
-}
-
-ul.repositories .tools {
-  display: none;
-  position: absolute;
-  right: 3px;
-  top: 3px;
-}
-ul.repositories li:hover .tools {
-  display: block;
-}
-
-ul.repositories  li:hover{
-  background-color: $theme.highlightColor;
-}
-
-.tools a {
-  background: none no-repeat scroll 94% 50% transparent;
-  display: inline-block;
-  float: left;
-  padding: 0;
-  text-indent: -9999px;
-  width: 16px;
-}
-
-.tools .delete {
-  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/bulletcross.png");
-}
-
-.tools .edit {
-  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/bulletedit.png");
-  background-position: 0 -2px;
-}    
-
-.addRepository {
-  margin-top: .3em;
-}
-
-.addRepository input[type="text"]{
-  color: $theme.textSecondaryColor;
-  font-size: .95em;
-}
-
-.addRepository .icon {
-  margin: -3px 0 0 -23px;
-}
-
-ul.repositories .addRepository:hover  {
-  background-color: transparent;
-}
-
-/*********** /Repositories *********/</code>
+}</code>
     </property>
     <property>
       <name/>

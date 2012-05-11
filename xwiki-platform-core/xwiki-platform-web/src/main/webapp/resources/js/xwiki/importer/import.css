@@ -2,11 +2,11 @@
 
 /* Overriding skins */
 
-div.legend {
+.legend {
 	margin-bottom:10px;
 	font-size:1.33em;
-	border-bottom:1px dotted #D6E1E7;
-	color:#005A83;
+	border-bottom: 1px dotted $theme.borderColor;
+	color: $theme.titleColor;
 	display:block;
 	font-weight:400;
 	line-height:1.2em;

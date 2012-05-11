@@ -154,6 +154,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
      */
+    @SuppressWarnings("unchecked")
     private <T> T safe(T unsafe)
     {
         return (T) this.scriptProvider.get(unsafe);
@@ -400,13 +401,11 @@ public class ExtensionManagerScriptService implements ScriptService
 
         installRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
 
-        Job job;
+        Job job = null;
         try {
-            job = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
+            job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
-
-            job = null;
         }
 
         return job;
@@ -476,13 +475,11 @@ public class ExtensionManagerScriptService implements ScriptService
 
         uninstallRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
 
-        Job job;
+        Job job = null;
         try {
-            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
+            job = this.jobManager.addJob(UninstallJob.JOBTYPE, uninstallRequest);
         } catch (Exception e) {
             setError(e);
-
-            job = null;
         }
 
         return job;

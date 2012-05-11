@@ -404,7 +404,7 @@ XWiki.ExtensionBehaviour = Class.create({
    * Schedule a new refresh if the extension has a job running.
    */
   _maybeScheduleRefresh : function() {
-    this.container.hasClassName('loading') &amp;&amp; this._refresh.bind(this).delay(1);
+    this.container.hasClassName('extension-item-loading') &amp;&amp; this._refresh.bind(this).delay(1);
   },
 
   /**
@@ -776,6 +776,9 @@ ul.extension-metadata li {
 .extension-item-remote .extension-name, .dependency-item.extension-item-remote {
   background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
+.extension-item-loading .extension-name, .dependency-item.extension-item-loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+}
 .dependency-item.extension-item-unknown {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
 }
@@ -802,6 +805,10 @@ ul.extension-metadata li {
 }
 .extension-log-item-info {
   background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
+  color: $theme.notificationInfoColor;
+}
+.extension-log-item-loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
   color: $theme.notificationInfoColor;
 }
 .extension-log-item-warn {
@@ -2068,6 +2075,10 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #macro (printStatusLog $status)
   #foreach ($log in $status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
+    #if (!$foreach.hasNext &amp;&amp; $status.state != 'FINISHED')
+      ## Display the last log item as loading if the job is in progress.
+      #set ($logLevel = 'loading')
+    #end
     * (% class="extension-log-item extension-log-item-$logLevel" %)(((
         #if ($log.throwable)
           #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
@@ -2106,7 +2117,10 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 
 #macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage)
   #set ($currentVersion = $NULL)
-  #if ($extension.isInstalled())
+  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
+  #if ($jobStatus &amp;&amp; $jobStatus.state != 'FINISHED')
+    #set ($status = 'loading')
+  #elseif ($extension.isInstalled())
     #set ($status = 'installed')
   #else
     #set ($status = $extension.repository.id.id)
@@ -2133,7 +2147,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #end
   #end
   #set ($message = $NULL)
-  #if ($status != 'remote')
+  #if ($status != 'remote' &amp;&amp; $status != 'loading')
     #set ($message = $msg.get("extensions.info.status.$status", [$currentVersion.id.version.value]))
   #end
   #set ($extensionStatus = $NULL)

@@ -959,6 +959,10 @@ ul.extension-metadata li {
   left: 14px;
 }
 
+.ui-progress {
+  margin-top: .5em;
+}
+
 .ui-progress-bar {
   background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
   background-repeat: repeat;
@@ -1023,6 +1027,8 @@ ul.extension-metadata li {
 .ui-progress-message {
   color: $theme.textSecondaryColor;
   font-size: .85em;
+  line-height: inherit;
+  margin: 0;
   min-width: 100px;
 }</code>
     </property>
@@ -1202,6 +1208,21 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
       #end
     #end
+#end
+
+#macro (displayProgressBar $extension)
+  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
+  #if ($jobStatus &amp;&amp; $jobStatus.state != 'FINISHED')
+    (% class="ui-progress" %)(((
+      (% class="ui-progress-background" %)(((
+        #set ($percent = $jobStatus.progress.offset)
+        #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+        (% class="ui-progress-bar green" style="width:${percent}%" %)((()))
+      )))
+      (% class="ui-progress-message" %)
+      $!jobStatus.log.peek().formattedMessage
+    )))
+  #end
 #end
 
 #macro (displayExtensionDetails_menuLink $detail $selected)
@@ -1389,6 +1410,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         }}}
 
       #end
+      #displayProgressBar($extension)
       (% class="clearfloats" %)((()))
     )))
     #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)

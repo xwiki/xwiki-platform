@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
@@ -35,6 +37,12 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class BooleanClass extends PropertyClass
 {
+    /** Other string values that might be used to represent "true" values. */
+    private static final Pattern TRUE_PATTERN = Pattern.compile("yes|true", Pattern.CASE_INSENSITIVE);
+
+    /** Other string values that might be used to represent "false" values. */
+    private static final Pattern FALSE_PATTERN = Pattern.compile("no|false", Pattern.CASE_INSENSITIVE);
+
     public BooleanClass(PropertyMetaClass wclass)
     {
         super("boolean", "Boolean", wclass);
@@ -90,8 +98,15 @@ public class BooleanClass extends PropertyClass
         BaseProperty property = newProperty();
         Number nvalue = null;
         if (StringUtils.isNotEmpty(value)) {
-            nvalue = new Integer(value);
+            if (StringUtils.isNumeric(value)) {
+                nvalue = new Integer(value);
+            } else if (TRUE_PATTERN.matcher(value).matches()) {
+                nvalue = Integer.valueOf(1);
+            } else if (FALSE_PATTERN.matcher(value).matches()) {
+                nvalue = Integer.valueOf(0);
+            }
         }
+        // We don't return null if there's no value, since the BooleanProperty really works that way
         property.setValue(nvalue);
         return property;
     }
@@ -225,10 +240,10 @@ public class BooleanClass extends PropertyClass
 
         radioNone.setID(prefix + name + "_none");
         labelNone.setFor(prefix + name + "_none");
-        
+
         radioTrue.setID(prefix + name);
         labelTrue.setFor(prefix + name);
-        
+
         radioFalse.setID(prefix + name + "_false");
         labelFalse.setFor(prefix + name + "_false");
 

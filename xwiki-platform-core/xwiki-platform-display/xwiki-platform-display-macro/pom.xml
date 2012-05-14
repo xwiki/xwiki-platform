@@ -116,7 +116,7 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-event</artifactId>
-      <version>${project.version}</version>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

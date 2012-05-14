@@ -106,6 +106,10 @@ public class BooleanClass extends PropertyClass
                 nvalue = Integer.valueOf(0);
             }
         }
+        if (nvalue == null) {
+            // Returning null makes sure that the old value (if one exists) will not be discarded/replaced
+            return null;
+        }
         property.setValue(nvalue);
         return property;
     }

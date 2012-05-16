@@ -98,7 +98,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.0.9.Final</version>
+        <version>3.0.10.Final</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>

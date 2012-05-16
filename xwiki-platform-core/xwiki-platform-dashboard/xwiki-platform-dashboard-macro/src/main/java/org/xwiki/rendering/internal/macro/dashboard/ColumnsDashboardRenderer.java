@@ -185,7 +185,6 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
         // render them as columns using the container macro and appropriate parameters
         ContainerMacroParameters containerParams = new ContainerMacroParameters();
         containerParams.setLayoutStyle("columns");
-        containerParams.setJustify(true);
         BlocksContainerMacro containerMacro = new BlocksContainerMacro();
         containerMacro.setComponentManager(this.componentManager);
         containerMacro.setContent(gadgetContainers);

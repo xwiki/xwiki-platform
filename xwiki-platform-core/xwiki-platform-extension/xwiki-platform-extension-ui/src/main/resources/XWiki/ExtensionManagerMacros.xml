@@ -701,13 +701,17 @@ return XWiki;
   font-size: .9em;
 }
 
-.extension-item-core .extension-status, .extension-item-installed .extension-status {
+.extension-item-core .extension-status, .extension-item-installed .extension-status,
+/* We have to duplicate the selectors to force the style to be applied to extension dependencies, which are nested inside extension display. */
+.extension-item .extension-item-core .extension-status, .extension-item .extension-item-installed .extension-status {
   color: $theme.notificationSuccessColor;
 }
-.extension-item-remote-installed .extension-status {
+.extension-item-remote-core .extension-status, .extension-item-remote-installed .extension-status,
+.extension-item .extension-item-remote-core .extension-status, .extension-item .extension-item-remote-installed .extension-status {
   color: $theme.notificationWarningColor;
 }
-.extension-item-remote-core .extension-status {
+/* This applies only to dependencies. */
+.extension-item-remote-core-incompatible .extension-status, .extension-item-remote-installed-incompatible .extension-status {
   color: $theme.notificationErrorColor;
 }
 
@@ -766,11 +770,11 @@ ul.extension-metadata li {
   margin: 0;
 }
 .extension-item-core .extension-name, .extension-item-remote-core .extension-name,
-.dependency-item.extension-item-core, .dependency-item.extension-item-remote-core {
+.dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 .extension-item-installed .extension-name, .extension-item-remote-installed .extension-name,
-.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed {
+.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed, .dependency-item.extension-item-remote-installed-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
 .extension-item-remote .extension-name, .dependency-item.extension-item-remote {
@@ -790,10 +794,10 @@ ul.extension-metadata li {
 .extension-item-core, .extension-item-installed {
   border-right-color: $theme.notificationSuccessColor;
 }
-.extension-item-remote-installed {
+.extension-item-remote-installed, .extension-item-remote-core {
   border-right-color: $theme.notificationWarningColor;
 }
-.extension-item-remote-core {
+.extension-item-remote-core-incompatible, .extension-item-remote-installed-incompatible {
   border-right-color: $theme.notificationErrorColor;
 }
 
@@ -1308,7 +1312,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #set ($dependencyStatusMessage = $NULL)
   #set ($dependencyName = $dependencyId)
   #if ($dependencyExtension)
-    #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage)
+    #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage $dependencyOrExtension.versionConstraint)
     #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
     #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$dependencyURL]]")
   #end
@@ -1701,34 +1705,26 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #end
 #end
 
-#macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage)
+#macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage $versionConstraint)
   #set ($currentVersion = $NULL)
   #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
   #if ($jobStatus &amp;&amp; $jobStatus.state != 'FINISHED')
     #set ($status = 'loading')
-  #elseif ($extension.isInstalled())
-    #set ($status = 'installed')
   #else
     #set ($status = $extension.repository.id.id)
-    #if ($status != 'core')
+    #if ($status != 'core' &amp;&amp; $status != 'installed')
       ## An extension, either local or remote, that might be available to install.
       ## Check if a different version of this extension is installed or is a core dependency.
       #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
-      #if ($currentVersion)
-        #set ($status = 'remote-core')
-        #if ($currentVersion.id.equals($extension.id))
-          #set ($status = 'core')
-        #end
-      #else
+      #if (!$currentVersion)
         #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
-        #if ($currentVersion)
-          #set ($status = 'remote-installed')
-          #if ($currentVersion.id.equals($extension.id))
-            #set ($status = 'installed')
-          #end
-        #else
-          #set ($status = 'remote')
-        #end
+      #end
+      #if ($currentVersion)
+        #set ($repoId = $currentVersion.repository.id.id)
+        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible"])
+        #set ($status = "#determineVersionCompatibility($extension.id $currentVersion.id $versionConstraint $options)")
+      #else
+        #set ($status = 'remote')
       #end
     #end
   #end
@@ -1740,6 +1736,22 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #setVariable ("$extensionStatus" $status)
   #set ($extensionStatusMessage = $NULL)
   #setVariable ("$extensionStatusMessage" $message)
+#end
+
+#macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
+  #set ($status = $options.get(0))
+  #if ($alice.equals($bob))
+    #set ($status = $options.get(1))
+  #elseif ($versionConstraint &amp;&amp; (
+      ($versionConstraint.version &amp;&amp; $bob.version.compareTo($versionConstraint.version) &lt; 0) || 
+      (!$versionConstraint.version &amp;&amp; !$versionConstraint.containsVersion($bob.version))))
+    ## Incompatible version because:
+    ## (1) there is a version constraint specified (applies only to dependencies) and
+    ## (2) either the version constraint matches an exact version which is newer than the existing version
+    ## (3) or the version constraint is a range which doesn't include the existing version.
+    #set ($status = $options.get(2))
+  #end
+  $status##
 #end
 {{/velocity}}</content>
 </xwikidoc>

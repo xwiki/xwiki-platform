@@ -49,12 +49,17 @@ import org.xwiki.component.phase.InitializationException;
  */
 @Component
 public class DefaultChartGenerator implements ChartGenerator, Initializable
-{    
+{
     /**
      * Map of available plot generators.
      */
     private Map<String, PlotGenerator> plotGenerators;
-    
+
+    /**
+     * Allows providing custom colors.
+     */
+    private DrawingSupplierFactory drawingSupplierFactory = new DrawingSupplierFactory();
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -78,6 +83,10 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
             throw new ChartGeneratorException(String.format("No such chart type : [%s].", type));
         }
         Plot plot = generator.generate(model, parameters);
+
+        // Set the default colors to use if the user has specified some colors.
+        plot.setDrawingSupplier(this.drawingSupplierFactory.createDrawingSupplier(parameters));
+
         JFreeChart jfchart = new JFreeChart(title, plot);
         int width = Integer.parseInt(parameters.get(WIDTH_PARAM));
         int height = Integer.parseInt(parameters.get(HEIGHT_PARAM));

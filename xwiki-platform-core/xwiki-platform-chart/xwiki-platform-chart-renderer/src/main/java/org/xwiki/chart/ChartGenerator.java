@@ -59,6 +59,13 @@ public interface ChartGenerator
     String SERIES_PARAM = "series";        
 
     /**
+     * Color parameter identifier. The format is {@code color1,color2,...,colorN} where each color is specified as
+     * a 6 characters string, the first 2 representing in hexadecimal the red percentage, the next two the green
+     * percentage and the last 2 the blue percentage. For example {@code FF0000,00FF00,0000FF} for red, green, blue.
+     */
+    String COLORS_PARAM = "colors";
+
+    /**
      * Generates an image of a chart representing the data presented as a {@link ChartModel} and extra formatting
      * parameters provided in the parameters map.
      * 

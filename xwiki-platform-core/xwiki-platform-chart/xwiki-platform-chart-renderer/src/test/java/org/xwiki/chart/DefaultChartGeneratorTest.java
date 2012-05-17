@@ -128,4 +128,17 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         byte[] chart = chartGenerator.generate(model, parameters);
         Assert.assertNotNull(chart);
     }
+
+    @Test
+    public final void testCustomColors() throws Exception
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, "Test area chart");
+        parameters.put(ChartGenerator.TYPE_PARAM, "area");
+        parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+        parameters.put(ChartGenerator.COLORS_PARAM, "FF0000,00FF00,0000FF");
+
+        byte[] chart = chartGenerator.generate(model, parameters);
+        Assert.assertNotNull(chart);
+    }
 }

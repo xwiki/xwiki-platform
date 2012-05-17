@@ -1702,7 +1702,7 @@ function (row, i, table) {
   ## Get starting item number from request
   #set ($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
   #set ($parameters.firstItem = $mathtool.toInteger($parameters.firstItem))
-  #if (!$paramters.firstItem)
+  #if (!$parameters.firstItem)
     #set ($parameters.firstItem = 0)
   #end
   ## Get number of items per page from request

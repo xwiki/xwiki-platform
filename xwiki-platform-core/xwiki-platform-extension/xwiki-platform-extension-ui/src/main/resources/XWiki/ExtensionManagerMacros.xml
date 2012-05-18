@@ -1154,21 +1154,21 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #if ($xcontext.action == 'get')
           ## AJAX request to show extension details.
           &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" name="showdetails" value="$msg.get('extensions.actions.showDetails')" class="button visibilityAction" /&gt;
+            &lt;input type="submit" name="showdetails" value="$msg.get('extensions.actions.showDetails')" class="button secondary visibilityAction" /&gt;
           &lt;/span&gt;
           &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" name="hidedetails" value="$msg.get('extensions.actions.hideDetails')" class="button visibilityAction" /&gt;
+            &lt;input type="submit" name="hidedetails" value="$msg.get('extensions.actions.hideDetails')" class="button secondary visibilityAction" /&gt;
           &lt;/span&gt;
         #else
           ## The given extension is displayed alone.
           &lt;span class="buttonwrapper"&gt;
-            &lt;a href="${xback}" class="button"&gt;$msg.get('extensions.actions.back')&lt;/a&gt;
+            &lt;a href="${xback}" class="button secondary"&gt;$msg.get('extensions.actions.back')&lt;/a&gt;
           &lt;/span&gt;
         #end
       #else
         ## The given extension is displayed in a list of extensions.
         &lt;span class="buttonwrapper"&gt;
-          &lt;input type="submit" name="actionshowdetails" value="$msg.get('extensions.actions.showDetails')" class="button" /&gt;
+          &lt;input type="submit" name="actionshowdetails" value="$msg.get('extensions.actions.showDetails')" class="button secondary" /&gt;
         &lt;/span&gt;
         &lt;input type="hidden" name="xback" value="${xback}" /&gt;
       #end

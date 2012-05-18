@@ -39,6 +39,13 @@
     <property name="wiki" type="string" column="ase_wiki" length="255" index="EVENT_WIKI" />
     <property name="space" type="string" column="ase_space" length="255" index="EVENT_SPACE" />
     <property name="page" type="string" column="ase_page" length="255" index="EVENT_PAGE" />
+    <property name="hidden" type="boolean">
+      <!-- Here we have a <column> element instead of a "column" attribute in the <property> element.
+           The reason is that we need the "default" attribute, so that upgrades don't fail. This attribute, unlike the
+            others, can only be used in the <column> element, not in <property>.
+      -->
+      <column name="ase_hidden" index="EVENT_HIDDEN" not-null="true" default="false"/>
+    </property>
     <property name="url" type="string" column="ase_url" length="2000" />
     <property name="title" type="string" column="ase_title" length="2000" />
     <property name="body" type="string" column="ase_body" length="2000" />

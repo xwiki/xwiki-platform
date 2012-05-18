@@ -37,6 +37,7 @@ import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -381,7 +382,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title,
         List<String> params, XWikiContext context) throws ActivityStreamException
     {
-        ActivityEvent event = newActivityEvent();
+        ActivityEventImpl event = new ActivityEventImpl();
         event.setStream(streamName);
         event.setPage(doc.getFullName());
         if (doc.getDatabase() != null) {
@@ -396,6 +397,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         event.setParams(params);
         // This might be wrong once non-altering events will be logged.
         event.setUser(doc.getAuthor());
+        event.setHidden(doc.isHidden());
         addActivityEvent(event, doc, context);
     }
 
@@ -607,6 +609,16 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         return searchEvents(fromHql, hql, filter, false, nb, start, parameterValues, context);
     }
 
+    /**
+     * @return True if the search methods must exclude hidden events, false otherwise.
+     */
+    private boolean filterHiddenEvents()
+    {
+        ConfigurationSource source = Utils.getComponent(ConfigurationSource.class, "user");
+        Integer preference = source.getProperty("displayHiddenDocuments", Integer.class);
+        return preference == null || preference != 1;
+    }
+
     @Override
     public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb,
         int start, List<Object> parameterValues, XWikiContext context) throws ActivityStreamException
@@ -614,16 +626,21 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         StringBuffer searchHql = new StringBuffer();
         List<ActivityEvent> results;
 
+        String hiddenFilter = "";
+        if (filterHiddenEvents()) {
+            hiddenFilter = "(act.hidden <> true or act.hidden is null) and ";
+        }
+
         if (filter) {
             searchHql.append("select act from ActivityEventImpl as act, ActivityEventImpl as act2 ");
             searchHql.append(fromHql);
-            searchHql.append(" where act.eventId=act2.eventId and ");
+            searchHql.append(" where act.eventId=act2.eventId and " + hiddenFilter);
             searchHql.append(hql);
             searchHql.append(" group by act.requestId having (act.priority)=max(act2.priority) order by act.date desc");
         } else {
             searchHql.append("select act from ActivityEventImpl as act ");
             searchHql.append(fromHql);
-            searchHql.append(" where ");
+            searchHql.append(" where " + hiddenFilter);
             searchHql.append(hql);
             searchHql.append(" order by act.date desc");
         }

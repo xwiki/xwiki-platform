@@ -133,6 +133,11 @@ public class ActivityEventImpl implements ActivityEvent
     protected String param5 = "";
 
     /**
+     * True if the page which fired the event is marked as hidden, false otherwise.
+     */
+    protected boolean hidden;
+
+    /**
      * Named parameters.
      */
     protected Map<String, String> parameters;
@@ -449,5 +454,22 @@ public class ActivityEventImpl implements ActivityEvent
     public Map<String, String> getParameters()
     {
         return this.parameters;
+    }
+
+    /**
+     * @return True if the event has been triggered by an action performed on a document marked as hidden.
+     */
+    public boolean isHidden()
+    {
+        return this.hidden;
+    }
+
+    /**
+     * @param hidden the event hidden flag.
+     * @see #isHidden()
+     */
+    public void setHidden(boolean hidden)
+    {
+        this.hidden = hidden;
     }
 }

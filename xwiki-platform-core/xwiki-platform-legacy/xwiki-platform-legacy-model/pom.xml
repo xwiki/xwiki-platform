@@ -33,10 +33,6 @@
   <name>XWiki Platform - Legacy - Model</name>
   <packaging>jar</packaging>
   <description>Legacy package for xwiki-platform-model</description>
-  <properties>
-    <!-- Remove when 4.0 is released -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

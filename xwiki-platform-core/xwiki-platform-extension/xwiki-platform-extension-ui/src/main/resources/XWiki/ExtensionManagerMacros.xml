@@ -1107,12 +1107,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
             #end
           &lt;/dl&gt;
           &lt;p&gt;
-            &lt;span class="buttonwrapper"&gt;
-              &lt;input type="submit" value="$msg.get('extensions.advancedSearch.actions.submit')" class="button" /&gt;
-            &lt;/span&gt;
-            &lt;span class="buttonwrapper"&gt;
-              &lt;a href="#extension-search-simple" class="actioncancel secondary button"&gt;$msg.get('extensions.advancedSearch.actions.cancel')&lt;/a&gt;
-            &lt;/span&gt;
+            #em_submitButton('extensions.advancedSearch.actions.submit')
+            #em_linkButton('#extension-search-simple' 'extensions.advancedSearch.actions.cancel' 'actioncancel')
           &lt;/p&gt;
         &lt;/div&gt;
       &lt;/fieldset&gt;
@@ -1153,23 +1149,15 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
         #if ($xcontext.action == 'get')
           ## AJAX request to show extension details.
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" name="showdetails" value="$msg.get('extensions.actions.showDetails')" class="button secondary visibilityAction" /&gt;
-          &lt;/span&gt;
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" name="hidedetails" value="$msg.get('extensions.actions.hideDetails')" class="button secondary visibilityAction" /&gt;
-          &lt;/span&gt;
+          #em_submitButton('extensions.actions.showDetails' 'showdetails' true 'visibilityAction')
+          #em_submitButton('extensions.actions.hideDetails' 'hidedetails' true 'visibilityAction')
         #else
           ## The given extension is displayed alone.
-          &lt;span class="buttonwrapper"&gt;
-            &lt;a href="${xback}" class="button secondary"&gt;$msg.get('extensions.actions.back')&lt;/a&gt;
-          &lt;/span&gt;
+          #em_linkButton($xback 'extensions.actions.back')
         #end
       #else
         ## The given extension is displayed in a list of extensions.
-        &lt;span class="buttonwrapper"&gt;
-          &lt;input type="submit" name="actionshowdetails" value="$msg.get('extensions.actions.showDetails')" class="button secondary" /&gt;
-        &lt;/span&gt;
+        #em_submitButton('extensions.actions.showDetails' 'actionshowdetails' true)
         &lt;input type="hidden" name="xback" value="${xback}" /&gt;
       #end
       ##
@@ -1181,14 +1169,20 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #end
         #if ($extensionStatus == 'installed' &amp;&amp; ($xcontext.isMainWiki() || !$extension.isInstalled(null)))
           ## This extension can be uninstalled.
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" name="actionuninstall" value="$msg.get('extensions.actions.uninstall')" class="button secondary" /&gt;
-          &lt;/span&gt;
-        #elseif ($extensionStatus == 'remote' || $extensionStatus == 'remote-installed')
+          #em_submitButton('extensions.actions.uninstall' 'actionuninstall' true)
+        #elseif ($extensionStatus == 'remote')
           ## Installable extension.
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" name="actioninstall" value="$msg.get('extensions.actions.install')" class="button" /&gt;
-          &lt;/span&gt;
+          #em_submitButton('extensions.actions.install' 'actioninstall')
+        #elseif ($extensionStatus == 'remote-installed')
+          ## An extension that can be either upgraded or downgraded.
+          ## Compare this version with the version that is currently installed to determine which button to display.
+          #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace).id.version)
+          #if ($extension.id.version.compareTo($currentVersion) &gt; 0)
+            #em_submitButton('extensions.actions.upgrade' 'actioninstall')
+          #else
+            ## TODO: Uncomment the following line when extension manager will support downgrading an extension.
+            ##em_submitButton('extensions.actions.downgrade' 'actioninstall')
+          #end
         #end
       #end
     &lt;/div&gt;
@@ -1501,9 +1495,9 @@ $xwiki.jsx.use('ExtensionManagerMacros')
               #end
               &lt;input name="actioninstall" type="hidden" /&gt;
               &lt;p&gt;
-                &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.install.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
+                #em_submitButton('extensions.install.actions.submit' 'confirm')
                 #if ("$!{request.xback}" != '')
-                  &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.install.actions.cancel')&lt;/a&gt;&lt;/span&gt;
+                  #em_linkButton($request.xback 'extensions.install.actions.cancel')
                 #end
               &lt;/p&gt;
             &lt;/div&gt;
@@ -1576,9 +1570,9 @@ $xwiki.jsx.use('ExtensionManagerMacros')
               #end
               &lt;input name="actionuninstall" type="hidden" /&gt;
               &lt;p&gt;
-                &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('extensions.uninstall.actions.submit')" name="confirm" class="button"/&gt;&lt;/span&gt;
+                #em_submitButton('extensions.uninstall.actions.submit' 'confirm')
                 #if ("$!{request.xback}" != '')
-                  &lt;span class="buttonwrapper"&gt;&lt;a href="${request.xback}" class="secondary button"&gt;$msg.get('extensions.uninstall.actions.cancel')&lt;/a&gt;&lt;/span&gt;
+                  #em_linkButton($request.xback 'extensions.uninstall.actions.cancel')
                 #end
               &lt;/p&gt;
             &lt;/div&gt;
@@ -1752,6 +1746,18 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #set ($status = $options.get(2))
   #end
   $status##
+#end
+
+#macro(em_submitButton $value $name $secondary $extraClassName)
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input type="submit" value="$escapetool.xml($msg.get($value))"#if($name) name="$escapetool.xml($name)"#end class="button#if($secondary) secondary#end#if($extraClassName) $!escapetool.xml($extraClassName)#end"/&gt;
+  &lt;/span&gt;
+#end
+
+#macro(em_linkButton $href $label $extraClassName)
+  &lt;span class="buttonwrapper"&gt;
+    &lt;a href="$escapetool.xml($href)" class="button secondary#if($extraClassName) $!escapetool.xml($extraClassName)#end"&gt;$msg.get($label)&lt;/a&gt;
+  &lt;/span&gt;
 #end
 {{/velocity}}</content>
 </xwikidoc>

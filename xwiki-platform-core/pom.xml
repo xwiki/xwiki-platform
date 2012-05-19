@@ -224,12 +224,13 @@
           <excludes>
             <exclude>**/internal/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <exclude>org/xwiki/gwt/wysiwyg/client/diff/**</exclude>
-            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/sync/**</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/diff/**</exclude> <!-- Moved as a new module -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/sync/**</exclude> <!-- Moved as a new module -->
             <exclude>org/xwiki/gwt/wysiwyg/client/Images</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
-            <exclude>org/xwiki/wysiwyg/server/plugin/sync/**</exclude>
-            <exclude>org/xwiki/query/QueryFilter</exclude>
+            <exclude>org/xwiki/wysiwyg/server/plugin/sync/**</exclude> <!-- Moved as a new module -->
+            <exclude>org/xwiki/query/QueryFilter</exclude> <!-- Real API breakage -->
+            <exclude>com/xpn/xwiki/plugin/autotag</exclude> <!-- Moved as a new module -->
           </excludes>
         </configuration>
       </plugin>

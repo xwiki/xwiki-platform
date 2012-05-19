@@ -623,7 +623,9 @@ public class Utils
 
     /**
      * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
+    @Deprecated
     public static ComponentManager getComponentManager()
     {
         return componentManager;
@@ -668,7 +670,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
+    @Deprecated
     public static <T> T getComponent(Type roleType, String roleHint)
     {
         T component;
@@ -695,7 +699,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
+    @Deprecated
     public static <T> T getComponent(Type roleType)
     {
         return getComponent(roleType, "default");

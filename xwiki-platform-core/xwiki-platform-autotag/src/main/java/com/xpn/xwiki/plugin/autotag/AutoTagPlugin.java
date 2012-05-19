@@ -422,13 +422,18 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
     /**
      * Build a tag cloud using the relative frequencies of the selected tags. This method must be called by
      * {@link #calculateTags(TagCloud)}.
-     *
+     * 
      * @param tagCloud the instance to process
      * @return the resulting set of tags, which is also stored in the instance {@link TagCloud#getTags() TagCloud}
      */
     private Set<Tag> calculateTagSizes(TagCloud tagCloud)
     {
         Map<String, Integer> stemmedWordFreqMap = tagCloud.getStemmedWordFreqMap();
+        // If there's no text, just use an empty set of tags and return
+        if (stemmedWordFreqMap == null || stemmedWordFreqMap.size() == 0) {
+            tagCloud.setTags(new TreeSet<Tag>());
+            return tagCloud.getTags();
+        }
         // We order the list by the value to select the most frequent tags
         Map<String, Integer> orderedMap = sortMap(stemmedWordFreqMap);
 
@@ -441,7 +446,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
                 break;
             }
         }
-        Integer[] freqs = (Integer[]) tagMap.values().toArray();
+        Integer[] freqs = tagMap.values().toArray(new Integer[0]);
 
         Integer minFreq = freqs[0];
         Integer maxFreq = freqs[freqs.length - 1];

@@ -39,7 +39,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Handle XHTML rendering for links to documents.
+ * Handle XHTML rendering for links to extensions.
  * 
  * @version $Id$
  * @since 3.4RC1

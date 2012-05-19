@@ -39,6 +39,10 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
     @MockingRequirement
     private ComponentScriptService css;
 
+    private interface SomeRole
+    {
+    }
+
     @Test
     public void getComponentManagerWhenNoProgrammingRights() throws Exception
     {
@@ -51,6 +55,59 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
         Assert.assertEquals(null, this.css.getComponentManager());
     }
 
+    @Test
+    public void getComponentInstanceWithNoHintWhenNoProgrammingRights() throws Exception
+    {
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(false));
+        }});
+
+        Assert.assertEquals(null, this.css.getInstance(SomeRole.class));
+    }
+
+    @Test
+    public void getComponentInstanceWithNoHintWhenProgrammingRights() throws Exception
+    {
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(true));
+            oneOf(cm).getInstance(SomeRole.class);
+            will(returnValue(getMockery().mock(SomeRole.class)));
+        }});
+
+        Assert.assertTrue(this.css.getInstance(SomeRole.class) instanceof SomeRole);
+    }
+
+    @Test
+    public void getComponentInstanceWithHintWhenNoProgrammingRights() throws Exception
+    {
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(false));
+        }});
+
+        Assert.assertEquals(null, this.css.getInstance(SomeRole.class, "hint"));
+    }
+
+    @Test
+    public void getComponentInstanceWithHintWhenProgrammingRights() throws Exception
+    {
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(true));
+            oneOf(cm).getInstance(SomeRole.class, "hint");
+            will(returnValue(getMockery().mock(SomeRole.class)));
+        }});
+
+        Assert.assertTrue(this.css.getInstance(SomeRole.class, "hint") instanceof SomeRole);
+    }
     @Test
     public void getComponentManagerWhenProgrammingRights() throws Exception
     {

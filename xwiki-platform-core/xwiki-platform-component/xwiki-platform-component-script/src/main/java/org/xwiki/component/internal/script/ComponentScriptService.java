@@ -19,12 +19,15 @@
  */
 package org.xwiki.component.internal.script;
 
+import java.lang.reflect.Type;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
 
@@ -57,5 +60,47 @@ public class ComponentScriptService implements ScriptService
     public ComponentManager getComponentManager()
     {
         return this.bridge.hasProgrammingRights() ? this.componentManager : null;
+    }
+
+    /**
+     * Find a component instance that implements that passed type. If the component has a singleton lifecycle then this
+     * method always return the same instance.
+     *
+     * @param <T> the component role type
+     * @param roleType the class (aka role) that the component implements
+     * @return the component instance
+     * @throws ComponentLookupException in case the component cannot be found
+     * @since 4.0RC1
+     */
+    <T> T getInstance(Type roleType) throws ComponentLookupException
+    {
+        T result = null;
+        ComponentManager cm = getComponentManager();
+        if (cm != null) {
+            result = cm.getInstance(roleType);
+        }
+        return result;
+    }
+
+    /**
+     * Find a component instance that implements that passed interface class. If the component has a singleton lifecycle
+     * then this method always return the same instance.
+     *
+     * @param <T> the component role type
+     * @param roleType the class (aka role) that the component implements
+     * @param roleHint the hint that differentiates a component implementation from another one (each component is
+     *            registered with a hint; the "default" hint being the default)
+     * @return the component instance
+     * @throws ComponentLookupException in case the component cannot be found
+     * @since 4.0RC1
+     */
+    <T> T getInstance(Type roleType, String roleHint) throws ComponentLookupException
+    {
+        T result = null;
+        ComponentManager cm = getComponentManager();
+        if (cm != null) {
+            result = cm.getInstance(roleType, roleHint);
+        }
+        return result;
     }
 }

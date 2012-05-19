@@ -1158,6 +1158,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .actionmenu .tmCreate {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
+  ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
+  #foreach ($prefix in ['-moz-', '-webkit-', '-o-', '-ms-', ''])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
 }
 
 .actionmenu .tmWiki {
@@ -1905,16 +1909,6 @@ h1.xwikipaneltitle {
 
 .actionmenu .tmCreate:hover {
   border-radius: 4px 4px 0px 0px;
-}
-
-.actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
-  #css3_backgroundLinearGradient({
-     'angle': 'top',
-     'colors': [
-      {'color': 'rgba(236,236,236,0.3)', 'position': '0%'},
-      {'color': 'rgba(236,236,236,0)', 'position': '30%'}
-    ]
-  })
 }
 
 .tmCreate  .tme-extensible {

@@ -230,7 +230,7 @@
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
             <exclude>org/xwiki/wysiwyg/server/plugin/sync/**</exclude> <!-- Moved as a new module -->
             <exclude>org/xwiki/query/QueryFilter</exclude> <!-- Real API breakage -->
-            <exclude>com/xpn/xwiki/plugin/autotag</exclude> <!-- Moved as a new module -->
+            <exclude>com/xpn/xwiki/plugin/autotag/**</exclude> <!-- Moved as a new module -->
           </excludes>
         </configuration>
       </plugin>

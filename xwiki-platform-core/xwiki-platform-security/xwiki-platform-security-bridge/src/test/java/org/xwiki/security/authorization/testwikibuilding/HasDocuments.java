@@ -17,19 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.authorization.testwikibuilding;
 
-import java.util.Set;
-
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.RightSet;
-import org.xwiki.security.authorization.RuleState;
-
-public class MockSecurityRule extends XWikiSecurityRule
+/**
+ * This interface is used for building a mocked test setup for testing the authorization manager.
+ *
+ * Interface for entities that contain documents.  I.e., a space.
+ *
+ * @since 4.2
+ * @version $Id$
+ */
+public interface HasDocuments extends HasAcl
 {
-    public MockSecurityRule(RightSet rights, RuleState state, Set<DocumentReference> users,
-        Set<DocumentReference> groups)
-    {
-        super(rights, state, users, groups);
-    }
+
+    /**
+     * @param name The name of the document to add.
+     * @return an entity representing the document that holds the acl of the document.
+     */
+    HasAcl addDocument(String name);
+
 }

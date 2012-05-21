@@ -231,6 +231,14 @@
             <exclude>org/xwiki/wysiwyg/server/plugin/sync/**</exclude> <!-- Moved sync plugin to new module -->
             <exclude>org/xwiki/query/QueryFilter</exclude> <!-- Real API breakage -->
             <exclude>com/xpn/xwiki/plugin/autotag/**</exclude> <!-- Moved as a new module -->
+            <!-- This class was added in 3.2M2 by error in a user-public package. It's been moved again in the
+                 internal package as it should have been. We don't expect many users to be affected by this. -->
+            <exclude>com/xpn/xwiki/doc/merge/MergeUtils</exclude>
+            <!-- In 2.2M1 we refactored BaseCollection to add getXClass() but we forgot to add it to the
+                 ObjectInterface interface. Even though this could break user we think it's very limited since
+                 nobody should implement directly ObjectInterface; instead everyone should extend BaseClass or
+                 BaseCollection. -->
+            <exclude>com/xpn/xwiki/objects/ObjectInterface</exclude>
             <!-- The following excludes are needed because we've upgraded from AspectJ 1.6.7 to AspectJ 1.6.11
                  in 4.0-milestone-1 and AspectJ has changed the way they weave stuff in class files thus leading to
                  false CLIRR errors (see http://www.eclipse.org/aspectj/doc/released/README-169.html - search for

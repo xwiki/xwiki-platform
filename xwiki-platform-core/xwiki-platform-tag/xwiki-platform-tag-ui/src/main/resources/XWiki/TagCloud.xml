@@ -376,11 +376,13 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #end
   &lt;/ol&gt;
 #else
+  &lt;p class="noitems"&gt;
   #if("$!tagCloudSpace" == "")
     $msg.get("xe.tag.notags")
   #else
     $msg.get("xe.tag.notagsforspace", ["$tagCloudSpace"])
   #end
+  &lt;/p&gt;
 #end
 {{/html}}
 {{/velocity}}</code>

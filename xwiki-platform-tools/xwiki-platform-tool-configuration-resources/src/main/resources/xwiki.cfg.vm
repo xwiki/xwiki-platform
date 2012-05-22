@@ -389,7 +389,7 @@ xwiki.editcomment.mandatory=$xwikiCfgEditCommentMandatory
 #-# Turn LDAP authentication on - otherwise only XWiki authentication
 #-# - 0: disable
 #-# - 1: enable
-#-# The default is 1
+#-# The default is 0
 # xwiki.authentication.ldap=1
 
 #-# LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
@@ -438,8 +438,8 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 #-# account is created.
 #-# - 0: only when creating user
 #-# - 1: at each authentication
-#-# The default is 1
-# xwiki.authentication.ldap.update_user=1
+#-# The default is 0
+xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# Maps XWiki groups to LDAP groups, separator is "|". The following kind of groups are supported:
@@ -465,8 +465,10 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 # xwiki.authentication.ldap.mode_group_sync=always
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
-#-# The default is 1
+#-# If ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 0
 xwiki.authentication.ldap.trylocal=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]

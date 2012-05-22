@@ -45,9 +45,10 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ### Administer localization wiki preferences, at global level
-#set($legend = ['language', 'translations'])
+#set($legend = ['language', 'date', 'translations'])
 #set($params = {})
-#set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
+#set($params.language = ['multilingual', 'languages' , 'default_language'])
+#set($params.date = ['dateformat', 'timezone'])
 #set($params.translations = ['documentBundles'])
 {{/velocity}}
 

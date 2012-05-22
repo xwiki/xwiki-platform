@@ -71,6 +71,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -3047,6 +3048,11 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
         needsUpdate |= bclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
+        needsUpdate |= bclass.addStaticListField("timezone", "Timezone", "---|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|" +
+                "Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|" +
+                "Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|" +
+                "Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|" +
+                "Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12");
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
@@ -5629,7 +5635,9 @@ public class XWiki implements EventListener
     public String getUserTimeZone(XWikiContext context)
     {
         String tz = getUserPreference("timezone", context);
-        if ((tz == null) || (tz.equals(""))) {
+        // We perform this verification ourselves since TimeZone#getTimeZone(String) with an invalid parameter returns
+        // GMT and not the system default.
+        if (!ArrayUtils.contains(TimeZone.getAvailableIDs(), tz)) {
             String defaultTz = TimeZone.getDefault().getID();
             return Param("xwiki.timezone", defaultTz);
         } else {

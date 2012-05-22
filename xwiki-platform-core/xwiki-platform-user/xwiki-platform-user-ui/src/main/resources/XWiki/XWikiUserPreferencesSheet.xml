@@ -65,6 +65,11 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.enableAccessibility')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('accessibility')&lt;/dd&gt;
       &lt;/dl&gt;
+      &lt;h1&gt;$msg.get('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
+      &lt;dl&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.timezone')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;$doc.display('timezone')&lt;/dd&gt;
+      &lt;/dl&gt;
       &lt;h1&gt;$msg.get('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;

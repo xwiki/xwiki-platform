@@ -1038,6 +1038,27 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </tags>
+    <timezone>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>timezone</name>
+      <number>71</number>
+      <picker>0</picker>
+      <prettyName>Timezone</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>default=System Default|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </timezone>
     <title>
       <customDisplay/>
       <disabled>0</disabled>
@@ -2417,6 +2438,27 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </tags>
+      <timezone>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>timezone</name>
+        <number>71</number>
+        <picker>0</picker>
+        <prettyName>Timezone</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>default=System Default|Etc/GMT-12=GMT-12|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </timezone>
       <title>
         <customDisplay/>
         <disabled>0</disabled>

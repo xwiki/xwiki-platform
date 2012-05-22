@@ -3030,6 +3030,7 @@ public class XWiki implements EventListener
             builder.append("  #end\n");
             builder.append("#end\n");
             builder.append("{{/velocity}}");
+            emailProperty.setCustomDisplay(builder.toString());
             needsUpdate = true;
         }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);

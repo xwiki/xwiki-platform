@@ -52,7 +52,7 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
             will(returnValue(false));
         }});
 
-        Assert.assertEquals(null, this.css.getComponentManager());
+        Assert.assertNull(this.css.getComponentManager());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
             will(returnValue(false));
         }});
 
-        Assert.assertEquals(null, this.css.getInstance(SomeRole.class));
+        Assert.assertNull(this.css.getInstance(SomeRole.class));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
             will(returnValue(false));
         }});
 
-        Assert.assertEquals(null, this.css.getInstance(SomeRole.class, "hint"));
+        Assert.assertNull(this.css.getInstance(SomeRole.class, "hint"));
     }
 
     @Test

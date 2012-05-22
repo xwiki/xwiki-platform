@@ -130,6 +130,9 @@ XWiki.ExtensionBehaviour = Class.create({
 
     // Enhances the behaviour of the Progress section.
     this._enhanceProgressBehaviour();
+
+    // Refresh the extension display if the extension has a job running.
+    this._maybeScheduleRefresh();
   },
 
   /**
@@ -198,7 +201,8 @@ XWiki.ExtensionBehaviour = Class.create({
 
   _update : function(html) {
     // Save the current state of the extension display so that it can be restored afterwards.
-    var extensionBodyHidden = this.container.down('.extension-body').hasClassName('hidden');
+    var extensionBody = this.container.down('.extension-body');
+    var extensionBodyHidden = !extensionBody || extensionBody.hasClassName('hidden');
     var currentMenuItem = this.container.down('.innerMenu li a.current');
     currentMenuItem &amp;&amp; (this._previouslySelectedMenuItem = currentMenuItem.getAttribute('href'));
     // Replace the current extension container element with the one that was just fetched.
@@ -209,7 +213,7 @@ XWiki.ExtensionBehaviour = Class.create({
     // Restore the state of the extension display.
     extensionBodyHidden &amp;&amp; this._onToggleShowHideDetails({
       stop : function() {},
-      element : function() {return this.container.down('input[name="hidedetails"]')}.bind(this)
+      element : function() {return this.container.down('input[name="hideDetails"]')}.bind(this)
     });
   },
 
@@ -239,18 +243,18 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enables the asynchronous loading of extension details and the show/hide extension details toggle.
    */
   _enhanceShowDetailsBehaviour : function() {
-    var showDetailsButton = this.container.down('input[name="actionshowdetails"]');
+    var showDetailsButton = this.container.down('input[name="actionShowDetails"]');
     if (showDetailsButton) {
       // Load the extension details asynchronously.
       showDetailsButton.observe('click', this._onShowDetails.bindAsEventListener(this));
     } else {
-      showDetailsButton = this.container.down('input[name="showdetails"]');
+      showDetailsButton = this.container.down('input[name="showDetails"]');
       if (!showDetailsButton) {
         return;
       }
       // Show/hide extension details toggle.
       showDetailsButton = showDetailsButton.up();
-      var hideDetailsButton = this.container.down('input[name="hidedetails"]').up();
+      var hideDetailsButton = this.container.down('input[name="hideDetails"]').up();
       showDetailsButton.__otherButton = hideDetailsButton;
       hideDetailsButton.__otherButton = showDetailsButton;
       this.container.select('.visibilityAction').invoke('observe', 'click', this._onToggleShowHideDetails.bindAsEventListener(this));
@@ -272,7 +276,7 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enhances the behaviour of the install button: computes the install plan asynchronously.
    */
   _enhanceInstallBehaviour : function() {
-    var installButton = this.container.down('input[name="actioninstall"]');
+    var installButton = this.container.down('input[name="actionInstall"]');
     installButton &amp;&amp; installButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
@@ -280,7 +284,7 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enhances the behaviour of the uninstall button: computes the uninstall plan asynchronously.
    */
   _enhanceUninstallBehaviour : function() {
-    var uninstallButton = this.container.down('input[name="actionuninstall"]');
+    var uninstallButton = this.container.down('input[name="actionUninstall"]');
     uninstallButton &amp;&amp; uninstallButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
@@ -294,7 +298,7 @@ XWiki.ExtensionBehaviour = Class.create({
       // Make sure the extension details are visible.
       extensionBody.hasClassName('hidden') &amp;&amp; this._onToggleShowHideDetails({
         stop : function() {},
-        element : function() {return this.container.down('input[name="showdetails"]')}.bind(this)
+        element : function() {return this.container.down('input[name="showDetails"]')}.bind(this)
       });
       // Prepare the progress section: create one if it is missing, clear its contents otherwise.
       var progressSection = this._prepareProgressSectionForLoading();
@@ -375,8 +379,6 @@ XWiki.ExtensionBehaviour = Class.create({
       onCreate : this._onBeforeStartJob.bind(this),
       onSuccess : function(response) {
         this._update(response.responseText);
-        // Refresh the extension display until the job is done.
-        this._maybeScheduleRefresh();
       }.bind(this),
       onComplete : this._onAfterStartJob.bind(this)
     });
@@ -396,7 +398,7 @@ XWiki.ExtensionBehaviour = Class.create({
       onSuccess : function(response) {
         this._update(response.responseText);
       }.bind(this),
-      onComplete : this._maybeScheduleRefresh.bind(this)
+      onFailure : this._maybeScheduleRefresh.bind(this)
     });
   },
 
@@ -404,7 +406,7 @@ XWiki.ExtensionBehaviour = Class.create({
    * Schedule a new refresh if the extension has a job running.
    */
   _maybeScheduleRefresh : function() {
-    this.container.hasClassName('extension-item-loading') &amp;&amp; this._refresh.bind(this).delay(1);
+    this.container.hasClassName('extension-item-loading') &amp;&amp; !this.container.down('input[name="confirm"]') &amp;&amp; this._refresh.bind(this).delay(1);
   },
 
   /**
@@ -520,7 +522,7 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
           target.toggleClassName('hidden');
           advancedSearchTrigger.toggleClassName('expanded');
         });
-        var cancelTrigger = target.down('a.actioncancel');
+        var cancelTrigger = target.down('a.actionCancel');
         if (cancelTrigger) {
           cancelTrigger.observe('click', function(event) {
             event.stop();
@@ -1108,7 +1110,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
           &lt;/dl&gt;
           &lt;p&gt;
             #em_submitButton('extensions.advancedSearch.actions.submit')
-            #em_linkButton('#extension-search-simple' 'extensions.advancedSearch.actions.cancel' 'actioncancel')
+            #em_linkButton('#extension-search-simple' 'extensions.advancedSearch.actions.cancel' 'actionCancel')
           &lt;/p&gt;
         &lt;/div&gt;
       &lt;/fieldset&gt;
@@ -1118,7 +1120,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   )))
 #end
 
-#macro (displayExtensionName $extension $actions)
+#macro (displayExtensionName $extension)
   #set ($name = "$!{extension.name}")
   #if ($name == '')
     #set ($name = "$!{extension.id.id}")
@@ -1133,14 +1135,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   {{html}}
   &lt;form action=""&gt;
     &lt;div class="extension-actions"&gt;
-      &lt;input type="hidden" name="extensionId" value="$extension.id.id" /&gt;
-      &lt;input type="hidden" name="extensionVersion" value="$extension.id.version" /&gt;
-      #if ($extensionWiki)
-        &lt;input type="hidden" name="extensionWiki" value="$extensionWiki" /&gt;
-      #end
-      #if ($request.section)
-        &lt;input type="hidden" name="section" value="$escapetool.xml($request.section)" /&gt;
-      #end
+      #extensionHiddenFormFields($extension.id.id $extension.id.version true)
       ##
       ## Generic actions.
       ##
@@ -1149,15 +1144,15 @@ $xwiki.jsx.use('ExtensionManagerMacros')
       #if ($request.extensionId == $extension.id.id &amp;&amp; $request.extensionVersion == $extension.id.version.value)
         #if ($xcontext.action == 'get')
           ## AJAX request to show extension details.
-          #em_submitButton('extensions.actions.showDetails' 'showdetails' true 'visibilityAction')
-          #em_submitButton('extensions.actions.hideDetails' 'hidedetails' true 'visibilityAction')
+          #em_submitButton('extensions.actions.showDetails' 'showDetails' true 'visibilityAction')
+          #em_submitButton('extensions.actions.hideDetails' 'hideDetails' true 'visibilityAction')
         #else
           ## The given extension is displayed alone.
           #em_linkButton($xback 'extensions.actions.back')
         #end
       #else
         ## The given extension is displayed in a list of extensions.
-        #em_submitButton('extensions.actions.showDetails' 'actionshowdetails' true)
+        #em_submitButton('extensions.actions.showDetails' 'actionShowDetails' true)
         &lt;input type="hidden" name="xback" value="${xback}" /&gt;
       #end
       ##
@@ -1169,19 +1164,19 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         #end
         #if ($extensionStatus == 'installed' &amp;&amp; ($xcontext.isMainWiki() || !$extension.isInstalled(null)))
           ## This extension can be uninstalled.
-          #em_submitButton('extensions.actions.uninstall' 'actionuninstall' true)
+          #em_submitButton('extensions.actions.uninstall' 'actionUninstall' true)
         #elseif ($extensionStatus == 'remote')
           ## Installable extension.
-          #em_submitButton('extensions.actions.install' 'actioninstall')
+          #em_submitButton('extensions.actions.install' 'actionInstall')
         #elseif ($extensionStatus == 'remote-installed')
           ## An extension that can be either upgraded or downgraded.
           ## Compare this version with the version that is currently installed to determine which button to display.
           #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace).id.version)
           #if ($extension.id.version.compareTo($currentVersion) &gt; 0)
-            #em_submitButton('extensions.actions.upgrade' 'actioninstall')
+            #em_submitButton('extensions.actions.upgrade' 'actionInstall')
           #else
             ## TODO: Uncomment the following line when extension manager will support downgrading an extension.
-            ##em_submitButton('extensions.actions.downgrade' 'actioninstall')
+            ##em_submitButton('extensions.actions.downgrade' 'actionInstall' true)
           #end
         #end
       #end
@@ -1238,7 +1233,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #end
   ## Display the progress tab if the install/uninstall plan is requested or if there is 
   ## a previously stored job status for this extension (a previous install or uninstall).
-  #set ($planRequested = $request.actioninstall || $request.actionuninstall)
+  #set ($planRequested = $request.actionInstall || $request.actionUninstall)
   #if ($planRequested || $extensionManager.getExtensionJobStatus($extension.id.id))
     * #displayExtensionDetails_menuLink('progress' $planRequested)
   #end
@@ -1352,19 +1347,46 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro (displayExtensionDetails_progress $extension)
   #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
-  #if ($jobStatus || $request.actioninstall || $request.actionuninstall)
+  #if ($jobStatus || $request.actionInstall || $request.actionUninstall)
 
     {{id name="extension-body-progress-${extension.id.id}-${extension.id.version}" /}}
     (% class="extension-body-progress extension-body-section" %)(((
-      #if ($request.actioninstall)
+      #if ($request.actionInstall)
         #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
-      #elseif ($request.actionuninstall)
+      #elseif ($request.actionUninstall)
         #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
       #else
         #printStatusLog($jobStatus)
+        #if ($jobStatus.state == 'WAITING')
+
+          #displayExtensionDetails_progressQuestion($extension $jobStatus)
+        #end
       #end
     )))
   #end
+#end
+
+#macro (displayExtensionDetails_progressQuestion $extension $jobStatus)
+  #set ($question = $jobStatus.question)
+  {{html wiki="true"}}
+    &lt;form action="" method="post" class="xform"&gt;
+      (((
+        #extensionHiddenFormFields($extension.id.id $extension.id.version)
+        &lt;input name="actionContinue" type="hidden" /&gt;
+        ; &lt;label&gt;$msg.get('extensions.upgrade.mergeConflict.label')&lt;/label&gt;##
+          (% class="xHint" %)$msg.get('extensions.upgrade.mergeConflict.hint', ["[[$question.currentDocument&gt;&gt;doc:$services.model.serialize($question.currentDocument.documentReference)]]"])&lt;/label&gt;
+        : &lt;select name="versionToKeep"&gt;
+          #foreach($version in ['NEXT', 'MERGED', 'CURRENT'])
+            &lt;option value="$version"#if ($question.globalAction == $version) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.versionToKeep.$version.toLowerCase()")&lt;/option&gt;
+          #end
+          &lt;/select&gt;
+
+        &lt;p&gt;
+          #em_submitButton('extensions.actions.continue' 'confirm')
+        &lt;/p&gt;
+      )))
+    &lt;/form&gt;
+  {{/html}}
 #end
 
 #macro (displayExtensionDetails $extension)
@@ -1484,16 +1506,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         {{html}}
           &lt;form action="" class="xform"&gt;
             &lt;div&gt;
-              &lt;input name="form_token" value="$!services.csrf.getToken()" type="hidden" /&gt;
-              &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
-              &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
-              #if ($extensionWiki)
-                &lt;input name="extensionWiki" value="$extensionWiki" type="hidden" /&gt;
-              #end
-              #if ($request.section)
-                &lt;input type="hidden" name="section" value="$escapetool.xml($request.section)" /&gt;
-              #end
-              &lt;input name="actioninstall" type="hidden" /&gt;
+              #extensionHiddenFormFields($extensionId $extensionVersion)
+              &lt;input name="actionInstall" type="hidden" /&gt;
               &lt;p&gt;
                 #em_submitButton('extensions.install.actions.submit' 'confirm')
                 #if ("$!{request.xback}" != '')
@@ -1559,16 +1573,8 @@ $xwiki.jsx.use('ExtensionManagerMacros')
         {{html}}
           &lt;form action="" class="xform"&gt;
             &lt;div&gt;
-              &lt;input name="form_token" value="$!services.csrf.getToken()" type="hidden" /&gt;
-              &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
-              &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
-              #if ($extensionWiki)
-                &lt;input name="extensionWiki" value="${extensionWiki}" type="hidden" /&gt;
-              #end
-              #if ($request.section)
-                &lt;input type="hidden" name="section" value="$escapetool.xml($request.section)" /&gt;
-              #end
-              &lt;input name="actionuninstall" type="hidden" /&gt;
+              #extensionHiddenFormFields($extensionId $extensionVersion)
+              &lt;input name="actionUninstall" type="hidden" /&gt;
               &lt;p&gt;
                 #em_submitButton('extensions.uninstall.actions.submit' 'confirm')
                 #if ("$!{request.xback}" != '')
@@ -1610,13 +1616,25 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
+#macro (continueExtensionUpgrade $extensionId)
+  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extensionId))
+  #if ($jobStatus &amp;&amp; $jobStatus.state == 'WAITING')
+    #set($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
+    #set($discard = $jobStatus.answered())
+  #end
+  ## Redirect to extension display.
+  $response.sendRedirect("#getExtensionURL()")
+#end
+
 #macro (handleExtensionRequest)
   #if ($request.confirm)
     #if ($services.csrf.isTokenValid($request.form_token))
-      #if ($request.actioninstall)
+      #if ($request.actionInstall)
         #installExtension($request.extensionId $request.extensionVersion $extensionNamespace)
-      #elseif ($request.actionuninstall)
+      #elseif ($request.actionUninstall)
         #uninstallExtension($request.extensionId $request.extensionVersion $extensionNamespace)
+      #elseif ($request.actionContinue)
+        #continueExtensionUpgrade($request.extensionId)
       #else
         $response.sendRedirect("#getExtensionURL()")
       #end
@@ -1758,6 +1776,20 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   &lt;span class="buttonwrapper"&gt;
     &lt;a href="$escapetool.xml($href)" class="button secondary#if($extraClassName) $!escapetool.xml($extraClassName)#end"&gt;$msg.get($label)&lt;/a&gt;
   &lt;/span&gt;
+#end
+
+#macro(extensionHiddenFormFields $extensionId $extensionVersion $noCSRFToken)
+  #if (!$noCSRFToken)
+    &lt;input name="form_token" value="$!services.csrf.getToken()" type="hidden" /&gt;
+  #end
+  &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
+  &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
+  #if ($extensionWiki)
+    &lt;input name="extensionWiki" value="${escapetool.xml($extensionWiki)}" type="hidden" /&gt;
+  #end
+  #if ($request.section)
+    &lt;input name="section" value="$escapetool.xml($request.section)" type="hidden" /&gt;
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

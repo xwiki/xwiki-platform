@@ -394,6 +394,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(EXTENSION_JOBID_PREFIX + id);
+        installRequest.setInteractive(true);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);

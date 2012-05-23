@@ -199,7 +199,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert
-            .assertEquals("<p><span class=\"wikiexternallink\"><a href=\"/some/path\">" +
+            .assertEquals("<p><span class=\"wikiinternallink\"><a href=\"/some/path\">" +
             		"<span class=\"wikigeneratedlinkcontent\">/some/path</span></a></span></p>",
                 printer.toString());
     }

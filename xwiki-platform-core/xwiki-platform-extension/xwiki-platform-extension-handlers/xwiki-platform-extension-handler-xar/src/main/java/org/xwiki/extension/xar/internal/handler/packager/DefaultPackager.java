@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +35,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.slf4j.Logger;
 import org.xml.sax.ContentHandler;
@@ -146,7 +147,7 @@ public class DefaultPackager implements Packager, Initializable
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
-        ZipInputStream zis = new ZipInputStream(xarInputStream);
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
 
         XWikiContext xcontext = getXWikiContext();
 
@@ -156,7 +157,7 @@ public class DefaultPackager implements Packager, Initializable
 
             this.observation.notify(new XARImportingEvent(), null, xcontext);
 
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+            for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (!entry.isDirectory()) {
                     try {
                         DocumentImporterHandler documentHandler =
@@ -268,10 +269,10 @@ public class DefaultPackager implements Packager, Initializable
         List<XarEntry> documents = null;
 
         FileInputStream fis = new FileInputStream(xarFile);
-        ZipInputStream zis = new ZipInputStream(fis);
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
 
         try {
-            for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
+            for (ZipArchiveEntry zipEntry = zis.getNextZipEntry(); zipEntry != null; zipEntry = zis.getNextZipEntry()) {
                 if (!zipEntry.isDirectory()) {
                     try {
                         XarPageLimitedHandler documentHandler = new XarPageLimitedHandler(this.componentManager);
@@ -283,7 +284,13 @@ public class DefaultPackager implements Packager, Initializable
                         }
 
                         XarEntry xarEntry = documentHandler.getXarEntry();
-                        xarEntry.setZipEntry(zipEntry);
+
+                        // FIXME: workaround a bug in Apache Commons Compress 1.4
+                        // See https://issues.apache.org/jira/browse/COMPRESS-187
+                        if (zipEntry.getComment() == null) {
+                            zipEntry.setComment("");
+                        }
+                        xarEntry.setZipArchiveEntry(zipEntry);
 
                         documents.add(xarEntry);
                     } catch (NotADocumentException e) {

@@ -566,6 +566,12 @@ public class DefaultRepositoryManager implements RepositoryManager
                 .toString());
 
         if (needSave) {
+            document.setAuthorReference(xcontext.getUserReference());
+            if (document.isNew()) {
+                document.setContentAuthorReference(xcontext.getUserReference());
+                document.setCreatorReference(xcontext.getUserReference());
+            }
+
             xcontext.getWiki()
                 .saveDocument(document,
                     "Imported extension [" + extensionId + "] from repository [" + repository.getId() + "]", true,

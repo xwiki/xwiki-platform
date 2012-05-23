@@ -95,22 +95,15 @@ public class LinkConfigDOMReader implements ConfigDOMReader<LinkConfig, AnchorEl
      */
     private LinkType readLinkType(Element wrappingSpan, String reference)
     {
-        String wrappingSpanClass = wrappingSpan.getClassName();
-        if ("wikilink".equals(wrappingSpanClass)) {
-            return LinkType.WIKIPAGE;
+        LinkType linkType = LinkType.getByClassName(wrappingSpan.getClassName());
+        if (linkType == null) {
+            // Default to external link.
+            linkType = LinkType.EXTERNAL;
+        } else if (linkType == LinkType.EXTERNAL && "mailto".equalsIgnoreCase(getLinkProtocol(reference))) {
+            // Email links don't user a dedicated CSS class name.
+            linkType = LinkType.EMAIL;
         }
-        if ("wikicreatelink".equals(wrappingSpanClass)) {
-            return LinkType.NEW_WIKIPAGE;
-        }
-        if ("wikiexternallink".equals(wrappingSpanClass)) {
-            String linkProtocol = getLinkProtocol(reference);
-            if ("mailto".equalsIgnoreCase(linkProtocol)) {
-                return LinkType.EMAIL;
-            } else if ("attach".equalsIgnoreCase(linkProtocol)) {
-                return LinkType.ATTACHMENT;
-            }
-        }
-        return LinkType.EXTERNAL;
+        return linkType;
     }
 
     /**

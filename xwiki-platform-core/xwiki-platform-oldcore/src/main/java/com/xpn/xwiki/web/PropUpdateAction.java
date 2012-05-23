@@ -32,6 +32,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.util.Util;
 
 public class PropUpdateAction extends XWikiAction
 {

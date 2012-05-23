@@ -57,7 +57,7 @@ public class PropUpdateAction extends XWikiAction
             newProperty.getxWikiClass(context).fromMap(map, newProperty);
             String newName = newProperty.getName();
 
-            if (StringUtils.isBlank(newName) || !newName.matches("[\\w\\.\\-\\_]+")) {
+            if (!Util.isValidXMLElementName(newName)) {
                 context.put("message", "propertynamenotcorrect");
                 return true;
             }

@@ -170,6 +170,10 @@
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
     
     <!-- For extracting metadata from various document types -->
     <dependency>

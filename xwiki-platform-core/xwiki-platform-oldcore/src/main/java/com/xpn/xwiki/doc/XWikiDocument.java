@@ -3625,7 +3625,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 4.1M2
      */
+    @Deprecated
     public void addToZip(ZipOutputStream zos, String zipname, boolean withVersions, XWikiContext context)
         throws XWikiException, IOException
     {
@@ -3645,7 +3647,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 4.2M2
      */
+    @Deprecated
     public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws XWikiException,
         IOException
     {
@@ -3668,7 +3672,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 4.1M2
      */
+    @Deprecated
     public void addToZip(ZipOutputStream zos, XWikiContext context) throws XWikiException, IOException
     {
         addToZip(zos, true, context);

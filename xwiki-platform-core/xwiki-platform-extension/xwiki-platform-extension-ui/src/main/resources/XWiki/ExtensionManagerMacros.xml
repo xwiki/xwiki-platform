@@ -1204,7 +1204,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (displayProgressBar $extension)
-  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
+  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #if ($jobStatus &amp;&amp; $jobStatus.state != 'FINISHED')
     (% class="ui-progress" %)(((
       (% class="ui-progress-background" %)(((
@@ -1234,7 +1234,10 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   ## Display the progress tab if the install/uninstall plan is requested or if there is 
   ## a previously stored job status for this extension (a previous install or uninstall).
   #set ($planRequested = $request.actionInstall || $request.actionUninstall)
-  #if ($planRequested || $extensionManager.getExtensionJobStatus($extension.id.id))
+  #if (!$planRequested)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+  #end
+  #if ($planRequested || $jobStatus)
     * #displayExtensionDetails_menuLink('progress' $planRequested)
   #end
 #end
@@ -1346,7 +1349,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 #end
 
 #macro (displayExtensionDetails_progress $extension)
-  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
+  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #if ($jobStatus || $request.actionInstall || $request.actionUninstall)
 
     {{id name="extension-body-progress-${extension.id.id}-${extension.id.version}" /}}
@@ -1616,8 +1619,33 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
-#macro (continueExtensionUpgrade $extensionId)
-  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extensionId))
+#macro (getExtensionJobStatus $extensionId $extensionVersion $return)
+  #set ($_jobStatus = $extensionManager.getExtensionJobStatus($extensionId))
+  #if ($_jobStatus)
+    #set ($_jobRequest = $_jobStatus.request)
+    ## Check if the stored job status also matches the extension name space.
+    #if (!$_jobRequest.hasNamespaces() || $_jobRequest.namespaces.contains($extensionNamespace))
+      ## Check if the stored job status also matches the extension version.
+      #foreach ($_extension in $_jobRequest.extensions)
+        #if ($_extension.id == $extensionId)
+          #set ($_version = $_extension.version)
+          #if (!$_version)
+            ## Some jobs don't require the extension version. Let's determine the currently available version.
+            #set ($_version = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+          #end
+          #if (!$_version || $extensionVersion == $_version.value)
+            #set ($return = $NULL)
+            #setVariable ("$return" $_jobStatus)
+            #break
+          #end
+        #end
+      #end
+    #end
+  #end
+#end
+
+#macro (continueExtensionUpgrade $extensionId $extensionVersion)
+  #getExtensionJobStatus($extensionId $extensionVersion $jobStatus)
   #if ($jobStatus &amp;&amp; $jobStatus.state == 'WAITING')
     #set($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
     #set($discard = $jobStatus.answered())
@@ -1634,7 +1662,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       #elseif ($request.actionUninstall)
         #uninstallExtension($request.extensionId $request.extensionVersion $extensionNamespace)
       #elseif ($request.actionContinue)
-        #continueExtensionUpgrade($request.extensionId)
+        #continueExtensionUpgrade($request.extensionId $request.extensionVersion)
       #else
         $response.sendRedirect("#getExtensionURL()")
       #end
@@ -1719,7 +1747,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 
 #macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage $versionConstraint)
   #set ($currentVersion = $NULL)
-  #set ($jobStatus = $extensionManager.getExtensionJobStatus($extension.id.id))
+  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #if ($jobStatus &amp;&amp; $jobStatus.state != 'FINISHED')
     #set ($status = 'loading')
   #else

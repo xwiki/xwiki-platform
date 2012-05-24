@@ -19,7 +19,9 @@
  */
 package org.xwiki.extension.script.internal;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -87,12 +89,12 @@ public class ExtensionManagerScriptService implements ScriptService
     /**
      * The prefix put behind all job ids.
      */
-    public static final String EXTENSION_JOBID_PREFIX = "extension_";
+    public static final String EXTENSION_JOBID_PREFIX = "extension";
 
     /**
      * The prefix put behind all job ids.
      */
-    public static final String EXTENSIONPLAN_JOBID_PREFIX = EXTENSION_JOBID_PREFIX + "_plan_";
+    public static final String EXTENSIONPLAN_JOBID_PREFIX = EXTENSION_JOBID_PREFIX + "_plan";
 
     /**
      * The real extension manager bridged by this script service.
@@ -393,7 +395,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(EXTENSION_JOBID_PREFIX + id);
+        installRequest.setId(Arrays.asList(EXTENSION_JOBID_PREFIX, id, namespace));
         installRequest.setInteractive(true);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
@@ -427,7 +429,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(EXTENSIONPLAN_JOBID_PREFIX + id);
+        installRequest.setId(Arrays.asList(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -468,7 +470,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(EXTENSION_JOBID_PREFIX + id);
+        uninstallRequest.setId(Arrays.asList(EXTENSION_JOBID_PREFIX, id, namespace));
         uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -516,7 +518,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(EXTENSIONPLAN_JOBID_PREFIX + id);
+        uninstallRequest.setId(Arrays.asList(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
         uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -563,7 +565,7 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(EXTENSIONPLAN_JOBID_PREFIX);
+        installRequest.setId(Arrays.asList(EXTENSIONPLAN_JOBID_PREFIX, namespace));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
         }
@@ -600,7 +602,7 @@ public class ExtensionManagerScriptService implements ScriptService
         return this.jobManager.getCurrentJob();
     }
 
-    private JobStatus getJobStatus(String jobId)
+    private JobStatus getJobStatus(List<String> jobId)
     {
         JobStatus jobStatus = this.jobManager.getJobStatus(jobId);
 
@@ -615,22 +617,24 @@ public class ExtensionManagerScriptService implements ScriptService
      * Return job status corresponding to the provided extension id from the current executed job or stored history.
      * 
      * @param extensionId the extension identifier
+     * @param namespace the namespace where the job is being or has been executed
      * @return the job status corresponding to the provided extension
      */
-    public JobStatus getExtensionJobStatus(String extensionId)
+    public JobStatus getExtensionJobStatus(String extensionId, String namespace)
     {
-        return getJobStatus(EXTENSION_JOBID_PREFIX + extensionId);
+        return getJobStatus(Arrays.asList(EXTENSION_JOBID_PREFIX, extensionId, namespace));
     }
 
     /**
      * Return extension plan corresponding to the provided extension id from the current executed job or stored history.
      * 
      * @param extensionId the extension identifier
+     * @param namespace the namespace where the job is being or has been executed
      * @return the extension plan corresponding to the provided extension
      */
-    public JobStatus getExtensionPlanJobStatus(String extensionId)
+    public JobStatus getExtensionPlanJobStatus(String extensionId, String namespace)
     {
-        return getJobStatus(EXTENSIONPLAN_JOBID_PREFIX + extensionId);
+        return getJobStatus(Arrays.asList(EXTENSIONPLAN_JOBID_PREFIX, extensionId, namespace));
     }
 
     /**

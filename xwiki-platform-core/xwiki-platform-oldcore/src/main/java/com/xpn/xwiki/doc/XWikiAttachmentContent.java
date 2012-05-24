@@ -91,6 +91,9 @@ public class XWikiAttachmentContent implements Cloneable
         final Environment env = Utils.getComponent(Environment.class);
         final File dir = new File(env.getTemporaryDirectory(), "attachment-cache");
         try {
+            if (!dir.mkdirs() && !dir.exists()) {
+                throw new UnexpectedException("Failed to create directory for attachments " + dir);
+            }
             final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, dir);
             // This causes the temp file to be created.
             dfi.getOutputStream();

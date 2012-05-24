@@ -1620,24 +1620,20 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
-  #set ($_jobStatus = $extensionManager.getExtensionJobStatus($extensionId))
+  #set ($_jobStatus = $extensionManager.getExtensionJobStatus($extensionId, $extensionNamespace))
   #if ($_jobStatus)
-    #set ($_jobRequest = $_jobStatus.request)
-    ## Check if the stored job status also matches the extension name space.
-    #if (!$_jobRequest.hasNamespaces() || $_jobRequest.namespaces.contains($extensionNamespace))
-      ## Check if the stored job status also matches the extension version.
-      #foreach ($_extension in $_jobRequest.extensions)
-        #if ($_extension.id == $extensionId)
-          #set ($_version = $_extension.version)
-          #if (!$_version)
-            ## Some jobs don't require the extension version. Let's determine the currently available version.
-            #set ($_version = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
-          #end
-          #if (!$_version || $extensionVersion == $_version.value)
-            #set ($return = $NULL)
-            #setVariable ("$return" $_jobStatus)
-            #break
-          #end
+    ## Check if the stored job status also matches the extension version.
+    #foreach ($_extension in $_jobStatus.request.extensions)
+      #if ($_extension.id == $extensionId)
+        #set ($_version = $_extension.version)
+        #if (!$_version)
+          ## Some jobs don't require the extension version. Let's determine the currently available version.
+          #set ($_version = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+        #end
+        #if (!$_version || $extensionVersion == $_version.value)
+          #set ($return = $NULL)
+          #setVariable ("$return" $_jobStatus)
+          #break
         #end
       #end
     #end

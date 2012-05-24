@@ -69,7 +69,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
  * @since 3.0M2
  */
 @RunWith(JMock.class)
-public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestCase
+public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentStoreTest
 {
     private static final String HELLO = "Hello World";
 

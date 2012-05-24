@@ -53,7 +53,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
  * @version $Id$
  * @since 3.0M2
  */
-public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComponentTestCase
+public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemAttachmentStoreTest
 {
     private FilesystemStoreTools fileTools;
 

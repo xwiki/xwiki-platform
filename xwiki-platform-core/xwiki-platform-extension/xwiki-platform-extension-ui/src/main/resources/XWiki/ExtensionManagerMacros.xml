@@ -1754,13 +1754,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #set ($status = $options.get(0))
   #if ($alice.equals($bob))
     #set ($status = $options.get(1))
-  #elseif ($versionConstraint &amp;&amp; (
-      ($versionConstraint.version &amp;&amp; $bob.version.compareTo($versionConstraint.version) &lt; 0) || 
-      (!$versionConstraint.version &amp;&amp; !$versionConstraint.containsVersion($bob.version))))
-    ## Incompatible version because:
-    ## (1) there is a version constraint specified (applies only to dependencies) and
-    ## (2) either the version constraint matches an exact version which is newer than the existing version
-    ## (3) or the version constraint is a range which doesn't include the existing version.
+  #elseif ($versionConstraint &amp;&amp; !$versionConstraint.isCompatible($bob.version))
     #set ($status = $options.get(2))
   #end
   $status##

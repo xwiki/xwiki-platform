@@ -19,26 +19,81 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.jmock.cglib.MockObjectTestCase;
+import java.util.Random;
+import java.io.InputStream;
+
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link XWikiAttachment}.
  *
  * @version $Id$
  */
-public class XWikiAttachmentTest extends MockObjectTestCase
+public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
 {
+    @Test
     public void testGetVersionList() throws Exception
     {
         final XWikiAttachment attach = new XWikiAttachment();
         attach.setVersion("1.1");
-        assertEquals("Version list was not one element long for version 1.1", 1,
-                     attach.getVersionList().size());
+        Assert.assertEquals("Version list was not one element long for version 1.1", 1,
+                            attach.getVersionList().size());
         attach.setVersion("1.2");
-        assertEquals("Version list was not two elements long for version 1.2.", 2,
-                     attach.getVersionList().size());
+        Assert.assertEquals("Version list was not two elements long for version 1.2.", 2,
+                            attach.getVersionList().size());
         attach.setVersion("1.3");
-        assertEquals("Version list was not two elements long for version 1.3.", 3,
-                     attach.getVersionList().size());
+        Assert.assertEquals("Version list was not two elements long for version 1.3.", 3,
+                            attach.getVersionList().size());
+    }
+
+    /**
+     * Create an attachment, populate it with enough data to make it flush to disk cache,
+     * read back data and make sure it's the same.
+     */
+    @Test
+    public void testStoreContentInDiskCache() throws Exception
+    {
+        int attachLength = 20000;
+        // Check for data dependent errors.
+        int seed = (int) System.currentTimeMillis();
+        final XWikiAttachment attach = new XWikiAttachment();
+        final InputStream ris = new RandomInputStream(attachLength, seed);
+        attach.setContent(ris);
+        Assert.assertEquals("Not all of the stream was read", 0, ris.available());
+        Assert.assertTrue(
+            IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
+                                  attach.getAttachment_content().getContentInputStream()));
+    }
+
+    /** An InputStream which will return a stream of zeros of length given in the constructor. */
+    private static class RandomInputStream extends InputStream
+    {
+        private int bytes;
+
+        private int state;
+
+        public RandomInputStream(final int bytes, final int seed)
+        {
+            this.bytes = bytes;
+            this.state = seed;
+        }
+
+        public int available()
+        {
+            return this.bytes;
+        }
+
+        public int read()
+        {
+            if (this.bytes == 0) {
+                return -1;
+            }
+            this.bytes--;
+            this.state = this.state << 13 | this.state >>> 19;
+            return ++this.state & 0xff;
+        }
     }
 }

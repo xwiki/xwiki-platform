@@ -32,4 +32,11 @@
   <artifactId>xwiki-platform-store-api</artifactId>
   <name>XWiki Platform - Store - Api</name>
   <description>Generic interfaces relating to storage.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-store-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+  </dependencies>
 </project>

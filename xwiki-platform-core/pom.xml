@@ -255,6 +255,10 @@
             <exclude>com/xpn/xwiki/objects/BaseElement</exclude>
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
             <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
+
+            <!-- Moved to commons-store-api which is a dependency of platform-store-api
+                 where it had been. -->
+            <exclude>org/xwiki/store/UnexpectedException</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -284,13 +284,7 @@ public class DefaultPackager implements Packager, Initializable
                         }
 
                         XarEntry xarEntry = documentHandler.getXarEntry();
-
-                        // FIXME: workaround a bug in Apache Commons Compress 1.4
-                        // See https://issues.apache.org/jira/browse/COMPRESS-187
-                        if (zipEntry.getComment() == null) {
-                            zipEntry.setComment("");
-                        }
-                        xarEntry.setZipArchiveEntry(zipEntry);
+                        xarEntry.setEntryName(zipEntry.getName());
 
                         documents.add(xarEntry);
                     } catch (NotADocumentException e) {

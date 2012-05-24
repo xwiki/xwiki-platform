@@ -60,7 +60,7 @@ public class XarFile
             throw new IOException("Failed to find entry [" + entry + "]");
         }
 
-        return this.zipFile.getInputStream(realEntry.getZipArchiveEntry());
+        return this.zipFile.getInputStream(this.zipFile.getEntry(realEntry.getEntryName()));
     }
 
     public Collection<XarEntry> getEntries()

@@ -91,7 +91,7 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
 
             // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job which
             // will generate a new JobStartedEvent
-            localEvent.setEvent(new RemoteJobStartedEvent(jobEvent.getJobId(), request));
+            localEvent.setEvent(new RemoteJobStartedEvent(jobEvent.getJobType(), request));
 
             return true;
         }

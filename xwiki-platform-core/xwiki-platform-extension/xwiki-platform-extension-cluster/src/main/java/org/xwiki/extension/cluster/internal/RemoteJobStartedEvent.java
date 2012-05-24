@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.cluster.internal;
 
+import java.util.List;
+
 import org.xwiki.job.Request;
 import org.xwiki.job.event.JobStartedEvent;
 
@@ -44,7 +46,7 @@ public class RemoteJobStartedEvent extends JobStartedEvent
      */
     public RemoteJobStartedEvent(String jobType, Request request)
     {
-        super(null, jobType, request);
+        super((List<String>) null, jobType, request);
     }
 
     /**

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
 import javax.servlet.ServletContext;
 
 import org.jmock.Expectations;
@@ -92,6 +93,8 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
             will(returnValue(null));
+            allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
+                will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         }});
 
         final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);

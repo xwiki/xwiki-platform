@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
@@ -78,6 +79,8 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         environment.setServletContext((ServletContext) mockServletContext.proxy());
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/cache/infinispan/config.xml"))
             .will(returnValue(null));
+        mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
+            .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

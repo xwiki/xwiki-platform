@@ -327,11 +327,12 @@ XWiki.ExtensionBehaviour = Class.create({
       lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
       // Add the progress menu.
       this.container.down('.innerMenu').insert('&lt;li&gt;&lt;span class="wikilink"&gt;&lt;a href="#' + progressSectionAnchor + '"&gt;$msg.get('extensions.info.category.progress')&lt;/a&gt;&lt;/span&gt;&lt;/li&gt;');
+    } else if (progressSection.down('.extension-log-item-loading')) {
+      // Just hide the question that has been answered if there is any progress item loading.
+      progressSection.down('form').hide();
     } else {
-      // Hide the contents of the progress section and display the loading animation.
-      progressSection.insert({before: progressSection.clone(false)});
-      progressSection.hide();
-      progressSection = progressSection.previous();
+      // Hide all the contents of the progress section and display the loading animation.
+      progressSection.childElements().invoke('hide');
       progressSection.addClassName('loading');
     }
     return progressSection;
@@ -357,16 +358,11 @@ XWiki.ExtensionBehaviour = Class.create({
    * @see #_prepareProgressSectionForLoading()
    */
   _restoreProgressSection : function() {
-    var progressSectionLoading = this.container.down('.extension-body-progress.loading');
-    if (progressSectionLoading) {
-      // If the progress section is hidden, re-display it.
-      var progressSection = progressSectionLoading.previous();
-      if (progressSection.hasClassName('extension-body-progress')) {
-        progressSectionLoading.remove();
-        progressSection.show();
-      } else {
-        progressSectionLoading.removeClassName('loading');
-      }
+    var progressSection = this.container.down('.extension-body-progress');
+    if (progressSection) {
+      // Show the contents of the progress section and remove the loading animation.
+      progressSection.childElements().invoke('show');
+      progressSection.removeClassName('loading');
     }
   },
 

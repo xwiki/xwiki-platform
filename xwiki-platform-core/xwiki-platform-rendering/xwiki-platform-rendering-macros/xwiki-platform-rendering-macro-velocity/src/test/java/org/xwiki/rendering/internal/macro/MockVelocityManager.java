@@ -22,16 +22,19 @@ package org.xwiki.rendering.internal.macro;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 
+import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 /**
  * Mock VelocityManager implementation used for testing, since we don't want to pull any dependency on the
@@ -53,6 +56,12 @@ public class MockVelocityManager implements VelocityManager, Initializable
     @Inject
     private VelocityEngine velocityEngine;
 
+    /**
+     * Used to get the current script context.
+     */
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
     private VelocityContext velocityContext = new VelocityContext();
 
     @Override
@@ -73,6 +82,16 @@ public class MockVelocityManager implements VelocityManager, Initializable
     @Override
     public VelocityContext getVelocityContext()
     {
+        // Copy current JSR223 ScriptContext binding
+        for (Map.Entry<String, Object> entry : this.scriptContextManager.getScriptContext()
+            .getBindings(ScriptContext.ENGINE_SCOPE).entrySet()) {
+            // Not ideal since it does not allow to modify a binding but it's too dangerous for existing velocity script
+            // otherwise
+            if (!this.velocityContext.containsKey(entry.getKey())) {
+                this.velocityContext.put(entry.getKey(), entry.getValue());
+            }
+        }
+
         return this.velocityContext;
     }
 

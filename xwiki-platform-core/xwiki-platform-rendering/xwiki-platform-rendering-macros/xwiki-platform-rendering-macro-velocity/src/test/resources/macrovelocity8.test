@@ -1,0 +1,24 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify it's possible to share a groovy variable with following velocity script
+.#-----------------------------------------------------
+{{groovy}}
+var = "toto"
+{{/groovy}}
+
+{{velocity}}
+$var
+{{/velocity}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [groovy] [] [var = "toto"]
+endMacroMarkerStandalone [groovy] [] [var = "toto"]
+beginMacroMarkerStandalone [velocity] [] [$var]
+beginParagraph
+onWord [toto]
+endParagraph
+endMacroMarkerStandalone [velocity] [] [$var]
+endDocument

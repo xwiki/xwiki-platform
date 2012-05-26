@@ -190,8 +190,17 @@ public class DefaultVelocityManager implements VelocityManager
         return cacheKey;
     }
 
-    public VelocityEngine getVelocityEngine() throws XWikiVelocityException
+    /**
+     * @return the Velocity Engine corresponding to the current execution context. More specifically returns
+     *         the Velocity Engine for the current skin since each skin has its own Velocity Engine so that each
+     *         skin can have global velocimacros defined
+     * @throws XWikiVelocityException in case of an error while creating a Velocity Engine
+     */
+    public synchronized VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
+        // Note: This method is synchronized to prevent several threads to create several instances of
+        // Velocity Engines (for the same skin).
+
         // Note: For improved performance we cache the Velocity Engines in order not to
         // recreate them all the time. The key we use is the location to the skin's macro.vm
         // file since caching on the skin would create more Engines than needed (some skins

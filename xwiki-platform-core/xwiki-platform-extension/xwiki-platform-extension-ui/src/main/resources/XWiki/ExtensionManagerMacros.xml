@@ -1853,6 +1853,9 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
+  ## Make sure the value of $return is always reset.
+  #set ($return = $NULL)
+  #setVariable ("$return" $NULL)
   #set ($_jobStatus = $extensionManager.getExtensionJobStatus($extensionId, $extensionNamespace))
   #if ($_jobStatus)
     ## Check if the stored job status also matches the extension version.
@@ -1864,7 +1867,6 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
           #set ($_version = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
         #end
         #if (!$_version || $extensionVersion == $_version.value)
-          #set ($return = $NULL)
           #setVariable ("$return" $_jobStatus)
           #break
         #end

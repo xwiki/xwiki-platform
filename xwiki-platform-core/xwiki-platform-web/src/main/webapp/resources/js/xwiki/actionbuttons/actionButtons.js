@@ -109,7 +109,7 @@ actionButtons.EditActions = Class.create({
       location += '?';
     }
     // Prevent a redundant request to remove the edit lock when the page unloads.
-    XWiki.EditLock.setLocked(false);
+    XWiki.EditLock && XWiki.EditLock.setLocked(false);
     window.location = location + '&action_cancel=true' + fragmentId;
   },
   onPreview : function(event) {

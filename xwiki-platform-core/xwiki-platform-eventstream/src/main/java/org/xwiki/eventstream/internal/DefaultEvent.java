@@ -491,7 +491,12 @@ public class DefaultEvent implements Event
      */
     public void setParameters(Map<String, String> parameters)
     {
-        this.parameters = new HashMap<String, String>(parameters);
+        if (parameters != null) {
+            this.parameters = new HashMap<String, String>(parameters);
+        } else {
+            // Fallback to empty parameters map.
+            this.parameters = new HashMap<String, String>();
+        }
     }
     
     /**

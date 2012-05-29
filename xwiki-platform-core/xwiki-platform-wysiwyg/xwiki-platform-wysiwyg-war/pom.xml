@@ -65,6 +65,12 @@
       <artifactId>xwiki-platform-wysiwyg-client</artifactId>
       <version>${project.version}</version>
       <classifier>shared</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

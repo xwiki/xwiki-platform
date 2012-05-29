@@ -124,7 +124,6 @@
                   <artifactId>xwiki-platform-wysiwyg-client</artifactId>
                   <version>${project.version}</version>
                   <classifier>shared</classifier>
-                  <type>jar</type>
                   <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
                 </artifactItem>
               </artifactItems>

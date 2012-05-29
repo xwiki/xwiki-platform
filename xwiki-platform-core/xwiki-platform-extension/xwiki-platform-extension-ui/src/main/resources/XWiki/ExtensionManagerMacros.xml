@@ -799,6 +799,24 @@ ul.extension-metadata li {
   border-right-color: $theme.notificationErrorColor;
 }
 
+.extension-diff-title {
+  margin: 1.2em 0 .6em;
+}
+.extension-diff-options .label {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-right: 0.3em;
+  text-transform: uppercase;
+}
+.extension-diff-options select {
+  margin-right: 0.3em;
+  width: auto;
+}
+.extension-diff {
+  font-size: 120%;
+  overflow: auto;
+}
+
 .extension-body-progress ul {
   margin-top: .5em;
 }
@@ -1036,6 +1054,150 @@ ul.extension-metadata li {
     </property>
     <property>
       <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.ExtensionManagerMacros</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8b441d74-c8e3-4d6f-8a51-fb559cf0df53</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>table.diff {
+  border-bottom: 1px solid $theme.borderColor;
+  border-top: 1px solid $theme.borderColor;
+  font-family: monospace;
+  margin: 0 1px;
+}
+
+.diff td {
+  padding: 0;
+}
+
+.diff .lineNumber {
+  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.textSecondaryColor;
+  padding-right: .5em;
+  text-align: right;
+}
+
+.diff .line, .diff .lineNumber {
+  border-bottom: 0;
+  border-top: 0;
+  padding-left: .5em;
+  white-space: pre;
+}
+
+.diff .line:hover {
+  background-color: $theme.highlightColor;
+}
+
+.diff .added {
+  background-color: #DDFFDD;
+  color: #000;
+}
+
+.diff .deleted {
+  background-color: #FFDDDD;
+  color: #000;
+}
+
+.diff .meta {
+  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.textSecondaryColor;
+}
+
+.diff .line del {
+  background-color: #FFAAAA;
+  text-decoration: none;
+}
+
+.diff .line ins {
+  background-color: #AAFFAA;
+  text-decoration: none;
+}</code>
+    </property>
+    <property>
+      <name>Diff</name>
     </property>
     <property>
       <parse>1</parse>
@@ -1380,11 +1542,86 @@ $xwiki.jsx.use('ExtensionManagerMacros')
           #end
           &lt;/select&gt;
 
-        &lt;p&gt;
-          #em_submitButton('extensions.actions.continue' 'confirm')
-        &lt;/p&gt;
+        &lt;p&gt;#em_submitButton('extensions.actions.continue' 'confirm')&lt;/p&gt;
+
+        #displayExtensionDetails_progressChanges($question)
       )))
     &lt;/form&gt;
+  {{/html}}
+#end
+
+#macro (displayExtensionDetails_progressChanges $question)
+  (% class="extension-diff-title" %)
+  ====== $msg.get('extensions.upgrade.mergeConflict.changes.title', ["[[$question.currentDocument&gt;&gt;doc:$services.model.serialize($question.currentDocument.documentReference)]]"]) ======
+
+  (% class="extension-diff-options" %)(((
+    #set ($versions = {'PREVIOUS': $question.previousDocument, 'CURRENT': $question.currentDocument, 'NEXT': $question.nextDocument, 'MERGED': $question.mergedDocument})
+    (% class="label" %)$msg.get('extensions.upgrade.mergeConflict.changes.original')(%%)##
+    &lt;select name="original"&gt;
+    #set ($originalVersion = 'MERGED')
+    #if ($versions.containsKey($request.original))
+      #set ($originalVersion = $request.original)
+    #end
+    #set ($originalDocument = $versions.get($originalVersion))
+    #foreach($version in $versions.keySet())
+      &lt;option value="$version"#if ($version == $originalVersion) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$version.toLowerCase()")&lt;/option&gt;
+    #end
+    &lt;/select&gt;##
+    (% class="label" %)$msg.get('extensions.upgrade.mergeConflict.changes.revised')(%%)##
+    &lt;select name="revised"&gt;
+    #set ($revisedVersion = 'NEXT')
+    #if ($versions.containsKey($request.revised))
+      #set ($revisedVersion = $request.revised)
+    #end
+    #set ($revisedDocument = $versions.get($revisedVersion))
+    #foreach($version in $versions.keySet())
+      &lt;option value="$version"#if ($version == $revisedVersion) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$version.toLowerCase()")&lt;/option&gt;
+    #end
+    &lt;/select&gt;##
+    #em_submitButton('extensions.actions.diff' 'diff' true)
+  )))
+
+  &lt;dl&gt;
+    &lt;dt&gt;&lt;label&gt;$msg.get('core.viewers.diff.contentChanges')&lt;/label&gt;&lt;/dt&gt;
+    &lt;dd&gt;&lt;div class="extension-diff"&gt;
+      #extendedDiff($originalDocument.content, $revisedDocument.content)
+    &lt;/div&gt;&lt;/dd&gt;
+  &lt;/dl&gt;
+#end
+
+#macro (extendedDiff $original $revised)
+  (% class="diff" %)
+  #foreach ($block in $services.diff.extended($original, $revised))
+    |(% class="lineNumber" %)...##
+    |(% class="lineNumber" %)...##
+    |(% class="line meta" %)@@ -$mathtool.add($block.originalStart, 1),$block.originalSize +$mathtool.add($block.revisedStart, 1),$block.revisedSize @@
+    #foreach ($line in $block)
+      #set ($lineNumber = $line.number + 1)
+      |(% class="lineNumber" %)#if (!$line.added)$lineNumber#end##
+      |(% class="lineNumber" %)#if (!$line.deleted)$lineNumber#end##
+      |(% class="line $line.type.toString().toLowerCase()" %)#extendedDiffLine($line)
+    #end
+  #end
+#end
+
+#macro (extendedDiffLine $line)
+  ## We use the HTML macro to be able to escape the line content (currently there's no API to escape wiki syntax).
+  {{html}}##
+  ${line.type.symbol}##
+  #if ($line.words)
+    #foreach ($word in $line.words)
+      #set ($escapedWord = $escapetool.html($word).replace('{{', '&amp;#123;&amp;#123;'))
+      #if ($word.added)
+        &lt;ins&gt;$escapedWord&lt;/ins&gt;##
+      #elseif ($word.deleted)
+        &lt;del&gt;$escapedWord&lt;/del&gt;##
+      #else
+        $escapedWord##
+      #end
+    #end
+  #else
+    $escapetool.html($line.content).replace('{{', '&amp;#123;&amp;#123;')##
+  #end
   {{/html}}
 #end
 

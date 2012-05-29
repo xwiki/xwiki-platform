@@ -1,0 +1,18 @@
+/**
+ * Recursively calcualte the kth Fibonacci number.
+ *
+ * @param k indicates which Fibonacci number to compute
+ * @return the kth Fibonacci number
+ */
+static int fib(int k) {
+    // Base Case:
+    //   If k <= 2 then fib(k) = 1.
+    if (k <= 2) {
+        return 1;
+    }
+    // Recursive case:
+    //   If k > 2 then fib(k) = fib(k-1) + fib(k-2).
+    else {
+        return fib(k-1) + fib(k-2);
+    }
+}

@@ -68,6 +68,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
 
     private XWikiSecurityAccess defaultAccess;
     private XWikiSecurityAccess denyAllAccess;
+    private XWikiSecurityAccess initialImportAccess;
 
     @Override
     @Before
@@ -95,10 +96,26 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
         for (Right right : Right.values()) {
             denyAllAccess.deny(right);
         }
+        initialImportAccess = new XWikiSecurityAccess();
+        for (Right right : Right.values()) {
+            if (Right.ADMIN.getImpliedRights().contains(right)) {
+                initialImportAccess.allow(right);
+            } else {
+                initialImportAccess.set(right, right.getDefaultState());
+            }
+        }
+        initialImportAccess.allow(Right.ADMIN);
     }
 
     private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(String name, final SecurityReference reference,
-        final List<List<SecurityRule>> ruleEntries)
+                                                                  final List<List<SecurityRule>> ruleEntries)
+    {
+        return getMockedSecurityRuleEntries(name, reference, ruleEntries, true);
+    }
+
+    private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(final String name, final SecurityReference reference,
+                                                                  final List<List<SecurityRule>> ruleEntries,
+                                                                  final boolean addMainWikiDefaultRules)
     {
         final Deque<SecurityReference> refs = reference.getReversedSecurityReferenceChain();
         final Deque<SecurityRuleEntry> entries = new ArrayDeque<SecurityRuleEntry>(refs.size());
@@ -113,17 +130,30 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             for (SecurityRuleEntry entry : entries) {
                 List<SecurityRule> rules;
 
-                try {
-                    rules = ruleEntries.get(i++);
-                } catch(IndexOutOfBoundsException e) {
+                if (i < ruleEntries.size()) {
+                    rules = ruleEntries.get(i);
+                } else {
                     rules = Collections.emptyList();
+                }
+
+                if (ref.getParentSecurityReference() == null && rules.size() == 0 && addMainWikiDefaultRules) {
+                    // Add some rule at the main wiki level to avoid that the wiki is determined to be in its initial
+                    // import state.  By setting DENY on all, this rule will not have any other side effects than
+                    // indicating that the initial import have been made.
+                    rules = Arrays.asList(getMockedSecurityRule(name + " non-initial import state indicator security rule",
+                                                                Arrays.asList(defaultUserRef),
+                                                                Collections.<GroupSecurityReference>emptyList(),
+                                                                allTestRights, DENY));
+                    
                 }
 
                 allowing (entry).getReference(); will(returnValue(ref));
                 allowing (entry).getRules(); will(returnValue(rules));
 
                 ref = ref.getParentSecurityReference();
+                i++;
             }
+
         }});
 
         return entries;
@@ -180,10 +210,10 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
     public void testSettleNoRulesOnMainWiki() throws Exception
     {
         Deque<SecurityRuleEntry> emptyXdocRules
-            = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList());
+            = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList(), false);
 
-        assertAccess("When no rules are defined, return default access for main wiki user on main wiki doc",
-            xuserRef, xdocRef, defaultAccess,
+        assertAccess("When no rules are defined, return initial import access for main wiki user on main wiki doc",
+            xuserRef, xdocRef, initialImportAccess,
             authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules));
 
         assertAccess("When no rules are defined, deny all access for local wiki user on main wiki doc",

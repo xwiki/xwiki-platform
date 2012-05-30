@@ -197,7 +197,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                 }
                 return access;
             }
-            if (!entry.isEmpty()) {
+            if (!entry.isEmpty() || ref.getParentSecurityReference() == null) {
                 SecurityAccessEntry accessEntry = securityCache.get(user, ref);
                 if (accessEntry == null) {
                     SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
@@ -223,7 +223,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             } 
         }
 
-        logger.debug("4. Returning default access level.");
+        logger.debug("4. Returning default access level.  (This should never be reached!)");
         return XWikiSecurityAccess.getDefaultAccess();
     }
 

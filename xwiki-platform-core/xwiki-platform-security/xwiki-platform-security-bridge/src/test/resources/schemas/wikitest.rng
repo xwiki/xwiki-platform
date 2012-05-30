@@ -20,6 +20,11 @@
           <data type="boolean" />
         </attribute>
       </optional>
+      <optional>
+        <attribute name="readOnly">
+          <data type="boolean" />
+        </attribute>
+      </optional>
       <group>
         <zeroOrMore>
           <ref name="user.element" />

@@ -76,8 +76,9 @@ public abstract class AbstractTestWiki
      * @param owner The owner of the wiki.
      * @param isMainWiki {@code true} if the wiki should be considered the main wiki.  It is an error unless exactly one
      * wiki in a test wiki setup is marked as the mainwiki.
+     * @param isReadOnly Wether the wiki is in read only mode.
      */
-    protected abstract HasWikiContents addWiki(String name, String owner, boolean isMainWiki);
+    protected abstract HasWikiContents addWiki(String name, String owner, boolean isMainWiki, boolean isReadOnly);
 
     /**
      * @return The mocked context for this test wiki setup.
@@ -184,7 +185,8 @@ public abstract class AbstractTestWiki
                            String name = attributes.getValue("name");
                            String owner = attributes.getValue("owner");
                            boolean isMainWiki = "true".equals(attributes.getValue("mainWiki"));
-                           HasWikiContents wiki = addWiki(name, owner, isMainWiki);
+                           boolean isReadOnly = "true".equals(attributes.getValue("readOnly"));
+                           HasWikiContents wiki = addWiki(name, owner, isMainWiki, isReadOnly);
 
                            currentWiki = wiki;
                            currentRightsHolder.push(currentWiki);
@@ -252,8 +254,13 @@ public abstract class AbstractTestWiki
                        @Override
                        public void startElement(Attributes attributes) {
                            String name = attributes.getValue("name");
+                           String creator = attributes.getValue("creator");
 
-                           HasAcl document = currentSpace.addDocument(name);
+                           if (creator == null) {
+                               creator = "XWiki.Admin";
+                           }
+
+                           HasAcl document = currentSpace.addDocument(name, creator);
                            currentRightsHolder.push(document);
                        }
 

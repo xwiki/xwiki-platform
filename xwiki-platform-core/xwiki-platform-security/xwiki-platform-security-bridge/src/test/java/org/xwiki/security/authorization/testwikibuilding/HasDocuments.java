@@ -32,8 +32,9 @@ public interface HasDocuments extends HasAcl
 
     /**
      * @param name The name of the document to add.
+     * @param creator The name of the creator.  May be {\code null}.
      * @return an entity representing the document that holds the acl of the document.
      */
-    HasAcl addDocument(String name);
+    HasAcl addDocument(String name, String creator);
 
 }

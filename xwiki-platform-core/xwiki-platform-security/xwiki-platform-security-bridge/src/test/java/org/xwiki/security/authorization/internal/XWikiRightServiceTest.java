@@ -45,15 +45,11 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki");
-        setContext(ctx);
 
         // TODO: Here we have a mismatch.
 
-        Assert.assertTrue("User from another wiki does not have right on a local wiki", getLegacyImpl().hasAccessLevel("view",
-           "wiki:XWiki.user", "wiki2:Space.Page", ctx));
-
-        Assert.assertFalse("User from another wiki has right on a local wiki", getCachingImpl().hasAccessLevel("view",
-            "wiki:XWiki.user", "wiki2:Space.Page", ctx));
+        assertAccessLevelFalseExpectedDifference("User from another wiki has right on a local wiki",
+                                                 "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
     }
 
@@ -162,5 +158,31 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
         Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
+    }
+
+    @Test
+    public void testGuestRightsOnEmptyWiki() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("empty.xml");
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+
+        ctx.setDatabase("xwiki");
+
+        assertAccessLevelTrue("Guest does not have view right on empty wiki.",
+                              "view", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrue("Guest does not have edit right on empty wiki.",
+                              "edit", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrue("Guest does not have delete right on empty wiki.",
+                              "delete", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrue("Guest does not have admin right on empty wiki.",
+                              "admin", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrueExpectedDifference("Guest does not have programming right on empty wiki.",
+                              "programming", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
     }
 }

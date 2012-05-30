@@ -5,6 +5,7 @@
     <group name="XWiki.group">
       <user name="user" />
     </group>
+    <allowGroup name="XWiki.AdminGroup" type="admin" />
   </wiki>
   <wiki name="wiki2" mainWiki="false" owner="wiki:XWiki.user" >
     <space name="Space">

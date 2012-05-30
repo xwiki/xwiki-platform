@@ -18,6 +18,7 @@
       <xs:attribute name="name" use="required" type="xs:Name"/>
       <xs:attribute name="owner" use="required" type="xs:Name"/>
       <xs:attribute name="mainWiki" type="xs:boolean"/>
+      <xs:attribute name="readOnly" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="user">

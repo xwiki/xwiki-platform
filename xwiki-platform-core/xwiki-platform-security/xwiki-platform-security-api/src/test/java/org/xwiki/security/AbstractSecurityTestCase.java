@@ -71,6 +71,7 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     protected UserSecurityReference anotherXuserRef;
     protected UserSecurityReference anotherUserRef;
     protected UserSecurityReference anotherWikiUserRef;
+    protected UserSecurityReference defaultUserRef;
 
     protected GroupSecurityReference groupRef;
     protected GroupSecurityReference anotherGroupRef;
@@ -163,6 +164,7 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
             xwikiSpace.getOriginalSpaceReference()));
         anotherWikiUserRef = newUserReference(new DocumentReference("user",
             anotherWikiXWikiSpace.getOriginalSpaceReference()));
+        defaultUserRef = newUserReference(new DocumentReference("default", xwikiSpace.getOriginalSpaceReference()));
 
         groupRef = newGroupReference(new DocumentReference("group", xwikiSpace.getOriginalSpaceReference()));
         anotherGroupRef = newGroupReference(

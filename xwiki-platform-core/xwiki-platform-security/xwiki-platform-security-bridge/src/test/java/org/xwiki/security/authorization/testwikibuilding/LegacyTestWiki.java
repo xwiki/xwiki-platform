@@ -179,7 +179,13 @@ public class LegacyTestWiki extends AbstractTestWiki {
 
             // Expectations for XWiki
 
-            allowing(xwiki).isReadOnly();    will(returnValue(true));
+            allowing(xwiki).isReadOnly();
+            will(new CustomAction("indicate wether the wiki is read only") {
+                    @Override
+                    public Object invoke(Invocation invocation) {
+                        return isReadOnly(currentDatabase);
+                    }
+            });
             allowing(xwiki).getMaxRecursiveSpaceChecks(with(any(XWikiContext.class))); will(returnValue(100));
             allowing(xwiki).getDocument(with(any(String.class)), with(any(XWikiContext.class)));
             will(new CustomAction("return a mocked document") {
@@ -230,12 +236,20 @@ public class LegacyTestWiki extends AbstractTestWiki {
                         return getAllGroupReferences((DocumentReference) invocation.getParameter(0));
                     }
                 });
+
+            // Expectations needed for old implementation 
+        
+            allowing(xwiki).getXWikiPreference(with(any(String.class)), with(equal("")), with(any(XWikiContext.class)));      will(returnValue("false"));
+            allowing(xwiki).getXWikiPreferenceAsInt(with(any(String.class)), with(0), with(any(XWikiContext.class))); will(returnValue(0));
+            allowing(xwiki).getSpacePreference(with(any(String.class)), with(equal("")), with(any(XWikiContext.class)));      will(returnValue("false"));
+            allowing(xwiki).getSpacePreferenceAsInt(with(any(String.class)), with(0), with(any(XWikiContext.class))); will(returnValue(0));
+        
         }});
 
     }
 
     @Override
-    public HasWikiContents addWiki(String name, String owner, boolean isMainWiki) {
+    public HasWikiContents addWiki(String name, String owner, boolean isMainWiki, boolean isReadOnly) {
 
         if (isMainWiki) {
             if (mainWikiName != null) {
@@ -245,7 +259,7 @@ public class LegacyTestWiki extends AbstractTestWiki {
             mainWikiName = name;
         }
 
-        return mockWiki(name, owner);
+        return mockWiki(name, owner, isReadOnly);
     }
 
     public void setUser(String username) {
@@ -268,11 +282,11 @@ public class LegacyTestWiki extends AbstractTestWiki {
         }
     }
 
-    private TestWiki mockWiki(String name, String owner) {
+    private TestWiki mockWiki(String name, String owner, boolean isReadOnly) {
         TestWiki wiki = wikis.get(name);
 
         if (wiki == null) {
-            wiki = new TestWiki(name, owner);
+            wiki = new TestWiki(name, owner, isReadOnly);
             wikis.put(name, wiki);
         }
 
@@ -284,7 +298,7 @@ public class LegacyTestWiki extends AbstractTestWiki {
         TestWiki wiki = wikis.get(userReference.getWikiReference().getName());
 
         if (wiki == null) {
-            return (Collection<DocumentReference>) Collections.EMPTY_SET;
+            return Collections.<DocumentReference>emptySet();
         }
 
         final Collection<String> groupNames = wiki.getGroupsForUser(userReference.getName());
@@ -328,6 +342,10 @@ public class LegacyTestWiki extends AbstractTestWiki {
     @Override
     public XWikiContext getXWikiContext() {
         return context;
+    }
+
+    public boolean isReadOnly(String wikiName) {
+        return wikis.get(wikiName).isReadOnly();
     }
 
     private XWikiDocument getDocument(DocumentReference documentReference) {
@@ -379,13 +397,16 @@ public class LegacyTestWiki extends AbstractTestWiki {
 
         private final Map<String, Set<String>> groupsForUser = new HashMap<String, Set<String>>();
 
-        TestWiki(String name, String owner) {
+        private final boolean isReadOnly;
+
+        TestWiki(String name, String owner, boolean isReadOnly) {
             this.name = name;
             this.owner = owner;
+            this.isReadOnly = isReadOnly;
 
             // The XWikiPreferences document always exist (unless explicitly deleted!) since it will be created on
             // application startup or at wiki creation.
-            mockDocument("XWiki", "XWikiPreferences", false);
+            mockDocument("XWiki", "XWikiPreferences", "XWiki.Admin", false);
         }
 
         @Override
@@ -426,10 +447,10 @@ public class LegacyTestWiki extends AbstractTestWiki {
             return mockSpace(name);
         }
 
-        TestDocument mockDocument(String spaceName, String name, boolean isNew) {
+        TestDocument mockDocument(String spaceName, String name, String creator, boolean isNew) {
             TestSpace space = mockSpace(spaceName);
 
-            return space.mockDocument(name, isNew);
+            return space.mockDocument(name, creator, isNew);
         }
 
         TestSpace mockSpace(String name) {
@@ -458,9 +479,13 @@ public class LegacyTestWiki extends AbstractTestWiki {
             return owner;
         }
 
+        public boolean isReadOnly() {
+            return isReadOnly;
+        }
+
         Collection<String> getGroupsForUser(String name) {
             Set<String> groups = groupsForUser.get(name);
-            return groups == null ? (Collection<String>) Collections.EMPTY_SET : groups;
+            return groups == null ? Collections.<String>emptySet() : groups;
         }
 
     }
@@ -480,15 +505,18 @@ public class LegacyTestWiki extends AbstractTestWiki {
         }
 
         @Override
-        public HasAcl addDocument(String name) {
-            return mockDocument(name, false);
+        public HasAcl addDocument(String name, String creator) {
+            return mockDocument(name, creator, false);
         }
 
-        TestDocument mockDocument(String name, boolean isNew) {
+        TestDocument mockDocument(String name, String creator, boolean isNew) {
             TestDocument document = documents.get(name);
 
             if (document == null) {
-                document = new TestDocument(name, this, isNew);
+                if (creator == null) {
+                    creator = "XWiki.Admin";
+                }
+                document = new TestDocument(name, this, creator, isNew);
                 documents.put(name, document);
             }
 
@@ -496,7 +524,7 @@ public class LegacyTestWiki extends AbstractTestWiki {
         }
 
         XWikiDocument getDocument(DocumentReference documentReference) {
-            TestDocument document = mockDocument(documentReference.getName(), true);
+            TestDocument document = mockDocument(documentReference.getName(), currentUsername, true);
 
             return document.getDocument();
         }
@@ -520,13 +548,16 @@ public class LegacyTestWiki extends AbstractTestWiki {
 
         private final String name;
 
+        private final String creator;
+
         private List<BaseObject> globalRights;
 
         private List<BaseObject> documentRights;
 
-        TestDocument(String name, TestSpace space, final Boolean isNew) {
+        TestDocument(String name, TestSpace space, String creator, final Boolean isNew) {
             this.space = space;
             this.name = name;
+            this.creator = creator;
 
             mockedDocument = mockery.mock(XWikiDocument.class,
                                           new Formatter().format("%s:%s.%s",
@@ -568,6 +599,8 @@ public class LegacyTestWiki extends AbstractTestWiki {
                             return null;
                         }
                 });
+                allowing(mockedDocument).getCreatorReference();
+                will(returnValue(documentReferenceResolver.resolve(TestDocument.this.creator, documentReference)));
                 allowing(mockedDocument).getWikiName(); will(returnValue(getSpace().getWiki().getName()));
                 allowing(mockedDocument).getDocumentReference(); will(returnValue(documentReference));
                 allowing(mockedDocument).getDatabase(); will(returnValue(getSpace().getWiki().getName()));

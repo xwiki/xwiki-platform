@@ -124,6 +124,52 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractMockingComponen
                            cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
     }
 
+    /**
+     * @param message A message explaining the assertion.
+     * @param accessLevel The access level to check.
+     * @param userName The name of the user.
+     * @param documentName The document name.
+     * @param ctx The context.
+     */
+    protected void assertAccessLevelTrueExpectedDifference(String message,
+                                         String accessLevel,
+                                         String userName,
+                                         String documentName,
+                                         XWikiContext ctx)
+        throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertFalse("Old implementation is is expected to differ: " + message,
+                          legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+
+        Assert.assertTrue("Caching implementation: " + message,
+                          cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
+     * @param accessLevel The access level to check.
+     * @param userName The name of the user.
+     * @param documentName The document name.
+     * @param ctx The context.
+     */
+    protected void assertAccessLevelFalseExpectedDifference(String message,
+                                          String accessLevel,
+                                          String userName,
+                                          String documentName,
+                                          XWikiContext ctx)
+        throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertTrue("Old implementation is expected to differ: " + message,
+                           legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+
+        Assert.assertFalse("Caching implementation: " + message,
+                           cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+    }
+
     /** @return An instance of the old implementation. */
     protected XWikiRightService getLegacyImpl() {
         return legacyImpl;

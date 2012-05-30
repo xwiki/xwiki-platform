@@ -2,6 +2,7 @@
 <wikis>
   <wiki name="wiki" mainWiki="true" owner="XWiki.Admin">
     <user name="XWiki.user" />
+    <allowGroup name="XWiki.AdminGroup" type="admin" />
   </wiki>
   <wiki name="wiki2" mainWiki="false" owner="wiki:XWiki.Admin" >
     <allowUser name="wiki:XWiki.user" type="view" />

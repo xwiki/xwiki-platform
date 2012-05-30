@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.tools.ant.util.StringUtils;
@@ -34,7 +33,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.util.Util;
 
@@ -56,14 +54,10 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
     private Logger logger;
 
     /**
-     * Used to get Environment Configuration data to evaluate Hibernate properties.
-     *
-     * Note that we don't get injected EnvironmentConfiguration directly here since it'll use the Default Configuration
-     * Source which would try to look into wiki documents thus creating a cycle leading to a stack overflow...
+     * Used to get Environment permanent directory to evaluate Hibernate properties.
      */
     @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource xwikiPropertiesConfigurationSource;
+    private org.xwiki.environment.Environment environment;
 
     /**
      * Hibernate configuration object.
@@ -163,12 +157,14 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             String url = hibernateConfiguration.getProperty(Environment.URL);
 
             // Replace variables
-            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                xwikiPropertiesConfigurationSource.getProperty(PROPERTY_PERMANENTDIRECTORY, String.class));
+            if (url.matches(".*\\$\\{.*\\}.*")) {
+                String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
+                    environment.getPermanentDirectory().getAbsolutePath());
 
-            // Set the new URL
-            hibernateConfiguration.setProperty(Environment.URL, newURL);
-            logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+                // Set the new URL
+                hibernateConfiguration.setProperty(Environment.URL, newURL);
+                logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+            }
         }
     };
 

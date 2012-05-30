@@ -73,7 +73,7 @@ public abstract class IndexFields
      * Version of the document
      */
     public static final String DOCUMENT_VERSION = "version";
-    
+
     /**
      * Language of the document
      */
@@ -89,8 +89,8 @@ public abstract class IndexFields
      * Filename, only used for attachments
      */
     public static final String FILENAME = "filename";
-	
-	public static final String MIMETYPE = "mimetype"; 
+
+    public static final String MIMETYPE = "mimetype";
 
     /**
      * XWiki object type, only used for objects

@@ -58,8 +58,7 @@ public class SearchResults extends Api
      * @param results Lucene search results
      * @param xwiki xwiki instance for access rights checking
      */
-    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, Searcher searcher, XWiki xwiki,
-        XWikiContext context)
+    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, Searcher searcher, XWiki xwiki, XWikiContext context)
     {
         super(context);
 
@@ -186,8 +185,9 @@ public class SearchResults extends Api
                 for (int i = 0; i < docs.scoreDocs.length; i++) {
                     SearchResult result = null;
                     try {
-                        result = new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score,
-                            this.xwiki);
+                        result =
+                            new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score,
+                                this.xwiki);
 
                         this.context.setDatabase(result.getWiki());
 

@@ -89,11 +89,8 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
     private void assertGetMimeType(String expect, String filename)throws XWikiException
     { 
-       // Document luceneDoc = new Document();
-        //this.attachmentData.addDataToLuceneDocument(luceneDoc, getContext());
-        
+       
         this.attachmentData.setMimeType(this.attachment.getMimeType(getContext()));
-       // String mimeType = luceneDoc.get(IndexFields.MIMETYPE);
         String mimeType = this.attachmentData.getMimeType();
         assertEquals("Wrong mimetype content indexed", expect, mimeType);
         

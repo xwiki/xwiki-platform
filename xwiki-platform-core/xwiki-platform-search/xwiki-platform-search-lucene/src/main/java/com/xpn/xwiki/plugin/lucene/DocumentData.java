@@ -54,8 +54,8 @@ public class DocumentData extends AbstractDocumentData
 
     /** Reference serializer which removes the wiki prefix. */
     @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     public DocumentData(final XWikiDocument doc, final XWikiContext context, final boolean deleted)
     {
@@ -68,8 +68,8 @@ public class DocumentData extends AbstractDocumentData
     }
 
     /**
-     * Append a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of
-     *         this document (in the given language)
+     * Append a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of this
+     * document (in the given language)
      */
     @Override
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)

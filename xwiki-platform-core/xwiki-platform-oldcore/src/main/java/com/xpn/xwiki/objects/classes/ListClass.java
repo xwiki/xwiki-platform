@@ -31,6 +31,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -342,7 +343,7 @@ public abstract class ListClass extends PropertyClass
                 msgname = "option_" + value;
                 newresult = context.getMessageTool().get(msgname);
                 if (msgname.equals(newresult)) {
-                    return displayValue;
+                    newresult = displayValue;
                 }
             }
         }
@@ -485,6 +486,7 @@ public abstract class ListClass extends PropertyClass
         int count = 0;
         for (Object rawvalue : list) {
             String value = getElementValue(rawvalue);
+            String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
                 + name, value);
@@ -494,7 +496,7 @@ public abstract class ListClass extends PropertyClass
             if (selectlist.contains(value)) {
                 radio.setChecked(true);
             }
-            radio.addElement(getDisplayValue(rawvalue, name, map, context));
+            radio.addElement(display);
 
             buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + name + "-" + count++ + "\">");
             buffer.append(radio.toString());
@@ -580,7 +582,7 @@ public abstract class ListClass extends PropertyClass
         // Add options from Set
         for (String rawvalue : list) {
             String value = getElementValue(rawvalue);
-            String display = getDisplayValue(rawvalue, name, map, context);
+            String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
             option option = new option(display, value);
             option.addElement(display);
             if (selectlist.contains(value)) {

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.tools.ant.util.StringUtils;
@@ -33,7 +34,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.environment.internal.EnvironmentConfiguration;
+import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.util.Util;
 
@@ -56,9 +57,13 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
 
     /**
      * Used to get Environment Configuration data to evaluate Hibernate properties.
+     *
+     * Note that we don't get injected EnvironmentConfiguration directly here since it'll use the Default Configuration
+     * Source which would try to look into wiki documents thus creating a cycle leading to a stack overflow...
      */
     @Inject
-    private EnvironmentConfiguration environmentConfiguration;
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesConfigurationSource;
 
     /**
      * Hibernate configuration object.
@@ -159,7 +164,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
 
             // Replace variables
             String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                environmentConfiguration.getPermanentDirectoryPath());
+                xwikiPropertiesConfigurationSource.getProperty(PROPERTY_PERMANENTDIRECTORY, String.class));
 
             // Set the new URL
             hibernateConfiguration.setProperty(Environment.URL, newURL);

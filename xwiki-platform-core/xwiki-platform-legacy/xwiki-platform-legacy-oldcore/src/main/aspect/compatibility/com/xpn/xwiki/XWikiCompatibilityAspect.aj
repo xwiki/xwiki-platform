@@ -250,33 +250,6 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
-     */
-    @Deprecated
-    public String XWiki.parseMessage(String id, XWikiContext context)
-    {
-        XWikiMessageTool msg = context.getMessageTool();
-
-        return parseContent(msg.get(id), context);
-    }
-
-    /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
-     */
-    @Deprecated
-    public String XWiki.parseMessage(XWikiContext context)
-    {
-        String message = (String) context.get("message");
-        if (message == null) {
-            return null;
-        }
-
-        return parseMessage(message, context);
-    }
-
-    /**
      * @deprecated Removed since it isn't used; since 3.1M2.
      */
     @Deprecated

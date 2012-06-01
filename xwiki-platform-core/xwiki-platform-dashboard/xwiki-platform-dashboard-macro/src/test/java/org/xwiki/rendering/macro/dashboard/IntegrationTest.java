@@ -49,7 +49,7 @@ import org.xwiki.velocity.VelocityManager;
  * @since 3.0RC1
  */
 @RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+public class IntegrationTest
 {
     @RenderingTestSuite.Initialized
     public void initialize(final ComponentManager componentManager) throws Exception
@@ -151,6 +151,5 @@ public class IntegrationTests
         DefaultComponentDescriptor<VelocityManager> descriptorVM = new DefaultComponentDescriptor<VelocityManager>();
         descriptorVM.setRole(VelocityManager.class);
         componentManager.registerComponent(descriptorVM, mockVelocityManager);
-
     }
 }

@@ -84,6 +84,6 @@ public class BaseStringProperty extends BaseProperty
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, getValue(), mergeResult));
+        setValue(MergeUtils.mergeCharacters((String) previousValue, (String) newValue, getValue(), mergeResult));
     }
 }

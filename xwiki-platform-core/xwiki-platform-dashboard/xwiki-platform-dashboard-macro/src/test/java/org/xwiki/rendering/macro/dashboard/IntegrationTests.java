@@ -137,7 +137,7 @@ public class IntegrationTests
                     public Object invoke(Invocation invocation) throws Throwable
                     {
                         org.xwiki.velocity.VelocityEngine velocityEngine =
-                            componentManager.getInstance(org.xwiki.velocity.VelocityEngine.class);
+                            componentManager.lookup(org.xwiki.velocity.VelocityEngine.class);
                         Properties properties = new Properties();
                         properties.setProperty("resource.loader", "file");
                         velocityEngine.initialize(properties);

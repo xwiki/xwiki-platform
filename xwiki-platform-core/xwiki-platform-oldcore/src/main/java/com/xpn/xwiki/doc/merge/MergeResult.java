@@ -72,6 +72,7 @@ public class MergeResult
     // Deprecated
 
     /**
+     * @param logLevel the level of the logs to return
      * @return the exceptions associated to the provided log level
      */
     private List<Exception> getExceptions(LogLevel logLevel)

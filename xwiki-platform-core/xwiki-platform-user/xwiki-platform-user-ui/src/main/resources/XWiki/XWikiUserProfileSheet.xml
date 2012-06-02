@@ -251,6 +251,14 @@
   &lt;/div&gt;
   #if (!$inEditMode)
     &lt;div class='half column'&gt;
+      #if (!$isGuest)
+      &lt;div class='userMessage profile-section'&gt;
+        &lt;h1&gt;$msg.get('platform.core.profile.section.sendMessage')&lt;/h1&gt;
+
+          {{messageSender /}}
+
+      &lt;/div&gt;
+      #end
       &lt;div class='userRecentChanges'&gt;
       #if ($context.user == $doc.fullName)
         &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;

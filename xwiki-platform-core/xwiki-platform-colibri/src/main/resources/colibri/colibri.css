@@ -1459,6 +1459,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
+  background-image: none;
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [

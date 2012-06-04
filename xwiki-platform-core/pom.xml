@@ -254,6 +254,8 @@
             <exclude>com/xpn/xwiki/api/XWiki</exclude>
             <exclude>com/xpn/xwiki/objects/BaseElement</exclude>
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
+            <exclude>com/xpn/xwiki/XWikiCompatibilityAspect</exclude>
+            <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
             <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
           </excludes>
         </configuration>

@@ -3048,11 +3048,12 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
         needsUpdate |= bclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
-        needsUpdate |= bclass.addStaticListField("timezone", "Timezone", "---|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|" +
-                "Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|" +
-                "Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|" +
-                "Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|" +
-                "Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12");
+        needsUpdate |=
+            bclass.addStaticListField("timezone", "Timezone", "---|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|"
+                + "Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|"
+                + "Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|"
+                + "Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|"
+                + "Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12");
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
@@ -3949,9 +3950,7 @@ public class XWiki implements EventListener
 
         memberObject.setStringValue("member", userName);
 
-        this.saveDocument(groupDoc,
-                          context.getMessageTool().get("core.comment.addedUserToGroup"),
-                          context);
+        this.saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
 
         try {
             XWikiGroupService gservice = getGroupService(context);
@@ -5958,7 +5957,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaces")
-                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
+                .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -5968,8 +5967,8 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
-                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"))
-                    .bindValue("space", spaceName).execute();
+                .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).bindValue("space", spaceName)
+                .execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -6049,8 +6048,9 @@ public class XWiki implements EventListener
     {
         try {
             // refreshes all Links of each doc of the wiki
-            List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments")
-                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
+            List<String> docs =
+                getStore().getQueryManager().getNamedQuery("getAllDocuments")
+                    .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).execute();
             for (int i = 0; i < docs.size(); i++) {
                 XWikiDocument myDoc = this.getDocument(docs.get(i), context);
                 myDoc.getStore().saveLinks(myDoc, context, true);
@@ -7160,5 +7160,32 @@ public class XWiki implements EventListener
     public String getName()
     {
         return "xwiki-core";
+    }
+
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
+    public String parseMessage(XWikiContext context)
+    {
+        String message = (String) context.get("message");
+        if (message == null) {
+            return null;
+        }
+
+        return parseMessage(message, context);
+    }
+
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
+    public String parseMessage(String id, XWikiContext context)
+    {
+        XWikiMessageTool msg = context.getMessageTool();
+
+        return parseContent(msg.get(id), context);
     }
 }

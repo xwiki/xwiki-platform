@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
@@ -54,7 +55,7 @@ import org.xwiki.skinx.SkinExtension;
 @Component
 @Named(DashboardMacro.MACRO_NAME)
 @Singleton
-public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
+public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> implements NestedScriptMacroEnabled
 {
     /**
      * The marker to set as class parameter for the gadget containers in this dashboard, i.e. the elements that can

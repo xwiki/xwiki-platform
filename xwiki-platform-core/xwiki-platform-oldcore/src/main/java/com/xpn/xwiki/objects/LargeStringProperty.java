@@ -27,6 +27,6 @@ public class LargeStringProperty extends BaseStringProperty
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, getValue(), mergeResult));
+        setValue(MergeUtils.mergeLines((String) previousValue, (String) newValue, getValue(), mergeResult));
     }
 }

@@ -27,13 +27,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
+import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
+    /**
+     * Used to do the actual merge.
+     */
+    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
+
     protected List<String> list = new ArrayList<String>();
 
     private String formStringSeparator = "|";
@@ -204,6 +211,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        MergeUtils.mergeCollection((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+        MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
     }
 }

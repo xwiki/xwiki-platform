@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +100,6 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
-import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -130,7 +128,6 @@ import com.xpn.xwiki.content.parsers.DocumentParser;
 import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
@@ -378,14 +375,14 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Used to normalize references.
      */
-    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_REFERENCE, "current");
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
     /**
      * Used to normalize references.
      */
-    protected DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+    protected DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
 
     /**
      * Used to resolve parent references in the way they are stored externally (database, xml, etc), ie relative or
@@ -5908,9 +5905,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead
-     * Hibernate uses this through reflection.
-     * It cannot be removed without altering hibernate.cfg.xml
+     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead Hibernate uses this through reflection. It cannot be
+     *             removed without altering hibernate.cfg.xml
      */
     @Deprecated
     public String getxWikiClassXML()
@@ -5927,9 +5923,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead
-     * Hibernate uses this through reflection.
-     * It cannot be removed without altering hibernate.cfg.xml
+     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead Hibernate uses this through reflection. It
+     *             cannot be removed without altering hibernate.cfg.xml
      */
     @Deprecated
     public void setxWikiClassXML(String xClassXML)
@@ -7737,10 +7732,11 @@ public class XWikiDocument implements DocumentModelBridge
         MergeResult mergeResult = new MergeResult();
 
         // Title
-        setTitle(MergeUtils.mergeString(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
+        setTitle(MergeUtils.mergeCharacters(previousDocument.getTitle(), newDocument.getTitle(), getTitle(),
+            mergeResult));
 
         // Content
-        setContent(MergeUtils.mergeString(previousDocument.getContent(), newDocument.getContent(), getContent(),
+        setContent(MergeUtils.mergeLines(previousDocument.getContent(), newDocument.getContent(), getContent(),
             mergeResult));
 
         // Parent
@@ -7783,9 +7779,7 @@ public class XWikiDocument implements DocumentModelBridge
                             mergeResult.setModified(true);
                         } else {
                             // XXX: collision between DB and new: object to add but already exists in the DB
-                            mergeResult.getErrors().add(
-                                new CollisionException("Collision found on object [" + objectResult.getReference()
-                                    + "]"));
+                            mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
                         if (objectResult != null) {
@@ -7795,16 +7789,12 @@ public class XWikiDocument implements DocumentModelBridge
                             } else {
                                 // XXX: collision between DB and new: object to remove but not the same as previous
                                 // version
-                                mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on object [" + objectResult.getReference()
-                                        + "]"));
+                                mergeResult.getLog().error("Collision found on object [{}]",
+                                    objectResult.getReference());
                             }
                         } else {
                             // Already removed from DB, lets assume the user is prescient
-                            mergeResult.getWarnings()
-                                .add(
-                                    new CollisionException("Object [" + previousObject.getReference()
-                                        + "] already removed"));
+                            mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     } else if (previousObject != null && newObject != null) {
                         if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
@@ -7813,9 +7803,8 @@ public class XWikiDocument implements DocumentModelBridge
                                 mergeResult.setModified(true);
                             } else {
                                 // XXX: collision between DB and new: property to add but already exists in the DB
-                                mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on object property ["
-                                        + propertyResult.getReference() + "]"));
+                                mergeResult.getLog().error("Collision found on object property [{}]",
+                                    propertyResult.getReference());
                             }
                         } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                             if (propertyResult != null) {
@@ -7825,15 +7814,13 @@ public class XWikiDocument implements DocumentModelBridge
                                 } else {
                                     // XXX: collision between DB and new: supposed to be removed but the DB version is
                                     // not the same as the previous version
-                                    mergeResult.getErrors().add(
-                                        new CollisionException("Collision found on object property ["
-                                            + propertyResult.getReference() + "]"));
+                                    mergeResult.getLog().error("Collision found on object property [{}]",
+                                        propertyResult.getReference());
                                 }
                             } else {
                                 // Already removed from DB, lets assume the user is prescient
-                                mergeResult.getWarnings().add(
-                                    new CollisionException("Object property [" + previousProperty.getReference()
-                                        + "] already removed"));
+                                mergeResult.getLog().warn("Object property [{}] already removed",
+                                    previousProperty.getReference());
                             }
                         } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                             if (propertyResult != null) {
@@ -7846,9 +7833,7 @@ public class XWikiDocument implements DocumentModelBridge
                             } else {
                                 // XXX: collision between DB and new: property to modify but does not exists in DB
                                 // Lets assume it's a mistake to fix
-                                mergeResult.getWarnings().add(
-                                    new CollisionException("Object [" + newProperty.getReference()
-                                        + "] does not exists"));
+                                mergeResult.getLog().warn("Object [{}] does not exists", newProperty.getReference());
 
                                 objectResult.addField(diff.getPropName(), newProperty);
                                 mergeResult.setModified(true);
@@ -7879,7 +7864,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                         mergeResult.setModified(true);
                     } catch (XWikiException e) {
-                        mergeResult.getErrors().add(e);
+                        mergeResult.getLog().error("Failed to delete attachment [{}]", diff.getFileName(), e);
                     }
                 }
             }

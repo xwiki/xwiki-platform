@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.doc.merge;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogQueue;
+import org.xwiki.logging.event.LogEvent;
 
 /**
  * Report of what happen during merge.
@@ -36,14 +40,9 @@ public class MergeResult
     private boolean modified;
 
     /**
-     * @see #getErrors()
+     * @see #getLog()
      */
-    private List<Exception> errors = new ArrayList<Exception>();
-
-    /**
-     * @see #getWarnings()
-     */
-    private List<Exception> warnings = new ArrayList<Exception>();
+    private LogQueue log = new LogQueue();
 
     /**
      * @param modified indicate that something has been modified during the merge
@@ -62,15 +61,49 @@ public class MergeResult
     }
 
     /**
+     * @return the log associated to the merge
+     * @since 4.1RC1
+     */
+    public LogQueue getLog()
+    {
+        return this.log;
+    }
+
+    // Deprecated
+
+    /**
+     * @param logLevel the level of the logs to return
+     * @return the exceptions associated to the provided log level
+     */
+    private List<Exception> getExceptions(LogLevel logLevel)
+    {
+        List<Exception> exceptions = new LinkedList<Exception>();
+
+        for (LogEvent logEvent : getLog()) {
+            if (logEvent.getLevel() == logLevel) {
+                if (logEvent.getThrowable() != null && logEvent.getThrowable() instanceof Exception) {
+                    exceptions.add(new MergeException(logEvent.getFormattedMessage(), logEvent.getThrowable()));
+                } else {
+                    exceptions.add(new MergeException(logEvent.getFormattedMessage()));
+                }
+            }
+        }
+
+        return exceptions;
+    }
+
+    /**
      * Error raised during the merge.
      * <p>
      * Generally collision for which we don't know what do to at all.
      * 
      * @return the merge errors
+     * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
+    @Deprecated
     public List<Exception> getErrors()
     {
-        return this.errors;
+        return getExceptions(LogLevel.ERROR);
     }
 
     /**
@@ -80,29 +113,35 @@ public class MergeResult
      * of the case has been made.
      * 
      * @return the merge warning
+     * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
+    @Deprecated
     public List<Exception> getWarnings()
     {
-        return this.warnings;
+        return getExceptions(LogLevel.WARN);
     }
 
     /**
      * Add error.
      * 
      * @param e the error
+     * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
+    @Deprecated
     public void error(Exception e)
     {
-        getErrors().add(e);
+        getLog().error("", e);
     }
 
     /**
      * Add warning.
      * 
      * @param e the warning
+     * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
+    @Deprecated
     public void warn(Exception e)
     {
-        getWarnings().add(e);
+        getLog().warn("", e);
     }
 }

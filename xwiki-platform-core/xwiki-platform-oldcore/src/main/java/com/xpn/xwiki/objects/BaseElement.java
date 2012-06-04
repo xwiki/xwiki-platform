@@ -274,7 +274,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(MergeUtils.mergeString(((BaseElement) previousElement).getPrettyName(),
+        setPrettyName(MergeUtils.mergeCharacters(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
     }
 }

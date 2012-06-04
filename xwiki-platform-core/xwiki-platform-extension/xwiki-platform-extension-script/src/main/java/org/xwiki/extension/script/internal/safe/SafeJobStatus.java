@@ -68,6 +68,7 @@ public class SafeJobStatus<J extends JobStatus> extends AbstractSafeObject<J> im
     }
 
     @Override
+    @Deprecated
     public List<LogEvent> getLog(LogLevel level)
     {
         return getWrapped().getLog(level);

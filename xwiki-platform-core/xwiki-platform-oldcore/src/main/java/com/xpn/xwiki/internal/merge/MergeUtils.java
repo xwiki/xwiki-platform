@@ -19,13 +19,18 @@
  */
 package com.xpn.xwiki.internal.merge;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.diff.DiffManager;
+import org.xwiki.diff.MergeException;
 
-import com.qarks.util.files.diff.Diff;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Provide some 3 ways merging related methods.
@@ -36,6 +41,11 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 public final class MergeUtils
 {
     /**
+     * Used to do the actual merge.
+     */
+    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
+
+    /**
      * Utility class.
      */
     private MergeUtils()
@@ -44,7 +54,7 @@ public final class MergeUtils
     }
 
     /**
-     * Merge a String.
+     * Merge String at lines level.
      * 
      * @param previousStr previous version of the string
      * @param newStr new version of the string
@@ -52,70 +62,125 @@ public final class MergeUtils
      * @param mergeResult the merge report
      * @return the merged string or the provided current string if the merge fail
      */
-    // TODO: add support for line merge
-    public static String mergeString(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
+    public static String mergeLines(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
     {
-        if (StringUtils.equals(previousStr, newStr)) {
-            // No change so nothing to do
-            return currentStr;
-        }
+        org.xwiki.diff.MergeResult<String> result;
+        try {
+            result = diffManager.merge(toLines(previousStr), toLines(currentStr), toLines(newStr), null);
 
-        String resultStr;
+            mergeResult.getLog().addAll(result.getLog());
 
-        if (StringUtils.isEmpty(currentStr)) {
-            // The current version is empty
-            if (StringUtils.equals(previousStr, currentStr)) {
-                // Simply because the previous version was empty too
-                resultStr = newStr;
-            } else {
-                // The current version has been replaced by an empty string
-                mergeResult.getErrors().add(
-                    new CollisionException("The current value has been replaced by empty string"));
-                resultStr = currentStr;
-            }
-        } else {
+            String resultStr = fromLines(result.getMerged());
 
-            com.qarks.util.files.diff.MergeResult result = Diff.quickMerge(previousStr, newStr, currentStr, false);
-
-            if (result.isConflict()) {
-                mergeResult.getErrors().add(
-                    new CollisionException(String.format(
-                        "Failed to merge with previous string [%s], new string [%s] and current string [%s]",
-                        previousStr, newStr, currentStr)));
-                resultStr = currentStr;
-            } else {
-                resultStr = result.getDefaultMergedResult();
+            if (StringUtils.equals(resultStr, currentStr)) {
                 mergeResult.setModified(true);
             }
+
+            return resultStr;
+        } catch (MergeException e) {
+            mergeResult.getLog().error("Failed to execute merge lines", e);
         }
 
-        return resultStr;
+        return currentStr;
     }
 
     /**
-     * Merge a {@link Collection}.
+     * Merge String at characters level.
      * 
-     * @param <T> the type of the lists elements
-     * @param previousList previous version of the collection
-     * @param newList new version of the collection
-     * @param currentList current version of the collection to modify
+     * @param previousStr previous version of the string
+     * @param newStr new version of the string
+     * @param currentStr current version of the string
      * @param mergeResult the merge report
+     * @return the merged string or the provided current string if the merge fail
      */
-    public static <T> void mergeCollection(Collection<T> previousList, Collection<T> newList,
-        Collection<T> currentList, MergeResult mergeResult)
+    public static String mergeCharacters(String previousStr, String newStr, String currentStr, MergeResult mergeResult)
     {
-        for (T previousElement : previousList) {
-            if (!newList.contains(previousElement)) {
-                currentList.remove(previousElement);
+        org.xwiki.diff.MergeResult<Character> result;
+        try {
+            result = diffManager.merge(toCharacters(previousStr), toCharacters(currentStr), toCharacters(newStr), null);
+
+            mergeResult.getLog().addAll(result.getLog());
+
+            String resultStr = fromCharacters(result.getMerged());
+
+            if (StringUtils.equals(resultStr, currentStr)) {
+                mergeResult.setModified(true);
             }
+
+            return resultStr;
+        } catch (MergeException e) {
+            mergeResult.getLog().error("Failed to execute merge characters", e);
         }
 
-        for (T newElement : newList) {
-            if (!previousList.contains(newElement)) {
-                currentList.add(newElement);
-            }
+        return currentStr;
+    }
+
+    /**
+     * Merge a {@link List}.
+     * 
+     * @param <T> the type of the lists elements
+     * @param commonAncestor previous version of the collection
+     * @param next new version of the collection
+     * @param current current version of the collection to modify
+     * @param mergeResult the merge report
+     */
+    public static <T> void mergeList(List<T> commonAncestor, List<T> next, List<T> current, MergeResult mergeResult)
+    {
+        org.xwiki.diff.MergeResult<T> result;
+        try {
+            result = diffManager.merge(commonAncestor, current, next, null);
+
+            current.clear();
+            current.addAll(result.getMerged());
+        } catch (MergeException e) {
+            mergeResult.getLog().error("Failed to execute merge lists", e);
         }
     }
 
-    // TODO: add mergeList method which respect better the position of the elements than mergeCollection
+    /**
+     * @param lines the lines
+     * @return the multilines text
+     */
+    private static String fromLines(List<String> lines)
+    {
+        return StringUtils.join(lines, '\n');
+    }
+
+    /**
+     * @param str the multilines text
+     * @return the lines
+     */
+    private static List<String> toLines(String str)
+    {
+        try {
+            return IOUtils.readLines(new StringReader(str));
+        } catch (IOException e) {
+            // Should never happen
+            return null;
+        }
+    }
+
+    /**
+     * @param characters the characters
+     * @return the single line text
+     */
+    private static String fromCharacters(List<Character> characters)
+    {
+        return StringUtils.join(characters, null);
+    }
+
+    /**
+     * @param str the single line text
+     * @return the lines
+     */
+    private static List<Character> toCharacters(String str)
+    {
+        List<Character> characters = new ArrayList<Character>(str.length());
+
+        for (char c : str.toCharArray()) {
+            characters.add(c);
+        }
+
+        return characters;
+    }
 }

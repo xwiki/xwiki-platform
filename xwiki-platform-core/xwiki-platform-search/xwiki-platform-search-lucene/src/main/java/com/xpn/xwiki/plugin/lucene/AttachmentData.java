@@ -57,7 +57,7 @@ public class AttachmentData extends AbstractDocumentData
     private static final float IRRELEVANT_DOCUMENT_FIELD_BOOST = 0.1f;
 
     /** The importance of the attachment mimetype. */
-    private static final float MIMETYPE_BOOST = 3f;
+    private static final float MIMETYPE_BOOST = 0.5f;
 
     /** Which fields are relevant for attachments as well and should be kept at their original importance. */
     private static final List<String> RELEVANT_DOCUMENT_FIELDS = new ArrayList<String>();

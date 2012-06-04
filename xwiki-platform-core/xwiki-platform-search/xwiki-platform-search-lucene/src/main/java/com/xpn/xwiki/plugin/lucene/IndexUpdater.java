@@ -76,7 +76,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
         new DocumentCreatedEvent(), new DocumentDeletedEvent(), new AttachmentAddedEvent(),
-        new AttachmentDeletedEvent());
+        new AttachmentDeletedEvent(), new AttachmentUpdatedEvent());
 
     /**
      * Collecting all the fields for using up in search

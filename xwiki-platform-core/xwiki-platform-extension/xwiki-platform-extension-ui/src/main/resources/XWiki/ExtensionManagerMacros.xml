@@ -1584,43 +1584,43 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   &lt;dl&gt;
     &lt;dt&gt;&lt;label&gt;$msg.get('core.viewers.diff.contentChanges')&lt;/label&gt;&lt;/dt&gt;
     &lt;dd&gt;&lt;div class="extension-diff"&gt;
-      #extendedDiff($originalDocument.content, $revisedDocument.content)
+      #unifiedDiff($originalDocument.content, $revisedDocument.content)
     &lt;/div&gt;&lt;/dd&gt;
   &lt;/dl&gt;
 #end
 
-#macro (extendedDiff $original $revised)
+#macro (unifiedDiff $previous $next)
   (% class="diff" %)
-  #foreach ($block in $services.diff.extended($original, $revised))
+  #foreach ($block in $services.diff.display.unified($previous, $next))
     |(% class="lineNumber" %)...##
     |(% class="lineNumber" %)...##
-    |(% class="line meta" %)@@ -$mathtool.add($block.originalStart, 1),$block.originalSize +$mathtool.add($block.revisedStart, 1),$block.revisedSize @@
+    |(% class="line meta" %)@@ -$mathtool.add($block.previousStart, 1),$block.previousSize +$mathtool.add($block.nextStart, 1),$block.nextSize @@
     #foreach ($line in $block)
-      #set ($lineNumber = $line.number + 1)
+      #set ($lineNumber = $line.index + 1)
       |(% class="lineNumber" %)#if (!$line.added)$lineNumber#end##
       |(% class="lineNumber" %)#if (!$line.deleted)$lineNumber#end##
-      |(% class="line $line.type.toString().toLowerCase()" %)#extendedDiffLine($line)
+      |(% class="line $line.type.toString().toLowerCase()" %)#unifiedDiffLine($line)
     #end
   #end
 #end
 
-#macro (extendedDiffLine $line)
+#macro (unifiedDiffLine $line)
   ## We use the HTML macro to be able to escape the line content (currently there's no API to escape wiki syntax).
   {{html}}##
   ${line.type.symbol}##
-  #if ($line.words)
-    #foreach ($word in $line.words)
-      #set ($escapedWord = $escapetool.html($word).replace('{{', '&amp;#123;&amp;#123;'))
-      #if ($word.added)
-        &lt;ins&gt;$escapedWord&lt;/ins&gt;##
-      #elseif ($word.deleted)
-        &lt;del&gt;$escapedWord&lt;/del&gt;##
+  #if ($line.chunks)
+    #foreach ($chunk in $line.chunks)
+      #set ($escapedChunk = $escapetool.html($chunk).replace('{{', '&amp;#123;&amp;#123;'))
+      #if ($chunk.added)
+        &lt;ins&gt;$escapedChunk&lt;/ins&gt;##
+      #elseif ($chunk.deleted)
+        &lt;del&gt;$escapedChunk&lt;/del&gt;##
       #else
-        $escapedWord##
+        $escapedChunk##
       #end
     #end
   #else
-    $escapetool.html($line.content).replace('{{', '&amp;#123;&amp;#123;')##
+    $escapetool.html($line.value).replace('{{', '&amp;#123;&amp;#123;')##
   #end
   {{/html}}
 #end

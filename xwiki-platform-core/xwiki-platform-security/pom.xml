@@ -25,11 +25,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.1-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security</artifactId>
   <name>XWiki Platform - Security</name>
-  <version>4.1-SNAPSHOT</version>
+  <version>4.2-SNAPSHOT</version>
   <description>XWiki Platform - Security is a replacement for the old xwiki rights service (experimental)</description>
   <packaging>pom</packaging>
   <dependencies>

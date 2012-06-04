@@ -64,7 +64,6 @@ else
 fi
 
 echo Starting Jetty on port $JETTY_PORT ...
-echo Logs are in the $PRGDIR/xwiki.log file
 
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $JETTY_HOME/logs 2>/dev/null

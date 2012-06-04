@@ -240,10 +240,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 }
                 break;
             default:
-                // Verify the user has edit rights on the document containing the Wiki Macro definition
-                if (this.bridge.isDocumentEditable(documentReference)) {
-                    isAllowed = true;
-                }
+                isAllowed = true;
         }
 
         return isAllowed;

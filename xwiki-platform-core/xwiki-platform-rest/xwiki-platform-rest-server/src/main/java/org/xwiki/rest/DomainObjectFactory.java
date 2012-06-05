@@ -27,6 +27,8 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attribute;
@@ -517,6 +519,48 @@ public class DomainObjectFactory
         pageLink.setRel(Relations.PAGE);
         attachment.getLinks().add(pageLink);
     }
+    
+    /** Create attachment URI with correctly encoded path portions.
+     * 
+     * @param baseUri
+     * @param xwikiAttachment
+     * @param doc
+     * @param useVersion Signal to generate a Uri at the attachment version number
+     * @return
+     * @throws IllegalArgumentException
+     */
+    protected static String createAttachmentUri(URI baseUri,
+            com.xpn.xwiki.api.Attachment xwikiAttachment, Document doc, 
+            boolean useVersion) throws IllegalArgumentException {
+        
+        String attachmentUri = "";
+        
+        try{
+            String eWiki = URIUtil.encodePath(doc.getWiki());
+            String eSpaceName = URIUtil.encodePath(doc.getSpace());
+            String eDocName = URIUtil.encodePath(doc.getName());
+            String eAttachName = URIUtil.encodePath(xwikiAttachment.getFilename());
+            String eVersionNum = URIUtil.encodePath(xwikiAttachment.getVersion());
+                           
+            java.lang.Class<? extends XWikiResource> 
+                pathClass = (useVersion) ? AttachmentVersionResource.class 
+                                           : AttachmentResource.class;
+            
+            UriBuilder uriBuilder = UriBuilder.fromUri(baseUri).path(pathClass);
+            
+            if(useVersion){
+                attachmentUri = uriBuilder.buildFromEncoded(
+                        eWiki, eSpaceName, eDocName, eAttachName).toString();
+            }else{
+                attachmentUri = uriBuilder.buildFromEncoded(
+                        eWiki, eSpaceName, eDocName, eAttachName,eVersionNum).toString();
+            }                      
+            
+        }catch(URIException ue){
+            throw new IllegalArgumentException("could not create attachmentUri",ue);
+        }
+        return attachmentUri;
+    }
 
     public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
         com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
@@ -525,11 +569,9 @@ public class DomainObjectFactory
 
         fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl);
 
-        Document doc = xwikiAttachment.getDocument();
-
-        String attachmentUri =
-            UriBuilder.fromUri(baseUri).path(AttachmentResource.class).build(doc.getWiki(), doc.getSpace(),
-                doc.getName(), xwikiAttachment.getFilename()).toString();
+        String attachmentUri = createAttachmentUri(
+                baseUri, xwikiAttachment, xwikiAttachment.getDocument(), false);
+        
         Link attachmentLink = objectFactory.createLink();
         attachmentLink.setHref(attachmentUri);
         attachmentLink.setRel(Relations.ATTACHMENT_DATA);
@@ -547,9 +589,9 @@ public class DomainObjectFactory
 
         Document doc = xwikiAttachment.getDocument();
 
-        String attachmentUri =
-            UriBuilder.fromUri(baseUri).path(AttachmentVersionResource.class).build(doc.getWiki(), doc.getSpace(),
-                doc.getName(), xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
+        String attachmentUri = createAttachmentUri(
+                baseUri, xwikiAttachment, doc, true);
+        
         Link attachmentLink = objectFactory.createLink();
         attachmentLink.setHref(attachmentUri);
         attachmentLink.setRel(Relations.ATTACHMENT_DATA);

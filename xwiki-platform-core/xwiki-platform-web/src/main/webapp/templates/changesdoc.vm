@@ -1,39 +1,64 @@
-#macro(changesTableHeader)
-  <tr class="changes-table-title">
-    <th>$msg.get('core.viewers.diff.property')</th>
-    <th class="diffremoveword">$msg.get('core.viewers.diff.oldValue')</th>
-    <th class="diffaddword">$msg.get('core.viewers.diff.newValue')</th>
-  </tr>
+#macro (unifiedDiff $previous $next)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+  <table class="diff">
+  #foreach ($block in $services.diff.display.unified($previous, $next))
+    <tr>
+      <td class="lineNumber">...</td>
+      <td class="lineNumber">...</td>
+      <td class="line meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
+    </tr>
+    #foreach ($line in $block)
+    <tr>
+      #set ($lineNumber = $line.index + 1)
+      <td class="lineNumber">#if (!$line.added)$lineNumber#end</td>
+      <td class="lineNumber">#if (!$line.deleted)$lineNumber#end</td>
+      <td class="line $line.type.toString().toLowerCase()">#unifiedDiffLine($line)</td>
+    </tr>
+    #end
+  #end
+  </table>
 #end
-#macro(displayPropertyChange $diff $propertyName $propertyDisplay)
+
+#macro (unifiedDiffLine $line)
+${line.type.symbol}##
+#if ($line.chunks)##
+#inlineDiffLine($line.chunks)##
+#else##
+$escapetool.html($line.value)##
+#end
+#end
+
+#macro (inlineDiff $previous $next)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+  <div class="diff">
+    <div class="line">#inlineDiffLine($services.diff.display.inline($previous, $next))</div>
+  </div>
+#end
+
+#macro (inlineDiffLine $chunks)
+#foreach ($chunk in $chunks)
+#set ($escapedChunk = $escapetool.html($chunk))
+#if ($chunk.added)##
+<ins>$escapedChunk</ins>##
+#elseif ($chunk.deleted)##
+<del>$escapedChunk</del>##
+#else##
+$escapedChunk##
+#end
+#end
+#end
+
+#macro(displayPropertyChange $diff $propertyDisplay)
   <tr>
     <td>$propertyDisplay</td>
     #if ("$!diff.propType" == 'TextAreaClass')
-      <td colspan="2">$xwiki.diff.getDifferencesAsHTML("$!diff.prevValue", "$!diff.newValue" ,false)</td>
+      <td>#unifiedDiff($diff.prevValue $diff.newValue)</td>
     #else
-    <td class="diffremoveword">
-      #if($propertyName == 'author')
-        #set($author = "$!diff.getPrevValue()")
-        #if($author != '')
-          $xwiki.getUserName($author)
-        #end
-      #else
-        $diff.getPrevValue()
-      #end
-    </td>
-    <td class="diffaddword">
-      #if($propertyName == 'author')
-        #set($author = "$!diff.getNewValue()")
-        #if($author != '')
-          $xwiki.getUserName($author)
-        #end
-      #else
-        $diff.getNewValue()
-      #end
-    </td>
+      <td>#inlineDiff($diff.prevValue $diff.newValue)</td>
     #end
   </tr>
 #end
+
 #set($commentsChanges = [])
 #set($objectsChanges = [])
 #foreach($objectDiff in $doc.getObjectDiff($origdoc, $newdoc))
@@ -92,13 +117,12 @@
       <tr class="changes-table-title">
         <th colspan="3">$msg.get('changes.metadatachanges')</th>
       </tr>
-      #changesTableHeader()
       #foreach($propertyChange in $doc.getMetaDataDiff($origdoc, $newdoc))
-        #displayPropertyChange($propertyChange $propertyChange.field $msg.get("core.viewers.diff.metadata.${propertyChange.field}"))
+        #displayPropertyChange($propertyChange $msg.get("core.viewers.diff.metadata.${propertyChange.field}"))
       #end
       #if($tagsChanges)
         #foreach($propertyChange in $tagsChanges)
-          #displayPropertyChange($propertyChange ${propertyChange.propName} $msg.get("core.viewers.diff.tag.${propertyChange.propName}"))
+          #displayPropertyChange($propertyChange $msg.get("core.viewers.diff.tag.${propertyChange.propName}"))
         #end
       #end
     </table>
@@ -107,20 +131,12 @@
 ##
 ## Content changes
 ##
-#set($text1 = "$!origdoc.content.trim().replaceAll('\r', '')")
-#set($text2 = "$!newdoc.content.trim().replaceAll('\r', '')")
-#if($text1 != $text2)
+#if($origdoc.content != $newdoc.content)
   #set($hasChanges = true)
-  <div id="changes-content">
-    <table class="changes-table" summary="$msg.get('core.viewers.diff.summary')">
-      <tr class="changes-table-title">
-        <th>$msg.get('core.viewers.diff.contentChanges')</th>
-      </tr>
-      <tr>
-        <td>$xwiki.diff.getDifferencesAsHTML($text1, $text2 ,false)</td>
-      </tr>
-    </table>
-  </div>
+  <dl>
+    <dt>$msg.get('core.viewers.diff.contentChanges')</dt>
+    <dd>#unifiedDiff($origdoc.content $newdoc.content)</dd>
+  </dl>
 #end
 ##
 ## Attachment changes
@@ -164,7 +180,6 @@
       <tr class="changes-table-title">
         <th colspan="3">$msg.get('core.viewers.diff.commentChanges')</th>
       </tr>
-      #changesTableHeader()
       #foreach($comment in $commentsChanges)
         #set($action = $comment.get(0).action)
         #if($action == 'object-added')
@@ -182,7 +197,7 @@
         #end
         #foreach($propertyChange in $comment)
           #if($propertyChange.action != 'object-added' && $propertyChange.action != 'object-removed')
-            #displayPropertyChange($propertyChange ${propertyChange.propName} $msg.get("core.viewers.diff.comment.${propertyChange.propName}"))
+            #displayPropertyChange($propertyChange $msg.get("core.viewers.diff.comment.${propertyChange.propName}"))
           #end
         #end
       #end
@@ -199,7 +214,6 @@
       <tr class="changes-table-title">
         <th colspan="3">$msg.get('core.viewers.diff.objectChanges')</th>
       </tr>
-      #changesTableHeader()
       #foreach($object in $objectsChanges)
         #set($action = $object.get(0).action)
         #if($action == 'object-added')
@@ -216,7 +230,7 @@
             #if ($propertyPrettyName == '')
               #set ($propertyPrettyName = ${propertyChange.propName})
             #end
-            #displayPropertyChange ($propertyChange ${propertyChange.propName} ${propertyPrettyName})
+            #displayPropertyChange ($propertyChange ${propertyPrettyName})
           #end
         #end
       #end

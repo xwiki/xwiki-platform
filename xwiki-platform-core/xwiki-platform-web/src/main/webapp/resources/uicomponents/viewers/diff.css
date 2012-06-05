@@ -1,0 +1,58 @@
+#template('colorThemeInit.vm')
+.diff {
+  white-space: normal;
+}
+
+table.diff {
+  border-bottom: 1px solid $theme.borderColor;
+  border-top: 1px solid $theme.borderColor;
+  font-family: monospace;
+  margin: 0 1px;
+}
+
+.diff td {
+  padding: 0;
+}
+
+.diff .lineNumber {
+  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.textSecondaryColor;
+  padding-right: .5em;
+  text-align: right;
+}
+
+.diff .line, .diff .lineNumber {
+  border-bottom: 0;
+  border-top: 0;
+  padding-left: .5em;
+  white-space: pre;
+}
+
+.diff .line:hover {
+  background-color: $theme.highlightColor;
+}
+
+.diff .added {
+  background-color: #DDFFDD;
+  color: #000;
+}
+
+.diff .deleted {
+  background-color: #FFDDDD;
+  color: #000;
+}
+
+.diff .meta {
+  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.textSecondaryColor;
+}
+
+.diff .line del {
+  background-color: #FFAAAA;
+  text-decoration: none;
+}
+
+.diff .line ins {
+  background-color: #AAFFAA;
+  text-decoration: none;
+}

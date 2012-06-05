@@ -224,6 +224,10 @@
           <excludes>
             <exclude>**/internal/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Add a method to the oldcore/wikimacro bridge -->
+            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroFactory</exclude>
+
+            <!-- Remove the following excludes after we release the 4.1 final version -->
             <exclude>org/xwiki/gwt/wysiwyg/client/diff/**</exclude> <!-- Moved diff plugin to new module -->
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/sync/**</exclude> <!-- Moved sync plugin to new module -->
             <exclude>org/xwiki/gwt/wysiwyg/client/Images</exclude> <!-- Moved sync plugin to new module -->

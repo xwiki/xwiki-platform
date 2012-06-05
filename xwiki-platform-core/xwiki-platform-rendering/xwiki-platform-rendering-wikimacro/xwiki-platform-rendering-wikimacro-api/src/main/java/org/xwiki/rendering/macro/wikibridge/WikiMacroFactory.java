@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Create a Wiki Macro object by gathering the Macro metadata from a document. 
+ * Create a Wiki Macro object by gathering the Macro metadata from a document.
  * 
  * @version $Id$
  * @since 2.0RC1
@@ -50,4 +50,12 @@ public interface WikiMacroFactory
      * @since 2.2M1
      */
     WikiMacro createWikiMacro(DocumentReference documentReference) throws WikiMacroException;
+    
+    /**
+     * @param documentReference the name of the document containing the wiki macro definition
+     * @param visibility the visibility required
+     * @return true if the passed visibility is allowed for the passed document.
+     * @since 4.2M1
+     */
+    boolean isAllowed(DocumentReference documentReference, WikiMacroVisibility visibility);
 }

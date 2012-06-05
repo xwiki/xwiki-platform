@@ -38,6 +38,7 @@ import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 
@@ -69,6 +70,12 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      */
     @Inject
     private ModelContext modelContext;
+
+    /**
+     * Used to check the right depending of the macro visibility.
+     */
+    @Inject
+    private WikiMacroFactory wikiMacroFactory;
 
     /**
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
@@ -133,20 +140,12 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @since 2.2M1
-     */
     @Override
     public boolean hasWikiMacro(DocumentReference documentReference)
     {
         return (null != this.wikiMacroMap.get(documentReference));
     }
 
-    /**
-     * {@inheritDoc}
-     * @since 2.2M1
-     */
     @Override
     public void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro)
         throws InsufficientPrivilegesException, WikiMacroException
@@ -154,7 +153,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) wikiMacro.getDescriptor();
 
         // Verify that the user has the right to register this wiki macro the chosen visibility
-        if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
+        if (this.wikiMacroFactory.isAllowed(documentReference, macroDescriptor.getVisibility())) {
             DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<Macro>();
             componentDescriptor.setRole(Macro.class);
             componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
@@ -175,10 +174,6 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @since 2.2M1
-     */
     @Override
     public void unregisterWikiMacro(DocumentReference documentReference) throws WikiMacroException
     {
@@ -187,7 +182,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) macroData.getWikiMacro().getDescriptor();
 
             // Verify that the user has the right to unregister this wiki macro for the chosen visibility
-            if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
+            if (this.wikiMacroFactory.isAllowed(documentReference, macroDescriptor.getVisibility())) {
                 String currentUser = this.bridge.getCurrentUser();
                 EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
                 try {
@@ -215,35 +210,6 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         } else {
             throw new WikiMacroException(String.format("Macro in [%s] isn't registered", documentReference));
         }
-    }
-
-    /**
-     * @param documentReference the name of the document containing the wiki macro definition
-     * @param visibility the visibility required
-     * @return true if the current user is allowed to register or unregister the wiki macro contained in the passed
-     *         document name and with the passed visibility. Global visibility require programming rights on the
-     *         document (to ensure they cannot be defined by standard users in a wiki farm - since only farm admins have
-     *         programming rights in a farm). Current user and current wiki visibility simply require edit rights on the
-     *         document.
-     * @since 2.2M1
-     */
-    private boolean isAllowed(DocumentReference documentReference, WikiMacroVisibility visibility)
-    {
-        boolean isAllowed = false;
-
-        switch (visibility) {
-            case GLOBAL:
-                // Verify that the user has programming rights since XWiki doesn't have a Wiki Farm Admin right yet
-                // and the programming rights is the closest to it.
-                if (this.bridge.hasProgrammingRights()) {
-                    isAllowed = true;
-                }
-                break;
-            default:
-                isAllowed = true;
-        }
-
-        return isAllowed;
     }
 
     /**

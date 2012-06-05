@@ -260,4 +260,29 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
         return result;
     }
+
+    @Override
+    // FXME: It's not right to check the current use, the document author should be checked instead. This makes
+    // initialization more complex and does not bring any security
+    public boolean isAllowed(DocumentReference documentReference, WikiMacroVisibility visibility)
+    {
+        boolean isAllowed = false;
+
+        XWikiContext xcontext = getContext();
+
+        switch (visibility) {
+            case GLOBAL:
+                // Verify that the user has programming rights
+                isAllowed = xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
+                break;
+            case WIKI:
+                // Verify that the user has admin right on the macro wiki
+                isAllowed = xcontext.getWiki().getRightService().hasWikiAdminRights(xcontext);
+                break;
+            default:
+                isAllowed = true;
+        }
+
+        return isAllowed;
+    }
 }

@@ -76,6 +76,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
     private WikiModel mockWikiModel;
 
+    private WikiMacroFactory mockWikiMacroFactory;
+
     @Override
     @Before
     public void setUp() throws Exception
@@ -101,6 +103,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations() {{
             allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocBridge).getCurrentUser(); will(returnValue("dummy"));
+            allowing(mockWikiMacroFactory).isAllowed(with(any(DocumentReference.class)), with(any(WikiMacroVisibility.class))); will(returnValue(true));
 
             // This is the document containing the wiki macro that will be put in the context available in the macro
             // Since we're not testing it here, it can be null.
@@ -112,8 +115,9 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
         // some tests fail because the lookup of this component fails (the implementation is defined in xwiki-core)
-        registerMockComponent(WikiMacroFactory.class);
+        this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
     }
 
     /**

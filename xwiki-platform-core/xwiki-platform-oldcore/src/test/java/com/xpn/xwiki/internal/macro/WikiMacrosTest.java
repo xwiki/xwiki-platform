@@ -113,7 +113,10 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
                 will(returnValue(macroDocument));
                 allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)),
                     with(any(String.class)), with(any(XWikiContext.class)));
-                will(returnValue(true));
+                allowing(rightService).hasWikiAdminRights(with(any(XWikiContext.class)));
+                    will(returnValue(true));
+                allowing(rightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                    will(returnValue(true));
             }
         });
 

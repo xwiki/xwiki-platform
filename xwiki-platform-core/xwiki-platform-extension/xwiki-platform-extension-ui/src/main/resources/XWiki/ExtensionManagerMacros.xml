@@ -749,12 +749,12 @@ ul.extension-metadata li {
   padding-top: 0.5em;
 }
 
-.extension-body-dependencies ul, .extension-body-progress ul {
+.extension-body-dependencies ul, .extension-body-progress &gt; ul {
   border-top: 1px dotted #E8E8E8;
   list-style-type: none;
   margin: 0;
 }
-.extension-body-dependencies li:hover, .extension-body-progress li:hover {
+.extension-body-dependencies li:hover, .extension-body-progress &gt; ul li:hover {
   background-color: $theme.highlightColor;
 }
 .dependency-item, .extension-log-item {
@@ -802,6 +802,9 @@ ul.extension-metadata li {
 .extension-diff-title {
   margin: 1.2em 0 .6em;
 }
+.extension-diff-options {
+  margin-bottom: .6em;
+}
 .extension-diff-options .label {
   font-size: 0.85em;
   font-weight: 700;
@@ -812,12 +815,8 @@ ul.extension-metadata li {
   margin-right: 0.3em;
   width: auto;
 }
-.extension-diff {
-  font-size: 120%;
-  overflow: auto;
-}
 
-.extension-body-progress ul {
+.extension-body-progress &gt; ul {
   margin-top: .5em;
 }
 .extension-log-item {
@@ -1053,151 +1052,7 @@ ul.extension-metadata li {
 }</code>
     </property>
     <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.ExtensionManagerMacros</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>8b441d74-c8e3-4d6f-8a51-fb559cf0df53</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>table.diff {
-  border-bottom: 1px solid $theme.borderColor;
-  border-top: 1px solid $theme.borderColor;
-  font-family: monospace;
-  margin: 0 1px;
-}
-
-.diff td {
-  padding: 0;
-}
-
-.diff .lineNumber {
-  background-color: $theme.backgroundSecondaryColor;
-  color: $theme.textSecondaryColor;
-  padding-right: .5em;
-  text-align: right;
-}
-
-.diff .line, .diff .lineNumber {
-  border-bottom: 0;
-  border-top: 0;
-  padding-left: .5em;
-  white-space: pre;
-}
-
-.diff .line:hover {
-  background-color: $theme.highlightColor;
-}
-
-.diff .added {
-  background-color: #DDFFDD;
-  color: #000;
-}
-
-.diff .deleted {
-  background-color: #FFDDDD;
-  color: #000;
-}
-
-.diff .meta {
-  background-color: $theme.backgroundSecondaryColor;
-  color: $theme.textSecondaryColor;
-}
-
-.diff .line del {
-  background-color: #FFAAAA;
-  text-decoration: none;
-}
-
-.diff .line ins {
-  background-color: #AAFFAA;
-  text-decoration: none;
-}</code>
-    </property>
-    <property>
-      <name>Diff</name>
+      <name>Style</name>
     </property>
     <property>
       <parse>1</parse>
@@ -1207,8 +1062,9 @@ ul.extension-metadata li {
     </property>
   </object>
   <content>{{velocity output="false"}}
-$xwiki.ssx.use('ExtensionManagerMacros')
-$xwiki.jsx.use('ExtensionManagerMacros')
+#set ($discard = $xwiki.ssx.use('ExtensionManagerMacros'))
+#set ($discard = $xwiki.jsx.use('ExtensionManagerMacros'))
+#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
 
 #set ($extensionManager = $services.extension)
 
@@ -1552,13 +1408,13 @@ $xwiki.jsx.use('ExtensionManagerMacros')
 
 #macro (displayExtensionDetails_progressChanges $question)
   (% class="extension-diff-title" %)
-  ====== $msg.get('extensions.upgrade.mergeConflict.changes.title', ["[[$question.currentDocument&gt;&gt;doc:$services.model.serialize($question.currentDocument.documentReference)]]"]) ======
+  === $msg.get('extensions.upgrade.mergeConflict.changes.title', ["[[$question.currentDocument&gt;&gt;doc:$services.model.serialize($question.currentDocument.documentReference)]]"]) ===
 
   (% class="extension-diff-options" %)(((
     #set ($versions = {'PREVIOUS': $question.previousDocument, 'CURRENT': $question.currentDocument, 'NEXT': $question.nextDocument, 'MERGED': $question.mergedDocument})
     (% class="label" %)$msg.get('extensions.upgrade.mergeConflict.changes.original')(%%)##
     &lt;select name="original"&gt;
-    #set ($originalVersion = 'MERGED')
+    #set ($originalVersion = 'CURRENT')
     #if ($versions.containsKey($request.original))
       #set ($originalVersion = $request.original)
     #end
@@ -1569,7 +1425,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     &lt;/select&gt;##
     (% class="label" %)$msg.get('extensions.upgrade.mergeConflict.changes.revised')(%%)##
     &lt;select name="revised"&gt;
-    #set ($revisedVersion = 'NEXT')
+    #set ($revisedVersion = 'MERGED')
     #if ($versions.containsKey($request.revised))
       #set ($revisedVersion = $request.revised)
     #end
@@ -1581,47 +1437,14 @@ $xwiki.jsx.use('ExtensionManagerMacros')
     #em_submitButton('extensions.actions.diff' 'diff' true)
   )))
 
-  &lt;dl&gt;
-    &lt;dt&gt;&lt;label&gt;$msg.get('core.viewers.diff.contentChanges')&lt;/label&gt;&lt;/dt&gt;
-    &lt;dd&gt;&lt;div class="extension-diff"&gt;
-      #unifiedDiff($originalDocument.content, $revisedDocument.content)
-    &lt;/div&gt;&lt;/dd&gt;
-  &lt;/dl&gt;
-#end
-
-#macro (unifiedDiff $previous $next)
-  (% class="diff" %)
-  #foreach ($block in $services.diff.display.unified($previous, $next))
-    |(% class="lineNumber" %)...##
-    |(% class="lineNumber" %)...##
-    |(% class="line meta" %)@@ -$mathtool.add($block.previousStart, 1),$block.previousSize +$mathtool.add($block.nextStart, 1),$block.nextSize @@
-    #foreach ($line in $block)
-      #set ($lineNumber = $line.index + 1)
-      |(% class="lineNumber" %)#if (!$line.added)$lineNumber#end##
-      |(% class="lineNumber" %)#if (!$line.deleted)$lineNumber#end##
-      |(% class="line $line.type.toString().toLowerCase()" %)#unifiedDiffLine($line)
-    #end
-  #end
-#end
-
-#macro (unifiedDiffLine $line)
-  ## We use the HTML macro to be able to escape the line content (currently there's no API to escape wiki syntax).
-  {{html}}##
-  ${line.type.symbol}##
-  #if ($line.chunks)
-    #foreach ($chunk in $line.chunks)
-      #set ($escapedChunk = $escapetool.html($chunk).replace('{{', '&amp;#123;&amp;#123;'))
-      #if ($chunk.added)
-        &lt;ins&gt;$escapedChunk&lt;/ins&gt;##
-      #elseif ($chunk.deleted)
-        &lt;del&gt;$escapedChunk&lt;/del&gt;##
-      #else
-        $escapedChunk##
-      #end
-    #end
-  #else
-    $escapetool.html($line.value).replace('{{', '&amp;#123;&amp;#123;')##
-  #end
+  {{html}}
+  #set ($rev1 = $originalVersion.toLowerCase())
+  #set ($rev2 = $revisedVersion.toLowerCase())
+  #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
+  #set ($origdoc = $wrappedDocs.get(0))
+  #set ($newdoc = $wrappedDocs.get(1))
+  #set ($headingLevel = 4)
+  #template('changesdoc.vm')
   {{/html}}
 #end
 

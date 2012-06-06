@@ -1,58 +1,68 @@
 #template('colorThemeInit.vm')
-.diff {
-  white-space: normal;
+.diff-container {
+  border: 1px solid $theme.borderColor;
+  font-family: Courier, monospace;
+  font-size: 12px;
+  overflow: auto;
 }
 
-table.diff {
-  border-bottom: 1px solid $theme.borderColor;
-  border-top: 1px solid $theme.borderColor;
-  font-family: monospace;
-  margin: 0 1px;
+.diff-container table {
+  /* Prevent scroll bars when the table fills the entire width. */
+  margin: 0;
 }
 
-.diff td {
+.diff-container td {
+  border: 0 none;
   padding: 0;
 }
 
-.diff .lineNumber {
+td.diff-line-number {
   background-color: $theme.backgroundSecondaryColor;
+  border-right: 1px solid $theme.borderColor;
   color: $theme.textSecondaryColor;
   padding-right: .5em;
   text-align: right;
+  vertical-align: top;
 }
 
-.diff .line, .diff .lineNumber {
-  border-bottom: 0;
-  border-top: 0;
+td.diff-line, td.diff-line-number {
   padding-left: .5em;
-  white-space: pre;
 }
 
-.diff .line:hover {
+td.diff-line {
+  /* Take all the available space. */
+  width: 100%;
+}
+
+.diff-line {
+  white-space: pre-wrap;
+}
+
+td.diff-line:hover {
   background-color: $theme.highlightColor;
 }
 
-.diff .added {
+.diff-line-added {
   background-color: #DDFFDD;
   color: #000;
 }
 
-.diff .deleted {
+.diff-line-deleted {
   background-color: #FFDDDD;
   color: #000;
 }
 
-.diff .meta {
+.diff-line-meta {
   background-color: $theme.backgroundSecondaryColor;
   color: $theme.textSecondaryColor;
 }
 
-.diff .line del {
+.diff-line del {
   background-color: #FFAAAA;
   text-decoration: none;
 }
 
-.diff .line ins {
+.diff-line ins {
   background-color: #AAFFAA;
   text-decoration: none;
 }

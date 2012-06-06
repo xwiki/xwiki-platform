@@ -705,46 +705,6 @@ div.buttonwrapper {
   padding: 1.5em 0 1em;
 }
 
-#changescontent table {
-  margin-bottom: 0;
-  width: 100%;
-}
-
-#changescontent th, #changescontent td {
-  border: 1px solid $theme.borderColor;
-  padding: 3px 4px;
-}
-
-#changescontent th {
-  font-size: .85em;
-}
-
-#changescontent  .changes-table-title th {
-  font-size: .9em;
-  text-transform: uppercase;
-}
-
-#changescontent table tr.changes-table-title + tr.changes-table-title th {
-  border-bottom-width: 4px;
-  font-size: .8em;
-}
-
-.diff {
-  overflow: auto;
-  white-space: pre-wrap;
-}
-
-.diffaddword {
-  color: $theme.notificationSuccessColor;
-  background-color: rgba(0, 255, 0, 0.15);
-}
-
-.diffremoveword {
-  color: $theme.notificationErrorColor;
-  text-decoration: line-through;
-  background-color: rgba(255, 0, 0, 0.15);
-}
-
 /* --------------Information--------------*/
 #informationcontent dd {
   padding: 0 1em 1em;

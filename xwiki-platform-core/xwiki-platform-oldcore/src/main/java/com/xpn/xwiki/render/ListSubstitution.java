@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.render;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
@@ -50,7 +51,7 @@ public class ListSubstitution extends WikiSubstitution
 
     private String currentline = null;
 
-    private StringBuffer currentList = new StringBuffer();
+    private StringBuilder currentList = new StringBuilder();
 
     public ListSubstitution(Util util)
     {
@@ -126,12 +127,11 @@ public class ListSubstitution extends WikiSubstitution
 
     public String handleList(String line)
     {
-        Util util = getUtil();
-        line = util.substitute("s/^\\s*$/<p \\/> /o", line);
-        if (util.matched()) {
+        if (StringUtils.isBlank(line)) {
+            line = "<p />";
             this.finished = true;
         }
-        if (util.match("m/^(\\S+?)/", line)) {
+        if (line.matches("\\S++.*")) {
             this.finished = true;
         }
 
@@ -155,14 +155,11 @@ public class ListSubstitution extends WikiSubstitution
     public String dumpCurrentList(StringBuffer output, boolean force)
     {
         if ((this.currentList.length() != 0) && (force || this.finished)) {
-            Util util = getUtil();
             String list = this.currentList.toString();
-            list = util.substitute("s/<\\/dl><dl>//go", list);
-            list = util.substitute("s/<\\/ul><ul>//go", list);
-            list = util.substitute("s/<\\/ol><ol>//go", list);
+            list = list.replaceAll("</([dou]l)><\\1>", "");
             output.append(list);
             output.append("\n");
-            this.currentList = new StringBuffer();
+            this.currentList = new StringBuilder();
             this.finished = false;
             return list;
         } else {

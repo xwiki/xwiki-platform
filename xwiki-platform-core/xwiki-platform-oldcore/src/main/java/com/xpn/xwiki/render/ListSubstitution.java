@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.util.Util;
 import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
+
+import com.xpn.xwiki.util.Util;
 
 public class ListSubstitution extends WikiSubstitution
 {
@@ -63,15 +64,16 @@ public class ListSubstitution extends WikiSubstitution
         setSubstitution(" ");
         super.appendSubstitution(stringBuffer, matchResult, i, minput, patternMatcher, pattern);
         int length;
-        if (currenttype == TYPE_UL2)
+        if (this.currenttype == TYPE_UL2) {
             length = matchResult.group(1).length() / 3;
-        else
+        } else {
             length = matchResult.group(1).length();
+        }
 
-        String text = currentline.substring(matchResult.endOffset(0));
+        String text = this.currentline.substring(matchResult.endOffset(0));
         String itemdelim = "li";
         String groupdelim = "ul";
-        switch (currenttype) {
+        switch (this.currenttype) {
             case TYPE_DL:
                 itemdelim = "dd";
                 groupdelim = "dt";
@@ -82,24 +84,24 @@ public class ListSubstitution extends WikiSubstitution
         }
 
         for (int nb = 0; nb < length; nb++) {
-            currentList.append("<");
-            currentList.append(groupdelim);
-            currentList.append(">");
+            this.currentList.append("<");
+            this.currentList.append(groupdelim);
+            this.currentList.append(">");
         }
-        currentList.append("<");
-        currentList.append(itemdelim);
-        currentList.append("> ");
-        currentList.append(text);
-        currentList.append("</");
-        currentList.append(itemdelim);
-        currentList.append(">\n");
+        this.currentList.append("<");
+        this.currentList.append(itemdelim);
+        this.currentList.append("> ");
+        this.currentList.append(text);
+        this.currentList.append("</");
+        this.currentList.append(itemdelim);
+        this.currentList.append(">\n");
         for (int nb = 0; nb < length; nb++) {
-            currentList.append("</");
-            currentList.append(groupdelim);
-            currentList.append(">");
+            this.currentList.append("</");
+            this.currentList.append(groupdelim);
+            this.currentList.append(">");
         }
-        finished = false;
-        currentline = null;
+        this.finished = false;
+        this.currentline = null;
     }
 
     public String substitute(String line, int type)
@@ -119,45 +121,52 @@ public class ListSubstitution extends WikiSubstitution
                 setPattern(olpattern);
                 break;
         }
-        return super.substitute(line); // To change body of overriden methods use Options | File Templates.
+        return super.substitute(line);
     }
 
     public String handleList(String line)
     {
         Util util = getUtil();
         line = util.substitute("s/^\\s*$/<p \\/> /o", line);
-        if (util.matched())
-            finished = true;
-        if (util.match("m/^(\\S+?)/", line))
-            finished = true;
+        if (util.matched()) {
+            this.finished = true;
+        }
+        if (util.match("m/^(\\S+?)/", line)) {
+            this.finished = true;
+        }
 
         // Handle the lists
-        currentline = line;
-        if (currentline != null)
-            substitute(currentline, TYPE_DL);
-        if (currentline != null)
-            substitute(currentline, TYPE_UL1);
-        if (currentline != null)
-            substitute(currentline, TYPE_UL2);
-        if (currentline != null)
-            substitute(currentline, TYPE_OL);
-        return currentline;
+        this.currentline = line;
+        if (this.currentline != null) {
+            substitute(this.currentline, TYPE_DL);
+        }
+        if (this.currentline != null) {
+            substitute(this.currentline, TYPE_UL1);
+        }
+        if (this.currentline != null) {
+            substitute(this.currentline, TYPE_UL2);
+        }
+        if (this.currentline != null) {
+            substitute(this.currentline, TYPE_OL);
+        }
+        return this.currentline;
     }
 
     public String dumpCurrentList(StringBuffer output, boolean force)
     {
-        if ((currentList.length() != 0) && (force || finished)) {
+        if ((this.currentList.length() != 0) && (force || this.finished)) {
             Util util = getUtil();
-            String list = currentList.toString();
+            String list = this.currentList.toString();
             list = util.substitute("s/<\\/dl><dl>//go", list);
             list = util.substitute("s/<\\/ul><ul>//go", list);
             list = util.substitute("s/<\\/ol><ol>//go", list);
             output.append(list);
             output.append("\n");
-            currentList = new StringBuffer();
-            finished = false;
+            this.currentList = new StringBuffer();
+            this.finished = false;
             return list;
-        } else
+        } else {
             return "";
+        }
     }
 }

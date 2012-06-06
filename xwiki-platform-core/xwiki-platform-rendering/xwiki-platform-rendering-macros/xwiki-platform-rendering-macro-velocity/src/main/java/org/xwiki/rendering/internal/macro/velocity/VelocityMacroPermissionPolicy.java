@@ -17,50 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.groovy;
+package org.xwiki.rendering.internal.macro.velocity;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.groovy.GroovyConfiguration;
 import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * Decide if Groovy script execution is allowed. Allow execution if one of the following conditions is met:
+ * Decide if velocity script execution is allowed. Allow execution if one of the following conditions is met:
  * <ul>
- *   <li>if the Secure Groovy Customizer is active and the transformation context
- *       is <strong>not</strong> restricted</li>
- *   <li>if the current document has programming rights</li>
+ *   <li>if the macro transformation context is <strong>not</strong> restricted</li>
  * </ul>
  *
  * @version $Id$
- * @since 4.1M1
+ * @since 4.2M1
  */
 @Component
-@Named("groovy")
+@Named("velocity")
 @Singleton
-public class GroovyMacroPermissionPolicy extends AbstractScriptMacroPermissionPolicy
+public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermissionPolicy
 {
-    /**
-     * Used to verify if the Groovy Secure Customizer is active. If so, we delegate security checks to it.
-     */
-    @Inject
-    private GroovyConfiguration configuration;
-
     @Override
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
-        boolean hasPermission;
-        if (this.configuration.getCompilationCustomizerNames().contains("secure")) {
-            // Security is delegated to Groovy Secure Customizer
-            hasPermission = !context.getTransformationContext().isRestricted();
-        } else {
-            hasPermission = super.hasPermission(parameters, context);
-        }
-        return hasPermission;
+        return !context.getTransformationContext().isRestricted();
     }
 }

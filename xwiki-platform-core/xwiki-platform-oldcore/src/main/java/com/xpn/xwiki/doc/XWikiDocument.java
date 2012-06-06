@@ -925,12 +925,43 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param restrictedTransformationContext 
+     *         {@see org.xwiki.display.internalDocumentDisplayerParameters.isTransformationContextRestricted}.
+     * @param context the XWiki Context object
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContent(String text, String syntaxId,
+                                     boolean restrictedTransformationContext, XWikiContext context)
+    {
+        return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(),
+                                  restrictedTransformationContext, context);
+    }
+
+    /**
+     * @param text the text to render
      * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 2.0M3
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context)
+    {
+        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param restrictedTransformationContext 
+     *         {@see org.xwiki.display.internalDocumentDisplayerParameters.isTransformationContextRestricted}.
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
+                                     boolean restrictedTransformationContext, XWikiContext context)
     {
         String result = getRenderingCache().getRenderedContent(getDocumentReference(), text, context);
 
@@ -954,6 +985,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setTransformationContextIsolated(true);
+                parameters.setTransformationContextRestricted(restrictedTransformationContext);
                 XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
                 result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 

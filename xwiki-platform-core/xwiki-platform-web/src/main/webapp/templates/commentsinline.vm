@@ -166,7 +166,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #if ($isAnnotation)
       <a href="#ID$comment.number"><blockquote class="annotatedText">$!escapetool.xml($commentSelection)</blockquote></a>
     #end
-    <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContent($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
+    <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
   </div>## xwikicomment
 #end
 ##

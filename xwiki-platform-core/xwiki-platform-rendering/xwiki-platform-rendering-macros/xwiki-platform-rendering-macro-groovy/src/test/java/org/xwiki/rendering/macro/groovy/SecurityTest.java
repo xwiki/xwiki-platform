@@ -143,12 +143,36 @@ public class SecurityTest extends AbstractComponentTestCase
         executeGroovyMacro("synchronized(this) {}");
     }
 
+    @Test(expected=MacroExecutionException.class)
+    public void testExecutionWhenSecureCustomizerAndRestricted() throws Exception
+    {
+        getMockery().checking(new Expectations()
+        {{
+            // No PR
+            allowing(dab).hasProgrammingRights();
+            will(returnValue(false));
+
+            // The secure AST Customizer is active
+            allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
+                will(returnValue(Arrays.asList("secure")));
+        }});
+
+        // Note: We execute something that works with the Groovy Security customizer...
+        executeGroovyMacro("new Integer(0)", true);
+    }
+
     private void executeGroovyMacro(String script) throws Exception
+    {
+        executeGroovyMacro(script, false);
+    }
+
+    private void executeGroovyMacro(String script, boolean restricted) throws Exception
     {
         Macro macro = getComponentManager().getInstance(Macro.class, "groovy");
         JSR223ScriptMacroParameters parameters = new JSR223ScriptMacroParameters();
 
         MacroTransformationContext context = new MacroTransformationContext();
+        context.getTransformationContext().setRestricted(restricted);
         // The script macro checks the current block (which is a macro block) to see what engine to use
         context.setCurrentMacroBlock(new MacroBlock("groovy", Collections.<String, String>emptyMap(), false));
 

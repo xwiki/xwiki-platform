@@ -71,7 +71,9 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
             if (heading.getLevel().getAsInt() <= displayConfiguration.getTitleHeadingDepth()) {
                 XDOM headingXDOM = new XDOM(Collections.<Block> singletonList(heading));
                 try {
-                    TransformationContext txContext = new TransformationContext(headingXDOM, document.getSyntax());
+                    TransformationContext txContext =
+                        new TransformationContext(headingXDOM, document.getSyntax(),
+                                                  parameters.isTransformationContextRestricted());
                     transformationManager.performTransformations(headingXDOM, txContext);
 
                     Block headingBlock = headingXDOM.getChildren().size() > 0 ? headingXDOM.getChildren().get(0) : null;

@@ -242,7 +242,9 @@ public class DocumentContentDisplayer implements DocumentDisplayer
         // XDOM to carry away the changes.
         content = content.clone();
 
-        TransformationContext txContext = new TransformationContext(content, document.getSyntax());
+        TransformationContext txContext =
+            new TransformationContext(content, document.getSyntax(),
+                                      parameters.isTransformationContextRestricted());
         txContext.setId(nameSpace);
         try {
             transformationManager.performTransformations(content, txContext);

@@ -605,6 +605,19 @@ public class Document extends Api
     }
 
     /**
+     * Render a text in a restricted mode, where script macros are completely disabled.
+     * 
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContentRestricted(String text, String syntaxId) throws XWikiException
+    {
+        return this.doc.getRenderedContent(text, syntaxId, true, getXWikiContext());
+    }
+
+    /**
      * @param text the text to render
      * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
      * @param targetSyntaxId the id of the syntax in which to render the document content

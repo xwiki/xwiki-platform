@@ -635,6 +635,7 @@ return XWiki;
       #set($discard = $spacePrefsDoc.set('levels', 'admin'))
       #set($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
       #set($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
+      #set($discard = $spacePrefsDoc.setHidden(true))
       #set($discard = $spacePrefsDoc.saveWithProgrammingRights($msg.get('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
     #end
   #end

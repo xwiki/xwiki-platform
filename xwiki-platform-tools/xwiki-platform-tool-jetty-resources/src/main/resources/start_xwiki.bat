@@ -24,14 +24,15 @@ set JETTY_PORT=8080
 set JETTY_STOP_PORT=8079
 set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=128m
 
-REM Ensure the logs directory exists as otherwise Jetty reports an error
-if not exist %JETTY_HOME%\logs mkdir %JETTY_HOME%\logs
-
-REM Ensure the work directory exists so that Jetty uses it for its temporary files.
-if not exist %JETTY_HOME%\work mkdir %JETTY_HOME%\work
+REM Location where XWiki stores generated data and where database files are.
+set XWIKI_DATA_DIR=${xwikiDataDir}
+set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir=%XWIKI_DATA_DIR%
 
 REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
-if not exist data mkdir data
+if not exist %XWIKI_DATA_DIR% mkdir %XWIKI_DATA_DIR%
+
+REM Ensure the logs directory exists as otherwise Jetty reports an error
+if not exist %XWIKI_DATA_DIR%\logs mkdir %XWIKI_DATA_DIR%\logs
 
 REM The port on which to start Jetty can be passed to this script as the first argument
 IF NOT [%1]==[] set JETTY_PORT=%1

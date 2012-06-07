@@ -4,11 +4,21 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($formname = "inline")
 #set($saveaction = "save")
 #set($previewenabled = true)
+## Determine if editing should be allowed
+#set($force = $!request.get("force"))
+#set($allowDocEdit = !(($doc.getLocked()==true)&&(!$force)) )
+##
 <div class="main layoutsubsection">
   <div id="contentmenu" class="actionmenu">
     #template("editmenu.vm")
   </div>
 <div id="mainContentArea">
+## ----------------------------------------------------------------------------
+## Start FORM at start of content area IF editing is allowed.
+## ----------------------------------------------------------------------------
+#if ($allowDocEdit)
+ <form id="inline" method="post" action="$doc.getURL("preview")" class="withLock">
+#end
 #template("hierarchy.vm")
 #template('editmeta.vm')
 ## ----------------------------------------------------------------------------
@@ -21,12 +31,9 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## ----------------------------
 <div id="document-title"><h1>$titleToDisplay</h1></div>
 ##
+## If the document cannot be edited, display an information and a forcing link:
 ##
-## Can the document be edited?
-## If not, display an information and a forcing link:
-##
-#set($force = $!request.get("force"))
-#if (($doc.getLocked()==true)&&(!$force))
+#if (!$allowDocEdit)
   <div class="layoutsection">
   $response.setStatus(423)
   #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
@@ -37,9 +44,8 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   </div>
 #else
 ##
-## Can edit. Display the form
+## Otherwise, can edit - continue the form.
 ##
-<form id="inline" method="post" action="$doc.getURL("preview")" class="withLock">
 <div>
 <input type="hidden" name="xcontinue" value="$doc.getURL($doc.getDefaultEditMode(), 'editor=inline')"/>
 ## CSRF prevention

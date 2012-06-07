@@ -138,6 +138,16 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
+     * @return the number of rows in the live table
+     */
+    public int getRowCount()
+    {
+        WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));
+        // We use XPath because we're interested only in the direct children.
+        return liveTableBody.findElements(By.xpath("tr")).size();
+    }
+
+    /**
      * @since 3.2M3
      */
     public void waitUntilRowCountGreaterThan(final int minimalExpectedRowCount)

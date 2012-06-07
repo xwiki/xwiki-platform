@@ -1804,6 +1804,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #if(!$errorMessage)
     #set($discard = $xdoc.setXClass($xclass))
     #set($discard = $xdoc.renameProperties($doc.documentReference, $fieldsToRename))
+    #set($discard = $xdoc.setHidden(true))
     #set($discard = $xdoc.setMetaDataDirty(true))
     #set($discard = $doc.save($msg.get('core.comment.updateClassProperty'), $minorEdit))
   #end
@@ -1841,6 +1842,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.setParent($doc.name))
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
+    #set($discard = $templateDoc.setHidden(true))
     #set($discard = $templateDoc.save($msg.get('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
   #end
 #end
@@ -1867,6 +1869,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
       #set($discard = $sheetDoc.setParent($doc.name))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+      #set($discard = $sheetDoc.setHidden(true))
       #set($discard = $sheetDoc.save($msg.get('platform.appwithinminutes.classEditorSheetSaveComment'), $minorEdit))
     #end
   #end

@@ -146,8 +146,7 @@ public class DocumentDisplayerParameters implements Cloneable
     }
 
     /**
-     * @return {@code true} if the transformation context should be restricted,
-     *         {@code false} otherwise.
+     * @return {@code true} if the transformation context should be restricted, {@code false} otherwise.
      */
     public boolean isTransformationContextRestricted()
     {
@@ -157,7 +156,7 @@ public class DocumentDisplayerParameters implements Cloneable
     /**
      * Set the flag indicating whether the transformation context should be restricted or not.
      *
-     * @param transformationContextRestricted {@code} true to indicate that potentially harmful transformations should
+     * @param transformationContextRestricted {@code true} to indicate that potentially harmful transformations should
      * not be executed.
      */
     public void setTransformationContextRestricted(boolean transformationContextRestricted)

@@ -382,7 +382,7 @@
   {{messageSender/}}
 #else
   #set ($queryString = "xredirect=$escapetool.url($xwiki.requestURL)")
-  $msg.get('xe.activity.messages.error.loginToSendMessage', "path:$doc.getURL('login', $queryString)")
+  (%class='noitems'%)$msg.get('xe.activity.messages.error.loginToSendMessage', "path:$doc.getURL('login', $queryString)")
 #end
 {{/velocity}}</content>
     </property>

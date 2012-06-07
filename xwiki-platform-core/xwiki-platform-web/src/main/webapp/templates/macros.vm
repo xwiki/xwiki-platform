@@ -1503,6 +1503,7 @@ function (row, i, table) {
   if (row["doc_viewable"]) {
   #foreach($colname in $collist)
     #set($colprop = $colprops.get($colname))
+    // $colname
     #if("$!colprop.type"!="hidden")
       #if($colname.indexOf("doc.")==0)
         #set($jscolname = $colname.replaceAll("doc.", "doc_"))
@@ -1603,6 +1604,7 @@ function (row, i, table) {
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
     var name = page.substring(p + 1);
     #foreach($colname in $collist)
+      // $colname
       #set($colprop = $colprops.get($colname))
       #if("$!colprop.type"!="hidden")
         #if($colname.indexOf("doc.")==0)

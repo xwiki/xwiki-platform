@@ -67,10 +67,12 @@
 #-#
 #-# You can set:
 #-# * an absolute path (recommended)
-#-# * a relative path but in this case the directory will be relative to where the XWiki server is started and thus
-#-#   the user under which XWiki is started will need write permissions for the current directory
+#-# * a relative path (not recommended at all)but in this case the directory will be relative to where the XWiki server
+#-#   is started and thus the user under which XWiki is started will need write permissions for the current directory
 #-#
-#-# If not specified, the Servlet container's temporary directory is used. This is absolutely not recommended and you
+#-# Note if the system property xwiki.data.dir is set then this property is not used.
+#-# If neither the system property nor this configuration value here are set then the Servlet container's temporary
+#-# directory is used; This is absolutely not recommended since that directory could be wiped out at any time and you
 #-# should specify a value.
 #if ($xwikiPropertiesEnvironmentPermanentDirectory)
 environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory

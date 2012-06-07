@@ -100,6 +100,7 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -316,16 +317,6 @@ public class XWiki implements EventListener
      */
     private static String configPath = null;
 
-    /*
-     * Work directory
-     */
-    private static File workDir = null;
-
-    /*
-     * Temp directory
-     */
-    private static File tempDir = null;
-
     /**
      * List of configured syntax ids.
      */
@@ -356,6 +347,11 @@ public class XWiki implements EventListener
     private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
     private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent((Type) XWikiURLBuilder.class, "entity");
+
+    /**
+     * Used to get the temporary and permanent directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -6661,64 +6657,17 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Get the XWiki temporary filesystem directory (deleted on exit)
+     * Get the XWiki temporary filesystem directory (cleaned up automatically by XWiki).
      * 
      * @param context
      * @return temporary directory
      * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use the {@link org.xwiki.environment.Environment#getTemporaryDirectory()}
      */
+    @Deprecated
     public File getTempDirectory(XWikiContext context)
     {
-        // if tempDir has already been set, return it
-        if (tempDir != null) {
-            return tempDir;
-        }
-
-        // xwiki.cfg
-        String dirPath = context.getWiki().Param("xwiki.temp.dir");
-        if (dirPath != null) {
-            try {
-                tempDir = new File(dirPath.replaceAll("\\s+$", ""));
-                if (tempDir.isDirectory() && tempDir.canWrite()) {
-                    tempDir.deleteOnExit();
-                    return tempDir;
-                }
-            } catch (Exception e) {
-                tempDir = null;
-                LOGGER.warn("xwiki.temp.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
-            }
-        }
-
-        Object jsct = context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
-
-        // javax.servlet.context.tempdir (File)
-        if (jsct != null && (jsct instanceof File)) {
-            tempDir = (File) jsct;
-            if (tempDir.isDirectory() && tempDir.canWrite()) {
-                return tempDir;
-            }
-        }
-
-        // javax.servlet.context.tempdir (String)
-        if (jsct != null && (jsct instanceof String)) {
-            tempDir = new File((String) jsct);
-
-            if (tempDir.isDirectory() && tempDir.canWrite()) {
-                return tempDir;
-            }
-        }
-
-        // Let's make a tempdir in java.io.tmpdir
-        tempDir = new File(System.getProperty("java.io.tmpdir"), "xwikiTemp");
-
-        if (tempDir.exists()) {
-            tempDir.deleteOnExit();
-        } else {
-            tempDir.mkdir();
-            tempDir.deleteOnExit();
-        }
-
-        return tempDir;
+        return this.environment.getTemporaryDirectory();
     }
 
     /**
@@ -6731,7 +6680,7 @@ public class XWiki implements EventListener
      */
     public File getWorkSubdirectory(String subdir, XWikiContext context)
     {
-        File fdir = new File(this.getWorkDirectory(context).getAbsolutePath(), subdir);
+        File fdir = new File(getWorkDirectory(context).getAbsolutePath(), subdir);
         if (!fdir.exists()) {
             fdir.mkdir();
         }
@@ -6745,41 +6694,12 @@ public class XWiki implements EventListener
      * @param context
      * @return work directory
      * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use the {@link org.xwiki.environment.Environment#getPermanentDirectory()}
      */
+    @Deprecated
     public File getWorkDirectory(XWikiContext context)
     {
-        String dirPath;
-
-        // if workDir has already been set, return it
-        if (workDir != null) {
-            return workDir;
-        }
-
-        // xwiki.cfg
-        dirPath = context.getWiki().Param("xwiki.work.dir");
-        if (dirPath != null) {
-            try {
-                workDir = new File(dirPath.replaceAll("\\s+$", ""));
-                if (workDir.exists()) {
-                    if (workDir.isDirectory() && workDir.canWrite()) {
-                        return workDir;
-                    }
-                } else {
-                    workDir.mkdir();
-
-                    return workDir;
-                }
-            } catch (Exception e) {
-                LOGGER.warn("xwiki.work.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
-
-                workDir = null;
-            }
-        }
-
-        // No choices left, retreiving the temp directory
-        this.workDir = this.getTempDirectory(context);
-
-        return this.workDir;
+        return this.environment.getPermanentDirectory();
     }
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException

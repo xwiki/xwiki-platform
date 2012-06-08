@@ -320,6 +320,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
     public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel, boolean user,
         boolean allow, boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException
     {
+        if (!global && ("admin".equals(accessLevel))) {
+            // Admin rights do not exist at document level.
+            throw new XWikiRightNotFoundException();
+        }
+
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
         String fieldName = user ? "users" : "groups";
         boolean found = false;

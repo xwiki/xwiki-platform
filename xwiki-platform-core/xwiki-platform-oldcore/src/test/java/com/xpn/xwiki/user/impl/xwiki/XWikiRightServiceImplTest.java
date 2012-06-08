@@ -169,6 +169,57 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         assertTrue(this.user.getPrefixedFullName() + " does not have global view right on wiki2", result);
     }
 
+    public void testHasAccessLevelAdminOnDocument() throws Exception
+    {
+        final String wikiName = this.user.getWikiName();
+
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference(wikiName,
+                                                                          "Space", "Page"));
+
+        final XWikiDocument preferences = new XWikiDocument(new DocumentReference(wikiName,
+                                                                                  "XWiki", "XWikiPreference"));
+
+        BaseObject rightsObject = new BaseObject();
+        rightsObject.setClassName("XWiki.XWikiRights");
+        rightsObject.setStringValue("levels", "admin");
+        rightsObject.setStringValue("users", this.user.getPrefixedFullName());
+        rightsObject.setIntValue("allow", 1);
+        doc.addXObject(rightsObject);
+
+        BaseObject preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "admin");
+        preferencesObject.setIntValue("allow", 0);
+        preferencesObject.setStringValue("users", this.user.getPrefixedFullName());
+        preferences.addXObject(preferencesObject);
+        preferences.setNew(false);
+
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+            new CustomStub("Implements XWiki.getDocument")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    if (!getContext().getDatabase().equals(wikiName)) {
+                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    }
+
+                    return preferences;
+                }
+            });
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
+            returnValue(doc));
+
+        getContext().setDatabase(wikiName);
+
+        assertFalse("Admin rights must not be considered when set on document level.",
+                    this.rightService.hasAccessLevel("admin", this.user.getPrefixedFullName(),
+                                                     doc.getPrefixedFullName(), true,
+                                                     getContext()));
+                    
+
+    }
+
     public void testHasAccessLevelWhithUserFromAnotherWiki() throws XWikiException
     {
         final XWikiDocument doc = new XWikiDocument(new DocumentReference(this.group2.getWikiName(), "Space", "Page"));

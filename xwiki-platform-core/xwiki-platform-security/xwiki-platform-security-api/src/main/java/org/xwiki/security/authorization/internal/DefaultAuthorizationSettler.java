@@ -21,12 +21,15 @@ package org.xwiki.security.authorization.internal;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
+import org.xwiki.security.SecurityReference;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
@@ -47,6 +50,38 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 @Singleton
 public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
 {
+
+    /**
+     * Check if the entity reference refers to a document that may contain global rights objects.  In other words
+     * '*:XWiki.XWikiPreferences' or '*:*.WebPreferences'.
+     *
+     * Used for XWIKI-6787.
+     * 
+     * @param entry A security rule entry.
+     * @return {\code true} if the document is scanned for global rights objects during authorization.
+     */
+    private boolean isGlobalRightsDocument(SecurityRuleEntry entry) {
+        SecurityReference r = entry.getReference();
+        return r.getType() == EntityType.DOCUMENT
+            && ("WebPreferences".equals(r.getName())
+                || ("XWikiPreferences".equals(r.getName())
+                    && "XWiki".equals(r.getParent().getName())));
+    }
+
+    /**
+     * @param rights A set of rights.
+     * @return A new set containing all elements of the given set except EDIT.
+     */
+    private Set<Right> removeEdit(Set<Right> rights) {
+        Set<Right> newSet = new LinkedHashSet<Right>();
+        for (Right right : rights) {
+            if (!Right.EDIT.equals(right)) {
+                newSet.add(right);
+            }
+        }
+        return newSet;
+    }
+
     @Override
     protected XWikiSecurityAccess settle(UserSecurityReference user, Collection<GroupSecurityReference> groups,
         SecurityRuleEntry entry, Policies policies)
@@ -56,6 +91,13 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
+
+        // XWIKI-6987, explicitly deny EDIT on these documents.  (EDIT may still be implied by ADMIN.)
+        final boolean isGlobalRightsDocument = isGlobalRightsDocument(entry);
+        if (isGlobalRightsDocument) {
+            access.deny(Right.EDIT);
+            enabledRights = removeEdit(enabledRights);
+        }
 
         // Evaluate rules from current entity
         for (Right right : enabledRights) {

@@ -55,6 +55,8 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     protected SecurityReference anotherDocRef;
     protected SecurityReference anotherSpaceDocRef;
     protected SecurityReference anotherWikiDocRef;
+    protected SecurityReference xwikiPreferencesDocRef;
+    protected SecurityReference webPreferencesDocRef;
 
     protected List<SecurityReference> entityRefs;
 
@@ -153,6 +155,9 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
         xwikiSpace = newEntityReference(new SpaceReference("XWiki", wikiRef.getOriginalWikiReference()));
         anotherWikiXWikiSpace = newEntityReference(new SpaceReference("XWiki",
             anotherWikiRef.getOriginalWikiReference()));
+
+        xwikiPreferencesDocRef = newEntityReference(new DocumentReference("XWikiPreferences", xwikiSpace.getOriginalSpaceReference()));
+        webPreferencesDocRef = newEntityReference(new DocumentReference("WebPreferences", spaceRef.getOriginalSpaceReference()));
 
         xuserRef = newUserReference(new DocumentReference("user", xXWikiSpace.getOriginalSpaceReference()));
         ownerRef = newUserReference(new DocumentReference("owner", xXWikiSpace.getOriginalSpaceReference()));

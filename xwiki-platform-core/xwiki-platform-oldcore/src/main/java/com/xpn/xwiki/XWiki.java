@@ -6656,52 +6656,6 @@ public class XWiki implements EventListener
         }
     }
 
-    /**
-     * Get the XWiki temporary filesystem directory (cleaned up automatically by XWiki).
-     * 
-     * @param context
-     * @return temporary directory
-     * @since 1.1 Milestone 4
-     * @deprecated starting with 4.2M1 use the {@link org.xwiki.environment.Environment#getTemporaryDirectory()}
-     */
-    @Deprecated
-    public File getTempDirectory(XWikiContext context)
-    {
-        return this.environment.getTemporaryDirectory();
-    }
-
-    /**
-     * Get a new directory in the xwiki work directory
-     * 
-     * @param subdir desired directory name
-     * @param context
-     * @return work subdirectory
-     * @since 1.1 Milestone 4
-     */
-    public File getWorkSubdirectory(String subdir, XWikiContext context)
-    {
-        File fdir = new File(getWorkDirectory(context).getAbsolutePath(), subdir);
-        if (!fdir.exists()) {
-            fdir.mkdir();
-        }
-
-        return fdir;
-    }
-
-    /**
-     * Get the XWiki work directory
-     * 
-     * @param context
-     * @return work directory
-     * @since 1.1 Milestone 4
-     * @deprecated starting with 4.2M1 use the {@link org.xwiki.environment.Environment#getPermanentDirectory()}
-     */
-    @Deprecated
-    public File getWorkDirectory(XWikiContext context)
-    {
-        return this.environment.getPermanentDirectory();
-    }
-
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
     {
         LOGGER.debug("Rolling back [" + tdoc + "] to version " + rev);

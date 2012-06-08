@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import java.io.File;
-
 import org.jmock.Mock;
 import org.xwiki.cache.CacheFactory;
 
@@ -44,7 +42,6 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
         super.setUp();
 
         Mock mockXWiki = mock(XWiki.class);
-        mockXWiki.stubs().method("getTempDirectory").will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         mockXWiki.stubs().method("Param").will(returnValue("10"));
         Mock mockCacheFactory = mock(CacheFactory.class);
         mockCacheFactory.expects(once()).method("newCache");

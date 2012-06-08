@@ -838,6 +838,7 @@
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
               **/pdf/impl/PdfExportImpl.java,
+              **/plugin/image/ImagePlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/charts/actions/ChartingAction.java,
               **/plugin/charts/actions/ChartWizardAction.java,

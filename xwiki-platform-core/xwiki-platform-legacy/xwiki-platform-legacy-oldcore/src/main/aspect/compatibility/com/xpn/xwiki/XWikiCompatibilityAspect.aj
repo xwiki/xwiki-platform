@@ -20,6 +20,7 @@
 package com.xpn.xwiki;
 
 import java.io.UnsupportedEncodingException;
+import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -567,5 +568,53 @@ public privileged aspect XWikiCompatibilityAspect
         } finally {
             context.setDatabase(database);
         }
+    }
+
+    /**
+     * Get the XWiki temporary filesystem directory (cleaned up automatically by XWiki).
+     *
+     * @param context
+     * @return temporary directory
+     * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use {@link org.xwiki.environment.Environment#getTemporaryDirectory()}
+     */
+    @Deprecated
+    public File XWiki.getTempDirectory(XWikiContext context)
+    {
+        return this.environment.getTemporaryDirectory();
+    }
+
+    /**
+     * Get a new directory in the xwiki work directory
+     *
+     * @param subdir desired directory name
+     * @param context
+     * @return work subdirectory
+     * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use {@link org.xwiki.environment.Environment#getPermanentDirectory()}
+     */
+    @Deprecated
+    public File XWiki.getWorkSubdirectory(String subdir, XWikiContext context)
+    {
+        File fdir = new File(this.environment.getPermanentDirectory().getAbsolutePath(), subdir);
+        if (!fdir.exists()) {
+            fdir.mkdir();
+        }
+
+        return fdir;
+    }
+
+    /**
+     * Get the XWiki work directory
+     *
+     * @param context
+     * @return work directory
+     * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use {@link org.xwiki.environment.Environment#getPermanentDirectory()}
+     */
+    @Deprecated
+    public File XWiki.getWorkDirectory(XWikiContext context)
+    {
+        return this.environment.getPermanentDirectory();
     }
 }

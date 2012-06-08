@@ -54,8 +54,8 @@
   #set($results = $rawresults.getResults("1", "$nb"))
   &lt;results&gt;
     #foreach($item in $results)
-      #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
-      #set($itemdoc = $xwiki.getDocument($itemfullname))  
+      #set($itemfullname = $services.model.serialize($item.getDocumentReference()))
+      #set($itemdoc = $xwiki.getDocument($item.getDocumentReference()))  
       #if($item.type == "attachment")
         #set($name = $item.filename)
         #set($url = $itemdoc.getAttachmentURL($name))
@@ -63,7 +63,7 @@
         #set($name = $itemdoc.getDisplayTitle())
         #set($url = $itemdoc.getURL())
       #end
-      &lt;rs id="$url" info="${escapetool.xml($itemdoc.fullName)}"&gt;$escapetool.xml($name)&lt;/rs&gt;
+      &lt;rs id="$url" info="${escapetool.xml($itemfullname)}"&gt;$escapetool.xml($name)&lt;/rs&gt;
     #end
   &lt;/results&gt;
 #else

@@ -44,8 +44,7 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-public class
-    SearchResults extends Api
+public class SearchResults extends Api
 {
     private final XWiki xwiki;
 

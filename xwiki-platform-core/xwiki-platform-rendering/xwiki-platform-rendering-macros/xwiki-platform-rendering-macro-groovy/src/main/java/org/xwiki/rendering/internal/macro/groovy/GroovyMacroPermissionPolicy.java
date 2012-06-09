@@ -56,7 +56,8 @@ public class GroovyMacroPermissionPolicy extends AbstractScriptMacroPermissionPo
     {
         boolean hasPermission;
         if (this.configuration.getCompilationCustomizerNames().contains("secure")) {
-            // Security is delegated to Groovy Secure Customizer
+            // If we are not running in a restricted context, the macro may run, but security will be delegated to
+            // Groovy Secure Customizer
             hasPermission = !context.getTransformationContext().isRestricted();
         } else {
             hasPermission = super.hasPermission(parameters, context);

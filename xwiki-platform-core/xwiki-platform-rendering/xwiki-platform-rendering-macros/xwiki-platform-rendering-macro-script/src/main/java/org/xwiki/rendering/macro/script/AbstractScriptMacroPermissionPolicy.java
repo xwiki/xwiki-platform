@@ -42,6 +42,6 @@ public abstract class AbstractScriptMacroPermissionPolicy implements MacroPermis
     @Override
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
-        return this.dab.hasProgrammingRights();
+        return !context.getTransformationContext().isRestricted() && this.dab.hasProgrammingRights();
     }
 }

@@ -94,13 +94,20 @@ public class ConflictQuestion
         this.globalAction = globalAction;
     }
 
+    /**
+     * @since 4.1
+     */
     public XWikiDocument getCustomDocument()
     {
         return this.customDocument;
     }
 
-    public void setCurrentDocument(XWikiDocument currentDocument)
+    /**
+     * @since 4.1
+     */
+    public void setCustom(XWikiDocument customDocument)
     {
-        this.currentDocument = currentDocument;
+        this.customDocument = customDocument;
+        this.globalAction = GlobalAction.CUSTOM;
     }
 }

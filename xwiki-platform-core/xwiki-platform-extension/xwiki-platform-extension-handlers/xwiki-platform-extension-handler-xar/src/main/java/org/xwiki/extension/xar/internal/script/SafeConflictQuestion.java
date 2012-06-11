@@ -84,12 +84,15 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
         return safe(this.question.getCustomDocument());
     }
 
-    public void setCurrentDocument(Document currentDocument)
+    /**
+     * @since 4.1
+     */
+    public void setCustomDocument(Document customDocument)
     {
         try {
-            XWikiDocument document = (XWikiDocument) FieldUtils.readField(currentDocument, "doc", true);
+            XWikiDocument document = (XWikiDocument) FieldUtils.readField(customDocument, "doc", true);
 
-            this.question.setCurrentDocument(document);
+            this.question.setCustom(document);
         } catch (IllegalAccessException e) {
             // TODO: log something ?
         }

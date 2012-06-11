@@ -548,10 +548,10 @@ public class DomainObjectFactory
             UriBuilder uriBuilder = UriBuilder.fromUri(baseUri).path(pathClass);
 
             if (useVersion) {
-                attachmentUri = uriBuilder.buildFromEncoded(eWiki, eSpaceName, eDocName, eAttachName).toString();
-            } else {
                 attachmentUri =
                     uriBuilder.buildFromEncoded(eWiki, eSpaceName, eDocName, eAttachName, eVersionNum).toString();
+            } else {
+                attachmentUri = uriBuilder.buildFromEncoded(eWiki, eSpaceName, eDocName, eAttachName).toString();
             }
 
         } catch (URIException ue) {

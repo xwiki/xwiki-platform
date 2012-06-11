@@ -162,6 +162,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setExecutionContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
+        displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
         XDOM result;
         try {
             result = this.documentDisplayer.display(documentBridge, displayParameters);

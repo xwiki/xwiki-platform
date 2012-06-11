@@ -126,7 +126,6 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
     });
   },
   createDialog : function($super, event) {
-    this.input.observe
     this.addButton.observe('click', this._onAdd.bind(this));
     $super(event);
   },

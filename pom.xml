@@ -33,7 +33,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>4.1-SNAPSHOT</version>
+  <version>4.1-rc-1</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for Platform extensions -->

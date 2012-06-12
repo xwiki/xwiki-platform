@@ -123,8 +123,7 @@ isc.XWEResultTree.addProperties({
     displayAttachmentsOnTop: false, // Display attachments before children pages.
     displayAttachmentsWhenEmpty: false, // Display attachments meta-node even if there's no attachments.
     displayAddAttachment: false, // Display a "Add Attachment" node in each Attachments meta-node.
-    displayAddAttachmentOnTop: true, // Display the "Add Attachment" node on top.
-    displayBlacklistedSpaces: false // Don't display blacklisted spaces.
+    displayAddAttachmentOnTop: true // Display the "Add Attachment" node on top.
 });
 
 isc.XWEResultTree.addMethods({
@@ -187,11 +186,6 @@ isc.XWEResultTree.addMethods({
         // getNodeDataSource returns null when parentNode is the root node.
         if (parentDS == null) {
           parentDS = this.getDataSource();
-        }
-
-        // Remove blacklisted spaces.
-        if (parentDS.Class == "XWEWikiDataSource" && this.displayBlacklistedSpaces == false) {
-            this.filterNodesByName(this.getChildren(), XWiki.blacklistedSpaces);
         }
 
         // Various transformations on children nodes.
@@ -300,20 +294,6 @@ isc.XWEResultTree.addMethods({
             }
         }
         return null;
-    },
-
-    /**
-     * This method loops over nodes and removes those which titles match an entry of the list of titles to filter.
-     *
-     * @param nodes Nodes to filter.
-     * @param namesToFilter Array of names to filter.
-     */
-    filterNodesByName : function(nodes, namesToFilter) {
-        for (var i = 0; i < nodes.length; i++) {
-            if (XWiki.blacklistedSpaces.indexOf(nodes[i].name) != -1) {
-                this.remove(nodes[i]);
-            }
-        }
     },
 
     addAddPageNode : function(node) {

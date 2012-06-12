@@ -339,7 +339,8 @@ return XWiki;
   ## Display the live table only if it was generated.
   #if($doc.content.length() &gt; 0)
     = $msg.get('platform.appwithinminutes.appLiveTableHeading') =
-    {{include document="$doc.fullName.replaceAll('~', '~~').replaceAll('"', '~"')"/}}
+    ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
+    {{html}}$doc.getRenderedContent($doc.content, $doc.syntax.toIdString()).replace('{{', '&amp;#123;&amp;#123;'){{/html}}
   #end
 #end
 {{/velocity}}</content>

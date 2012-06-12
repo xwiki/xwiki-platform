@@ -105,7 +105,7 @@ public class ConflictQuestion
     /**
      * @since 4.1
      */
-    public void setCustom(XWikiDocument customDocument)
+    public void setCustomDocument(XWikiDocument customDocument)
     {
         this.customDocument = customDocument;
         this.globalAction = GlobalAction.CUSTOM;

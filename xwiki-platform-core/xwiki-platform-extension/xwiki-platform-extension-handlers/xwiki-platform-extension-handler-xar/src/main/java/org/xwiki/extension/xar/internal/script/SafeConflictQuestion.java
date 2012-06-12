@@ -92,7 +92,7 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
         try {
             XWikiDocument document = (XWikiDocument) FieldUtils.readField(customDocument, "doc", true);
 
-            this.question.setCustom(document);
+            this.question.setCustomDocument(document);
         } catch (IllegalAccessException e) {
             // TODO: log something ?
         }

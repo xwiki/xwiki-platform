@@ -65,6 +65,12 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     }
 
     @Override
+    public boolean isValid(String namespace)
+    {
+        return getWrapped().isValid(namespace);
+    }
+
+    @Override
     public Collection<String> getNamespaces()
     {
         return safe(getWrapped().getNamespaces());

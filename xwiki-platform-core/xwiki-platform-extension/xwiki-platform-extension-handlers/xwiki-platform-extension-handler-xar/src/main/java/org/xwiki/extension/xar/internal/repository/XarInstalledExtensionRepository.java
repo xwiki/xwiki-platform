@@ -75,13 +75,13 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
 
     @Inject
-    private InstalledExtensionRepository installedRepository;
+    private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private Packager packager;
+    private transient Packager packager;
 
     @Inject
-    private ObservationManager observation;
+    private transient ObservationManager observation;
 
     /**
      * The logger to log.

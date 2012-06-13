@@ -1039,25 +1039,34 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </tags>
     <timezone>
-      <cache>0</cache>
-      <customDisplay/>
+      <customDisplay>{{velocity}}
+      #if ($xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+        {{html}}
+          #if($xwiki.jodatime)
+            &lt;select id='$prefix$name' name='$prefix$name'&gt;
+              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+              #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
+                &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
+              #end
+            &lt;/select&gt;
+          #else
+            &lt;input id='$prefix$name' name='$prefix$name' type="text" value="$!value"/&gt;
+          #end
+        {{/html}}
+      #else
+        $value
+      #end
+      {{/velocity}}</customDisplay>
       <disabled>0</disabled>
-      <displayType>select</displayType>
-      <multiSelect>0</multiSelect>
       <name>timezone</name>
       <number>71</number>
       <picker>0</picker>
       <prettyName>Timezone</prettyName>
-      <relationalStorage>0</relationalStorage>
-      <separator> </separator>
-      <separators> ,|</separators>
-      <size>1</size>
-      <sort>none</sort>
+      <size>30</size>
       <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <values>default=System Default|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12</values>
-      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      <validationMessage></validationMessage>
+      <validationRegExp></validationRegExp>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </timezone>
     <title>
       <customDisplay/>
@@ -2439,25 +2448,34 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </tags>
       <timezone>
-        <cache>0</cache>
-        <customDisplay/>
+        <customDisplay>{{velocity}}
+        #if ($xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+          {{html}}
+            #if($xwiki.jodatime)
+              &lt;select id='$prefix$name' name='$prefix$name'&gt;
+                &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+                #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
+                  &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
+                #end
+              &lt;/select&gt;
+            #else
+              &lt;input id='$prefix$name' name='$prefix$name' type="text" value="$!value"/&gt;
+            #end
+          {{/html}}
+        #else
+          $value
+        #end
+        {{/velocity}}</customDisplay>
         <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
         <name>timezone</name>
         <number>71</number>
         <picker>0</picker>
         <prettyName>Timezone</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <sort>none</sort>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>default=System Default|Etc/GMT-12=GMT-12|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+        <validationMessage></validationMessage>
+        <validationRegExp></validationRegExp>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </timezone>
       <title>
         <customDisplay/>
@@ -2708,6 +2726,9 @@ Your account on ${wikiname} has been successfully activated. You can now login a
     </property>
     <property>
       <stylesheets>style.css</stylesheets>
+    </property>
+    <property>
+      <timezone/>
     </property>
     <property>
       <title>$tdoc.getRenderedTitle("plain/1.0") ($doc.fullName) - XWiki</title>

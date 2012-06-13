@@ -3048,12 +3048,33 @@ public class XWiki implements EventListener
         needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
         needsUpdate |= bclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
-        needsUpdate |=
-            bclass.addStaticListField("timezone", "Timezone", "---|Etc/GMT-11=GMT-11|Etc/GMT-10=GMT-10|"
-                + "Etc/GMT-9=GMT-9|Etc/GMT-8=GMT-8|Etc/GMT-7=GMT-7|Etc/GMT-6=GMT-6|Etc/GMT-5=GMT-5|Etc/GMT-4=GMT-4|"
-                + "Etc/GMT-3=GMT-3|Etc/GMT-2=GMT-2|Etc/GMT-1=GMT-1|Etc/GMT-0=GMT|Etc/GMT+1=GMT+1|Etc/GMT+2=GMT+2|"
-                + "Etc/GMT+3=GMT+3|Etc/GMT+4=GMT+4|Etc/GMT+5=GMT+5|Etc/GMT+6=GMT+6|Etc/GMT+7=GMT+7|Etc/GMT+8=GMT+8|"
-                + "Etc/GMT+9=GMT+9|Etc/GMT+10=GMT+10|Etc/GMT+11=GMT+11|Etc/GMT+12=GMT+12");
+        needsUpdate |= bclass.addTextField("timezone", "Timezone", 30);
+        PropertyClass timezoneProperty = (PropertyClass) bclass.get("timezone");
+        if (!timezoneProperty.isCustomDisplayed(context)) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("{{velocity}}\n");
+            builder.append("#if ($xcontext.action == 'inline' || $xcontext.action == 'edit')\n");
+            builder.append("  {{html}}\n");
+            builder.append("    #if($xwiki.jodatime)\n");
+            builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
+            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>" +
+                "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
+            builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
+            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>" +
+                "$tz</option>\n");
+            builder.append("        #end\n");
+            builder.append("      </select>\n");
+            builder.append("    #else\n");
+            builder.append("      <input id='$prefix$name' name='$prefix$name' type=\"text\" value=\"$!value\"/>\n");
+            builder.append("    #end\n");
+            builder.append("  {{/html}}\n");
+            builder.append("#else\n");
+            builder.append("  $value\n");
+            builder.append("#end\n");
+            builder.append("{{/velocity}}\n");
+            timezoneProperty.setCustomDisplay(builder.toString());
+            needsUpdate = true;
+        }
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);

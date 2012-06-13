@@ -89,7 +89,7 @@ public class ExtensionManagerScriptService implements ScriptService
     /**
      * The prefix put behind all job ids.
      */
-    public static final String EXTENSION_JOBID_PREFIX = "action";
+    public static final String EXTENSION_JOBID_PREFIX = "extension";
 
     /**
      * The prefix put behind all job ids which are actual actions.

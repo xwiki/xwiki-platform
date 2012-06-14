@@ -234,7 +234,7 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     @Override
     public Collection<InstalledExtension> getInstalledExtensions()
     {
-        return (Collection<InstalledExtension>) this.extensions;
+        return (Collection) this.extensions.values();
     }
 
     @Override

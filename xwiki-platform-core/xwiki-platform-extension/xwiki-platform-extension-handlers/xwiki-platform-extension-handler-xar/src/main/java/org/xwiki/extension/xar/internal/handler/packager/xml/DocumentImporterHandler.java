@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
+import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
@@ -123,6 +124,10 @@ public class DocumentImporterHandler extends DocumentHandler
         ConflictQuestion question =
             new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument);
 
+        if (mergedDocument == null) {
+            question.setGlobalAction(GlobalAction.NEXT);
+        }
+
         if (this.configuration != null && this.configuration.getJobStatus() != null) {
             try {
                 this.configuration.getJobStatus().ask(question);
@@ -191,7 +196,13 @@ public class DocumentImporterHandler extends DocumentHandler
                         new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(),
                             mergedDocument.getLanguage()), documentMergeResult);
                 } else {
-                    saveDocument(nextDocument, comment, context);
+                    XWikiDocument documentToSave =
+                        this.configuration.isInteractive() ? askDocumentToSave(currentDocument, previousDocument,
+                            nextDocument, null) : nextDocument;
+
+                    if (documentToSave != currentDocument) {
+                        saveDocument(documentToSave, comment, context);
+                    }
                 }
             } else {
                 saveDocument(nextDocument, comment, context);

@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.xar;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -249,7 +250,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         }
         Job installJob = this.taskManager.executeJob(InstallJob.JOBTYPE, installRequest);
 
-        List<LogEvent> errors = installJob.getStatus().getLog(LogLevel.ERROR);
+        List<LogEvent> errors = installJob.getStatus().getLog().getLogs(LogLevel.ERROR);
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
@@ -267,14 +268,16 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         }
         Job uninstallJob = this.taskManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
 
-        List<LogEvent> errors = uninstallJob.getStatus().getLog(LogLevel.ERROR);
+        List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogs(LogLevel.ERROR);
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
     }
 
+    // Tests
+
     @Test
-    public void testInstall() throws Throwable
+    public void testInstallOnWiki() throws Throwable
     {
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         existingDocument.setDefaultLanguage("en");
@@ -330,7 +333,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testUpgrade() throws Throwable
+    public void testUpgradeOnWiki() throws Throwable
     {
         install(this.localXarExtensiontId1, "wiki");
 
@@ -365,7 +368,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testUninstall() throws Throwable
+    public void testUninstallFromWiki() throws Throwable
     {
         install(this.localXarExtensiontId1, "wiki");
 
@@ -383,5 +386,47 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
 
         Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
+    }
+
+    @Test
+    public void testInstallOnRoot() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
+                will(returnValue(Arrays.asList("wiki1", "wiki2")));
+            }
+        });
+
+        // install
+
+        install(this.localXarExtensiontId1, null);
+
+        // validate
+
+        XWikiDocument pageWiki1 =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space1", "page1"), getContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+
+        XWikiDocument pageWiki2 =
+            this.mockXWiki.getDocument(new DocumentReference("wiki2", "space1", "page1"), getContext());
+
+        Assert.assertFalse(pageWiki2.isNew());
+
+        // uninstall
+
+        uninstall(this.localXarExtensiontId1, null);
+
+        // validate
+
+        pageWiki1 = this.mockXWiki.getDocument(new DocumentReference("wiki1", "space1", "page1"), getContext());
+
+        Assert.assertTrue(pageWiki1.isNew());
+
+        pageWiki2 = this.mockXWiki.getDocument(new DocumentReference("wiki2", "space1", "page1"), getContext());
+
+        Assert.assertTrue(pageWiki2.isNew());
     }
 }

@@ -45,7 +45,7 @@
       <scope>runtime</scope>
     </dependency>
     <!-- The LDAP UI provides a new entry in the admin UI, and depends on it -->
-    <!-- TODO: put it back when the admin application is a real application and don't contain datas anymore
+    <!-- TODO: put it back when the admin application is a real application and doesn't contain datas anymore
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration</artifactId>

@@ -34,6 +34,7 @@ import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -173,7 +174,8 @@ public class DocumentImporterHandler extends DocumentHandler
                             this.configuration.getMergeConfiguration(), context);
 
                     if (documentMergeResult.isModified()) {
-                        if (this.configuration.isInteractive() && !documentMergeResult.getErrors().isEmpty()) {
+                        if (this.configuration.isInteractive()
+                            && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
                             XWikiDocument documentToSave =
                                 askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument);
 

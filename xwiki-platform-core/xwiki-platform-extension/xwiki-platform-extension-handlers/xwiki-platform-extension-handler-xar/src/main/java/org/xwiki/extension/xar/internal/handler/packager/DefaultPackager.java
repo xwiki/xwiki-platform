@@ -159,9 +159,10 @@ public class DefaultPackager implements Packager, Initializable
 
             for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (!entry.isDirectory()) {
+                    DocumentImporterHandler documentHandler =
+                        new DocumentImporterHandler(this, this.componentManager, wiki);
+
                     try {
-                        DocumentImporterHandler documentHandler =
-                            new DocumentImporterHandler(this, this.componentManager, wiki);
                         documentHandler.setPreviousXarFile(previousXarFile);
                         documentHandler.setConfiguration(configuration);
 
@@ -170,11 +171,17 @@ public class DefaultPackager implements Packager, Initializable
                         if (documentHandler.getMergeResult() != null) {
                             mergeResult.addMergeResult(documentHandler.getMergeResult());
                         }
+
+                        this.logger.info("Successfully imported document [{}] in language [{}]", documentHandler
+                            .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                         this.logger.debug("Entry [" + entry + "] is not a document", e);
                     } catch (Exception e) {
                         this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+
+                        this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
+                            .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
                     }
                 }
             }

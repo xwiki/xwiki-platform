@@ -48,10 +48,7 @@
     #set($sortAttachBy = "$!{request.sortAttachBy}")
     #if($sortAttachBy != '')
      ### Prepend request parameter
-     #set($sortAttachBy = "&sortAttachBy=${sortAttachBy}")
-    #else
-     ### Default to sort by filename
-     #set($sortAttachBy = "&sortAttachBy=filename")
+     #set($sortAttachBy = "&sortAttachBy=${sortAttachBy}")    
     #end
     #set ($discard = $docextras.add(['Attachments', 'attachments', $msg.get('docextra.attachments'), $doc.getAttachmentList().size(), "attachmentsinline.vm$!{sortAttachBy}", $msg.get('core.shortcuts.view.attachments')]))
   #end

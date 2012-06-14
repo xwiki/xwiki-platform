@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
@@ -92,7 +93,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
         this.events.add(new DocumentCreatedEvent());
         this.events.add(new DocumentDeletedEvent());
-        this.events.add(new DocumentCreatedEvent());
+        this.events.add(new DocumentUpdatedEvent());
 
         this.events.add(new WikiDeletedEvent());
     }

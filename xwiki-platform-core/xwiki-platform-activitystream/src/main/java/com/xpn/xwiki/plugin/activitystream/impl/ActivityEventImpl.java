@@ -468,8 +468,10 @@ public class ActivityEventImpl implements ActivityEvent
      * @param hidden the event hidden flag.
      * @see #isHidden()
      */
-    public void setHidden(boolean hidden)
+    public void setHidden(Boolean hidden)
     {
-        this.hidden = hidden;
+        if (hidden != null) {
+            this.hidden = hidden;
+        }
     }
 }

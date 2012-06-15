@@ -26,8 +26,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 
 /**
- * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
- * resolver takes default values from a parameter which must be of type
+ * Resolver that resolves a {@link org.xwiki.model.reference.EntityReference} into an absolute reference. For missing
+ * reference parts, the resolver takes default values from a parameter which must be of type
  * {@link org.xwiki.model.reference.EntityReference}.
  * 
  * @version $Id$

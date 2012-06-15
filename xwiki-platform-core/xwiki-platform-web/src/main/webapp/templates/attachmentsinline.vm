@@ -11,20 +11,20 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #end
 #set($showactions = 0)
 ### Determine attachment sorting
-#set($sortAttachBy = "$!{request.sortAttachBy}")
-#if($sortAttachBy == '')
+#set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
+#if($sortAttachmentsBy == '')
   ### Default to sorting by filename, sort not requested.
-  #set($sortAttachBy = "filename")
+  #set($sortAttachmentsBy = "filename")
 #end
 ### Set attachment sorting direction
-#if($sortAttachBy == 'date')
+#if($sortAttachmentsBy == 'date')
   ### Sort the date descending
-  #set($sortAttachBy = "date:desc")
+  #set($sortAttachmentsBy = "date:desc")
 #else
   ### Sort everthing else ascending
-  #set($sortAttachBy = "${sortAttachBy}:asc")
+  #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
 #end
-#set($attachments = $sorttool.sort($doc.attachmentList, "$sortAttachBy}"))
+#set($attachments = $sorttool.sort($doc.attachmentList, "$sortAttachmentsBy"))
 <div id="attachmentscontent" class="xwikiintracontent">
 <div id="attw">
 <div id="_attachments">

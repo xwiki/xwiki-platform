@@ -12,7 +12,8 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #set($showactions = 0)
 ### Determine attachment sorting
 #set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
-#if($sortAttachmentsBy == '')
+#set ($validAttachmentProperties = ['filename', 'date', 'filesize', 'author', 'version', 'mimeType'])
+#if($sortAttachmentsBy == '' || $validAttachmentProperties.indexOf($sortAttachmentsBy) == -1)
   ### Default to sorting by filename, sort not requested.
   #set($sortAttachmentsBy = "filename")
 #end

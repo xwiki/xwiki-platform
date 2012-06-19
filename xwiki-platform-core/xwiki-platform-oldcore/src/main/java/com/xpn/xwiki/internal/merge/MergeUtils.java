@@ -72,7 +72,7 @@ public final class MergeUtils
 
             String resultStr = fromLines(result.getMerged());
 
-            if (StringUtils.equals(resultStr, currentStr)) {
+            if (!StringUtils.equals(resultStr, currentStr)) {
                 mergeResult.setModified(true);
             }
 
@@ -103,7 +103,7 @@ public final class MergeUtils
 
             String resultStr = fromCharacters(result.getMerged());
 
-            if (StringUtils.equals(resultStr, currentStr)) {
+            if (!StringUtils.equals(resultStr, currentStr)) {
                 mergeResult.setModified(true);
             }
 

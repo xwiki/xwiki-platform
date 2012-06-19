@@ -1393,8 +1393,13 @@ ul.extension-metadata li {
         ; &lt;label&gt;$msg.get('extensions.upgrade.mergeConflict.label')&lt;/label&gt;##
           (% class="xHint" %)$msg.get('extensions.upgrade.mergeConflict.hint', ["[[$question.currentDocument&gt;&gt;doc:$services.model.serialize($question.currentDocument.documentReference)]]"])&lt;/label&gt;
         : &lt;select name="versionToKeep"&gt;
-          #foreach($version in ['NEXT', 'MERGED', 'CURRENT'])
-            &lt;option value="$version"#if ($question.globalAction == $version) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.versionToKeep.$version.toLowerCase()")&lt;/option&gt;
+          #set ($versions = {'NEXT': $question.nextDocument, 'MERGED': $question.mergedDocument, 'CURRENT': $question.currentDocument})
+          #foreach($entry in $versions.entrySet())
+            ## Make sure that each version has a document associated. We don't have for instance a merged document when
+            ## there is no previous installed version of a XAR extension but the imported documents already exist in the wiki.
+            #if ($entry.value)
+              &lt;option value="$entry.key"#if ($question.globalAction == $entry.key) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.versionToKeep.$entry.key.toLowerCase()")&lt;/option&gt;
+            #end
           #end
           &lt;/select&gt;
 
@@ -1414,38 +1419,48 @@ ul.extension-metadata li {
     #set ($versions = {'PREVIOUS': $question.previousDocument, 'CURRENT': $question.currentDocument, 'NEXT': $question.nextDocument, 'MERGED': $question.mergedDocument})
     (% class="label" %)$msg.get('extensions.upgrade.mergeConflict.changes.original')(%%)##
     &lt;select name="original"&gt;
-    #set ($originalVersion = 'CURRENT')
-    #if ($versions.containsKey($request.original))
+    #if ("$!request.original" != '')
       #set ($originalVersion = $request.original)
+    #else
+      #set ($originalVersion = 'CURRENT')
     #end
     #set ($originalDocument = $versions.get($originalVersion))
-    #foreach($version in $versions.keySet())
-      &lt;option value="$version"#if ($version == $originalVersion) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$version.toLowerCase()")&lt;/option&gt;
+    #foreach($entry in $versions.entrySet())
+      #if ($entry.value)
+        &lt;option value="$entry.key"#if ($entry.key == $originalVersion) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")&lt;/option&gt;
+      #end
     #end
     &lt;/select&gt;##
     (% class="label" %)$msg.get('extensions.upgrade.mergeConflict.changes.revised')(%%)##
     &lt;select name="revised"&gt;
-    #set ($revisedVersion = 'MERGED')
-    #if ($versions.containsKey($request.revised))
+    #if ("$!request.revised" != '')
       #set ($revisedVersion = $request.revised)
+    #elseif ($question.mergedDocument)
+      #set ($revisedVersion = 'MERGED')
+    #else
+      #set ($revisedVersion = 'NEXT')
     #end
     #set ($revisedDocument = $versions.get($revisedVersion))
-    #foreach($version in $versions.keySet())
-      &lt;option value="$version"#if ($version == $revisedVersion) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$version.toLowerCase()")&lt;/option&gt;
+    #foreach($entry in $versions.entrySet())
+      #if ($entry.value)
+        &lt;option value="$entry.key"#if ($entry.key == $revisedVersion) selected="selected"#end&gt;$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")&lt;/option&gt;
+      #end
     #end
     &lt;/select&gt;##
     #em_submitButton('extensions.actions.diff' 'diff' true)
   )))
+  #if ($originalDocument &amp;&amp; $revisedDocument)
 
-  {{html}}
-  #set ($rev1 = $originalVersion.toLowerCase())
-  #set ($rev2 = $revisedVersion.toLowerCase())
-  #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
-  #set ($origdoc = $wrappedDocs.get(0))
-  #set ($newdoc = $wrappedDocs.get(1))
-  #set ($headingLevel = 4)
-  #template('changesdoc.vm')
-  {{/html}}
+    {{html}}
+    #set ($rev1 = $originalVersion.toLowerCase())
+    #set ($rev2 = $revisedVersion.toLowerCase())
+    #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
+    #set ($origdoc = $wrappedDocs.get(0))
+    #set ($newdoc = $wrappedDocs.get(1))
+    #set ($headingLevel = 4)
+    #template('changesdoc.vm')
+    {{/html}}
+  #end
 #end
 
 #macro (displayExtensionDetails $extension)

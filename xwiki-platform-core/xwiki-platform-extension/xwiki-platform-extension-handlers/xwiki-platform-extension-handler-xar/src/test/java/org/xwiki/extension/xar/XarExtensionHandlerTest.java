@@ -340,28 +340,32 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // validate
 
-        XWikiDocument page = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+        XWikiDocument samepage = this.mockXWiki.getDocument(new DocumentReference("wiki", "samespace", "samepage"), getContext());
 
-        Assert.assertFalse("Document wiki.space.page has not been saved in the database", page.isNew());
+        Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+        
+        XWikiDocument modifiedpage = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
 
-        Assert.assertEquals("Wrong content", "content 2", page.getContent());
-        Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "2.1", page.getVersion());
+        Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
 
-        BaseClass baseClass = page.getXClass();
+        Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
+        Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
+        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+
+        BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
         Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
-        XWikiDocument page2 =
+        XWikiDocument newPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space2", "page2"), getContext());
 
-        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", page2.isNew());
+        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", newPage.isNew());
 
-        XWikiDocument page1 =
+        XWikiDocument removedPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
 
-        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
+        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", removedPage.isNew());
     }
 
     @Test

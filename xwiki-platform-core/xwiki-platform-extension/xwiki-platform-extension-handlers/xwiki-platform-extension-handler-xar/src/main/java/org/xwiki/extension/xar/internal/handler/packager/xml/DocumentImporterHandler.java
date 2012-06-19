@@ -59,6 +59,12 @@ public class DocumentImporterHandler extends DocumentHandler
 
     private PackageConfiguration configuration;
 
+    /**
+     * Attachment are imported before trying to merge a document for memory handling reasons so we need to know if there
+     * was really an existing document before starting to import attachments.
+     */
+    private Boolean hasCurrentDocument;
+
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
     {
         super(componentManager, wiki);
@@ -167,10 +173,11 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument nextDocument = getDocument();
 
             // Merge and save
-            if (currentDocument != null && !currentDocument.isNew()) {
+            if (currentDocument != null && this.hasCurrentDocument == Boolean.TRUE) {
                 XWikiDocument previousDocument = getPreviousDocument();
 
                 if (previousDocument != null) {
+                    // 3 ways merge
                     XWikiDocument mergedDocument = currentDocument.clone();
 
                     MergeResult documentMergeResult =
@@ -194,12 +201,18 @@ public class DocumentImporterHandler extends DocumentHandler
                         new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(),
                             mergedDocument.getLanguage()), documentMergeResult);
                 } else {
-                    XWikiDocument documentToSave =
-                        this.configuration.isInteractive() ? askDocumentToSave(currentDocument, previousDocument,
-                            nextDocument, null) : nextDocument;
+                    // already existing document in database but without previous version
+                    if (!currentDocument.equals(nextDocument)) {
+                        XWikiDocument documentToSave;
+                        if (this.configuration.isInteractive()) {
+                            documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, null);
+                        } else {
+                            documentToSave = nextDocument;
+                        }
 
-                    if (documentToSave != currentDocument) {
-                        saveDocument(documentToSave, comment, context);
+                        if (documentToSave != currentDocument) {
+                            saveDocument(documentToSave, comment, context);
+                        }   
                     }
                 }
             } else {
@@ -229,6 +242,10 @@ public class DocumentImporterHandler extends DocumentHandler
             }
 
             existingDocument = translatedDocument;
+        }
+
+        if (this.hasCurrentDocument == null) {
+            this.hasCurrentDocument = !existingDocument.isNew();
         }
 
         return existingDocument;

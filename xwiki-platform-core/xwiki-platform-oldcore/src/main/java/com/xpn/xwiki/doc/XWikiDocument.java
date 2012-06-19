@@ -3414,24 +3414,10 @@ public class XWikiDocument implements DocumentModelBridge
             return true;
         }
 
+        // Reference/language (document identifier)
+
         XWikiDocument doc = (XWikiDocument) object;
         if (!getDocumentReference().equals(doc.getDocumentReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getAuthorReference(), doc.getAuthorReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getContentAuthorReference(), doc.getContentAuthorReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getCreatorReference(), doc.getCreatorReference())) {
             return false;
         }
 
@@ -3447,6 +3433,26 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
+        // Authors
+
+        if (ObjectUtils.notEqual(getAuthorReference(), doc.getAuthorReference())) {
+            return false;
+        }
+
+        if (ObjectUtils.notEqual(getContentAuthorReference(), doc.getContentAuthorReference())) {
+            return false;
+        }
+
+        if (ObjectUtils.notEqual(getCreatorReference(), doc.getCreatorReference())) {
+            return false;
+        }
+
+        // Version
+
+        if (!getVersion().equals(doc.getVersion())) {
+            return false;
+        }
+
         if (getDate().getTime() != doc.getDate().getTime()) {
             return false;
         }
@@ -3456,6 +3462,48 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         if (getCreationDate().getTime() != doc.getCreationDate().getTime()) {
+            return false;
+        }
+
+        if (!getComment().equals(doc.getComment())) {
+            return false;
+        }
+
+        if (isMinorEdit() != doc.isMinorEdit()) {
+            return false;
+        }
+
+        // Datas
+
+        if (!equalsDatas(doc)) {
+            return false;
+        }
+
+        // We consider that 2 documents are still equal even when they have different original
+        // documents (see getOriginalDocument() for more details as to what is an original
+        // document).
+
+        return true;
+    }
+
+    /**
+     * Same as {@link #equals(Object)} but only for actual datas of the document.
+     * <p>
+     * The goal being to compare two versions of the same document this method skip every version/reference/author
+     * related information. For example it allows to compare a document comming from a another wiki and easily check if
+     * thoses actually are the same thing whatever the plumbing differences.
+     * 
+     * @param doc the document to compare
+     * @return true if bith documents have the same datas
+     */
+    public boolean equalsDatas(XWikiDocument doc)
+    {
+        // Same Java object, they sure are equal
+        if (this == doc) {
+            return true;
+        }
+
+        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
             return false;
         }
 
@@ -3471,10 +3519,6 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getVersion().equals(doc.getVersion())) {
-            return false;
-        }
-
         if (ObjectUtils.notEqual(getTemplateDocumentReference(), doc.getTemplateDocumentReference())) {
             return false;
         }
@@ -3484,14 +3528,6 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         if (!getValidationScript().equals(doc.getValidationScript())) {
-            return false;
-        }
-
-        if (!getComment().equals(doc.getComment())) {
-            return false;
-        }
-
-        if (isMinorEdit() != doc.isMinorEdit()) {
             return false;
         }
 
@@ -3532,10 +3568,6 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         }
-
-        // We consider that 2 documents are still equal even when they have different original
-        // documents (see getOriginalDocument() for more details as to what is an original
-        // document).
 
         return true;
     }

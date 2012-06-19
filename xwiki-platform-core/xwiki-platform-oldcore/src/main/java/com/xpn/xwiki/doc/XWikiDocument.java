@@ -3495,6 +3495,7 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @param doc the document to compare
      * @return true if bith documents have the same datas
+     * @since 4.1.1
      */
     public boolean equalsDatas(XWikiDocument doc)
     {

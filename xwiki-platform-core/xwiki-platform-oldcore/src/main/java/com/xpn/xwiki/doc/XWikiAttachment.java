@@ -193,7 +193,6 @@ public class XWikiAttachment implements Cloneable
 
     public void setFilename(String filename)
     {
-        filename = filename.replaceAll("\\+", " ");
         if (!filename.equals(this.filename)) {
             setMetaDataDirty(true);
             this.filename = filename;

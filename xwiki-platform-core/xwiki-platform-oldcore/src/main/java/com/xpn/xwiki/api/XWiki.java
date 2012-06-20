@@ -191,7 +191,7 @@ public class XWiki extends Api
     {
         try {
             XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getPrefixedFullName(),
                 getXWikiContext()) == false) {
                 return null;
             }

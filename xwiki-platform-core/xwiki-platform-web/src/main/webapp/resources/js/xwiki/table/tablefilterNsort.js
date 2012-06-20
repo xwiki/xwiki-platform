@@ -182,11 +182,11 @@ function ts_resortTable(lnk) {
   newRows.sort(sortfn);
 
   if (span.getAttribute("sortdir") == 'down') {
-    ARROW = '<img border="0" src="'+ image_path + image_up + '" alt="&uarr;"/>';
+    ARROW = '<img border="0" src="'+ image_path + image_up + '" alt="&#x2191;"/>';
     newRows.reverse();
     span.setAttribute('sortdir','up');
   } else {
-    ARROW = '<img border="0" src="'+ image_path + image_down + '" alt="&darr;"/>';
+    ARROW = '<img border="0" src="'+ image_path + image_down + '" alt="&#x2193;"/>';
     span.setAttribute('sortdir','down');
   }
 
@@ -213,7 +213,7 @@ function ts_resortTable(lnk) {
   for (var ci = 0; ci < allspans.length; ++ci) {
     if (allspans[ci].className == 'sortarrow') {
       if (getParent(allspans[ci],"table") == getParent(lnk,"table")) { // in the same table as us?
-        allspans[ci].innerHTML = '<img border="0" src="'+ image_path + image_none + '" alt="&darr;"/>';
+        allspans[ci].innerHTML = '<img border="0" src="'+ image_path + image_none + '" alt="&#x21F5;"/>';
       }
     }
   }
@@ -369,7 +369,7 @@ function ts_makeSortable(table) {
     var cell = firstRow.cells[i];
     var txt = ts_getInnerText(cell);
     if (cell.className != "unsortable" && cell.className.indexOf("unsortable") == -1) {
-      cell.innerHTML = '<a href="#" class="sortHeader" onclick="ts_resortTable(this);return false;">' + txt + '<span class="sortarrow"><img border="0" src="'+ image_path + image_none + '" alt="&darr;"/></span></a>';
+      cell.innerHTML = '<a href="#" class="sortHeader" onclick="ts_resortTable(this);return false;">' + txt + '<span class="sortarrow"><img border="0" src="'+ image_path + image_none + '" alt="&#x21F5;"/></span></a>';
     }
   }
   alternate(table);

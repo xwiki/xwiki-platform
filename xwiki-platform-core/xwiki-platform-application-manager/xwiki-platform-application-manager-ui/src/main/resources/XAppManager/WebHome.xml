@@ -71,7 +71,7 @@ $msg.get("xapp.totalnumberofapp") : $listApp.size()
       &lt;th scope="col"&gt;$msg.get("xapp.appname")&lt;/th&gt;
       &lt;th scope="col"&gt;$msg.get("version")&lt;/th&gt;
       &lt;th scope="col"&gt;$msg.get("xapp.description")&lt;/th&gt;
-      &lt;th scope="col"&gt;$msg.get("more")&lt;/th&gt;
+      &lt;th scope="col" class="unsortable noFilter"&gt;$msg.get("more")&lt;/th&gt;
     &lt;/tr&gt;
     #foreach($app in $listApp)
       &lt;tr&gt;

@@ -27,8 +27,8 @@
 ##
 #############################################################################
 ##
-$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js")##
-$xwiki.ssfx.use("js/xwiki/table/table.css")##
+$xwiki.jsfx.use('js/xwiki/table/tablefilterNsort.js', true)##
+$xwiki.ssfx.use('js/xwiki/table/table.css', true)##
 #set($WikiManager = $services.wikimanager)
 #if(!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))

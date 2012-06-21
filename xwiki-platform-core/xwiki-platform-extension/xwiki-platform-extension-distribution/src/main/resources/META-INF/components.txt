@@ -1,0 +1,3 @@
+org.xwiki.extension.distribution.internal.DistributionScriptService
+org.xwiki.extension.distribution.internal.DistributionInitializerListener
+org.xwiki.extension.distribution.internal.DefaultDistributionManager

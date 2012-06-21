@@ -51,6 +51,12 @@ public class SafeCoreExtensionRepository<T extends CoreExtensionRepository> exte
     // CoreExtensionRepository
 
     @Override
+    public CoreExtension getEnvironmentExtension()
+    {
+        return safe(getWrapped().getEnvironmentExtension());
+    }
+
+    @Override
     public int countExtensions()
     {
         return getWrapped().countExtensions();

@@ -134,7 +134,7 @@ $escapedChunk##
 ##
 ## Content changes
 ##
-#if($origdoc.content != $newdoc.content)
+#if($origdoc && $newdoc && $origdoc.content != $newdoc.content)
   #set($hasChanges = true)
   <h$headingLevel>$msg.get('core.viewers.diff.contentChanges')</h$headingLevel>
   #unifiedDiff($origdoc.content $newdoc.content)

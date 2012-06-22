@@ -781,7 +781,7 @@ public class DefaultRepositoryManager implements RepositoryManager
     {
         BaseProperty< ? > property = (BaseProperty< ? >) object.safeget(field);
 
-        return property != null ? (T) property.getValue() : def;
+        return property != null && property.getValue() != null ? (T) property.getValue() : def;
     }
 
     protected boolean update(BaseObject object, String fieldName, Object value)

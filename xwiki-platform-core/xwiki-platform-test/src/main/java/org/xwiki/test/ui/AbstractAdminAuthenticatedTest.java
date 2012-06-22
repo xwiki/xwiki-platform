@@ -23,14 +23,14 @@ import org.junit.Before;
 
 /**
  * Helper class to be extended by tests requiring an Admin user logged in.
- *
+ * 
  * @version $Id$
  * @since 3.2M3
  */
 public class AbstractAdminAuthenticatedTest extends AbstractTest
 {
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         if (!"Admin".equals(getUtil().getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of

@@ -32,9 +32,9 @@ import org.openqa.selenium.support.FindBy;
  * @version $Id$
  * @since 3.2M3
  */
-public class HistoryTab extends BaseElement
+public class HistoryPane extends BaseElement
 {
-    @FindBy(id = "Historypane")
+    @FindBy(id = "historycontent")
     private WebElement pane;
 
     public boolean hasVersionWithSummary(String summary)
@@ -65,12 +65,12 @@ public class HistoryTab extends BaseElement
         try {
             // Try to find a radio button. This will mean there are several revisions in the table
             // and we'll find the version written down in the 3rd column
-            pane.findElement(By.xpath("//tr[2]/td/input"));
-            return pane.findElement(By.xpath("//node()[contains(@class, 'currentversion')]/td[3]/a")).getText();
+            pane.findElement(By.xpath(".//tr[2]/td/input"));
+            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[3]/a")).getText();
         } catch (NoSuchElementException e) {
             // If we cound not find the radio button, there is less columns displayed and the version will be
             // in the first column
-            return pane.findElement(By.xpath("//node()[contains(@class, 'currentversion')]/td[1]/a")).getText();
+            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[1]/a")).getText();
         }
     }
 
@@ -79,12 +79,12 @@ public class HistoryTab extends BaseElement
         try {
             // Try to find a radio button. This will mean there are several revisions in the table
             // and we'll find the version comment written down in the 6th column
-            pane.findElement(By.xpath("//tr[2]/td/input"));
-            return pane.findElement(By.xpath("//node()[contains(@class, 'currentversion')]/td[6]")).getText();
+            pane.findElement(By.xpath(".//tr[2]/td/input"));
+            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[6]")).getText();
         } catch (NoSuchElementException e) {
             // If we cound not find the radio button, there is less columns displayed and the version comment will be
             // in the 4th column
-            return pane.findElement(By.xpath("//node()[contains(@class, 'currentversion')]/td[4]")).getText();
+            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[4]")).getText();
         }
     }
 
@@ -93,12 +93,12 @@ public class HistoryTab extends BaseElement
         try {
             // Try to find a radio button. This will mean there are several revisions in the table
             // and we'll find the author written down in the 4th column
-            pane.findElement(By.xpath("//tr[2]/td/input"));
-            return pane.findElement(By.xpath("//node()[contains(@class, 'currentversion')]/td[4]")).getText();
+            pane.findElement(By.xpath(".//tr[2]/td/input"));
+            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[4]")).getText();
         } catch (NoSuchElementException e) {
             // If we cound not find the radio button, there is less columns displayed and the version will be
             // in the second column
-            return pane.findElement(By.xpath("//node()[contains(@class, 'currentversion')]/td[2]")).getText();
+            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[2]")).getText();
         }
     }
 
@@ -110,8 +110,8 @@ public class HistoryTab extends BaseElement
     {
         makeConfirmDialogSilent(true);
 
-        getDriver().findElement(
-            By.xpath("//table[@class='xwikidatatable']//tr[contains(., '" + version
+        pane.findElement(
+            By.xpath(".//table[@class='xwikidatatable']//tr[contains(., '" + version
                 + "')]//td[@class='xwikibuttonlink']/a[contains(.,'Rollback')]")).click();
 
         // A new page is loaded after the dialog is accepted, thus we need to wait that it's loaded before returning
@@ -126,8 +126,37 @@ public class HistoryTab extends BaseElement
     {
         makeConfirmDialogSilent(true);
 
-        getDriver().findElement(
-            By.xpath("//table[@class='xwikidatatable']//tr[contains(., '" + version
+        pane.findElement(
+            By.xpath(".//table[@class='xwikidatatable']//tr[contains(., '" + version
                 + "')]//td[@class='xwikibuttonlink']/a[contains(.,'Delete')]")).click();
+    }
+
+    /**
+     * Clicks on the 'Show Minor Edits' button.
+     * 
+     * @return the new history pane that includes the minor edits
+     */
+    public HistoryPane showMinorEdits()
+    {
+        getUtil().findElementWithoutWaiting(getDriver(), pane, By.name("viewminorversions")).click();
+        return new HistoryPane();
+    }
+
+    /**
+     * Selects the specified document versions and clicks the button to compare them.
+     * 
+     * @param fromVersion the from version
+     * @param toVersion the to version
+     * @return the page that shows the differences between the selected pages
+     */
+    public ComparePage compare(String fromVersion, String toVersion)
+    {
+        String versionXPath = ".//input[@name = 'rev%s' and @value = '%s']";
+        getUtil().findElementWithoutWaiting(getDriver(), pane, By.xpath(String.format(versionXPath, 1, fromVersion)))
+            .click();
+        getUtil().findElementWithoutWaiting(getDriver(), pane, By.xpath(String.format(versionXPath, 2, toVersion)))
+            .click();
+        getUtil().findElementWithoutWaiting(getDriver(), pane, By.xpath(".//input[@accesskey = 'c']")).click();
+        return new ComparePage();
     }
 }

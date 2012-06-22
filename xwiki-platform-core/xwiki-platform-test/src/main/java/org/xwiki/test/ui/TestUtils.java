@@ -768,6 +768,7 @@ public class TestUtils
             if (value instanceof Iterable) {
                 for (Object element : (Iterable< ? >) value) {
                     addQueryStringEntry(builder, key, element.toString());
+                    builder.append('&');
                 }
             } else {
                 addQueryStringEntry(builder, key, value.toString());
@@ -952,6 +953,17 @@ public class TestUtils
 
     public void attachFile(String space, String page, String name, File file, boolean failIfExists) throws Exception
     {
+        InputStream is = new FileInputStream(file);
+        try {
+            attachFile(space, page, name, is, failIfExists);
+        } finally {
+            is.close();
+        }
+    }
+
+    public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists)
+        throws Exception
+    {
         // make sure xwiki.Import exists
         if (!pageExists(space, page)) {
             createPage(space, page, null, null);
@@ -964,18 +976,13 @@ public class TestUtils
         url.append("/pages/");
         url.append(escapeURL(page));
         url.append("/attachments/");
-        url.append(escapeURL(file.getName()));
+        url.append(escapeURL(name));
 
-        InputStream is = new FileInputStream(file);
-        try {
-            if (failIfExists) {
-                executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode());
-            } else {
-                executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode(),
-                    Status.ACCEPTED.getStatusCode());
-            }
-        } finally {
-            is.close();
+        if (failIfExists) {
+            executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode());
+        } else {
+            executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode(),
+                Status.ACCEPTED.getStatusCode());
         }
     }
 

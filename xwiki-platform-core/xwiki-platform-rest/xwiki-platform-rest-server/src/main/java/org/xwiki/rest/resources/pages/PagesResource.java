@@ -30,6 +30,7 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.DomainObjectFactory;
@@ -50,7 +51,8 @@ public class PagesResource extends XWikiResource
     @GET
     public Pages getPages(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parentId") String parentFilterExpression)
+        @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parentId") String parentFilterExpression,
+        @QueryParam("order") String order)
         throws XWikiException, QueryException, ComponentLookupException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -61,12 +63,11 @@ public class PagesResource extends XWikiResource
         try {
             Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
+            Query query = ("date".equals(order)) ? queryManager.createQuery("select doc.name from Document doc where doc.space=:space and language='' order by doc.date desc", "xwql") : queryManager.getNamedQuery("getSpaceDocsName");
             /* Use an explicit query to improve performance */
-            List<String> pageNames =
-                queryManager.getNamedQuery("getSpaceDocsName")
-                    .addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
+            List<String> pageNames = query.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
                     .bindValue("space", spaceName).setOffset(start).setLimit(number).execute();
-
+ 
             Pattern parentFilter = null;
             if (parentFilterExpression != null) {
                 if (parentFilterExpression.equals("null")) {

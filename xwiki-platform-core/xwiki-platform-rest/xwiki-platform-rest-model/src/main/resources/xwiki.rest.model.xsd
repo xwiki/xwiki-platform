@@ -463,7 +463,7 @@
           <element name="objectNumber" type="int" minOccurs="0"></element>
           <element name="filename" type="string" minOccurs="0"></element>
           <element name="score" type="float" minOccurs="0"></element>
-        </sequence>
+	  </sequence>
       </extension>
     </complexContent>
   </complexType>

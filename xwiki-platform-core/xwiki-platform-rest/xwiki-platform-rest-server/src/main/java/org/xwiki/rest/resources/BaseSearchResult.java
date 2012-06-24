@@ -108,6 +108,7 @@ public class BaseSearchResult extends XWikiResource
                 result.addAll(searchQuery(keywords, Query.HQL, wikiName, space, hasProgrammingRights, number, start, distinct));
             }
 
+            // not yet implemented
             if (searchScopes.contains(SearchScope.LUCENE)) {
                 result.addAll(searchLucene(keywords, wikiName, space, hasProgrammingRights, number, start, distinct));
             }

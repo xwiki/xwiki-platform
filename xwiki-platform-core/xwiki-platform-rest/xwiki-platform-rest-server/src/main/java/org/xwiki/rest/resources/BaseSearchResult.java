@@ -120,7 +120,6 @@ public class BaseSearchResult extends XWikiResource
                     distinct));
             }
 
-            // not yet implemented
             if (searchScopes.contains(SearchScope.LUCENE)) {
                 result.addAll(searchLucene(keywords, wikiName, space, hasProgrammingRights, number, start, searchWikis,
                     order));
@@ -337,6 +336,7 @@ public class BaseSearchResult extends XWikiResource
                 String spaceName = (String) object;
                 Document spaceDoc = Utils.getXWikiApi(componentManager).getDocument(spaceName + ".WebHome");
                 String title = spaceDoc.getDisplayTitle();
+
                 SearchResult searchResult = objectFactory.createSearchResult();
                 searchResult.setType("space");
                 searchResult.setId(String.format("%s:%s", wikiName, spaceName));
@@ -575,6 +575,11 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setVersion(doc.getVersion());
                     searchResult.setAuthor(doc.getAuthor());
                     searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
+
+                    String pageUri = null;
+                    try {
+                        if (StringUtils.isBlank(language)) {
+                            pageUri =
                                 UriBuilder
                                     .fromUri(this.uriInfo.getBaseUri())
                                     .path(PageResource.class)
@@ -633,6 +638,8 @@ public class BaseSearchResult extends XWikiResource
         /* This try is just needed for executing the finally clause. */
         try {
             List<SearchResult> result = new ArrayList<SearchResult>();
+
+            LOGGER.error("HERE");
 
             if (keywords == null) {
                 return result;

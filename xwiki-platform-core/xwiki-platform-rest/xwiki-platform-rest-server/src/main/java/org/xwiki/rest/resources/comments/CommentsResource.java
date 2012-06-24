@@ -67,7 +67,7 @@ public class CommentsResource extends XWikiResource
 
         for (com.xpn.xwiki.api.Object xwikiComment : ri) {
             comments.getComments().add(
-                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment));
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment, Utils.getXWikiApi(componentManager)));
         }
 
         return comments;
@@ -106,7 +106,7 @@ public class CommentsResource extends XWikiResource
             doc.save();
 
             Comment createdComment =
-                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject);
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject, Utils.getXWikiApi(componentManager));
 
             return Response.created(
                 UriBuilder.fromUri(uriInfo.getBaseUri()).path(CommentResource.class).build(wikiName, spaceName,

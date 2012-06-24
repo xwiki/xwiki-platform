@@ -54,7 +54,7 @@ public class SpaceSearchResource extends BaseSearchResult
 
         searchResults.getSearchResults().addAll(
             search(searchScopes, keywords, wikiName, spaceName, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true));
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, "", ""));
 
         return searchResults;
     }

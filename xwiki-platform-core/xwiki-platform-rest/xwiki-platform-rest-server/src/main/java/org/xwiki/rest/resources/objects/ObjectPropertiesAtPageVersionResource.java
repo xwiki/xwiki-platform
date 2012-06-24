@@ -70,7 +70,7 @@ public class ObjectPropertiesAtPageVersionResource extends XWikiResource
 
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, true);
+                .getXWikiContext(componentManager), doc, baseObject, true, Utils.getXWikiApi(componentManager));
 
         Properties properties = objectFactory.createProperties();
         properties.getProperties().addAll(object.getProperties());

@@ -199,7 +199,8 @@ public class BaseAttachmentsResource extends XWikiResource
                     attachment.setSize(xwikiAttachment.getFilesize());
                     attachment.setMimeType(mimeType);
                     attachment.setAuthor(xwikiAttachment.getAuthor());
-
+                    attachment.setAuthorName(Utils.getAuthorName(xwikiAttachment.getAuthor(), componentManager));
+                    
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(xwikiAttachment.getDate());
                     attachment.setDate(calendar);
@@ -269,7 +270,7 @@ public class BaseAttachmentsResource extends XWikiResource
 
             attachments.getAttachments().add(
                 DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,
-                    attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl));
+                    attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager)));
         }
 
         return attachments;
@@ -311,7 +312,7 @@ public class BaseAttachmentsResource extends XWikiResource
         Attachment attachment =
             DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
                 doc, xwikiAttachment, Utils.getXWikiContext(componentManager)), attachmentXWikiRelativeUrl,
-                attachmentXWikiAbsoluteUrl);
+                attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager));
 
         return new AttachmentInfo(attachment, alreadyExisting);
     }

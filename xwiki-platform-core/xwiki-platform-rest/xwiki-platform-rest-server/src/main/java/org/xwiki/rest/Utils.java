@@ -216,4 +216,18 @@ public class Utils
 
         return user.getUser();
     }
+    
+    /**
+     * <p>
+     * Retrieve the XWiki private API object
+     * </p>
+     * 
+     * @param componentManager The component manager to be used to retrieve the execution context.
+     * @return The XWiki private API object.
+     */
+    public static String getAuthorName(String author, ComponentManager componentManager)
+    {
+        return getXWikiContext(componentManager).getWiki().getUserName(author, null, false, getXWikiContext(componentManager));
+    }
+
 }

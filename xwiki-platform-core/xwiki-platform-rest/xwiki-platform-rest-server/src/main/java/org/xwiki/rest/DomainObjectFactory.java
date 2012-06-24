@@ -268,6 +268,8 @@ public class DomainObjectFactory
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
         pageSummary.setSyntax(doc.getSyntaxId());
         pageSummary.setVersion(doc.getVersion());
+        pageSummary.setAuthor(doc.getAuthor());
+        pageSummary.setAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
         pageSummary.setParent(doc.getParent());
@@ -415,6 +417,7 @@ public class DomainObjectFactory
         page.setMinorVersion(doc.getRCSVersion().at(1));
         page.setLanguage(doc.getLanguage());
         page.setCreator(doc.getCreator());
+        page.setCreatorName(xwikiApi.getUserName(doc.getCreator(), false));
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(doc.getCreationDate());
@@ -492,7 +495,7 @@ public class DomainObjectFactory
     }
 
     private static void fillAttachment(Attachment attachment, ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi)
     {
         Document doc = xwikiAttachment.getDocument();
 
@@ -504,6 +507,7 @@ public class DomainObjectFactory
         attachment.setPageVersion(doc.getVersion());
         attachment.setMimeType(xwikiAttachment.getMimeType());
         attachment.setAuthor(xwikiAttachment.getAuthor());
+        attachment.setAuthorName(xwikiApi.getUserName(xwikiAttachment.getAuthor(), false));
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(xwikiAttachment.getDate());
@@ -562,11 +566,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi)
     {
         Attachment attachment = objectFactory.createAttachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi);
 
         String attachmentUri = createAttachmentUri(baseUri, xwikiAttachment, xwikiAttachment.getDocument(), false);
 
@@ -579,11 +583,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachmentAtVersion(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi)
     {
         Attachment attachment = new Attachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi);
 
         Document doc = xwikiAttachment.getDocument();
 
@@ -598,7 +602,7 @@ public class DomainObjectFactory
     }
 
     public static Comment createComment(ObjectFactory objectFactory, URI baseUri, Document doc,
-        com.xpn.xwiki.api.Object xwikiComment)
+        com.xpn.xwiki.api.Object xwikiComment, XWiki xwikiApi)
     {
         Comment comment = objectFactory.createComment();
         comment.setId(xwikiComment.getNumber());
@@ -606,6 +610,7 @@ public class DomainObjectFactory
         com.xpn.xwiki.api.Property property = xwikiComment.getProperty("author");
         if (property != null) {
             comment.setAuthor((String) property.getValue());
+            comment.setAuthorName(xwikiApi.getUserName((String) property.getValue(), false));
         }
 
         property = xwikiComment.getProperty("date");
@@ -642,12 +647,14 @@ public class DomainObjectFactory
     }
 
     private static void fillObjectSummary(ObjectSummary objectSummary, ObjectFactory objectFactory, URI baseUri,
-        Document doc, BaseObject xwikiObject) throws XWikiException
+        Document doc, BaseObject xwikiObject, XWiki xwikiApi) throws XWikiException
     {
         objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
         objectSummary.setGuid(xwikiObject.getGuid());
         objectSummary.setPageId(doc.getPrefixedFullName());
         objectSummary.setPageVersion(doc.getVersion());
+        objectSummary.setPageAuthor(doc.getAuthor());
+        objectSummary.setPageAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
         objectSummary.setWiki(doc.getWiki());
         objectSummary.setSpace(doc.getSpace());
         objectSummary.setPageName(doc.getName());
@@ -662,10 +669,10 @@ public class DomainObjectFactory
     }
 
     public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri,
-        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion) throws XWikiException
+        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi) throws XWikiException
     {
         ObjectSummary objectSummary = objectFactory.createObjectSummary();
-        fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject);
+        fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject, xwikiApi);
 
         Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.OBJECT);
         objectSummary.getLinks().add(objectLink);
@@ -697,10 +704,10 @@ public class DomainObjectFactory
     }
 
     public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
-        Document doc, BaseObject xwikiObject, boolean useVersion) throws XWikiException
+        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi) throws XWikiException
     {
         Object object = objectFactory.createObject();
-        fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject);
+        fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject, xwikiApi);
 
         BaseClass xwikiClass = xwikiObject.getXClass(xwikiContext);
 

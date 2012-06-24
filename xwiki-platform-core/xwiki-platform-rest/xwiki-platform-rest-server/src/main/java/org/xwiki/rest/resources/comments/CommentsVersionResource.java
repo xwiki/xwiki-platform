@@ -32,6 +32,7 @@ import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Comments;
+import org.xwiki.rest.Utils;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -62,7 +63,7 @@ public class CommentsVersionResource extends XWikiResource
 
         for (com.xpn.xwiki.api.Object xwikiComment : ri) {
             comments.getComments().add(
-                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment));
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment, Utils.getXWikiApi(componentManager)));
         }
 
         return comments;

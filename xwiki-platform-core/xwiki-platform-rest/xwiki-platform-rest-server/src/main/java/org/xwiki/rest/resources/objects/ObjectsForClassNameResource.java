@@ -63,7 +63,7 @@ public class ObjectsForClassNameResource extends BaseObjectsResource
         for (com.xpn.xwiki.objects.BaseObject object : ri) {
             objects.getObjectSummaries().add(
                 DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                    .getXWikiContext(componentManager), doc, object, false));
+                    .getXWikiContext(componentManager), doc, object, false, Utils.getXWikiApi(componentManager)));
         }
 
         return objects;

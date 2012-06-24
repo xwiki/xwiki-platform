@@ -65,7 +65,7 @@ public class ObjectsAtPageVersionResource extends BaseObjectsResource
             if (object != null) {
                 objects.getObjectSummaries().add(
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                        .getXWikiContext(componentManager), doc, object, true));
+                        .getXWikiContext(componentManager), doc, object, true, Utils.getXWikiApi(componentManager)));
             }
         }
 

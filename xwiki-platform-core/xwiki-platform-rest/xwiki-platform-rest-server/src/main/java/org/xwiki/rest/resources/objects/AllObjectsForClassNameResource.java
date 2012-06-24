@@ -79,7 +79,7 @@ public class AllObjectsForClassNameResource extends XWikiResource
 
                 ObjectSummary objectSummary =
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                        .getXWikiContext(componentManager), doc, xwikiObject, false);
+                        .getXWikiContext(componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager));
 
                 objects.getObjectSummaries().add(objectSummary);
             }

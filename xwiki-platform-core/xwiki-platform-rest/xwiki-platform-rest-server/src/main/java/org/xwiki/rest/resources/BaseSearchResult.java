@@ -44,12 +44,22 @@ import org.xwiki.rest.resources.spaces.SpaceResource;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
+import com.xpn.xwiki.plugin.lucene.SearchResults;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @version $Id$
  */
 public class BaseSearchResult extends XWikiResource
 {
-    protected static final String SEARCH_TEMPLATE_INFO = "q={keywords}(&scope={content|name|title|spaces|objects})*";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSearchResult.class);
+
+    protected static final String SEARCH_TEMPLATE_INFO =
+        "q={keywords}(&scope={content|name|title|spaces|objects|xwql|hql|lucene})*";
 
     protected static enum SearchScope
     {
@@ -79,8 +89,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> search(List<SearchScope> searchScopes, String keywords, String wikiName, String space,
-        boolean hasProgrammingRights, int number, int start, boolean distinct) throws IllegalArgumentException, UriBuilderException, QueryException,
-        XWikiException
+        boolean hasProgrammingRights, int number, int start, boolean distinct, String searchWikis, String order)
+        throws IllegalArgumentException, UriBuilderException, QueryException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -101,16 +111,19 @@ public class BaseSearchResult extends XWikiResource
             }
 
             if (searchScopes.contains(SearchScope.XWQL)) {
-                result.addAll(searchQuery(keywords, Query.XWQL, wikiName, space, hasProgrammingRights, number, start, distinct));
+                result.addAll(searchQuery(keywords, Query.XWQL, wikiName, space, hasProgrammingRights, number, start,
+                    distinct));
             }
 
             if (searchScopes.contains(SearchScope.HQL)) {
-                result.addAll(searchQuery(keywords, Query.HQL, wikiName, space, hasProgrammingRights, number, start, distinct));
+                result.addAll(searchQuery(keywords, Query.HQL, wikiName, space, hasProgrammingRights, number, start,
+                    distinct));
             }
 
             // not yet implemented
             if (searchScopes.contains(SearchScope.LUCENE)) {
-                result.addAll(searchLucene(keywords, wikiName, space, hasProgrammingRights, number, start, distinct));
+                result.addAll(searchLucene(keywords, wikiName, space, hasProgrammingRights, number, start, searchWikis,
+                    order));
             }
 
             return result;
@@ -135,8 +148,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
-        String space, boolean hasProgrammingRights, int number, int start) throws QueryException, IllegalArgumentException,
-        UriBuilderException, XWikiException
+        String space, boolean hasProgrammingRights, int number, int start) throws QueryException,
+        IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -205,8 +218,8 @@ public class BaseSearchResult extends XWikiResource
             } else {
                 queryResult =
                     queryManager.createQuery(query, Query.XWQL)
-                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number).setOffset(start)
-                        .execute();
+                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
+                        .setOffset(start).execute();
             }
 
             for (Object object : queryResult) {
@@ -231,22 +244,28 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setSpace(spaceName);
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
+                    searchResult.setAuthor(doc.getAuthor());
+                    searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
 
                     String pageUri = null;
                     try {
                         if (StringUtils.isBlank(language)) {
                             pageUri =
-                                UriBuilder.fromUri(this.uriInfo.getBaseUri()).path(PageResource.class)
-                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                URLEncoder.encode(spaceName, "UTF-8"),
-                                URLEncoder.encode(pageName, "UTF-8")).toString();
+                                UriBuilder
+                                    .fromUri(this.uriInfo.getBaseUri())
+                                    .path(PageResource.class)
+                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"))
+                                    .toString();
                         } else {
                             searchResult.setLanguage(language);
                             pageUri =
-                                UriBuilder.fromUri(this.uriInfo.getBaseUri()).path(PageTranslationResource.class)
-                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                URLEncoder.encode(spaceName, "UTF-8"),
-                                URLEncoder.encode(pageName, "UTF-8"), language).toString();
+                                UriBuilder
+                                    .fromUri(this.uriInfo.getBaseUri())
+                                    .path(PageTranslationResource.class)
+                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
+                                        language).toString();
                         }
                     } catch (UnsupportedEncodingException ex) {
                         // This should never happen, UTF-8 is always valid.
@@ -282,8 +301,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws UriBuilderException
      * @throws XWikiException
      */
-    protected List<SearchResult> searchSpaces(String keywords, String wikiName, boolean hasProgrammingRights, int number, int start)
-        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+    protected List<SearchResult> searchSpaces(String keywords, String wikiName, boolean hasProgrammingRights,
+        int number, int start) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -310,14 +329,15 @@ public class BaseSearchResult extends XWikiResource
             List<Object> queryResult = null;
             queryResult =
                 queryManager.createQuery(query, Query.XWQL)
-                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number).setOffset(start).execute();
+                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
+                    .setOffset(start).execute();
 
             for (Object object : queryResult) {
 
                 String spaceName = (String) object;
                 Document spaceDoc = Utils.getXWikiApi(componentManager).getDocument(spaceName + ".WebHome");
                 String title = spaceDoc.getDisplayTitle();
-                
+
                 SearchResult searchResult = objectFactory.createSearchResult();
                 searchResult.setType("space");
                 searchResult.setId(String.format("%s:%s", wikiName, spaceName));
@@ -372,8 +392,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchObjects(String keywords, String wikiName, String space,
-        boolean hasProgrammingRights, int number, int start) throws QueryException, IllegalArgumentException, UriBuilderException,
-        XWikiException
+        boolean hasProgrammingRights, int number, int start) throws QueryException, IllegalArgumentException,
+        UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -430,7 +450,7 @@ public class BaseSearchResult extends XWikiResource
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
                 if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
-                	Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("object");
@@ -443,6 +463,8 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setVersion(doc.getVersion());
                     searchResult.setClassName(className);
                     searchResult.setObjectNumber(objectNumber);
+                    searchResult.setAuthor(doc.getAuthor());
+                    searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
 
                     String pageUri =
                         UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
@@ -486,32 +508,35 @@ public class BaseSearchResult extends XWikiResource
      * @throws UriBuilderException
      * @throws XWikiException
      */
-    protected List<SearchResult> searchQuery(String keywords, String queryLanguage, String wikiName,
-        String space, boolean hasProgrammingRights, int number, int start, boolean distinct) throws QueryException, IllegalArgumentException,
-        UriBuilderException, XWikiException
+    protected List<SearchResult> searchQuery(String keywords, String queryLanguage, String wikiName, String space,
+        boolean hasProgrammingRights, int number, int start, boolean distinct) throws QueryException,
+        IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
         try {
             List<SearchResult> result = new ArrayList<SearchResult>();
-           
+
             if (keywords == null || keywords.trim().startsWith("select")) {
                 return result;
             }
 
             Formatter f = new Formatter();
             if (distinct)
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc " + keywords);
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc "
+                    + keywords);
             else
                 f.format("select doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc " + keywords);
-            	
+
             String query = f.toString();
-            if (space!=null)
-            	query.replace("where ", "where doc.space=:space and ");
-            
+            if (space != null)
+                query.replace("where ", "where doc.space=:space and ");
+
             if (!hasProgrammingRights) {
-                query.replace("where ", "where doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' and ");
+                query
+                    .replace("where ",
+                        "where doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' and ");
             }
 
             List<Object> queryResult = null;
@@ -519,13 +544,11 @@ public class BaseSearchResult extends XWikiResource
             /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
                 queryResult =
-                    queryManager.createQuery(query, queryLanguage)
-                        .bindValue("space", space).setLimit(number).setOffset(start).execute();
+                    queryManager.createQuery(query, queryLanguage).bindValue("space", space).setLimit(number)
+                        .setOffset(start).execute();
             } else {
                 queryResult =
-                    queryManager.createQuery(query, queryLanguage)
-                        .setLimit(number).setOffset(start)
-                        .execute();
+                    queryManager.createQuery(query, queryLanguage).setLimit(number).setOffset(start).execute();
             }
 
             for (Object object : queryResult) {
@@ -539,10 +562,10 @@ public class BaseSearchResult extends XWikiResource
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
                 if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
-                	Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
-                    
-                	SearchResult searchResult = objectFactory.createSearchResult();
+
+                    SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("page");
                     searchResult.setId(pageId);
                     searchResult.setPageFullName(pageFullName);
@@ -551,22 +574,28 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setSpace(spaceName);
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
+                    searchResult.setAuthor(doc.getAuthor());
+                    searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
 
                     String pageUri = null;
                     try {
                         if (StringUtils.isBlank(language)) {
                             pageUri =
-                                UriBuilder.fromUri(this.uriInfo.getBaseUri()).path(PageResource.class)
-                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                URLEncoder.encode(spaceName, "UTF-8"),
-                                URLEncoder.encode(pageName, "UTF-8")).toString();
+                                UriBuilder
+                                    .fromUri(this.uriInfo.getBaseUri())
+                                    .path(PageResource.class)
+                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"))
+                                    .toString();
                         } else {
                             searchResult.setLanguage(language);
                             pageUri =
-                                UriBuilder.fromUri(this.uriInfo.getBaseUri()).path(PageTranslationResource.class)
-                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                URLEncoder.encode(spaceName, "UTF-8"),
-                                URLEncoder.encode(pageName, "UTF-8"), language).toString();
+                                UriBuilder
+                                    .fromUri(this.uriInfo.getBaseUri())
+                                    .path(PageTranslationResource.class)
+                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
+                                        language).toString();
                         }
                     } catch (UnsupportedEncodingException ex) {
                         // This should never happen, UTF-8 is always valid.
@@ -587,7 +616,6 @@ public class BaseSearchResult extends XWikiResource
         }
     }
 
-    
     /**
      * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
      * 
@@ -603,27 +631,110 @@ public class BaseSearchResult extends XWikiResource
      * @throws UriBuilderException
      * @throws XWikiException
      */
-    protected List<SearchResult> searchLucene(String keywords, String wikiName,
-        String space, boolean hasProgrammingRights, int number, int start, boolean distinct) throws QueryException, IllegalArgumentException,
-        UriBuilderException, XWikiException
+    protected List<SearchResult> searchLucene(String keywords, String defaultWikiName, String space,
+        boolean hasProgrammingRights, int number, int start, String searchWikis, String order) throws QueryException,
+        IllegalArgumentException, UriBuilderException, XWikiException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
         try {
             List<SearchResult> result = new ArrayList<SearchResult>();
-           
+
+            LOGGER.error("HERE");
+
             if (keywords == null) {
                 return result;
             }
 
-            // TBD
- 
+            if (!hasProgrammingRights) {
+                if (space != null)
+                    keywords = "(" + keywords + ") AND space:" + space;
+                else
+                    keywords +=
+                        " AND NOT space:XWiki AND NOT space:Admin and NOT space:Panels and NOT space:WebPreferences";
+            } else if (space != null) {
+                keywords = "(" + keywords + ") AND space:" + space;
+            }
+
+            LOGGER.error("Query is: " + keywords);
+
+            try {
+                XWikiContext context = Utils.getXWikiContext(componentManager);
+                LucenePlugin lucene = (LucenePlugin) Utils.getXWiki(componentManager).getPlugin("lucene", context);
+                SearchResults luceneSearchResults =
+                    lucene.getSearchResults(keywords, order, (searchWikis == null) ? defaultWikiName : searchWikis, "",
+                        context);
+                List<com.xpn.xwiki.plugin.lucene.SearchResult> luceneResults =
+                    luceneSearchResults.getResults(start, (number == -1) ? 20 : number);
+                for (com.xpn.xwiki.plugin.lucene.SearchResult luceneSearchResult : luceneResults) {
+                    String wikiName = luceneSearchResult.getWiki();
+                    String spaceName = luceneSearchResult.getSpace();
+                    String pageName = luceneSearchResult.getName();
+                    String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
+                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                    String title = doc.getDisplayTitle();
+
+                    SearchResult searchResult = objectFactory.createSearchResult();
+                    searchResult.setType(luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE) ? "page"
+                        : "file");
+                    searchResult.setId(luceneSearchResult.getId());
+                    searchResult.setPageFullName(pageFullName);
+                    searchResult.setTitle(title);
+                    searchResult.setWiki(wikiName);
+                    searchResult.setSpace(spaceName);
+                    searchResult.setPageName(pageName);
+                    searchResult.setVersion(doc.getVersion());
+                    if (luceneSearchResult.equals(LucenePlugin.DOCTYPE_ATTACHMENT))
+                        searchResult.setFilename(luceneSearchResult.getFilename());
+                    searchResult.setScore(luceneSearchResult.getScore());
+                    searchResult.setAuthor(luceneSearchResult.getAuthor());
+                    searchResult.setAuthorName(Utils.getAuthorName(luceneSearchResult.getAuthor(), componentManager));
+
+                    String language = luceneSearchResult.getLanguage();
+                    if (language.equals("default"))
+                        language = "";
+
+                    String pageUri = null;
+                    try {
+                        if (StringUtils.isBlank(language)) {
+                            pageUri =
+                                UriBuilder
+                                    .fromUri(this.uriInfo.getBaseUri())
+                                    .path(PageResource.class)
+                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"))
+                                    .toString();
+                        } else {
+                            searchResult.setLanguage(language);
+                            pageUri =
+                                UriBuilder
+                                    .fromUri(this.uriInfo.getBaseUri())
+                                    .path(PageTranslationResource.class)
+                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
+                                        language).toString();
+                        }
+                    } catch (UnsupportedEncodingException ex) {
+                        // This should never happen, UTF-8 is always valid.
+                    }
+
+                    Link pageLink = new Link();
+                    pageLink.setHref(pageUri);
+                    pageLink.setRel(Relations.PAGE);
+                    searchResult.getLinks().add(pageLink);
+                    result.add(searchResult);
+                }
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Error performing lucene search", e);
+            }
+
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            // Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
+
     /**
      * Return a list of {@link SearchScope} objects by parsing the strings provided in the search scope strings. If the
      * list doesn't contain any valid scope string, then CONTENT is added by default.
@@ -653,3 +764,4 @@ public class BaseSearchResult extends XWikiResource
     }
 
 }
+

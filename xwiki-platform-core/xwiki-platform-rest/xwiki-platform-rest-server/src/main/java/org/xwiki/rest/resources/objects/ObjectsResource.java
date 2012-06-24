@@ -76,7 +76,7 @@ public class ObjectsResource extends BaseObjectsResource
             if (object != null) {
                 objects.getObjectSummaries().add(
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                        .getXWikiContext(componentManager), doc, object, false));
+                        .getXWikiContext(componentManager), doc, object, false, Utils.getXWikiApi(componentManager)));
             }
         }
 
@@ -131,7 +131,7 @@ public class ObjectsResource extends BaseObjectsResource
             UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName, spaceName, pageName,
                 object.getClassName(), objectNumber)).entity(
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, xwikiObject, false)).build();
+                .getXWikiContext(componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager))).build();
     }
 
 }

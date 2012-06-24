@@ -69,7 +69,7 @@ public class ObjectPropertyResource extends XWikiResource
 
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false);
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
 
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
@@ -118,7 +118,7 @@ public class ObjectPropertyResource extends XWikiResource
         baseObject = xwikiDocument.getObject(className, objectNumber);
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false);
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
 
         for (Property p : object.getProperties()) {
             if (p.getName().equals(propertyName)) {

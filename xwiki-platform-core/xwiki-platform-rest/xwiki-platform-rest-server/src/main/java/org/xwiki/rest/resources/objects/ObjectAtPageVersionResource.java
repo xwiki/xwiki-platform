@@ -65,7 +65,7 @@ public class ObjectAtPageVersionResource extends XWikiResource
         }
 
         return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-            .getXWikiContext(componentManager), doc, baseObject, true);
+            .getXWikiContext(componentManager), doc, baseObject, true, Utils.getXWikiApi(componentManager));
     }
 
 }

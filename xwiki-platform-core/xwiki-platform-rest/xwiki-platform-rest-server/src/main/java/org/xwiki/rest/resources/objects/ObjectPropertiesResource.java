@@ -61,7 +61,7 @@ public class ObjectPropertiesResource extends BaseObjectsResource
 
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false);
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
 
         Properties properties = objectFactory.createProperties();
         properties.getProperties().addAll(object.getProperties());

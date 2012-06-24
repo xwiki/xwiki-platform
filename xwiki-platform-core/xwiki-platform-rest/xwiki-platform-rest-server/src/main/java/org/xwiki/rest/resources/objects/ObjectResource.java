@@ -59,7 +59,7 @@ public class ObjectResource extends BaseObjectsResource
         }
 
         return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-            .getXWikiContext(componentManager), doc, baseObject, false);
+            .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
     }
 
     @PUT
@@ -91,7 +91,7 @@ public class ObjectResource extends BaseObjectsResource
 
         return Response.status(Status.ACCEPTED).entity(
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false)).build();
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager))).build();
     }
 
     @DELETE

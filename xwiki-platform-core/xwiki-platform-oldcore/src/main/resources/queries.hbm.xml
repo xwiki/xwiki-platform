@@ -27,9 +27,6 @@
   <query name="getSpaceDocsName">
     select distinct doc.name from XWikiDocument doc where doc.space=:space order by doc.name asc
   </query>
-  <query name="getSpaceDocsNameByDate">
-    select distinct doc.name from XWikiDocument doc where doc.space=:space order by doc.date desc 
-  </query>
   <query name="getAllSpaceDocuments">
     select distinct doc.name from XWikiDocument doc where doc.space=:space
   </query>

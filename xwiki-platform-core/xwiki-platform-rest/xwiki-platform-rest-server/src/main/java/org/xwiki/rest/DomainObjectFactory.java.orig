@@ -98,7 +98,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
  * This class contains utility methods for building representations using model objects.
  * </p>
  * 
- * @version $Id$
+ * @version $Id: 96e745408fd33a9da0d74f470dd8c78d4e391f8e $
  */
 public class DomainObjectFactory
 {
@@ -267,7 +267,6 @@ public class DomainObjectFactory
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
         pageSummary.setSyntax(doc.getSyntaxId());
-        pageSummary.setVersion(doc.getVersion());
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
         pageSummary.setParent(doc.getParent());
@@ -647,7 +646,6 @@ public class DomainObjectFactory
         objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
         objectSummary.setGuid(xwikiObject.getGuid());
         objectSummary.setPageId(doc.getPrefixedFullName());
-        objectSummary.setPageVersion(doc.getVersion());
         objectSummary.setWiki(doc.getWiki());
         objectSummary.setSpace(doc.getSpace());
         objectSummary.setPageName(doc.getName());

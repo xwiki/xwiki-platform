@@ -45,9 +45,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 @Component("officeimporter/anchor")
 public class AnchorFilter extends AbstractHTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParameters)
     {
         List<Element> links = filterDescendants(document.getDocumentElement(), new String[] {TAG_A});

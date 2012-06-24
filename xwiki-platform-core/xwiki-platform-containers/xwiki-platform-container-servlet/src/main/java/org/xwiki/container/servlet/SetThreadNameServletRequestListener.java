@@ -37,11 +37,7 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
     /** The name of the servlet request attribute holding the original name of the processing thread. */
     private static final String ORIGINAL_THREAD_NAME_ATTRIBUTE = "xwiki.thread.originalName";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletRequestListener#requestInitialized(javax.servlet.ServletRequestEvent)
-     */
+    @Override
     public void requestInitialized(ServletRequestEvent sre)
     {
         ServletRequest servletRequest = sre.getServletRequest();
@@ -60,11 +56,7 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletRequestListener#requestDestroyed(javax.servlet.ServletRequestEvent)
-     */
+    @Override
     public void requestDestroyed(ServletRequestEvent sre)
     {
         ServletRequest servletRequest = sre.getServletRequest();

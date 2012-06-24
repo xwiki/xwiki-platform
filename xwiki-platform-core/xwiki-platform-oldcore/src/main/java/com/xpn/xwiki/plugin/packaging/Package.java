@@ -34,8 +34,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.json.JSONObject;
@@ -72,6 +77,8 @@ public class Package
     public static final int Right = 1;
 
     public static final String DEFAULT_FILEEXT = "xml";
+
+    public static final String XAR_FILENAME_ENCODING = "UTF-8";
 
     public static final String DefaultPackageFileName = "package.xml";
 
@@ -336,7 +343,13 @@ public class Package
             return "No Selected file";
         }
 
-        ZipOutputStream zos = new ZipOutputStream(os);
+        ZipArchiveOutputStream zos = new ZipArchiveOutputStream(os);
+        zos.setEncoding(XAR_FILENAME_ENCODING);
+        // By including the unicode extra fields, it is possible to extract XAR-files
+        // containing documents with non-ascii characters in the document name using InfoZIP,
+        // and the filenames will be correctly converted to the character set of the local
+        // file system.
+        zos.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
         for (int i = 0; i < this.files.size(); i++) {
             DocumentInfo docinfo = this.files.get(i);
             XWikiDocument doc = docinfo.getDoc();
@@ -370,7 +383,7 @@ public class Package
         return "";
     }
 
-/**
+    /**
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
      * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
      *
@@ -397,12 +410,12 @@ public class Package
      */
     public String Import(InputStream file, XWikiContext context) throws IOException, XWikiException
     {
-        ZipInputStream zis = new ZipInputStream(file);
-        ZipEntry entry;
+        ZipArchiveInputStream zis;
+        ArchiveEntry entry;
         Document description = null;
 
         try {
-            zis = new ZipInputStream(file);
+            zis = new ZipArchiveInputStream(file, XAR_FILENAME_ENCODING, false);
 
             List<XWikiDocument> docsToLoad = new LinkedList<XWikiDocument>();
             /*
@@ -691,6 +704,7 @@ public class Package
                     }
                 }
                 doc.getDoc().addXObjectsToRemoveFromVersion(previousdoc);
+                doc.getDoc().setOriginalDocument(previousdoc);
             }
             try {
                 if (!backup) {
@@ -984,14 +998,14 @@ public class Package
      * @param context curent XWikiContext
      * @throws IOException when an error occurs during streaming operation
      */
-    private void addInfosToZip(ZipOutputStream zos, XWikiContext context) throws IOException
+    private void addInfosToZip(ZipArchiveOutputStream zos, XWikiContext context) throws IOException
     {
         try {
             String zipname = DefaultPackageFileName;
-            ZipEntry zipentry = new ZipEntry(zipname);
-            zos.putNextEntry(zipentry);
+            ZipArchiveEntry zipentry = new ZipArchiveEntry(zipname);
+            zos.putArchiveEntry(zipentry);
             toXML(zos, context);
-            zos.closeEntry();
+            zos.closeArchiveEntry();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1055,12 +1069,38 @@ public class Package
      * @param context current XWikiContext
      * @throws XWikiException when an error occurs during documents access
      * @throws IOException when an error occurs during streaming operation
+     * @deprecated since 4.1M2
      */
+    @Deprecated
     public void addToZip(XWikiDocument doc, ZipOutputStream zos, boolean withVersions, XWikiContext context)
         throws XWikiException, IOException
     {
         String zipname = getPathFromDocument(doc, context);
-        doc.addToZip(zos, zipname, withVersions, context);
+        ZipEntry zipentry = new ZipEntry(zipname);
+        zos.putNextEntry(zipentry);
+        doc.toXML(zos, true, false, true, withVersions, context);
+        zos.closeEntry();
+    }
+
+    /**
+     * Write an XML serialized XWikiDocument to a ZipOutputStream
+     * 
+     * @param doc the document to serialize
+     * @param zos the ZipOutputStream to write to
+     * @param withVersions if true, also serialize all document versions
+     * @param context current XWikiContext
+     * @throws XWikiException when an error occurs during documents access
+     * @throws IOException when an error occurs during streaming operation
+     * @since 4.1M2
+     */
+    private void addToZip(XWikiDocument doc, ZipArchiveOutputStream zos, boolean withVersions, XWikiContext context)
+        throws XWikiException, IOException
+    {
+        String zipname = getPathFromDocument(doc, context);
+        ZipArchiveEntry zipentry = new ZipArchiveEntry(zipname);
+        zos.putArchiveEntry(zipentry);
+        doc.toXML(zos, true, false, true, withVersions, context);
+        zos.closeArchiveEntry();
     }
 
     public void addToDir(XWikiDocument doc, File dir, boolean withVersions, XWikiContext context) throws XWikiException

@@ -53,6 +53,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         super(name, className, context);
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
@@ -72,6 +73,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         lastUnfinishedTimerDataList = new CircularFifoBuffer((int) size);
     }
 
+    @Override
     public String getName()
     {
         return "monitor";

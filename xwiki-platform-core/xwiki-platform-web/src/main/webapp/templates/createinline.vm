@@ -77,7 +77,7 @@
 ## Output JavaScript validation code
 ## ---------------------------------------------------------------------------------------------------------
 $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')##
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)##
 <script type="text/javascript">
 //<![CDATA[
   XWiki.createPage = {
@@ -124,7 +124,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
 ## ---------------------------------------------------------------------------------------------------------
 ## Get the list of available template providers, computed in the action and set on the context
 ## ---------------------------------------------------------------------------------------------------------
-#set($availableTemplateProviders = $util.getArrayList())
+#set ($availableTemplateProviders = [])
 #foreach($tpDoc in $createAvailableTemplates)
   #set ($tpObj = $tpDoc.getObject('XWiki.TemplateProviderClass'))
   #if ("$!{tpObj.getProperty('type').value}" == $tocreate || ("$!{tpObj.getProperty('type').value}" == '' && $tocreate == 'page'))
@@ -139,7 +139,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     ## Template field
     ## ---------------------------------------------------------------------------------------------------------
     #if(!$availableTemplateProviders.isEmpty() && $templateProvider == '' && $template == '')
-      #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
+      #set ($jsSpaceInclusionValidationContainer = [])
       <dl>
         <dt>
           <label>$msg.get('core.create.template')</label>
@@ -164,7 +164,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
             #set($jsAllowedSpacesArray = '')## Reset previous value
             #if ($tocreate == 'space')
               ## TODO remove this when XWiki starts supporting nested spaces
-              #set($allowedSpaces = $util.getArrayList())
+              #set ($allowedSpaces = [])
             #else
               #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
               #if($space == '' && !$allowedSpaces.isEmpty())
@@ -229,7 +229,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     ## ---------------------------------------------------------------------------------------------------------
     ## Page creation
     ## ---------------------------------------------------------------------------------------------------------
-    #set ($jsValidationInitializersContainer = $util.getArrayList())
+    #set ($jsValidationInitializersContainer = [])
     <input type="hidden" name="parent" value="$!{escapetool.xml($parent)}"/>
     ## ---------------------------------------------------------------------------------------------------------
     ## Template field

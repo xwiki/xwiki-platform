@@ -46,6 +46,7 @@
   #if (!$doc.getObject($prefsClassName))
     #set ($discard = $doc.newObject($prefsClassName))
     $!doc.setParent("${doc.space}.WebHome")
+    #set ($discard = $doc.setHidden(true))
     #set ($discard = $doc.save())
   #end
 #end

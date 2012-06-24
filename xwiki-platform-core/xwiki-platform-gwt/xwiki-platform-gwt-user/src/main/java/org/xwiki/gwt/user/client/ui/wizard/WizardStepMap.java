@@ -35,11 +35,7 @@ public class WizardStepMap extends HashMap<String, WizardStep> implements Wizard
      */
     private static final long serialVersionUID = 6713667523066371331L;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStepProvider#getStep(String)
-     */
+    @Override
     public WizardStep getStep(String name)
     {
         return get(name);

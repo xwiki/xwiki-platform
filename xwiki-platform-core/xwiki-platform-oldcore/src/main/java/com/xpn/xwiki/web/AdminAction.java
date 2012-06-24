@@ -38,11 +38,6 @@ public class AdminAction extends XWikiAction
     /** The logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminAction.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiAction#render(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

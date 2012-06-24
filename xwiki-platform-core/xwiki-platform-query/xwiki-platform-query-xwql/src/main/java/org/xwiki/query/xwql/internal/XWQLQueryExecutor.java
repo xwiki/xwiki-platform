@@ -29,9 +29,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 
 @Component
@@ -46,28 +51,49 @@ public class XWQLQueryExecutor implements QueryExecutor
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private ModelContext context;
+
     public QueryManager getQueryManager() throws ComponentLookupException
     {
-        // we can't inject QueryManager because of cyclic dependency.
-        return this.componentManager.lookup(QueryManager.class);
+        // We can't inject QueryManager because of cyclic dependency.
+        return this.componentManager.getInstance(QueryManager.class);
     }
 
+    @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
+        EntityReference currentEntityReference = this.context.getCurrentEntityReference();
+
         Query nativeQuery;
         try {
-            nativeQuery = getQueryManager().createQuery(
-                this.translator.translate(query.getStatement()),
-                this.translator.getOutputLanguage());
+            if (query.getWiki() != null) {
+                if (currentEntityReference.getType() == EntityType.WIKI) {
+                    this.context.setCurrentEntityReference(new WikiReference(query.getWiki()));
+                } else {
+                    this.context.setCurrentEntityReference(currentEntityReference.replaceParent(
+                        currentEntityReference.extractReference(EntityType.WIKI), new WikiReference(query.getWiki())));
+                }
+            }
+
+            nativeQuery =
+                getQueryManager().createQuery(this.translator.translate(query.getStatement()),
+                    this.translator.getOutputLanguage());
             nativeQuery.setLimit(query.getLimit());
             nativeQuery.setOffset(query.getOffset());
             nativeQuery.setWiki(query.getWiki());
+            if (query.getFilters() != null) {
+                for (QueryFilter filter : query.getFilters()) {
+                    nativeQuery.addFilter(filter);
+                }
+            }
             for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
                 nativeQuery.bindValue(e.getKey(), e.getValue());
             }
             for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
                 nativeQuery.bindValue(e.getKey(), e.getValue());
             }
+
             return nativeQuery.execute();
         } catch (Exception e) {
             if (e instanceof QueryException) {
@@ -75,6 +101,8 @@ public class XWQLQueryExecutor implements QueryExecutor
             }
             throw new QueryException("Exception while translating [" + query.getStatement() + "] XWQL query to the ["
                 + this.translator.getOutputLanguage() + "] language", query, e);
+        } finally {
+            this.context.setCurrentEntityReference(currentEntityReference);
         }
     }
 

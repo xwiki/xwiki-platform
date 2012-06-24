@@ -24,13 +24,20 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import org.dom4j.Element;
 
-public interface ObjectInterface extends ElementInterface {
-    public BaseClass getxWikiClass(XWikiContext context) throws XWikiException;
-    // public void setxWikiClass(BaseClass xWikiClass);
+public interface ObjectInterface extends ElementInterface
+{
+    /**
+     * @since 4.0M1
+     */
+    public BaseClass getXClass(XWikiContext context) throws XWikiException;
 
     public PropertyInterface get(String name) throws XWikiException;
-    public void put(String name,PropertyInterface property) throws XWikiException;
+
+    public void put(String name, PropertyInterface property) throws XWikiException;
+
     public PropertyInterface safeget(String name);
+
     public void safeput(String name, PropertyInterface property);
+
     public Element toXML(BaseClass bclass);
 }

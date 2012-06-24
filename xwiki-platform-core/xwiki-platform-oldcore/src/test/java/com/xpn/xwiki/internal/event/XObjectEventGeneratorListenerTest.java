@@ -63,7 +63,7 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     {
         super.setUp();
 
-        this.observation = getComponentManager().lookup(ObservationManager.class);
+        this.observation = getComponentManager().getInstance(ObservationManager.class);
 
         // Remove wiki macro listener which is useless and try to load documents from database
         this.observation.removeListener("wikimacrolistener");

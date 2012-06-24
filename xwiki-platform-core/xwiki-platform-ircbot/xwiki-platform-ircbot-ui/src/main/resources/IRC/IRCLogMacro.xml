@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>IRC</web>
+  <name>IRCLogMacro</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>IRC.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1331121809000</creationDate>
+  <date>1331134540000</date>
+  <contentUpdateDate>1331134540000</contentUpdateDate>
+  <version>1.1</version>
+  <title>IRC Logging Macro</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>9</number>
+        <prettyName>Macro code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <disabled>0</disabled>
+        <name>contentDescription</name>
+        <number>8</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Optional|Mandatory|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategory>
+        <disabled>0</disabled>
+        <name>defaultCategory</name>
+        <number>4</number>
+        <prettyName>Default category</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultCategory>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>6</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <name>IRC.IRCLogMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>0f963aec-191e-4109-b806-cb2bada5d729</guid>
+    <property>
+      <code>{{velocity}}
+## ============================================
+## Compute the page name in which to log by executing the script located
+## at IRC.IRCConfiguration in an IRC.LoggingBotListener object
+## ============================================
+#set ($configDoc = $xwiki.getDocument("IRC.IRCConfiguration"))
+#set ($logListenerDoc = $xwiki.getDocument("IRC.LoggingBotListener"))
+#set ($data = $configDoc.getObject("IRC.LoggingBotListener"))
+#set ($pageScript = $data.getProperty("page").getValue())
+#set ($pageName = $logListenerDoc.getRenderedContent($pageScript, $logListenerDoc.syntax.toIdString(), "plain/1.0"))
+#set ($logDoc = $xwiki.getDocument($pageName))
+## ============================================
+## If the Doc doesn't exist, create it
+## ============================================
+#if ($logDoc.isNew())
+  ## ===========================================
+  ## Set the title (find the channel)
+  ## ===========================================
+  #set ($irccontext = $services.ircbot.context)
+  #if ("$!irccontext" != "")
+    #set ($channel = "$!irccontext.channel.name")
+    #if ("$!channel" == "")
+      #set ($channel = "$!irccontext.bot.channelsNames.iterator().next()")
+    #end
+    #set ($channel = $stringtool.stripStart($channel, '#'))
+  #end
+  #if ("$!channel" == "")
+    #set ($channel = "&lt;unknown&gt;")
+  #end
+  #set ($titleDate = $datetool.get('dd MMMM yyyy'))
+  #set ($discard = $logDoc.setTitle("IRC Archive for channel #$channel on $titleDate"))
+  ## ===========================================
+  ## Set other metadata
+  ## ===========================================
+  #set ($discard = $logDoc.setParent('IRC.WebHome'))
+  #set ($discard = $logDoc.setCreator('IRCBot'))
+  #set ($archiveClassName = 'IRC.IRCBotArchiveClass')
+  #set ($archiveObject = $logDoc.getObject($archiveClassName, true))
+  #set ($discard = $archiveObject.set('channel', $channel))
+#end
+## ============================================
+## Add the new content to the logging doc
+## ============================================
+#set ($currentContent = $logDoc.content)
+#set ($newContent = $xcontext.macro.content)
+#if ($currentContent &amp;&amp; $currentContent.length() &gt; 0)
+  #set ($logDate = $datetool.get('HH:mm'))
+  #set ($newContent = "$currentContent
+$logDate $newContent")
+#end
+#set ($discard = $logDoc.setContent($newContent))
+## ============================================
+## Save it!
+## ============================================
+#set ($discard = $logDoc.save("Logging from IRC", true))
+{{/velocity}}</code>
+    </property>
+    <property>
+      <contentDescription>The content to add to the IRC log document</contentDescription>
+    </property>
+    <property>
+      <contentType>Mandatory</contentType>
+    </property>
+    <property>
+      <defaultCategory/>
+    </property>
+    <property>
+      <description>Adds a log entry in the IRC Archive for a channel</description>
+    </property>
+    <property>
+      <id>irclog</id>
+    </property>
+    <property>
+      <name>IRC Log</name>
+    </property>
+    <property>
+      <supportsInlineMode>1</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

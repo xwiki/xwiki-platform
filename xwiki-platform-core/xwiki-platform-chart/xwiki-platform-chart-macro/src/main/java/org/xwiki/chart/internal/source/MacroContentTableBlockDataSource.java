@@ -61,9 +61,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
     @Inject
     private DocumentAccessBridge docBridge;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
         throws MacroExecutionException
     {
@@ -76,7 +74,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         // Parse the macro content into an XDOM.
         XDOM xdom;
         try {
-            Parser parser = componentManager.lookup(Parser.class,
+            Parser parser = componentManager.getInstance(Parser.class,
                 docBridge.getDocument(this.docBridge.getCurrentDocumentReference()).getSyntax().toIdString());
             xdom = parser.parse(new StringReader(macroContent));
         } catch (Exception ex) {

@@ -40,7 +40,7 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     @Override
     protected void registerComponents() throws Exception
     {
-        this.filter = getComponentManager().lookup(VelocityMacroFilter.class, "html");
+        this.filter = getComponentManager().getInstance(VelocityMacroFilter.class, "html");
         this.context = new VelocityContext();
     }
 

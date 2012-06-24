@@ -37,6 +37,7 @@ public class InlineAction extends XWikiAction
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(InlineAction.class);
 
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = context.getDoc();
@@ -48,7 +49,7 @@ public class InlineAction extends XWikiAction
             Document vcdoc = (Document) vcontext.get("cdoc");
             EditForm peform = (EditForm) form;
 
-            XWikiDocument doc2 = (XWikiDocument) doc.clone();
+            XWikiDocument doc2 = doc.clone();
             Document vdoc2 = doc2.newDocument(context);
             context.put("doc", doc2);
             vcontext.put("doc", vdoc2);
@@ -76,7 +77,7 @@ public class InlineAction extends XWikiAction
                 vcontext.put("cdoc", vdoc2);
             } else {
                 XWikiDocument cdoc = vcdoc.getDocument();
-                XWikiDocument cdoc2 = (XWikiDocument) cdoc.clone();
+                XWikiDocument cdoc2 = cdoc.clone();
                 vcontext.put("cdoc", cdoc2.newDocument(context));
                 cdoc2.readFromTemplate(peform, context);
             }

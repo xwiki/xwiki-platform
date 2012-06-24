@@ -51,11 +51,6 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 
     private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -64,6 +59,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
         Mock mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         mockXWiki.stubs().method("getDocument").will(new CustomStub("Implements XWiki.getDocument")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 String docFullName = (String) invocation.parameterValues.get(0);
@@ -79,6 +75,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
         mockXWiki.stubs().method("saveDocument").will(new CustomStub("Implements XWiki.saveDocument")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -91,6 +88,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
         mockXWiki.stubs().method("getClass").will(new CustomStub("Implements XWiki.getClass")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 String classFullName = (String) invocation.parameterValues.get(0);
@@ -98,11 +96,12 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 
                 XWikiDocument doc = context.getWiki().getDocument(classFullName, context);
 
-                return doc.getxWikiClass();
+                return doc.getXClass();
             }
         });
         mockXWiki.stubs().method("getXClass").will(new CustomStub("Implements XWiki.getClass")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 DocumentReference classReference = (DocumentReference) invocation.parameterValues.get(0);
@@ -111,11 +110,12 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
                 XWikiDocument doc = context.getWiki().getDocument(
                     classReference.getLastSpaceReference().getName() + "." + classReference.getName(), context);
 
-                return doc.getxWikiClass();
+                return doc.getXClass();
             }
         });
         mockXWiki.stubs().method("clearName").will(new CustomStub("Implements XWiki.clearName")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 return invocation.parameterValues.get(0);
@@ -433,7 +433,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         assertFalse(doc.isNew());
 
-        BaseClass baseclass = doc.getxWikiClass();
+        BaseClass baseclass = doc.getXClass();
 
         assertEquals(xclass.getClassFullName(), baseclass.getName());
 

@@ -19,15 +19,16 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.watchlist.WatchListStore.ElementType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
@@ -333,7 +334,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public List<String> getWatchedDocuments() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.DOCUMENT, context);
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.DOCUMENT,
+                this.context);
+        } catch (XWikiException ex) {
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -344,7 +350,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public List<String> getWatchedSpaces() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.SPACE, context);
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.SPACE,
+                this.context);
+        } catch (XWikiException ex) {
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -355,9 +366,14 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public List<String> getWatchedWikis() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.WIKI, context);
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.WIKI,
+                this.context);
+        } catch (XWikiException ex) {
+            return Collections.emptyList();
+        }
     }
-    
+
     /**
      * Get the list of users watched by the current user.
      * 
@@ -366,7 +382,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public List<String> getWatchedUsers() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.USER, context);
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.USER,
+                this.context);
+        } catch (XWikiException ex) {
+            return Collections.emptyList();
+        }
     }
 
     /**

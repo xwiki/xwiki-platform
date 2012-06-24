@@ -35,11 +35,6 @@ public class RegisterAction extends XWikiAction
     /** Name of the corresponding template and URL parameter. */
     private static final String REGISTER = "register";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiAction#action(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -77,11 +72,6 @@ public class RegisterAction extends XWikiAction
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiAction#render(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

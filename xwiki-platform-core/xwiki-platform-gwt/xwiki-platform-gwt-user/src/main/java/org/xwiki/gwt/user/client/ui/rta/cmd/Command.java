@@ -255,31 +255,19 @@ public class Command
         this.name = name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#toString()
-     */
+    @Override
     public String toString()
     {
         return name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
+    @Override
     public int hashCode()
     {
         return name == null ? super.hashCode() : name.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) {

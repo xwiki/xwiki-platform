@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.store;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,7 +32,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * @version $Id$
  * @since 1.4M2
  */
-@ComponentRole
+@Role
 public interface AttachmentVersioningStore
 {
     /**

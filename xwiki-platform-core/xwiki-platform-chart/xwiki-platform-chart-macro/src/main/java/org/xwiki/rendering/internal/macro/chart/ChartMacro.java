@@ -103,17 +103,13 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Block> execute(ChartMacroParameters macroParams, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -152,7 +148,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         String source = paramsMap.get("source");
         File chartFile;
         try {
-            ChartDataSource dataSource = this.componentManager.lookup(ChartDataSource.class, source);
+            ChartDataSource dataSource = this.componentManager.getInstance(ChartDataSource.class, source);
             byte[] chart =
                 this.chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
             chartFile = getChartImageFile(parameters);

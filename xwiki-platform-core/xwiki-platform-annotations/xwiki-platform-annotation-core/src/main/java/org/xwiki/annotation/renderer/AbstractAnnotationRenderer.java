@@ -68,11 +68,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
      */
     protected AnnotationGeneratorChainingListener annotationsGenerator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         ListenerChain chain = new ListenerChain();
@@ -120,11 +116,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
      */
     public abstract LinkLabelGenerator getLinkLabelGenerator();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.renderer.AnnotationPrintRenderer#setAnnotations(java.util.Collection)
-     */
+    @Override
     public void setAnnotations(Collection<Annotation> annotations)
     {
         this.annotationsGenerator.setAnnotations(annotations);

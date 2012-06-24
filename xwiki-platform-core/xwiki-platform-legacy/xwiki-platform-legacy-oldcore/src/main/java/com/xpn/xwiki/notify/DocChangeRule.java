@@ -62,12 +62,7 @@ public class DocChangeRule implements XWikiNotificationRule
         this.target = target;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.notify.XWikiNotificationRule#verify(com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
         if (!isPostverify()) {
@@ -83,12 +78,7 @@ public class DocChangeRule implements XWikiNotificationRule
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.notify.XWikiNotificationRule#preverify(com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
         if (!isPreverify()) {
@@ -104,22 +94,12 @@ public class DocChangeRule implements XWikiNotificationRule
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.notify.XWikiNotificationRule#verify(com.xpn.xwiki.doc.XWikiDocument, java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void verify(XWikiDocument doc, String action, XWikiContext context)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.notify.XWikiNotificationRule#preverify(com.xpn.xwiki.doc.XWikiDocument, java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void preverify(XWikiDocument doc, String action, XWikiContext context)
     {
     }

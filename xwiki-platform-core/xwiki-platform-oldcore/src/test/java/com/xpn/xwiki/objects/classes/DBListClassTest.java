@@ -41,6 +41,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
 {
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -58,6 +59,7 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
         mockXWikiRenderingEngine.stubs().method("interpretText").will(
             new CustomStub("Implements XWikiRenderingEngine.interpretText")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return invocation.parameterValues.get(0);

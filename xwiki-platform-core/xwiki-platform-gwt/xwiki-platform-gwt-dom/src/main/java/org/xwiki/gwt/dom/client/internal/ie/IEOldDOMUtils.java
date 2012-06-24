@@ -112,12 +112,6 @@ public class IEOldDOMUtils extends IEDOMUtils
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IEDOMUtils#setInnerHTML(Element, String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
-     */
     @Override
     public void setInnerHTML(Element element, String html)
     {
@@ -188,6 +182,7 @@ public class IEOldDOMUtils extends IEDOMUtils
      * @see IEDOMUtils#hasAttribute(Element, String)
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=4690
      */
+    @Override
     public boolean hasAttribute(Element element, String attributeName)
     {
         Attribute attribute = element.getAttributeNode(attributeName);
@@ -256,6 +251,7 @@ public class IEOldDOMUtils extends IEDOMUtils
      * 
      * @see IEDOMUtils#removeProperty(Element, String)
      */
+    @Override
     public void removeProperty(Element element, String propertyName)
     {
         super.removeProperty(element, propertyName);

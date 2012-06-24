@@ -19,9 +19,9 @@
  */
 package org.xwiki.officeimporter.splitter;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -33,35 +33,35 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 public class TargetDocumentDescriptor
 {
     /**
-     * The "default" component role hint.
+     * Target document reference.
      */
-    private static final String DEFAULT_COMPONENT_HINT = "default";
+    private final DocumentReference documentReference;
 
     /**
-     * Name of the target document referencee.
+     * The object used to serialize entity references.
      */
-    private DocumentReference documentReference;
+    private EntityReferenceSerializer<String> serializer;
 
     /**
-     * Name of the parent document refernce.
+     * Parent document reference.
      */
     private DocumentReference parentReference;
-
-    /**
-     * Component manager used to lookup for various name serializers.
-     */
-    private ComponentManager componentManager;
 
     /**
      * Creates a new {@link TargetDocumentDescriptor} instance.
      * 
      * @param documentReference reference of the target document
-     * @param componentManager used to lookup for various name serializers.
+     * @param componentManager used to lookup the entity reference serializer
      */
     public TargetDocumentDescriptor(DocumentReference documentReference, ComponentManager componentManager)
     {
         this.documentReference = documentReference;
-        this.componentManager = componentManager;
+        try {
+            this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        } catch (ComponentLookupException e) {
+            // Shouldn't happen.
+            this.serializer = null;
+        }
     }
 
     /**
@@ -77,7 +77,7 @@ public class TargetDocumentDescriptor
      */
     public String getDocumentReferenceAsString()
     {
-        return serializeDocumentRefefence(getDocumentReference(), DEFAULT_COMPONENT_HINT);
+        return serializer.serialize(getDocumentReference());
     }
 
     /**
@@ -93,8 +93,7 @@ public class TargetDocumentDescriptor
      */
     public String getParentReferenceAsString()
     {
-        return (null != getParentReference()) ? serializeDocumentRefefence(
-            getParentReference(), DEFAULT_COMPONENT_HINT) : null;
+        return (null != getParentReference()) ? serializer.serialize(getParentReference()) : null;
     }
 
     /**
@@ -107,28 +106,7 @@ public class TargetDocumentDescriptor
         this.parentReference = parentReference;
     }
 
-    /**
-     * Utility method for serializing a {@link org.xwiki.model.reference.DocumentReference}.
-     * 
-     * @param documentReference document reference
-     * @param serializerHint which serializer to use.
-     * @return string representation of a document reference
-     */
-    private String serializeDocumentRefefence(DocumentReference documentReference, String serializerHint)
-    {
-        try {
-            EntityReferenceSerializer<String> serializer =
-                this.componentManager.lookup(EntityReferenceSerializer.class, serializerHint);
-            return serializer.serialize(documentReference);
-        } catch (ComponentLookupException ex) {
-            // TODO: put a descriptive comment.
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean equals(Object obj)
     {
         boolean equals = false;
@@ -139,9 +117,7 @@ public class TargetDocumentDescriptor
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int hashCode()
     {
         return getDocumentReference().hashCode();

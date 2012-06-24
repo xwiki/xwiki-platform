@@ -76,7 +76,7 @@ public class DefaultCacheManager implements CacheManager
      */
     public CacheFactory getCacheFactory(String cacheHint) throws ComponentLookupException
     {
-        return this.componentManager.lookup(CacheFactory.class, cacheHint);
+        return this.componentManager.getInstance(CacheFactory.class, cacheHint);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class DefaultCacheManager implements CacheManager
     {
         CacheFactory cacheFactory;
         try {
-            cacheFactory = this.componentManager.lookup(CacheFactory.class, cacheHint);
+            cacheFactory = this.componentManager.getInstance(CacheFactory.class, cacheHint);
         } catch (ComponentLookupException e) {
             throw new CacheException("Failed to get cache factory for role hint [" + cacheHint + "]", e);
         }

@@ -76,7 +76,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
         new DocumentCreatedEvent(), new DocumentDeletedEvent(), new AttachmentAddedEvent(),
-        new AttachmentDeletedEvent());
+        new AttachmentDeletedEvent(), new AttachmentUpdatedEvent());
 
     /**
      * Collecting all the fields for using up in search
@@ -373,32 +373,19 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         return retval;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return EVENTS;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiContext context = (XWikiContext) data;

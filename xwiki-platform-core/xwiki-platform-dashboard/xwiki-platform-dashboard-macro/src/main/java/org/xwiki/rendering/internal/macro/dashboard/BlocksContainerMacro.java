@@ -64,13 +64,6 @@ class BlocksContainerMacro extends AbstractContainerMacro<ContainerMacroParamete
             null, ContainerMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.AbstractContainerMacro
-     *      #getContent(org.xwiki.rendering.macro.container.ContainerMacroParameters, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected List<Block> getContent(ContainerMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
@@ -81,6 +74,7 @@ class BlocksContainerMacro extends AbstractContainerMacro<ContainerMacroParamete
     /**
      * @return the componentManager used by this macro to find components.
      */
+    @Override
     public ComponentManager getComponentManager()
     {
         return componentManager;

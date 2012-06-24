@@ -27,29 +27,24 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
   <name>XWiki Platform - Rendering - Macro - Groovy</name>
   <description>XWiki Platform - Rendering - Macro - Groovy</description>
   <dependencies>
+    <!-- Note: We could only depend on xwiki-commons-groovy but since we want everyone to depend on the Groovy Macro
+         to also have all customizers defined in xwiki-platform-groovy we have added a dependency on it instead -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-groovy</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-    </dependency>
-    <!-- Adding a dependency on Ivy since groovy-all only has an optional dependency on it and since we want to bundle
-         it so that XWiki users scripting in Groovy can use Grapes out of the box. -->
-    <dependency>
-      <groupId>org.apache.ivy</groupId>
-      <artifactId>ivy</artifactId>
-      <version>2.2.0</version>
-    </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

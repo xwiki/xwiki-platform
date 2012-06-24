@@ -80,6 +80,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
         super.registerComponents();
     }
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -90,10 +91,10 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
         getContext().setWiki(mockXWiki);
 
-        this.xwiki20Parser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
+        this.xwiki20Parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
 
         this.wikiMacroDocumentReference = new DocumentReference(getContext().getDatabase(), "space", "macroPage");
-        this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
+        this.wikiMacroManager = getComponentManager().getInstance(WikiMacroManager.class);
 
         this.wikiMacroDocument = new XWikiDocument(wikiMacroDocumentReference);
 
@@ -156,7 +157,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     {
         registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         converter.convert(new StringReader("{{wikimacrobindings param1=\"value2\" param2=\"value2\"/}}"),
@@ -171,7 +172,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     {
         registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
 
-        Converter converter = getComponentManager().lookup(Converter.class);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
 

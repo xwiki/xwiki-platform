@@ -63,27 +63,20 @@ public abstract class AbstractInteractiveWizardStep extends AbstractNavigationAw
      * 
      * @see AbstractNavigationAwareWizardStep#display()
      */
+    @Override
     public FlowPanel display()
     {
         return panel;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#isAutoSubmit()
-     */
+    @Override
     public final boolean isAutoSubmit()
     {
         // This step has a panel for a reason.
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#getStepTitle()
-     */
+    @Override
     public String getStepTitle()
     {
         return title;

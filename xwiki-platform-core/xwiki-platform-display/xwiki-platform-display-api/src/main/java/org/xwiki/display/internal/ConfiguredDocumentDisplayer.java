@@ -85,12 +85,12 @@ public class ConfiguredDocumentDisplayer implements DocumentDisplayer
     {
         String documentDisplayerHint = displayConfiguration.getDocumentDisplayerHint();
         try {
-            return componentManager.lookup(DocumentDisplayer.class, documentDisplayerHint);
+            return componentManager.getInstance(DocumentDisplayer.class, documentDisplayerHint);
         } catch (ComponentLookupException e) {
             logger.warn("Failed to lookup document displayer with hint [{}]. Using default document displayer.",
                 documentDisplayerHint);
             try {
-                return componentManager.lookup(DocumentDisplayer.class);
+                return componentManager.getInstance(DocumentDisplayer.class);
             } catch (ComponentLookupException ex) {
                 throw new RuntimeException("Failed to lookup default document displayer.", ex);
             }

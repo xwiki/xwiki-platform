@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.query;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -37,10 +36,9 @@ import com.xpn.xwiki.XWikiContext;
  * A provider of QueryExecutor. Allows providing of a QueryExecutor defined by the configuration.
  * 
  * @version $Id$
- * @since 3.2M2
+ * @since 4.0M1
  */
 @Component
-@Named("queryExecutor")
 @Singleton
 public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 {
@@ -84,7 +82,7 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 
         final String storeName = context.getWiki().Param("xwiki.store.main.hint", "default");
         try {
-            this.queryExecutor = this.manager.lookup(QueryExecutor.class, storeName);
+            this.queryExecutor = this.manager.getInstance(QueryExecutor.class, storeName);
         } catch (ComponentLookupException e) {
             this.logger.warn(
                 "Could not find a QueryExecutor with hint " + storeName + " which is the hint for the storage engine. "

@@ -27,22 +27,18 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.KeyboardAdaptor;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 
 /**
  * Handles the keyboard events concerning read-only regions inside the rich text area.
  * 
  * @version $Id$
  */
-public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler, KeyUpHandler
+public class ReadOnlyKeyboardHandler extends KeyboardAdaptor
 {
     /**
      * The list of key codes that are allowed on the read-only regions.
@@ -61,90 +57,14 @@ public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler,
      */
     private final ReadOnlyUtils readOnlyUtils = new ReadOnlyUtils();
 
-    /**
-     * Flag used to avoid handling both KeyDown and KeyPress events. This flag is needed because of the inconsistencies
-     * between browsers regarding keyboard events. For instance IE doesn't generate the KeyPress event for backspace key
-     * and generates multiple KeyDown events while a key is hold down. On the contrary, FF generates the KeyPress event
-     * for the backspace key and generates just one KeyDown event while a key is hold down. FF generates multiple
-     * KeyPress events when a key is hold down.
-     */
-    private boolean ignoreNextKeyPress;
-
-    /**
-     * Flag used to prevent the default browser behavior for the KeyPress event when the KeyDown event has been
-     * canceled. This is needed only in functional tests where keyboard events (KeyDown, KeyPress, KeyUp) are triggered
-     * independently and thus canceling KeyDown doesn't prevent the default KeyPress behavior. Without this flag, and
-     * because we have to handle the KeyDown event besides the KeyPress in order to overcome cross-browser
-     * inconsistencies, simulating keyboard typing in functional tests would trigger our custom behavior but also the
-     * default browser behavior.
-     */
-    private boolean cancelNextKeyPress;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
-    public void onKeyDown(KeyDownEvent event)
+    @Override
+    protected void handleRepeatableKey(Event event)
     {
-        ignoreNextKeyPress = true;
-        handleRepeatableKey((Event) event.getNativeEvent());
-        cancelNextKeyPress = ((Event) event.getNativeEvent()).isCancelled();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
-    public void onKeyPress(KeyPressEvent event)
-    {
-        if (!ignoreNextKeyPress) {
-            handleRepeatableKey((Event) event.getNativeEvent());
-        } else if (cancelNextKeyPress) {
-            ((Event) event.getNativeEvent()).xPreventDefault();
+        if (event.getKeyCode() == KeyCodes.KEY_BACKSPACE || event.getKeyCode() == KeyCodes.KEY_DELETE) {
+            onDelete(event);
+        } else if (!NON_PRINTING_KEY_CODES.contains(event.getKeyCode())) {
+            onTyping(event);
         }
-        ignoreNextKeyPress = false;
-        cancelNextKeyPress = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
-    public void onKeyUp(KeyUpEvent event)
-    {
-        ignoreNextKeyPress = false;
-        cancelNextKeyPress = false;
-        handleKeyRelease((Event) event.getNativeEvent());
-    }
-
-    /**
-     * Handles a repeatable key press.
-     * 
-     * @param event the native event that was fired
-     */
-    private void handleRepeatableKey(Event event)
-    {
-        // Don't handle the key if the event was canceled by a different party.
-        if (!event.isCancelled()) {
-            if (event.getKeyCode() == KeyCodes.KEY_BACKSPACE || event.getKeyCode() == KeyCodes.KEY_DELETE) {
-                onDelete(event);
-            } else if (!NON_PRINTING_KEY_CODES.contains(event.getKeyCode())) {
-                onTyping(event);
-            }
-        }
-    }
-
-    /**
-     * Handles a key release.
-     * 
-     * @param event the native event that was fired
-     */
-    private void handleKeyRelease(Event event)
-    {
-        // Ignore.
     }
 
     /**
@@ -297,8 +217,140 @@ public class ReadOnlyKeyboardHandler implements KeyDownHandler, KeyPressHandler,
     private void onTyping(Event event)
     {
         Document document = Element.as(event.getEventTarget()).getOwnerDocument().cast();
-        if (readOnlyUtils.isSelectionBoundaryInsideReadOnlyElement(document)) {
+        Range range = document.getSelection().getRangeAt(0);
+        if (isBoundary(range)) {
+            Element readOnlyContainer = readOnlyUtils.getClosestReadOnlyAncestor(range.getStartContainer());
+            if (readOnlyContainer != null) {
+                int readOnlyBoundary = isBoundary(range, readOnlyContainer);
+                if (readOnlyBoundary == 0) {
+                    event.xPreventDefault();
+                } else {
+                    // Allow typing if the caret is at the boundary of a read-only area, by moving the caret outside.
+                    moveCaretOutside(readOnlyContainer, readOnlyBoundary < 0);
+                }
+            }
+        } else if (readOnlyUtils.isRangeBoundaryInsideReadOnlyElement(range)) {
             event.xPreventDefault();
         }
+    }
+
+    /**
+     * @param range a DOM range
+     * @return {@code true} if the given range is collapsed between two DOM nodes or at the start/end of a text node,
+     *         {@code false} otherwise
+     */
+    private boolean isBoundary(Range range)
+    {
+        return range.isCollapsed()
+            && (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE || range.getStartOffset() == 0 || range
+                .getStartOffset() == range.getStartContainer().getNodeValue().length());
+    }
+
+    /**
+     * NOTE: We assume {@link #isBoundary(Range)} returns {@code true} for the given range.
+     * 
+     * @param caret a collapsed range within the given container
+     * @param container a DOM node <strong>containing</strong> the caret
+     * @return {@code -1} if the caret is at the start of the given node before any visible content, {@code 1} if it is
+     *         at the end after all visible content, {@code 0} otherwise
+     */
+    private int isBoundary(Range caret, Element container)
+    {
+        Range betweenNodes = caret;
+        // Make sure the caret is between DOM nodes and not inside a text node.
+        if (!domUtils.canHaveChildren(caret.getStartContainer())) {
+            betweenNodes = caret.cloneRange();
+            betweenNodes.selectNode(caret.getStartContainer());
+            betweenNodes.collapse(caret.getStartOffset() == 0);
+        }
+        if (!hasVisibleContentBefore(container, betweenNodes)) {
+            return -1;
+        } else if (!hasVisibleContentAfter(container, betweenNodes)) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * @param container a DOM node
+     * @param caret specifies a position within the given container, <strong>between</strong> DOM nodes
+     * @return {@code true} if the given container has visible content before the caret position, {@code false}
+     *         otherwise
+     */
+    private boolean hasVisibleContentBefore(Node container, Range caret)
+    {
+        Node leaf = domUtils.getPreviousLeaf(caret);
+        if (leaf == null || !container.isOrHasChild(leaf)) {
+            // We jumped outside of the container without finding any leaf.
+            return false;
+        }
+        // Move backward looking for a visible leaf, taking care not to jump over the first leaf.
+        Node firstLeaf = domUtils.getFirstLeaf(container);
+        while (!isVisible(leaf)) {
+            if (leaf == firstLeaf) {
+                return false;
+            }
+            leaf = domUtils.getPreviousLeaf(leaf);
+        }
+        return true;
+    }
+
+    /**
+     * @param container a DOM node
+     * @param caret specifies a position within the given container, <strong>between</strong> DOM nodes
+     * @return {@code true} if the given container has visible content after the caret position, {@code false} otherwise
+     */
+    private boolean hasVisibleContentAfter(Node container, Range caret)
+    {
+        Node leaf = domUtils.getNextLeaf(caret);
+        if (leaf == null || !container.isOrHasChild(leaf)) {
+            // We jumped outside of the container without finding any leaf.
+            return false;
+        }
+        // Move forward looking for a visible leaf, taking care not to jump over the last leaf.
+        Node lastLeaf = domUtils.getLastLeaf(container);
+        while (!isVisible(leaf)) {
+            if (leaf == lastLeaf) {
+                return false;
+            }
+            leaf = domUtils.getNextLeaf(leaf);
+        }
+        return true;
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is visible, {@code false} otherwise
+     */
+    private boolean isVisible(Node node)
+    {
+        if (node == null) {
+            return false;
+        }
+        switch (node.getNodeType()) {
+            case Node.ELEMENT_NODE:
+                return "br".equalsIgnoreCase(node.getNodeName()) || Element.as(node).getOffsetWidth() > 0;
+            case Node.TEXT_NODE:
+                return node.getNodeValue().length() > 0 && isVisible(node.getParentNode());
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Places the caret outside of the specified node, either before or after.
+     * 
+     * @param node a DOM node
+     * @param before {@code true} to place the caret before the given node, {@code false} to place it after
+     */
+    protected void moveCaretOutside(Node node, boolean before)
+    {
+        Document document = node.getOwnerDocument().cast();
+        Range range = document.createRange();
+        range.selectNode(node);
+        range.collapse(before);
+        Selection selection = document.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 }

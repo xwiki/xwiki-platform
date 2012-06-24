@@ -1,58 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>AppWithinMinutes</web>
-<name>Pickers</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>AppWithinMinutes.FormFieldCategoryClass</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1318184030000</creationDate>
-<date>1318495355000</date>
-<contentUpdateDate>1318495355000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('platform.appwithinminutes.classEditorPickersCategoryName')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>AppWithinMinutes.FormFieldCategoryClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<priority>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>priority</name>
-<number>1</number>
-<numberType>long</numberType>
-<prettyName>Priority</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-</priority>
-</class>
-<name>AppWithinMinutes.Pickers</name>
-<number>0</number>
-<className>AppWithinMinutes.FormFieldCategoryClass</className>
-<guid>b7294eee-7373-418d-9532-d12bacf40948</guid>
-<property>
-<priority>1</priority>
-</property>
-</object>
-<content></content></xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>Pickers</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1318184030000</creationDate>
+  <date>1318495355000</date>
+  <contentUpdateDate>1318495355000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('platform.appwithinminutes.classEditorPickersCategoryName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>AppWithinMinutes.FormFieldCategoryClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <priority>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>1</number>
+        <numberType>long</numberType>
+        <prettyName>Priority</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
+    </class>
+    <name>AppWithinMinutes.Pickers</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldCategoryClass</className>
+    <guid>b7294eee-7373-418d-9532-d12bacf40948</guid>
+    <property>
+      <priority>1</priority>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

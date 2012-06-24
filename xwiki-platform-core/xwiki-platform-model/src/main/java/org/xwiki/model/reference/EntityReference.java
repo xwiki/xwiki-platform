@@ -329,24 +329,48 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * Return a clone of this reference, but with one of its parent replaced by another one.
      *
      * @param oldParent the old parent that will be replaced
-     * @param newParent the new parent that will replace oldParent in the chain
+     * @param newParent the new parent that will replace oldParent in the chain. If the same as oldParent,
+     *                  this is returned.
      * @return a new reference with a amended parent chain
      * @since 3.3M2
      */
     public EntityReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
+        if (oldParent == newParent) {
+            return this;
+        }
         return new EntityReference(this, oldParent, newParent);
     }
 
     /**
      * Return a clone of this reference with a parent appended at the root of its parents chain.
      *
-     * @param newParent the parent that became the root parent of this reference (and its parent)
+     * @param newParent the parent that became the root parent of this reference (and its parent).
+     *                  If null, this is returned.
      * @return a new reference with newParent added to its parent chain
      */
     public EntityReference appendParent(EntityReference newParent)
     {
-        return this.replaceParent(null, newParent);
+        if (newParent == null) {
+            return this;
+        }
+        return new EntityReference(this, null, newParent);
+    }
+
+    /**
+     * Return a clone of this reference truncated to a null parent when it reach the given parent.
+     * It is very similar to replaceParent(parent, null), except that it is not overridden.
+     *
+     * @param oldParent the parent that will be replaced by a null. If null, this is returned.
+     * @return a new reference with oldParent and its descendant removed from its parent chain
+     * @since 4.0M2
+     */
+    public EntityReference removeParent(EntityReference oldParent)
+    {
+        if (oldParent == null) {
+            return this;
+        }
+        return new EntityReference(this, oldParent, null);
     }
 
     @Override

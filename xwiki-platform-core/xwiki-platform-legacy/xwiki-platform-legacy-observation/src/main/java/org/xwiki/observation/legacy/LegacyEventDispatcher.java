@@ -73,17 +73,13 @@ public class LegacyEventDispatcher implements EventListener
      */
     private ObservationManager observationManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "legacyEventDispatcher";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getEvents()
     {
         return new ArrayList<Event>()
@@ -97,9 +93,7 @@ public class LegacyEventDispatcher implements EventListener
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof DocumentDeletedEvent) {
@@ -128,7 +122,7 @@ public class LegacyEventDispatcher implements EventListener
             return this.observationManager;
         }
         try {
-            this.observationManager = this.componentManager.lookup(ObservationManager.class);
+            this.observationManager = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to lookup observation manager", e);
         }

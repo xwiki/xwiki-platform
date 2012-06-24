@@ -218,7 +218,7 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 #macro(resizedUserAvatar $username $size)
   #if(!$picturelist)
-    #set($picturelist = $util.hashMap)
+    #set($picturelist = {})
   #end
   #if(!$picturelist.containsKey("${username}--${size}"))
     #set($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
@@ -295,7 +295,7 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   ## Map mimetypes to their corresponding icons
   #if(!$mimetypeMap)
-    #set($mimetypeMap = $util.hashMap)
+    #set($mimetypeMap = {})
     ## images
     #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'svg']))
     #set($discard = $mimetypeMap.put('application/svg+xml',                ['vector', 'svg']))
@@ -326,7 +326,7 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   #if(!$extensionMap)
     ## Map extensions to their corresponding icons
-    #set($extensionMap = $util.hashMap)
+    #set($extensionMap = {})
     ## media
     #set($discard = $extensionMap.put('ogg',      ['music', 'audio']))
     #set($discard = $extensionMap.put('flac',     ['music', 'audio']))
@@ -463,7 +463,7 @@ $fn
 ###
 #macro(footnote $text)
 #if(!$page_footnotes)
-#set($page_footnotes = $util.arrayList)
+#set($page_footnotes = [])
 #set($footnote_group_id = 1)
 #end
 #set($discard = $page_footnotes.add($text))
@@ -545,14 +545,14 @@ $fn
   ## Reuse existing variable, in case it is manually overriden somewhere else
   #if(!$itemsPerPage)
     #if($request.ipp)
-      #set($itemsPerPage = $util.parseInt($request.ipp))
+      #set($itemsPerPage = $mathtool.toInteger($request.ipp))
     #else
       #set($itemsPerPage = $defaultItemsPerPage)
     #end
   #end
   ## Page numbers start at 1 outside this macro, but for internal computations we use 0-indexed values.
-  #set($currentPageNumber = $util.parseInt($request.page) - 1)
-  #if($currentPageNumber < 0)
+  #set($currentPageNumber = $mathtool.toInteger($request.page) - 1)
+  #if(!$currentPageNumber || $currentPageNumber < 0)
     #set($currentPageNumber = 0)
   #end
   ## The first item to show. Must be >= 0.
@@ -599,7 +599,7 @@ $fn
  * @param $withPageBreaks a boolean indicating whether a page break should be generated before each new child document
  *###
 #macro(includeChildren $page $withPageBreaks)
-  #if ($clevel > 0)
+  #if ($clevel && $clevel > 0)
     #if ("$!page.fullName" == '')
       ## Not a Document, probably a String (document name)
       ## Make it backwards compatible with older versions of the macro
@@ -623,7 +623,7 @@ $fn
 ##
 ## Macro to include linked pages at multiple levels
 #macro(includeLinks $page $withPageBreaks)
- #if($clevel!=0)
+ #if($clevel && $clevel!=0)
   #set($pageDoc = $xwiki.getDocument($page))
   #foreach($child in $pageDoc.getLinks())
     #set($childDocName = $child.getLink())
@@ -1040,7 +1040,7 @@ $html
  * @param blacklistedSpaces spaces to exclude from the list.
  *#
 #macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
-  #set($documentList = $util.getArrayList())
+  #set($documentList = [])
   #foreach($docName in $docNames)
     #if($xwiki.hasAccessLevel("view", $xcontext.user, $docName))
       #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
@@ -1083,7 +1083,7 @@ $html
 #macro(setVariableFromRequest $variable $parameterName $defaultValue)
   ## Trick: when null, "$variable" will print the actual parameter name, so "$abc" if the macro was called with $abc as a parameter.
   ## Use this hack to extract the actual parameter name, and use #evaluate to set it.
-  #set ($variable = $util.null)
+  #set ($variable = $NULL)
   #set ($varName = "$variable")
   #readVariableFromRequest($varName $parameterName $defaultValue)
 #end
@@ -1117,13 +1117,13 @@ $html
       #if ($defaultValue.class == 'class java.lang.Boolean')
         #set ($result = $util.parseBoolean($result))
       #elseif ($defaultValue.class == 'class java.lang.Integer')
-        #set ($result = $util.parseInt($result))
+        #set ($result = $mathtool.toInteger($result))
       #elseif ($defaultValue.class == 'class java.lang.Float')
-        #set ($result = $util.parseFloat($result))
+        #set ($result = $mathtool.toNumber($result).floatValue())
       #elseif ($defaultValue.class == 'class java.lang.Long')
-        #set ($result = $util.parseLong($result))
+        #set ($result = $mathtool.toNumber($result).longValue())
       #elseif ($defaultValue.class == 'class java.lang.Double')
-        #set ($result = $util.parseDouble($result))
+        #set ($result = $mathtool.toDouble($result))
       #end
     #end
     #if ("$!result" == '')
@@ -1502,8 +1502,8 @@ function (row, i, table) {
   var tr = new Element("tr");
   if (row["doc_viewable"]) {
   #foreach($colname in $collist)
-    // $colname
     #set($colprop = $colprops.get($colname))
+    // $colname
     #if("$!colprop.type"!="hidden")
       #if($colname.indexOf("doc.")==0)
         #set($jscolname = $colname.replaceAll("doc.", "doc_"))
@@ -1604,6 +1604,8 @@ function (row, i, table) {
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
     var name = page.substring(p + 1);
     #foreach($colname in $collist)
+      // $colname
+      #set($colprop = $colprops.get($colname))
       #if("$!colprop.type"!="hidden")
         #if($colname.indexOf("doc.")==0)
          #set($jscolname = $colname.replaceAll("doc.", "doc_"))
@@ -1700,17 +1702,19 @@ function (row, i, table) {
     #set($parameters.hash = "${escapetool.H}${parameters.hash}")
   #end
   ## Get starting item number from request
-  #set($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
-  ## If the value is missing or invalid, parseInt returns 0, which is the default first item.
-  #set($parameters.firstItem = $util.parseInt($parameters.firstItem))
-  ## Get number of items per page from request
-  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
-    #set($parameters.defaultItemsPerPage = 20)
+  #set ($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
+  #set ($parameters.firstItem = $mathtool.toInteger($parameters.firstItem))
+  #if (!$parameters.firstItem)
+    #set ($parameters.firstItem = 0)
   #end
-  #set($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
-  #set($parameters.itemsPerPage = $util.parseInt($parameters.itemsPerPage))
-  #if($parameters.itemsPerPage <= 0)
-    #set($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
+  ## Get number of items per page from request
+  #if (!$parameters.defaultItemsPerPage || $mathtool.toInteger($parameters.defaultItemsPerPage) <= 0)
+    #set ($parameters.defaultItemsPerPage = 20)
+  #end
+  #set ($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
+  #set ($parameters.itemsPerPage = $mathtool.toInteger($parameters.itemsPerPage))
+  #if (!$parameters.itemsPerPage || $parameters.itemsPerPage <= 0)
+    #set ($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
   #end
 #end
 #**
@@ -2019,7 +2023,7 @@ var $jsVarName = {
 #end
 #set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
 #set($ok = $parameters.put('convertInput', true))
-#set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', "xpage=wysiwyginput&token=${services.csrf.getToken()}")))
+#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', "xpage=wysiwyginput&token=${services.csrf.getToken()}")))
 #if($full)
   #set($ok = $parameters.put('displayTabs', $services.wysiwyg.config.isSourceEditorEnabled()))
   #if($parameters.displayTabs)
@@ -2041,6 +2045,7 @@ var $jsVarName = {
 #set($ok = $parameters.put('fontNames', $services.wysiwyg.config.getFontNames()))
 #set($ok = $parameters.put('fontSizes', $services.wysiwyg.config.getFontSizes()))
 #set($ok = $parameters.put('styleNames', $services.wysiwyg.config.getStyleNames()))
+#set($ok = $parameters.put('historySize', $services.wysiwyg.config.getHistorySize()))
 #set($ok = $parameters.put('wiki', $editedDocument.wiki))
 #set($ok = $parameters.put('space', $editedDocument.space))
 #set($ok = $parameters.put('page', $editedDocument.name))
@@ -2085,7 +2090,7 @@ Wysiwyg.onModuleLoad(function() {
   * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
   *#
 #macro(wysiwyg_editProperty $editedDocument $propertyId $full)
-#set($parameters = $util.hashMap)
+#set($parameters = {})
 #wysiwyg_storeConfig($parameters $editedDocument $propertyId $full)
 #wysiwyg_editPropertyCustom($editedDocument $parameters)
 #end
@@ -2118,7 +2123,7 @@ Wysiwyg.onModuleLoad(function() {
   * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
   *#
 #macro(wysiwyg_editProperties $editedDocument $propertyIds $full)
-#set($parameters = $util.hashMap)
+#set($parameters = {})
 #wysiwyg_storeConfig($parameters $editedDocument '' $full)
 #wysiwyg_editPropertiesCustom($editedDocument $propertyIds $parameters)
 #end
@@ -2131,7 +2136,7 @@ Wysiwyg.onModuleLoad(function() {
   * @param $parameters WYSIWYG editor configuration parameters
   *#
 #macro(wysiwyg_editPropertiesCustom $editedDocument $propertyIds $parameters)
-#set($instanceParameters = $util.hashMap)
+#set($instanceParameters = {})
 #set($ok = $instanceParameters.putAll($parameters))
 #set($propertyIds = "$!propertyIds")
 #foreach($propertyId in $propertyIds.split(","))
@@ -2231,6 +2236,24 @@ Wysiwyg.onModuleLoad(function() {
  *                'position' : stop position for the color (between 0% and 100% or a lenght)
  *#
 #macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
+  ## Older color themes don't have values defined for the gradients, so we'll use a simple background-color instead
+  #set ($validColors = 0)
+  #set ($validColor = '')
+  #foreach ($colorEntry in $gradientData.colors)
+    #if ("$!{colorEntry.color}" != '')
+      #set ($validColors = $validColors + 1)
+      #set ($validColor = $colorEntry.color)
+    #end
+  #end
+  #if ($validColors <= 1)
+    #if ("$!{icon}" != '')
+      background-image: ${icon};
+    #end
+    #if ("$!{validColor}" != '')
+      background-color: ${validColor};
+    #end
+    #break($macro)
+  #end
   #set ($browserVariants = ['-moz-', '-webkit-', '-o-', '-ms-', ''])
   #set ($colors = '')
   #if ($gradientData.angle)
@@ -2252,6 +2275,19 @@ Wysiwyg.onModuleLoad(function() {
 #macro (css3_backgroundLinearGradient $gradientData)
   #css3_backgroundIconAndLinearGradient ('' $gradientData)
 #end
+
+#**
+ * Macro that displays a gradient specific to IE browsers (IE6-IE9)
+ *
+ * @param $startColor initial color for a gradient, format #AARRGGBB, range from #FF000000 to #FFFFFFFF
+ * @param $endColor final color for the gradient
+ *#
+#macro (css_filterGradient $startColor $endColor)
+  #if (("$!{startColor}" != '') && ("$!{endColor}" != ''))
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=${startColor}, endColorstr=${endColor},GradientType=0 );
+  #end
+#end
+
 #**
  * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
  *

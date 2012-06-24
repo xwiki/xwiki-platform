@@ -45,13 +45,14 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
     private CommonsConfigurationSource source;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
         this.source = new CommonsConfigurationSource();
-        ConverterManager converterManager = getComponentManager().lookup(ConverterManager.class);
+        ConverterManager converterManager = getComponentManager().getInstance(ConverterManager.class);
         ReflectionUtils.setFieldValue(source, "converterManager", converterManager);
         this.configuration = new BaseConfiguration();
         this.source.setConfiguration(this.configuration);

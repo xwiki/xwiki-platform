@@ -67,12 +67,13 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      * Request parameter to request a field in an annotation request.
      */
     private static final String ANNOTATION_REQUEST_REQUESTED_FIELD_PARAMETER = "request_field";
-    
+
     /**
      * Request parameter prefix for a filter in an annotation request.
      */
-    
+
     private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
+
     /**
      * Entity reference serializer used to get reference to the document to perform annotation operation on.
      */
@@ -92,6 +93,9 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
         @PathParam("wikiName") String wiki)
     {
         try {
+            // Initialize the context with the correct value.
+            updateContext(wiki, space, page);
+
             DocumentReference docRef = new DocumentReference(wiki, space, page);
             String documentName = referenceSerializer.serialize(docRef);
             // check access to this function
@@ -151,6 +155,9 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
         @PathParam("spaceName") String space, @PathParam("pageName") String page, AnnotationAddRequest request)
     {
         try {
+            // Initialize the context with the correct value.
+            updateContext(wiki, space, page);
+
             DocumentReference docRef = new DocumentReference(wiki, space, page);
             String documentName = referenceSerializer.serialize(docRef);
 

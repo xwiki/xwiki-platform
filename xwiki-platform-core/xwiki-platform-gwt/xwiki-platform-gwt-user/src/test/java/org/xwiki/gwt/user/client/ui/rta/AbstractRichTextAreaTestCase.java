@@ -56,11 +56,7 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
      */
     protected RichTextArea rta;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractWysiwygClientTest#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -102,11 +98,7 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
         iframe.contentWindow.location = 'javascript:window.content';
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadHandler#onLoad(LoadEvent)
-     */
+    @Override
     public void onLoad(LoadEvent event)
     {
         // http://wiki.codetalks.org/wiki/index.php/Docs/Keyboard_navigable_JS_widgets
@@ -114,11 +106,7 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
         Scheduler.get().scheduleDeferred(new FocusCommand(rta));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractWysiwygClientTest#gwtTearDown()
-     */
+    @Override
     protected void gwtTearDown() throws Exception
     {
         super.gwtTearDown();

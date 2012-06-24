@@ -40,11 +40,6 @@ public class AutomaticWatchModeListenerTest extends AbstractBridgedComponentTest
 
     private EventListener observationContextListener;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
@@ -54,7 +49,7 @@ public class AutomaticWatchModeListenerTest extends AbstractBridgedComponentTest
         this.listener = new AutomaticWatchModeListener(this.mockStore);
 
         this.observationContextListener =
-            getComponentManager().lookup(EventListener.class, "ObservationContextListener");
+            getComponentManager().getInstance(EventListener.class, "ObservationContextListener");
     }
 
     @Test

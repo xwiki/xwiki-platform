@@ -51,5 +51,15 @@
         <version>${commons.version}</version>
       </extension>
     </extensions>
+    <!-- TODO: Remove once http://jira.codehaus.org/browse/MENFORCER-133 is fixed. -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+          <version>${commons.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

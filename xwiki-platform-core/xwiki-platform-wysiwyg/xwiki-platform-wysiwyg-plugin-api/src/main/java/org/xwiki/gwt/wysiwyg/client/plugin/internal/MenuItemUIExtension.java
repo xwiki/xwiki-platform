@@ -41,11 +41,7 @@ public class MenuItemUIExtension extends AbstractUIExtension
         super(role);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractUIExtension#isEnabled(String)
-     */
+    @Override
     public boolean isEnabled(String feature)
     {
         UIObject uiObject = getUIObject(feature);
@@ -55,11 +51,7 @@ public class MenuItemUIExtension extends AbstractUIExtension
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractUIExtension#setEnabled(String, boolean)
-     */
+    @Override
     public void setEnabled(String feature, boolean enabled)
     {
         UIObject uiObject = getUIObject(feature);

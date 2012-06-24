@@ -63,7 +63,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 
         query.bindValue("extensionId", extensionId);
 
-        ExtensionVersions extensions = this.objectFactory.createExtensionVersions();
+        ExtensionVersions extensions = this.extensionObjectFactory.createExtensionVersions();
 
         getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
 

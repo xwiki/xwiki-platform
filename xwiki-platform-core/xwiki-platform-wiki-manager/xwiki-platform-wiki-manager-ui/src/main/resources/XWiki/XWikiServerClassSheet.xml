@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>XWikiServerClassSheet</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.XWikiServerClass</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1187881143000</creationDate>
-<date>1319535225000</date>
-<contentUpdateDate>1319535225000</contentUpdateDate>
-<version>1.1</version>
-<title>XWikiServerClassSheet</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<content>#set ($WikiManager = $services.wikimanager)
+  <web>XWiki</web>
+  <name>XWikiServerClassSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiServerClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1187881143000</creationDate>
+  <date>1319535225000</date>
+  <contentUpdateDate>1319535225000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiServerClassSheet</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <content>#set ($WikiManager = $services.wikimanager)
 #set ($Exception = $WikiManager.DefaultException)
 ##
 #set ($action = $request.getParameter("action"))
@@ -188,4 +189,5 @@
     #end
   #end
 #end
-</content></xwikidoc>
+</content>
+</xwikidoc>

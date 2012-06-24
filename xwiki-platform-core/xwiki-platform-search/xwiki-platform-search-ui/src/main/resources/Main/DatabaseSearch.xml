@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Main</web>
-<name>DatabaseSearch</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.Search</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1274890129000</creationDate>
-<date>1298680377000</date>
-<contentUpdateDate>1298680377000</contentUpdateDate>
-<version>1.1</version>
-<title>#if("$!{request.text}"=="")$msg.get("search.page.database.title.noquery")#else$msg.get("search.page.database.title.query", [$request.text])#end</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>true</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>Main</web>
+  <name>DatabaseSearch</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.Search</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1274890129000</creationDate>
+  <date>1298680377000</date>
+  <contentUpdateDate>1298680377000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if("$!{request.text}"=="")$msg.get("search.page.database.title.noquery")#else$msg.get("search.page.database.title.query", [$request.text])#end</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Disable the document extra data: comments, attachments, history...
 #set($docextras = [])
@@ -51,7 +52,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ##
 ##
 #set($text = "$!request.getParameter('text')")
-#set($utext = $util.encodeURI($text))
+#set($utext = $escapetool.url($text))
 ## ---------------
 ## Query form
 ## ---------------
@@ -70,7 +71,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 {{/html}}
 #end
 #set($space = $selectedSpace)
-#set($datedlist = $util.arrayList)
+#set($datedlist = [])
 #if("$!text" == '')
   ## No search
 #else
@@ -108,40 +109,41 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   ## -----------------------------------------------------------
   ## Search in the page names
   ## -----------------------------------------------------------
-  #set ($sql = "where $webClause upper(doc.fullName) like upper('%$!text%') order by doc.date desc")
-  #foreach ($item in $xwiki.searchDocuments($sql , $nbitems, 0))
+  #set($query = $services.query.xwql("where $webClause upper(doc.fullName) like ?1 order by doc.date desc").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
   ## -----------------------------------------------------------
   ## Search in page content
   ## -----------------------------------------------------------
-  #set ($sql = "where $webClause upper(doc.content) like upper('%$!text%') order by doc.date desc")
-  #foreach ($item in $xwiki.searchDocuments($sql , $nbitems, 0))
+  #set($query = $services.query.xwql("where $webClause upper(doc.content) like ?1 order by doc.date desc").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
   ## -----------------------------------------------------------
   ## Search in text fields (simple String properties)
   ## -----------------------------------------------------------
-  #set($sql= ", BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper('%$!text%')")
-  #foreach ($item in $xwiki.searchDocuments($sql , $nbitems, 0))
+  #set($query = $services.query.xwql("from BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
   ## -----------------------------------------------------------
   ## Search in big text fields (textarea properties)
   ## -----------------------------------------------------------
-  #set($sql= ", BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper('%$!text%')")
-  #foreach ($item in $xwiki.searchDocuments($sql , $nbitems, 0))
+  #set($query = $services.query.xwql("from BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
+  #foreach ($item in $query.execute())
     #addelement($item $datedlist)
   #end
 #end
-#set($list = $util.arrayList)
-#foreach($item in $util.sort($datedlist))
+#set($list = [])
+#set ($discard = $collectionstool.sort($datedlist))
+#foreach($item in $datedlist)
   ## datedlist contains items prefixed with the date; strip the date from the actual item name:
   #set($ok = $list.add(0, $item.substring(14)))
 #end
 #if ("$!utext" != '')
   #if($rssmode)
-    #set ($feed = $xwiki.feed.getDocumentFeed($list, $util.getHashMap()))
+    #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
     #set ($feedURI = $doc.getExternalURL("view"))
     #set ($discard = $feed.setLink($feedURI))
     #set ($discard = $feed.setUri($feedURI))
@@ -165,4 +167,5 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     {{/html}}
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

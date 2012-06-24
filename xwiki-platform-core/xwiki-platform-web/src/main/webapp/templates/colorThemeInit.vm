@@ -18,21 +18,31 @@
   'borderColor'                      : '#E8E8E8',
   'linkColor'                        : '#528BA1',
   'highlightColor'                   : '#FFFFDD',
-  'menuBackgroundColor'              : '#EAEAEA',
+  'fieldGradientColor'               : '#F5F5F5',
+  'menuBackgroundColor'              : '#ECECEC',
+  'menuGradientColor'                : '#FFFFFF',
   'menuLinkColor'                    : '#4D5860',
+  'menuContentBackgroundColor'       : '#ECECEC',
+  'menuContentGradientColor'         : '#FFFFFF',
+  'menuContentLinkColor'             : '#4D5860',
   'menuSelectedEntryBackgroundColor' : '#FFFFFF',
   'menuSelectedEntryLinkColor'       : '#4D5860',
   'menuAddEntryBackgroundColor'      : '#4D9244',
   'menuAddEntryLinkColor'            : '#FFFFFF',
+  'submenuContentBackgroundColor'    : '#ECECEC',
   'panelBackgroundColor'             : '#FFFFFF',
-  'panelHeaderBackgroundColor'       : '#FFFFFF',
+  'panelHeaderBackgroundColor'       : '#ECECEC',
+  'panelHeaderGradientColor'         : '#FFFFFF',
   'panelHeaderTextColor'             : '#4D5860',
   'panelTextColor'                   : '#4D4D4D',
   'panelCollapsedBackgroundColor'    : '#ECECEC',
+  'panelCollapsedGradientColor'      : '#FFFFFF',
   'panelCollapsedTextColor'          : '#4D5860',
   'buttonPrimaryBackgroundColor'     : '#528BA1',
+  'buttonPrimaryGradientColor'       : '#528BA1',
   'buttonPrimaryTextColor'           : '#FFFFFF',
   'buttonSecondaryBackgroundColor'   : '#ECECEC',
+  'buttonSecondaryGradientColor'     : '#FFFFFF',
   'buttonSecondaryTextColor'         : '#4D5860',
   'backgroundSecondaryColor'         : '#F3F3F3',
   'notificationInfoColor'            : '#336699',
@@ -54,7 +64,7 @@
     #set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
   #end
   #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
-  #set ($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass', true))
+  #set ($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass'))
 #end
 #if ("$!themeObj" != '')
   #foreach ($prop in $themeObj.properties)
@@ -69,5 +79,24 @@
          #set ($discard = $theme.put($prop.name, ''))
        #end
      #end
+  #end
+  #set ($gradientColorsToRemove = [])
+  #foreach ($prop in $theme.entrySet())
+    #if ($prop.key.endsWith('GradientColor') && "$!{themeObj.getProperty($prop.key).value}" == '')
+      #set ($discard = $gradientColorsToRemove.add($prop.key))
+    #end
+  #end
+  #foreach ($prop in $gradientColorsToRemove)
+    #set ($discard = $theme.put($prop, ''))
+  #end
+  ## For old themes that don't have separate values for #mainmenu and #contentmenu overwrite #contentmenu values with the ones from the #mainmenu
+  #if ("$!{themeObj.getProperty('menuContentLinkColor').value}" == '')
+    #set ($discard = $theme.put('menuContentLinkColor', "$!{themeObj.getProperty('menuLinkColor').value}"))
+  #end
+  #if ("$!{themeObj.getProperty('menuContentBackgroundColor').value}" == '')
+    #set ($discard = $theme.put('menuContentBackgroundColor', "$!{themeObj.getProperty('menuBackgroundColor').value}"))
+  #end
+  #if ("$!{themeObj.getProperty('submenuContentBackgroundColor').value}" == '')
+    #set ($discard = $theme.put('submenuContentBackgroundColor', "$!{themeObj.getProperty('menuBackgroundColor').value}"))
   #end
 #end

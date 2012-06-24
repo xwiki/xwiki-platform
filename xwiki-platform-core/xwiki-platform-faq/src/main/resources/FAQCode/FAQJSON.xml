@@ -1,28 +1,30 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>FAQCode</web>
-<name>FAQJSON</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>FAQCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1319795369000</creationDate>
-<date>1319797559000</date>
-<contentUpdateDate>1319797559000</contentUpdateDate>
-<version>1.1</version>
-<title>FAQ JSON</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{include document="XWiki.LiveTableResultsMacros" /}}
+  <web>FAQCode</web>
+  <name>FAQJSON</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>FAQCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319795369000</creationDate>
+  <date>1319797559000</date>
+  <contentUpdateDate>1319797559000</contentUpdateDate>
+  <version>1.1</version>
+  <title>FAQ JSON</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{include document="XWiki.LiveTableResultsMacros" /}}
 {{velocity}}
 #gridresultwithfilter($request.classname $request.collist.split(",") "" " and doc.fullName&lt;&gt;'FAQCode.FAQTemplate' and doc.space='$!request.space'")
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

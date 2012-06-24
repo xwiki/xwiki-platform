@@ -1,163 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>BlogIntroduction</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1236779890000</creationDate>
-<date>1236779890000</date>
-<contentUpdateDate>1236779890000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>Blog.BlogPostClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<classname>Blog.CategoryClass</classname>
-<customDisplay></customDisplay>
-<displayType>checkbox</displayType>
-<idField>doc.fullName</idField>
-<multiSelect>1</multiSelect>
-<name>category</name>
-<number>4</number>
-<parentField>doc.parent</parentField>
-<picker>0</picker>
-<prettyName>Category</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator>, </separator>
-<separators></separators>
-<size>1</size>
-<sort>value</sort>
-<sql></sql>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField>name</valueField>
-<classType>com.xpn.xwiki.objects.classes.DBTreeListClass</classType>
-</category>
-<content>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<editor>---</editor>
-<name>content</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Content</prettyName>
-<rows>20</rows>
-<size>80</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<extract>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<editor>---</editor>
-<name>extract</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>Extract</prettyName>
-<rows>10</rows>
-<size>80</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</extract>
-<hidden>
-<customDisplay></customDisplay>
-<defaultValue>0</defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>hidden</name>
-<number>5</number>
-<prettyName>Is hidden</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</hidden>
-<publishDate>
-<customDisplay></customDisplay>
-<dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
-<emptyIsToday>1</emptyIsToday>
-<name>publishDate</name>
-<number>7</number>
-<picker>1</picker>
-<prettyName>Publish date</prettyName>
-<size>20</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.DateClass</classType>
-</publishDate>
-<published>
-<customDisplay></customDisplay>
-<defaultValue>0</defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>published</name>
-<number>6</number>
-<prettyName>Is published</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</published>
-<title>
-<customDisplay></customDisplay>
-<name>title</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Title</prettyName>
-<size>80</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</title>
-</class>
-<name>Blog.BlogIntroduction</name>
-<number>0</number>
-<className>Blog.BlogPostClass</className>
-<guid>49ea4e6b-9a83-4f63-9ab9-7b596176bce8</guid>
-<property>
-<category>
-<value>Blog.News</value>
-</category>
-</property>
-<property>
-<content>This is your wiki's blog first post. Its goal is to provide a short description of your blog's main features.
+  <web>Blog</web>
+  <name>BlogIntroduction</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1236779890000</creationDate>
+  <date>1236779890000</date>
+  <contentUpdateDate>1236779890000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>Blog.BlogPostClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <classname>Blog.CategoryClass</classname>
+        <customDisplay/>
+        <displayType>checkbox</displayType>
+        <idField>doc.fullName</idField>
+        <multiSelect>1</multiSelect>
+        <name>category</name>
+        <number>4</number>
+        <parentField>doc.parent</parentField>
+        <picker>0</picker>
+        <prettyName>Category</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator>, </separator>
+        <separators/>
+        <size>1</size>
+        <sort>value</sort>
+        <sql/>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField>name</valueField>
+        <classType>com.xpn.xwiki.objects.classes.DBTreeListClass</classType>
+      </category>
+      <content>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Content</prettyName>
+        <rows>20</rows>
+        <size>80</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extract>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <editor>---</editor>
+        <name>extract</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Extract</prettyName>
+        <rows>10</rows>
+        <size>80</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </extract>
+      <hidden>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>hidden</name>
+        <number>5</number>
+        <prettyName>Is hidden</prettyName>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
+      <publishDate>
+        <customDisplay/>
+        <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+        <emptyIsToday>1</emptyIsToday>
+        <name>publishDate</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Publish date</prettyName>
+        <size>20</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+      </publishDate>
+      <published>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>published</name>
+        <number>6</number>
+        <prettyName>Is published</prettyName>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </published>
+      <title>
+        <customDisplay/>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Title</prettyName>
+        <size>80</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Blog.BlogIntroduction</name>
+    <number>0</number>
+    <className>Blog.BlogPostClass</className>
+    <guid>49ea4e6b-9a83-4f63-9ab9-7b596176bce8</guid>
+    <property>
+      <category>
+        <value>Blog.News</value>
+      </category>
+    </property>
+    <property>
+      <content>This is your wiki's blog first post. Its goal is to provide a short description of your blog's main features.
 
 * You can **create new blog posts** through the input field located on [[your Blog's homepage&gt;&gt;Blog.WebHome]]. The status of a blog post may be any one of the following:
 ** //Unpublished//: your post is still a draft. It can be seen by its creator and by administrators. Once you have clicked publish, you cannot unpublish a post. However, you can choose to hide it.
@@ -177,21 +177,22 @@
 
 Happy blogging!
 </content>
-</property>
-<property>
-<extract></extract>
-</property>
-<property>
-<hidden>0</hidden>
-</property>
-<property>
-<publishDate>2009-06-01 12:00:00.0</publishDate>
-</property>
-<property>
-<published>1</published>
-</property>
-<property>
-<title>First blog post</title>
-</property>
-</object>
-<content></content></xwikidoc>
+    </property>
+    <property>
+      <extract/>
+    </property>
+    <property>
+      <hidden>0</hidden>
+    </property>
+    <property>
+      <publishDate>2009-06-01 12:00:00.0</publishDate>
+    </property>
+    <property>
+      <published>1</published>
+    </property>
+    <property>
+      <title>First blog post</title>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

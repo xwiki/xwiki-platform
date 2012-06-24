@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Stats</web>
-<name>Macros</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Stats.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1195803878000</creationDate>
-<date>1196173438000</date>
-<contentUpdateDate>1196173438000</contentUpdateDate>
-<version>1.1</version>
-<title>Statistics Macros</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<content>#macro(printPageStats $stats)
+  <web>Stats</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Stats.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1195803878000</creationDate>
+  <date>1196173438000</date>
+  <contentUpdateDate>1196173438000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Statistics Macros</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>#macro(printPageStats $stats)
 $!xwiki.ssx.use('Stats.Style')
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;

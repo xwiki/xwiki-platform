@@ -1,4 +1,3 @@
-org.xwiki.officeimporter.internal.OfficeImporterVelocityContextInitializer
 org.xwiki.officeimporter.internal.builder.DefaultXHTMLOfficeDocumentBuilder
 org.xwiki.officeimporter.internal.builder.DefaultXDOMOfficeDocumentBuilder
 org.xwiki.officeimporter.internal.builder.DefaultPresentationBuilder
@@ -17,5 +16,5 @@ org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
 org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeConfiguration
 org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeManager
 org.xwiki.officeimporter.internal.openoffice.OpenOfficeManagerLifecycleListener
-org.xwiki.officeimporter.internal.openoffice.OpenOfficeManagerVelocityContextInitializer
-org.xwiki.officeimporter.internal.openoffice.OpenOfficeConfigurationVelocityContextInitializer
+org.xwiki.officeimporter.internal.openoffice.script.OpenOfficeManagerScriptService
+org.xwiki.officeimporter.internal.script.OfficeImporterScriptService

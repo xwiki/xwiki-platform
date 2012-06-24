@@ -17,19 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.store.migration.hibernate;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.store.migration.DataMigration;
+import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
  * Hibernate data migrations role.
  * @version $Id$
  * @since 3.4M1
  */
-@ComponentRole
+@Role
 public interface HibernateDataMigration extends DataMigration
 {
+    /**
+     * @return a changelog file for the liquibase database refactoring
+     * @throws com.xpn.xwiki.store.migration.DataMigrationException on error
+     * @since 4.0M1
+     */
+    String getLiquibaseChangeLog() throws DataMigrationException;
 }

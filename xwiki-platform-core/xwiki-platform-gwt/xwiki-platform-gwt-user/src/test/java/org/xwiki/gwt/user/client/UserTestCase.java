@@ -34,11 +34,7 @@ public class UserTestCase extends GWTTestCase
      */
     public static final String MODULE_NAME = "org.xwiki.gwt.user.UserTest";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#getModuleName()
-     */
+    @Override
     public String getModuleName()
     {
         return MODULE_NAME;

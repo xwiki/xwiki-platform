@@ -97,11 +97,7 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
      */
     private Cache<OfficeDocumentView> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         CacheConfiguration config = new CacheConfiguration();
@@ -113,11 +109,7 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewer#createView(AttachmentReference, Map)
-     */
+    @Override
     public XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
         // Search the cache.
@@ -175,24 +167,19 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
         Map<String, String> parameters) throws Exception;
 
     /**
-     * Saves a temporary file associated with the given attachment.
+     * Creates a temporary file that stores the given data.
      * 
-     * @param attachmentReference reference to the attachment to which this temporary file belongs
-     * @param fileName name of the temporary file
-     * @param fileData file data
-     * @return file that was just written
-     * @throws Exception if an error occurs while writing the temporary file
+     * @param file the temporary file to be created
+     * @param fileData file data to be written
+     * @throws Exception if an error occurs while creating the temporary file
      */
-    protected File saveTemporaryFile(AttachmentReference attachmentReference, String fileName, byte[] fileData)
-        throws Exception
+    protected void createTemporaryFile(File file, byte[] fileData) throws Exception
     {
-        File tempFile = new File(getTemporaryDirectory(attachmentReference), fileName);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(tempFile);
+            fos = new FileOutputStream(file);
             IOUtils.write(fileData, fos);
-            tempFile.deleteOnExit();
-            return tempFile;
+            file.deleteOnExit();
         } finally {
             IOUtils.closeQuietly(fos);
         }
@@ -229,6 +216,21 @@ public abstract class AbstractOfficeViewer implements OfficeViewer, Initializabl
             throw new Exception(String.format(message, tempDir, attachmentName));
         }
         return tempDir;
+    }
+
+    /**
+     * Utility method for obtaining a temporary file to store an artifact produced by the office viewer.
+     * 
+     * @param attachmentReference a reference to the attachment that produced the artifact
+     * @param artifactName the name of the artifact to be saved in the temporary file
+     * @return a temporary file to store the specified artifact
+     * @throws Exception if {@link #getTemporaryDirectory(AttachmentReference)} throws an exception
+     */
+    protected File getTemporaryFile(AttachmentReference attachmentReference, String artifactName) throws Exception
+    {
+        // Encode to avoid illegal characters in the artifact name.
+        String encodedArtifactName = URLEncoder.encode(artifactName, DEFAULT_ENCODING);
+        return new File(getTemporaryDirectory(attachmentReference), encodedArtifactName);
     }
 
     /**

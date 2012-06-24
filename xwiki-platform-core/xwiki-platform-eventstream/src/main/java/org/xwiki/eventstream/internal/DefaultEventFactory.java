@@ -58,11 +58,7 @@ public class DefaultEventFactory implements EventFactory
     @Inject
     private DocumentAccessBridge bridge;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventFactory#createEvent()
-     */
+    @Override
     public Event createEvent()
     {
         Event result = new DefaultEvent();
@@ -73,11 +69,7 @@ public class DefaultEventFactory implements EventFactory
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventFactory#createRawEvent()
-     */
+    @Override
     public Event createRawEvent()
     {
         return new DefaultEvent();

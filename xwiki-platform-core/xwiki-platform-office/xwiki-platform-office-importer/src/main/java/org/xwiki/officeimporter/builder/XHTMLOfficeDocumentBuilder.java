@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.builder;
 
 import java.io.InputStream;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
@@ -32,7 +32,7 @@ import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
  * @version $Id$
  * @since 2.1M1
  */
-@ComponentRole
+@Role
 public interface XHTMLOfficeDocumentBuilder
 {
     /**
@@ -41,8 +41,8 @@ public interface XHTMLOfficeDocumentBuilder
      * @param officeFileStream {@link InputStream} corresponding to the office document.
      * @param officeFileName name of the office document (used to determine input document format).
      * @param reference reference document w.r.t which html cleaning is performed. If the office file contains images or
-     *            other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
-     *            attachments to the reference document.
+     *        other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
+     *        attachments to the reference document.
      * @param filterStyles whether to filter css styles present in the html content produced by openoffice server.
      * @return an {@link XHTMLOfficeDocument} corresponding to the office document.
      * @throws OfficeImporterException if an error occurs while performing the import operation.

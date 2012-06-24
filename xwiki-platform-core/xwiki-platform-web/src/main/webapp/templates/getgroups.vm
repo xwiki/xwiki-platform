@@ -1,8 +1,8 @@
 $response.setContentType("application/x-json")
-#set( $offset = $util.parseInt( $request.get( "offset" ) ) )
+#set ($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set( $off = $offset - 1 )
-#set( $limit = $util.parseInt( $request.get( "limit" ) ) )
+#set ($limit = $mathtool.toInteger($request.get('limit')))
 
 #set( $rm = $xwiki.rightsmanager.groupsApi )
 
@@ -11,24 +11,24 @@ $response.setContentType("application/x-json")
 #set( $keys = $params.keySet() )
 #set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo", "sort", "dir"] )
 #set( $docProps = ["fullName", "name"] )
-#set( $filterMap = $util.hashMap )
-#set( $orderList = $util.arrayList )
+#set ($filterMap = {})
+#set ($orderList = [])
 #foreach( $key in $keys )
   #if(! $defaultKeys.contains( $key ) )
      ## build the filters map
      #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
      #if( $docProps.contains( $key )) 
-        #set( $arr = $util.arrayList )
+        #set ($arr = [])
         #set( $discard = $arr.add( null ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr))
         #set( $discard = $orderList.add( "$key" ))
      #else
-        #set( $arr = $util.arrayList )
+        #set ($arr = [])
         #set( $discard = $arr.add( "StringProperty" ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr))
-        #set( $arr2 = $util.arrayList )
+        #set ($arr2 = [])
         #set( $discard = $arr2.add( "$key" ) )
         #set( $discard = $arr2.add( "StringProperty" ) )
         #set( $discard = $orderList.add( $arr2 ))
@@ -58,7 +58,7 @@ $response.setContentType("application/x-json")
 "totalrows": $countGroups,
 "returnedrows": #if($countGroups < $limit) $countGroups #else $limit #end,
 "offset": $offset,
-"reqNo": $util.parseInt($request.reqNo),
+"reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
 #foreach( $group in $groups )
   #set($wikiname = $group.getWiki())

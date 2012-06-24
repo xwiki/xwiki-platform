@@ -1,213 +1,215 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>XWikiServerClass</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.XWikiClasses</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1187881140000</creationDate>
-<date>1312816343000</date>
-<contentUpdateDate>1312816343000</contentUpdateDate>
-<version>2.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Imported from XAR</comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<class>
-<name>XWiki.XWikiServerClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<description>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>description</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<homepage>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>homepage</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>Home page</prettyName>
-<size>30</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</homepage>
-<iswikitemplate>
-<customDisplay></customDisplay>
-<defaultValue>0</defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>checkbox</displayType>
-<name>iswikitemplate</name>
-<number>10</number>
-<prettyName>Template</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</iswikitemplate>
-<language>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>language</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>Language</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>en|fr</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</language>
-<owner>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>owner</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Owner</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators></separators>
-<size>5</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<usesList>1</usesList>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
-</owner>
-<secure>
-<customDisplay></customDisplay>
-<defaultValue>0</defaultValue>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>checkbox</displayType>
-<name>secure</name>
-<number>7</number>
-<prettyName>Secure</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</secure>
-<server>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>server</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>Server</prettyName>
-<size>30</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</server>
-<state>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>state</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>State</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>active|inactive|locked</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</state>
-<visibility>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>visibility</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>Visibility</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>public|private</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</visibility>
-<wikiprettyname>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>wikiprettyname</name>
-<number>9</number>
-<picker>0</picker>
-<prettyName>Wiki pretty name</prettyName>
-<size>30</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</wikiprettyname>
-</class>
-<content>
-</content></xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiServerClass</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiClasses</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1187881140000</creationDate>
+  <date>1312816343000</date>
+  <contentUpdateDate>1312816343000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <class>
+    <name>XWiki.XWikiServerClass</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <description>
+      <contenttype>FullyRenderedText</contenttype>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>---</editor>
+      <name>description</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Description</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </description>
+    <homepage>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>homepage</name>
+      <number>8</number>
+      <picker>0</picker>
+      <prettyName>Home page</prettyName>
+      <size>30</size>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </homepage>
+    <iswikitemplate>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType>checkbox</displayType>
+      <name>iswikitemplate</name>
+      <number>10</number>
+      <prettyName>Template</prettyName>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </iswikitemplate>
+    <language>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>language</name>
+      <number>6</number>
+      <picker>0</picker>
+      <prettyName>Language</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>en|fr</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </language>
+    <owner>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>owner</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Owner</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>5</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <usesList>1</usesList>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+    </owner>
+    <secure>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType>checkbox</displayType>
+      <name>secure</name>
+      <number>7</number>
+      <prettyName>Secure</prettyName>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </secure>
+    <server>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>server</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>Server</prettyName>
+      <size>30</size>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </server>
+    <state>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>state</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>State</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>active|inactive|locked</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </state>
+    <visibility>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>visibility</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>Visibility</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>public|private</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </visibility>
+    <wikiprettyname>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>wikiprettyname</name>
+      <number>9</number>
+      <picker>0</picker>
+      <prettyName>Wiki pretty name</prettyName>
+      <size>30</size>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </wikiprettyname>
+  </class>
+  <content>
+</content>
+</xwikidoc>

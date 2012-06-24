@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WikiCode</web>
-<name>Macros</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WikiCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1191500546000</creationDate>
-<date>1209754607000</date>
-<contentUpdateDate>1209754607000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Imported from XAR</comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<content>#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
+  <web>WikiCode</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1191500546000</creationDate>
+  <date>1209754607000</date>
+  <contentUpdateDate>1209754607000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <content>#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
   #if(!$formatDate)
     #set($formatDate = $msg.get("wikimanager.defaultdatetimeformat"))
   #end
@@ -37,4 +38,5 @@
 
   #if($star)*#end [$pagename&gt;$pagelink] $xwiki.formatDate($date, $formatDate) $username
 #end
-</content></xwikidoc>
+</content>
+</xwikidoc>

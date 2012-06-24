@@ -21,16 +21,16 @@ package org.xwiki.query;
 
 import java.util.Set;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
- * This interface encapsulates methods for the management of search queries.
+ * This interface encapsulates methods for the management of search queries and is similar to JCR's
+ * <a href="http://www.day.com/maven/jsr170/javadocs/jcr-2.0/javax/jcr/query/QueryManager.html">QueryManager</a>.
  *
  * @version $Id$
- * @see javax.jcr.query.QueryManager
  * @since 1.6M1
  */
-@ComponentRole
+@Role
 public interface QueryManager
 {
     /**

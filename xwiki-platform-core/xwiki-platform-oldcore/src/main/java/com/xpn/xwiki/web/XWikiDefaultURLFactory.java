@@ -19,56 +19,70 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
-
 import java.net.URL;
 
-public abstract class XWikiDefaultURLFactory implements XWikiURLFactory {
-    public URL createURL(String web, String name, XWikiContext context) {
+import com.xpn.xwiki.XWikiContext;
+
+public abstract class XWikiDefaultURLFactory implements XWikiURLFactory
+{
+    @Override
+    public URL createURL(String web, String name, XWikiContext context)
+    {
         return createURL(web, name, "view", null, null, context);
     }
 
-    public URL createExternalURL(String web, String name, String action, String querystring, String anchor, XWikiContext context) {
+    @Override
+    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
+        XWikiContext context)
+    {
         return createExternalURL(web, name, action, querystring, anchor, context.getDatabase(), context);
     }
 
-    public URL createURL(String web, String name, String action, XWikiContext context) {
+    @Override
+    public URL createURL(String web, String name, String action, XWikiContext context)
+    {
         return createURL(web, name, action, null, null, context);
     }
 
-    public URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context) {
+    @Override
+    public URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context)
+    {
         return createURL(web, name, action, querystring, anchor, context.getDatabase(), context);
     }
 
-    public URL createSkinURL(String filename, String web, String name, XWikiContext context) {
+    @Override
+    public URL createSkinURL(String filename, String web, String name, XWikiContext context)
+    {
         return createSkinURL(filename, web, name, context.getDatabase(), context);
     }
 
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring, XWikiContext context) {
+    @Override
+    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+        XWikiContext context)
+    {
         return createAttachmentURL(filename, web, name, action, querystring, context.getDatabase(), context);
     }
 
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring, XWikiContext context) {
+    @Override
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+        String querystring, XWikiContext context)
+    {
         return createAttachmentRevisionURL(filename, web, name, revision, querystring, context.getDatabase(), context);
     }
 
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, XWikiContext context) {
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+        XWikiContext context)
+    {
         return createAttachmentRevisionURL(filename, web, name, revision, null, context.getDatabase(), context);
     }
 
+    @Override
     public URL getRequestURL(XWikiContext context)
     {
         return context.getURL();
     }
 
-    /**
-     * Converts a URL to a string representation. It's up to the implementation to decide whether to perform
-     * transformations or not on the URL. For example some implementations will convert the URL to a relative URL
-     * if the URL is an internal XWiki URL.
-     *  
-     * @param url the URL to convert
-     * @return the converted URL as a string 
-     */
+    @Override
     public String getURL(URL url, XWikiContext context)
     {
         return url.toString();

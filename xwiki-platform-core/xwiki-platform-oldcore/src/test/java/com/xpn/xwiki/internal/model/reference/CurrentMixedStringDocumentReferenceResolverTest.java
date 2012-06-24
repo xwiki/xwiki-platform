@@ -45,7 +45,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "currentmixed");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "currentmixed");
     }
 
     @Test

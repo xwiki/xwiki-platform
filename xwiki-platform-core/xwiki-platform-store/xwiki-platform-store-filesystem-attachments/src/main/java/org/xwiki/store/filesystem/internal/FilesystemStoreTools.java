@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole
+@Role
 public interface FilesystemStoreTools
 {
     /**

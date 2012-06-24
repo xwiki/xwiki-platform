@@ -48,7 +48,7 @@ public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTe
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.wikiMacroFactory = getComponentManager().lookup(WikiMacroFactory.class);
+        this.wikiMacroFactory = getComponentManager().getInstance(WikiMacroFactory.class);
 
         // Build the macro definition document.
         BaseObject obj = new BaseObject();

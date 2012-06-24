@@ -54,16 +54,19 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
     private int sectionNumber = 0;
 
+    @Override
     protected String getLocaleKey()
     {
         return "filter.heading";
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         buffer.append(handleMatch(result, context));
     }
 
+    @Override
     public void setInitialContext(InitialRenderContext context)
     {
         super.setInitialContext(context);

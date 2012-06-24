@@ -21,7 +21,7 @@ package org.xwiki.query;
 
 import java.util.Set;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Execute queries (supported languages are returned by {@link #getLanguages()}).
@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @see QueryExecutor
  */
-@ComponentRole
+@Role
 public interface QueryExecutorManager extends QueryExecutor
 {
     /**

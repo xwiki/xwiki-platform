@@ -975,12 +975,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             throw getXWikiGWTException(e);
         }
         if (withObjects) {
-            Iterator it = xdoc.getxWikiObjects().values().iterator();
+            Iterator<List<BaseObject>> it = xdoc.getXObjects().values().iterator();
             while (it.hasNext()) {
-                List list = (List) it.next();
+                List<BaseObject> list = it.next();
 
                 for (int i = 0; i < list.size(); i++) {
-                    BaseObject bobj = (BaseObject) list.get(i);
+                    BaseObject bobj = list.get(i);
                     if (bobj != null) {
                         XObject obj = newObject(new XObject(), bobj, withViewDisplayers, withEditDisplayers, context);
                         doc.addObject(bobj.getClassName(), obj);
@@ -1027,9 +1027,9 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         xObject.setName(baseObject.getName());
         xObject.setNumber(baseObject.getNumber());
         xObject.setClassName(baseObject.getClassName());
-        String prefix = baseObject.getxWikiClass(context).getName() + "_" + baseObject.getNumber() + "_";
+        String prefix = baseObject.getXClass(context).getName() + "_" + baseObject.getNumber() + "_";
 
-        Object[] propnames = baseObject.getxWikiClass(context).getFieldList().toArray();
+        Object[] propnames = baseObject.getXClass(context).getFieldList().toArray();
         for (int i = 0; i < propnames.length; i++) {
             String propname = ((PropertyInterface) propnames[i]).getName();
             // TODO: this needs to be a param
@@ -1070,7 +1070,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
     protected void mergeObject(XObject xobject, BaseObject baseObject, XWikiContext context)
     {
-        BaseClass bclass = baseObject.getxWikiClass(context);
+        BaseClass bclass = baseObject.getXClass(context);
         Object[] propnames = bclass.getPropertyNames();
         for (int i = 0; i < propnames.length; i++) {
             String propname = (String) propnames[i];

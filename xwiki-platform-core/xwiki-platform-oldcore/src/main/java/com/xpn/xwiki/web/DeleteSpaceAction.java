@@ -56,9 +56,8 @@ public class DeleteSpaceAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         String space = context.getDoc().getDocumentReference().getLastSpaceReference().getName();
-        @SuppressWarnings("unchecked")
         EntityReferenceResolver<String> nameResolver =
-            Utils.getComponent(EntityReferenceResolver.class, "current");
+            Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
         boolean redirected = false;
         // If confirm=1 then delete the space. If not, the render action will go to the "deletespace" template asking
         // for user confirmation. The "deletespace" template will then call the /deletespace/ action again with

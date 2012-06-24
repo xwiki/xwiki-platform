@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WorkspaceManager</web>
-<name>TemplateTranslations</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WorkspaceManager.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1303158348000</creationDate>
-<date>1307445978000</date>
-<contentUpdateDate>1307445978000</contentUpdateDate>
-<version>1.1</version>
-<title>TemplateTranslations</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content># Various translations that are used in the workspace template and, implicitly, in the created workspaces.
+  <web>WorkspaceManager</web>
+  <name>TemplateTranslations</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WorkspaceManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303158348000</creationDate>
+  <date>1307445978000</date>
+  <contentUpdateDate>1307445978000</contentUpdateDate>
+  <version>1.1</version>
+  <title>TemplateTranslations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content># Various translations that are used in the workspace template and, implicitly, in the created workspaces.
 
 # Rebrand the term 'Wiki' to 'Workspace' in the menu of a workspace. To be used by the workspace template and in all created workspaces.
 core.menu.type.wiki=Workspace
@@ -50,4 +51,5 @@ workspacemanager.prop.secure.hint=If enabled, all this wiki's generated external
 
 # DESCRIPTIONS
 admin.xwiki.workspaceusers.description=Manage workspace members: add, remove, invite, accept or reject workspace members.
-</content></xwikidoc>
+</content>
+</xwikidoc>

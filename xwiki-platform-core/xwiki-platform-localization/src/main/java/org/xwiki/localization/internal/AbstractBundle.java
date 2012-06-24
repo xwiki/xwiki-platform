@@ -42,11 +42,7 @@ public abstract class AbstractBundle extends AbstractLogEnabled implements Bundl
      */
     private int priority;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#getPriority()
-     */
+    @Override
     public int getPriority()
     {
         return this.priority;
@@ -60,21 +56,13 @@ public abstract class AbstractBundle extends AbstractLogEnabled implements Bundl
         this.priority = priority;
     }
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#getTranslation(String)
-     */
+    @Override
     public String getTranslation(String key)
     {
         return getTranslation(key, this.wikiInfo.getContextLanguage());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#use(String)
-     */
+    @Override
     public void use(String bundleLocation)
     {
         // Do nothing, as by default bundles don't accept pulling.

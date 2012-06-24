@@ -19,14 +19,14 @@
  */
 package org.xwiki.container;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Manages initializations that have to be done when the XWiki Request object is initialized.
  *
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface RequestInitializerManager
 {
     /**

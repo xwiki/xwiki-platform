@@ -29,21 +29,25 @@ public class MyFilterConfig implements FilterConfig
 {
     protected Hashtable params = new Hashtable();
 
+    @Override
     public String getFilterName()
     {
         return null;
     }
 
+    @Override
     public ServletContext getServletContext()
     {
         return null;
     }
 
+    @Override
     public String getInitParameter(String s)
     {
         return (String) params.get(s);
     }
 
+    @Override
     public Enumeration getInitParameterNames()
     {
         return params.keys();

@@ -22,16 +22,18 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class RedirectAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
-        XWikiRequest request = context.getRequest();
+public class RedirectAction extends XWikiAction
+{
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWikiResponse response = context.getResponse();
 
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null)||(redirect.equals("")))
+        if ((redirect == null) || (redirect.equals("")))
             redirect = context.getURLFactory().createURL("Main", "WebHome", "view", context).toString();
         sendRedirect(response, redirect);
         return false;
-	}
+    }
 }

@@ -27,13 +27,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
+import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
+    /**
+     * Used to do the actual merge.
+     */
+    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
+
     protected List<String> list = new ArrayList<String>();
 
     private String formStringSeparator = "|";
@@ -48,22 +55,12 @@ public class ListProperty extends BaseProperty implements Cloneable
         this.formStringSeparator = formStringSeparator;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#getValue()
-     */
     @Override
     public Object getValue()
     {
         return getList();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#setValue(java.lang.Object)
-     */
     @Override
     public void setValue(Object value)
     {
@@ -90,11 +87,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         return super.toFormString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#toFormString()
-     */
     @Override
     public String toFormString()
     {
@@ -108,11 +100,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         return StringUtils.chomp(result.toString(), this.formStringSeparator);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -154,11 +141,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#clone()
-     */
     @Override
     public ListProperty clone()
     {
@@ -193,11 +175,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#toXML()
-     */
     @Override
     public Element toXML()
     {
@@ -231,15 +208,9 @@ public class ListProperty extends BaseProperty implements Cloneable
         return toXMLString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#mergeValue(java.lang.Object, java.lang.Object,
-     *      com.xpn.xwiki.doc.merge.MergeResult)
-     */
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        MergeUtils.mergeCollection((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+        MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
     }
 }

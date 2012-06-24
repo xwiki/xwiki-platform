@@ -37,7 +37,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @since 2.3M1
  */
 @Component
-@Named("currentmixed/reference")
+@Named("currentmixed")
 @Singleton
 public class CurrentMixedReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
@@ -45,12 +45,6 @@ public class CurrentMixedReferenceEntityReferenceResolver extends AbstractRefere
     @Named("currentmixed")
     private EntityReferenceValueProvider provider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.internal.reference.AbstractReferenceEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType,
-     *      java.lang.Object[])
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {

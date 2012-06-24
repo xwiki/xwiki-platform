@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,30 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>XWikiSkinsSheet</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.XWikiSkins</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1306878414000</creationDate>
-<date>1306885344000</date>
-<contentUpdateDate>1306885344000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.admin.skin")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.1</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>XWikiSkinsSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSkins</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1306878414000</creationDate>
+  <date>1306885344000</date>
+  <contentUpdateDate>1306885344000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.admin.skin")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 ## Keep testing the inline action for backward compatibility with existing skin documents.
 #if ($context.action == 'edit' || $context.action == 'inline')
   #set ($className = 'XWiki.XWikiSkins')
@@ -56,4 +58,5 @@
   * [[$msg.get('xe.admin.skin.editskin')&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
   * [[$msg.get('xe.admin.skin.testskin')&gt;&gt;Main.WebHome||queryString="skin=${doc.fullName}"]]
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

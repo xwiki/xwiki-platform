@@ -45,7 +45,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostPublicMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -58,7 +58,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostPublicMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -72,7 +72,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostPersonalMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -85,7 +85,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostPersonalMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -99,7 +99,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostDirectMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -113,7 +113,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostDirectMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -128,7 +128,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostGroupMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -142,7 +142,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Test
     public void testPostGroupMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().lookup(MessageStream.class);
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
                     {
             {

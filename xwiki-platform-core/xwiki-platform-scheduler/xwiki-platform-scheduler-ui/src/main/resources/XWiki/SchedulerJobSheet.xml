@@ -1,55 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>SchedulerJobSheet</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.SchedulerJobClass</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1274533105000</date>
-<contentUpdateDate>1274533105000</contentUpdateDate>
-<version>1.1</version>
-<title>Scheduler Job Sheet</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.EditModeClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultEditMode>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
-</class>
-<name>XWiki.SchedulerJobSheet</name>
-<number>0</number>
-<className>XWiki.EditModeClass</className>
-<guid>3b53199c-0ee8-476f-b7cd-43fc857b391c</guid>
-<property>
-<defaultEditMode>inline</defaultEditMode>
-</property>
-</object>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>SchedulerJobSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.SchedulerJobClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1274533105000</date>
+  <contentUpdateDate>1274533105000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Scheduler Job Sheet</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.EditModeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultEditMode>
+        <name>defaultEditMode</name>
+        <number>1</number>
+        <prettyName>Default Edit Mode</prettyName>
+        <size>15</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultEditMode>
+    </class>
+    <name>XWiki.SchedulerJobSheet</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>3b53199c-0ee8-476f-b7cd-43fc857b391c</guid>
+    <property>
+      <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <content>{{velocity}}
 #if($doc.getObject('XWiki.SchedulerJobClass'))
 #set($job = $doc.getObject("XWiki.SchedulerJobClass"))
 **$msg.get("xe.scheduler.job.name")**
@@ -77,7 +78,7 @@ $job.getProperty('script').value
 #if($xcontext.action=="inline")
 {{info}}$msg.get('xe.scheduler.job.scriptexplanation')){{/info}}
 
-{{info}}"Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html&gt;_blank]]:
+{{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 
 |= Cron expression |= Meaning
 | **0 15 10 * * ?** | Fire at 10:15am every day
@@ -92,4 +93,5 @@ $job.getProperty('script').value
 #else
  {{warning}}$msg.get('xe.scheduler.job.object'){{/warning}}
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

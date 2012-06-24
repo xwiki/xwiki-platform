@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>CategoryRss</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1230080962000</creationDate>
-<date>1230091357000</date>
-<contentUpdateDate>1230091357000</contentUpdateDate>
-<version>1.1</version>
-<title>Blog category RSS Feed Generator</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>true</hidden>
-<content>{{include document="Blog.RssCode"/}}
+  <web>Blog</web>
+  <name>CategoryRss</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1230080962000</creationDate>
+  <date>1230091357000</date>
+  <contentUpdateDate>1230091357000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Blog category RSS Feed Generator</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Blog.RssCode"/}}
 
 {{include document="Blog.CategoriesCode"/}}
 
@@ -39,7 +39,7 @@ $response.setContentType('application/rss+xml')
   #if($category == '')
     #set($category = $defaultCategoryParent)
   #end
-  #set ($categoryDoc = $util.null)
+  #set ($categoryDoc = $NULL)
   #setVariable ("$categoryDoc" $xwiki.getDocument($category))
 #end
 #getTargetCategory($categoryDoc)

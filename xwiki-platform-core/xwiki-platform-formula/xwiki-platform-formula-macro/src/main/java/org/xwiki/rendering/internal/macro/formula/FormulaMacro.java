@@ -99,11 +99,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(FormulaMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -157,9 +153,9 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         throws ComponentLookupException, IllegalArgumentException
     {
         try {
-            FormulaRenderer renderer = this.manager.lookup(FormulaRenderer.class, rendererHint);
+            FormulaRenderer renderer = this.manager.getInstance(FormulaRenderer.class, rendererHint);
             String imageName = renderer.process(formula, inline, fontSize, imageType);
-            String url = this.dab.getURL(null, "tex", null, null) + "/" + imageName;
+            String url = this.dab.getDocumentURL(null, "tex", null, null) + "/" + imageName;
             ResourceReference imageReference = new ResourceReference(url, ResourceType.URL);
             ImageBlock result = new ImageBlock(imageReference, false);
             // Set the alternative text for the image to be the original formula
@@ -170,11 +166,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;

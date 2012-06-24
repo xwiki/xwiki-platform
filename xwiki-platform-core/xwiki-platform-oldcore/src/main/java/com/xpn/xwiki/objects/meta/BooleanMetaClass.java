@@ -54,6 +54,7 @@ public class BooleanMetaClass extends PropertyMetaClass
         safeput("defaultValue", default_value_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new BooleanClass();

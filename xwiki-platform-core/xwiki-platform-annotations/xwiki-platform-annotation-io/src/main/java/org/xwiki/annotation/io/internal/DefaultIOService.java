@@ -32,22 +32,16 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
-import org.xwiki.annotation.event.AnnotationAddedEvent;
-import org.xwiki.annotation.event.AnnotationDeletedEvent;
-import org.xwiki.annotation.event.AnnotationUpdatedEvent;
+import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.io.IOServiceException;
 import org.xwiki.annotation.maintainer.AnnotationState;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -68,12 +62,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Singleton
 public class DefaultIOService implements IOService
 {
-    /**
-     * The name of the field of the annotation object containing the reference of the content on which the annotation is
-     * added.
-     */
-    private static final String TARGET = "target";
-
     /**
      * The execution used to get the deprecated XWikiContext.
      */
@@ -100,22 +88,16 @@ public class DefaultIOService implements IOService
     private EntityReferenceSerializer<String> localSerializer;
 
     /**
-     * Document access bridge used to get the annotations configuration parameters.
-     */
-    @Inject
-    private DocumentAccessBridge dab;
-
-    /**
-     * Component manager to get the observation manager and send notifications.
-     */
-    @Inject
-    private ComponentManager componentManager;
-
-    /**
      * The logger to use for logging.
      */
     @Inject
     private Logger logger;
+
+    /**
+     * The Annotation Application's configuration.
+     */
+    @Inject
+    private AnnotationConfiguration configuration;
 
     /**
      * {@inheritDoc} <br />
@@ -123,6 +105,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#addAnnotation(String, org.xwiki.annotation.Annotation)
      */
+    @Override
     public void addAnnotation(String target, Annotation annotation) throws IOServiceException
     {
         try {
@@ -139,9 +122,13 @@ public class DefaultIOService implements IOService
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
             // create a new object in this document to hold the annotation
-            String annotationClassName = getAnnotationClassName();
-            int id = document.createNewObject(annotationClassName, deprecatedContext);
-            BaseObject object = document.getObject(annotationClassName, id);
+            // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
+            // for an object's class. This avoids ugly log warning messages.
+            EntityReference annotationClassReference = configuration.getAnnotationClassReference();
+            annotationClassReference =
+                annotationClassReference.removeParent(annotationClassReference.extractReference(EntityType.WIKI));
+            int id = document.createXObject(annotationClassReference, deprecatedContext);
+            BaseObject object = document.getXObject(configuration.getAnnotationClassReference(), id);
             updateObject(object, annotation, deprecatedContext);
             // and set additional data: author to annotation author, date to now and the annotation target
             object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
@@ -158,24 +145,16 @@ public class DefaultIOService implements IOService
             // ftm don't store the type of the reference since we only need to recognize the field, not to also read it.
             if (targetReference.getType() == EntityType.OBJECT_PROPERTY
                 || targetReference.getType() == EntityType.DOCUMENT) {
-                object.set(TARGET, localSerializer.serialize(targetReference), deprecatedContext);
+                object.set(Annotation.TARGET_FIELD, localSerializer.serialize(targetReference), deprecatedContext);
             } else {
-                object.set(TARGET, target, deprecatedContext);
+                object.set(Annotation.TARGET_FIELD, target, deprecatedContext);
             }
             // set the author of the document to the current user
             document.setAuthor(deprecatedContext.getUser());
             deprecatedContext.getWiki().saveDocument(document,
                 "Added annotation on \"" + annotation.getSelection() + "\"", deprecatedContext);
-
-            // notify listeners that an annotation was added
-            ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new AnnotationAddedEvent(documentFullName, object.getNumber() + ""), document,
-                deprecatedContext);
-
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
-        } catch (ComponentLookupException exc) {
-            this.logger.warn("Could not get the observation manager to send notifications about the annotation add");
         }
     }
 
@@ -186,6 +165,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#getAnnotations(String)
      */
+    @Override
     public Collection<Annotation> getAnnotations(String target) throws IOServiceException
     {
         try {
@@ -204,7 +184,7 @@ public class DefaultIOService implements IOService
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             // and the annotation class objects in it
-            List<BaseObject> objects = document.getObjects(getAnnotationClassName());
+            List<BaseObject> objects = document.getXObjects(configuration.getAnnotationClassReference());
             // and build a list of Annotation objects
             List<Annotation> result = new ArrayList<Annotation>();
             if (objects == null) {
@@ -212,7 +192,7 @@ public class DefaultIOService implements IOService
             }
             for (BaseObject object : objects) {
                 // if it's not on the required target, ignore it
-                if (object == null || !localTargetId.equals(object.getStringValue(TARGET))) {
+                if (object == null || !localTargetId.equals(object.getStringValue(Annotation.TARGET_FIELD))) {
                     continue;
                 }
                 // use the object number as annotation id
@@ -224,11 +204,7 @@ public class DefaultIOService implements IOService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.io.IOService#getAnnotation(java.lang.String, java.lang.String)
-     */
+    @Override
     public Annotation getAnnotation(String target, String annotationID) throws IOServiceException
     {
         try {
@@ -251,8 +227,10 @@ public class DefaultIOService implements IOService
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             // and the annotation class objects in it
             // parse the annotation id as object index
-            BaseObject object = document.getObject(getAnnotationClassName(), Integer.valueOf(annotationID.toString()));
-            if (object == null || !localTargetId.equals(object.getStringValue(TARGET))) {
+            BaseObject object =
+                document.getXObject(configuration.getAnnotationClassReference(),
+                    Integer.valueOf(annotationID.toString()));
+            if (object == null || !localTargetId.equals(object.getStringValue(Annotation.TARGET_FIELD))) {
                 return null;
             }
             // use the object number as annotation id
@@ -272,6 +250,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#removeAnnotation(String, String)
      */
+    @Override
     public void removeAnnotation(String target, String annotationID) throws IOServiceException
     {
         try {
@@ -297,25 +276,21 @@ public class DefaultIOService implements IOService
             }
             // and the document object on it
             BaseObject annotationObject =
-                document.getObject(getAnnotationClassName(), Integer.valueOf(annotationID.toString()));
+                document.getXObject(configuration.getAnnotationClassReference(),
+                    Integer.valueOf(annotationID.toString()));
 
             // if object exists and its target matches the requested target, delete it
-            if (annotationObject != null && localTargetId.equals(annotationObject.getStringValue(TARGET))) {
+            if (annotationObject != null
+                && localTargetId.equals(annotationObject.getStringValue(Annotation.TARGET_FIELD))) {
                 document.removeObject(annotationObject);
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
                     deprecatedContext);
-                // notify listeners that an annotation was deleted
-                ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-                observationManager
-                    .notify(new AnnotationDeletedEvent(docName, annotationID), document, deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while removing the annotation", e);
-        } catch (ComponentLookupException exc) {
-            this.logger.warn("Could not get the observation manager to send notifications about the annotation delete");
         }
     }
 
@@ -327,6 +302,7 @@ public class DefaultIOService implements IOService
      * 
      * @see org.xwiki.annotation.io.IOService#updateAnnotations(String, java.util.Collection)
      */
+    @Override
     public void updateAnnotations(String target, Collection<Annotation> annotations) throws IOServiceException
     {
         try {
@@ -350,7 +326,7 @@ public class DefaultIOService implements IOService
                 } catch (NumberFormatException e) {
                     continue;
                 }
-                BaseObject object = document.getObject(getAnnotationClassName(), annId);
+                BaseObject object = document.getXObject(configuration.getAnnotationClassReference(), annId);
                 if (object == null) {
                     continue;
                 }
@@ -361,17 +337,9 @@ public class DefaultIOService implements IOService
                 // set the author of the document to the current user
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
-                // send annotation update notifications for all annotations set to notify for
-                ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-                for (String updateNotif : updateNotifs) {
-                    observationManager.notify(new AnnotationUpdatedEvent(docName, updateNotif), document,
-                        deprecatedContext);
-                }
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
-        } catch (ComponentLookupException exc) {
-            this.logger.warn("Could not get the observation manager to send notifications about the annotation update");
         }
     }
 
@@ -402,9 +370,8 @@ public class DefaultIOService implements IOService
                 try {
                     annotation.set(propName, ((BaseProperty) object.get(propName)).getValue());
                 } catch (XWikiException e) {
-                    this.logger.warn(
-                        "Unable to get property " + propName + " from object " + object.getClassName() + "["
-                            + object.getNumber() + "]. Will not be saved in the annotation.", e);
+                    this.logger.warn("Unable to get property " + propName + " from object " + object.getClassName()
+                        + "[" + object.getNumber() + "]. Will not be saved in the annotation.", e);
                 }
             }
         }
@@ -433,8 +400,8 @@ public class DefaultIOService implements IOService
         // don't reset the state, the date (which will be set now, upon save), and ignore anything that could overwrite
         // the target. Don't set the author either, will be set by caller, if needed
         Collection<String> skippedFields =
-            Arrays
-                .asList(new String[] {Annotation.STATE_FIELD, Annotation.DATE_FIELD, Annotation.AUTHOR_FIELD, TARGET});
+            Arrays.asList(new String[] {Annotation.STATE_FIELD, Annotation.DATE_FIELD, Annotation.AUTHOR_FIELD,
+            Annotation.TARGET_FIELD});
         // all fields in the annotation, try to put them in object (I wonder what happens if I can't...)
         for (String propName : annotation.getFieldNames()) {
             if (!skippedFields.contains(propName)) {
@@ -470,16 +437,5 @@ public class DefaultIOService implements IOService
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-    }
-
-    /**
-     * Helper function to return the annotation class from the annotation configuration document.
-     * 
-     * @return the name of the annotation class that describes the annotation structure
-     */
-    protected String getAnnotationClassName()
-    {
-        String configDocument = "AnnotationCode.AnnotationConfig";
-        return (String) dab.getProperty(configDocument, configDocument, "annotationClass");
     }
 }

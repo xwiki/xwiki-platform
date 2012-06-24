@@ -40,9 +40,7 @@ public class PortletResponse implements Response
         return this.portletResponse;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public OutputStream getOutputStream() throws IOException
     {
         if (this.portletResponse instanceof RenderResponse) {
@@ -51,17 +49,13 @@ public class PortletResponse implements Response
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentLength(int length)
     {
         // No content length for portlets, do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentType(String mimeType)
     {
         if (this.portletResponse instanceof RenderResponse) {

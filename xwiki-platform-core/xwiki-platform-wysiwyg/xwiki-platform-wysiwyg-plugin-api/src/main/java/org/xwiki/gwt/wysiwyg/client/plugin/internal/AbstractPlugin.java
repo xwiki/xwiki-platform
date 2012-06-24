@@ -80,11 +80,7 @@ public abstract class AbstractPlugin implements Plugin
         return uiExtensions;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Plugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         if (loaded) {
@@ -103,11 +99,7 @@ public abstract class AbstractPlugin implements Plugin
         return textArea;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Plugin#getUIExtensions()
-     */
+    @Override
     public UIExtension[] getUIExtensions()
     {
         return uiExtensions.toArray(new UIExtension[uiExtensions.size()]);
@@ -134,11 +126,7 @@ public abstract class AbstractPlugin implements Plugin
         registrations.addAll(registrations);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Plugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         textArea = null;

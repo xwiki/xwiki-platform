@@ -79,11 +79,7 @@ public class LocalEventListener implements EventListener
      */
     private RemoteObservationManager remoteObservationManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         List<Event> events;
@@ -97,30 +93,22 @@ public class LocalEventListener implements EventListener
         return events;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (this.remoteObservationManager == null) {
             try {
                 // Make sure to not receive events until RemoteObservationManager is ready
-                this.componentManager.lookup(ObservationManager.class).removeListener(getName());
-                this.remoteObservationManager = this.componentManager.lookup(RemoteObservationManager.class);
-                this.componentManager.lookup(ObservationManager.class).addListener(this);
+                ObservationManager om = this.componentManager.getInstance(ObservationManager.class);
+                om.removeListener(getName());
+                this.remoteObservationManager = this.componentManager.getInstance(RemoteObservationManager.class);
+                om.addListener(this);
 
                 this.remoteObservationManager.notify(new LocalEventData(event, source, data));
             } catch (ComponentLookupException e) {

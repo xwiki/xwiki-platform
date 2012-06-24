@@ -19,45 +19,58 @@
  */
 package com.xpn.xwiki.monitor.api;
 
-public class MonitorTimerSummary {
+public class MonitorTimerSummary
+{
     private String name;
+
     private long duration = 0;
+
     private long nbcalls = 0;
+
     private long nbrequests = 0;
 
-    public MonitorTimerSummary(String name) {
+    public MonitorTimerSummary(String name)
+    {
         this.name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void addTimer(long duration) {
+    public void addTimer(long duration)
+    {
         this.duration += duration;
         this.nbcalls++;
         this.nbrequests = 1;
     }
 
-    public long getDuration() {
+    public long getDuration()
+    {
         return duration;
     }
 
-    public long getNbCalls() {
+    public long getNbCalls()
+    {
         return nbcalls;
     }
 
-    public void add(MonitorTimerSummary stimer) {
+    public void add(MonitorTimerSummary stimer)
+    {
         duration += stimer.getDuration();
         nbcalls += stimer.getNbCalls();
         nbrequests++;
     }
 
-    public long getRequests() {
+    public long getRequests()
+    {
         return nbrequests;
     }
 
-    public String toString() {
+    @Override
+    public String toString()
+    {
         StringBuffer str = new StringBuffer();
         str.append(name);
         str.append(": duration=");

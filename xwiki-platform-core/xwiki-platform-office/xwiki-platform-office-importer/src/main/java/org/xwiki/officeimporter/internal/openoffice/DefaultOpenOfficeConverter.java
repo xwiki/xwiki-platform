@@ -68,9 +68,7 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
         this.workDir = workDir;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, byte[]> convert(Map<String, InputStream> inputStreams, String inputFileName,
         String outputFileName) throws OpenOfficeConverterException
     {
@@ -83,7 +81,7 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
         OpenOfficeConverterFileStorage storage = null;
         try {
             // Prepare temporary storage.
-            storage = new OpenOfficeConverterFileStorage(workDir, inputFileName, outputFileName);
+            storage = new OpenOfficeConverterFileStorage(this.workDir, inputFileName, outputFileName);
 
             // Write out all the input streams.
             FileOutputStream fos = null;
@@ -98,7 +96,7 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
             }
 
             // Perform the conversion.
-            converter.convert(storage.getInputFile(), storage.getOutputFile());
+            this.converter.convert(storage.getInputFile(), storage.getOutputFile());
 
             // Collect all the output artifacts.
             Map<String, byte[]> result = new HashMap<String, byte[]>();
@@ -122,13 +120,9 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConverter#isMediaTypeSupported(String)
-     */
+    @Override
     public boolean isMediaTypeSupported(String mediaType)
     {
-        return converter.getFormatRegistry().getFormatByMediaType(mediaType) != null;
+        return this.converter.getFormatRegistry().getFormatByMediaType(mediaType) != null;
     }
 }

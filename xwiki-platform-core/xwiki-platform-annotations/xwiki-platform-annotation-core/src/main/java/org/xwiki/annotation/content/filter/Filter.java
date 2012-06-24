@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.annotation.content.filter;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * This component defines a filter to be used by alterers. It defines a set of accepted characters.
@@ -28,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface Filter
 {
     /**

@@ -71,7 +71,7 @@ public class XWikiStatsReader
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
     private EntityReferenceSerializer<String> compactwikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Return the statistics action stored.

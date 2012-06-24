@@ -1,123 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WikiCode</web>
-<name>MyLastWikiModificationsWidget</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Panels.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1191862105000</creationDate>
-<date>1221577244000</date>
-<contentUpdateDate>1221577244000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Imported from XAR</comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>Panels.PanelClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>5</number>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Information|Navigation|Tools|Administration|Other</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</category>
-<content>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>content</name>
-<number>4</number>
-<prettyName>Content</prettyName>
-<rows>25</rows>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<description>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>description</name>
-<number>3</number>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<type>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>type</name>
-<number>2</number>
-<prettyName>Panel type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>view|edit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-</class>
-<name>WikiCode.MyLastWikiModificationsWidget</name>
-<number>0</number>
-<className>Panels.PanelClass</className>
-<guid>84ccd230-db93-4e16-bb80-03ffbfbb78b4</guid>
-<property>
-<category>Information</category>
-</property>
-<property>
-<content>#panelheader($msg.get("wikimanager.widget.mylastmodifications.title"))
+  <web>WikiCode</web>
+  <name>MyLastWikiModificationsWidget</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1191862105000</creationDate>
+  <date>1221577244000</date>
+  <contentUpdateDate>1221577244000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>Panels.PanelClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Information|Navigation|Tools|Administration|Other</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </category>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>4</number>
+        <prettyName>Content</prettyName>
+        <rows>25</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <description>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>2</number>
+        <prettyName>Panel type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>view|edit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <name>WikiCode.MyLastWikiModificationsWidget</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>84ccd230-db93-4e16-bb80-03ffbfbb78b4</guid>
+    <property>
+      <category>Information</category>
+    </property>
+    <property>
+      <content>#panelheader($msg.get("wikimanager.widget.mylastmodifications.title"))
   #set($usermodifications = "${xcontext.user}")
   #set($usermodificationswiki = "${xcontext.database}")
   #includeInContext("WikiCode.LastWikiModificationsCode")
 #panelfooter()</content>
-</property>
-<property>
-<description>Panel Description</description>
-</property>
-<property>
-<name>MyLastWikiModificationsWidget</name>
-</property>
-<property>
-<type>view</type>
-</property>
-</object>
-<content>#includeForm("Panels.PanelSheet")</content></xwikidoc>
+    </property>
+    <property>
+      <description>Panel Description</description>
+    </property>
+    <property>
+      <name>MyLastWikiModificationsWidget</name>
+    </property>
+    <property>
+      <type>view</type>
+    </property>
+  </object>
+  <content>#includeForm("Panels.PanelSheet")</content>
+</xwikidoc>

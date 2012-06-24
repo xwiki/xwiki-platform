@@ -69,17 +69,13 @@ public class XDOMOfficeDocument implements OfficeDocument
         this.componentManager = componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XDOM getContentDocument()
     {
         return this.xdom;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getContentAsString()
     {
         return getContentAsString("xwiki/2.0");
@@ -95,7 +91,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     {
         try {
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, syntaxId);
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, syntaxId);
             renderer.render(this.xdom, printer);
             return printer.toString();
         } catch (ComponentLookupException ex) {
@@ -104,9 +100,7 @@ public class XDOMOfficeDocument implements OfficeDocument
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, byte[]> getArtifacts()
     {
         return this.artifacts;
@@ -163,7 +157,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     {
         try {
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, "plain/1.0");
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, "plain/1.0");
             renderer.render(header, printer);
             return printer.toString();
         } catch (ComponentLookupException ex) {

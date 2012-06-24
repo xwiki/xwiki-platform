@@ -19,7 +19,7 @@
  */
 package org.xwiki.csrf;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Anti-CSRF (Cross Site Request Forgery) protection using secret token validation mechanism.
@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.5M2
  */
-@ComponentRole
+@Role
 public interface CSRFToken
 {
     /**

@@ -80,11 +80,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, ShortcutKeyCommand>
         return registrations;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
+    @Override
     public void onKeyDown(KeyDownEvent event)
     {
         ignoreNextKeyPress = true;
@@ -102,11 +98,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, ShortcutKeyCommand>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         if (command != null) {
@@ -120,11 +112,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, ShortcutKeyCommand>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (command != null) {

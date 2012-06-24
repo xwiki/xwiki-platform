@@ -28,7 +28,6 @@ public class DBTreeListMetaClass extends DBListMetaClass
 {
     public DBTreeListMetaClass()
     {
-        super();
         setPrettyName("Database Tree");
         setName(DBTreeListClass.class.getName());
 
@@ -39,6 +38,7 @@ public class DBTreeListMetaClass extends DBListMetaClass
         safeput("parentField", parentfield_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new DBTreeListClass();

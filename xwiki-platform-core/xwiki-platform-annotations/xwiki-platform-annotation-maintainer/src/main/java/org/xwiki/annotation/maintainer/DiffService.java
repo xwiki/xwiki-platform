@@ -21,7 +21,7 @@ package org.xwiki.annotation.maintainer;
 
 import java.util.Collection;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Defines the interface of a service providing the differences between two strings.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface DiffService
 {
     /**

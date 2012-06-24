@@ -41,11 +41,6 @@ public class ExternalServletURLFactory extends XWikiServletURLFactory
         super(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String getURL(URL url, XWikiContext context)
     {

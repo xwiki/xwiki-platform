@@ -32,6 +32,7 @@ public class LevelsMetaClass extends ListMetaClass
         setName(LevelsClass.class.getName());
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new LevelsClass();

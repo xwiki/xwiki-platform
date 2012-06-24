@@ -56,6 +56,12 @@ import org.xwiki.velocity.VelocityManager;
 
 import static org.xwiki.rendering.test.BlockAssert.*;
 
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+
+
 /**
  * Unit tests for {@link IncludeMacro}.
  * 
@@ -76,8 +82,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         super.setUp();
 
         // Put a fake XWiki context on the execution context.
-        getComponentManager().lookup(Execution.class).getContext()
-            .setProperty("xwikicontext", new HashMap<Object, Object>());
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        execution.getContext().setProperty("xwikicontext", new HashMap<Object, Object>());
     }
 
     @Override
@@ -86,8 +92,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         super.registerComponents();
         
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-        this.includeMacro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        this.rendererFactory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
+        this.includeMacro = (IncludeMacro) getComponentManager().getInstance(Macro.class, "include");
+        this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
@@ -109,6 +115,25 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             "{{velocity}}#testmacro{{/velocity}}");
 
         assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    public void testIncludeMacroWithNewContextShowsPassingOnRestrictedFlag() throws Exception
+    {
+        String expected =  "beginDocument\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage][base]=[wiki:Space.IncludedPage]]\n"
+            + "beginMacroMarkerStandalone [velocity] [] [$foo]\n"
+            + "beginGroup [[class]=[xwikirenderingerror]]\n"
+            + "onWord [Failed to execute the [velocity] macro]\n"
+            + "endGroup [[class]=[xwikirenderingerror]]\n"
+            + "beginGroup [[class]=[xwikirenderingerrordescription hidden]]\n"
+            + "onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: You don't have the right to execute this script";
+
+        // We verify that a Velocity macro set in the including page is not seen in the included page.
+        List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true);
+
+        assertBlocksStartsWith(expected, blocks, this.rendererFactory);
+
     }
 
     @Test
@@ -344,13 +369,14 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
     private XDOM getXDOM(String content) throws Exception
     {
-        return getComponentManager().lookup(Parser.class, "xwiki/2.0").parse(new StringReader(content));
+        Parser parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        return parser.parse(new StringReader(content));
     }
 
     private List<Block> runIncludeMacroWithPreVelocity(Context context, String velocity, String includedContent)
         throws Exception
     {
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer,
             "wiki:Space.IncludingPage", velocity);
@@ -359,6 +385,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     private List<Block> runIncludeMacro(final Context context, String includedContent) throws Exception
+    {
+        return runIncludeMacro(context, includedContent, false);
+    }
+
+    private List<Block> runIncludeMacro(final Context context, String includedContent, boolean restricted) throws Exception
     {
         final DocumentReference includedDocumentReference = new DocumentReference("wiki", "Space", "IncludedPage");
         String includedDocStringRef = "wiki:space.page";
@@ -385,10 +416,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
         MacroTransformation macroTransformation =
-            (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
+            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext macroContext = createMacroTransformationContext(includedDocStringRef, false);
         macroContext.setId("wiki:Space.IncludingPage");
         macroContext.setTransformation(macroTransformation);
+        macroContext.getTransformationContext().setRestricted(restricted);
 
         return this.includeMacro.execute(parameters, null, macroContext);
     }

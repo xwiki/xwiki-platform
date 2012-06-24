@@ -3,13 +3,13 @@
 <web>XAppResources</web>
 <name>Translations</name>
 <language>vi</language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>1</translation>
 <parent>XAppResources.WebHome</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
 <date>1278346254000</date>
 <contentUpdateDate>1278346254000</contentUpdateDate>
@@ -23,5 +23,4 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language vi generated from http://www.l10n.xwiki.org
-#Wed Dec 07 22:47:39 CET 2011
 </content></xwikidoc>

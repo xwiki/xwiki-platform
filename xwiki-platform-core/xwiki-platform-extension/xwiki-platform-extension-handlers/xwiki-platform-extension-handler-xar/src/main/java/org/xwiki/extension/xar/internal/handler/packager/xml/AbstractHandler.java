@@ -37,6 +37,10 @@ import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class AbstractHandler extends DefaultHandler
 {
     @Inject
@@ -215,7 +219,7 @@ public class AbstractHandler extends DefaultHandler
 
     protected ExecutionContext getExecutionContext() throws ComponentLookupException
     {
-        return getComponentManager().lookup(Execution.class).getContext();
+        return getComponentManager().<Execution>getInstance(Execution.class).getContext();
     }
 
     protected XWikiContext getXWikiContext() throws ComponentLookupException

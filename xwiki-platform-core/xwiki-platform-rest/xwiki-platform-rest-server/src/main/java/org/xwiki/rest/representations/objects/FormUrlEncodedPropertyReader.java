@@ -53,11 +53,13 @@ public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
 {
     private static final String PROPERTY_PREFIX = "property#";
 
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Property.class.isAssignableFrom(type);
     }
 
+    @Override
     public Property readFrom(Class<Property> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

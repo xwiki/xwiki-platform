@@ -57,32 +57,20 @@ public abstract class AbstractUIExtension implements UIExtension
         uiObjects = new HashMap<String, UIObject>();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         Set<String> features = uiObjects.keySet();
         return features.toArray(new String[features.size()]);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getRole()
-     */
+    @Override
     public String getRole()
     {
         return role;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getUIObject(String)
-     */
+    @Override
     public UIObject getUIObject(String feature)
     {
         return uiObjects.get(feature);

@@ -44,10 +44,12 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         this.localCacheFactory = localCacheFactory;
     }
 
+    @Override
     public void init(XWiki context)
     {
     }
 
+    @Override
     public XWikiCache newCache(String cacheName) throws XWikiException
     {
         CacheConfiguration configuration = new CacheConfiguration();
@@ -61,6 +63,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         }
     }
 
+    @Override
     public XWikiCache newCache(String cacheName, int capacity) throws XWikiException
     {
         CacheConfiguration configuration = new CacheConfiguration();
@@ -77,16 +80,19 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         }
     }
 
+    @Override
     public XWikiCache newCache(String cacheName, Properties props) throws XWikiException
     {
         return newCache(cacheName);
     }
 
+    @Override
     public XWikiCache newCache(String cacheName, Properties props, int capacity) throws XWikiException
     {
         return newCache(cacheName, capacity);
     }
 
+    @Override
     public XWikiCache newLocalCache() throws XWikiException
     {
         try {
@@ -97,6 +103,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         }
     }
 
+    @Override
     public XWikiCache newLocalCache(int capacity) throws XWikiException
     {
         CacheConfiguration configuration = new CacheConfiguration();
@@ -112,14 +119,15 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         }
     }
 
+    @Override
     public XWikiCache newLocalCache(Properties props) throws XWikiException
     {
         return newLocalCache();
     }
 
+    @Override
     public XWikiCache newLocalCache(Properties props, int capacity) throws XWikiException
     {
         return newLocalCache(capacity);
     }
-
 }

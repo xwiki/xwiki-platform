@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XAppSheets</web>
-<name>XWikiApplicationClassSheet</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>XAppClasses.XWikiApplicationClass</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1192211384000</creationDate>
-<date>1319471051000</date>
-<contentUpdateDate>1319471051000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<content>#set($Appmanager = $services.applicationmanager)
+  <web>XAppSheets</web>
+  <name>XWikiApplicationClassSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XAppClasses.XWikiApplicationClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1192211384000</creationDate>
+  <date>1319471051000</date>
+  <contentUpdateDate>1319471051000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <content>#set($Appmanager = $services.applicationmanager)
 #set($Exception = $Appmanager.DefaultException)
 ##
 #set($object = $doc.getObject("XAppClasses.XWikiApplicationClass"))
@@ -82,4 +83,5 @@
   &lt;/dl&gt;
 #else
   1 Document \"$doc.name\"
-#end</content></xwikidoc>
+#end</content>
+</xwikidoc>

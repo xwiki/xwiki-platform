@@ -19,7 +19,7 @@
  */
 package org.xwiki.display.internal;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Configuration properties for the display module.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.2M3
  */
-@ComponentRole
+@Role
 public interface DisplayConfiguration
 {
     /**

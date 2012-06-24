@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -57,8 +59,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
 
-    /** Colon symbol. */
-    private static final String COLON = ":";
+    /** Needed for computing the archive cache key. */
+    @Inject
+    private EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -135,31 +138,19 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         if (archiveDoc != null) {
             return archiveDoc;
         }
-        String key = ((doc.getDatabase() == null) ? "xwiki" : doc.getDatabase()) + COLON + doc.getFullName();
-        if (!"".equals(doc.getLanguage())) {
-            key = key + COLON + doc.getLanguage();
-        }
 
-        synchronized (key) {
-            archiveDoc = context.getDocumentArchive(key);
-            if (archiveDoc == null) {
-                String db = context.getDatabase();
-                try {
-                    if (doc.getDatabase() != null) {
-                        context.setDatabase(doc.getDatabase());
-                    }
-                    archiveDoc = new XWikiDocumentArchive(doc.getId());
-                    loadXWikiDocArchive(archiveDoc, true, context);
-                    doc.setDocumentArchive(archiveDoc);
-                } finally {
-                    context.setDatabase(db);
-                }
-                // This will also make sure that the Archive has a strong reference
-                // and will not be discarded as long as the context exists.
-                context.addDocumentArchive(key, archiveDoc);
+        String db = context.getDatabase();
+        try {
+            if (doc.getDatabase() != null) {
+                context.setDatabase(doc.getDatabase());
             }
-            return archiveDoc;
+            archiveDoc = new XWikiDocumentArchive(doc.getId());
+            loadXWikiDocArchive(archiveDoc, true, context);
+            doc.setDocumentArchive(archiveDoc);
+        } finally {
+            context.setDatabase(db);
         }
+        return archiveDoc;
     }
 
     @Override

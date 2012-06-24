@@ -71,11 +71,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#init(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void init(XWikiContext context)
     {
         this.contextPath = context.getWiki().getWebAppPath(context);
@@ -162,11 +158,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return context.getWiki().Param("xwiki.home", null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#getServerURL(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL getServerURL(XWikiContext context) throws MalformedURLException
     {
         return getServerURL(context.getDatabase(), context);
@@ -205,23 +197,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return url == null ? this.serverURL : url;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String, boolean,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context)
     {
         return createURL(web, name, action, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
     {
@@ -245,7 +227,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             newpath.append("?");
-            newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
+            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
             // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
@@ -323,24 +305,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return Util.encodeURI(name, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createExternalURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context)
     {
         return this.createURL(web, name, action, querystring, anchor, xwikidb, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createSkinURL(java.lang.String, java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
@@ -355,12 +327,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createSkinURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
@@ -377,6 +344,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
@@ -407,12 +375,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createAttachmentURL(java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
@@ -445,7 +408,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             newpath.append("?");
-            newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
+            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         try {
@@ -477,12 +440,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             && (wiki == null || doc.getDocumentReference().getWikiReference().getName().equals(wiki));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiURLFactory#createAttachmentRevisionURL(java.lang.String, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
         String querystring, String xwikidb, XWikiContext context)
     {
@@ -508,7 +466,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             qstring += "&" + querystring;
         }
         newpath.append("?");
-        newpath.append(StringUtils.chomp(StringUtils.chomp(qstring, "&"), "&amp;"));
+        newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
 
         try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
@@ -546,56 +504,56 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public String getURL(URL url, XWikiContext context)
     {
+        String relativeURL = "";
+
         try {
-            if (url == null) {
-                return "";
-            }
+            if (url != null) {
+                String surl = url.toString();
 
-            String surl = url.toString();
-            if (!surl.startsWith(serverURL.toString())) {
-                // External URL: leave it as is.
-                return surl;
-            } else {
-                // Internal XWiki URL: convert to relative.
-                StringBuffer sbuf = new StringBuffer(url.getPath());
-                String querystring = url.getQuery();
-                if (!StringUtils.isEmpty(querystring)) {
-                    sbuf.append("?");
-                    sbuf.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
-                    // sbuf.append(querystring.replaceAll("&","&amp;"));
-                }
+                if (!surl.startsWith(serverURL.toString())) {
+                    // External URL: leave it as is.
+                    relativeURL = surl;
+                } else {
+                    // Internal XWiki URL: convert to relative.
+                    StringBuffer sbuf = new StringBuffer(url.getPath());
+                    String querystring = url.getQuery();
+                    if (!StringUtils.isEmpty(querystring)) {
+                        sbuf.append("?");
+                        sbuf.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                        // sbuf.append(querystring.replaceAll("&","&amp;"));
+                    }
 
-                String anchor = url.getRef();
-                if (!StringUtils.isEmpty(anchor)) {
-                    sbuf.append("#");
-                    sbuf.append(anchor);
+                    String anchor = url.getRef();
+                    if (!StringUtils.isEmpty(anchor)) {
+                        sbuf.append("#");
+                        sbuf.append(anchor);
+                    }
+
+                    relativeURL = Util.escapeURL(sbuf.toString());
                 }
-                return Util.escapeURL(sbuf.toString());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+            LOGGER.error("Failed to create URL", e);
         }
+
+        return relativeURL;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#getRequestURL(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public URL getRequestURL(XWikiContext context)
     {
         final URL url = super.getRequestURL(context);
+
         try {
             final URL servurl = getServerURL(context);
             // if use apache mod_proxy we needed to know external host address
             return new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
-        } catch (MalformedURLException ex) {
+        } catch (MalformedURLException e) {
             // This should not happen
-            ex.printStackTrace();
-            return url;
+            LOGGER.error("Failed to create request URL", e);
         }
+
+        return url;
     }
 
     public XWikiAttachment findAttachmentForDocRevision(XWikiDocument doc, String docRevision, String filename,

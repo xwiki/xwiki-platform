@@ -1,142 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>AppWithinMinutes</web>
-<name>TextArea</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>AppWithinMinutes.FormFieldClass</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1318181085000</creationDate>
-<date>1319487691000</date>
-<contentUpdateDate>1319487691000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('platform.appwithinminutes.classEditorTextAreaFieldName')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<class>
-<name>AppWithinMinutes.TextArea</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<longText>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>longText</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Long Text</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</longText>
-</class>
-<object>
-<class>
-<name>AppWithinMinutes.FormFieldClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<classname>AppWithinMinutes.FormFieldCategoryClass</classname>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<idField></idField>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators></separators>
-<size>1</size>
-<sort>none</sort>
-<sql></sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</category>
-<icon>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>icon</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<priority>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>priority</name>
-<number>3</number>
-<numberType>long</numberType>
-<prettyName>Priority</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-</priority>
-<properties>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>properties</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>Properties</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</properties>
-</class>
-<name>AppWithinMinutes.TextArea</name>
-<number>0</number>
-<className>AppWithinMinutes.FormFieldClass</className>
-<guid>d08fadb8-6ad0-475d-b737-9726fc4ed4d5</guid>
-<property>
-<category>AppWithinMinutes.Standard</category>
-</property>
-<property>
-<icon>icons/datamodel/textarea.png</icon>
-</property>
-<property>
-<priority>1</priority>
-</property>
-<property>
-<properties>rows editor</properties>
-</property>
-</object>
-<content></content></xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>TextArea</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.FormFieldClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1318181085000</creationDate>
+  <date>1319487691000</date>
+  <contentUpdateDate>1319487691000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('platform.appwithinminutes.classEditorTextAreaFieldName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <class>
+    <name>AppWithinMinutes.TextArea</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <longText>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>---</editor>
+      <name>longText</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Long Text</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </longText>
+  </class>
+  <object>
+    <class>
+      <name>AppWithinMinutes.FormFieldClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <classname>AppWithinMinutes.FormFieldCategoryClass</classname>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>1</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </category>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <priority>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>3</number>
+        <numberType>long</numberType>
+        <prettyName>Priority</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
+      <properties>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>properties</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Properties</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </properties>
+    </class>
+    <name>AppWithinMinutes.TextArea</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldClass</className>
+    <guid>d08fadb8-6ad0-475d-b737-9726fc4ed4d5</guid>
+    <property>
+      <category>AppWithinMinutes.Standard</category>
+    </property>
+    <property>
+      <icon>icons/datamodel/textarea.png</icon>
+    </property>
+    <property>
+      <priority>1</priority>
+    </property>
+    <property>
+      <properties>rows editor</properties>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

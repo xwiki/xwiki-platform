@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -40,8 +41,11 @@ public class ObjectAddAction extends XWikiAction
 {
     private static final String[] EMPTY_PROPERTY = new String[] {""};
 
-    @SuppressWarnings("unchecked")
-    private DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.class, "current");
+    /**
+     * Used to resolve XClass references.
+     */
+    private EntityReferenceResolver<String> relativeResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING,
+        "relative");
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -58,7 +62,7 @@ public class ObjectAddAction extends XWikiAction
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
         String className = oform.getClassName();
-        DocumentReference classReference = this.resolver.resolve(className, EntityType.DOCUMENT);
+        EntityReference classReference = this.relativeResolver.resolve(className, EntityType.DOCUMENT);
         BaseObject object = doc.newXObject(classReference, context);
 
         // We need to have a string in the map for each field for the object to be correctly created.
@@ -92,6 +96,7 @@ public class ObjectAddAction extends XWikiAction
         // forward to edit
         String redirect = Utils.getRedirect("edit", "editor=object", "xcontinue", "xredirect");
         sendRedirect(response, redirect);
+
         return false;
     }
 }

@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -36,7 +36,7 @@ import org.xwiki.model.reference.ObjectReference;
  * @version $Id$
  * @since 1.6M1
  */
-@ComponentRole
+@Role
 public interface DocumentAccessBridge
 {
     /**
@@ -59,38 +59,6 @@ public interface DocumentAccessBridge
      * @since 2.2M1
      */
     DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception;
-
-    /**
-     * Get the document object associated with the passed document name.
-     * 
-     * @param documentName the name of the document to find
-     * @return the document object matching the passed document name
-     * @throws Exception when the storage cannot be accessed
-     * @deprecated replaced by {@link #getDocument(org.xwiki.model.reference.DocumentReference)} since 2.2M1
-     */
-    @Deprecated
-    DocumentModelBridge getDocument(org.xwiki.bridge.DocumentName documentName) throws Exception;
-
-    /**
-     * Get the different parts of a document name (wiki, space, page).
-     * 
-     * @param documentName the name of the document for which to return name information
-     * @return the document name object containing the information
-     * @deprecated replaced by {@link org.xwiki.model.reference.DocumentReferenceResolver} since 2.2M1
-     */
-    @Deprecated
-    org.xwiki.bridge.DocumentName getDocumentName(String documentName);
-
-    /**
-     * Get the different parts of a the current document name (wiki, space, page).
-     * <p>
-     * The current document is found in the context.
-     * 
-     * @return the document name object containing the information
-     * @deprecated replaced by {@link #getCurrentDocumentReference()} since 2.2M1
-     */
-    @Deprecated
-    org.xwiki.bridge.DocumentName getCurrentDocumentName();
 
     /**
      * Get the reference to the current document (found in the Context).
@@ -439,18 +407,6 @@ public interface DocumentAccessBridge
     InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception;
 
     /**
-     * Returns the content of a document attachment.
-     * 
-     * @param attachmentName the name of the attachment to access
-     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
-     *         not exist
-     * @throws Exception If the document cannot be accessed.
-     * @deprecated replaced by {@link #getAttachmentContent(org.xwiki.model.reference.AttachmentReference)} since 2.2M1
-     */
-    @Deprecated
-    InputStream getAttachmentContent(org.xwiki.bridge.AttachmentName attachmentName) throws Exception;
-
-    /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
      * newly.
      * 
@@ -548,17 +504,6 @@ public interface DocumentAccessBridge
     List<AttachmentReference> getAttachmentReferences(DocumentReference documentReference) throws Exception;
 
     /**
-     * Retrieves all attachments in the passed document.
-     * 
-     * @param documentName the document for which to retrieve all attachment names
-     * @return the list of attachment names in the passed document
-     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
-     * @deprecated replaced by {@link #getAttachmentReferences(DocumentReference)} since 2.2M1
-     */
-    @Deprecated
-    List<org.xwiki.bridge.AttachmentName> getAttachments(org.xwiki.bridge.DocumentName documentName) throws Exception;
-
-    /**
      * Retrieves the relative URL (ie the path without the hostname and port) that can be used to access an attachment.
      * 
      * @param documentReference the reference to the document containing the attachment (eg "wiki:Space.Page")
@@ -594,18 +539,6 @@ public interface DocumentAccessBridge
     String getAttachmentURL(AttachmentReference attachmentReference, String queryString, boolean isFullURL);
 
     /**
-     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be used
-     * to access an attachment.
-     * 
-     * @param attachmentName the attachment name for which to find the URL
-     * @param isFullURL whether the returned URL will a relative URL or the full URL
-     * @return the attachment URL
-     * @deprecated replaced by {@link #getAttachmentURL(AttachmentReference , boolean)} since 2.2M1
-     */
-    @Deprecated
-    String getAttachmentURL(org.xwiki.bridge.AttachmentName attachmentName, boolean isFullURL);
-
-    /**
      * @param documentReference the document for which to retrieve all attachment URLs
      * @param isFullURL whether the returned URL will a relative URL or the full URL
      * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full URL)
@@ -616,17 +549,6 @@ public interface DocumentAccessBridge
      */
     @Deprecated
     List<String> getAttachmentURLs(DocumentReference documentReference, boolean isFullURL) throws Exception;
-
-    /**
-     * @param documentName the document for which to retrieve all attachment URLs
-     * @param isFullURL whether the returned URL will a relative URL or the full URL
-     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full URL)
-     *         for all attachments in the passed document
-     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
-     * @deprecated use {@link #getAttachmentReferences(org.xwiki.model.reference.DocumentReference)} instead
-     */
-    @Deprecated
-    List<String> getAttachmentURLs(org.xwiki.bridge.DocumentName documentName, boolean isFullURL) throws Exception;
 
     /**
      * @param documentReference the reference of the document to access
@@ -667,8 +589,18 @@ public interface DocumentAccessBridge
      * Utility method to retrieve the current user.
      * 
      * @return the current user full reference.
+     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()} since 4.0RC1
      */
+    @Deprecated
     String getCurrentUser();
+
+    /**
+     * Utility method to retrieve the current user document reference.
+     *
+     * @return the current user document reference.
+     * @since 4.0RC1
+     */
+    DocumentReference getCurrentUserReference();
 
     /**
      * Utility method to set the current user.

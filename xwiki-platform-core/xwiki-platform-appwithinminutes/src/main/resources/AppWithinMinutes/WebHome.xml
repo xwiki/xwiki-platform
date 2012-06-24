@@ -1,41 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>AppWithinMinutes</web>
-<name>WebHome</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1320655345000</creationDate>
-<date>1320656877000</date>
-<contentUpdateDate>1320656877000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('platform.appwithinminutes.homePageTitle')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>AppWithinMinutes</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1320655345000</creationDate>
+  <date>1320656877000</date>
+  <contentUpdateDate>1320656877000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('platform.appwithinminutes.homePageTitle')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>AppWithinMinutes.WebHome</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>9bf2d1ac-8540-4d53-bbd0-91525a49c621</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>document.observe('xwiki:livetable:newrow', function(event) {
+  // Add the xredirect parameter to the query string of the delete action to
+  // redirect the user back to the live table after an application is deleted.
+  var deleteLink = event.memo.row.down('td.actions').down('a.actiondelete');
+  // The delete URL doesn't have any query string by default.
+  deleteLink.href = deleteLink.href + '?xredirect=' + encodeURIComponent(window.location.href);
+});</code>
+    </property>
+    <property>
+      <name>Code</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <content>{{velocity}}
 $msg.get('platform.appwithinminutes.description')
 
-(% class="buttonwrapper" %)[[$msg.get('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
+#if($hasCreateSpace)
+  (% class="buttonwrapper" %)[[$msg.get('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
 
+#end
 = $msg.get('platform.appwithinminutes.appsLiveTableHeading') =##
 #set($columnsProperties = {
   'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
   'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},
-  'doc.date': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true}
+  'doc.date': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true},
+  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
 })
 #set($options = {
   'className': 'AppWithinMinutes.LiveTableClass',
+  'resultPage' : 'AppWithinMinutes.AppsLiveTableResults',
   'translationPrefix': 'platform.appwithinminutes.appsLiveTable.',
   'tagCloud': true,
   'rowCount': 15,
@@ -43,6 +145,7 @@ $msg.get('platform.appwithinminutes.description')
   'selectedColumn': 'doc.space',
   'defaultOrder': 'asc'
 })
-#set($columns = ['doc.space', 'doc.author', 'doc.date'])
+#set($columns = ['doc.space', 'doc.author', 'doc.date', '_actions'])
 #livetable('livetable' $columns $columnsProperties $options)
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

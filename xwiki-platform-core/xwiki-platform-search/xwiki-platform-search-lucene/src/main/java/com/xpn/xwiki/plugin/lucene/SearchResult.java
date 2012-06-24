@@ -23,6 +23,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -66,6 +67,10 @@ public class SearchResult
 
     private String creator;
 
+    private boolean hidden;
+
+    private DocumentReference documentReference;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResult.class);
 
     /**
@@ -89,6 +94,8 @@ public class SearchResult
         this.language = doc.get(IndexFields.DOCUMENT_LANGUAGE);
         this.date = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_DATE));
         this.creationDate = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_CREATIONDATE));
+        this.hidden = IndexFields.stringToBoolean(doc.get(IndexFields.DOCUMENT_HIDDEN));
+        this.documentReference = new DocumentReference(wiki, space, name);
         if (LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type)) {
             this.filename = doc.get(IndexFields.FILENAME);
             Document document;
@@ -252,4 +259,19 @@ public class SearchResult
         return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(this.type) || LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type));
     }
 
+    /**
+     * @return true if the result is marked as "hidden", false otherwise.
+     */
+    public boolean isHidden()
+    {
+        return this.hidden;
+    }
+
+    /**
+     * @return the reference of the document.
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
+    }
 }

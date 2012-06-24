@@ -24,25 +24,25 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 /**
  * Take care of parsing xar files and handling database actions.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
-@ComponentRole
+@Role
 public interface Packager
 {
-    void importXAR(XarFile previousXarFile, File xarFile, String wiki, MergeConfiguration mergeConfiguration)
-        throws IOException, XWikiException;
+    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
+        XWikiException;
 
-    void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException;
+    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
 
     List<XarEntry> getEntries(File xarFile) throws IOException;
 
-    void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException;
+    void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
 }

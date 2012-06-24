@@ -1,2 +1,3 @@
 org.xwiki.cache.infinispan.internal.InfinispanCacheFactory
 org.xwiki.cache.infinispan.internal.LocaInfinispanCacheFactory
+org.xwiki.cache.infinispan.internal.StopCacheManagerListener

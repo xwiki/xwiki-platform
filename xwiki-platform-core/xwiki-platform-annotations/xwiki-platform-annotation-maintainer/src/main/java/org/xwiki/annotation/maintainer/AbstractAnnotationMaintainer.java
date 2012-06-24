@@ -77,12 +77,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
     @Inject
     protected ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.AnnotationMaintainer#updateAnnotations(java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public void updateAnnotations(String target, String previousContent, String currentContent)
         throws MaintainerServiceException
     {
@@ -142,17 +137,17 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      */
     private String renderPlainText(String content, String syntaxId) throws Exception
     {
-        PrintRenderer renderer = componentManager.lookup(PrintRenderer.class, "normalizer-plain/1.0");
+        PrintRenderer renderer = componentManager.getInstance(PrintRenderer.class, "normalizer-plain/1.0");
 
         // parse
-        Parser parser = componentManager.lookup(Parser.class, syntaxId);
+        Parser parser = componentManager.getInstance(Parser.class, syntaxId);
         XDOM xdom = parser.parse(new StringReader(content));
 
         // run transformations -> although it's going to be at least strange to handle rendered content since there
         // is no context
-        SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
         Syntax sourceSyntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
-        TransformationManager transformationManager = componentManager.lookup(TransformationManager.class);
+        TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, sourceSyntax);
 
         // render

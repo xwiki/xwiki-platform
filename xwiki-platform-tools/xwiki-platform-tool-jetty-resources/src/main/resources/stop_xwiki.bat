@@ -20,9 +20,11 @@ REM 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 REM -------------------------------------------------------------------------
 
 set JETTY_HOME=jetty
+set JETTY_STOP_PORT=8079
 
-REM Specify port and key to stop a running Jetty instance
-set XWIKI_OPTS=-DSTOP.KEY=xwiki -DSTOP.PORT=8079
+REM The port on which to stop Jetty can be passed to this script as the first argument
+IF NOT [%1]==[] set JETTY_STOP_PORT=%1
+set XWIKI_OPTS=-DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
 
 java %XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -jar %JETTY_HOME%/start.jar --stop
 

@@ -40,11 +40,6 @@ public class XWikiServlet extends HttpServlet
     /** Serial version ID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
     @Override
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws ServletException, IOException
@@ -58,7 +53,7 @@ public class XWikiServlet extends HttpServlet
 
         ActionManager manager;
         try {
-            manager = componentManager.lookup(ActionManager.class);
+            manager = componentManager.getInstance(ActionManager.class);
         } catch (ComponentLookupException e) {
             // We cannot find the Action manager, not much we can do, abort...
             throw new ServletException("Failed to locate Action Manager component.", e);
@@ -68,7 +63,7 @@ public class XWikiServlet extends HttpServlet
         // components needing them can depend on the Container component to get them.
         try {
             ServletContainerInitializer containerInitializer =
-                componentManager.lookup(ServletContainerInitializer.class);
+                componentManager.getInstance(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(httpServletRequest);
             containerInitializer.initializeResponse(httpServletResponse);
             containerInitializer.initializeSession(httpServletRequest);

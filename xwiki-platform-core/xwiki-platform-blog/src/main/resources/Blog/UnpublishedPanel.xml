@@ -1,110 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Blog</web>
-<name>UnpublishedPanel</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Panels.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1232044871000</creationDate>
-<date>1232045491000</date>
-<contentUpdateDate>1232045491000</contentUpdateDate>
-<version>1.1</version>
-<title>Unpublished Blog Posts Panel</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.1</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>Panels.PanelClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>5</number>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Information|Navigation|Tools|Administration|Other</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</category>
-<content>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>content</name>
-<number>4</number>
-<prettyName>Content</prettyName>
-<rows>25</rows>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<description>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>description</name>
-<number>3</number>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<type>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>type</name>
-<number>2</number>
-<prettyName>Panel type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>view|edit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-</class>
-<name>Blog.UnpublishedPanel</name>
-<number>0</number>
-<className>Panels.PanelClass</className>
-<guid>068ead4b-e950-45d3-a10f-d35b71df2bb7</guid>
-<property>
-<category>Navigation</category>
-</property>
-<property>
-<content>{{include document="Blog.BlogCode"/}}
+  <web>Blog</web>
+  <name>UnpublishedPanel</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1232044871000</creationDate>
+  <date>1232045491000</date>
+  <contentUpdateDate>1232045491000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Unpublished Blog Posts Panel</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>Panels.PanelClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Information|Navigation|Tools|Administration|Other</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </category>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>4</number>
+        <prettyName>Content</prettyName>
+        <rows>25</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <description>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>2</number>
+        <prettyName>Panel type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>view|edit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <name>Blog.UnpublishedPanel</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>068ead4b-e950-45d3-a10f-d35b71df2bb7</guid>
+    <property>
+      <category>Navigation</category>
+    </property>
+    <property>
+      <content>{{include document="Blog.BlogCode"/}}
 
 {{velocity}}
 #getBlogEntriesBaseQuery($query)
@@ -121,15 +122,16 @@
   #panelfooter()
 #end
 {{/velocity}}</content>
-</property>
-<property>
-<description>Shows the most recent unpublished blog entries.</description>
-</property>
-<property>
-<name>Unpublished Blog Posts</name>
-</property>
-<property>
-<type>view</type>
-</property>
-</object>
-<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>
+    </property>
+    <property>
+      <description>Shows the most recent unpublished blog entries.</description>
+    </property>
+    <property>
+      <name>Unpublished Blog Posts</name>
+    </property>
+    <property>
+      <type>view</type>
+    </property>
+  </object>
+  <content>{{include document="Panels.PanelSheet"/}}</content>
+</xwikidoc>

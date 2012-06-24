@@ -36,11 +36,7 @@ import com.google.gwt.user.client.ui.TextBox;
  */
 public class RichTextAreaTest extends RichTextAreaTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaTestCase#gwtTearDown()
-     */
+    @Override
     protected void gwtTearDown() throws Exception
     {
         super.gwtTearDown();

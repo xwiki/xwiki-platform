@@ -1,76 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>News</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.Categories</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1229921526000</creationDate>
-<date>1229921670000</date>
-<contentUpdateDate>1229921670000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template>Blog.CategoryTemplate</template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>Blog.CategoryClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<description>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<editor>---</editor>
-<name>description</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<customDisplay></customDisplay>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Name</prettyName>
-<size>40</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-</class>
-<name>Blog.News</name>
-<number>0</number>
-<className>Blog.CategoryClass</className>
-<property>
-<description>Blog posts that can be considered as public interest news.</description>
-</property>
-<property>
-<name>News</name>
-</property>
-</object>
-<content></content></xwikidoc>
+  <web>Blog</web>
+  <name>News</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.Categories</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1229921526000</creationDate>
+  <date>1229921670000</date>
+  <contentUpdateDate>1229921670000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template>Blog.CategoryTemplate</template>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>Blog.CategoryClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <description>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <editor>---</editor>
+        <name>description</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <customDisplay/>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Blog.News</name>
+    <number>0</number>
+    <className>Blog.CategoryClass</className>
+    <property>
+      <description>Blog posts that can be considered as public interest news.</description>
+    </property>
+    <property>
+      <name>News</name>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

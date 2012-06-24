@@ -43,7 +43,6 @@ import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.resources.pages.PageResource;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -58,7 +57,7 @@ public class WikiPagesResource extends XWikiResource
     public Pages getPages(@PathParam("wikiName") String wikiName,
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("name") @DefaultValue("") String name,
         @QueryParam("space") @DefaultValue("") String space, @QueryParam("author") @DefaultValue("") String author,
-        @QueryParam("number") @DefaultValue("25") Integer number) throws QueryException, XWikiException
+        @QueryParam("number") @DefaultValue("25") Integer number) throws QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 

@@ -26,7 +26,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Programming;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -546,19 +545,6 @@ public class Context extends Api
     public List<String> getDisplayedFields()
     {
         return getXWikiContext().getDisplayedFields();
-    }
-
-    /**
-     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
-     * 
-     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
-     * @see Util
-     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
-     */
-    @Deprecated
-    public Util getUtil()
-    {
-        return this.context.getUtil();
     }
 
     /**

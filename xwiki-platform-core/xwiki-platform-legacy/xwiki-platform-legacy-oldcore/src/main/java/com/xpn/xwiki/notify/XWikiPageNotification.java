@@ -33,6 +33,7 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPageNotification.class);
 
+    @Override
     public void notify(XWikiNotificationRule rule, XWikiDocument doc, String action, XWikiContext context)
     {
         try {
@@ -70,9 +71,10 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
             }
         } catch (Throwable e) {
             Object[] args = {page};
-            XWikiException e2 = new XWikiException(XWikiException.MODULE_XWIKI_GROOVY,
-                XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED, "Error parsing groovy notification for page {0}", e,
-                args);
+            XWikiException e2 =
+                new XWikiException(XWikiException.MODULE_XWIKI_GROOVY,
+                    XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED,
+                    "Error parsing groovy notification for page {0}", e, args);
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(e2.getFullMessage());
             }

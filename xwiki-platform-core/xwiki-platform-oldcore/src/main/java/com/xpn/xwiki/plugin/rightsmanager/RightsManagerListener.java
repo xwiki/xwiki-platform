@@ -91,32 +91,19 @@ public final class RightsManagerListener implements EventListener
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return EVENTS;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         // Only take into account local events

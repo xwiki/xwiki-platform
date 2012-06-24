@@ -56,6 +56,7 @@ public class CssExtension implements Extension
     {
         return new SxCompressor()
         {
+            @Override
             public String compress(String source)
             {
                 try {

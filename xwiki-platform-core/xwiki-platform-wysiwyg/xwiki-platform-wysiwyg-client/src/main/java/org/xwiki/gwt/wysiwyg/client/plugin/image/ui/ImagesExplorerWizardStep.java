@@ -224,25 +224,30 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference the image to be selected
      * @param cb the object to be notified after the specified image is selected
      */
-    private void setSpaceSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
+    private void setSpaceSelection(AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        String originWiki = new WikiPageReference(getData().getOrigin()).getWikiName();
-        spaceSelector.setWiki(displayWikiSelector ? imageReference.getWikiPageReference().getWikiName() : originWiki);
-        spaceSelector.refreshList(imageReference.getWikiPageReference().getSpaceName(),
-            new AsyncCallback<List<String>>()
+        // Clone the image reference because we might modify it. See the next comment.
+        final AttachmentReference actualImageReference = imageReference.clone();
+        WikiPageReference wikiPageReference = actualImageReference.getWikiPageReference();
+        spaceSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : wikiPageReference.getWikiName());
+        // Replace the image reference components that point to missing entities with the entities selected by default.
+        // In this case, if the image reference points to a wiki that doesn't exist then we update the image reference
+        // to use the wiki selected by default.
+        wikiPageReference.setWikiName(spaceSelector.getWiki());
+        spaceSelector.refreshList(wikiPageReference.getSpaceName(), new AsyncCallback<List<String>>()
+        {
+            public void onSuccess(List<String> result)
             {
-                public void onSuccess(List<String> result)
-                {
-                    setPageSelection(imageReference, cb);
-                }
+                setPageSelection(actualImageReference, cb);
+            }
 
-                public void onFailure(Throwable caught)
-                {
-                    if (cb != null) {
-                        cb.onFailure(caught);
-                    }
+            public void onFailure(Throwable caught)
+            {
+                if (cb != null) {
+                    cb.onFailure(caught);
                 }
-            });
+            }
+        });
     }
 
     /**
@@ -253,13 +258,20 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      */
     private void setPageSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        String originWiki = new WikiPageReference(getData().getOrigin()).getWikiName();
-        pageSelector.setWiki(displayWikiSelector ? imageReference.getWikiPageReference().getWikiName() : originWiki);
-        pageSelector.setSpace(imageReference.getWikiPageReference().getSpaceName());
+        pageSelector.setWiki(spaceSelector.getWiki());
+        pageSelector.setSpace(spaceSelector.getSelectedSpace());
+        // Replace the image reference components that point to missing entities with the entities selected by default.
+        // In this case, if the image reference points to a space that doesn't exist then we update the image reference
+        // to use the space selected by default.
+        imageReference.getWikiPageReference().setSpaceName(pageSelector.getSpace());
         pageSelector.refreshList(imageReference.getWikiPageReference().getPageName(), new AsyncCallback<List<String>>()
         {
             public void onSuccess(List<String> result)
             {
+                // Replace the image reference components that point to missing entities with the entities selected by
+                // default. In this case, if the image reference points to a page that doesn't exist then we update the
+                // image reference to use the page selected by default.
+                imageReference.getWikiPageReference().setPageName(pageSelector.getSelectedPage());
                 initCurrentPage(imageReference, cb);
             }
 
@@ -295,8 +307,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
                 }
             });
         } else if (event.getSource() == spaceSelector) {
-            WikiPageReference originPage = new WikiPageReference(getData().getOrigin());
-            pageSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : originPage.getWikiName());
+            pageSelector.setWiki(spaceSelector.getWiki());
             pageSelector.setSpace(spaceSelector.getSelectedSpace());
             pageSelector.refreshList(pageSelector.getSelectedPage());
         }

@@ -22,17 +22,20 @@ package com.xpn.xwiki.plugin.graphviz;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 
 /**
@@ -71,6 +74,11 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
     private String neatoPath;
 
     /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
+
+    /**
      * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
      * 
      * @param name the plugin name
@@ -83,33 +91,18 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
         return "graphviz";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new GraphVizPluginApi((GraphVizPlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#flushCache(XWikiContext)
-     */
     @Override
     public void flushCache()
     {
@@ -120,17 +113,12 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#init(XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
         super.init(context);
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         this.tempDir = new File(dir, this.getName());
         try {
             this.tempDir.mkdirs();

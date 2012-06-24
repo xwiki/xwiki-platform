@@ -105,6 +105,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
      * @return true if the page exists or false otherwise
      * @see org.radeox.api.engine.WikiRenderEngine#exists(String)
      */
+    @Override
     public boolean exists(String name)
     {
         String database = getXWikiContext().getDatabase();
@@ -140,11 +141,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.radeox.api.engine.WikiRenderEngine#showCreate()
-     */
+    @Override
     public boolean showCreate()
     {
         return true;
@@ -160,6 +157,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
      * @param anchor the anchor specified in the link if any (can be null)
      * @see org.radeox.api.engine.WikiRenderEngine#appendLink(StringBuffer, String, String, String)
      */
+    @Override
     public void appendLink(StringBuffer buffer, String name, String view, String anchor)
     {
         if (name.length() == 0 && anchor != null) {
@@ -242,12 +240,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.radeox.api.engine.WikiRenderEngine#appendLink(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public void appendLink(StringBuffer buffer, String name, String view)
     {
         appendLink(buffer, name, view, null);
@@ -265,12 +258,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("</a></span>");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.radeox.api.engine.WikiRenderEngine#appendCreateLink(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public void appendCreateLink(StringBuffer buffer, String name, String view)
     {
         String database = getXWikiContext().getDatabase();

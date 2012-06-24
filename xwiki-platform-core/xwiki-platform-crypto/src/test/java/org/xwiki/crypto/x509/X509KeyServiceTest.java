@@ -80,7 +80,7 @@ public class X509KeyServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.passwordService = getComponentManager().lookup(PasswordCryptoService.class);
+        this.passwordService = getComponentManager().getInstance(PasswordCryptoService.class);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class X509KeyServiceTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void newPrivateKeyWrongPassword() throws GeneralSecurityException
+    public void newPrivateKeyWrongPassword()
     {
         try {
             Assert.assertNotNull("Private key is null", getKeyPair(passwordService).getPrivateKey("asdf"));

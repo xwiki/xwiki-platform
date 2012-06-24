@@ -53,11 +53,7 @@ public final class ClickCommand implements com.google.gwt.user.client.Command
         nativeClickEvent = Document.get().createClickEvent(0, 0, 0, 0, 0, false, false, false, false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.Command#execute()
-     */
+    @Override
     public void execute()
     {
         try {

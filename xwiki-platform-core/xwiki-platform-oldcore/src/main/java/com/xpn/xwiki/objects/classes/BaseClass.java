@@ -38,13 +38,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -81,29 +78,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     private String nameField;
 
-    @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local/reference");
-
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
-    /**
-     * Used here to merge setName() and setWiki() calls into the DocumentReference.
-     */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#getReference()
-     */
     @Override
     public DocumentReference getReference()
     {
@@ -144,9 +126,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (reference != null) {
                 EntityReference relativeReference =
                     this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-                reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
-                         reference.getParent().getParent()));
+                reference =
+                    new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                        new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
+                            .getParent().getParent()));
             } else {
                 reference = this.currentMixedDocumentReferenceResolver.resolve(name);
             }
@@ -205,22 +188,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#get(java.lang.String)
-     */
     @Override
     public PropertyInterface get(String name)
     {
         return safeget(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
     @Override
     public void put(String name, PropertyInterface property)
     {
@@ -362,7 +335,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public BaseCollection newObject(XWikiContext context) throws XWikiException
     {
         BaseObject bobj = newCustomClassInstance(context);
-        bobj.setXClassReference(this.localReferenceEntityReferenceSerializer.serialize(getDocumentReference()));
+        DocumentReference classReference = getDocumentReference();
+        bobj.setXClassReference(classReference.removeParent(classReference.getWikiReference()));
 
         return bobj;
     }
@@ -419,11 +393,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#clone()
-     */
     @Override
     public BaseClass clone()
     {
@@ -438,11 +407,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return bclass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -492,11 +456,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     public Element toXML(BaseClass bclass)
     {
@@ -1190,11 +1149,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#getDiff(java.lang.Object, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
@@ -1256,10 +1210,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // XXX: collision between DB and new: property to add but already exists in the DB
-                    mergeResult.getErrors()
-                        .add(
-                            new CollisionException("Collision found on class property [" + newProperty.getReference()
-                                + "]"));
+                    mergeResult.getLog().error("Collision found on class property [{}]", newProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                 if (propertyResult != null) {
@@ -1270,15 +1221,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                     } else {
                         // XXX: collision between DB and new: property to remove but not the same as previous
                         // version
-                        mergeResult.getErrors().add(
-                            new CollisionException("Collision found on class property ["
-                                + previousProperty.getReference() + "]"));
+                        mergeResult.getLog().error("Collision found on class property [{}]",
+                            previousProperty.getReference());
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getWarnings().add(
-                        new CollisionException("Object property [" + previousProperty.getReference()
-                            + "] already removed"));
+                    mergeResult.getLog().warn("Object property [{}] already removed", previousProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                 if (propertyResult != null) {
@@ -1292,10 +1240,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 } else {
                     // XXX: collision between DB and new: property to modify but does not exists in DB
                     // Lets assume it's a mistake to fix
-                    mergeResult.getWarnings()
-                        .add(
-                            new CollisionException("Collision found on class property [" + newProperty.getReference()
-                                + "]"));
+                    mergeResult.getLog().warn("Collision found on class property [{}]", newProperty.getReference());
 
                     addField(diff.getPropName(), newClass.getField(diff.getPropName()));
                     mergeResult.setModified(true);

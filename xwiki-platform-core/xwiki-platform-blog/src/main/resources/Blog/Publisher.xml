@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>Publisher</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WenHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1226240773000</creationDate>
-<date>1227675504000</date>
-<contentUpdateDate>1227675504000</contentUpdateDate>
-<version>1.1</version>
-<title>Publish blog posts</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>true</hidden>
-<content>{{include document="Blog.BlogCode"/}}
+  <web>Blog</web>
+  <name>Publisher</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WenHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1226240773000</creationDate>
+  <date>1227675504000</date>
+  <contentUpdateDate>1227675504000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Publish blog posts</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Blog.BlogCode"/}}
 
 {{velocity output="false"}}
 #set($xredirect = "$!{request.xredirect}")

@@ -30,12 +30,6 @@ import org.xwiki.model.reference.EntityReference;
 public abstract class AbstractXObjectEvent extends AbstractEntityEvent implements XObjectEvent
 {
     /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other attachment event (add, update, delete).

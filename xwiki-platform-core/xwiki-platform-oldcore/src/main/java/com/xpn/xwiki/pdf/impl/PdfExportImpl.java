@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -116,14 +117,12 @@ public class PdfExportImpl implements PdfExport
     private static final Properties TIDY_CONFIGURATION;
 
     /** Document name resolver. */
-    @SuppressWarnings("unchecked")
     private static DocumentReferenceResolver<String> referenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Document name serializer. */
-    @SuppressWarnings("unchecked")
     private static EntityReferenceSerializer<String> referenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /** Provides access to document properties. */
     private static DocumentAccessBridge dab = Utils.getComponent(DocumentAccessBridge.class);
@@ -145,6 +144,11 @@ public class PdfExportImpl implements PdfExport
 
     /** The JTidy instance used for cleaning up HTML documents. */
     private Tidy tidy;
+
+    /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
 
     // Fields initialization
     static {
@@ -233,23 +237,13 @@ public class PdfExportImpl implements PdfExport
         this.tidy.setConfigurationFromProps(TIDY_CONFIGURATION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#exportToPDF(XWikiDocument, OutputStream, XWikiContext)
-     * @since 1.0
-     */
+    @Override
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException
     {
         export(doc, out, ExportType.PDF, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#export(XWikiDocument, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
-     * @since 3.0M2
-     */
+    @Override
     public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
@@ -258,7 +252,7 @@ public class PdfExportImpl implements PdfExport
         // This could be improved by setting a specific context using the passed document but we
         // would also need to get the translations and set them too.
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         this.tidy.setOutputEncoding(context.getWiki().getEncoding());
         this.tidy.setInputEncoding(context.getWiki().getEncoding());
@@ -286,12 +280,7 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExport#exportHtml(String, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
-     * @since 3.0M2
-     */
+    @Override
     public void exportHtml(String html, OutputStream out, ExportType type, XWikiContext context) throws XWikiException
     {
         exportXHTML(applyCSS(convertToStrictXHtml(html), context), out, type, context);
@@ -689,7 +678,7 @@ public class PdfExportImpl implements PdfExport
      * Create an XWikiException object with the given source, export type and error type.
      * 
      * @param source the source exception that is forwarded
-     * @param exportType the type of the export performed while the exception occurred, {@link #PDF} or {@link #RTF}
+     * @param exportType the type of the export performed while the exception occurred, PDF or RTF
      * @param errorType the type of error that occurred, one of the constants in {@link XWikiException}
      * @return a new XWikiException object
      */

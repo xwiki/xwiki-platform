@@ -19,7 +19,7 @@
  */
 package org.xwiki.wysiwyg.server.plugin.macro;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 
 /**
@@ -27,7 +27,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface MacroDescriptorTranslator
 {
     /**

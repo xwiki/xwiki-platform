@@ -81,7 +81,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
     {
         try {
             return (XWikiHibernateVersioningStore) componentManager
-                .lookup(XWikiVersioningStoreInterface.class, "hibernate");
+                .getInstance(XWikiVersioningStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_MIGRATION,

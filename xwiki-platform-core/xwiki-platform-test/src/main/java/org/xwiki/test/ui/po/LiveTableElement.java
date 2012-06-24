@@ -95,6 +95,16 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
+     * @param inputId the filter input identifier
+     * @return the value of the filter input for the specified column
+     * @see #filterColumn(String, String)
+     */
+    public String getFilterValue(String inputId)
+    {
+        return getDriver().findElement(By.id(inputId)).getAttribute("value");
+    }
+
+    /**
      * @param columnTitle the title of live table column
      * @return the 0-based index of the specified column
      */
@@ -125,6 +135,16 @@ public class LiveTableElement extends BaseElement
         WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));
         return liveTableBody.findElements(
             By.xpath(String.format(cellXPath, getColumnIndex(columnTitle) + 1, escapedColumnValue))).size() > 0;
+    }
+
+    /**
+     * @return the number of rows in the live table
+     */
+    public int getRowCount()
+    {
+        WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));
+        // We use XPath because we're interested only in the direct children.
+        return liveTableBody.findElements(By.xpath("tr")).size();
     }
 
     /**

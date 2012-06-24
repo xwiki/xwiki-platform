@@ -25,8 +25,8 @@
   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class entity-name="XWiki.AggregatorURLClass" table="feeds_aggregatorurl">
-        <id name="id" type="integer" unsaved-value="any">
-            <column name="agg_id" not-null="true" />
+        <id name="id" type="long" unsaved-value="any">
+            <column name="agg_id" not-null="true" sql-type="integer"/>
             <generator class="assigned" />
         </id>
         <property name="name" type="string" column="agg_name" length="2000" />
@@ -58,8 +58,8 @@
     </class>
 
     <class entity-name="XWiki.FeedEntryClass" table="feeds_feedentry">
-        <id name="id" type="integer" unsaved-value="any">
-            <column name="fee_id" not-null="true" />
+        <id name="id" type="long" unsaved-value="any">
+            <column name="fee_id" not-null="true" sql-type="integer" />
             <generator class="assigned" />
         </id>
         <property name="title" type="string" column="fee_title" length="2000" />

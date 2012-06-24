@@ -111,11 +111,6 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
      */
     public abstract boolean hasPageExtensions(XWikiContext context);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

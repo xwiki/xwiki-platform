@@ -50,21 +50,12 @@ public abstract class AbstractEntityEvent implements EntityEvent
         this.reference = reference;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.internal.event.EntityEvent#getReference()
-     */
+    @Override
     public EntityReference getReference()
     {
         return this.reference;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
     @Override
     public boolean matches(Object otherEvent)
     {
@@ -86,11 +77,6 @@ public abstract class AbstractEntityEvent implements EntityEvent
         return getReference() == null || getReference().equals(otherReference);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -101,11 +87,6 @@ public abstract class AbstractEntityEvent implements EntityEvent
         return getClass() == obj.getClass() && ObjectUtils.equals(this.reference, ((EntityEvent) obj).getReference());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

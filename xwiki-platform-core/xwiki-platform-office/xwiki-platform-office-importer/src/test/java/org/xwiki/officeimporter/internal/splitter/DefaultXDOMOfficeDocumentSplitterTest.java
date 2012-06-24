@@ -23,8 +23,11 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -32,8 +35,6 @@ import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-
-import junit.framework.Assert;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentSplitter}.
@@ -44,7 +45,7 @@ import junit.framework.Assert;
 public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporterTest
 {
     /**
-     * Parser for building xdom instances.
+     * Parser for building XDOM instances.
      */
     private Parser xwikiSyntaxParser;
 
@@ -52,34 +53,35 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
      * Document splitter for testing.
      */
     private XDOMOfficeDocumentSplitter officeDocumentSplitter;
-    
-    /**
-     * {@inheritDoc}
-     */
+
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        this.xwikiSyntaxParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
-        this.officeDocumentSplitter = getComponentManager().lookup(XDOMOfficeDocumentSplitter.class);
+
+        this.xwikiSyntaxParser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        this.officeDocumentSplitter = getComponentManager().getInstance(XDOMOfficeDocumentSplitter.class);
     }
 
     /**
      * Test basic document splitting.
+     * 
+     * @throws Exception if it fails to parse the wiki syntax or if it fails to split the document
      */
-    @org.junit.Test
+    @Test
     public void testDocumentSplitting() throws Exception
     {
         // Create xwiki/2.0 document.
         StringBuffer buffer = new StringBuffer();
-        buffer.append("=Heading1=").append("\n");
-        buffer.append("Content").append("\n");
-        buffer.append("==Heading11==").append("\n");
-        buffer.append("Content").append("\n");
-        buffer.append("==Heading12==").append("\n");
-        buffer.append("Content").append("\n");
-        buffer.append("=Heading2=").append("\n");
-        buffer.append("Content").append("\n");
+        buffer.append("=Heading1=").append('\n');
+        buffer.append("Content").append('\n');
+        buffer.append("==Heading11==").append('\n');
+        buffer.append("Content").append('\n');
+        buffer.append("==Heading12==").append('\n');
+        buffer.append("Content").append('\n');
+        buffer.append("=Heading2=").append('\n');
+        buffer.append("Content").append('\n');
         XDOM xdom = xwikiSyntaxParser.parse(new StringReader(buffer.toString()));
 
         // Create xdom office document.
@@ -87,51 +89,64 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
             new XDOMOfficeDocument(xdom, new HashMap<String, byte[]>(), getComponentManager());
         final DocumentReference baseDocument = new DocumentReference("xwiki", "Test", "Test");
 
-        // Add expectations to mock document name serializer. 
-        getMockery().checking(new Expectations() {{
-            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(baseDocument);
-            will(returnValue("Test.Test"));
-            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading1"));
-            will(returnValue("Test.Heading1"));
-            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading11"));
-            will(returnValue("Test.Heading11"));
-            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading12"));
-            will(returnValue("Test.Heading12"));
-            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading2"));
-            will(returnValue("Test.Heading2"));
-        }});
-        
-        // Add expectations to mock document name factory.         
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve("Test.Test");
-            will(returnValue(new DocumentReference("xwiki", "Test", "Test")));
-            allowing(mockDocumentReferenceResolver).resolve("Test.Heading1");
-            will(returnValue(new DocumentReference("xwiki", "Test", "Heading1")));
-            allowing(mockDocumentReferenceResolver).resolve("Test.Heading11");
-            will(returnValue(new DocumentReference("xwiki", "Test", "Heading11")));
-            allowing(mockDocumentReferenceResolver).resolve("Test.Heading12");
-            will(returnValue(new DocumentReference("xwiki", "Test", "Heading12")));
-            allowing(mockDocumentReferenceResolver).resolve("Test.Heading2");
-            will(returnValue(new DocumentReference("xwiki", "Test", "Heading2")));
-        }});
-        
+        // Add expectations to mock document name serializer.
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(baseDocument);
+                will(returnValue("Test.Test"));
+                allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(
+                    new DocumentReference("xwiki", "Test", "Heading1"));
+                will(returnValue("Test.Heading1"));
+                allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(
+                    new DocumentReference("xwiki", "Test", "Heading11"));
+                will(returnValue("Test.Heading11"));
+                allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(
+                    new DocumentReference("xwiki", "Test", "Heading12"));
+                will(returnValue("Test.Heading12"));
+                allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(
+                    new DocumentReference("xwiki", "Test", "Heading2"));
+                will(returnValue("Test.Heading2"));
+            }
+        });
+
+        // Add expectations to mock document name factory.
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentReferenceResolver).resolve("Test.Test");
+                will(returnValue(new DocumentReference("xwiki", "Test", "Test")));
+                allowing(mockDocumentReferenceResolver).resolve("Test.Heading1");
+                will(returnValue(new DocumentReference("xwiki", "Test", "Heading1")));
+                allowing(mockDocumentReferenceResolver).resolve("Test.Heading11");
+                will(returnValue(new DocumentReference("xwiki", "Test", "Heading11")));
+                allowing(mockDocumentReferenceResolver).resolve("Test.Heading12");
+                will(returnValue(new DocumentReference("xwiki", "Test", "Heading12")));
+                allowing(mockDocumentReferenceResolver).resolve("Test.Heading2");
+                will(returnValue(new DocumentReference("xwiki", "Test", "Heading2")));
+            }
+        });
+
         // Add expectations to mock document access bridge.
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).exists("Test.Heading1");
-            will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists("Test.Heading11");
-            will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists("Test.Heading12");
-            will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists("Test.Heading2");
-            will(returnValue(false));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).exists("Test.Heading1");
+                will(returnValue(false));
+                allowing(mockDocumentAccessBridge).exists("Test.Heading11");
+                will(returnValue(false));
+                allowing(mockDocumentAccessBridge).exists("Test.Heading12");
+                will(returnValue(false));
+                allowing(mockDocumentAccessBridge).exists("Test.Heading2");
+                will(returnValue(false));
+            }
+        });
 
         // Perform the split operation.
         Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
             officeDocumentSplitter.split(officeDocument, new int[] {1, 2, 3, 4, 5, 6}, "headingNames", baseDocument);
-        
-        // There should be five xdom office documents.
+
+        // There should be five XDOM office documents.
         Assert.assertEquals(5, result.size());
     }
 }

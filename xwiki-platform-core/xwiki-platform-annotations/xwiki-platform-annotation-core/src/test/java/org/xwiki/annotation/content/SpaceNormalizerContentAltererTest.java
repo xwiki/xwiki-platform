@@ -64,16 +64,11 @@ public class SpaceNormalizerContentAltererTest extends AbstractComponentTestCase
         this.altered = altered;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        alterer = getComponentManager().lookup(ContentAlterer.class, "space-normalizer");
+        alterer = getComponentManager().getInstance(ContentAlterer.class, "space-normalizer");
     }
 
     /**

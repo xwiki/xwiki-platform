@@ -21,7 +21,7 @@ package org.xwiki.captcha;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * The CaptchaVerifier interface allows us to check if an answer to a captcha was correct.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.2M2
  */
-@ComponentRole()
+@Role
 public interface CaptchaVerifier
 {
     /**

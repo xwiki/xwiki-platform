@@ -108,6 +108,8 @@ actionButtons.EditActions = Class.create({
     if (location.indexOf('?') == -1) {
       location += '?';
     }
+    // Prevent a redundant request to remove the edit lock when the page unloads.
+    XWiki.EditLock && XWiki.EditLock.setLocked(false);
     window.location = location + '&action_cancel=true' + fragmentId;
   },
   onPreview : function(event) {
@@ -208,6 +210,9 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     this.savingBox.replace(this.failedBox);
     if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
       $('ajaxRequestFailureReason').update('Server not responding');
+    } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
+      // Regard the body of plain text responses as custom status messages.
+      $('ajaxRequestFailureReason').update(response.responseText);
     } else {
       $('ajaxRequestFailureReason').update(response.statusText);
     }

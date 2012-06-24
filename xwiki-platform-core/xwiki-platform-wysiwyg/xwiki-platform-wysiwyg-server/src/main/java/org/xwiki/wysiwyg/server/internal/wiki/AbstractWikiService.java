@@ -20,9 +20,11 @@
 package org.xwiki.wysiwyg.server.internal.wiki;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,6 +40,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import org.xwiki.wysiwyg.server.wiki.LinkService;
@@ -68,6 +71,13 @@ public abstract class AbstractWikiService implements WikiService
     private QueryManager queryManager;
 
     /**
+     * The query filter used to filter hidden documents.
+     */
+    @Inject
+    @Named("hidden")
+    private QueryFilter hiddenDocumentsQueryFilter;
+
+    /**
      * The service used to create links.
      */
     @Inject
@@ -86,6 +96,18 @@ public abstract class AbstractWikiService implements WikiService
      */
     @Inject
     private CSRFToken csrf;
+
+    @Override
+    public List<String> getSpaceNames(String wikiName)
+    {
+        try {
+            return queryManager.getNamedQuery("getSpaces").setWiki(wikiName).addFilter(hiddenDocumentsQueryFilter)
+                .execute();
+        } catch (QueryException e) {
+            logger.error("Failed to get the list of spaces.", e);
+            return Collections.emptyList();
+        }
+    }
 
     @Override
     public List<String> getPageNames(String wikiName, String spaceName)
@@ -125,25 +147,12 @@ public abstract class AbstractWikiService implements WikiService
     {
         StringBuilder statement = new StringBuilder();
         statement.append("select distinct doc.space, doc.name from XWikiDocument as doc where ");
-        List<String> blackListedSpaces = getBlackListedSpaces();
-        if (!blackListedSpaces.isEmpty()) {
-            // Would have been nice to use a list parameter but the underlying implementation of the query module
-            // doesn't support it so we have to compute the in(..) filter manually.
-            for (int i = 0; i < blackListedSpaces.size(); i++) {
-                statement.append(i == 0 ? "doc.space not in (" : ",");
-                statement.append(":bSpace").append(i);
-            }
-            statement.append(") and ");
-        }
         statement.append("(lower(doc.title) like '%'||:keyword||'%' or lower(doc.fullName) like '%'||:keyword||'%')");
         statement.append(" order by doc.space, doc.name");
 
         Query query = createHQLQuery(statement.toString());
         query.setWiki(wikiName).setOffset(offset).setLimit(limit);
         query.bindValue("keyword", keyword.toLowerCase());
-        for (int i = 0; i < blackListedSpaces.size(); i++) {
-            query.bindValue("bSpace" + i, blackListedSpaces.get(i));
-        }
 
         return getWikiPages(searchDocumentReferences(query));
     }
@@ -157,21 +166,11 @@ public abstract class AbstractWikiService implements WikiService
     private Query createHQLQuery(String statement)
     {
         try {
-            return queryManager.createQuery(statement, Query.HQL);
+            return queryManager.createQuery(statement, Query.HQL).addFilter(hiddenDocumentsQueryFilter);
         } catch (QueryException e) {
             throw new RuntimeException(e);
         }
     }
-
-    /**
-     * Helper function to retrieve the blacklisted spaces in this session, as they've been set in xwikivars.vm, when the
-     * page edited with this WYSIWYG was loaded.
-     * <p>
-     * TODO: remove this when the public API will exclude them by default, or they'll be set in the configuration.
-     * 
-     * @return the list of blacklisted spaces from the session
-     */
-    protected abstract List<String> getBlackListedSpaces();
 
     /**
      * Helper function to create a list of {@link WikiPage}s from a list of document references.

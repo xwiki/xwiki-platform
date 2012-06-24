@@ -26,7 +26,6 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver}.

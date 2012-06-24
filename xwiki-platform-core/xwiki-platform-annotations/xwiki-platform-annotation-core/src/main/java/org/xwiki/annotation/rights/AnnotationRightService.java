@@ -19,7 +19,7 @@
  */
 package org.xwiki.annotation.rights;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Service to provide functions to check access rights to annotations actions (viewing, adding annotations, editing).
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface AnnotationRightService
 {
     /**

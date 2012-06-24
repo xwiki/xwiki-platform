@@ -19,13 +19,16 @@
  */
 package org.xwiki.extension.cluster.internal;
 
-import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.event.JobStartedEvent;
+import java.util.List;
+
+import org.xwiki.job.Request;
+import org.xwiki.job.event.JobStartedEvent;
 
 /**
  * Internal event used to start a new job.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
 public class RemoteJobStartedEvent extends JobStartedEvent
 {
@@ -43,7 +46,7 @@ public class RemoteJobStartedEvent extends JobStartedEvent
      */
     public RemoteJobStartedEvent(String jobType, Request request)
     {
-        super(null, jobType, request);
+        super((List<String>) null, jobType, request);
     }
 
     /**

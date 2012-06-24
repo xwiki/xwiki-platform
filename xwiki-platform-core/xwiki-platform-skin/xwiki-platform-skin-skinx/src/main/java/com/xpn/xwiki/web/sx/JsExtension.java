@@ -42,31 +42,19 @@ public class JsExtension implements Extension
     /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(JsExtension.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getClassName()
-     */
+    @Override
     public String getClassName()
     {
         return "XWiki.JavaScriptExtension";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getContentType()()
-     */
+    @Override
     public String getContentType()
     {
         return "text/javascript; charset=UTF-8";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getCompressor()
-     */
+    @Override
     public SxCompressor getCompressor()
     {
         return new JsCompressor();
@@ -75,11 +63,7 @@ public class JsExtension implements Extension
     /** The JavaScript compressor which is returned by getCompressor. Currently implemented using YUI Compressor. */
     private static class JsCompressor implements SxCompressor
     {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see SxCompressor#compress(String)
-         */
+        @Override
         public String compress(String source)
         {
             try {
@@ -101,22 +85,14 @@ public class JsExtension implements Extension
         /** A Javascript error reporter which logs errors with the XWiki logging system. */
         private static class CustomErrorReporter implements ErrorReporter
         {
-            /**
-             * {@inheritDoc}
-             * 
-             * @see ErrorReporter#error(String, String, int, String, int)
-             */
+            @Override
             public void error(String message, String filename, int lineNumber, String context, int column)
             {
                 LOGGER.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
                     message, context, lineNumber, column));
             }
 
-            /**
-             * {@inheritDoc}
-             * 
-             * @see ErrorReporter#runtimeError(String, String, int, String, int)
-             */
+            @Override
             public EvaluatorException runtimeError(String message, String filename, int lineNumber,
                 String context, int column)
             {
@@ -124,11 +100,7 @@ public class JsExtension implements Extension
                 return null;
             }
 
-            /**
-             * {@inheritDoc}
-             * 
-             * @see ErrorReporter#warning(String, String, int, String, int)
-             */
+            @Override
             public void warning(String message, String filename, int lineNumber, String context, int column)
             {
                 LOGGER.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",

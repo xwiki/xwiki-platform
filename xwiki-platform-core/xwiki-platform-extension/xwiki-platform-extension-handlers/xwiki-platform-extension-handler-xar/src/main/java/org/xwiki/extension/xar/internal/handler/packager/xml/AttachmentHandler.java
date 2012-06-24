@@ -29,6 +29,11 @@ import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class AttachmentHandler extends AbstractHandler
 {
     public AttachmentHandler(ComponentManager componentManager)

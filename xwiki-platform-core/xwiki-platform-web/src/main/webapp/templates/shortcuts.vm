@@ -4,7 +4,7 @@
 ## List format : ["ExtraAnchor",  "ExtraTabText", numberOfItems]
 ##
 #if (!$docextralinks && !$docextras)
-  #set($docextralinks = $util.arrayList)
+  #set($docextralinks = [])
   #if($xcontext.action == 'view' && $viewer != 'content')
     #set ($discard = $docextralinks.add(['content', $msg.get('core.links.content'), -1]))
   #end

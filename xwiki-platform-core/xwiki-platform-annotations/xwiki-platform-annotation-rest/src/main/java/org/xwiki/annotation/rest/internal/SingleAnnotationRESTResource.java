@@ -77,6 +77,9 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
         @PathParam("wikiName") String wiki, @PathParam("id") String id, AnnotationRequest request)
     {
         try {
+            // Initialize the context with the correct value.
+            updateContext(wiki, space, page);
+
             DocumentReference docRef = new DocumentReference(wiki, space, page);
             String documentName = referenceSerializer.serialize(docRef);
 
@@ -113,6 +116,9 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
         @PathParam("wikiName") String wiki, @PathParam("id") String id, AnnotationUpdateRequest updateRequest)
     {
         try {
+            // Initialize the context with the correct value.
+            updateContext(wiki, space, page);
+
             DocumentReference docRef = new DocumentReference(wiki, space, page);
             String documentName = referenceSerializer.serialize(docRef);
 

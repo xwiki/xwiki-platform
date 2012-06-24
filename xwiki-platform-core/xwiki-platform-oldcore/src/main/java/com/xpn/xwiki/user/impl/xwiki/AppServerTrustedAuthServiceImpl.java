@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
- * Implements a authentication mecanism which is trusting the App Server authentication. If it fails it falls back to
+ * Implements an authentication mechanism which is trusting the App Server authentication. If it fails it falls back to
  * the standard XWiki authentication.
  * 
  * @version $Id$
@@ -43,11 +43,9 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
         if ((user == null) || user.equals("")) {
             return super.checkAuth(context);
         } else {
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("Launching create user for " + user);
+            LOGGER.debug("Launching create user for [{}]", user);
             createUser(user, context);
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("Create user done for " + user);
+            LOGGER.debug("Create user done for [{}]", user);
             user = "XWiki." + user;
         }
         context.setUser(user);

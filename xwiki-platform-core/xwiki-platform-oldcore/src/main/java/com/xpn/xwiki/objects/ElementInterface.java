@@ -34,6 +34,7 @@ public interface ElementInterface
      */
     EntityReference getReference();
 
+    @Override
     String toString();
 
     /**
@@ -65,7 +66,7 @@ public interface ElementInterface
      * @param newElement the next version of the element
      * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
-     * @param the merge report
+     * @param mergeResult the merge report
      * @since 3.2M1
      */
     void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration, XWikiContext context,

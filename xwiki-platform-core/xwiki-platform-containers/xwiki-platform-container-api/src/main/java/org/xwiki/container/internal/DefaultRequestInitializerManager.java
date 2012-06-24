@@ -52,7 +52,7 @@ public class DefaultRequestInitializerManager implements RequestInitializerManag
     {
         // Find all request interceptors and call them to initialize the Request
         try {
-            for (Object interceptor : this.componentManager.lookupList(RequestInitializer.class)) {
+            for (Object interceptor : this.componentManager.getInstanceList(RequestInitializer.class)) {
                 ((RequestInitializer) interceptor).initialize(request);
             }
         } catch (ComponentLookupException e) {

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,35 +19,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>ConfigurableClass</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1265775370000</creationDate>
-<date>1299715500000</date>
-<contentUpdateDate>1299715500000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.admin.configurable.title")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden><attachment>
-<filename>DefaultAdminSectionIcon.png</filename>
-<filesize>7257</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1266210801000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAcDklE
+  <web>XWiki</web>
+  <name>ConfigurableClass</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1265775370000</creationDate>
+  <date>1299715500000</date>
+  <contentUpdateDate>1299715500000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.admin.configurable.title")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>DefaultAdminSectionIcon.png</filename>
+    <filesize>7257</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1266210801000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAcDklE
 QVR4Xu1dWZMU15U+uVVXV69V1Q00CAQIic3sgwRGCMmSxtaLxxEOxfwDTYT9H+xH+80x8+D3mRiH
 ZhSOCVkOWQrLiE2LQYBkhEBgBAgkdQPqpXqvLXPOd+LGvc6lq6CobCyrLzrKrSoz63737OfedoMg
 oKX27SKXltoS6Eu0BPoSpUCWZdlqV7aHDh1yf/aznxVXrVpVdF13wLbtgUwmU+D9/Nzc3Py6dev+
@@ -173,205 +177,206 @@ GTtdHeKRT1X9t1XLGvRhiPoWOX3fvn2/YUBe1t8x5DE56k88GgcT5wxhXpDLKFuRCdwg+HcYAUG8
 k+L7iSCr2StULgctABSkAODikwO4BWBfAV6mIQHdbw30uDdZN8eyb2vADeggW93fYlDtBdYfB+AU
 Gwhd1LjNaPADBjsFoL5hNK8Zoq63eab7BT3gZsSvFhuWJnWsQR1iGo4MgmQg/DioLQA2RN++NhyR
 iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
-/wpRrz9iAAAAAElFTkSuQmCC</content></attachment>
-<class>
-<name>XWiki.ConfigurableClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<disabled>0</disabled>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<disabled>0</disabled>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<disabled>0</disabled>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<disabled>0</disabled>
-<name>iconAttachment</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<disabled>0</disabled>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>XWiki.ConfigurableClass</name>
-<number>0</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>71fc6ffa-92cb-48f1-9d80-a845d1807b10</guid>
-<property>
-<cache>long</cache>
-</property>
-<property>
-<code>document.observe('dom:loaded', function() {
+/wpRrz9iAAAAAElFTkSuQmCC</content>
+  </attachment>
+  <class>
+    <name>XWiki.ConfigurableClass</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <codeToExecute>
+      <disabled>0</disabled>
+      <editor>---</editor>
+      <name>codeToExecute</name>
+      <number>7</number>
+      <picker>0</picker>
+      <prettyName>codeToExecute</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </codeToExecute>
+    <configurationClass>
+      <disabled>0</disabled>
+      <name>configurationClass</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>configurationClass</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </configurationClass>
+    <configureGlobally>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>configureGlobally</name>
+      <number>4</number>
+      <prettyName>configureGlobally</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </configureGlobally>
+    <displayInSection>
+      <disabled>0</disabled>
+      <name>displayInSection</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>displayInSection</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </displayInSection>
+    <heading>
+      <disabled>0</disabled>
+      <name>heading</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>heading</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </heading>
+    <iconAttachment>
+      <disabled>0</disabled>
+      <name>iconAttachment</name>
+      <number>8</number>
+      <picker>0</picker>
+      <prettyName>iconAttachment</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </iconAttachment>
+    <linkPrefix>
+      <disabled>0</disabled>
+      <name>linkPrefix</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>linkPrefix</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </linkPrefix>
+    <propertiesToShow>
+      <cache>0</cache>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <multiSelect>1</multiSelect>
+      <name>propertiesToShow</name>
+      <number>6</number>
+      <picker>0</picker>
+      <prettyName>propertiesToShow</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>20</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </propertiesToShow>
+  </class>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.ConfigurableClass</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>71fc6ffa-92cb-48f1-9d80-a845d1807b10</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>document.observe('dom:loaded', function() {
   // Hide headers unless they have error messages under them.
   var elementsInPage = $('admin-page-content').childNodes;
   var errorShown = false;
@@ -417,18 +422,18 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
     }
   });
 });</code>
-</property>
-<property>
-<name></name>
-</property>
-<property>
-<parse>1</parse>
-</property>
-<property>
-<use>onDemand</use>
-</property>
-</object>
-<content>{{include document="XWiki.ConfigurableClassMacros" /}}
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{include document="XWiki.ConfigurableClassMacros" /}}
 
 {{velocity}}
 #*
@@ -843,4 +848,5 @@ $doc.dropPermissions()##
 
   #end
 #end## If we should be looking at the main administration page.
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

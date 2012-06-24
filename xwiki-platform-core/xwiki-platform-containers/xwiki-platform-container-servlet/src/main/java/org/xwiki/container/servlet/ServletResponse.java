@@ -40,9 +40,7 @@ public class ServletResponse implements Response
         return this.httpServletResponse;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public OutputStream getOutputStream() throws IOException
     {
         try {
@@ -52,17 +50,13 @@ public class ServletResponse implements Response
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentLength(int length)
     {
         this.httpServletResponse.setContentLength(length);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentType(String mimeType)
     {
         this.httpServletResponse.setContentType(mimeType);

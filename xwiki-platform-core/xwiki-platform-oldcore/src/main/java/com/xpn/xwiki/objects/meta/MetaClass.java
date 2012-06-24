@@ -58,6 +58,7 @@ public class MetaClass extends BaseClass
         safeput(levelsclass.getName(), levelsclass);
     }
 
+    @Override
     public void safeput(String name, PropertyInterface property)
     {
         addField("meta" + name, property);
@@ -67,16 +68,19 @@ public class MetaClass extends BaseClass
         }
     }
 
+    @Override
     public PropertyInterface safeget(String name)
     {
         return super.safeget("meta" + name);
     }
 
+    @Override
     public PropertyInterface get(String name)
     {
         return safeget(name);
     }
 
+    @Override
     public void put(String name, PropertyInterface property)
     {
         safeput(name, property);
@@ -92,6 +96,7 @@ public class MetaClass extends BaseClass
         MetaClass.metaClass = metaClass;
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new BaseClass();

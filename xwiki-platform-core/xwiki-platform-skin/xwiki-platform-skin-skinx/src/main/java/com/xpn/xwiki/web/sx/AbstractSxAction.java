@@ -123,11 +123,6 @@ public abstract class AbstractSxAction extends XWikiAction
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

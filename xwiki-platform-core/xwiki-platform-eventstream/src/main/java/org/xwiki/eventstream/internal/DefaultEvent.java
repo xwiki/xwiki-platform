@@ -97,106 +97,61 @@ public class DefaultEvent implements Event
     /** @see #getParameters() */
     private Map<String, String> parameters;
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getId()
-     */
+    @Override
     public String getId()
     {
         return this.id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setId(String)
-     * @see #getId()
-     */
+    @Override
     public void setId(String id)
     {
         this.id = id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getGroupId()
-     */
+    @Override
     public String getGroupId()
     {
         return this.groupId;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setGroupId(String)
-     * @see #getGroupId()
-     */
+    @Override
     public void setGroupId(String id)
     {
         this.groupId = id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getType()
-     */
+    @Override
     public String getType()
     {
         return this.type;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setType(String)
-     * @see #getType()
-     */
+    @Override
     public void setType(String type)
     {
         this.type = type;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getDate()
-     */
+    @Override
     public Date getDate()
     {
         return this.date;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setDate(Date)
-     * @see #getDate()
-     */
+    @Override
     public void setDate(Date date)
     {
         this.date = date;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getImportance()
-     */
+    @Override
     public Importance getImportance()
     {
         return this.importance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setImportance(org.xwiki.eventstream.Event.Importance)
-     * @see #getImportance()
-     */
+    @Override
     public void setImportance(Importance importance)
     {
         if (importance == null) {
@@ -206,53 +161,31 @@ public class DefaultEvent implements Event
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getApplication()
-     */
+    @Override
     public String getApplication()
     {
         return this.application;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setApplication(String)
-     * @see #getApplication()
-     */
+    @Override
     public void setApplication(String application)
     {
         this.application = application;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getStream()
-     */
+    @Override
     public String getStream()
     {
         return this.stream;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setStream(String)
-     * @see #getStream()
-     */
+    @Override
     public void setStream(String stream)
     {
         this.stream = stream;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getWiki()
-     */
+    @Override
     public WikiReference getWiki()
     {
         WikiReference result = null;
@@ -266,22 +199,13 @@ public class DefaultEvent implements Event
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setWiki(WikiReference)
-     * @see #getWiki()
-     */
+    @Override
     public void setWiki(WikiReference wiki)
     {
         this.wiki = wiki;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getSpace()
-     */
+    @Override
     public SpaceReference getSpace()
     {
         SpaceReference result = null;
@@ -293,205 +217,124 @@ public class DefaultEvent implements Event
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setSpace(SpaceReference)
-     * @see #getSpace()
-     */
+    @Override
     public void setSpace(SpaceReference space)
     {
         this.space = space;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getDocument()
-     */
+    @Override
     public DocumentReference getDocument()
     {
         return this.document;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setDocument(DocumentReference)
-     * @see #getDocument()
-     */
+    @Override
     public void setDocument(DocumentReference document)
     {
         this.document = document;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getDocumentVersion()
-     */
+    @Override
     public String getDocumentVersion()
     {
         return this.documentVersion;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setDocumentVersion(String)
-     * @see #getDocumentVersion()
-     */
+    @Override
     public void setDocumentVersion(String version)
     {
         this.documentVersion = version;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getRelatedEntity()
-     */
+    @Override
     public EntityReference getRelatedEntity()
     {
         return this.relatedEntity;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setRelatedEntity(EntityReference)
-     * @see #getRelatedEntity()
-     */
+    @Override
     public void setRelatedEntity(EntityReference entity)
     {
         this.relatedEntity = entity;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getUser()
-     */
+    @Override
     public DocumentReference getUser()
     {
         return this.user;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setUser(DocumentReference)
-     * @see #getUser()
-     */
+    @Override
     public void setUser(DocumentReference user)
     {
         this.user = user;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getUrl()
-     */
+    @Override
     public URL getUrl()
     {
         return this.url;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setUrl(URL)
-     * @see #getUrl()
-     */
+    @Override
     public void setUrl(URL url)
     {
         this.url = url;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getTitle()
-     */
+    @Override
     public String getTitle()
     {
         return this.title;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setTitle(String)
-     * @see #getTitle()
-     */
+    @Override
     public void setTitle(String title)
     {
         this.title = title;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getBody()
-     */
+    @Override
     public String getBody()
     {
         return this.body;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setBody(String)
-     * @see #getBody()
-     */
+    @Override
     public void setBody(String body)
     {
         this.body = body;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getDocumentTitle()
-     */
+    @Override
     public String getDocumentTitle()
     {
         return this.documentTitle;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setDocumentTitle(String)
-     * @see #getDocumentTitle()
-     */
+    @Override
     public void setDocumentTitle(String title)
     {
         this.documentTitle = title;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#getParameters()
-     */
+    @Override
     public Map<String, String> getParameters()
     {
         return this.parameters == null ? Collections.<String, String> emptyMap()
             : Collections.unmodifiableMap(this.parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Event#setParameters(Map)
-     * @see #getParameters()
-     */
+    @Override
     public void setParameters(Map<String, String> parameters)
     {
-        this.parameters = new HashMap<String, String>(parameters);
+        if (parameters != null) {
+            this.parameters = new HashMap<String, String>(parameters);
+        } else {
+            // Fallback to empty parameters map.
+            this.parameters = new HashMap<String, String>();
+        }
     }
     
     /**

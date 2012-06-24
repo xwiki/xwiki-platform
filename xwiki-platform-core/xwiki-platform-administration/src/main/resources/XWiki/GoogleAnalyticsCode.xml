@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,35 +19,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>GoogleAnalyticsCode</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1309440660000</creationDate>
-<date>1309796049000</date>
-<contentUpdateDate>1309796049000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('admin.analytics')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden><attachment>
-<filename>analytics.png</filename>
-<filesize>10176</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1309795571000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgAElEQVR4nO19eZRdxXnnr+qub+nX
+  <web>XWiki</web>
+  <name>GoogleAnalyticsCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1309440660000</creationDate>
+  <date>1309796049000</date>
+  <contentUpdateDate>1309796049000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('admin.analytics')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>analytics.png</filename>
+    <filesize>10176</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1309795571000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgAElEQVR4nO19eZRdxXnnr+qub+nX
 u1q9CC1oQ2IRiyQkjC2MFxZHIdiCY5hx7EwIcTyJSWyOF5RJe4JN7EmceM7YMfGKkzhYMhPGmMUG
 zCIbMAgLob1bS7eW3rtfL2+5W1XNH3Xve/dt3a9bjYFEv3Nev9f31nbrV99XX321XOAczuEc/uOD
 vNkF+M+Mzs5Os6mpKZZIJGLZbDYajUYbVFWtZ4zVm6ZSS6m2wHXtXbfeevtT85mvOp+JnYNEZ2en
@@ -225,258 +229,259 @@ MjIy7jhOsJAkcBWXnaadkXTHcX/6wgu/mqBUHXr99ddHH3vssUnP8yZPnTplua7L0+k0cRyHIH9A
 zoyvcj6HeUdwRk8WkvSA+LJzGWdDDoF0gUb87+Bl7ecIf3MQzAo6yJ/IVVbiZ5T0CqD+RyB/5rqN
 c1L+ZiKY9w+OUwsbdQWYK0Ek9KGhzznC31zw0EfgDVLvwTcpunYOv30Uj80rDtvmi6RzZL91ML8D
 hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
-</content></attachment>
-<class>
-<name>XWiki.GoogleAnalyticsCode</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<account>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>account</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Account (UA-xxxxxxx-x)</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</account>
-</class>
-<object>
-<class>
-<name>XWiki.ConfigurableClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<disabled>0</disabled>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<disabled>0</disabled>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<disabled>0</disabled>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<disabled>0</disabled>
-<name>iconAttachment</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<disabled>0</disabled>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<name>XWiki.GoogleAnalyticsCode</name>
-<number>0</number>
-<className>XWiki.ConfigurableClass</className>
-<guid>73f7eae5-ce0c-43fa-9282-1a379803a375</guid>
-<property>
-<codeToExecute>{{include document='XWiki.GoogleAnalyticsCode' /}}</codeToExecute>
-</property>
-<property>
-<configurationClass></configurationClass>
-</property>
-<property>
-<configureGlobally>1</configureGlobally>
-</property>
-<property>
-<displayInSection>analytics</displayInSection>
-</property>
-<property>
-<heading></heading>
-</property>
-<property>
-<iconAttachment>analytics.png</iconAttachment>
-</property>
-<property>
-<linkPrefix></linkPrefix>
-</property>
-<property>
-<propertiesToShow/>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>XWiki.GoogleAnalyticsCode</name>
-<number>0</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>67bc7341-1915-4732-99bc-55de2816ef93</guid>
-<property>
-<cache>long</cache>
-</property>
-<property>
-<code>#set($analyticsDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
+</content>
+  </attachment>
+  <class>
+    <name>XWiki.GoogleAnalyticsCode</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <account>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>account</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Account (UA-xxxxxxx-x)</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </account>
+  </class>
+  <object>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <codeToExecute>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <disabled>0</disabled>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayInSection>
+        <disabled>0</disabled>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <disabled>0</disabled>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <disabled>0</disabled>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <disabled>0</disabled>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+    </class>
+    <name>XWiki.GoogleAnalyticsCode</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>73f7eae5-ce0c-43fa-9282-1a379803a375</guid>
+    <property>
+      <codeToExecute>{{include document='XWiki.GoogleAnalyticsCode' /}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayInSection>analytics</displayInSection>
+    </property>
+    <property>
+      <heading/>
+    </property>
+    <property>
+      <iconAttachment>analytics.png</iconAttachment>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.GoogleAnalyticsCode</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>67bc7341-1915-4732-99bc-55de2816ef93</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#set($analyticsDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
 #set($analyticsObj = $analyticsDoc.getObject('XWiki.GoogleAnalyticsCode'))
 #set($accounts = [])
 #if("$!analyticsObj" != "" &amp;&amp; "$!analyticsObj.account" != "")
@@ -503,18 +508,18 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 #end</code>
-</property>
-<property>
-<name>googleanalytics</name>
-</property>
-<property>
-<parse>1</parse>
-</property>
-<property>
-<use>onDemand</use>
-</property>
-</object>
-<content>{{velocity output="false"}}
+    </property>
+    <property>
+      <name>googleanalytics</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity output="false"}}
 #macro(saveGoogleAccount $account)
 	#set($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
 	#set($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))
@@ -585,4 +590,5 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 &lt;/form&gt;
 {{/html}}
 
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

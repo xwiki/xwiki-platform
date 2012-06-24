@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>IRC</web>
+  <name>WikiNewsBotListener</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>IRC.IRCBot</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1331905409000</creationDate>
+  <date>1331910045000</date>
+  <contentUpdateDate>1331910045000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Wiki News Bot Listener</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <class>
+    <name>IRC.WikiNewsBotListener</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <wikis>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <multiSelect>0</multiSelect>
+      <name>wikis</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Wikis</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </wikis>
+  </class>
+  <object>
+    <class>
+      <name>IRC.IRCBotListenerClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <description>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Description</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </description>
+      <inactive>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>inactive</name>
+        <number>3</number>
+        <prettyName>Inactive</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </inactive>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>IRC.WikiNewsBotListener</name>
+    <number>0</number>
+    <className>IRC.IRCBotListenerClass</className>
+    <guid>fb2667a6-1ee9-454e-b175-988407a127df</guid>
+    <property>
+      <description>!news: list the last modifications done on the wiki</description>
+    </property>
+    <property>
+      <inactive/>
+    </property>
+    <property>
+      <name>Wiki News</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>IRC.IRCBotListenerEventClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <event>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>event</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Event</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </event>
+      <script>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>script</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Script</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </script>
+    </class>
+    <name>IRC.WikiNewsBotListener</name>
+    <number>0</number>
+    <className>IRC.IRCBotListenerEventClass</className>
+    <guid>50d28f5b-c229-44d5-b664-434709bcbb92</guid>
+    <property>
+      <event>onMessage</event>
+    </property>
+    <property>
+      <script>{{groovy}}
+import com.xpn.xwiki.*
+
+def irccontext = services.get("ircbot").getContext() 
+def message = irccontext.get("message")
+def wikiServerPrefix = "XWiki.XWikiServer"
+def wikiNames = irccontext.get("wikis")
+
+if (message.startsWith("!news")) {
+  println "Last 4 pages modified:"
+  getLastModifications("where 1=1 order by doc.date desc", 4, xwiki.getXWiki(), xcontext.getContext()).each() {
+    println "  * ${it.wiki}:${it.fullName} by ${it.author} ${it.comment ? "(${it.comment})" : ""} - ${it.getExternalURL("view")}"
+  }
+}
+
+/**
+  * Find last modifications on all passed wikis. If the passed wiki list is null or empty the modifications for all wikis is returned.
+  */
+List getLastModifications(String sql, int nbModifications, XWiki xwiki, XWikiContext context)
+{
+  def documentlist = [];
+
+  if (xwiki.isVirtualMode()) {
+    def names = wikiNames
+    if (names == null || names.size() == 0) {
+      def allwikilist = xwiki.store.searchDocumentsNames(", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className='XWiki.XWikiServerClass' and doc.fullName&lt;&gt;'XWiki.XWikiServerClassTemplate' and prop.id.id=obj.id and prop.id.name='server'", context)
+      names = []
+      for (wikidocname in allwikilist) {
+        names.add(wikidocname.substring(wikiServerPrefix.length()).toLowerCase())
+      }
+      if (!names.contains(context.getMainXWiki())) {
+        names.add(context.getMainXWiki())
+      }
+    }
+  
+    for (wikiname in names) {
+      addModifications(documentlist, wikiname, sql, nbModifications, xwiki, context)
+      if (documentlist.size() &gt; nbModifications)  {
+        documentlist = documentlist.subList(0, nbModifications)
+      }
+    }
+  } else {
+    addModifications(documentlist, null, sql, nbModifications, xwiki, context)
+  }
+
+  return documentlist;
+}
+
+void addModifications(List documentlist, String wikiname, String sql, int nbModifications, XWiki xwiki, XWikiContext context)
+{
+  def currentwiki = context.getDatabase()
+
+  if (wikiname == null) {
+    wikiname = currentwiki
+  }
+    
+  try {
+    context.setDatabase(wikiname);
+
+    def xwikiApi = new com.xpn.xwiki.api.XWiki(xwiki, context)
+    def reqlist = xwikiApi.searchDocuments(sql, true, nbModifications, 0)
+
+    def insertAt = 0
+    for (doc in reqlist) {
+      insertAt = 0
+      for (sorteddoc in documentlist) {
+        if (sorteddoc.getDate().before(doc.getDate())) {
+          break
+        }
+        ++insertAt
+      }
+        
+      if (insertAt &lt; reqlist.size()) {
+        documentlist.add(insertAt, doc)
+      } else {
+        documentlist.add(doc)
+      }
+    }
+  } catch (e) {
+    throw new Exception("Failed to get recent changes for wiki ${wikiname}", e)
+  } finally {
+    context.setDatabase(currentwiki)
+  }
+}
+{{/groovy}}</script>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>IRC.IRCBotListenerEventClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <event>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>event</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Event</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </event>
+      <script>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>script</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Script</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </script>
+    </class>
+    <name>IRC.WikiNewsBotListener</name>
+    <number>1</number>
+    <className>IRC.IRCBotListenerEventClass</className>
+    <guid>aa3391c1-db44-4789-a961-c0fad2c684e5</guid>
+    <property>
+      <event>onRegistration</event>
+    </property>
+    <property>
+      <script>{{groovy}}
+def object = xwiki.getDocument("IRC.IRCConfiguration").getObject("IRC.WikiNewsBotListener")
+if (object == null) {
+  return
+}
+
+def mappings = [:]
+
+def wikis = object.getProperty("wikis").value
+if (wikis != null &amp;&amp; wikis.trim().length() &gt; 0) {
+  mappings.put("wikis", wikis)
+}
+
+xcontext.put("irclistener", mappings)
+{{/groovy}}</script>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

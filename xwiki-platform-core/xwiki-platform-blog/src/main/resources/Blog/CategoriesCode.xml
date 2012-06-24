@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Blog</web>
-<name>CategoriesCode</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1226789865000</creationDate>
-<date>1229917290000</date>
-<contentUpdateDate>1229917290000</contentUpdateDate>
-<version>1.1</version>
-<title>Macros for the Blog Categories</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>true</hidden>
-<content>{{include document="Blog.BlogCode"/}}
+  <web>Blog</web>
+  <name>CategoriesCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1226789865000</creationDate>
+  <date>1229917290000</date>
+  <contentUpdateDate>1229917290000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Macros for the Blog Categories</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Blog.BlogCode"/}}
 
 {{velocity output="false"}}
 ##
@@ -38,8 +39,8 @@
  *        placed. Useful for a paginated view.
  *###
 #macro(getEntriesForCategory $category $entries $totalEntries)
-  #set ($entries = $util.null)
-  #set ($totalEntries = $util.null)
+  #set ($entries = $NULL)
+  #set ($totalEntries = $NULL)
   #if ("$!{blogCategoryEntriesCache.containsKey($!{category})}" == 'true')
     #setVariable ("$entries" $blogCategoryEntriesCache.get($!{category}).get(0))
     #setVariable ("$totalEntries" $blogCategoryEntriesCache.get($!{category}).get(1))
@@ -89,7 +90,7 @@
  *        all its subcategories. To obtain the full hierarchy, start with the key 'Blog.Categories'.
  *###
 #macro(getCategoriesHierarchy $space $tree)
-  #set ($tree = $util.null)
+  #set ($tree = $NULL)
   #if ("$!{blogCategoriesHierarchyCache.containsKey($!{space})}" == 'true')
     #setVariable ("$tree" $blogCategoriesHierarchyCache.get($!{space}))
   #else
@@ -137,7 +138,7 @@
  *        For any other value, the default ("simple") is considered.
  *###
 #macro(displayCategoriesHierarchy $tree $displayMethod)
-  #set($processedCategories = $util.arrayList)
+  #set($processedCategories = [])
   #displayCategoriesHierarchyRecursive($tree $defaultCategoryParent 1 $displayMethod)
 #end
 ##
@@ -166,7 +167,7 @@
  *###
 #macro(displayCategoriesHierarchyRecursive $tree $root $level $displayMethod)
   #if(!$processedCategories)
-    #set($processedCategories = $util.arrayList)
+    #set($processedCategories = [])
   #end
   #foreach($item in $tree.get($root))
     #if(!$processedCategories.contains($item))

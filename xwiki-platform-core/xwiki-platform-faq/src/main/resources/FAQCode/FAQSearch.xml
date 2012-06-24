@@ -1,31 +1,33 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>FAQCode</web>
-<name>FAQSearch</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>FAQ.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1319794084000</creationDate>
-<date>1319797785000</date>
-<contentUpdateDate>1319797785000</contentUpdateDate>
-<version>1.1</version>
-<title>Search FAQs</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{include document="XWiki.SearchCode"/}}
+  <web>FAQCode</web>
+  <name>FAQSearch</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>FAQ.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319794084000</creationDate>
+  <date>1319797785000</date>
+  <contentUpdateDate>1319797785000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Search FAQs</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{include document="XWiki.SearchCode"/}}
 
 {{velocity}}
 #set($allwikinamelist = ["xwiki"])
 {{include document="$searchPage"/}}
 {{/velocity}}
-</content></xwikidoc>
+</content>
+</xwikidoc>

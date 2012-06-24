@@ -31,8 +31,11 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -69,6 +72,13 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    /**
+     * The component used to resolve a string relative reference.
+     */
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeReferenceResolver;
+    
     /**
      * The component used to serialize entity references as absolute string references.
      */
@@ -145,8 +155,8 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     @Override
     public boolean bind(DocumentModelBridge document, DocumentReference sheetReference)
     {
-        DocumentReference sheetBindingClassReference =
-            documentReferenceResolver.resolve(getSheetBindingClass(), document.getDocumentReference());
+        EntityReference sheetBindingClassReference =
+            this.relativeReferenceResolver.resolve(getSheetBindingClass(), EntityType.DOCUMENT);
         List<BaseObject> sheetBindingObjects = ((XWikiDocument) document).getXObjects(sheetBindingClassReference);
         if (sheetBindingObjects != null) {
             for (BaseObject sheetBindingObject : sheetBindingObjects) {

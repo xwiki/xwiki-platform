@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WorkspaceManager</web>
-<name>BrowseWorkspacesLiveTableResultsMacros</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WorkspaceManager.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1293832800000</creationDate>
-<date>1307188675000</date>
-<contentUpdateDate>1307188675000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("platform.livetable.resultsmacros")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity output="false"}}
+  <web>WorkspaceManager</web>
+  <name>BrowseWorkspacesLiveTableResultsMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WorkspaceManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1307188675000</date>
+  <contentUpdateDate>1307188675000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("platform.livetable.resultsmacros")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}
 #**
  * Macro to get the results of a livetable data call.
  * This page is called from live grids via Ajax with the argument xpage=plain. It returns a
@@ -43,14 +44,17 @@
   #if("$!{request.xpage}" == 'plain')
     $response.setContentType('application/json')
   #end
-  #set($offset = $util.parseInt($request.get('offset')))
+  #set($offset = $mathtool.toInteger($request.get('offset')))
   ## offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
-  #if($offset &lt; 0)
+  #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
-  #set($limit = $util.parseInt($request.get('limit')))
-  #set($tablelist = $util.arrayList)
+  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
+  #set($tablelist = [])
   ##
   ##
   ##
@@ -77,6 +81,7 @@
     #set($fromSql = "${fromSql} , BaseObject as tobject, DBStringListProperty as tagprop")
     #set($whereSql = "${whereSql} and tobject.className='XWiki.TagClass' and tobject.name=doc.fullName and tobject.id=tagprop.id.id and tagprop.id.name='tags' and (")
     #foreach($tag in $request.getParameterValues('tag'))
+      ## FIXME Double decoding?
       #set($tag = $util.decodeURI($tag))
       #if($velocityCount &gt; 1) #set($whereSql = "${whereSql} and ") #end
       #set($whereSql = "${whereSql} ? in elements(tagprop.list)")
@@ -204,7 +209,7 @@
   ],
   "returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
   "offset": $mathtool.add($offset, 1),
-  "reqNo": $util.parseInt($request.reqNo),
+  "reqNo": $mathtool.toInteger($request.reqNo),
   "rows": [
     ## Some constants which are usefull while processing each item.
     #set ($WorkspaceManager = $services.workspace)
@@ -560,7 +565,7 @@
       #livetable_getTableName($colname)
       #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-      #set($discard = $whereParams.addAll(["${colname}", $util.parseInt(${filterValue})]))
+      #set($discard = $whereParams.addAll(["${colname}", $mathtool.toInteger(${filterValue})]))
     #elseif($propType == 'DateClass')
       #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
@@ -603,4 +608,5 @@
   #livetable_addColumnToQuery($colname)
 #end
 
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

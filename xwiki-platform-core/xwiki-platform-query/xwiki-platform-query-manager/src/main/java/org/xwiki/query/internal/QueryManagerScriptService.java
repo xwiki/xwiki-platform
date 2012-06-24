@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -48,6 +49,12 @@ public class QueryManagerScriptService implements ScriptService
     private QueryManager secureQueryManager;
 
     /**
+     * Used to create {@link ScriptQuery}.
+     */
+    @Inject
+    private ComponentManager componentManager;
+
+    /**
      * Shortcut for writing a XWQL query.
      * 
      * @param statement the XWQL statement for the query
@@ -56,7 +63,7 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query xwql(String statement) throws QueryException
     {
-        return this.secureQueryManager.createQuery(statement, Query.XWQL);
+        return new ScriptQuery(this.secureQueryManager.createQuery(statement, Query.XWQL), componentManager);
     }
 
     /**
@@ -68,7 +75,7 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query hql(String statement) throws QueryException
     {
-        return this.secureQueryManager.createQuery(statement, Query.HQL);
+        return new ScriptQuery(this.secureQueryManager.createQuery(statement, Query.HQL), componentManager);
     }
 
     /**
@@ -81,6 +88,6 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query createQuery(String statement, String language) throws QueryException
     {
-        return this.secureQueryManager.createQuery(statement, language);
+        return new ScriptQuery(this.secureQueryManager.createQuery(statement, language), componentManager);
     }
 }

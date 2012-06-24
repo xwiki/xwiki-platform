@@ -41,10 +41,7 @@ import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.HeadingLevelSplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
-import org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
-import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
-import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
@@ -96,11 +93,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 2.2M1
-     */
+    @Override
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
         throws OfficeImporterException
@@ -112,11 +105,12 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
         // Create splitting and naming criterion for refactoring.
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(headingLevelsToSplit);
-        NamingCriterion namingCriterion = getNamingCriterion(namingCriterionHint, strBaseDoc);
+        NamingCriterion namingCriterion = DocumentSplitterUtils.getNamingCriterion(
+            namingCriterionHint, strBaseDoc, this.docBridge, this.plainTextRenderer);
 
         // Create the root document required by refactoring module.
         WikiDocument rootDoc = new WikiDocument(strBaseDoc, officeDocument.getContentDocument(), null);
-        List<WikiDocument> documents = documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
+        List<WikiDocument> documents = this.documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
 
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
@@ -130,12 +124,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
             }
 
             // Rewire artifacts.
-            Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
-            List<ImageBlock> imageBlocks = doc.getXdom().getChildrenByType(ImageBlock.class, true);
-            for (ImageBlock imageBlock : imageBlocks) {
-                String imageReference = imageBlock.getReference().getReference();
-                artifacts.put(imageReference, officeDocument.getArtifacts().remove(imageReference));
-            }
+            Map<String, byte[]> artifacts = DocumentSplitterUtils.relocateArtifacts(doc, officeDocument);
 
             // Create the resulting XDOMOfficeDocument.
             XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifacts, this.componentManager);
@@ -143,28 +132,5 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         }
 
         return result;
-    }
-
-    /**
-     * Utility method for building a {@link NamingCriterion} based on the parameters provided.
-     * 
-     * @param namingCriterionId naming criterion identifier.
-     * @param baseDocument reference document name to be used when generating names.
-     * @return a {@link NamingCriterion} based on the parameters provided.
-     * @throws OfficeImporterException if there is no naming criterion matching the given naming criterion id.
-     */
-    private NamingCriterion getNamingCriterion(String namingCriterionId, String baseDocument)
-        throws OfficeImporterException
-    {
-        // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
-        if (namingCriterionId.equals("headingNames")) {
-            return new HeadingNameNamingCriterion(baseDocument, this.docBridge, this.plainTextRenderer, false);
-        } else if (namingCriterionId.equals("mainPageNameAndHeading")) {
-            return new HeadingNameNamingCriterion(baseDocument, this.docBridge, this.plainTextRenderer, true);
-        } else if (namingCriterionId.equals("mainPageNameAndNumbering")) {
-            return new PageIndexNamingCriterion(baseDocument, this.docBridge);
-        } else {
-            throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
-        }
     }
 }

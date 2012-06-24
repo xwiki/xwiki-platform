@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -32,7 +32,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M1
  */
-@ComponentRole
+@Role
 public interface WikiMacroBindingInitializer
 {
     /**

@@ -47,6 +47,7 @@ public class StyleFilter extends RegexTokenFilter
         super("\\{(style)(?::([^\\}]*))?\\}(.*)\\{style}", MULTILINE);
     }
 
+    @Override
     public void setInitialContext(InitialRenderContext context)
     {
         macros = MacroRepository.getInstance();
@@ -58,6 +59,7 @@ public class StyleFilter extends RegexTokenFilter
         return macros;
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         String command = result.group(1);

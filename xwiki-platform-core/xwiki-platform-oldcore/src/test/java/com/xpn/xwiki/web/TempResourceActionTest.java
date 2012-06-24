@@ -73,7 +73,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
 
         // Configure Servlet Environment defined in AbstractBridgedComponentTestCase so that it returns a good
         // temporary directory
-        ServletEnvironment environment = (ServletEnvironment) getComponentManager().lookup(Environment.class);
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         environment.setTemporaryDirectory(base);
 
         final ExecutionContextManager mockExecutionContextManager =

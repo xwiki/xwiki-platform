@@ -103,9 +103,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         this.credentialSupplier = credentialSupplier;
     }
 
-    /**
-     * @see com.sun.syndication.fetcher.FeedFetcher#retrieveFeed(java.net.URL)
-     */
+    @Override
     public SyndFeed retrieveFeed(URL feedUrl)
         throws IllegalArgumentException, IOException, FeedException, FetcherException
     {

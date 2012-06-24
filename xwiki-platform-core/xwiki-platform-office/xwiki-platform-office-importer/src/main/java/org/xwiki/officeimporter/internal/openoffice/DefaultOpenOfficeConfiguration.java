@@ -50,7 +50,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
-     * @see OpenOfficeConfiguration#getServerPort();
+     * @see OpenOfficeConfiguration#getServerPort()
      */
     private static final int DEFAULT_SERVER_PORT = 8100;
 
@@ -80,85 +80,52 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     @Inject
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#getServerType()
-     */
+    @Override
     public int getServerType()
     {
         return this.configuration.getProperty(PREFIX + "serverType", DEFAULT_SERVER_TYPE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#getServerPort()
-     */
+    @Override
     public int getServerPort()
     {
         return this.configuration.getProperty(PREFIX + "serverPort", DEFAULT_SERVER_PORT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#isAutoStart()
-     */
+    @Override
     public boolean isAutoStart()
     {
         return this.configuration.getProperty(PREFIX + "autoStart", DEFAULT_AUTO_START);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#getHomePath()
-     */
+    @Override
     public String getHomePath()
     {
-        return this.configuration.getProperty(PREFIX + "homePath", defaultHomePath);
+        return this.configuration.getProperty(PREFIX + "homePath", this.defaultHomePath);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#getProfilePath()
-     */
+    @Override
     public String getProfilePath()
     {
         return this.configuration.getProperty(PREFIX + "profilePath");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
-     */
+    @Override
     public int getMaxTasksPerProcess()
     {
         return this.configuration.getProperty(PREFIX + "maxTasksPerProcess", DEFAULT_MAX_TASKS_PER_PROCESS);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
-     */
+    @Override
     public long getTaskExecutionTimeout()
     {
         return this.configuration.getProperty(PREFIX + "taskExecutionTimeout", DEFAULT_TASK_EXECUTION_TIMEOUT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
     @Override
     public void initialize() throws InitializationException
     {
         File defaultHomeFolder = OfficeUtils.getDefaultOfficeHome();
-        defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
+        this.defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
     }
 }

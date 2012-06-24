@@ -3,13 +3,13 @@
 <web>XAppResources</web>
 <name>Translations</name>
 <language>ca</language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>1</translation>
 <parent>XAppResources.WebHome</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
 <date>1278346254000</date>
 <contentUpdateDate>1278346254000</contentUpdateDate>
@@ -23,7 +23,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
-#Mon Oct 24 18:49:13 CEST 2011
 xapp.action.exportnonrecurse=Exportar (sense recursivitat)
 xapp.action.exportrecurse=Exportar
 xapp.action.reloadapp=Recarregar

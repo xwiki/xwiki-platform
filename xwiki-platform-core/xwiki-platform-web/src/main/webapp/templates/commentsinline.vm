@@ -135,7 +135,13 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayComment $comment, $commentDoc)
-  <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
+  ## if the current comment is an annotation (i.e. has selection) set a flag to display selection, and add a few classes
+  #set($commentSelection = $comment.getProperty('selection').value)
+  #set($isAnnotation = false)
+  #if ("$!commentSelection" != "")
+    #set($isAnnotation = true)
+  #end
+  <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#mediumUserAvatar($comment.author)#{else}#smallUserAvatar($comment.author)#end</div>
     <div class="commentheader">
       <div>
@@ -157,7 +163,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #end
       </span>## commenttools
     </div>## commentheader
-    <div class="commentcontent">$commentDoc.getRenderedContent($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
+    #if ($isAnnotation)
+      <a href="#ID$comment.number"><blockquote class="annotatedText">$!escapetool.xml($commentSelection)</blockquote></a>
+    #end
+    <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
   </div>## xwikicomment
 #end
 ##
@@ -174,7 +183,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
           <label for="${xCommentClass}_author">$msg.get('core.viewers.comments.add.guestName.prompt') <input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author"/></label>
-          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())")'>$msg.get('login')</a></strong>
+          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")'>$msg.get('login')</a></strong>
         #end
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -273,7 +282,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #redirectIfActionNotView()
 #set($commentNumber = "$!{request.number}")
 #if($commentNumber != '')
-  #set($commentNumber = $util.parseInt($commentNumber))
+  #set($commentNumber = $mathtool.toInteger($commentNumber))
   #set($comment = $doc.getObject($xCommentClass, $commentNumber))
   #if("$!{comment}" != '')
     #if ("$!{request.xpage}" == '')
@@ -301,10 +310,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   <div id="_comments">
 #if($comments.size() > 0)
   #set($rootKey = "-1")
-  #set($commentThreads = $util.hashMap)
-  #set($discard = $commentThreads.put($rootKey, $util.arrayList))
+  #set($commentThreads = {})
+  #set($discard = $commentThreads.put($rootKey, []))
   #foreach($comment in $comments)
-    #set($discard = $commentThreads.put("${comment.number}", $util.arrayList))
+    #set($discard = $commentThreads.put("${comment.number}", []))
   #end
   #foreach($comment in $comments)
     #addCommentToThreads($comment, $commentThreads, $rootKey)

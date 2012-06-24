@@ -72,13 +72,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
      * Used to convert a string into a proper Document Reference.
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Name to string.
      */
     private EntityReferenceSerializer<String> entityReferenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.class);
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     protected void logAllow(String username, String page, String action, String info)
     {
@@ -320,6 +320,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
     public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel, boolean user,
         boolean allow, boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException
     {
+        if (!global && ("admin".equals(accessLevel))) {
+            // Admin rights do not exist at document level.
+            throw new XWikiRightNotFoundException();
+        }
+
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
         String fieldName = user ? "users" : "groups";
         boolean found = false;
@@ -598,10 +603,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             DocumentReference docReference = currentdoc.getDocumentReference();
 
-            if (accessLevel.equals("edit") &&
-                (docReference.getName().equals("WebPreferences") ||
-                 (docReference.getLastSpaceReference().getName().equals("XWiki") &&
-                  docReference.getName().equals("XWikiPreferences")))) {
+            if (accessLevel.equals("edit")
+                && (docReference.getName().equals("WebPreferences") || (docReference.getLastSpaceReference().getName()
+                    .equals("XWiki") && docReference.getName().equals("XWikiPreferences")))) {
                 // Since edit rights on these documents would be sufficient for a user to elevate himself to
                 // admin or even programmer, we will instead check for admin access on these documents.
                 // See http://jira.xwiki.org/browse/XWIKI-6987 and http://jira.xwiki.org/browse/XWIKI-2184.
@@ -779,10 +783,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // and that all users that were not denied
             // should be allowed.
             if (!allow_found) {
-                // Should these rights be denied only if no deny rights were found?
-                if (accessLevel.equals("register") || accessLevel.equals("delete")) {
-                    logDeny(userOrGroupName, entityReference, accessLevel, "global level (" + accessLevel
-                        + " right must be explicit)");
+                // Delete must be denied by default.
+                if ("delete".equals(accessLevel)) {
+                    if (hasAccessLevel("admin", userOrGroupName, entityReference, user, context)) {
+                        logAllow(userOrGroupName, entityReference, accessLevel, "admin rights imply delete on empty wiki");
+                        return true;
+                    }
+                    logDeny(userOrGroupName, entityReference, accessLevel, "global level (delete right must be explicit)");
 
                     return false;
                 } else {
@@ -822,7 +829,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
         // the resolved page name.
         // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
         // to retrieve only the page name
-        DocumentReference userReference = Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
+        DocumentReference userReference =
+            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+                username);
         return StringUtils.equalsIgnoreCase(userReference.getName(), SUPERADMIN_USER);
     }
 

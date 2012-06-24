@@ -73,9 +73,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         super(name, description, contentDescriptor, parametersBeanClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -115,7 +113,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
     protected LayoutManager getLayoutManager(String layoutStyle)
     {
         try {
-            return getComponentManager().lookup(LayoutManager.class, layoutStyle);
+            return getComponentManager().getInstance(LayoutManager.class, layoutStyle);
         } catch (ComponentLookupException e) {
             // TODO: maybe should log?
             return null;
@@ -142,9 +140,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         return this.componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,30 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>AdminFieldsDisplaySheet</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.AdminSheet</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1211796643000</creationDate>
-<date>1299711613000</date>
-<contentUpdateDate>1299711613000</contentUpdateDate>
-<version>1.1</version>
-<title>AdminFieldsDisplaySheet</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>AdminFieldsDisplaySheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.AdminSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1211796643000</creationDate>
+  <date>1299711613000</date>
+  <contentUpdateDate>1299711613000</contentUpdateDate>
+  <version>1.1</version>
+  <title>AdminFieldsDisplaySheet</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 #if ("$!section" != '')
   ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
@@ -65,6 +67,11 @@
         #if ($title == $field &amp;&amp; $prop)
           #set ($title = $!prop.prettyName)
         #end
+        #if($msg.get("${obj.xWikiClass.name}_${field}") != "${obj.xWikiClass.name}_${field}")
+          #set ($title = $msg.get("${obj.xWikiClass.name}_${field}"))
+        #end
+        #set($hint = $msg.get("${obj.xWikiClass.name}_${field}.hint"))
+        #if($hint == "${obj.xWikiClass.name}_${field}.hint") #set($hint = $NULL) #end
         &lt;dt&gt;
         &lt;label #if($prop)for="${prefsClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
         #if($field == 'skin')
@@ -86,6 +93,7 @@
           #end
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
+        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
         &lt;/label&gt;
         &lt;/dt&gt;
         #if ($prop)
@@ -114,4 +122,5 @@
   &lt;/form&gt;
   {{/html}}
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

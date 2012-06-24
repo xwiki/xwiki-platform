@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Main</web>
-<name>TagsRss</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.RssFeeds</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1252454400000</date>
-<contentUpdateDate>1252454400000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.rss.tags.feed")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>Main</web>
+  <name>TagsRss</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.RssFeeds</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.rss.tags.feed")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 #if("$!{request.xpage}" == 'plain' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
   ##
   ## Build document list.
@@ -41,7 +41,7 @@
   ## Build feed.
   ##
   #set ($list = $xwiki.searchDocuments($sql , 20 , 0))
-  #set ($feed = $xwiki.feed.getDocumentFeed($list, $util.getHashMap(), $util.getHashMap()))
+  #set ($feed = $xwiki.feed.getDocumentFeed($list, {}, {}))
   #set ($feedURI = $xwiki.getDocument("Main.WebHome").getExternalURL("view"))
   #set ($discard = $feed.setLink($feedURI))
   #set ($discard = $feed.setUri($feedURI))

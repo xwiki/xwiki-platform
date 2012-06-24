@@ -67,7 +67,7 @@ public class AnnotationVelocityContextInitializer implements VelocityContextInit
     {
         try {
             // create a wrapper of the annotation service for exposing its methods in velocity
-            ScriptService annotationsScriptService = componentManager.lookup(ScriptService.class, 
+            ScriptService annotationsScriptService = componentManager.getInstance(ScriptService.class,
                 ANNOTATION_SCRIPT_SERVICE_HINT);
             context.put(VELOCITY_CONTEXT_KEY, annotationsScriptService);
         } catch (ComponentLookupException e) {

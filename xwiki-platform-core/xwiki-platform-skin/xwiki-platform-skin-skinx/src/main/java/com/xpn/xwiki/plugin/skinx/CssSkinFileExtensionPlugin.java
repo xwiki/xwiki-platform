@@ -56,33 +56,18 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return PLUGIN_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new SkinFileExtensionPluginApi((AbstractSkinExtensionPlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
-     */
     @Override
     public String getLink(String filename, XWikiContext context)
     {

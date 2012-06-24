@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.formula.AbstractFormulaRenderer;
 import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.ImageData;
@@ -69,7 +69,7 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
 
     /** Application container, needed for retrieving the work directory where temporary files can be created. */
     @Inject
-    private Container container;
+    private Environment environment;
 
     /** Temporary parent directory for storing files created during the image rendering process. */
     private File tempDirectory;
@@ -77,7 +77,7 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
     @Override
     public void initialize() throws InitializationException
     {
-        this.tempDirectory = new File(this.container.getApplicationContext().getTemporaryDirectory(), "formulae");
+        this.tempDirectory = new File(this.environment.getTemporaryDirectory(), "formulae");
         this.tempDirectory.mkdir();
     }
 

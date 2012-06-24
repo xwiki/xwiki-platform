@@ -21,14 +21,14 @@ package org.xwiki.crypto.passwd;
 
 import java.util.Properties;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * The configuration for the password based cryptography service.
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface PasswordCryptoServiceConfiguration
 {
     /** @return the type of cipher to use for encryption. */

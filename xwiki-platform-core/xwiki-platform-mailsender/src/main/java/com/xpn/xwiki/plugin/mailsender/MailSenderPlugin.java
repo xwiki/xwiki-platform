@@ -130,11 +130,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
@@ -145,11 +140,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(XWikiContext)
-     */
     @Override
     public void virtualInit(XWikiContext context)
     {
@@ -160,22 +150,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
         return ID;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -243,7 +223,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(EMAIL_XWIKI_CLASS_NAME);
         needsUpdate |= bclass.addTextField("subject", "Subject", 40);
         needsUpdate |= bclass.addTextField("language", "Language", 5);
@@ -270,6 +250,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         if (needsUpdate) {
@@ -354,8 +338,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Add attachments to a multipart message
      * 
-     * @param multipart Multipart message
-     * @param attachments List of attachments
+     * @param attachment the attachment to create the body part for.
+     * @param context the XWiki context.
+     * @return the body part for the given attachment.
      */
     public MimeBodyPart createAttachmentBodyPart(Attachment attachment, XWikiContext context) throws XWikiException,
         IOException, MessagingException

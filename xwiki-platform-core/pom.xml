@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -37,7 +37,6 @@
     <gwt.version>2.4.0</gwt.version>
     <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
-    <restlet.version>2.0.11</restlet.version>
   </properties>
   <dependencies>
     <dependency>
@@ -47,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
+      <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -87,7 +86,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2-xwiki</version>
+        <version>2.5.2</version>
       </dependency>
       <!-- JFreeChart -->
       <dependency>
@@ -99,7 +98,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>2.12.2.Final</version>
+        <version>3.0.10.Final</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
@@ -218,6 +217,35 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/internal/**</exclude>
+            <exclude>**/test/**</exclude>
+            <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Add a method to the oldcore/wikimacro bridge -->
+            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroFactory</exclude>
+            <!-- The following excludes are needed because we've upgraded from AspectJ 1.6.7 to AspectJ 1.6.11
+                 in 4.0-milestone-1 and AspectJ has changed the way they weave stuff in class files thus leading to
+                 false CLIRR errors (see http://www.eclipse.org/aspectj/doc/released/README-169.html - search for
+                 "Intertype fields preserve visibility and name" for details).
+
+                 Thus we have to add those excludes. However those excludes could hide real breakages and thus before
+                 the release is done the Release Manager must absolutely remove those excludes below and try running
+                 CLIRR with AspectJ 1.6.7 to verify that no breakages have been added. To do so simply edit the
+                 Legacy OldCore pom.xml and add <version>1.6.7</version> for aspectjrt and <version>1.3</version> for
+                 the AspectJ Maven plugin version.
+            -->
+            <exclude>com/xpn/xwiki/XWikiCompatibilityAspect</exclude>
+            <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
+            <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
+            <!-- Minor modification in the AS event implementation, can be removed after the 4.1 release -->
+            <exclude>com/xpn/xwiki/plugin/activitystream/impl/ActivityEventImpl</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
     <extensions>
       <!-- Needed to add support for the "xar" packaging -->
@@ -236,6 +264,7 @@
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application-manager</module>
     <module>xwiki-platform-appwithinminutes</module>
+    <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-cache</module>
@@ -254,13 +283,14 @@
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-formula</module>
+    <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>
     <module>xwiki-platform-jodatime</module>
-    <module>xwiki-platform-legacy</module>
+    <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-mailsender</module>
@@ -276,6 +306,7 @@
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
+    <module>xwiki-platform-security</module>
     <module>xwiki-platform-selenium</module>
     <module>xwiki-platform-sheet</module>
     <module>xwiki-platform-skin</module>
@@ -298,38 +329,16 @@
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>
+    <!-- Profile to build Legacy modules -->
     <profile>
-      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
-           Cobertura instrumentation in a special profile (when the Cobertura profile is
-           executed, the Clirr one isn't). -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <!-- Remove the following excludes after we release 3.5 -->
-                <exclude>org/xwiki/container/ContainerFactory</exclude>
-                <!-- Moved to another module -->
-                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
-                <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <xwiki.clirr.skip>false</xwiki.clirr.skip>
-      </properties>
+      <id>legacy</id>
+      <modules>
+        <module>xwiki-platform-legacy</module>
+      </modules>
     </profile>
     <profile>
-      <id>gwtTestManual</id>
+      <!-- Allows running GWT tests manually -->
+      <id>gwt-test-manual</id>
       <build>
         <plugins>
           <plugin>

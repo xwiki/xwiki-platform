@@ -29,6 +29,8 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -147,15 +149,6 @@ public class Util
         return matches;
     }
 
-    /**
-     * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
-     */
-    @Deprecated
-    public List<String> getMatches(String content, String spattern, int group) throws MalformedPatternException
-    {
-        return getUniqueMatches(content, spattern, group);
-    }
-
     public static String cleanValue(String value)
     {
         value = StringUtils.replace(value, "\r\r\n", "%_N_%");
@@ -243,34 +236,6 @@ public class Util
         getP5util().split(results, pattern, text);
 
         return results;
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File, String)} */
-    @Deprecated
-    public static String getFileContent(File file) throws IOException
-    {
-        return FileUtils.readFileToString(file, XWiki.DEFAULT_ENCODING);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.IOUtils#toString(Reader)} */
-    @Deprecated
-    public static String getFileContent(Reader reader) throws IOException
-    {
-        return IOUtils.toString(reader);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToByteArray(File)} */
-    @Deprecated
-    public static byte[] getFileContentAsBytes(File file) throws IOException
-    {
-        return FileUtils.readFileToByteArray(file);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.IOUtils#toByteArray(InputStream)} */
-    @Deprecated
-    public static byte[] getFileContentAsBytes(InputStream is) throws IOException
-    {
-        return IOUtils.toByteArray(is);
     }
 
     public static boolean contains(String name, String list, String sep)
@@ -917,5 +882,36 @@ public class Util
             LOGGER.warn("Invalid language: " + languageCode);
         }
         return defaultLanguage;
+    }
+
+    /**
+     * Get a likely unique 64bit hash representing the provided uid string. Use the MD5 hashing algorithm.
+     *
+     * @param uid an uid string usually provided by
+     * {@link org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer} or
+     * {@link org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer}
+     * @return 64bit hash
+     * @since 4.0M1
+     */
+    public static long getHash(String uid)
+    {
+        MessageDigest md5 = null;
+        long hash = 0;
+
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+            byte[] digest = md5.digest(uid.getBytes("UTF-8"));
+            for (int l = digest.length, i = Math.max(0, digest.length - 9); i < l; i++) {
+                hash = hash << 8 | ((long) digest[i] & 0xFF);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            LOGGER.error("Cannot retrieve MD5 provider for hashing", ex);
+            throw new RuntimeException("MD5 hash is required for id hash");
+        } catch (Exception ex) {
+            LOGGER.error("Id computation failed during MD5 processing", ex);
+            throw new RuntimeException("MD5 hash is required for id hash");
+        }
+
+        return hash;
     }
 }

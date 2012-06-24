@@ -19,24 +19,67 @@
  */
 package org.xwiki.wysiwyg.server.internal.cleaner;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 
 /**
- * Unit tests for default {@link org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner} implementation.
+ * A generic JUnit test used by {@link HTMLCleanerTestSuite} to clean some passed HTML content and verify it matches
+ * some passed expectation.
  * 
  * @version $Id$
  */
-public class HTMLCleanerTest extends TestCase
+public class HTMLCleanerTest
 {
     /**
-     * @return the suite of tests to be run
-     * @throws Exception if loading the suite of tests fails
+     * The HTML cleaner being tested.
      */
-    public static Test suite() throws Exception
+    private HTMLCleaner cleaner;
+
+    /**
+     * The HTML fragment to be cleaned.
+     */
+    private final String input;
+
+    /**
+     * The expected clean HTML.
+     */
+    private final String expected;
+
+    /**
+     * Creates a new test case that checks if the result of cleaning the given HTML input equals the expected HTML.
+     * 
+     * @param input the HTML fragment to be cleaned
+     * @param expected the expected clean HTML
+     * @param cleaner the HTML cleaner being tested
+     */
+    public HTMLCleanerTest(String input, String expected, HTMLCleaner cleaner)
     {
-        HTMLCleanerTestSuite suite = new HTMLCleanerTestSuite("WYSIWYG HTML Cleaner Unit Tests");
-        suite.addTestsFromResource("/HTMLCleanerTests.txt");
-        return new ComponentManagerTestSetup(suite);
+        this.input = input;
+        this.expected = expected;
+        this.cleaner = cleaner;
+    }
+
+    /**
+     * The actual test.
+     */
+    @Test
+    public void execute()
+    {
+        Assert.assertEquals(xhtmlFragment(expected), cleaner.clean(input));
+    }
+
+    /**
+     * Adds the XHTML envelope to the given XHTML fragment.
+     * 
+     * @param fragment the content to be placed inside the {@code body} tag
+     * @return the given XHTML fragment wrapped in the XHTML envelope
+     */
+    private String xhtmlFragment(String fragment)
+    {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + "<html><head></head><body>" + fragment
+            + "</body></html>\n";
     }
 }

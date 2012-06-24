@@ -35,8 +35,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.workspace.Workspace;
-import org.xwiki.workspace.WorkspaceManager;
 import org.xwiki.workspace.WorkspaceException;
+import org.xwiki.workspace.WorkspaceManager;
 import org.xwiki.workspace.WorkspaceManagerMessageTool;
 
 import com.xpn.xwiki.XWiki;
@@ -188,8 +188,8 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
                     deprecatedContext);
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
-                logger.error("Failed to check if user [{}] can edit workspace [{}]. Assuming false.", new String[] {
-                userName, workspaceName}, e);
+                logger.error("Failed to check if user [{}] can edit workspace [{}]. Assuming false.", new Object[] {
+                userName, workspaceName, e});
             }
 
             return false;
@@ -219,8 +219,8 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
                     mainWikiPreferencesDocumentName, deprecatedContext));
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
-                logger.error("Failed to check if user [{}] can delete workspace [{}]. Assuming false.", new String[] {
-                userName, workspaceName}, e);
+                logger.error("Failed to check if user [{}] can delete workspace [{}]. Assuming false.", new Object[] {
+                userName, workspaceName, e});
             }
 
             return false;
@@ -380,24 +380,21 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         try {
             xwiki.getStore().deleteWiki(workspaceName, deprecatedContext);
             observationManager.notify(new WikiDeletedEvent(workspaceName), workspaceName, deprecatedContext);
-            xwiki.getVirtualWikiList().remove(workspaceName);
         } catch (Exception e) {
-            throw new WorkspaceException(
-                String.format("Failed to delete wiki '%s' from database", workspaceName), e);
+            throw new WorkspaceException(String.format("Failed to delete wiki '%s' from database", workspaceName), e);
         }
 
         try {
             xwiki.deleteDocument(workspace.getWikiDescriptor().getDocument(), false, deprecatedContext);
         } catch (Exception e) {
-            throw new WorkspaceException(String.format("Failed to delete wiki descriptor for workspace '%s'",
-                workspace), e);
+            throw new WorkspaceException(
+                String.format("Failed to delete wiki descriptor for workspace '%s'", workspace), e);
         }
 
     }
 
     @Override
-    public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument)
-        throws WorkspaceException
+    public void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws WorkspaceException
     {
         Workspace workspace = getWorkspace(workspaceName);
 

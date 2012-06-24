@@ -53,16 +53,12 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.XWikiCaptchaService#getCaptchaVerifier(java.lang.String)
-     */
+    @Override
     public CaptchaVerifier getCaptchaVerifier(String captchaName) throws CaptchaVerifierNotFoundException
     {
         CaptchaVerifier captchaVerifier;
         try {
-            captchaVerifier = componentManager.lookup(CaptchaVerifier.class, captchaName);
+            captchaVerifier = componentManager.getInstance(CaptchaVerifier.class, captchaName);
         } catch (ComponentLookupException e) {
             throw new CaptchaVerifierNotFoundException("The CaptchaVerifier " + captchaName
                                                        + " could not be found, try listCaptchaNames()"
@@ -71,27 +67,19 @@ public class DefaultXWikiCaptchaService implements XWikiCaptchaService
         return captchaVerifier;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.XWikiCaptchaService#listCaptchaNames()
-     */
+    @Override
     public List<String> listCaptchaNames()
     {
         List<String> captchaNames = new ArrayList<String>();
         try {
-            captchaNames.addAll(componentManager.lookupMap(CaptchaVerifier.class).keySet());
+            captchaNames.addAll(componentManager.getInstanceMap(CaptchaVerifier.class).keySet());
         } catch (ComponentLookupException e) {
             this.logger.error("Couldn't get list of CaptchaVerifier names " + e.getMessage());
         }
         return captchaNames;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.XWikiCaptchaService#isEnabled()
-     */
+    @Override
     @Deprecated
     public boolean isEnabled()
     {

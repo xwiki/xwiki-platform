@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,275 +19,277 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>WysiwygEditorConfigClass</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1292332239000</creationDate>
-<date>1300205761000</date>
-<contentUpdateDate>1300205761000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('wysiwyg.config.class.title')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<class>
-<name>XWiki.WysiwygEditorConfigClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<attachmentSelectionLimited>
-<customDisplay></customDisplay>
-<defaultValue>0</defaultValue>
-<disabled>0</disabled>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>attachmentSelectionLimited</name>
-<number>5</number>
-<prettyName>Attachment selection limited</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</attachmentSelectionLimited>
-<colorPalette>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>colorPalette</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>Color palette</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</colorPalette>
-<colorsPerRow>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>colorsPerRow</name>
-<number>9</number>
-<numberType>integer</numberType>
-<prettyName>Colors per row</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-</colorsPerRow>
-<externalImages>
-<customDisplay></customDisplay>
-<defaultValue>1</defaultValue>
-<disabled>0</disabled>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>externalImages</name>
-<number>6</number>
-<prettyName>External images</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</externalImages>
-<fontNames>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>fontNames</name>
-<number>10</number>
-<picker>0</picker>
-<prettyName>Font names</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</fontNames>
-<fontSizes>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>fontSizes</name>
-<number>11</number>
-<picker>0</picker>
-<prettyName>Font sizes</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</fontSizes>
-<imageSelectionLimited>
-<customDisplay></customDisplay>
-<defaultValue>0</defaultValue>
-<disabled>0</disabled>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>imageSelectionLimited</name>
-<number>7</number>
-<prettyName>Image selection limited</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</imageSelectionLimited>
-<menuBar>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>menuBar</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>Menu Bar</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</menuBar>
-<plugins>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>plugins</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Plugins</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</plugins>
-<sourceEditorEnabled>
-<customDisplay></customDisplay>
-<defaultValue>1</defaultValue>
-<disabled>0</disabled>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>sourceEditorEnabled</name>
-<number>1</number>
-<prettyName>Source editor enabled</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</sourceEditorEnabled>
-<styleNames>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>styleNames</name>
-<number>12</number>
-<picker>0</picker>
-<prettyName>Style names</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</styleNames>
-<toolBar>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>toolBar</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>Tool Bar</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</toolBar>
-</class>
-<object>
-<class>
-<name>XWiki.ClassSheetBinding</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<sheet>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>sheet</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Sheet</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</sheet>
-</class>
-<name>XWiki.WysiwygEditorConfigClass</name>
-<number>0</number>
-<className>XWiki.ClassSheetBinding</className>
-<guid>a3f1872b-69f3-4cda-98cd-2d4c51ea5e3d</guid>
-<property>
-<sheet>WysiwygEditorConfigSheet</sheet>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.DocumentSheetBinding</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<sheet>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>sheet</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Sheet</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</sheet>
-</class>
-<name>XWiki.WysiwygEditorConfigClass</name>
-<number>0</number>
-<className>XWiki.DocumentSheetBinding</className>
-<guid>b376326a-ed18-407f-bf8e-46d3f9ddab46</guid>
-<property>
-<sheet>XWiki.ClassSheet</sheet>
-</property>
-</object>
-<content></content></xwikidoc>
+  <web>XWiki</web>
+  <name>WysiwygEditorConfigClass</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1292332239000</creationDate>
+  <date>1300205761000</date>
+  <contentUpdateDate>1300205761000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('wysiwyg.config.class.title')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <class>
+    <name>XWiki.WysiwygEditorConfigClass</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <attachmentSelectionLimited>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>attachmentSelectionLimited</name>
+      <number>5</number>
+      <prettyName>Attachment selection limited</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </attachmentSelectionLimited>
+    <colorPalette>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>colorPalette</name>
+      <number>8</number>
+      <picker>0</picker>
+      <prettyName>Color palette</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </colorPalette>
+    <colorsPerRow>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>colorsPerRow</name>
+      <number>9</number>
+      <numberType>integer</numberType>
+      <prettyName>Colors per row</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </colorsPerRow>
+    <externalImages>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>externalImages</name>
+      <number>6</number>
+      <prettyName>External images</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </externalImages>
+    <fontNames>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>fontNames</name>
+      <number>10</number>
+      <picker>0</picker>
+      <prettyName>Font names</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </fontNames>
+    <fontSizes>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>fontSizes</name>
+      <number>11</number>
+      <picker>0</picker>
+      <prettyName>Font sizes</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </fontSizes>
+    <imageSelectionLimited>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>imageSelectionLimited</name>
+      <number>7</number>
+      <prettyName>Image selection limited</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </imageSelectionLimited>
+    <menuBar>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>menuBar</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>Menu Bar</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </menuBar>
+    <plugins>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>plugins</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Plugins</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </plugins>
+    <sourceEditorEnabled>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>sourceEditorEnabled</name>
+      <number>1</number>
+      <prettyName>Source editor enabled</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </sourceEditorEnabled>
+    <styleNames>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>styleNames</name>
+      <number>12</number>
+      <picker>0</picker>
+      <prettyName>Style names</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </styleNames>
+    <toolBar>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>toolBar</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>Tool Bar</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </toolBar>
+  </class>
+  <object>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>XWiki.WysiwygEditorConfigClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>a3f1872b-69f3-4cda-98cd-2d4c51ea5e3d</guid>
+    <property>
+      <sheet>WysiwygEditorConfigSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>XWiki.WysiwygEditorConfigClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>b376326a-ed18-407f-bf8e-46d3f9ddab46</guid>
+    <property>
+      <sheet>XWiki.ClassSheet</sheet>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

@@ -3,13 +3,13 @@
 <web>WikiResources</web>
 <name>Translations</name>
 <language>hu</language>
-<defaultLanguage>en</defaultLanguage>
+<defaultLanguage></defaultLanguage>
 <translation>1</translation>
 <parent>WikiResources.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
 <date>1300991417000</date>
 <contentUpdateDate>1300991417000</contentUpdateDate>
@@ -23,5 +23,4 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>## XWiki Translation for language hu generated from http://www.l10n.xwiki.org
-#Wed Dec 07 22:46:36 CET 2011
 </content></xwikidoc>

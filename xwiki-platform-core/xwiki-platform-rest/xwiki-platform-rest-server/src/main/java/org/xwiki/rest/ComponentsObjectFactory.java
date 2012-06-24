@@ -28,14 +28,14 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 
 /**
- * <p>
  * This class is used to provide Restlet/JAX-RS a way to instantiate components. Instances requested through this
- * factory are created using the XWiki component manager. A special list stored in the current Restlet context is used
- * in order to keep track of all the allocated components that have a "per-lookup" policy. This is needed in order to
- * ensure proper release of those instances and to avoid memory leaks.
- * </p>
+ * factory are created using the XWiki component manager. A special list stored in the execution context is used in
+ * order to keep track of all the allocated components that have a "per-lookup" policy. This is needed in order to
+ * ensure proper release of those instances at the end of the request and to avoid memory leaks.
  * 
  * @version $Id$
  */
@@ -56,49 +56,39 @@ public class ComponentsObjectFactory implements ObjectFactory
         this.componentManager = componentManager;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.restlet.ext.jaxrs.ObjectFactory#getInstance(java.lang.Class)
-     */
+    @Override
+    @SuppressWarnings("unchecked")
     public <T> T getInstance(Class<T> clazz) throws InstantiateException
     {
         try {
-            /* Use the component manager to lookup the class. This ensure that injections are properly executed */
-            XWikiRestComponent component = componentManager.lookup(XWikiRestComponent.class, clazz.getName());
+            // Use the component manager to lookup the class. This ensure that injections are properly executed.
+            XWikiRestComponent component = componentManager.getInstance(XWikiRestComponent.class, clazz.getName());
 
-            /*
-             * JAX-RS resources and providers must be declared as components whose hint is the FQN of the class
-             * implementing it. This is needed because of they are looked up using the FQN as the hint.
-             */
-            ComponentDescriptor componentDescriptor =
+            // JAX-RS resources and providers must be declared as components whose hint is the FQN of the class
+            // implementing it. This is needed because of they are looked up using the FQN as the hint.
+            ComponentDescriptor<XWikiRestComponent> componentDescriptor =
                 componentManager.getComponentDescriptor(XWikiRestComponent.class, clazz.getName());
 
-            /*
-             * Retrieve the releasable component list from the context. This is used to store component instances that
-             * need to be released later.
-             */
+            // Retrieve the list of releasable components from the execution context. This is used to store component
+            // instances that need to be released at the end of the request.
+            ExecutionContext executionContext = componentManager.<Execution> getInstance(Execution.class).getContext();
             List<XWikiRestComponent> releasableComponentReferences =
-                (List<XWikiRestComponent>) org.restlet.Context.getCurrent().getAttributes().get(
-                    Constants.RELEASABLE_COMPONENT_REFERENCES);
+                (List<XWikiRestComponent>) executionContext.getProperty(Constants.RELEASABLE_COMPONENT_REFERENCES);
             if (releasableComponentReferences == null) {
                 releasableComponentReferences = new ArrayList<XWikiRestComponent>();
-                org.restlet.Context.getCurrent().getAttributes().put(Constants.RELEASABLE_COMPONENT_REFERENCES,
-                    releasableComponentReferences);
+                executionContext.setProperty(Constants.RELEASABLE_COMPONENT_REFERENCES, releasableComponentReferences);
             }
 
-            /* Only add components that have a per-lookup instantiation stategy. */
+            // Only add the components that have a per-lookup instantiation strategy.
             if (componentDescriptor.getInstantiationStrategy() == ComponentInstantiationStrategy.PER_LOOKUP) {
                 releasableComponentReferences.add(component);
             }
 
-            /*
-             * Return the instantiated component. This cast should never fail if the programmer has correctly set the
-             * component hint to the actual fully qualified name of the Java class.
-             */
+            // Return the instantiated component. This cast should never fail if the programmer has correctly set the
+            // component hint to the actual fully qualified name of the Java class.
             return (T) component;
         } catch (ComponentLookupException e) {
             throw new InstantiateException(e);
         }
     }
-
 }

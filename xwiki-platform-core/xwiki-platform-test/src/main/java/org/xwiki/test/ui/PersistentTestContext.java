@@ -118,6 +118,7 @@ public class PersistentTestContext
     {
         return new PersistentTestContext(this)
         {
+            @Override
             public void shutdown()
             {
                 // Do nothing, that's why it's unstoppable.

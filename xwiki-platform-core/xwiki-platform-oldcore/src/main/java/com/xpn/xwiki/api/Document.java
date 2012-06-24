@@ -109,30 +109,26 @@ public class Document extends Api
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "local");
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to convert user references to string.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Document constructor.
@@ -606,6 +602,19 @@ public class Document extends Api
     public String getRenderedContent(String text, String syntaxId) throws XWikiException
     {
         return this.doc.getRenderedContent(text, syntaxId, getXWikiContext());
+    }
+
+    /**
+     * Render a text in a restricted mode, where script macros are completely disabled.
+     * 
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContentRestricted(String text, String syntaxId) throws XWikiException
+    {
+        return this.doc.getRenderedContent(text, syntaxId, true, getXWikiContext());
     }
 
     /**
@@ -2030,7 +2039,7 @@ public class Document extends Api
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
     {
         // Call to getDoc() ensures that we are working on a clone()
-        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(getXWikiContext()), getXWikiContext());
+        return new com.xpn.xwiki.api.Object(getDoc().addXObjectFromRequest(getXWikiContext()), getXWikiContext());
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest(String className) throws XWikiException
@@ -2476,11 +2485,6 @@ public class Document extends Api
         return this.doc.isMostRecent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -2505,6 +2509,28 @@ public class Document extends Api
         }
 
         return true;
+    }
+
+    /**
+     * Indicates whether the document is 'hidden' or not, meaning that it should not be returned in public search
+     * results or appear in the User Interface in general.
+     *
+     * @return <code>true</code> if the document is hidden, <code>false</code> otherwise.
+     */
+    public boolean isHidden()
+    {
+        return doc.isHidden();
+    }
+
+    /**
+     * Indicates whether the document should be 'hidden' or not, meaning that it should not be returned in public search
+     * results or appear in the User Interface in general.
+     *
+     * @param hidden <code>true</code> if the document should be 'hidden', <code>false</code> otherwise.
+     */
+    public void setHidden(boolean hidden)
+    {
+        doc.setHidden(hidden);
     }
 
     /**

@@ -78,7 +78,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     /**
      * The relative skin path of the feed icon to be displayed in the channel title.
      */
-    private static final String FEED_ICON_RESOURCE_PATH = "icons/silk/feed.gif";
+    private static final String FEED_ICON_RESOURCE_PATH = "icons/silk/feed.png";
 
     /**
      * The Box macro is used to draw boxes around RSS feed items and for the main around the RSS feed list.
@@ -114,21 +114,13 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

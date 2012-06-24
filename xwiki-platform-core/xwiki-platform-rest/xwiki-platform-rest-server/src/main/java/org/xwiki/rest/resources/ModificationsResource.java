@@ -38,7 +38,6 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 
 /**
@@ -53,7 +52,7 @@ public class ModificationsResource extends XWikiResource
         @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("25") Integer number,
         @QueryParam("order") @DefaultValue("desc") String order, @QueryParam("date") @DefaultValue("0") Long ts)
-        throws XWikiException, QueryException
+        throws QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 

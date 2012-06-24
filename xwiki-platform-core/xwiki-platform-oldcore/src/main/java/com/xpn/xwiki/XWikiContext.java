@@ -37,7 +37,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -119,17 +118,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private int classCacheSize = 20;
 
-    private int archiveCacheSize = 20;
-
     // Used to avoid recursive loading of documents if there are recursives usage of classes
+    // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     @SuppressWarnings("unchecked")
     private Map<DocumentReference, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
-    // Used to avoid reloading archives in the same request
-    @SuppressWarnings("unchecked")
-    private Map<String, XWikiDocumentArchive> archiveCache = Collections.synchronizedMap(new LRUMap(
-        this.archiveCacheSize));
-
+    // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
 
     /**
@@ -137,24 +131,21 @@ public class XWikiContext extends Hashtable<Object, Object>
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+        EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /** The Execution so that we can check if permissions were dropped there. */
     private final Execution execution = Utils.getComponent(Execution.class);
@@ -364,11 +355,7 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
     }
 
-    /**
-     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
-     */
-    @Deprecated
-    public void setUser(String user, boolean main)
+    private void setUserInternal(String user, boolean main)
     {
         if (user == null) {
             setUserReference(null);
@@ -383,7 +370,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * Make sure to use "XWiki" as default space when it's not provided in  user name.
+     * Make sure to use "XWiki" as default space when it's not provided in user name.
      */
     private DocumentReference resolveUserReference(String user)
     {
@@ -397,7 +384,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     @Deprecated
     public void setUser(String user)
     {
-        setUser(user, false);
+        setUserInternal(user, false);
     }
 
     /**
@@ -586,45 +573,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getBaseClass(DocumentReference)}
-     */
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
-    @Deprecated
-    public BaseClass getBaseClass(String name)
-    {
-        BaseClass baseClass = null;
-        if (StringUtils.isNotEmpty(name)) {
-            baseClass = this.classCache.get(this.currentMixedDocumentReferenceResolver.resolve(name));
-        }
-        return baseClass;
-    }
-
-    /**
      * Empty the class cache.
      */
     public void flushClassCache()
     {
         this.classCache.clear();
-    }
-
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public void addDocumentArchive(String key, XWikiDocumentArchive obj)
-    {
-        this.archiveCache.put(key, obj);
-    }
-
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public XWikiDocumentArchive getDocumentArchive(String key)
-    {
-        return this.archiveCache.get(key);
-    }
-
-    /**
-     * Empty the archive cache.
-     */
-    public void flushArchiveCache()
-    {
-        this.archiveCache.clear();
     }
 
     public void setLinksAction(String action)
@@ -694,6 +647,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * Drop permissions for the remainder of the request cycle.
+     * <p>
      * After this is called:
      * <ul>
      * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>
@@ -710,12 +664,9 @@ public class XWikiContext extends Hashtable<Object, Object>
      * way for code following this call to save another document as this user, blessing it too with programming right.
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
-     *
      * <p>
-     * If you are interested in a more flexable sandboxing method which sandboxed code only
-     * for the remainder of the rendering cycle, consider using
-     * {@link com.xpn.xwiki.api.Document#dropPermissions()}.
-     * <p>
+     * If you are interested in a more flexable sandboxing method which sandboxed code only for the remainder of the
+     * rendering cycle, consider using {@link com.xpn.xwiki.api.Document#dropPermissions()}.
      * 
      * @since 3.0M3
      */
@@ -725,10 +676,10 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return true if {@link XWikiContext#dropPermissions()} has been called
-     *              on this context, or if the {@link XWikiConstant.DROPPED_PERMISSIONS}
-     *              key has been set in the {@link org.xwiki.context.ExecutionContext}
-     *              for this thread. This is done by calling {@Document#dropPermissions()}
+     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context, or if the
+     *         {@link XWikiConstant.DROPPED_PERMISSIONS} key has been set in the
+     *         {@link org.xwiki.context.ExecutionContext} for this thread. This is done by calling
+     *         {@Document#dropPermissions()}
      */
     public boolean hasDroppedPermissions()
     {
@@ -736,13 +687,26 @@ public class XWikiContext extends Hashtable<Object, Object>
             return true;
         }
 
-        final Object dropped =
-            this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
+        final Object dropped = this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
 
         if (dropped == null || !(dropped instanceof Integer)) {
             return false;
         }
 
         return ((Integer) dropped) == System.identityHashCode(this.execution.getContext());
+    }
+
+    // Object
+
+    @Override
+    public synchronized XWikiContext clone()
+    {
+        XWikiContext context = (XWikiContext) super.clone();
+
+        // Make sure to have unique instances of the various caches
+        context.displayedFields = Collections.synchronizedList(new ArrayList<String>(this.displayedFields));
+        context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
+
+        return context;
     }
 }

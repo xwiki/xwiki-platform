@@ -20,8 +20,6 @@
 
 package org.xwiki.extension.repository.xwiki.internal.resources;
 
-import java.util.Locale;
-
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -56,7 +54,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
         throws QueryException
     {
-        ExtensionsSearchResult result = this.objectFactory.createExtensionsSearchResult();
+        ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
 
         result.setOffset(offset);
         

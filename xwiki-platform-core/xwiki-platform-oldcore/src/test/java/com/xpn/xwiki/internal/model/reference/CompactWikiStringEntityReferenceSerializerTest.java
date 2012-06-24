@@ -46,7 +46,7 @@ public class CompactWikiStringEntityReferenceSerializerTest extends AbstractComp
         super.registerComponents();
 
         this.mockModelContext = registerMockComponent(ModelContext.class);
-        this.serializer = getComponentManager().lookup(EntityReferenceSerializer.class, "compactwiki");
+        this.serializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
     }
 
     @org.junit.Test

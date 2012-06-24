@@ -77,4 +77,9 @@ public aspect PropertyClassCompatibiityAspect
     public void PropertyClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
     }
+
+    public BaseClass PropertyClass.getxWikiClass(XWikiContext context)
+    {
+        return getXClass(context);
+    }
 }

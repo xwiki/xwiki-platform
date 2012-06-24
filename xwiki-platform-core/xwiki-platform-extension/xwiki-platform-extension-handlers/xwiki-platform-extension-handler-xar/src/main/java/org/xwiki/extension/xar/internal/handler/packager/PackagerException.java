@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class PackagerException extends Exception
 {
     public PackagerException(String message)

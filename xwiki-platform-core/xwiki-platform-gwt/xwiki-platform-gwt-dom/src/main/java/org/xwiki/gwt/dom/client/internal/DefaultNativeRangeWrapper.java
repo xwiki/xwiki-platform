@@ -36,31 +36,19 @@ public class DefaultNativeRangeWrapper extends DefaultRange implements NativeRan
      */
     private JavaScriptObject nativeRange;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NativeRangeWrapper#getNativeRange()
-     */
+    @Override
     public JavaScriptObject getNativeRange()
     {
         return nativeRange;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NativeRangeWrapper#setNativeRange(JavaScriptObject)
-     */
+    @Override
     public void setNativeRange(JavaScriptObject nativeRange)
     {
         this.nativeRange = nativeRange;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultRange#cloneRange()
-     */
+    @Override
     public Range cloneRange()
     {
         // We should use Object.clone when it is implemented in GWT

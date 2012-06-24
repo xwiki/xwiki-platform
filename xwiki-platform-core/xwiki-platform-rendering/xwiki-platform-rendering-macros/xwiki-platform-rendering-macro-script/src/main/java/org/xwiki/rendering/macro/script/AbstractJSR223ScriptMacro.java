@@ -34,6 +34,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -56,6 +57,11 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
      */
     private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines";
+
+    /**
+     * The JSR223 Script Engine Manager we use to evaluate JSR223 scripts.
+     */
+    protected ScriptEngineManager scriptEngineManager;
 
     /**
      * Used to get the current script context to give to script engine evaluation method.
@@ -113,11 +119,14 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+        this.scriptEngineManager = new ScriptEngineManager();
+    }
+
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
@@ -145,11 +154,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         return this.scriptContextManager.getScriptContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext)
-     */
     @Override
     protected List<Block> evaluateBlock(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -253,8 +257,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         ScriptEngine engine = scriptEngines.get(engineName);
 
         if (engine == null) {
-            ScriptEngineManager sem = new ScriptEngineManager();
-            engine = sem.getEngineByName(engineName);
+            engine = this.scriptEngineManager.getEngineByName(engineName);
             scriptEngines.put(engineName, engine);
         }
 

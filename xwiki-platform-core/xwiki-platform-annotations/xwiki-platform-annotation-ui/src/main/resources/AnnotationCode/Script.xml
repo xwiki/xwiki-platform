@@ -21,109 +21,109 @@
 -->
 
 <xwikidoc>
-<web>AnnotationCode</web>
-<name>Script</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>AnnotationCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1264864355000</creationDate>
-<date>1299875556000</date>
-<contentUpdateDate>1299875556000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>AnnotationCode.Script</name>
-<number>0</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
-<property>
-<cache></cache>
-</property>
-<property>
-<code>var XWiki = (function (XWiki) {
+  <web>AnnotationCode</web>
+  <name>Script</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264864355000</creationDate>
+  <date>1299875556000</date>
+  <contentUpdateDate>1299875556000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Selection = Class.create({
   container : false,
@@ -502,104 +502,119 @@ XWiki.Selection = Class.create({
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>
-</property>
-<property>
-<name>Annotation Javascript -- Selection handling code</name>
-</property>
-<property>
-<parse>0</parse>
-</property>
-<property>
-<use>always</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>AnnotationCode.Script</name>
-<number>1</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
-<property>
-<cache></cache>
-</property>
-<property>
-<code>var XWiki = (function (XWiki) {
+    </property>
+    <property>
+      <name>Annotation Javascript -- Selection handling code</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>AnnotationCode.Script</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>## Retrieve the annotation settings from the configuration object
+#set($config = 'AnnotationCode.AnnotationConfig')
+#set($configObj = $xwiki.getDocument($config).getObject($config))
+#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
+#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
+#set($annotationsActivated = $configObj.getProperty('activated').value)
+#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
+#set($annotationClass = $configObj.getProperty('annotationClass').value)
+
+var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
-  annTabname : 'Annotations',
+  #if ("$!annotationClass" == 'XWiki.XWikiComments')
+    annTabname : 'Comments',
+    annTabTemplate : 'commentsinline.vm',
+  #else
+    annTabname : 'Annotations',
+    annTabTemplate : 'annotationsinline.vm',
+  #end
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
   // whether the annotations are being displayed; synchronizes with displayAnnotationsCheckbox if that element exists
@@ -644,6 +659,8 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
+    // refresh the annotations displayed on the document when an annotation is deleted as a comment, that is from the comments tab when annotations are merged with comments
+    document.observe('xwiki:annotation:tab:deleted', this.refreshAnnotationsOnCommentDelete.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
     // register the key shortcuts for toggling annotation visibility
@@ -692,7 +709,7 @@ XWiki.Annotation = Class.create({
       annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
       annContainer.insert({top: annLink});
       rightMenu.insert({bottom: annContainer});
-  
+
       annLink.observe('click', this.toggleSettingsPanel.bind(this));
     }
   },
@@ -703,7 +720,7 @@ XWiki.Annotation = Class.create({
       this.displayAnnotationsCheckbox.checked = visibility;
     }
   },
-  
+
   toggleSettingsPanel : function(event) {
     var menu = event.element();
     // prevent link
@@ -804,7 +821,7 @@ XWiki.Annotation = Class.create({
   toggleAnnotationHighlight : function(annotationId, visible) {
     this.annotatedElement.select('.annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
   },
-  
+
   /**
    * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching 
    * the annotations.
@@ -828,7 +845,7 @@ XWiki.Annotation = Class.create({
     // TODO: request for color when it will be used by the annotation displayer and sent by the backend
     return [];
   },
-  
+
   /**
    * Returns a map of fieldName, fieldValue pairs that encode the current filter that needs to be applied to the fetched
    * and rendered annotations.
@@ -838,7 +855,7 @@ XWiki.Annotation = Class.create({
     // return the current filter stored from the last update of the filter
     return this.currentFilter;
   },
-  
+
   /**
    * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its 
    * hash parameter and returns the altered value.
@@ -862,11 +879,15 @@ XWiki.Annotation = Class.create({
     for (var i = 0; i &lt; extraFields.length; i++) {
       parametersHash.get('request_field').push(extraFields[i]);
     }
-    
+
     return parametersHash;
   },
 
-  fetchAnnotations : function(andShow) {
+  /*
+   * @param andShow whether the annotations should also be shown (highlighted) on the content
+   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)   
+   */
+  fetchAnnotations : function(andShow, force) {
     var getAnnotationsURL = XWiki.contextPath + '/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent(XWiki.currentPage) + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
       parameters: this.prepareRequestParameters(new Hash()), 
@@ -882,8 +903,8 @@ XWiki.Annotation = Class.create({
         }
         // hide message at page bottom
         this._x_notification.hide();
-        // load the received annotated content in the page, along with annotations and annotations markers
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow);
+        // load the received annotated content in the page, along with annotations and annotations markers.
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
         // store the state of the annotations
         this.fetchedAnnotations = true;
         if (this.displayAnnotationsCheckbox) {
@@ -915,7 +936,7 @@ XWiki.Annotation = Class.create({
       }.bind(this)
     });
   },
-  
+
   /**
    * Checks if the passed response contains a non-zero response code and, in this case, executes the failure callback 
    * of the response.
@@ -956,7 +977,7 @@ XWiki.Annotation = Class.create({
       this.toggleAnnotations(true);
     }
   },
-  
+
   reloadTab : function(navigateToPane) {
     var annotationsPane = $( this.annTabname + 'pane');
     if (annotationsPane) {
@@ -965,13 +986,15 @@ XWiki.Annotation = Class.create({
       annotationsPane.addClassName('empty');
       if (!annotationsPane.hasClassName('hidden')) {
         // reload
-        XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane);
+        XWiki.displayDocExtra(this.annTabname, this.annTabTemplate, navigateToPane);
       }
     }
   },
 
   addDeleteListenersInTab : function() {
-    $$(".annotation a.delete").each(function(item) {
+    // This applies only to the annotations tab because merged annotations are currently displayed and deleted by the Comments system.
+    // NOTE: don't forget to change this too if, in the future, annotations are no longer deleted by the Comments system from the Comments tab.
+    $$("#Annotationspane .annotation a.delete").each(function(item) {
       this.addDeleteListener(item);
     }.bind(this));
   },
@@ -984,7 +1007,7 @@ XWiki.Annotation = Class.create({
       this.addEditListener(item, annotationId, container.up());
     }.bind(this));
   },
-  
+
   addValidateListenersInTab : function() {
     $$(".annotation a.validate").each(function(item) {
       var container = item.up('.annotation');
@@ -992,7 +1015,7 @@ XWiki.Annotation = Class.create({
       var annotationId = container.id.substring(16);
       this.addValidateListener(item, annotationId, container);
     }.bind(this));
-  },  
+  },
 
   addDeleteListener : function(item, inBubble, container) {
     item.observe('click', function(event) {
@@ -1039,7 +1062,7 @@ XWiki.Annotation = Class.create({
       }
     }.bindAsEventListener(this));
   },
-  
+
   addValidateListener : function(item, id, container, inBubble) {
     item.observe('click', function(event) {
       item.blur();
@@ -1146,7 +1169,7 @@ XWiki.Annotation = Class.create({
     // and fetch the annotations display in it
     this.fetchAndShowAnnotationDetails(id, newBubble);
   },
-  
+
   fetchAndShowAnnotationDetails : function(annotationId, container) {
     new Ajax.Request('$xwiki.getURL("AnnotationCode.DisplayForm")', {
       parameters: {
@@ -1177,7 +1200,7 @@ XWiki.Annotation = Class.create({
       }.bind(this)
     });
   },
-  
+
   displayLoadingBubble : function(top, left) {
     // create an element with the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
@@ -1214,7 +1237,7 @@ XWiki.Annotation = Class.create({
     container.update(content);
     return true;
   },
-  
+
   /**
    * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all 
    * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the 
@@ -1260,7 +1283,7 @@ XWiki.Annotation = Class.create({
         failureText : "$msg.get('annotations.action.edit.loaderror')"
       });
   },
-  
+
   /**
    * Handles the asynchronous update of annotation given by annotatinId, to the specified url, sending the specified 
    * parameters and using the passed messages. Container will pass in loading state while the async call takes place, 
@@ -1341,6 +1364,26 @@ XWiki.Annotation = Class.create({
     var editButton = container.down('a.edit');
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
+    }
+    // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
+    var replyButton = container.down('a.commentreply');
+    if (replyButton) {
+      // When a click is done on this button, fire a click on the corresponding button in the comments tab.
+
+      // Locate the button in the comments tab.
+      var replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+
+      // If the replyButtonInTab is not found, then the comments tab is not visible so we hide the reply button as well, otherwise it just does not work.
+      if (!replyButtonInTab) {
+        replyButton.hide();
+      } else {
+        // Get the click handlers for the reply button from the comments tab.
+        var clickEventHandlers = replyButtonInTab.getStorage().get('prototype_event_registry').get('click');
+        // Register the same event handlers for the bubble reply button.
+        clickEventHandlers.each(function(wrapper){
+          replyButton.observe('click', wrapper.handler);
+        });
+      }
     }
   },
 
@@ -1451,7 +1494,7 @@ XWiki.Annotation = Class.create({
           // display the annotation creation form
           this.fillCreateForm(this.createPanel, response.responseText);
         }.bind(this),
-   
+
         onFailure: function(response) {
           var failureReason = response.statusText;
           if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
@@ -1479,7 +1522,7 @@ XWiki.Annotation = Class.create({
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();    
   },
-  
+
   fillCreateForm : function(container, panelContent) {
     // put the content in. Safe update because an escape might have been hit
     if (!this.safeUpdate(this.createPanel, panelContent)) {
@@ -1503,7 +1546,7 @@ XWiki.Annotation = Class.create({
     }
     // and listen to the create shortcut again
     this.registerAddAnnotationShortcut();
-  }, 
+  },
 
   onAnnotationAdd : function(event) {
     // don't submit
@@ -1544,19 +1587,28 @@ XWiki.Annotation = Class.create({
         response.request.options.onFailure(response);
       }
     });
+  },
+
+  /**
+   * Handles the refresh of the document content when an annotations is deleted from the comments tab.
+   * It applies only to the case when annotations are merged with (and stored as) comments. Custom annotations will not use this.
+   */
+  refreshAnnotationsOnCommentDelete : function(event) {
+    // if the annotations are currently visible, re-fetch the annotations and display them
+    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault;
+    if (visible) {
+      // Force the reloading in case this annotation was the last one.
+      this.fetchAnnotations(true, true);
+    } else {
+      // Mark the loaded annotations as dirty and make sure the next time the annotations checkbox is checked, the annotations will be fetched.
+      this.fetchedAnnotations = false;
+    }
   }
 });
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-## Retrieve the annotation settings from the configuration object
-#set($config = 'AnnotationCode.AnnotationConfig')
-#set($configObj = $xwiki.getDocument($config).getObject($config))
-#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
-#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
-#set($annotationsActivated = $configObj.getProperty('activated').value)
-#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 document.observe('xwiki:dom:loaded', function() {
   // if the action on the current document is not view, don't load annotations
   if (XWiki.contextaction != "view") {
@@ -1591,55 +1643,56 @@ document.observe('xwiki:dom:loaded', function() {
     new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
   }
 });</code>
-</property>
-<property>
-<name>Annotation Javascript -- Annotation application</name>
-</property>
-<property>
-<parse>1</parse>
-</property>
-<property>
-<use>always</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.RequiredRightClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<level>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>level</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>level</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>edit|programming</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</level>
-</class>
-<name>AnnotationCode.Script</name>
-<number>0</number>
-<className>XWiki.RequiredRightClass</className>
-<guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
-<property>
-<level>programming</level>
-</property>
-</object>
-<content>
-</content></xwikidoc>
+    </property>
+    <property>
+      <name>Annotation Javascript -- Annotation application</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
+    <property>
+      <level>programming</level>
+    </property>
+  </object>
+  <content>
+</content>
+</xwikidoc>

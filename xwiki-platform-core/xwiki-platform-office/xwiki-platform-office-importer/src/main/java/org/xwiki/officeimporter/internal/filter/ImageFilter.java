@@ -74,9 +74,7 @@ public class ImageFilter extends AbstractHTMLFilter
     @Named("currentmixed")
     private DocumentReferenceResolver<String> documentStringReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document htmlDocument, Map<String, String> cleaningParams)
     {
         String targetDocument = cleaningParams.get("targetDocument");
@@ -85,7 +83,7 @@ public class ImageFilter extends AbstractHTMLFilter
         List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {TAG_IMG});
         for (Element image : images) {
             if (targetDocumentReference == null && !StringUtils.isBlank(targetDocument)) {
-                targetDocumentReference = documentStringReferenceResolver.resolve(targetDocument);
+                targetDocumentReference = this.documentStringReferenceResolver.resolve(targetDocument);
             }
             String src = image.getAttribute(ATTRIBUTE_SRC);
             if (!StringUtils.isBlank(src) && targetDocumentReference != null) {
@@ -103,7 +101,8 @@ public class ImageFilter extends AbstractHTMLFilter
 
                 // Set image source attribute relative to the reference document.
                 AttachmentReference attachmentReference = new AttachmentReference(src, targetDocumentReference);
-                image.setAttribute(ATTRIBUTE_SRC, documentAccessBridge.getAttachmentURL(attachmentReference, false));
+                image.setAttribute(ATTRIBUTE_SRC, this.documentAccessBridge
+                    .getAttachmentURL(attachmentReference, false));
 
                 // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
                 // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for

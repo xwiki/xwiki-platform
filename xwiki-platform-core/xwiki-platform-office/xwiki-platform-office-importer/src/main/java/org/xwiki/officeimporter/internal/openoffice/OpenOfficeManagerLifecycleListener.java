@@ -66,28 +66,19 @@ public class OpenOfficeManagerLifecycleListener implements EventListener
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * @see EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return Arrays.asList(new ApplicationStartedEvent(), new ApplicationStoppedEvent());
     }
 
-    /**
-     * {@inheritDoc}
-     * @see EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return "oomanager";
     }
 
-    /**
-     * {@inheritDoc}
-     * @see EventListener#onEvent(Event, Object, Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (ApplicationStartedEvent.class.getName().equals(event.getClass().getName())) {
@@ -123,5 +114,5 @@ public class OpenOfficeManagerLifecycleListener implements EventListener
         } catch (OpenOfficeManagerException ex) {
             this.logger.error(ex.getMessage(), ex);
         }
-    }        
+    }
 }

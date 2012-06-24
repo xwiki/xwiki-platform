@@ -65,6 +65,11 @@ public final class DatabaseProduct
     public static final DatabaseProduct MYSQL = new DatabaseProduct("MySQL");
 
     /**
+     * The product name for PostgreSQL databases.
+     */
+    public static final DatabaseProduct POSTGRESQL = new DatabaseProduct("PostgreSQL");
+
+    /**
      * Represents an unknown database for which we were not able to find the product name.
      */
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
@@ -94,11 +99,6 @@ public final class DatabaseProduct
         return this.productName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object object)
     {
@@ -133,6 +133,8 @@ public final class DatabaseProduct
             product = DB2;
         } else if (productNameAsString.equalsIgnoreCase(MYSQL.getProductName())) {
             product = MYSQL;
+        } else if (productNameAsString.equalsIgnoreCase(POSTGRESQL.getProductName())) {
+            product = POSTGRESQL;
         } else {
             product = UNKNOWN;
         }
@@ -140,14 +142,15 @@ public final class DatabaseProduct
         return product;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return getProductName().hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getProductName();
     }
 }

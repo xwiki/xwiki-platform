@@ -70,7 +70,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     /** Token storage (one token per user). */
-    private ConcurrentMap<String, String> tokens;
+    private final ConcurrentMap<String, String> tokens = new ConcurrentHashMap<String, String>();
 
     /** Random number generator. */
     private SecureRandom random;
@@ -101,7 +101,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        this.tokens = new ConcurrentHashMap<String, String>();
         try {
             this.random = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
@@ -112,6 +111,16 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
         this.random.setSeed(seed);
         this.logger.debug("CSRFToken: Anti-CSRF secret token component has been initialized");
+    }
+
+    /**
+     * Set the source of random numbers manually.
+     *
+     * @param random a source of random numbers to use.
+     */
+    protected void setRandom(final SecureRandom random)
+    {
+        this.random = random;
     }
 
     /**
@@ -147,6 +156,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public void clearToken()
     {
+        this.logger.debug("Forgetting CSRF token for [{}]", getTokenKey());
         this.tokens.remove(getTokenKey());
     }
 

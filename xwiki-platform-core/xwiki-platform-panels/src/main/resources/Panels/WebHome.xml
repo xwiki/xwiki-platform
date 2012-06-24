@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Panels</web>
-<name>WebHome</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1252454400000</date>
-<contentUpdateDate>1252454400000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.panels")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.1</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>Panels</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.panels")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 #if($hasAdmin)
 
 = $msg.get('xe.panels.create') =
@@ -32,8 +33,7 @@
 #end
 = $msg.get('xe.panels.viewer') =
 
-#set ($sql = ', BaseObject as obj where obj.name=doc.fullName and obj.className=? and doc.fullName!=? order by doc.name')
-#set ($searchResults = $xwiki.searchDocuments($sql, ['Panels.PanelClass', 'Panels.PanelTemplate']))
+#set ($searchResults = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName&lt;&gt;?1 order by doc.name').bindValue(1, 'Panels.PanelTemplate').execute())
 #foreach ($item in $searchResults)
   #set ($pdoc = $xwiki.getDocument($item))
   #set ($obj = $pdoc.getObject("Panels.PanelClass"))
@@ -57,4 +57,5 @@
 * [[$item]] #if ($hasAdmin)[ [[$msg.get('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$msg.get('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

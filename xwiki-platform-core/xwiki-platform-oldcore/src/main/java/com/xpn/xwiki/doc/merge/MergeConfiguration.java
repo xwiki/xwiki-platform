@@ -43,7 +43,7 @@ public class MergeConfiguration
     /**
      * Indicate of the provided previous/new document can be modified.
      * <p>
-     * By default merge can modify provided documents by performances reason. For example when the new version of the
+     * By default merge can modify provided documents for performances reasons. For example when the new version of the
      * document contains a new object it's directly moved without being cloned.
      * 
      * @return true if merge is allowed to modify provided versions

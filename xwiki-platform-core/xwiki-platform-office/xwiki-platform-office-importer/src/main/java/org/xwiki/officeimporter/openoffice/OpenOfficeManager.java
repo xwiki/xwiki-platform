@@ -19,7 +19,7 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Component interface for managing openoffice server connection / process.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 1.8RC3
  */
-@ComponentRole
+@Role
 public interface OpenOfficeManager
 {
     /**
@@ -73,9 +73,7 @@ public interface OpenOfficeManager
             this.stateDescription = stateDescription;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public String toString()
         {
             return this.stateDescription;

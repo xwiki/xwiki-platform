@@ -1,6 +1,6 @@
 #template('xwikivars.vm')
 #if($mobile=="off")
-#set($parents = $util.arrayList)
+#set($parents = [])
 #set($discard = $parents.add($doc.fullName))
 #macro(computeHierarchy $doc $result $level)
   #set($parent = $doc.parent)

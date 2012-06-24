@@ -1,67 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WikiManager</web>
-<name>CreateNewWiki</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WikiManager.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1186676964000</creationDate>
-<date>1319464582000</date>
-<contentUpdateDate>1319464582000</contentUpdateDate>
-<version>2.1</version>
-<title>$msg.get("wikimanager.createwiki")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.RequiredRightClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<level>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>level</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>level</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>edit|programming</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</level>
-</class>
-<name>WikiManager.CreateNewWiki</name>
-<number>0</number>
-<className>XWiki.RequiredRightClass</className>
-<guid>7dad4f7e-a1b7-4606-95d1-4237991c76fe</guid>
-<property>
-<level>programming</level>
-</property>
-</object>
-<content>############################################################################################
+  <web>WikiManager</web>
+  <name>CreateNewWiki</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1186676964000</creationDate>
+  <date>1319464582000</date>
+  <contentUpdateDate>1319464582000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("wikimanager.createwiki")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <name>WikiManager.CreateNewWiki</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>7dad4f7e-a1b7-4606-95d1-4237991c76fe</guid>
+    <property>
+      <level>programming</level>
+    </property>
+  </object>
+  <content>############################################################################################
 ## Create a new wiki with initial minimum informations step by step or in one page.
 ##
 ## Can use URL parameters :
@@ -101,7 +102,7 @@
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
     #foreach ($user in $users)
       #if ($xcontext.database == $xcontext.mainWikiName) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
+      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
     #end
   &lt;/select&gt;
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;
@@ -621,4 +622,5 @@
 #end
 // ]]&gt;
 &lt;/script&gt;
-{/pre}</content></xwikidoc>
+{/pre}</content>
+</xwikidoc>

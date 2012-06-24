@@ -103,6 +103,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A token to be used in subsequent calls as an identification.
      * @throws Exception If authentication fails.
      */
+    @Override
     public String login(String userName, String password) throws Exception
     {
         String token;
@@ -128,6 +129,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return True is logout was successful.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public Boolean logout(String token) throws Exception
     {
         XWikiUtils.checkToken(token, this.xwikiContext);
@@ -142,6 +144,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return The server information
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public Map getServerInfo(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -187,6 +190,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list of Maps that represent SpaceSummary objects.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public List getSpaces(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -223,6 +227,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A map representing a Space object.
      * @throws Exception An invalid token is provided or the user doesn't have enough rights to access the space.
      */
+    @Override
     public Map getSpace(String token, String spaceKey) throws Exception
     {
 
@@ -259,6 +264,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or the space cannot be created or it already exists and the user
      *             has not the rights to modify it
      */
+    @Override
     public Map addSpace(String token, Map spaceMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -293,6 +299,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return True if the space has been successfully deleted.
      * @throws Exception An invalid token is provided or there was a problem while deleting the space.
      */
+    @Override
     public Boolean removeSpace(String token, String spaceKey) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -341,6 +348,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list containing PageSummary objects.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public List getPages(String token, String spaceKey) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -378,6 +386,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or the user has not the right to access the page or the page does
      *             not exist.
      */
+    @Override
     public Map getPage(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -431,6 +440,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or some data is missing or the page is locked or the user has no
      *             right to modify the page.
      */
+    @Override
     public Map storePage(String token, Map pageMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -608,6 +618,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public Boolean removePage(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -638,6 +649,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public List getPageHistory(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -672,6 +684,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public String renderContent(String token, String space, String pageId, String content) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -709,6 +722,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public List getComments(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -737,6 +751,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A map representing a Comment object.
      * @throws Exception An invalid token is provided or if the comment cannot be retrieved. access it.
      */
+    @Override
     public Map getComment(String token, String commentId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -760,6 +775,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A map representing a Comment object with updated information.
      * @throws Exception An invalid token is provided or if the user has not the right to access it.
      */
+    @Override
     public Map addComment(String token, Map commentMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -789,6 +805,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return True if the comment has been successfully removed.
      * @throws Exception An invalid token is provided or the user has not the right to access it.
      */
+    @Override
     public Boolean removeComment(String token, String commentId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -820,6 +837,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public List getAttachments(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -848,6 +866,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public Map addAttachment(String token, Integer contentId, Map attachmentMap, byte[] attachmentData)
         throws Exception
     {
@@ -880,6 +899,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it or the attachment with the given fileName does not exist on the given page.
      */
+    @Override
     public byte[] getAttachmentData(String token, String pageId, String fileName, String versionNumber)
         throws Exception
     {
@@ -905,6 +925,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it or the attachment with the given fileName does not exist on the given page.
      */
+    @Override
     public Boolean removeAttachment(String token, String pageId, String fileName) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -947,6 +968,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list of maps representing XWikiClass objects.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public List getClasses(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -970,6 +992,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A map representing a XWikiClass object.
      * @throws Exception An invalid token is provided or if the given class does not exist.
      */
+    @Override
     public Map getClass(String token, String className) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -991,6 +1014,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public List getObjects(String token, String pageId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1025,6 +1049,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it or no object with the given id exist in the page.
      */
+    @Override
     public Map getObject(String token, String pageId, String className, Integer id) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1050,6 +1075,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it.
      */
+    @Override
     public Map storeObject(String token, Map objectMap) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1128,6 +1154,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it or no object with the given id exist in the page.
      */
+    @Override
     public Boolean removeObject(String token, String pageId, String className, Integer id) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1163,6 +1190,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list of maps representing Search Results.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public List search(String token, String query, int maxResults) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1209,6 +1237,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list of maps representing XWikiPageHistorySummary
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public List getModifiedPagesHistory(String token, Date date, int numberOfResults, int start, boolean fromLatest)
         throws Exception
     {
@@ -1261,6 +1290,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      *         there is a version mismatch.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public Map storePage(String token, Map pageMap, boolean checkVersion) throws Exception
     {
         if (checkVersion) {
@@ -1306,6 +1336,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      *         empty if there is a version mismatch.
      * @throws Exception An invalid token is provided.
      */
+    @Override
     public Map storeObject(String token, Map objectMap, boolean checkVersion) throws Exception
     {
         if (checkVersion) {
@@ -1345,6 +1376,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
      *             access it or no object with the given id exist in the page.
      */
+    @Override
     public Map getObject(String token, String pageId, String guid) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1371,6 +1403,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @throws Exception An invalid token is provided, the syntaxId is not supported, the source is invalid or the
      *             conversion fails.
      */
+    @Override
     public String convert(String token, String source, String initialSyntaxId, String targetSyntaxId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1395,6 +1428,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list containing all syntaxes supported by rendering parsers.
      * @throws Exception An invalid token is provided or the syntax lookup fails.
      */
+    @Override
     public List<String> getInputSyntaxes(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1402,7 +1436,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         List<Parser> parsers;
         ComponentManager componentManager = Utils.getComponentManager();
         try {
-            parsers = componentManager.lookupList(Parser.class);
+            parsers = componentManager.getInstanceList(Parser.class);
             for (Parser parser : parsers) {
                 syntaxes.add(parser.getSyntax().toIdString());
             }
@@ -1419,6 +1453,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return A list containing all syntaxes supported by renderers.
      * @throws Exception An invalid token is provided or the syntax lookup fails.
      */
+    @Override
     public List<String> getOutputSyntaxes(String token) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
@@ -1427,7 +1462,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         ComponentManager componentManager = Utils.getComponentManager();
         try {
             // TODO: use BlockRenderer
-            renderers = componentManager.lookupList(PrintRendererFactory.class);
+            renderers = componentManager.getInstanceList(PrintRendererFactory.class);
             for (PrintRendererFactory renderer : renderers) {
                 syntaxes.add(renderer.getSyntax().toIdString());
             }
@@ -1448,6 +1483,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return The rendered content.
      * @throws Exception If a invalid token is provided, an unsupported syntax id is given or the rendering fails.
      */
+    @Override
     public String renderPageContent(String token, String pageId, String content, String sourceSyntaxId,
         String targetSyntaxId) throws Exception
     {
@@ -1468,6 +1504,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * @return The rendered content
      * @throws Exception If a invalid token is provided, an unsupported syntax id is given or the rendering fails.
      */
+    @Override
     public String getRenderedContent(String token, String pageId, String syntaxId) throws Exception
     {
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);

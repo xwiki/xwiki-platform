@@ -1,0 +1,3 @@
+org.xwiki.sheet.internal.DefaultSheetManager
+org.xwiki.sheet.internal.SheetDocumentDisplayer
+org.xwiki.sheet.internal.SheetRequestInitializer

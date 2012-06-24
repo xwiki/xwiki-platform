@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
 import javax.servlet.ServletContext;
 
 import org.jmock.Expectations;
@@ -59,6 +60,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getMockery().setImposteriser(imposteriser);
     }
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -77,18 +79,22 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getContext().put(ComponentManager.class.getName(), getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
-        Execution execution = getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().getInstance(Execution.class);
         execution.getContext().setProperty("xwikicontext", this.context);
-        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(this.context);
+        XWikiStubContextProvider stubContextProvider =
+            getComponentManager().getInstance(XWikiStubContextProvider.class);
+        stubContextProvider.initialize(this.context);
 
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
-        ServletEnvironment environment = (ServletEnvironment) getComponentManager().lookup(Environment.class);
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         final ServletContext mockServletContext = getMockery().mock(ServletContext.class);
         environment.setServletContext(mockServletContext);
         getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
             will(returnValue(null));
+            allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
+                will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         }});
 
         final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
@@ -97,6 +103,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         }});
     }
 
+    @Override
     @After
     public void tearDown() throws Exception
     {

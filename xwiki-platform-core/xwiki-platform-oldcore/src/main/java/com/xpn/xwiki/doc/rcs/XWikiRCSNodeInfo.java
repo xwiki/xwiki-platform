@@ -195,9 +195,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
         return getId().getVersion();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int compareTo(XWikiRCSNodeInfo o)
     {
         return getId().getVersion().compareTo(o.getId().getVersion());

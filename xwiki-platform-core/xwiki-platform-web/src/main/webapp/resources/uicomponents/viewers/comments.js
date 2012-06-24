@@ -86,6 +86,12 @@ viewers.Comments = Class.create({
                 // Replace the comment with a "deleted comment" placeholder
                 comment.replace(this.createNotification("$msg.get('core.viewers.comments.commentDeleted')"));
                 this.updateCount();
+                // fire an event for the annotations to know when a comment / annotation is deleted
+                // FIXME: This is not the best way to go because the Annotations system should be in charge of properly deleting annotations,
+                // not the Comments system. Try to find an alternative for the future.
+                if (comment.hasClassName('annotation')) {
+                  document.fire("xwiki:annotation:tab:deleted");
+                }
               }.bind(this),
               onComplete : function() {
                 // In the end: re-enable the button
@@ -195,29 +201,7 @@ viewers.Comments = Class.create({
   addReplyListener : function() {
     if (this.form) {
       $$(this.xcommentSelector).each(function(item) {
-        // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
-        // Quick fix until Prototype 1.6.1 is integrated.
-        item = item.down('a.commentreply');
-        if (!item) {
-          return;
-        }
-        item.observe('click', function(event) {
-          item.blur();
-          event.stop();
-          // If the form was already displayed as a reply, re-enable the Reply button for the old location
-          if (this.form.up('.commentthread')) {
-            this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
-          }
-          // Insert the form on top of that comment's discussion
-          item.up(this.xcommentSelector).next('.commentthread').insert({'top' : this.form});
-          // Set the replyto field to the replied comment's number
-          this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-          // Clear the contents and focus the textarea
-          this.form["XWiki.XWikiComments_comment"].value = "";
-          this.form["XWiki.XWikiComments_comment"].focus();
-          // Hide the reply button
-          item.hide();
-        }.bindAsEventListener(this));
+        this.addReplyListenerToComment(item);
       }.bind(this));
     } else {
       // If, for some reason, the form is missing, hide the reply functionality from the user
@@ -225,6 +209,32 @@ viewers.Comments = Class.create({
         item.hide();
       });
     }
+  },
+  
+  addReplyListenerToComment : function(item) {
+    // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
+    // Quick fix until Prototype 1.6.1 is integrated.
+    item = item.down('a.commentreply');
+    if (!item) {
+      return;
+    }
+    item.observe('click', function(event) {
+      item.blur();
+      event.stop();
+      // If the form was already displayed as a reply, re-enable the Reply button for the old location
+      if (this.form.up('.commentthread')) {
+        this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
+      }
+      // Insert the form on top of that comment's discussion
+      item.up(this.xcommentSelector).next('.commentthread').insert({'top' : this.form});
+      // Set the replyto field to the replied comment's number
+      this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
+      // Clear the contents and focus the textarea
+      this.form["XWiki.XWikiComments_comment"].value = "";
+      this.form["XWiki.XWikiComments_comment"].focus();
+      // Hide the reply button
+      item.hide();
+    }.bindAsEventListener(this));    
   },
   /**
    * Permalink: Display a modal popup providing the permalink.
@@ -341,7 +351,7 @@ viewers.Comments = Class.create({
          var notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.preview.inProgress')", "inprogress");
          new Ajax.Request(previewURL, {
             method : 'post',
-            parameters : {'xpage' : 'plain', 'content' : form.commentElt.value},
+            parameters : {'xpage' : 'plain', 'sheet' : '', 'content' : form.commentElt.value},
             onSuccess : function (response) {
               this.doPreview(response.responseText, form);
               notification.hide();

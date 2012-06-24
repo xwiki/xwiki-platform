@@ -1,110 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Panels</web>
-<name>Navigation</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Panels.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1165426047000</creationDate>
-<date>1184168629000</date>
-<contentUpdateDate>1184168629000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>Panels.PanelClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>5</number>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Information|Navigation|Tools|Administration|Other</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</category>
-<content>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>content</name>
-<number>4</number>
-<prettyName>Content</prettyName>
-<rows>25</rows>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<description>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>description</name>
-<number>3</number>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<type>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>type</name>
-<number>2</number>
-<prettyName>Panel type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>view|edit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-</class>
-<name>Panels.Navigation</name>
-<number>0</number>
-<className>Panels.PanelClass</className>
-<guid>32f141e5-f3c5-4e97-8d0a-cdca33a8a451</guid>
-<property>
-<category>Navigation</category>
-</property>
-<property>
-<content>{{velocity}}
+  <web>Panels</web>
+  <name>Navigation</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1165426047000</creationDate>
+  <date>1184168629000</date>
+  <contentUpdateDate>1184168629000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>Panels.PanelClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Information|Navigation|Tools|Administration|Other</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </category>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>4</number>
+        <prettyName>Content</prettyName>
+        <rows>25</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <description>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>2</number>
+        <prettyName>Panel type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>view|edit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <name>Panels.Navigation</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>32f141e5-f3c5-4e97-8d0a-cdca33a8a451</guid>
+    <property>
+      <category>Navigation</category>
+    </property>
+    <property>
+      <content>{{velocity}}
 #panelheader($msg.get('xe.panels.navigation'))
 #set ($hiddenPages = ['Main.WebRss', 'Main.DatabaseSearch', 'Main.WebSearch', 'Main.LuceneSearch', 'Main.WebSearchRss', 'Main.BlogRss', 'Main.TagsRss', 'Main.RegisterNewUserAction', 'Main.SpaceIndex', 'Blog.Category'])
 #set ($blacklistedPages = ['WebPreferences'])
@@ -125,7 +126,7 @@
     (((=${space}=)))
     (% id="xwikinav${space}Content" class="accordionTabContentBox" %)
     (((
-    #set ($spaceDocs = $xwiki.searchDocuments('doc.space=? order by doc.name', [$space]))
+    #set ($spaceDocs = $services.query.xwql('where doc.space=?1 order by doc.name').addFilter('hidden').bindValue(1, $space).execute())
     #foreach ($page in $spaceDocs)
       #if (!$hiddenPages.contains($page) || $hasAdmin)
         #set($dotIndex = $page.indexOf('.')+1)
@@ -157,15 +158,16 @@ document.observe('xwiki:dom:loaded', function() {
 {{/html}}
 #panelfooter()
 {{/velocity}}</content>
-</property>
-<property>
-<description>Lists all spaces and all documents in the spaces. Note that administration spaces and pages are only displayed for Administrators. This Panel provides a default automated navigation. However when your wiki grows you'll usually want to replace it with your own fixed navigation for which you'll create another Panel.</description>
-</property>
-<property>
-<name>Navigation</name>
-</property>
-<property>
-<type>view</type>
-</property>
-</object>
-<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>
+    </property>
+    <property>
+      <description>Lists all spaces and all documents in the spaces. Note that administration spaces and pages are only displayed for Administrators. This Panel provides a default automated navigation. However when your wiki grows you'll usually want to replace it with your own fixed navigation for which you'll create another Panel.</description>
+    </property>
+    <property>
+      <name>Navigation</name>
+    </property>
+    <property>
+      <type>view</type>
+    </property>
+  </object>
+  <content>{{include document="Panels.PanelSheet"/}}</content>
+</xwikidoc>

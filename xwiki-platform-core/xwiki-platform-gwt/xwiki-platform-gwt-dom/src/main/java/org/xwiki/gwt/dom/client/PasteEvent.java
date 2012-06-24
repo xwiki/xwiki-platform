@@ -52,21 +52,13 @@ public class PasteEvent extends DomEvent<PasteHandler>
         return TYPE;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DomEvent#getAssociatedType()
-     */
+    @Override
     public final Type<PasteHandler> getAssociatedType()
     {
         return TYPE;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DomEvent#dispatch(com.google.gwt.event.shared.EventHandler)
-     */
+    @Override
     protected void dispatch(PasteHandler handler)
     {
         handler.onPaste(this);

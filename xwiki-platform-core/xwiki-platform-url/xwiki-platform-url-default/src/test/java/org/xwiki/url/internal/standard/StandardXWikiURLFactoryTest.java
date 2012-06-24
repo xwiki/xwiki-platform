@@ -64,7 +64,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         this.mockPathBasedHostResolver = registerMockComponent(HostResolver.class, "path", "path");
         this.mockDomainHostResolver = registerMockComponent(HostResolver.class, "domain", "domain");
 
-        this.factory = getComponentManager().lookup(XWikiURLFactory.class, "standard");
+        this.factory = getComponentManager().getInstance(XWikiURLFactory.class, "standard");
     }
 
     @Test

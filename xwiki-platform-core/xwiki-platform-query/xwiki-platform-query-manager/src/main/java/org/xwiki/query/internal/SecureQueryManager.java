@@ -31,7 +31,7 @@ import org.xwiki.query.QueryExecutorManager;
 /**
  * QueryManager implementation to use in scripts (uses a secure {@link org.xwiki.query.QueryExecutorManager} which
  * performs checks for rights).
- *
+ * 
  * @version $Id$
  */
 @Component
@@ -46,9 +46,7 @@ public class SecureQueryManager extends AbstractQueryManager
     @Named("secure")
     protected QueryExecutorManager queryExecutorManager;
 
-    /**
-     * @return {@link QueryExecutorManager}
-     */
+    @Override
     protected QueryExecutorManager getQueryExecutorManager()
     {
         return this.queryExecutorManager;
@@ -58,7 +56,7 @@ public class SecureQueryManager extends AbstractQueryManager
      * @param statement XWQL statement
      * @return Query
      * @throws QueryException if any errors
-     * @see {@link #createQuery(String, String)}
+     * @see #createQuery(String, String)
      * @deprecated it's now available from {@link org.xwiki.query.internal.QueryManagerScriptService} since 2.4M2
      */
     @Deprecated

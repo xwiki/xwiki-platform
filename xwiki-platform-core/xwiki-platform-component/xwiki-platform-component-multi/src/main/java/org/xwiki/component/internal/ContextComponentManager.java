@@ -76,7 +76,7 @@ public class ContextComponentManager extends DelegateComponentManager implements
     }
 
     @Override
-    public <T> void release(T component) throws ComponentLifecycleException
+    public void release(Object component) throws ComponentLifecycleException
     {
         throwException();
     }
@@ -89,12 +89,6 @@ public class ContextComponentManager extends DelegateComponentManager implements
 
     @Override
     public void setParent(ComponentManager parentComponentManager)
-    {
-        throwException();
-    }
-
-    @Override
-    public <T> void unregisterComponent(Class<T> role, String roleHint)
     {
         throwException();
     }

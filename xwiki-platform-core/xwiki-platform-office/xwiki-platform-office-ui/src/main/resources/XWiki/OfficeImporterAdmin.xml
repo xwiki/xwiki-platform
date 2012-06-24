@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>OfficeImporterAdmin</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.OfficeImporter</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1235987110000</creationDate>
-<date>1299711367000</date>
-<contentUpdateDate>1299711367000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("admin.ooserver")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<attachment>
-<filename>icon.png</filename>
-<filesize>13137</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1284981206000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAzGElEQVR4Xux9CZBl11ned999+979
+  <web>XWiki</web>
+  <name>OfficeImporterAdmin</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.OfficeImporter</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1235987110000</creationDate>
+  <date>1299711367000</date>
+  <contentUpdateDate>1299711367000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("admin.ooserver")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>icon.png</filename>
+    <filesize>13137</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1284981206000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAzGElEQVR4Xux9CZBl11ned999+979
 el1metae0UgaaSShzdYS23IZHC9yrMRAjEnFBBPABSniMpBADEkZSAjgsBgoG7PIKLEsCWFkS9bY
 kiysZXaNZunZ9+me3l4vb71bvvfVqYsf/UbSjGfKovAZHd3l3fV8//+f7//Pf25H8c+ufL/8cwb9
 +6AHQYCrXr5fbFYP34NiWdb3Nf0yG87Ca5e239/3vvdZn/jEJ1aVSn07NmxY5z/+la8+v7fc95P2
@@ -258,8 +260,9 @@ AloHAFKF+DaD4dk8uD5Eszl2RxTshYCfC/xFZ9BbyNHR0UdUkdxEyJvAIwlyCrBjwJqiAGEGrah4
 S1KJrNwSXnluAOyHWmvq2KM+eYB9D+7aaz3bHwNPvf0igM922ZWnc8aBJ2gKmZx9AN0LtG8TtlNS
 QJ7NUQem750OyGyv7ApgPugUvKoAh3QDvYXwwkc23ATjw7lsozAQ+eoAdGG6IPMB2vrNlTZWA94F
 9PQCws4p3wk8BeGHVP986XtiDiDxgK0k0H1vD8PxMiy9dQB6EH2o3QPcQgfQnJCy+tdZpg5kC/0/
-lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content></attachment>
-<content>{{velocity}}
+lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content>
+  </attachment>
+  <content>{{velocity}}
 #set($msgParameter=$msg.get("xe.officeimporter.openoffice.parameter"))
 #set($msgValue=$msg.get("xe.officeimporter.openoffice.value"))
 #set($msgYes=$msg.get("xe.officeimporter.openoffice.yes"))
@@ -363,4 +366,5 @@ lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content></attachment>
 
   {{info}}$msgLimitedControl{{/info}}
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

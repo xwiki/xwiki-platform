@@ -19,10 +19,8 @@
  */
 package org.xwiki.chart.internal.plot;
 
-import java.util.Map;
-
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 
 /**
  * A {@link PlotGenerator} for generating line charts.
@@ -30,13 +28,11 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
  * @version $Id$
  * @since 2.0M1
  */
-public class LinePlotGenerator extends AbstractXYPlotGenerator
+public class LinePlotGenerator extends AbstractCategoryPlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected XYItemRenderer getXYItemRenderer(Map<String, String> parameters)
+    @Override
+    protected CategoryItemRenderer getRenderer()
     {
-        return new XYLineAndShapeRenderer();
-    } 
+        return new LineAndShapeRenderer();
+    }
 }

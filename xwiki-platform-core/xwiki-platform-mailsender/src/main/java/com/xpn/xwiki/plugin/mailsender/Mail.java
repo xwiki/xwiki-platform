@@ -180,7 +180,15 @@ public class Mail
     {
         StringBuffer buffer = new StringBuffer();
         for (Map.Entry<String, String> header : getHeaders().entrySet()) {
-            buffer.append("[" + header.getKey() + "] = [" + header.getValue() + "]");
+            buffer.append('[');
+            buffer.append(header.getKey());
+            buffer.append(']');
+            buffer.append(' ');
+            buffer.append('=');
+            buffer.append(' ');
+            buffer.append('[');
+            buffer.append(header.getValue());
+            buffer.append(']');
         }
         return buffer.toString();
     }

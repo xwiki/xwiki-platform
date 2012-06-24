@@ -45,11 +45,6 @@ public class CurrentPageImageSelectPane extends WizardStepElement
     @FindBy(className = "xNewImagePreview")
     private WebElement uploadNewImageOption;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStepElement#waitToLoad()
-     */
     @Override
     public CurrentPageImageSelectPane waitToLoad()
     {

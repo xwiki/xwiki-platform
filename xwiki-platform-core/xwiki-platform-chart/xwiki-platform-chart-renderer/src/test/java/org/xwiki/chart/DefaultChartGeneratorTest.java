@@ -47,23 +47,16 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
      */
     private ChartModel model;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void registerComponents() throws Exception
     {
         Short dataArray[][] = { {1, 2, 3}, {1, 3, 5}};
         String rowHeaders[] = {"1", "2"};
         String columnHeaders[] = {"1", "2", "3"};
         this.model = new DefaultChartModel(dataArray, rowHeaders, columnHeaders);
-        this.chartGenerator = getComponentManager().lookup(ChartGenerator.class);
+        this.chartGenerator = getComponentManager().getInstance(ChartGenerator.class);
     }
 
-    /**
-     * Test pie chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
     @Test
     public final void testPieChart() throws ChartGeneratorException
     {
@@ -76,11 +69,6 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         Assert.assertNotNull(chart);
     }
 
-    /**
-     * Test bar chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
     @Test
     public final void testBarChart() throws ChartGeneratorException
     {
@@ -93,11 +81,18 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         Assert.assertNotNull(chart);
     }
 
-    /**
-     * Test line chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
+    @Test
+    public final void testBar3DChart() throws ChartGeneratorException
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, "Test 3D bar chart");
+        parameters.put(ChartGenerator.TYPE_PARAM, "bar3D");
+        parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+
+        byte[] chart = chartGenerator.generate(model, parameters);
+        Assert.assertNotNull(chart);
+    }
+
     @Test
     public final void testLineChart() throws ChartGeneratorException
     {
@@ -110,11 +105,18 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         Assert.assertNotNull(chart);
     }
 
-    /**
-     * Test area chart generation.
-     * 
-     * @throws ChartGeneratorException if an error occurs while generating the chart.
-     */
+    @Test
+    public final void testLine3DChart() throws ChartGeneratorException
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, "Test 3D line chart");
+        parameters.put(ChartGenerator.TYPE_PARAM, "line3D");
+        parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+
+        byte[] chart = chartGenerator.generate(model, parameters);
+        Assert.assertNotNull(chart);
+    }
+
     @Test
     public final void testAreaChart() throws ChartGeneratorException
     {
@@ -122,6 +124,19 @@ public class DefaultChartGeneratorTest extends AbstractComponentTestCase
         parameters.put(ChartGenerator.TITLE_PARAM, "Test area chart");
         parameters.put(ChartGenerator.TYPE_PARAM, "area");
         parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+
+        byte[] chart = chartGenerator.generate(model, parameters);
+        Assert.assertNotNull(chart);
+    }
+
+    @Test
+    public final void testCustomColors() throws Exception
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, "Test area chart");
+        parameters.put(ChartGenerator.TYPE_PARAM, "area");
+        parameters.put(ChartGenerator.SERIES_PARAM, "rows");
+        parameters.put(ChartGenerator.COLORS_PARAM, "FF0000,00FF00,0000FF");
 
         byte[] chart = chartGenerator.generate(model, parameters);
         Assert.assertNotNull(chart);

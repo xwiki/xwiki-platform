@@ -33,11 +33,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class TabPanelSelector implements BeforeSelectionHandler<Integer>, SelectionHandler<Integer>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BeforeSelectionHandler#onBeforeSelection(BeforeSelectionEvent)
-     */
+    @Override
     public void onBeforeSelection(BeforeSelectionEvent<Integer> event)
     {
         if (!event.isCanceled()) {
@@ -54,11 +50,7 @@ public class TabPanelSelector implements BeforeSelectionHandler<Integer>, Select
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionHandler#onSelection(SelectionEvent)
-     */
+    @Override
     public void onSelection(SelectionEvent<Integer> event)
     {
         TabPanel tabPanel = (TabPanel) event.getSource();

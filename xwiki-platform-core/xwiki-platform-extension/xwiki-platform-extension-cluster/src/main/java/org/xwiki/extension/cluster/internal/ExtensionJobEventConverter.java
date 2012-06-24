@@ -26,12 +26,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.job.AbstractRequest;
-import org.xwiki.extension.job.DefaultRequest;
-import org.xwiki.extension.job.Request;
-import org.xwiki.extension.job.event.JobStartedEvent;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.DefaultRequest;
+import org.xwiki.job.Request;
+import org.xwiki.job.event.JobStartedEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
@@ -40,6 +40,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
  * Convert {@link JobStartedEvent} to and from remote event.
  * 
  * @version $Id$
+ * @since 4.0M1
  */
 @Component
 @Singleton
@@ -90,7 +91,7 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
 
             // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job which
             // will generate a new JobStartedEvent
-            localEvent.setEvent(new RemoteJobStartedEvent(jobEvent.getJobId(), request));
+            localEvent.setEvent(new RemoteJobStartedEvent(jobEvent.getJobType(), request));
 
             return true;
         }

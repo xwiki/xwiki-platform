@@ -81,22 +81,13 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
      */
     private VelocityParser velocityParser;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.velocityParser = new VelocityParser();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#after(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String before(String content, VelocityContext velocityContext)
     {
         // Add bindings
@@ -264,12 +255,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
         filterContext.removeWhiteSpaces = false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#before(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String after(String content, VelocityContext velocityContext)
     {
         velocityContext.remove(BINDING_NEWLINE);

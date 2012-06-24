@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,30 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>ConfigurableClassMacros</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.ConfigurableClass</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1265775370000</creationDate>
-<date>1299713133000</date>
-<contentUpdateDate>1299713133000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.admin.configurable.macros.title")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity output="false"}}
+  <web>XWiki</web>
+  <name>ConfigurableClassMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.ConfigurableClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1265775370000</creationDate>
+  <date>1299713133000</date>
+  <contentUpdateDate>1299713133000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.admin.configurable.macros.title")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
 ## Constants:
 #set($redirectParameter = 'xredirect')
 #set($nameOfThisDocument = 'XWiki.ConfigurableClass')
@@ -98,7 +100,7 @@
   #else
     #set($userToCheck = $docToCheck.getAuthor())
   #end
-  #set ($hasAccess = $util.null)
+  #set ($hasAccess = $NULL)
   #setVariable ("$hasAccess" $xwiki.hasAccessLevel('edit', $userToCheck, $currentDoc))
 #end
 
@@ -284,4 +286,5 @@
     &lt;/dl&gt;
   #end
 #end## define $formHtml
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

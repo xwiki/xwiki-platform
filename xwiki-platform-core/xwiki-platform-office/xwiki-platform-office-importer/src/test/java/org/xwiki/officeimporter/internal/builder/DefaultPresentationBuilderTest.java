@@ -76,22 +76,15 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
      */
     private Parser mockXHTMLParser;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        presentationBuilder = (DefaultPresentationBuilder) getComponentManager().lookup(PresentationBuilder.class);
+        presentationBuilder = (DefaultPresentationBuilder) getComponentManager().getInstance(PresentationBuilder.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractOfficeImporterTest#registerComponents()
-     */
     @Override
     protected void registerComponents() throws Exception
     {

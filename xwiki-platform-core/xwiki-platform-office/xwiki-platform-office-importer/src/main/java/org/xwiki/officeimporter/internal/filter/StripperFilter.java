@@ -41,12 +41,10 @@ public class StripperFilter extends AbstractHTMLFilter
      */
     private String[] filterTags = new String[] {TAG_STYLE, TAG_SCRIPT};
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
-        List<Element> toBeStrippedElements = filterDescendants(document.getDocumentElement(), filterTags);
+        List<Element> toBeStrippedElements = filterDescendants(document.getDocumentElement(), this.filterTags);
         for (Element element : toBeStrippedElements) {
             element.getParentNode().removeChild(element);
         }

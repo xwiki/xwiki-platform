@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Stats</web>
-<name>Referrer</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Stats.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1195803878000</creationDate>
-<date>1196159417000</date>
-<contentUpdateDate>1196159417000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.statistics.referrerstats")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<content>#if ($xwiki.statsService.enabledForCurrentWiki)
+  <web>Stats</web>
+  <name>Referrer</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Stats.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1195803878000</creationDate>
+  <date>1196159417000</date>
+  <contentUpdateDate>1196159417000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.statistics.referrerstats")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>#if ($xwiki.statsService.enabledForCurrentWiki)
   #displayPanelLayout(2 ['Stats.BestReferrers', 'Stats.MostReferredPages'])
 #else
   #printStatisticsDisabled()

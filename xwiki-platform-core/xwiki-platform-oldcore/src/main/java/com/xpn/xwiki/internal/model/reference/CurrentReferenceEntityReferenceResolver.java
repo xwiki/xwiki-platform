@@ -38,7 +38,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @see com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
  */
 @Component
-@Named("current/reference")
+@Named("current")
 @Singleton
 public class CurrentReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {

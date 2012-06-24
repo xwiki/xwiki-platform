@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>UserDirectoryLivetableResultsOverride</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1332517363000</creationDate>
+  <date>1332517956000</date>
+  <contentUpdateDate>1332517956000</contentUpdateDate>
+  <version>1.1</version>
+  <title>UserDirectoryLivetableResults - Workspaces Application Override</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output='false'}}
+#*
+ * Recursively retrieve the all that subgroups of a group.
+ *
+ * @param baseGroupDocument input group document. This can be a group from another wiki, other than the current one.
+ * @param visitedGroupDocuments output list of group document instances that are directly or indirectly subgroups of the input one. Also, this list is limited to groups that are located in the same wiki as the input one.
+ *#
+#macro (getAllSubGroupsRecursively $baseGroupDocument $visitedGroupDocuments)
+  #if ($visitedGroupDocuments.contains($baseGroupDocument))
+    ## Already visited, skip and avoid cycles.
+    #break
+  #end
+  ## Mark the base group as visited to avoid going trough it twice.
+  #set ($discard = $visitedGroupDocuments.add($baseGroupDocument))
+  ##
+  ## Get the base group's members.
+  #set ($groupMemberObjects = $baseGroupDocument.getObjects('XWiki.XWikiGroups'))
+  ##
+  #foreach ($groupMemberObject in $groupMemberObjects)
+    #set ($groupMember = $groupMemberObject.getProperty('member').value)
+    #set ($groupMemberReference = $services.model.resolveDocument($groupMember))
+    ## Check if the member was specified relatively (no wiki prefix) and it was mistakingly resolved as local to the current workspace. Force to use the base group document's wiki name.
+    #if ("$!{groupMemberReference.wikiReference.name}" == $xcontext.database &amp;&amp; !$groupMember.startsWith("${xcontext.database}:"))
+      #set ($groupMemberReference = $services.model.createDocumentReference($baseGroupDocument.documentReference.wikiReference.name, $groupMemberReference.lastSpaceReference.name, $groupMemberReference.name))
+    #end
+    ## Handle only members from the base group's wiki (ignore references to other members from other wikis).
+    #if ("$!{groupMemberReference.wikiReference}" == $baseGroupDocument.documentReference.wikiReference)
+      #set ($groupMemberDocument = $xwiki.getDocument($groupMemberReference))
+      ## Skip users, handle only subgroups.
+      #if ($groupMemberDocument.getObject('XWiki.XWikiGroups'))
+        ## Recursivity is recursive.
+        #getAllSubGroupsRecursively($groupMemberDocument, $visitedGroupDocuments)
+      #end
+    #end
+  #end
+#end
+##
+##
+## If this is a workspace, there are no local users so we are interested only in global users.
+#set ($currentDatabase = $xcontext.database)
+#if ($services.workspace.isWorkspace($currentDatabase))
+  ##
+  ## Enhance the livetable query to return all the global users that are either directly or indirectly members of the workspace.
+  ##
+  #set ($extraFromClause = '')
+  #set ($extraWhereClause = '')
+  #set ($extraWhereClauseParameters = [])
+  ##
+  ## Step1: Get the workspace members from the workspace's members group.
+  #set ($workspace = $services.workspace.getWorkspace($currentDatabase))
+  #set ($workspaceMemberObjects = $workspace.groupDocument.getObjects('XWiki.XWikiGroups'))
+  ##
+  ## Differentiate between users and groups
+  #set ($workspaceMemberUsers = [])
+  #set ($workspaceMemberGroups = [])
+  #foreach ($workspaceMemberObject in $workspaceMemberObjects)
+    #set ($workspaceMember = $workspaceMemberObject.getProperty('member').value)
+    #set ($workspaceMemberReference = $services.model.resolveDocument($workspaceMember))
+    ## We are interested only in main wiki users and groups, since we are in a workspace.
+    #if ("$!workspaceMemberReference.wikiReference.name" == $xcontext.mainWikiName)
+      #set ($workspaceMemberDocument = $xwiki.getDocument($workspaceMemberReference))
+      ## A document can represent both a user and a group.
+      ## Is it a user?
+      #if ($workspaceMemberDocument.getObject('XWiki.XWikiUsers'))
+        #set ($discard = $workspaceMemberUsers.add($workspaceMember))
+      #end
+      ## Is it a group?
+      #if ($workspaceMemberDocument.getObject('XWiki.XWikiGroups'))
+        ## Recursively get all referenced groups from the main wiki.
+        #getAllSubGroupsRecursively($workspaceMemberDocument, $workspaceMemberGroups)
+      #end
+    #end
+  #end
+  ##
+  ## Extend the livetable query to display only the direct users of the workspace and the indirect users (that are members of subgroups of the workspace group)
+  #if ($workspaceMemberUsers.size() &gt; 0 || $workspaceMemberGroups.size() &gt; 0)
+    #set ($extraWhereClause = "AND ")
+    #if ($workspaceMemberUsers.size() &gt; 0 &amp;&amp; $workspaceMemberGroups.size() &gt; 0)
+      ## Begin both clauses group
+      #set ($extraWhereClause = "${extraWhereClause}(")
+    #end
+    ##
+    ## Users
+    #if ($workspaceMemberUsers.size() &gt; 0)
+      #set ($extraWhereClause = "${extraWhereClause}CONCAT('${xcontext.mainWikiName}:', doc.fullName) IN (")
+      #foreach ($workspaceMemberUser in $workspaceMemberUsers)
+        #if ($velocityCount &gt; 1)
+          #set ($extraWhereClause = "${extraWhereClause},")
+        #end
+        #set ($extraWhereClause = "${extraWhereClause}?")
+        #set ($discard = $extraWhereClauseParameters.add("$!{workspaceMemberUser}"))
+      #end
+      #set ($extraWhereClause = "${extraWhereClause})")
+    #end
+    ## Groups
+    #if ($workspaceMemberGroups.size() &gt; 0)
+      #if ($workspaceMemberUsers.size() &gt; 0)
+        ## This is grouped with the users clause from above.
+        #set ($extraWhereClause = "${extraWhereClause} OR ")
+      #end
+      #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id.id=obj.id AND prop.name='member' AND obj.name IN (")
+      #foreach ($workspaceMemberGroup in $workspaceMemberGroups)
+        #if ($velocityCount &gt; 1)
+          #set ($extraWhereClause = "${extraWhereClause},")
+        #end
+        #set ($extraWhereClause = "${extraWhereClause}?")
+        #set ($discard = $extraWhereClauseParameters.add("$!{workspaceMemberGroup.fullName}"))
+      #end
+      #set ($extraWhereClause = "${extraWhereClause}))")
+    #end
+    ##
+    ## Close both clauses group
+    #if ($workspaceMemberUsers.size() &gt; 0 &amp;&amp; $workspaceMemberGroups.size() &gt; 0)
+      #set ($extraWhereClause = "${extraWhereClause})")
+    #end
+  #end
+  ##
+  ## Step2: Set the database to the main wiki so that the query will be performed on the right wiki.
+  #set ($discard = $xcontext.setDatabase($xcontext.mainWikiName))
+#end
+{{/velocity}}
+
+{{comment}}Call the default user directory data source that we have just enhanced.{{/comment}}
+
+{{include document='XWiki.UserDirectoryLivetableResults' /}}
+
+{{velocity output='false'}}
+##
+#if ($services.workspace.isWorkspace($xcontext.database))
+  ## Reset the context database to the initial one, in case this page gets included somewhere.
+  #set ($discard = $xcontext.setDatabase($currentDatabase))
+#end
+{{/velocity}}</content>
+</xwikidoc>

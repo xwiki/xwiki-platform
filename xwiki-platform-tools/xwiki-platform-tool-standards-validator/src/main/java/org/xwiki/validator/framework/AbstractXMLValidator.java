@@ -106,11 +106,7 @@ public abstract class AbstractXMLValidator implements Validator
         this.validateXML = validateXML;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#setDocument(java.io.InputStream)
-     */
+    @Override
     public void setDocument(InputStream document)
     {
         this.document = null;
@@ -128,11 +124,7 @@ public abstract class AbstractXMLValidator implements Validator
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#validate()
-     */
+    @Override
     public List<ValidationError> validate()
     {
         if (this.document == null) {

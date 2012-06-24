@@ -84,6 +84,9 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     /** The importance of the document last modification date. **/
     protected static final float DATE_BOOST = 0.1f;
 
+    /** The importance of the document hidden flag. **/
+    protected static final float HIDDEN_BOOST = 0.01f;
+
     private String version;
 
     private String documentTitle;
@@ -129,7 +132,7 @@ public abstract class AbstractDocumentData extends AbstractIndexData
      * </ul>
      * 
      * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
-     *        content in the default language will be used.
+     *            content in the default language will be used.
      */
     @Override
     public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
@@ -147,14 +150,14 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     public void addDocumentDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
     {
         // Keyword fields: stored and indexed, but not tokenized
-        addFieldToDocument(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.NOT_ANALYZED,
-            ID_BOOST, luceneDoc);
+        addFieldToDocument(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.NOT_ANALYZED, ID_BOOST,
+            luceneDoc);
 
         addFieldToDocument(IndexFields.DOCUMENT_LANGUAGE, getLanguage(), Field.Store.YES, Field.Index.NOT_ANALYZED,
             LANGUAGE_BOOST, luceneDoc);
 
-        addFieldToDocument(IndexFields.DOCUMENT_WIKI, getWiki(), Field.Store.YES, Field.Index.NOT_ANALYZED,
-            WIKI_BOOST, luceneDoc);
+        addFieldToDocument(IndexFields.DOCUMENT_WIKI, getWiki(), Field.Store.YES, Field.Index.NOT_ANALYZED, WIKI_BOOST,
+            luceneDoc);
 
         if (StringUtils.isNotBlank(this.author)) {
             addFieldToDocument(IndexFields.DOCUMENT_AUTHOR, this.author, Field.Store.YES, Field.Index.NOT_ANALYZED,
@@ -196,6 +199,9 @@ public abstract class AbstractDocumentData extends AbstractIndexData
 
         addFieldToDocument(IndexFields.DOCUMENT_FULLNAME, getDocumentFullName(), Field.Store.YES, Field.Index.ANALYZED,
             FULL_NAME_BOOST, luceneDoc);
+
+        addFieldToDocument(IndexFields.DOCUMENT_HIDDEN, doc.isHidden().toString(), Field.Store.YES,
+            Field.Index.NOT_ANALYZED, HIDDEN_BOOST, luceneDoc);
 
         // Large text fields: tokenized and indexed, but not stored
         // No reconstruction of the original content will be possible from the search result
@@ -312,7 +318,8 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     @Override
     public String getDocumentFullName()
     {
-        return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getEntityReference());
+        return Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING, "local")
+            .serialize(getEntityReference());
     }
 
     public String getVersion()
@@ -343,7 +350,8 @@ public abstract class AbstractDocumentData extends AbstractIndexData
     @Override
     public String getFullName()
     {
-        return (String) Utils.getComponent(EntityReferenceSerializer.class).serialize(getEntityReference());
+        return Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
+            getEntityReference());
     }
 
     public String getLanguage()

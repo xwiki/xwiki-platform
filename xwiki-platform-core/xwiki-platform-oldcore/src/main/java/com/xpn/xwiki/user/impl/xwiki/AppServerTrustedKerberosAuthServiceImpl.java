@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.text.MessageFormat;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,17 +61,12 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AppServerTrustedKerberosAuthServiceImpl.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#checkAuth(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         String user = context.getRequest().getRemoteUser();
 
-        LOGGER.debug(MessageFormat.format("Checking auth for remote user {0}", user));
+        LOGGER.debug("Checking auth for remote user [{}]", user);
 
         if (StringUtils.isBlank(user)) {
             return super.checkAuth(context);
@@ -87,12 +80,6 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
         return new XWikiUser(user);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#checkAuth(java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException

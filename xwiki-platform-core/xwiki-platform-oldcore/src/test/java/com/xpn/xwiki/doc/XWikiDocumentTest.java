@@ -119,7 +119,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.defaultEntityReferenceSerializer = getComponentManager().lookup(EntityReferenceSerializer.class);
+        this.defaultEntityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.document.setSyntax(Syntax.XWIKI_1_0);
@@ -163,7 +163,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().put("msg", this.mockXWikiMessageTool.proxy());
 
-        this.baseClass = this.document.getxWikiClass();
+        this.baseClass = this.document.getXClass();
         this.baseClass.addTextField("string", "String", 30);
         this.baseClass.addTextAreaField("area", "Area", 10, 10);
         this.baseClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);
@@ -250,32 +250,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("wiki", doc.getWikiName());
     }
 
-    public void testGetDisplayTitleWhenNoTitleAndNoContent()
-    {
-        this.document.setContent("Some content");
-
-        assertEquals("Page", this.document.getDisplayTitle(getContext()));
-    }
-
-    public void testGetDisplayWhenTitleExists()
-    {
-        this.document.setContent("Some content");
-        this.document.setTitle("Title");
-        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
-            .will(velocityEngineEvaluateStub);
-
-        assertEquals("Title", this.document.getDisplayTitle(getContext()));
-    }
-
-    public void testGetDisplayWhenNoTitleButSectionExists()
-    {
-        this.document.setContent("Some content\n1 Title");
-        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
-            .will(velocityEngineEvaluateStub);
-
-        assertEquals("Title", this.document.getDisplayTitle(getContext()));
-    }
-
     public void testGetRenderedTitleWhenMatchingTitleHeaderDepth()
     {
         this.document.setContent("=== level3");
@@ -293,19 +267,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-    }
-
-    /**
-     * Verify that if an error happens when evaluation the title, we fallback to the computed title.
-     */
-    public void testGetDisplayTitleWhenVelocityError()
-    {
-        this.document.setContent("Some content");
-        this.document.setTitle("some content that generate a velocity error");
-        this.mockVelocityEngine.expects(once()).method("evaluate")
-            .will(throwException(new XWikiVelocityException("message")));
-
-        assertEquals("Page", this.document.getDisplayTitle(getContext()));
     }
 
     public void testMinorMajorVersions()
@@ -473,35 +434,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
         assertEquals(2, duplicatedDocument.getXObjects(duplicatedClassReference).size());
-    }
-
-    public void testCloneWithAbsoluteClassReference()
-    {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
-
-        EntityReference relativeClassReference =
-            new EntityReference(DOCNAME, EntityType.DOCUMENT, new EntityReference(DOCSPACE, EntityType.SPACE));
-        DocumentReference classReference = new DocumentReference("wiki", DOCSPACE, DOCNAME);
-        DocumentReference duplicatedClassReference = new DocumentReference("otherwiki", DOCSPACE, DOCNAME);
-
-        BaseObject object = new BaseObject();
-        object.setXClassReference(relativeClassReference);
-        document.addXObject(object);
-        BaseObject object2 = new BaseObject();
-        object2.setXClassReference(classReference);
-        document.addXObject(object2);
-        BaseObject object3 = new BaseObject();
-        object3.setXClassReference(relativeClassReference);
-        document.addXObject(object3);
-
-        XWikiDocument clonedDocument = document.clone();
-        assertEquals(3, clonedDocument.getXObjects(classReference).size());
-        assertEquals(document.getXObjects(classReference), clonedDocument.getXObjects(classReference));
-
-        XWikiDocument duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
-        assertNotNull(duplicatedDocument.getXObject(duplicatedClassReference, 0));
-        assertNotNull(duplicatedDocument.getXObject(classReference, 1));
-        assertNotNull(duplicatedDocument.getXObject(duplicatedClassReference, 2));
     }
 
     public void testToStringReturnsFullName()
@@ -1136,6 +1068,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testCopyDocument() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
+        doc.setTitle("Some title");
         BaseObject o = new BaseObject();
         o.setClassName(CLASSNAME);
         doc.addObject(CLASSNAME, o);
@@ -1145,6 +1078,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertNotSame(o, newDoc.getObject(CLASSNAME));
         assertFalse(newO.getGuid().equals(o.getGuid()));
+        // Verify that the title is copied
+        assertEquals("Some title", newDoc.getTitle());
+    }
+
+    /**
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-6743">XWIKI-6743</a>
+     */
+    public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki1", "space1", "page1"));
+        doc.setTitle(doc.getDocumentReference().getName());
+
+        XWikiDocument newDoc = doc.copyDocument(new DocumentReference("wiki2", "space2", "page2"), getContext());
+
+        // Verify that the title is modified
+        assertEquals("page2", newDoc.getTitle());
     }
 
     public void testResolveClassReference() throws Exception

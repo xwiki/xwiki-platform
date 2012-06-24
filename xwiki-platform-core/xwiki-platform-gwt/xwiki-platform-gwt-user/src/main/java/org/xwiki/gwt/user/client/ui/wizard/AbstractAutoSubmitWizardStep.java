@@ -49,6 +49,7 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
      * 
      * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public final void init(Object data, AsyncCallback< ? > cb)
     {
@@ -64,11 +65,7 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
         return data;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#getStepTitle()
-     */
+    @Override
     public String getStepTitle()
     {
         return stepTitle;
@@ -84,22 +81,14 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
         this.stepTitle = stepTitle;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#display()
-     */
+    @Override
     public final Widget display()
     {
         // Steps that are automatically submitted should not be displayed.
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return data;
@@ -112,27 +101,20 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
      * 
      * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
      */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         // Leave the input data unchanged by default.
         async.onSuccess(Boolean.TRUE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#isAutoSubmit()
-     */
+    @Override
     public final boolean isAutoSubmit()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         // Do nothing by default.

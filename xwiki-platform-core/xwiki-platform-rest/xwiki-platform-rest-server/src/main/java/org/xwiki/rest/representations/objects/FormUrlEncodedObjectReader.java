@@ -56,11 +56,13 @@ public class FormUrlEncodedObjectReader implements MessageBodyReader<Object>, XW
 
     private static final String PROPERTY_PREFIX = "property#";
 
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Object.class.isAssignableFrom(type);
     }
 
+    @Override
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException

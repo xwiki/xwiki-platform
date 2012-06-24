@@ -73,11 +73,6 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         // Empty voluntarily. Extending classes can override to provide custom component registration.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#tearDown()
-     */
     @Override
     protected void tearDown() throws Exception
     {

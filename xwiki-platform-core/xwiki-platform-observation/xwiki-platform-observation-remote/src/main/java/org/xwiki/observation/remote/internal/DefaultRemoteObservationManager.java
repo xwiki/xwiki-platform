@@ -105,16 +105,12 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
      */
     private NetworkAdapter networkAdapter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         try {
             String networkAdapterHint = this.configuration.getNetworkAdapter();
-            this.networkAdapter = this.componentManager.lookup(NetworkAdapter.class, networkAdapterHint);
+            this.networkAdapter = this.componentManager.getInstance(NetworkAdapter.class, networkAdapterHint);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to initialize network adapter ["
                 + this.configuration.getNetworkAdapter() + "]", e);
@@ -130,11 +126,7 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#notify(org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public void notify(LocalEventData localEvent)
     {
         if (this.remoteEventManagerContext.isRemoteState()) {
@@ -159,11 +151,7 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#notify(org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public void notify(RemoteEventData remoteEvent)
     {
         // Make sure the Execution context is properly initialized
@@ -185,21 +173,13 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#startChannel(java.lang.String)
-     */
+    @Override
     public void startChannel(String channelId) throws RemoteEventException
     {
         this.networkAdapter.startChannel(channelId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#stopChannel(java.lang.String)
-     */
+    @Override
     public void stopChannel(String channelId) throws RemoteEventException
     {
         this.networkAdapter.stopChannel(channelId);

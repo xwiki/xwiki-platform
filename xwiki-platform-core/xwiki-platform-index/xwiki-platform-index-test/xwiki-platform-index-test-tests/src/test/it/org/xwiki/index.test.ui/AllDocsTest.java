@@ -50,7 +50,7 @@ public class AllDocsTest extends AbstractTest
 
         // Test 2: Verify filtering works by filtering on the document name
         livetable = page.clickIndexTab();
-        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", "Treeview");
-        Assert.assertTrue(livetable.hasRow("Page", "Treeview"));
+        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", "XWikiAllGroup");
+        Assert.assertTrue(livetable.hasRow("Page", "XWikiAllGroup"));
     }
 }

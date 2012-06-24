@@ -35,143 +35,138 @@ public class ActivityEventImpl implements ActivityEvent
     /**
      * ID.
      */
-    private String eventId;
+    protected String eventId;
 
     /**
      * Request ID.
      */
-    private String requestId;
+    protected String requestId;
 
     /**
      * Priority.
      */
-    private int priority;
+    protected int priority;
 
     /**
      * Date the event occured.
      */
-    private Date date;
+    protected Date date;
 
     /**
      * Stream the event belongs to.
      */
-    private String stream;
+    protected String stream;
 
     /**
      * Application which fired the event (as of august 2009 this application is always "xwiki").
      */
-    private String application;
+    protected String application;
 
     /**
      * Type of the event, see {@link ActivityEventType}.
      */
-    private String type;
+    protected String type;
 
     /**
      * Context user at the time the event has been fired.
      */
-    private String user;
+    protected String user;
 
     /**
      * Wiki in which the event occured, example: "xwiki".
      */
-    private String wiki;
+    protected String wiki;
 
     /**
      * Space in which the event occured, example: "Main".
      */
-    private String space;
+    protected String space;
 
     /**
      * Name of the document which fired the event, example: "Main.WebHome".
      */
-    private String page;
+    protected String page;
 
     /**
      * URL of the document which fired the event, example: "/xwiki/bin/view/Main/WebHome".
      */
-    private String url;
+    protected String url;
 
     /**
      * Title of the event.
      */
-    private String title;
+    protected String title;
 
     /**
      * Body message of the event.
      */
-    private String body = "";
+    protected String body = "";
 
     /**
      * Version of the document at the time the event occured.
      */
-    private String version = "";
+    protected String version = "";
 
     /**
      * Free param 1.
      */
-    private String param1 = "";
+    protected String param1 = "";
 
     /**
      * Free param 2.
      */
-    private String param2 = "";
+    protected String param2 = "";
 
     /**
      * Free param 3.
      */
-    private String param3 = "";
+    protected String param3 = "";
 
     /**
      * Free param 4.
      */
-    private String param4 = "";
+    protected String param4 = "";
 
     /**
      * Free param 5.
      */
-    private String param5 = "";
+    protected String param5 = "";
+
+    /**
+     * True if the page which fired the event is marked as hidden, false otherwise.
+     */
+    protected boolean hidden;
 
     /**
      * Named parameters.
      */
-    private Map<String, String> parameters;
+    protected Map<String, String> parameters;
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDisplayTitle(XWikiContext context)
     {
         return context.getMessageTool().get(this.title, getParams());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDisplayBody(XWikiContext context)
     {
         return context.getMessageTool().get(this.body, getParams());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDisplayDate(XWikiContext context)
     {
         return context.getWiki().formatDate(this.date, null, context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDisplayUser(XWikiContext context)
     {
         return context.getWiki().getUserName(this.user, context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParams(List<String> params)
     {
         if (params != null) {
@@ -194,7 +189,7 @@ public class ActivityEventImpl implements ActivityEvent
     }
 
     /**
-     * {@inheritDoc}
+     * @return the parameters of the event
      */
     public List<String> getParams()
     {
@@ -207,81 +202,61 @@ public class ActivityEventImpl implements ActivityEvent
         return params;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getEventId()
     {
         return this.eventId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setEventId(String eventId)
     {
         this.eventId = eventId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getRequestId()
     {
         return this.requestId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setRequestId(String requestId)
     {
         this.requestId = requestId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getPriority()
     {
         return this.priority;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setPriority(int priority)
     {
         this.priority = priority;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getApplication()
     {
         return this.application;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setStream(String stream)
     {
         this.stream = stream;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getVersion()
     {
         return this.version;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setVersion(String version)
     {
         if (version != null) {
@@ -289,259 +264,214 @@ public class ActivityEventImpl implements ActivityEvent
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getParam1()
     {
         return this.param1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParam1(String param1)
     {
         this.param1 = param1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getParam2()
     {
         return this.param2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParam2(String param2)
     {
         this.param2 = param2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getParam3()
     {
         return this.param3;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParam3(String param3)
     {
         this.param3 = param3;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getParam4()
     {
         return this.param4;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParam4(String param4)
     {
         this.param4 = param4;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getParam5()
     {
         return this.param5;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParam5(String param5)
     {
         this.param5 = param5;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getWiki()
     {
         return this.wiki;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getType()
     {
         return this.type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setType(String type)
     {
         this.type = type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getUser()
     {
         return this.user;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setUser(String user)
     {
         this.user = user;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getSpace()
     {
         return this.space;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setSpace(String space)
     {
         this.space = space;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getPage()
     {
         return this.page;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setPage(String page)
     {
         this.page = page;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getUrl()
     {
         return this.url;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setUrl(String url)
     {
         this.url = url;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getTitle()
     {
         return this.title;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setTitle(String title)
     {
         this.title = title;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getBody()
     {
         return this.body;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setBody(String body)
     {
         this.body = body;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Date getDate()
     {
         return this.date;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setDate(Date date)
     {
         this.date = date;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getStream()
     {
         return this.stream;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setApplication(String application)
     {
         this.application = application;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setParameters(Map<String, String> parameters)
     {
         this.parameters = parameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, String> getParameters()
     {
         return this.parameters;
+    }
+
+    /**
+     * @return True if the event has been triggered by an action performed on a document marked as hidden.
+     */
+    public boolean isHidden()
+    {
+        return this.hidden;
+    }
+
+    /**
+     * @param hidden the event hidden flag.
+     * @see #isHidden()
+     */
+    public void setHidden(Boolean hidden)
+    {
+        if (hidden != null) {
+            this.hidden = hidden;
+        }
     }
 }

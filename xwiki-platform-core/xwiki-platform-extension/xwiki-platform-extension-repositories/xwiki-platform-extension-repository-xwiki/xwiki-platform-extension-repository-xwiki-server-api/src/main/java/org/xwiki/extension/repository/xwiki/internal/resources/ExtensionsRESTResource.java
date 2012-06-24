@@ -47,7 +47,7 @@ public class ExtensionsRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
         throws QueryException
     {
-        Extensions extensions = this.objectFactory.createExtensions();
+        Extensions extensions = this.extensionObjectFactory.createExtensions();
 
         if (requireTotalHits) {
             Query countQuery = createExtensionsCountQuery(null, null);

@@ -96,43 +96,6 @@ public class DefaultWikiService extends AbstractWikiService
     }
 
     @Override
-    public List<String> getSpaceNames(String wikiName)
-    {
-        List<String> spaceNamesList = new ArrayList<String>();
-        String database = getXWikiContext().getDatabase();
-        try {
-            if (wikiName != null) {
-                getXWikiContext().setDatabase(wikiName);
-            }
-            spaceNamesList = getXWikiContext().getWiki().getSpaces(getXWikiContext());
-            // remove the blacklisted spaces from the all spaces list
-            spaceNamesList.removeAll(getBlackListedSpaces());
-            Collections.sort(spaceNamesList);
-        } catch (Exception e) {
-            this.logger.error(e.getLocalizedMessage(), e);
-        } finally {
-            if (wikiName != null) {
-                getXWikiContext().setDatabase(database);
-            }
-        }
-        return spaceNamesList;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected List<String> getBlackListedSpaces()
-    {
-        // get the blacklisted spaces from the session
-        List<String> blacklistedSpaces =
-            (ArrayList<String>) getXWikiContext().getRequest().getSession().getAttribute("blacklistedSpaces");
-        // always return a list, even if blacklisted spaces variable wasn't set
-        if (blacklistedSpaces == null) {
-            blacklistedSpaces = Collections.emptyList();
-        }
-        return blacklistedSpaces;
-    }
-
-    @Override
     protected String getCurrentUserRelativeTo(String wikiName)
     {
         return compactEntityReferenceSerializer.serialize(getXWikiContext().getUserReference(), new WikiReference(

@@ -52,7 +52,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.cache = (DefaultDocumentCache<String>) getComponentManager().lookup(DocumentCache.class);
+        this.cache = (DefaultDocumentCache<String>) getComponentManager().getInstance(DocumentCache.class);
 
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setConfigurationId("documentcachetest");
@@ -64,7 +64,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
         this.document.setOriginalDocument(this.document.clone());
 
         this.mockXWiki = getMockery().mock(XWiki.class);
-        getContext().setWiki((XWiki) this.mockXWiki);
+        getContext().setWiki(this.mockXWiki);
         
         getMockery().checking(new Expectations() {{
             allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
@@ -80,7 +80,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testGetSet() throws InterruptedException
+    public void testGetSet()
     {
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data2", this.document.getDocumentReference(), "ext1", "ext2");
@@ -95,7 +95,8 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data", this.document.getDocumentReference(), "ext1", "ext2");
 
-        getComponentManager().lookup(ObservationManager.class).notify(
+        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        observationManager.notify(
             new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
         Assert.assertNull(this.cache.get(this.document.getDocumentReference()));

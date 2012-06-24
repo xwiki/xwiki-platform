@@ -43,9 +43,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 @Component("officeimporter/list")
 public class ListFilter extends AbstractHTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         List<Element> listItems = filterDescendants(document.getDocumentElement(), new String[] {TAG_LI});

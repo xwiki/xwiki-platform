@@ -39,49 +39,37 @@ import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
  */
 public abstract class AbstractDavView extends AbstractDavResource
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean exists()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getModificationTime()
     {
         return IOUtil.UNDEFINED_TIME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isCollection()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void move(DavResource destination) throws DavException
     {
         throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void spool(OutputContext outputContext) throws IOException
     {
         throw new IOException("Views cannot be spooled.");
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
@@ -91,9 +79,7 @@ public abstract class AbstractDavView extends AbstractDavResource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {

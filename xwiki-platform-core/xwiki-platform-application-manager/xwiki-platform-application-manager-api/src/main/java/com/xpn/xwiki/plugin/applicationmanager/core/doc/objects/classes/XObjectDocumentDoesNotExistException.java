@@ -22,7 +22,7 @@ package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Exception when try get {@link SuperDocument} that does not exist.
+ * Exception when try get {@link XObjectDocument} that does not exist.
  * 
  * @version $Id$
  * @since Application Manager 1.0RC1

@@ -23,8 +23,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -33,6 +37,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for all stored statistics object.
@@ -83,6 +88,12 @@ public class XWikiStats extends BaseCollection
      * The name of the XML node <code>property</code>.
      */
     private static final String XMLNODE_PROPERTY = "property";
+
+    /** Override default page name to easily detect it after resolution. */
+    private static final EntityReference EMPTY_REF = new EntityReference("$$EMPTY$$", EntityType.DOCUMENT);
+
+    /** Resolve names into reference for uid string serialization. */
+    private final EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
 
     /**
      * Default constructor.
@@ -141,14 +152,39 @@ public class XWikiStats extends BaseCollection
     }
 
     @Override
+    protected String getLocalKey() {
+        StringBuilder sb = new StringBuilder(64);
+
+        // The R40000XWIKI6990DataMigration use a stubbed class to provide the above two values. If the ids depends
+        // on other non-static requirements, it should be adapted accordingly.
+        String name = getName();
+        int nb = getNumber();
+
+        if (!StringUtils.isEmpty(name)) {
+            // TODO: Refactor to get the original reference without this resolve.
+            EntityReference ref = resolver.resolve(name, EntityType.DOCUMENT, EMPTY_REF);
+            if (ref.getName().equals(EMPTY_REF.getName())) {
+                ref = ref.getParent();
+            }
+            sb.append(getLocalUidStringEntityReferenceSerializer().serialize(ref));
+        }
+
+        // if number used, serialize it as well. It may happened that the hash is 0, but this is really unlikely
+        // and it will not hurt anyway.
+        if (nb != 0) {
+            // TODO: Avoid the hashed number, and use the original info (referer, period, etc...)
+            String str = Integer.toString(nb);
+            sb.append(str.length()).append(':').append(str);
+        }
+        
+        return sb.toString();
+    }
+    
+    // Satisfy checkstyle !
+    @Override
     public int hashCode()
     {
-        return (getName() + getClassName() + "_" + getNumber()).hashCode();
-    }
-
-    @Override
-    public void setId(int id)
-    {
+        return super.hashCode();
     }
 
     @Override

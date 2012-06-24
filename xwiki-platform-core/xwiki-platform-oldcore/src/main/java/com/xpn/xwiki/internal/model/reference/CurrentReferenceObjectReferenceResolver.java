@@ -40,7 +40,7 @@ import org.xwiki.model.reference.ObjectReferenceResolver;
  * @since 3.3M1
  */
 @Component
-@Named("current/reference")
+@Named("current")
 @Singleton
 public class CurrentReferenceObjectReferenceResolver implements ObjectReferenceResolver<EntityReference>
 {
@@ -48,7 +48,7 @@ public class CurrentReferenceObjectReferenceResolver implements ObjectReferenceR
      * Used to actually resolve the provided entity references.
      */
     @Inject
-    @Named("current/reference")
+    @Named("current")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Override

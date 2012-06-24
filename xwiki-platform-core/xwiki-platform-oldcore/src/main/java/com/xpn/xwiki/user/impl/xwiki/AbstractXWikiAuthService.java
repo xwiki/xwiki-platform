@@ -64,7 +64,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // the resolved page name.
         // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
         // to retrieve only the page name
-        DocumentReference documentReference = Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
+        DocumentReference documentReference =
+            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+                username);
         return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);
     }
 

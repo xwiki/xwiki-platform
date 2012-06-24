@@ -1,48 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>DocumentSheetBinding</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.XWikiClasses</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1310473447000</creationDate>
-<date>1311662115000</date>
-<contentUpdateDate>1311662115000</contentUpdateDate>
-<version>1.1</version>
-<title>XWiki Sheet Include</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<class>
-<name>XWiki.DocumentSheetBinding</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<sheet>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>sheet</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Sheet</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</sheet>
-</class>
-<content>This class is used to apply a custom sheet to a document. See also [[SheetDescriptorClass]].</content></xwikidoc>
+  <web>XWiki</web>
+  <name>DocumentSheetBinding</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiClasses</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1310473447000</creationDate>
+  <date>1311662115000</date>
+  <contentUpdateDate>1311662115000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWiki Sheet Include</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <class>
+    <name>XWiki.DocumentSheetBinding</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <sheet>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>sheet</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Sheet</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </sheet>
+  </class>
+  <content>This class is used to apply a custom sheet to a document. See also [[SheetDescriptorClass]].</content>
+</xwikidoc>

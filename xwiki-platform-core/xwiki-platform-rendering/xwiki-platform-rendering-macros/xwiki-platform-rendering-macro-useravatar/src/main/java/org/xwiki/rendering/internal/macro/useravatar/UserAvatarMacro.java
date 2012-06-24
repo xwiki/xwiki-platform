@@ -111,24 +111,20 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername(),
-            new EntityReference(USER_SPACE, EntityType.SPACE));
+        DocumentReference userReference =
+            this.currentDocumentReferenceResolver.resolve(parameters.getUsername(), new EntityReference(USER_SPACE,
+                EntityType.SPACE));
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;
         if (this.documentAccessBridge.exists(userReference)) {
-            Object avatarProperty = this.documentAccessBridge.getProperty(userReference,
-                new DocumentReference(this.currentEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),
-                    USER_SPACE, "XWikiUsers"), "avatar");
+            Object avatarProperty =
+                this.documentAccessBridge.getProperty(userReference, new DocumentReference(userReference
+                    .getWikiReference().getName(), USER_SPACE, "XWikiUsers"), "avatar");
             if (avatarProperty != null) {
                 fileName = avatarProperty.toString();
             }
@@ -143,8 +139,9 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
             imageReference = new ResourceReference(this.skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
         } else {
             AttachmentReference attachmentReference = new AttachmentReference(fileName, userReference);
-            imageReference = new ResourceReference(
-                this.compactWikiEntityReferenceSerializer.serialize(attachmentReference), ResourceType.ATTACHMENT);
+            imageReference =
+                new ResourceReference(this.compactWikiEntityReferenceSerializer.serialize(attachmentReference),
+                    ResourceType.ATTACHMENT);
         }
         ImageBlock imageBlock = new ImageBlock(imageReference, false);
 
@@ -162,11 +159,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         return Collections.singletonList((Block) imageBlock);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;

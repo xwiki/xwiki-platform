@@ -58,22 +58,12 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
         setActivityStream(new ActivityStreamImpl());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return PLUGIN_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -111,11 +101,6 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
         return context.getWiki().getXWikiPreference(prefName, prefName, defaultValue, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiDefaultPlugin#init(XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
@@ -127,11 +112,6 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiDefaultPlugin#virtualInit(XWikiContext)
-     */
     @Override
     public void virtualInit(XWikiContext context)
     {

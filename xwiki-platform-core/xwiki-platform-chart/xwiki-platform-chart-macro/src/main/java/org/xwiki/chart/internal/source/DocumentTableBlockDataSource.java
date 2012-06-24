@@ -77,9 +77,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
         throws MacroExecutionException
     {
@@ -95,7 +93,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         // Parse the document content into an XDOM.
         XDOM xdom;
         try {
-            Parser parser = componentManager.lookup(Parser.class, docBridge.getDocumentSyntaxId(documentName));
+            Parser parser = componentManager.getInstance(Parser.class, docBridge.getDocumentSyntaxId(documentName));
             xdom = parser.parse(new StringReader(docBridge.getDocumentContent(documentName)));
         } catch (Exception ex) {
             throw new MacroExecutionException(String.format("Error while parsing document: [%s].", documentName), ex);

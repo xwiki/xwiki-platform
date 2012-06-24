@@ -72,11 +72,7 @@ public class OfficeDocumentView implements DisposableCacheValue
         this.temporaryFiles = temporaryFiles;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DisposableCacheValue#dispose()
-     */
+    @Override
     public void dispose() throws Exception
     {
         // Cleanup all the temporary files.

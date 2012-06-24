@@ -58,31 +58,39 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
     private DocumentAccessBridge bridge;
 
     /**
-     * {@inheritDoc}
+     * @param statement the statement to evaluate.
+     * @return true if the statement is complete, false otherwise.
      */
+    private boolean isShortFormStatement(String statement)
+    {
+        boolean isShortStatement = false;
+        String lcStatement = statement.trim().toLowerCase();
+
+        isShortStatement |= lcStatement.startsWith(", ");
+        isShortStatement |= lcStatement.startsWith("from");
+        isShortStatement |= lcStatement.startsWith("where");
+        isShortStatement |= lcStatement.startsWith("order");
+
+        return isShortStatement;
+    }
+
+    @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
-        if (query.getWiki() != null && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Query#setWiki requires programming right", query, null);
-        }
         if (query.isNamed() && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Named queries requires programming right", query, null);
         }
-        // TODO: Make it possible to use HQL without programming rights for non-full statements.
-        if (!Query.XWQL.equals(query.getLanguage()) && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Query languages others than XWQL require programming right", query, null);
+        if (!Query.XWQL.equals(query.getLanguage()) && !Query.HQL.equals(query.getLanguage())
+                && !getBridge().hasProgrammingRights()) {
+            throw new QueryException("Query languages others than XWQL or HQL require programming right", query, null);
         }
-        // Note: We only need to check for select (and not update, delete, etc) since the XWQL parser only supports
-        // SELECT statements.
-        if (query.getStatement().trim().toLowerCase().startsWith("select") && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Full form XWQL statements requires programming right", query, null);
+        if (!isShortFormStatement(query.getStatement()) && !getBridge().hasProgrammingRights()) {
+            throw new QueryException("Full form statements requires programming right", query, null);
         }
         return getNestedQueryExecutorManager().execute(query);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Set<String> getLanguages()
     {
         return getNestedQueryExecutorManager().getLanguages();

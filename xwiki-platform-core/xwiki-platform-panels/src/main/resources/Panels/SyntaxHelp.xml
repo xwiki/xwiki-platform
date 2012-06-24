@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Panels</web>
-<name>SyntaxHelp</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Panels.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1153995199000</creationDate>
-<date>1203523463000</date>
-<contentUpdateDate>1203523463000</contentUpdateDate>
-<version>1.1</version>
-<title>XWiki syntax help</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.1</syntaxId>
-<hidden>false</hidden><attachment>
-<filename>img.png</filename>
-<filesize>959</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1203518471000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAAAAADgE0Q3AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAA
+  <web>Panels</web>
+  <name>SyntaxHelp</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1153995199000</creationDate>
+  <date>1203523463000</date>
+  <contentUpdateDate>1203523463000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWiki syntax help</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>img.png</filename>
+    <filesize>959</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1203518471000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAAAAADgE0Q3AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAA
 CxMAAAsTAQCanBgAAAAHdElNRQfWBxcOEy+3/bdlAAADUElEQVRIx52WTW/cVBSG32tfezxJZiaT
 0EwnCkVKgVZI3cFAVYkFLEFCKoI/wz9Bgh/ApqqEWLQLFmUHAtJKqKIqMKhSJ50R+aCTTHzPey4L
 2/PVIru9C8u6Po/f83XtYzxefAUvwcACAMZPjrXc1gfJVm0VgPHA+HCQGmOMKcfQ6jYypeO/jQ1t
@@ -44,90 +47,91 @@ NyLmZizc0iIyVQAIbOdarxMUUP2r8wHpqXO+Kf0UmZ7BcOuLTbjIAsDDDQinxpr7VUQ2d2w5fLBZ
 pHzsnV8MfuagLhx1OZjWSZpHupjnWUyLVdxJ84Y1uPa6kJSsRUmhZvdcZnD1kxyqAX6XuX1mKxSK
 yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 +QsNjAcwUSSm2vBhYTIlAGk1xmQzinmZcfQ/40v+ffqYGLoAAAAASUVORK5CYII=
-</content></attachment>
-<object>
-<class>
-<name>Panels.PanelClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>5</number>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Information|Navigation|Tools|Administration|Other</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</category>
-<content>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>content</name>
-<number>4</number>
-<prettyName>Content</prettyName>
-<rows>25</rows>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
-<description>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>description</name>
-<number>3</number>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<type>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>type</name>
-<number>2</number>
-<prettyName>Panel type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>view|edit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-</class>
-<name>Panels.SyntaxHelp</name>
-<number>0</number>
-<className>Panels.PanelClass</className>
-<guid>d27c4f7d-60e3-4a4a-9802-b05b502a625a</guid>
-<property>
-<category>Information</category>
-</property>
-<property>
-<content>{{velocity}}
+  </attachment>
+  <object>
+    <class>
+      <name>Panels.PanelClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Information|Navigation|Tools|Administration|Other</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </category>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>4</number>
+        <prettyName>Content</prettyName>
+        <rows>25</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <description>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>2</number>
+        <prettyName>Panel type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>view|edit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <name>Panels.SyntaxHelp</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>d27c4f7d-60e3-4a4a-9802-b05b502a625a</guid>
+    <property>
+      <category>Information</category>
+    </property>
+    <property>
+      <content>{{velocity}}
 #largepanelheader($msg.get('xe.panels.syntax.help'))
 #set ($syntaxDoc = $xwiki.getDocument('XWiki.XWikiSyntax'))
 #if ($syntaxDoc.isNew())
@@ -138,15 +142,16 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 $msg.get('helponsyntax') {{html clean="false"}}&lt;a href="$url" onclick="openURL('$url', '_blank'); return false;"&gt;&lt;span class="nobr"&gt;$msg.get('xwikisyntax')&lt;/span&gt;&lt;/a&gt;{{/html}}
 #panelfooter()
 {{/velocity}}</content>
-</property>
-<property>
-<description>Displays information on the XWiki syntax.</description>
-</property>
-<property>
-<name>Syntax help</name>
-</property>
-<property>
-<type>edit</type>
-</property>
-</object>
-<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>
+    </property>
+    <property>
+      <description>Displays information on the XWiki syntax.</description>
+    </property>
+    <property>
+      <name>Syntax help</name>
+    </property>
+    <property>
+      <type>edit</type>
+    </property>
+  </object>
+  <content>{{include document="Panels.PanelSheet"/}}</content>
+</xwikidoc>

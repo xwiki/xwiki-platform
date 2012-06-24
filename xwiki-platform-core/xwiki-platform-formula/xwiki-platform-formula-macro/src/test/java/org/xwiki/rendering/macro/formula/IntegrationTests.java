@@ -49,33 +49,36 @@ public class IntegrationTests
         final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
+        descriptorDAB.setRoleType(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
         // Image Storage Mock
         final ImageStorage mockImageStorage = mockery.mock(ImageStorage.class);
         DefaultComponentDescriptor<ImageStorage> descriptorIS = new DefaultComponentDescriptor<ImageStorage>();
-        descriptorIS.setRole(ImageStorage.class);
+        descriptorIS.setRoleType(ImageStorage.class);
         componentManager.registerComponent(descriptorIS, mockImageStorage);
 
         // Configuration Mock
         final FormulaMacroConfiguration mockConfiguration = mockery.mock(FormulaMacroConfiguration.class);
         DefaultComponentDescriptor<FormulaMacroConfiguration> descriptorEMC =
             new DefaultComponentDescriptor<FormulaMacroConfiguration>();
-        descriptorEMC.setRole(FormulaMacroConfiguration.class);
+        descriptorEMC.setRoleType(FormulaMacroConfiguration.class);
         componentManager.registerComponent(descriptorEMC, mockConfiguration);
 
-        mockery.checking(new Expectations() {{
-            atLeast(2).of(mockDocumentAccessBridge).getURL(null, "tex", null, null);
-            will(returnValue("/xwiki/bin/view/Main/"));
+        mockery.checking(new Expectations()
+        {
+            {
+                atLeast(2).of(mockDocumentAccessBridge).getDocumentURL(null, "tex", null, null);
+                will(returnValue("/xwiki/bin/view/Main/"));
 
-            atLeast(2).of(mockConfiguration).getRenderer();
-            will(returnValue("snuggletex"));
+                atLeast(2).of(mockConfiguration).getRenderer();
+                will(returnValue("snuggletex"));
 
-            atLeast(2).of(mockImageStorage).get(with(any(String.class)));
-            will(returnValue(null));
+                atLeast(2).of(mockImageStorage).get(with(any(String.class)));
+                will(returnValue(null));
 
-            atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
-        }});
+                atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
+            }
+        });
     }
 }

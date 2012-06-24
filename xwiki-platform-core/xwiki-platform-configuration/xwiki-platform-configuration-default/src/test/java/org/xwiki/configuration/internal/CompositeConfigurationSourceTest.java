@@ -48,12 +48,13 @@ public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
 
     private Configuration config2;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
         this.composite = new CompositeConfigurationSource();
-        ConverterManager converterManager = getComponentManager().lookup(ConverterManager.class);
+        ConverterManager converterManager = getComponentManager().getInstance(ConverterManager.class);
 
         CommonsConfigurationSource source1 = new CommonsConfigurationSource();
         ReflectionUtils.setFieldValue(source1, "converterManager", converterManager);

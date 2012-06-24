@@ -20,7 +20,7 @@
 package com.xpn.xwiki.store;
 
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface XWikiVersioningStoreInterface
 {
     void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context)

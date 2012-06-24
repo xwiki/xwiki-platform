@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
@@ -257,8 +258,7 @@ public class Utils
      */
     public static String getRedirect(String action, String queryString, String... redirectParameters)
     {
-        XWikiContext context =
-            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+        XWikiContext context = getContext();
         XWikiRequest request = context.getRequest();
         String redirect = null;
         for (String p : redirectParameters) {
@@ -267,9 +267,11 @@ public class Utils
                 break;
             }
         }
+
         if (StringUtils.isEmpty(redirect)) {
             redirect = context.getDoc().getURL(action, queryString, true, context);
         }
+
         return redirect;
     }
 
@@ -621,7 +623,9 @@ public class Utils
 
     /**
      * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
+    @Deprecated
     public static ComponentManager getComponentManager()
     {
         return componentManager;
@@ -635,23 +639,12 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
+     * @deprecated since 4.0M1 use {@link #getComponent(Type, String)} instead
      */
+    @Deprecated
     public static <T> T getComponent(Class<T> role, String hint)
     {
-        T component = null;
-        if (componentManager != null) {
-            try {
-                component = componentManager.lookup(role, hint);
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to load component [" + role.getName() + "] for hint [" + hint + "]",
-                    e);
-            }
-        } else {
-            throw new RuntimeException("Component manager has not been initialized before lookup for ["
-                + role.getName() + "] for hint [" + hint + "]");
-        }
-
-        return component;
+        return getComponent((Type) role, hint);
     }
 
     /**
@@ -661,10 +654,57 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
+     * @deprecated since 4.0M1 use {@link #getComponent(Type)} instead
      */
+    @Deprecated
     public static <T> T getComponent(Class<T> role)
     {
-        return getComponent(role, "default");
+        return getComponent((Type) role);
+    }
+
+    /**
+     * Lookup a XWiki component by role and hint.
+     * 
+     * @param roleType the class (aka role) that the component implements
+     * @param roleHint a value to differentiate different component implementations for the same role
+     * @return the component's instance
+     * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
+     *             initialized
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     */
+    @Deprecated
+    public static <T> T getComponent(Type roleType, String roleHint)
+    {
+        T component;
+
+        if (componentManager != null) {
+            try {
+                component = componentManager.getInstance(roleType, roleHint);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to load component for type [" + roleType + "] for hint [" + roleHint
+                    + "]", e);
+            }
+        } else {
+            throw new RuntimeException("Component manager has not been initialized before lookup for [" + roleType
+                + "] for hint [" + roleHint + "]");
+        }
+
+        return component;
+    }
+
+    /**
+     * Lookup a XWiki component by role (uses the default hint).
+     * 
+     * @param roleType the class (aka role) that the component implements
+     * @return the component's instance
+     * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
+     *             initialized
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     */
+    @Deprecated
+    public static <T> T getComponent(Type roleType)
+    {
+        return getComponent(roleType, "default");
     }
 
     /**
@@ -674,13 +714,15 @@ public class Utils
      * @throws RuntimeException if some of the components cannot be found/initialized, or if the component manager is
      *             not initialized
      * @since 2.0M3
+     * @deprecated since 4.0M1 use {@link #getComponentManager()} instead
      */
+    @Deprecated
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
         if (componentManager != null) {
             try {
-                components = componentManager.lookupList(role);
+                components = componentManager.getInstanceList(role);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load components with role [" + role.getName() + "]", e);
             }

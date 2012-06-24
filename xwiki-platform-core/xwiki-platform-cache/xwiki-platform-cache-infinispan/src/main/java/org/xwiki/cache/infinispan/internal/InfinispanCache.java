@@ -82,7 +82,11 @@ public class InfinispanCache<T> extends AbstractCache<T>
     @Override
     public void set(String key, T obj)
     {
-        this.cache.put(key, obj);
+        if (obj != null) {
+            this.cache.put(key, obj);
+        } else {
+            this.cache.remove(key);
+        }
     }
 
     @Override

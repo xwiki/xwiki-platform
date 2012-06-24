@@ -27,31 +27,37 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+    <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.jvnet.hudson</groupId>
+      <artifactId>org.suigeneris.jrcs.diff</artifactId>
+      <version>0.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson</groupId>
+      <artifactId>org.suigeneris.jrcs.rcs</artifactId>
+      <version>0.4.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-diff-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
-
-    <!-- The JRCS JARS are are in our repo till we get them published on the central repository.
-         JRCS home page: http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->
-    <dependency>
-      <groupId>org.suigeneris</groupId>
-      <artifactId>jrcs.diff</artifactId>
-      <version>0.4.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.suigeneris</groupId>
-      <artifactId>jrcs.rcs</artifactId>
-      <version>0.4.2</version>
-    </dependency>
 
     <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
          license allows it -->
@@ -164,12 +170,16 @@
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
     
     <!-- For extracting metadata from various document types -->
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>0.9</version>
+      <version>1.1</version>
     </dependency>
 
     <!-- XML processing -->
@@ -236,6 +246,18 @@
       <artifactId>javassist</artifactId>
       <version>3.9.0.GA</version>
     </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>2.0.3</version>
+    </dependency>
+
+    <!-- UnexpectedException -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Authentication -->
     <dependency>
@@ -248,7 +270,6 @@
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
@@ -280,9 +301,9 @@
 
     <!-- JSON -->
     <dependency>
+      <!-- Used by packaging plugin -->
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
-      <version>2.3</version>
       <classifier>jdk15</classifier>
     </dependency>
 
@@ -628,11 +649,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- XWiki syntax parsers -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
@@ -707,7 +728,6 @@
               **/api/Document.java,
               **/api/DocumentSection.java,
               **/api/Object.java,
-              **/api/Util.java,
               **/api/XWiki.java,
               **/atom/lifeblog/LifeblogServices.java,
               **/atom/lifeblog/UserBlog.java,
@@ -818,11 +838,8 @@
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
               **/pdf/impl/PdfExportImpl.java,
-              **/plugin/autotag/AutoTagPluginAPI.java,
-              **/plugin/autotag/AutoTagPlugin.java,
+              **/plugin/image/ImagePlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
-              **/plugin/autotag/TagCloud.java,
-              **/plugin/autotag/Tag.java,
               **/plugin/charts/actions/ChartingAction.java,
               **/plugin/charts/actions/ChartWizardAction.java,
               **/plugin/charts/actions/CreateChartAction.java,
@@ -1022,6 +1039,7 @@
               **/store/migration/hibernate/R4359XWIKI1459DataMigration.java,
               **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
               **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
+              **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
               **/store/XWikiAttachmentStoreInterface.java,
               **/store/XWikiBatcherFactory.java,
               **/store/XWikiBatcher.java,
@@ -1086,10 +1104,6 @@
               **/web/InlineAction.java,
               **/web/LifeBlogAction.java,
               **/web/LockAction.java,
-              **/web/LoginAction.java,
-              **/web/LoginErrorAction.java,
-              **/web/LoginSubmitAction.java,
-              **/web/LogoutAction.java,
               **/web/ObjectAddAction.java,
               **/web/ObjectAddForm.java,
               **/web/ObjectRemoveAction.java,
@@ -1148,6 +1162,17 @@
           </excludes>
         </configuration>
       </plugin>
+      <!-- Since oldcore doesn't follow the "internal" package rule (for legacy reasons) we only run CLIRR on "api"
+           packages -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/api/**</include>
+          </includes>
+        </configuration>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -1183,26 +1208,6 @@
     </pluginManagement>
   </build>
   <profiles>
-    <profile>
-      <!-- See platform/core/pom.xml -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/api/**</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for
            debugging XWiki, especially in the case when you cannot debug the application (for

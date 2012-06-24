@@ -59,14 +59,12 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
      */
     private XDOMOfficeDocumentBuilder xdomOfficeDocumentBuilder;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        this.xdomOfficeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
+        this.xdomOfficeDocumentBuilder = getComponentManager().getInstance(XDOMOfficeDocumentBuilder.class);
     }
 
     /**

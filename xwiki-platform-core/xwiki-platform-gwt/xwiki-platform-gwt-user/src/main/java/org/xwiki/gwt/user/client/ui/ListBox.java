@@ -20,6 +20,7 @@
 package org.xwiki.gwt.user.client.ui;
 
 import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.user.client.KeyboardAdaptor;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,7 +53,7 @@ import com.google.gwt.user.client.ui.Focusable;
  * @version $Id$
  */
 public class ListBox<T> extends Composite implements HasSelectionHandlers<ListItem<T>>, HasDoubleClickHandlers,
-    HasAllKeyHandlers, ClickHandler, KeyDownHandler, KeyPressHandler, KeyUpHandler, Focusable
+    HasAllKeyHandlers, ClickHandler, Focusable
 {
     /**
      * The list of items from which we can choose one.
@@ -60,18 +61,20 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
     private final FlowPanel list = new FlowPanel();
 
     /**
+     * The object used to handle keyboard events.
+     */
+    private final KeyboardAdaptor keyboardAdaptor = new KeyboardAdaptor()
+    {
+        protected void handleRepeatableKey(Event event)
+        {
+            updateSelectedItem(event);
+        }
+    };
+
+    /**
      * The currently selected item; {@code null} if no item is selected.
      */
     private ListItem<T> selectedItem;
-
-    /**
-     * Flag used to avoid updating the selected item on both KeyDown and KeyPress events. This flag is needed because of
-     * the inconsistencies between browsers regarding keyboard events. For instance IE doesn't generate the KeyPress
-     * event for navigation (arrow) keys and generates multiple KeyDown events while a key is hold down. On the
-     * contrary, FF generates the KeyPress event for navigation (arrow) keys and generates just one KeyDown event while
-     * a key is hold down. FF generates multiple KeyPress events when a key is hold down.
-     */
-    private boolean ignoreNextKeyPress;
 
     /**
      * Creates a new list box.
@@ -80,9 +83,9 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
     {
         FocusPanel panel = new FocusPanel(list);
         panel.addClickHandler(this);
-        panel.addKeyDownHandler(this);
-        panel.addKeyPressHandler(this);
-        panel.addKeyUpHandler(this);
+        panel.addKeyDownHandler(keyboardAdaptor);
+        panel.addKeyPressHandler(keyboardAdaptor);
+        panel.addKeyUpHandler(keyboardAdaptor);
 
         initWidget(panel);
         setStylePrimaryName("xListBox");
@@ -143,51 +146,31 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         setSelectedItem(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
-     */
+    @Override
     public HandlerRegistration addSelectionHandler(SelectionHandler<ListItem<T>> handler)
     {
         return addHandler(handler, SelectionEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasDoubleClickHandlers#addDoubleClickHandler(DoubleClickHandler)
-     */
+    @Override
     public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler)
     {
         return addDomHandler(handler, DoubleClickEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasAllKeyHandlers#addKeyDownHandler(KeyDownHandler)
-     */
+    @Override
     public HandlerRegistration addKeyDownHandler(KeyDownHandler handler)
     {
         return addDomHandler(handler, KeyDownEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasAllKeyHandlers#addKeyPressHandler(KeyPressHandler)
-     */
+    @Override
     public HandlerRegistration addKeyPressHandler(KeyPressHandler handler)
     {
         return addDomHandler(handler, KeyPressEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasAllKeyHandlers#addKeyUpHandler(KeyUpHandler)
-     */
+    @Override
     public HandlerRegistration addKeyUpHandler(KeyUpHandler handler)
     {
         return addDomHandler(handler, KeyUpEvent.getType());
@@ -221,11 +204,7 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == getWidget()) {
@@ -249,44 +228,6 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
             }
         }
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
-    public void onKeyDown(KeyDownEvent event)
-    {
-        if (event.getSource() == getWidget()) {
-            ignoreNextKeyPress = true;
-            updateSelectedItem((Event) event.getNativeEvent());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
-    public void onKeyPress(KeyPressEvent event)
-    {
-        if (event.getSource() == getWidget()) {
-            if (!ignoreNextKeyPress) {
-                updateSelectedItem((Event) event.getNativeEvent());
-            }
-            ignoreNextKeyPress = false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
-    public void onKeyUp(KeyUpEvent event)
-    {
-        ignoreNextKeyPress = false;
     }
 
     /**
@@ -379,33 +320,25 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         return list.getWidgetCount();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getTabIndex()
     {
         return ((Focusable) getWidget()).getTabIndex();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setTabIndex(int index)
     {
         ((Focusable) getWidget()).setTabIndex(index);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setFocus(boolean focused)
     {
         ((Focusable) getWidget()).setFocus(focused);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setAccessKey(char key)
     {
         ((Focusable) getWidget()).setAccessKey(key);

@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Main</web>
-<name>WebSearch</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252450800000</creationDate>
-<date>1274890282000</date>
-<contentUpdateDate>1274890282000</contentUpdateDate>
-<version>1.1</version>
-<title>#if("$!{request.text}"=="")$msg.get("search.page.database.title.noquery")#else$msg.get("search.page.database.title.query", [$request.text])#end</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity output="false"}}
+  <web>Main</web>
+  <name>WebSearch</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252450800000</creationDate>
+  <date>1274890282000</date>
+  <contentUpdateDate>1274890282000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if("$!{request.text}"=="")$msg.get("search.page.database.title.noquery")#else$msg.get("search.page.database.title.query", [$request.text])#end</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
 ## This is a retro-compatibility page
 ## You should use DatabaseSearch page now
 {{/velocity}}
 
-{{include document="DatabaseSearch" /}}</content></xwikidoc>
+{{include document="DatabaseSearch" /}}</content>
+</xwikidoc>

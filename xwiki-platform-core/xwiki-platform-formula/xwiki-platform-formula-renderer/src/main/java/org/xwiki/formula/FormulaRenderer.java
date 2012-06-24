@@ -21,7 +21,7 @@ package org.xwiki.formula;
 
 import java.io.IOException;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Convert a LaTeX formula into an image.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M3
  */
-@ComponentRole
+@Role
 public interface FormulaRenderer
 {
     /**

@@ -19,13 +19,17 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
 
 /**
  * Stores all information needed for execute a query.
@@ -35,6 +39,16 @@ import org.xwiki.query.QueryExecutor;
  */
 public class DefaultQuery implements Query
 {
+    /**
+     * Used to log possible warnings.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultQuery.class);
+
+    /**
+     * field for {@link #isNamed()}.
+     */
+    protected boolean isNamed;
+
     /**
      * field for {@link Query#getStatement()}.
      */
@@ -71,9 +85,9 @@ public class DefaultQuery implements Query
     private int offset;
 
     /**
-     * field for {@link #isNamed()}.
+     * field for {@link #getFilters()}.
      */
-    private boolean isNamed;
+    private List<QueryFilter> filters = new ArrayList<QueryFilter>();
 
     /**
      * field for {@link #getExecuter()}.
@@ -98,7 +112,7 @@ public class DefaultQuery implements Query
     /**
      * Create a named Query.
      *
-     * @param queryName name of the query.
+     * @param queryName the name of the query.
      * @param executor QueryExecutor component for execute the query.
      */
     public DefaultQuery(String queryName, QueryExecutor executor)
@@ -108,129 +122,127 @@ public class DefaultQuery implements Query
         this.isNamed = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getStatement()
     {
         return statement;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getLanguage()
     {
         return language;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isNamed()
     {
         return isNamed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query setWiki(String wiki)
     {
         this.wiki = wiki;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getWiki()
     {
         return wiki;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query bindValue(String var, Object val)
     {
         namedParameters.put(var, val);
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query bindValue(int index, Object val)
     {
         positionalParameters.put(index, val);
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query bindValues(List<Object> values)
     {
         for (int i = 0; i < values.size(); i++) {
-            bindValue(i + 1, values.get(i));
+            // There's a difference in the way positional parameters are handled:
+            // - HQL (jdbc-like), the index of positional parameters must start at 0
+            // - XWQL (jpql-like), the index of positional parameters must start at 1
+            //
+            // This difference is also hardcoded in HqlQueryExecutor#populateParameters(), a better solution could
+            // be to replace the current DefaultQuery with distinct implementations: XwqlQuery, HqlQuery, NamedQuery.
+            if (Query.HQL.equals(getLanguage())) {
+                bindValue(i, values.get(i));
+            } else {
+                bindValue(i + 1, values.get(i));
+            }
         }
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getLimit()
     {
         return limit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getOffset()
     {
         return offset;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query setLimit(int limit)
     {
         this.limit = limit;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query setOffset(int offset)
     {
         this.offset = offset;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, Object> getNamedParameters()
     {
         return namedParameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<Integer, Object> getPositionalParameters()
     {
         return positionalParameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public List<QueryFilter> getFilters()
+    {
+        return filters;
+    }
+
+    @Override
+    public Query addFilter(QueryFilter filter)
+    {
+        if (!filters.contains(filter)) {
+            this.filters.add(filter);
+        } else {
+            LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter.toString(), this.getStatement());
+        }
+
+        return this;
+    }
+
+    @Override
     public <T> List<T> execute() throws QueryException
     {
         return getExecuter().execute(this);

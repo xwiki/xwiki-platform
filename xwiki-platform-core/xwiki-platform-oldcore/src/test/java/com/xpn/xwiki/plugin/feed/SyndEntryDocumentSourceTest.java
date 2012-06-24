@@ -75,6 +75,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
 
     protected XWikiDocument doc;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -132,10 +133,12 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
 
         final XWiki xwiki = new XWiki(new XWikiConfig(), context)
         {
+            @Override
             protected void registerWikiMacros()
             {
             }
 
+            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
@@ -149,6 +152,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -162,6 +166,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -186,6 +191,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         mockXWikiRightsService.stubs().method("hasAccessLevel").will(
             new CustomStub("Implements XWikiRightService.hasAccessLevel")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     // String right = (String) invocation.parameterValues.get(0);
@@ -203,7 +209,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         XWikiDocument doc = getContext().getWiki().getDocument(ARTICLE_CLASS_NAME, getContext());
         boolean needsUpdate = doc.isNew();
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(ARTICLE_CLASS_NAME);
 
         needsUpdate |= bclass.addTextField("title", "Title", 64);

@@ -39,11 +39,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
      */
     private Executable executable;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

@@ -1,56 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Panels</web>
-<name>PanelSheet</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Panels.PanelClass</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1157353355000</creationDate>
-<date>1277305869000</date>
-<contentUpdateDate>1277305869000</contentUpdateDate>
-<version>1.1</version>
-<title>Panel Sheet</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>true</hidden>
-<object>
-<class>
-<name>XWiki.EditModeClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultEditMode>
-<disabled>0</disabled>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
-</class>
-<name>Panels.PanelSheet</name>
-<number>0</number>
-<className>XWiki.EditModeClass</className>
-<guid>72b48dfa-090a-4b17-8859-73de9e1e050c</guid>
-<property>
-<defaultEditMode>inline</defaultEditMode>
-</property>
-</object>
-<content>{{velocity output="false"}}
+  <web>Panels</web>
+  <name>PanelSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.PanelClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1157353355000</creationDate>
+  <date>1277305869000</date>
+  <contentUpdateDate>1277305869000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Panel Sheet</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.EditModeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultEditMode>
+        <disabled>0</disabled>
+        <name>defaultEditMode</name>
+        <number>1</number>
+        <prettyName>Default Edit Mode</prettyName>
+        <size>15</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultEditMode>
+    </class>
+    <name>Panels.PanelSheet</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>72b48dfa-090a-4b17-8859-73de9e1e050c</guid>
+    <property>
+      <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <content>{{velocity output="false"}}
 #macro(displayPanelProperty $obj $propName)
   ; #if ($xcontext.action == 'inline')
     {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$msg.get("${class.getName()}_${propName}")&lt;/label&gt;{{/html}}
@@ -73,4 +74,5 @@
   #displayPanelProperty($obj 'description')
   #displayPanelProperty($obj 'content')
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Session;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
+import org.xwiki.query.QueryFilter;
 
 /**
  * QueryExecutor implementation for Hibernate Store.
@@ -71,6 +73,12 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private Execution execution;
 
+    /**
+     * The bridge to the old XWiki core API, used to access user preferences.
+     */
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -88,11 +96,22 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             return getStore().executeRead(getContext(), true, new HibernateCallback<List<T>>()
             {
                 @SuppressWarnings("unchecked")
+                @Override
                 public List<T> doInHibernate(Session session)
                 {
                     org.hibernate.Query hquery = createHibernateQuery(session, query);
                     populateParameters(hquery, query);
-                    return hquery.list();
+
+                    if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+                        List results = hquery.list();
+                        for (QueryFilter filter : query.getFilters()) {
+                            results = filter.filterResults(results);
+                        }
+
+                        return (List<T>) results;
+                    } else {
+                        return hquery.list();
+                    }
                 }
             });
         } catch (XWikiException e) {
@@ -103,14 +122,63 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     }
 
     /**
+     * Append the required select clause to HQL short query statements. Short statements are the only way for users
+     * without programming rights to perform queries. Such statements can be for example:
+     * <ul>
+     *     <li><code>, BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.MyClass'</code></li>
+     *     <li><code>where doc.creationDate > '2008-01-01'</code></li>
+     * </ul>
+     *
+     * @param statement the statement to complete if required.
+     * @return the complete statement if it had to be completed, the original one otherwise.
+     */
+    protected String completeShortFormStatement(String statement)
+    {
+        String lcStatement = statement.toLowerCase().trim();
+        if (lcStatement.startsWith("where") || lcStatement.startsWith(",") || lcStatement.startsWith("order")) {
+            return "select doc.fullName from XWikiDocument doc " + statement.trim();
+        }
+
+        return statement;
+    }
+
+    /**
      * @param session hibernate session
      * @param query Query object
      * @return hibernate query
      */
     protected org.hibernate.Query createHibernateQuery(Session session, Query query)
     {
-        return query.isNamed() ? session.getNamedQuery(query.getStatement()) : session
-            .createQuery(query.getStatement());
+        org.hibernate.Query hquery;
+        String statement = query.getStatement();
+
+        if (!query.isNamed()) {
+            // handle short queries
+            statement = completeShortFormStatement(statement);
+
+            // Handle query filters
+            if (query.getFilters() != null) {
+                for (QueryFilter filter : query.getFilters()) {
+                    statement = filter.filterStatement(statement, Query.HQL);
+                }
+            }
+            hquery = session.createQuery(statement);
+        } else {
+            hquery = session.getNamedQuery(query.getStatement());
+            if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+                // Since we can't modify the hibernate query statement at this point we need to create a new one to
+                // apply the query filter. This comes with a performance cost, we could fix it by handling named queries
+                // ourselves and not delegate them to hibernate. This way we would always get a statement that we can
+                // transform before the execution.
+                statement = hquery.getQueryString();
+                for (QueryFilter filter : query.getFilters()) {
+                    statement = filter.filterStatement(statement, Query.HQL);
+                }
+                hquery = session.createQuery(statement);
+            }
+        }
+
+        return hquery;
     }
 
     /**

@@ -10,7 +10,22 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
   #set($redirect = "${doc.getURL()}#Attachments")
 #end
 #set($showactions = 0)
-#set($attachments = $doc.attachmentList)
+### Determine attachment sorting
+#set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
+#set ($validAttachmentProperties = ['filename', 'date', 'filesize', 'author', 'version', 'mimeType'])
+#if($sortAttachmentsBy == '' || $validAttachmentProperties.indexOf($sortAttachmentsBy) == -1)
+  ### Default to sorting by filename, sort not requested.
+  #set($sortAttachmentsBy = "filename")
+#end
+### Set attachment sorting direction
+#if($sortAttachmentsBy == 'date')
+  ### Sort the date descending
+  #set($sortAttachmentsBy = "date:desc")
+#else
+  ### Sort everthing else ascending
+  #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
+#end
+#set($attachments = $sorttool.sort($doc.attachmentList, "$sortAttachmentsBy"))
 <div id="attachmentscontent" class="xwikiintracontent">
 <div id="attw">
 <div id="_attachments">
@@ -23,7 +38,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     <span class="xwikibuttonlinks">
     #if($hasEdit || $hasAdmin)
       ## Delete attachment link
-      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.deleteTitle', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
+      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.delete.title', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
       ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
       ## the browser supports Dav Edit 
       #set($documentUrl=$doc.getExternalURL("download"))

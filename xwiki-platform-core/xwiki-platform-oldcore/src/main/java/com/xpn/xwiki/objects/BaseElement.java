@@ -28,7 +28,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -62,8 +63,13 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+    protected EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
+
+    /**
+     * Used to build uid string for the getId() hash.
+     */
+    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
     @Override
     public R getReference()
@@ -76,7 +82,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @since 3.2M1.2M1
+     * @since 3.2M1
      */
     protected R createReference()
     {
@@ -145,6 +151,58 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void setPrettyName(String name)
     {
         this.prettyName = name;
+    }
+
+    /**
+     * @return return the LocalUidStringEntityReferenceSerializer to compute ids.
+     * @since 4.0M1
+     */
+    protected EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer()
+    {
+        if (this.localUidStringEntityReferenceSerializer == null) {
+            this.localUidStringEntityReferenceSerializer =
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
+        }
+
+        return this.localUidStringEntityReferenceSerializer;
+    }
+
+    /**
+     * @return a unique identifier representing this element reference to be used for {@code hashCode()}.
+     * @since 4.0M1
+     */
+    protected String getLocalKey()
+    {
+        // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly synced.
+        return getLocalUidStringEntityReferenceSerializer().serialize(getReference());
+    }
+
+    /**
+     * Return an truncated MD5 hash of the local key computed in {@link #getLocalKey()}.
+     * 
+     * @return the identifier used by hibernate for storage.
+     * @since 4.0M1
+     */
+    public long getId()
+    {
+        // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly synced.
+        return Util.getHash(getLocalKey());
+    }
+
+    /**
+     * Dummy function, do hibernate is always happy.
+     * 
+     * @param id the identifier assigned by hibernate.
+     * @since 4.0M1
+     */
+    public void setId(long id)
+    {
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return (int) Util.getHash(getLocalKey());
     }
 
     @Override
@@ -216,7 +274,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(MergeUtils.mergeString(((BaseElement) previousElement).getPrettyName(),
+        setPrettyName(MergeUtils.mergeCharacters(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
     }
 }

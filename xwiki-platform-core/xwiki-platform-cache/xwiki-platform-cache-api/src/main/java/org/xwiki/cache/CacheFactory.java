@@ -20,7 +20,7 @@
 package org.xwiki.cache;
 
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * This interface is implemented by a XWiki cache component implementation to provide cache creation. It's the entry
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface CacheFactory
 {
     /**

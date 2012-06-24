@@ -37,7 +37,6 @@ import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.FilterableEvent;
-import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.test.AbstractComponentTestCase;
 
 @Deprecated
@@ -47,10 +46,11 @@ public class LegacyEventDispatcherTest extends AbstractComponentTestCase
 
     private ObservationManager om;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
-        this.om = getComponentManager().lookup(ObservationManager.class);
+        this.om = getComponentManager().getInstance(ObservationManager.class);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class LegacyEventDispatcherTest extends AbstractComponentTestCase
         // The notification is synchronous, so the following assertion will only be tested
         // once all matching event listeners have been notified.
         Assert.assertNotNull("Should have been notified by legacy event dispatcher", this.receivedEvent);
-        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((EventFilter)((FilterableEvent)this.receivedEvent).getEventFilter()).getFilter());
+        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((FilterableEvent)this.receivedEvent).getEventFilter().getFilter());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class LegacyEventDispatcherTest extends AbstractComponentTestCase
         // The notification is synchronous, so the following assertion will only be tested
         // once all matching event listeners have been notified.
         Assert.assertNotNull("Should have been notified by legacy event dispatcher", this.receivedEvent);
-        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((EventFilter)((FilterableEvent)this.receivedEvent).getEventFilter()).getFilter());
+        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((FilterableEvent)this.receivedEvent).getEventFilter().getFilter());
     }
 
     @Test
@@ -86,23 +86,26 @@ public class LegacyEventDispatcherTest extends AbstractComponentTestCase
         // The notification is synchronous, so the following assertion will only be tested
         // once all matching event listeners have been notified.
         Assert.assertNotNull("Should have been notified by legacy event dispatcher", this.receivedEvent);
-        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((EventFilter)((FilterableEvent)this.receivedEvent).getEventFilter()).getFilter());
+        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((FilterableEvent)this.receivedEvent).getEventFilter().getFilter());
     }
 
     private void registerListenerWithLegacyEvent(final Event event)
     {
         this.om.addListener(new EventListener()
         {
+            @Override
             public String getName()
             {
                 return "testLegacyEventDispatchEventListener";
             }
 
+            @Override
             public List<Event> getEvents()
             {
                 return Collections.<Event> singletonList(event);
             }
 
+            @Override
             public void onEvent(Event event, Object source, Object data)
             {
                 receivedEvent = event;

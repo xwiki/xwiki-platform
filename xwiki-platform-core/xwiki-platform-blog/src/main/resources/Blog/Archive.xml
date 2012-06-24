@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Blog</web>
-<name>Archive</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1229907788000</creationDate>
-<date>1303397326000</date>
-<contentUpdateDate>1303397326000</contentUpdateDate>
-<version>1.1</version>
-<title>Blog Archive</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{include document="Blog.BlogCode"/}}
+  <web>Blog</web>
+  <name>Archive</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1229907788000</creationDate>
+  <date>1303397326000</date>
+  <contentUpdateDate>1303397326000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Blog Archive</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Blog.BlogCode"/}}
 
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
@@ -44,13 +45,13 @@
     #set($discard = $xwiki.getDocument($firstEntry))
     #getEntryObject($discard $entryObj)
     #getEntryDate($discard $entryObj $firstYear)
-    #set($firstYear = $util.parseInt($xwiki.formatDate($firstYear, 'yyyy')))
+    #set($firstYear = $mathtool.toInteger($xwiki.formatDate($firstYear, 'yyyy')))
   #end
   #foreach($lastEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value) desc", 1, 0, $queryParams))
     #set($discard = $xwiki.getDocument($lastEntry))
     #getEntryObject($discard $entryObj)
     #getEntryDate($discard $entryObj $lastYear)
-    #set($lastYear = $util.parseInt($xwiki.formatDate($lastYear, 'yyyy')))
+    #set($lastYear = $mathtool.toInteger($xwiki.formatDate($lastYear, 'yyyy')))
   #end
   #if("$!{firstYear}" != '') ## At least one entry exists
     #foreach($year in [$firstYear..$lastYear])
@@ -108,8 +109,8 @@
 #macro(displayBlogMonthArchive $blogDoc $year $month)
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM yyyy'))
   #set($tempDate = $xwiki.jodatime.mutableDateTime)
-  $tempDate.setYear($util.parseInt($year))##
-  $tempDate.setMonthOfYear($util.parseInt($month))##
+  $tempDate.setYear($mathtool.toInteger($year))##
+  $tempDate.setMonthOfYear($mathtool.toInteger($month))##
 = $msg.get('xe.blog.archive.postsfor') $dateFormatter.print($tempDate) =
   #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = ? or doc.parent = ?)")
@@ -133,13 +134,13 @@
   #set($space = 'Blog')
 #end
 #getBlogDocument($space $blogDoc)
-#set ($month = "$!{util.parseInt($request.month)}")
-#set ($year = "$!{util.parseInt($request.year)}")
-#if ($year == '0')
+#set ($month = "$!{mathtool.toInteger($request.month)}")
+#set ($year = "$!{mathtool.toInteger($request.year)}")
+#if ($year == '')
   ## Show a brief history of the blog, a tree with first level = years, second level = months, and the number of entries from that year/month in every node.
   #displayBlogFullArchive($blogDoc)
 #else
-  #if ($month == '0')
+  #if ($month == '')
     ## Show an index of all posts in this year (titles only), with month names as subtitles
     #displayBlogYearArchive($blogDoc $year)
   #else
@@ -148,4 +149,5 @@
   #end
 #end
 {{/html}}
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

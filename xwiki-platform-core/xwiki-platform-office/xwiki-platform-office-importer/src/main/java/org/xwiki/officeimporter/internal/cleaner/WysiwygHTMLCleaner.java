@@ -46,39 +46,39 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 public class WysiwygHTMLCleaner implements HTMLCleaner
 {
     /**
-     * Default html cleaner component used internally. 
+     * Default html cleaner component used internally.
      */
     @Inject
     private HTMLCleaner defaultHtmlCleaner;
-    
+
     /**
      * {@link HTMLFilter} for stripping various tags.
      */
     @Inject
     @Named("officeimporter/stripper")
     private HTMLFilter stripperFilter;
-    
+
     /**
      * {@link HTMLFilter} filtering styles.
      */
     @Inject
     @Named("officeimporter/style")
     private HTMLFilter styleFilter;
-    
+
     /**
      * {@link HTMLFilter} for stripping redundant tags.
      */
     @Inject
     @Named("officeimporter/redundancy")
     private HTMLFilter redundancyFilter;
-    
+
     /**
      * {@link HTMLFilter} for cleaning empty paragraphs.
      */
     @Inject
     @Named("officeimporter/paragraph")
     private HTMLFilter paragraphFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering image tags.
      */
@@ -92,7 +92,7 @@ public class WysiwygHTMLCleaner implements HTMLCleaner
     @Inject
     @Named("officeimporter/list")
     private HTMLFilter listFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering tables.
      */
@@ -100,31 +100,19 @@ public class WysiwygHTMLCleaner implements HTMLCleaner
     @Named("officeimporter/table")
     private HTMLFilter tableFilter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent)
     {
         return clean(originalHtmlContent, getDefaultConfiguration());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader, HTMLCleanerConfiguration)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
         return this.defaultHtmlCleaner.clean(originalHtmlContent, configuration);
     }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#getDefaultConfiguration()
-     */
+
+    @Override
     public HTMLCleanerConfiguration getDefaultConfiguration()
     {
         HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();
@@ -132,15 +120,15 @@ public class WysiwygHTMLCleaner implements HTMLCleaner
         // Add OO cleaning filters after the default filters
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>(configuration.getFilters());
         filters.addAll(Arrays.asList(
-            this.stripperFilter, 
-            this.styleFilter, 
+            this.stripperFilter,
+            this.styleFilter,
             this.redundancyFilter,
             this.paragraphFilter,
             this.imageFilter,
             this.listFilter,
             this.tableFilter));
         configuration.setFilters(filters);
-        
+
         return configuration;
-    }    
+    }
 }

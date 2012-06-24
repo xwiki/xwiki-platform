@@ -36,6 +36,7 @@ public class TCPROMTest extends AbstractROMTestCase
     
     private Mockery context = new Mockery();
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -44,7 +45,8 @@ public class TCPROMTest extends AbstractROMTestCase
         System.setProperty("jgroups.bind_addr", "localhost");
 
         getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp"));
-        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp");
+        RemoteObservationManager rom = getComponentManager2().getInstance(RemoteObservationManager.class);
+        rom.startChannel("tcp");
     }
 
     @After

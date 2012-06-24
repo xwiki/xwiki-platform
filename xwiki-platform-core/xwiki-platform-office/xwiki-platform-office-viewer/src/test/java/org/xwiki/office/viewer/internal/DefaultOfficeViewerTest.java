@@ -59,12 +59,12 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
      * An attachment reference to be used in tests.
      */
     private static final AttachmentReference ATTACHMENT_REFERENCE =
-        new AttachmentReference("Test.doc", new DocumentReference("xwiki", "Main", "Test"));
+        new AttachmentReference("Test file.doc", new DocumentReference("xwiki", "Main", "Test"));
 
     /**
      * String attachment reference to be used in tests.
      */
-    private static final String STRING_ATTACHMENT_REFERENCE = "xwiki:Main.Test@Test.doc";
+    private static final String STRING_ATTACHMENT_REFERENCE = "xwiki:Main.Test@Test file.doc";
 
     /**
      * The cache key corresponding to {@link #STRING_ATTACHMENT_REFERENCE} and {@link #DEFAULT_VIEW_PARAMETERS}.
@@ -113,9 +113,9 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     {
         super.setUp();
 
-        documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        entityReferenceSerializer = getComponentManager().lookup(EntityReferenceSerializer.class);
-        officeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
+        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        entityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
+        officeDocumentBuilder = getComponentManager().getInstance(XDOMOfficeDocumentBuilder.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -124,7 +124,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     {
         super.configure();
 
-        final CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
+        final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
         cache = getMockery().mock(Cache.class);
         getMockery().checking(new Expectations()
         {
@@ -305,14 +305,14 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     }
 
     /**
-     * A test case for testing the {@link AbstractOfficeViewer#getTemporaryDirectory(AttachmentReference)} method.
+     * A test case for testing the {@link AbstractOfficeViewer#getTemporaryFile(AttachmentReference, String)} method.
      * 
      * @throws Exception if an error occurs.
      */
     @Test
-    public void testGetTemporaryDirectory() throws Exception
+    public void testGetTemporaryFile() throws Exception
     {
-        final Environment environment = getComponentManager().lookup(Environment.class);
+        final Environment environment = getComponentManager().getInstance(Environment.class);
 
         getMockery().checking(new Expectations()
         {
@@ -322,8 +322,9 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        File tempFile = defaultOfficeViewer.getTemporaryDirectory(ATTACHMENT_REFERENCE);
-        Assert.assertTrue(tempFile.getAbsolutePath().endsWith("/temp/officeviewer/xwiki/Main/Test/Test.doc"));
+        File tempFile = defaultOfficeViewer.getTemporaryFile(ATTACHMENT_REFERENCE, "some image.png");
+        Assert.assertTrue(tempFile.getAbsolutePath().endsWith(
+            "/temp/officeviewer/xwiki/Main/Test/Test+file.doc/some+image.png"));
     }
 
     /**
@@ -343,7 +344,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        String url = defaultOfficeViewer.buildURL(ATTACHMENT_REFERENCE, "some_temporary_artifact.gif");
-        Assert.assertEquals("/xwiki/bin/temp/Main/Test/officeviewer/Test.doc/some_temporary_artifact.gif", url);
+        String url = defaultOfficeViewer.buildURL(ATTACHMENT_REFERENCE, "some temporary artifact.gif");
+        Assert.assertEquals("/xwiki/bin/temp/Main/Test/officeviewer/Test+file.doc/some+temporary+artifact.gif", url);
     }
 }

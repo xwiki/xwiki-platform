@@ -44,10 +44,7 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
      */
     private static final int TIMEOUT_MILLISECONDS = 5000;
 
-    /**
-     * {@inheritDoc}
-     * @see RomeFeedFactory#createFeed(org.xwiki.rendering.macro.rss.RssMacroParameters)
-     */
+    @Override
     public SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException
     {
         if (StringUtils.isEmpty(parameters.getFeed())) {

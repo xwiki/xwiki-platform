@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>ExternalLinksJSON</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.ExternalLinks</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1320049413000</creationDate>
-<date>1320310931000</date>
-<contentUpdateDate>1320310931000</contentUpdateDate>
-<version>1.1</version>
-<title>JSON Generation for the External Link States LiveTable</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Copied from xwiki:Main.MyJSON</comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>ExternalLinksJSON</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.ExternalLinks</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1320049413000</creationDate>
+  <date>1320310931000</date>
+  <contentUpdateDate>1320310931000</contentUpdateDate>
+  <version>1.1</version>
+  <title>JSON Generation for the External Link States LiveTable</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 #if("$!{request.xpage}" == 'plain')
   $response.setContentType('application/json')
 #end
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $util.parseInt($request.get('offset')))
+#set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
-#if($offset &lt; 0)
+#if (!$offset || $offset &lt; 0)
   #set($offset = 0)
 #end
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $util.parseInt($request.get('limit')))
+#set($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
 ##====================================
 ## Step1: Transform Map into list, one list item per link/page
 ##====================================
@@ -92,7 +96,7 @@
 "tags" : [],
 "returnedrows":  ${resultList.size()},
 "offset": $mathtool.add($offset, 1),
-"reqNo": $util.parseInt($request.reqNo),
+"reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
 #foreach ($entry in $resultList)
   #if($velocityCount &gt; 1) , #end
@@ -111,4 +115,5 @@
 ]
 }
 {{/velocity}}
-</content></xwikidoc>
+</content>
+</xwikidoc>

@@ -22,7 +22,7 @@
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
     <dl>
     #if ($hasCustomField)
-      #set ($properties = $util.arrayList)
+      #set ($properties = [])
       #foreach ($propName in $customField.split(','))
         #set ($discard = $properties.add($class.get($propName)))
       #end
@@ -241,8 +241,8 @@
       <a href='$fullEditorURL' class='edit-all' title="$msg.get('core.editors.object.editAllObjects')">$msg.get('core.editors.object.editAllObjects')</a>
     </div>
   #end
-  #set ($redirect = $xwiki.getRequestURL())
-  <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+  #set ($redirect = $xwiki.relativeRequestURL)
+  <form id="update" method="post" action="$doc.getURL("save")" class="withLock">
   <div id="xwikieditcontent" class="clear">
   <div id="document-title"><h1>$msg.get('core.editors.object.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
 
@@ -260,7 +260,7 @@
           #set ($customObject = "${request.nb}")
         #end
       #end
-      #set ($customObject = $util.parseInt($customObject))
+      #set ($customObject = $mathtool.toInteger($customObject))
       #set ($q = "${q}&amp;object=${customObject}")
     #end
     #if ($hasCustomField)

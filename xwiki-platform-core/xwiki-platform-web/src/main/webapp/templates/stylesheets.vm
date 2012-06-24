@@ -18,7 +18,7 @@
 ## style1.css, style2.css and style3.css
 #set ($stylesheets = $xwiki.getSpacePreference('stylesheets'))
 #if ($stylesheets != '')
-  #foreach ($stylesheet in $util.split($stylesheets, ','))
+  #foreach ($stylesheet in $stylesheets.split(','))
     #if (!$stylesheet.equalsIgnoreCase($defaultstyle))
       <link href="$xwiki.getSkinFile($stylesheet, true)" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${velocityCount}" />
     #end

@@ -67,10 +67,12 @@
 #-#
 #-# You can set:
 #-# * an absolute path (recommended)
-#-# * a relative path but in this case the directory will be relative to where the XWiki server is started and thus
-#-#   the user under which XWiki is started will need write permissions for the current directory
+#-# * a relative path (not recommended at all)but in this case the directory will be relative to where the XWiki server
+#-#   is started and thus the user under which XWiki is started will need write permissions for the current directory
 #-#
-#-# If not specified, the Servlet container's temporary directory is used. This is absolutely not recommended and you
+#-# Note if the system property xwiki.data.dir is set then this property is not used.
+#-# If neither the system property nor this configuration value here are set then the Servlet container's temporary
+#-# directory is used; This is absolutely not recommended since that directory could be wiped out at any time and you
 #-# should specify a value.
 #if ($xwikiPropertiesEnvironmentPermanentDirectory)
 environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
@@ -138,6 +140,10 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-------------------------------------------------------------------------------------
+# Rendering Transformations
+#-------------------------------------------------------------------------------------
+
 #-# [Since 2.6RC1]
 #-# Controls what transformations will be executed when rendering content.
 #-# A transformation modifies the parsed content. For example the Icon transformation replaces some characters with
@@ -179,6 +185,23 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Defines the time (in ms) after which an external link should be checked again for validity.
 #-# the default configuration is:
 # rendering.transformation.linkchecker.timeout = 3600000
+
+#-------------------------------------------------------------------------------------
+# Rendering Macros
+#-------------------------------------------------------------------------------------
+
+#-# Velocity Macro
+
+#-# [Since 2.0M1]
+#-# Defines which Velocity Filter to use by default. This offers the possibility to filter the Velocity macro content
+#-# before and after the Velocity Engine execution.
+#-# The following filters are available:
+#-# - indent (the default): Remove all first whites spaces of lines to support source code indentation without
+#-#          generating whitespaces in the resulting XDOM.
+#-# - none: Doesn't change the content
+#-# - html: Removes all leading and trailing white spaces and new lines. If you need a space you'll need to use
+#-#         \$sp and if you need a new line you'll need to use \$nl
+#-# rendering.macro.velocity.filter = indent
 
 #-------------------------------------------------------------------------------------
 # Cache
@@ -261,7 +284,24 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
 #-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.ChainingUberspector
-#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector
+#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+
+#-------------------------------------------------------------------------------------
+# Groovy
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.1M1]
+#-# Allows to specify Compiler customization for the Groovy execution engine.
+#-# There's no customizers defined by default. Available customizer ids:
+#-# - timedinterrupt: interrupt script execution if it takes longer than a given time (default to 1 minute)
+#-# - secure: runs Groovy in a security sandbox
+#-# groovy.compilationCustomizers=<list of customizer ids here>
+
+#-# Timed Interrupt Customizer
+
+#-# [Since 4.1M1]
+#-# Default execution time for a script before a timeout occurs, in seconds.
+#-# groovy.customizer.timedInterrupt.timeout=60
 
 #-------------------------------------------------------------------------------------
 # Events distribution
@@ -406,4 +446,4 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The user agent to use when communication with external services (generally repositories).
 #-# 
 #-# The default is:
-# extension.userAgent=ExtensionMannager
+# extension.userAgent=XWikiExtensionManager

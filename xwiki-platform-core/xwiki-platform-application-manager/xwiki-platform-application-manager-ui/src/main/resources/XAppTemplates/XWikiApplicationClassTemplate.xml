@@ -1,245 +1,247 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XAppTemplates</web>
-<name>XWikiApplicationClassTemplate</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>XAppManager.WebHome</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1192211384000</creationDate>
-<date>1312816354000</date>
-<contentUpdateDate>1312816354000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Imported from XAR</comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XAppClasses.XWikiApplicationClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<appauthors>
-<disabled>0</disabled>
-<name>appauthors</name>
-<number>10</number>
-<prettyName>Authors</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</appauthors>
-<applications>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>applications</name>
-<number>5</number>
-<picker></picker>
-<prettyName>Applications</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>80</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</applications>
-<appname>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>appname</name>
-<number>1</number>
-<prettyName>Application Name</prettyName>
-<size>30</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</appname>
-<appprettyname>
-<disabled>0</disabled>
-<name>appprettyname</name>
-<number>12</number>
-<prettyName>Application Pretty Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</appprettyname>
-<appversion>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>appversion</name>
-<number>3</number>
-<prettyName>Application Version</prettyName>
-<size>30</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</appversion>
-<dependencies>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>dependencies</name>
-<number>4</number>
-<picker></picker>
-<prettyName>Dependencies</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>80</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</dependencies>
-<description>
-<contenttype>FullyRenderedText</contenttype>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>description</name>
-<number>2</number>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<docstoinclude>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>docstoinclude</name>
-<number>7</number>
-<picker></picker>
-<prettyName>Documents to include</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>80</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</docstoinclude>
-<docstolink>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>docstolink</name>
-<number>8</number>
-<picker></picker>
-<prettyName>Documents to link</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>80</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</docstolink>
-<documents>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>documents</name>
-<number>6</number>
-<picker></picker>
-<prettyName>Documents</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>80</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</documents>
-<license>
-<disabled>0</disabled>
-<name>license</name>
-<number>11</number>
-<prettyName>License</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</license>
-<translationdocs>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>translationdocs</name>
-<number>9</number>
-<picker></picker>
-<prettyName>Translations documents</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator>|</separator>
-<separators>|</separators>
-<size>80</size>
-<sort>none</sort>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</translationdocs>
-</class>
-<name>XAppTemplates.XWikiApplicationClassTemplate</name>
-<number>0</number>
-<className>XAppClasses.XWikiApplicationClass</className>
-<guid>351e457c-dc9d-4a4b-9fe2-4be8dbedcf33</guid>
-<property>
-<appversion>1.0</appversion>
-</property>
-</object>
-<content>#includeForm("XAppSheets.XWikiApplicationClassSheet")</content></xwikidoc>
+  <web>XAppTemplates</web>
+  <name>XWikiApplicationClassTemplate</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XAppManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1192211384000</creationDate>
+  <date>1312816354000</date>
+  <contentUpdateDate>1312816354000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XAppClasses.XWikiApplicationClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <appauthors>
+        <disabled>0</disabled>
+        <name>appauthors</name>
+        <number>10</number>
+        <prettyName>Authors</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </appauthors>
+      <applications>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>applications</name>
+        <number>5</number>
+        <picker/>
+        <prettyName>Applications</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>80</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </applications>
+      <appname>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>appname</name>
+        <number>1</number>
+        <prettyName>Application Name</prettyName>
+        <size>30</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </appname>
+      <appprettyname>
+        <disabled>0</disabled>
+        <name>appprettyname</name>
+        <number>12</number>
+        <prettyName>Application Pretty Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </appprettyname>
+      <appversion>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>appversion</name>
+        <number>3</number>
+        <prettyName>Application Version</prettyName>
+        <size>30</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </appversion>
+      <dependencies>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>dependencies</name>
+        <number>4</number>
+        <picker/>
+        <prettyName>Dependencies</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>80</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </dependencies>
+      <description>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <docstoinclude>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>docstoinclude</name>
+        <number>7</number>
+        <picker/>
+        <prettyName>Documents to include</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>80</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </docstoinclude>
+      <docstolink>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>docstolink</name>
+        <number>8</number>
+        <picker/>
+        <prettyName>Documents to link</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>80</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </docstolink>
+      <documents>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>documents</name>
+        <number>6</number>
+        <picker/>
+        <prettyName>Documents</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>80</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </documents>
+      <license>
+        <disabled>0</disabled>
+        <name>license</name>
+        <number>11</number>
+        <prettyName>License</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </license>
+      <translationdocs>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>translationdocs</name>
+        <number>9</number>
+        <picker/>
+        <prettyName>Translations documents</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>80</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </translationdocs>
+    </class>
+    <name>XAppTemplates.XWikiApplicationClassTemplate</name>
+    <number>0</number>
+    <className>XAppClasses.XWikiApplicationClass</className>
+    <guid>351e457c-dc9d-4a4b-9fe2-4be8dbedcf33</guid>
+    <property>
+      <appversion>1.0</appversion>
+    </property>
+  </object>
+  <content>#includeForm("XAppSheets.XWikiApplicationClassSheet")</content>
+</xwikidoc>

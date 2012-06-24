@@ -52,6 +52,17 @@ public class XWikiServletContextListener implements ServletContextListener
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
 
+        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
+        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
+        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
+        // Class that need to lookup then just need to get it from the XWikiContext instance.
+        // This is of course not necessary for XWiki components since they just need to implement
+        // the Composable interface to get access to the Component Manager or better they simply
+        // need to declare their components requirements using the @Inject annotation of the xwiki
+        // component manager together with a private class member, for automatic injection by the CM on init.
+        servletContextEvent.getServletContext().setAttribute(
+            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
+
         // Use a Component Event Manager that stacks Component instance creation events till we tell it to flush them.
         // The reason is that the Observation Manager used to send the events but we need the Application Context to
         // be set up before we start sending events since there can be Observation Listener components that require
@@ -62,7 +73,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // Initialize the Environment
         try {
             ServletEnvironment servletEnvironment =
-                (ServletEnvironment) this.componentManager.lookup(Environment.class);
+                (ServletEnvironment) this.componentManager.getInstance(Environment.class);
             servletEnvironment.setServletContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Servlet Environment", e);
@@ -75,7 +86,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // below in an Event Listener and move it to the legacy module.
         try {
             ServletContainerInitializer containerInitializer =
-                this.componentManager.lookup(ServletContainerInitializer.class);
+                this.componentManager.getInstance(ServletContainerInitializer.class);
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Application Context", e);
@@ -85,8 +96,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // something on startup to do it.
         ObservationManager observationManager;
         try {
-            observationManager = this.componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new ApplicationStartedEvent(), this);
+            observationManager = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to find the Observation Manager component", e);
         }
@@ -96,16 +106,8 @@ public class XWikiServletContextListener implements ServletContextListener
         eventManager.shouldStack(false);
         eventManager.flushEvents();
 
-        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
-        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
-        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
-        // Class that need to lookup then just need to get it from the XWikiContext instance.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to declare their components requirements using the @Inject annotation of the xwiki
-        // component manager together with a private class member, for automatic injection by the CM on init.
-        servletContextEvent.getServletContext().setAttribute(
-            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
+        // Indicate to the various components that XWiki is ready
+        observationManager.notify(new ApplicationStartedEvent(), this);
     }
 
     @Override
@@ -114,7 +116,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // Send an Observation event to signal the XWiki application is stopped. This allows components who need to do
         // something on stop to do it.
         try {
-            ObservationManager observationManager = this.componentManager.lookup(ObservationManager.class);
+            ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
             observationManager.notify(new ApplicationStoppedEvent(), this);
         } catch (ComponentLookupException e) {
             // Nothing to do here.
@@ -127,8 +129,8 @@ public class XWikiServletContextListener implements ServletContextListener
         // below in an Event Listener and move it to the legacy module.
         try {
             ApplicationContextListenerManager applicationContextListenerManager =
-                this.componentManager.lookup(ApplicationContextListenerManager.class);
-            Container container = this.componentManager.lookup(Container.class);
+                this.componentManager.getInstance(ApplicationContextListenerManager.class);
+            Container container = this.componentManager.getInstance(Container.class);
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         } catch (ComponentLookupException ex) {
             // Nothing to do here.

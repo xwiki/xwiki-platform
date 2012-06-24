@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>Migration</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.Management</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1229212898000</creationDate>
-<date>1229214636000</date>
-<contentUpdateDate>1229214636000</contentUpdateDate>
-<version>1.1</version>
-<title>Blog migration</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>true</hidden>
-<content>{{velocity filter="none"}}
+  <web>Blog</web>
+  <name>Migration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.Management</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1229212898000</creationDate>
+  <date>1229214636000</date>
+  <contentUpdateDate>1229214636000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Blog migration</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity filter="none"}}
 #if($request.migrate &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
   #set($newContent = '#includeForm("Blog.BlogPostSheet")')
   #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")

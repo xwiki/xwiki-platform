@@ -21,7 +21,7 @@ package org.xwiki.workspace;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
@@ -30,7 +30,7 @@ import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface WorkspaceManager
 {
     /**

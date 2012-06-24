@@ -62,11 +62,6 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      */
     protected abstract String generateLink(String url, String resourceName, XWikiContext context);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
-     */
     @Override
     public String getLink(String resourceName, XWikiContext context)
     {

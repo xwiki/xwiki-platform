@@ -120,7 +120,7 @@ public class WatchListJobManager
     private boolean initWatchListJobClassProperties(XWikiDocument watchListJobClass, XWikiContext context)
     {
         boolean needsUpdate = false;
-        BaseClass bclass = watchListJobClass.getxWikiClass();
+        BaseClass bclass = watchListJobClass.getXClass();
 
         bclass.setName(WATCHLIST_JOB_CLASS);
         needsUpdate |= bclass.addTextField(WATCHLIST_JOB_EMAIL_PROP, "Email template to use", 30);
@@ -162,6 +162,10 @@ public class WatchListJobManager
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         if (needsUpdate) {
@@ -266,11 +270,10 @@ public class WatchListJobManager
         try {
             doc = context.getWiki().getDocument(docName, context);
 
-            job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
+            job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             if (job == null) {
                 needsUpdate = true;
-                int index = doc.createNewObject(SchedulerPlugin.XWIKI_JOB_CLASS, context);
-                job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, index);
+                job = doc.newXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, context);
                 job.setStringValue("jobName", name);
                 job.setStringValue("jobClass", WatchListJob.class.getName());
                 job.setStringValue("cron", cron);
@@ -283,15 +286,16 @@ public class WatchListJobManager
             needsUpdate |= createWatchListJobObject(doc, emailTemplate, context);
             needsUpdate |= setWatchListCommonDocumentsFields(doc);
 
-            if (StringUtils.isBlank(doc.getTitle())) {
+            if (StringUtils.isBlank(doc.getTitle()) || StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setTitle("$msg.get(\"" + nameResource + "\")");
-            }
-
-            if (StringUtils.isBlank(doc.getContent())) {
-                needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
+            }
+
+            if (!doc.isHidden()) {
+                needsUpdate = true;
+                doc.setHidden(true);
             }
 
             if (needsUpdate) {

@@ -21,36 +21,36 @@
 -->
 
 <xwikidoc>
-<web>AnnotationCode</web>
-<name>AnnotationConfig</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>AnnotationCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1243945864000</creationDate>
-<date>1270567353000</date>
-<contentUpdateDate>1270567353000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('annotations.config.title')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<attachment>
-<filename>AnnotationsSectionIcon.png</filename>
-<filesize>10881</filesize>
-<author>XWiki.Admin</author>
-<date>1284770708000</date>
-<version>1.1</version>
-<comment></comment>
-<content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAqNklE
+  <web>AnnotationCode</web>
+  <name>AnnotationConfig</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1243945864000</creationDate>
+  <date>1270567353000</date>
+  <contentUpdateDate>1270567353000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('annotations.config.title')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>AnnotationsSectionIcon.png</filename>
+    <filesize>10881</filesize>
+    <author>XWiki.Admin</author>
+    <date>1284770708000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAqNklE
 QVR4Xu19WYwkV9XmiYjcKjOrKjNrr973zW63l/YugzH8GGNgsNgk1pcBadD88gNC88IAEiMhoXkC
 HnjgYQQIGCEkPOgHLIzBuzV4p7ttd7vXpbq6a8m1coltvviUNzoiOzKzlrbx4L7y9Y24ceNGVH5n
 u+ecGx1zXVfeW+VaicnbUK6Va6BfK9dAv1Y0TdPbh8FWU8eq/4c//OHw1q1bx2u12huf/vSn6/98
@@ -240,636 +240,637 @@ LIFQva3O28d6AHAJ/QCcn1kNerd/8h/X5ApC6JcsU/PBdwH28t59hWVNRBANOI9PzIiGqv/ucVtb
 P/6P13du/EfqwC4ZvH6LDI/nJPnI3+QNAL7YBs9ZFugNnyFsv82jrhV0FyWgN21FBKoGzoXtFOpM
 mAi6AOFEgLpywKbkn18c0fzWRWUbqA6BxzFa1LNV0c4eEv0vqLyOERldLMkBxjjaWJ/Up5mwRGTd
 i3pYGXCEbfWgK+AVCCAAJ4LqfeAJeBR3v11lRt6FJVICSg9p4NTIUGL5XL6iQsCJ0+qdM/0JgIcr
-E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content></attachment>
-<class>
-<name>AnnotationCode.AnnotationConfig</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<customDisplay></customDisplay>
-<defaultValue>1</defaultValue>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>1</number>
-<prettyName>Annotations are activated</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<annotationClass>
-<cache>0</cache>
-<classname></classname>
-<displayType>input</displayType>
-<idField></idField>
-<multiSelect>0</multiSelect>
-<name>annotationClass</name>
-<number>5</number>
-<picker>1</picker>
-<prettyName>XWiki class defining annotations structure</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators></separators>
-<size>60</size>
-<sort>none</sort>
-<sql>select distinct doc.fullName from XWikiDocument doc</sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</annotationClass>
-<displayHighlight>
-<defaultValue>1</defaultValue>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>displayHighlight</name>
-<number>4</number>
-<prettyName>Display annotations highlight by default</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</displayHighlight>
-<displayed>
-<defaultValue>0</defaultValue>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>displayed</name>
-<number>3</number>
-<prettyName>Display annotations by default</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</displayed>
-<exceptionSpaces>
-<cache>0</cache>
-<classname></classname>
-<displayType>select</displayType>
-<idField></idField>
-<multiSelect>1</multiSelect>
-<name>exceptionSpaces</name>
-<number>2</number>
-<picker>1</picker>
-<prettyName>Except for the following spaces</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> ,</separator>
-<separators> ,</separators>
-<size>6</size>
-<sort>none</sort>
-<sql>select distinct doc.web from XWikiDocument doc</sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</exceptionSpaces>
-</class>
-<object>
-<class>
-<name>AnnotationCode.AnnotationConfig</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<customDisplay></customDisplay>
-<defaultValue>1</defaultValue>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>1</number>
-<prettyName>Annotations are activated</prettyName>
-<tooltip></tooltip>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<annotationClass>
-<cache>0</cache>
-<classname></classname>
-<displayType>input</displayType>
-<idField></idField>
-<multiSelect>0</multiSelect>
-<name>annotationClass</name>
-<number>5</number>
-<picker>1</picker>
-<prettyName>XWiki class defining annotations structure</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators></separators>
-<size>60</size>
-<sort>none</sort>
-<sql>select distinct doc.fullName from XWikiDocument doc</sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</annotationClass>
-<displayHighlight>
-<defaultValue>1</defaultValue>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>displayHighlight</name>
-<number>4</number>
-<prettyName>Display annotations highlight by default</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</displayHighlight>
-<displayed>
-<defaultValue>0</defaultValue>
-<displayFormType>radio</displayFormType>
-<displayType></displayType>
-<name>displayed</name>
-<number>3</number>
-<prettyName>Display annotations by default</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</displayed>
-<exceptionSpaces>
-<cache>0</cache>
-<classname></classname>
-<displayType>select</displayType>
-<idField></idField>
-<multiSelect>1</multiSelect>
-<name>exceptionSpaces</name>
-<number>2</number>
-<picker>1</picker>
-<prettyName>Except for the following spaces</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> ,</separator>
-<separators> ,</separators>
-<size>6</size>
-<sort>none</sort>
-<sql>select distinct doc.web from XWikiDocument doc</sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</exceptionSpaces>
-</class>
-<name>AnnotationCode.AnnotationConfig</name>
-<number>0</number>
-<className>AnnotationCode.AnnotationConfig</className>
-<guid>f5586fd3-262e-4726-805f-b63b40d0b695</guid>
-<property>
-<activated>1</activated>
-</property>
-<property>
-<annotationClass>AnnotationCode.AnnotationClass</annotationClass>
-</property>
-<property>
-<displayHighlight>1</displayHighlight>
-</property>
-<property>
-<displayed>0</displayed>
-</property>
-<property>
-<exceptionSpaces/>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.ConfigurableClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<name>iconAttachment</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<name>AnnotationCode.AnnotationConfig</name>
-<number>0</number>
-<className>XWiki.ConfigurableClass</className>
-<guid>f2fe8d2b-4815-4c51-955d-5cc4a8b89969</guid>
-<property>
-<codeToExecute>$msg.get('annotations.config.activate.explanation')</codeToExecute>
-</property>
-<property>
-<configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
-</property>
-<property>
-<configureGlobally>1</configureGlobally>
-</property>
-<property>
-<displayInSection>Annotations</displayInSection>
-</property>
-<property>
-<heading>$msg.get('annotations.config.activate.title')</heading>
-</property>
-<property>
-<iconAttachment>AnnotationsSectionIcon.png</iconAttachment>
-</property>
-<property>
-<linkPrefix></linkPrefix>
-</property>
-<property>
-<propertiesToShow>
-<value>activated</value>
-<value>exceptionSpaces</value>
-</propertiesToShow>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.ConfigurableClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<name>iconAttachment</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<name>AnnotationCode.AnnotationConfig</name>
-<number>1</number>
-<className>XWiki.ConfigurableClass</className>
-<guid>e4e9617e-ce2d-4621-aa3d-592cb05f9723</guid>
-<property>
-<codeToExecute></codeToExecute>
-</property>
-<property>
-<configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
-</property>
-<property>
-<configureGlobally>1</configureGlobally>
-</property>
-<property>
-<displayInSection>Annotations</displayInSection>
-</property>
-<property>
-<heading>$msg.get('annotations.config.display.title')</heading>
-</property>
-<property>
-<iconAttachment></iconAttachment>
-</property>
-<property>
-<linkPrefix></linkPrefix>
-</property>
-<property>
-<propertiesToShow>
-<value>displayHighlight</value>
-<value>displayed</value>
-</propertiesToShow>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.ConfigurableClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<name>iconAttachment</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<name>AnnotationCode.AnnotationConfig</name>
-<number>2</number>
-<className>XWiki.ConfigurableClass</className>
-<guid>d7373c3c-9aae-45a0-b18b-cb6213741755</guid>
-<property>
-<codeToExecute>$msg.get('annotations.config.type.explanation')</codeToExecute>
-</property>
-<property>
-<configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
-</property>
-<property>
-<configureGlobally>1</configureGlobally>
-</property>
-<property>
-<displayInSection>Annotations</displayInSection>
-</property>
-<property>
-<heading>$msg.get('annotations.config.type.title')</heading>
-</property>
-<property>
-<iconAttachment></iconAttachment>
-</property>
-<property>
-<linkPrefix></linkPrefix>
-</property>
-<property>
-<propertiesToShow>
-<value>annotationClass</value>
-</propertiesToShow>
-</property>
-</object>
-<content>{{include document="AnnotationConfigSheet" /}}</content>
+E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
+  </attachment>
+  <class>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <activated>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>activated</name>
+      <number>1</number>
+      <prettyName>Annotations are activated</prettyName>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </activated>
+    <annotationClass>
+      <cache>0</cache>
+      <classname/>
+      <displayType>input</displayType>
+      <idField/>
+      <multiSelect>0</multiSelect>
+      <name>annotationClass</name>
+      <number>5</number>
+      <picker>1</picker>
+      <prettyName>XWiki class defining annotations structure</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>60</size>
+      <sort>none</sort>
+      <sql>select distinct doc.fullName from XWikiDocument doc</sql>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+    </annotationClass>
+    <displayHighlight>
+      <defaultValue>1</defaultValue>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>displayHighlight</name>
+      <number>4</number>
+      <prettyName>Display annotations highlight by default</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </displayHighlight>
+    <displayed>
+      <defaultValue>0</defaultValue>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>displayed</name>
+      <number>3</number>
+      <prettyName>Display annotations by default</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </displayed>
+    <exceptionSpaces>
+      <cache>0</cache>
+      <classname/>
+      <displayType>select</displayType>
+      <idField/>
+      <multiSelect>1</multiSelect>
+      <name>exceptionSpaces</name>
+      <number>2</number>
+      <picker>1</picker>
+      <prettyName>Except for the following spaces</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> ,</separator>
+      <separators> ,</separators>
+      <size>6</size>
+      <sort>none</sort>
+      <sql>select distinct doc.web from XWikiDocument doc</sql>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+    </exceptionSpaces>
+  </class>
+  <object>
+    <class>
+      <name>AnnotationCode.AnnotationConfig</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue>1</defaultValue>
+        <displayFormType>radio</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>1</number>
+        <prettyName>Annotations are activated</prettyName>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <annotationClass>
+        <cache>0</cache>
+        <classname/>
+        <displayType>input</displayType>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>annotationClass</name>
+        <number>5</number>
+        <picker>1</picker>
+        <prettyName>XWiki class defining annotations structure</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>60</size>
+        <sort>none</sort>
+        <sql>select distinct doc.fullName from XWikiDocument doc</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </annotationClass>
+      <displayHighlight>
+        <defaultValue>1</defaultValue>
+        <displayFormType>radio</displayFormType>
+        <displayType/>
+        <name>displayHighlight</name>
+        <number>4</number>
+        <prettyName>Display annotations highlight by default</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </displayHighlight>
+      <displayed>
+        <defaultValue>0</defaultValue>
+        <displayFormType>radio</displayFormType>
+        <displayType/>
+        <name>displayed</name>
+        <number>3</number>
+        <prettyName>Display annotations by default</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </displayed>
+      <exceptionSpaces>
+        <cache>0</cache>
+        <classname/>
+        <displayType>select</displayType>
+        <idField/>
+        <multiSelect>1</multiSelect>
+        <name>exceptionSpaces</name>
+        <number>2</number>
+        <picker>1</picker>
+        <prettyName>Except for the following spaces</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> ,</separator>
+        <separators> ,</separators>
+        <size>6</size>
+        <sort>none</sort>
+        <sql>select distinct doc.web from XWikiDocument doc</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </exceptionSpaces>
+    </class>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <number>0</number>
+    <className>AnnotationCode.AnnotationConfig</className>
+    <guid>f5586fd3-262e-4726-805f-b63b40d0b695</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <annotationClass>XWiki.XWikiComments</annotationClass>
+    </property>
+    <property>
+      <displayHighlight>1</displayHighlight>
+    </property>
+    <property>
+      <displayed>0</displayed>
+    </property>
+    <property>
+      <exceptionSpaces/>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <codeToExecute>
+        <editor>---</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <defaultValue/>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayInSection>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+    </class>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>f2fe8d2b-4815-4c51-955d-5cc4a8b89969</guid>
+    <property>
+      <codeToExecute>$msg.get('annotations.config.activate.explanation')</codeToExecute>
+    </property>
+    <property>
+      <configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayInSection>Annotations</displayInSection>
+    </property>
+    <property>
+      <heading>$msg.get('annotations.config.activate.title')</heading>
+    </property>
+    <property>
+      <iconAttachment>AnnotationsSectionIcon.png</iconAttachment>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow>
+        <value>activated</value>
+        <value>exceptionSpaces</value>
+      </propertiesToShow>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <codeToExecute>
+        <editor>---</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <defaultValue/>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayInSection>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+    </class>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <number>1</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>e4e9617e-ce2d-4621-aa3d-592cb05f9723</guid>
+    <property>
+      <codeToExecute/>
+    </property>
+    <property>
+      <configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayInSection>Annotations</displayInSection>
+    </property>
+    <property>
+      <heading>$msg.get('annotations.config.display.title')</heading>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow>
+        <value>displayHighlight</value>
+        <value>displayed</value>
+      </propertiesToShow>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <codeToExecute>
+        <editor>---</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <defaultValue/>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayInSection>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+    </class>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <number>2</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>d7373c3c-9aae-45a0-b18b-cb6213741755</guid>
+    <property>
+      <codeToExecute>$msg.get('annotations.config.type.explanation')</codeToExecute>
+    </property>
+    <property>
+      <configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayInSection>Annotations</displayInSection>
+    </property>
+    <property>
+      <heading>$msg.get('annotations.config.type.title')</heading>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow>
+        <value>annotationClass</value>
+      </propertiesToShow>
+    </property>
+  </object>
+  <content>{{include document="AnnotationConfigSheet" /}}</content>
 </xwikidoc>

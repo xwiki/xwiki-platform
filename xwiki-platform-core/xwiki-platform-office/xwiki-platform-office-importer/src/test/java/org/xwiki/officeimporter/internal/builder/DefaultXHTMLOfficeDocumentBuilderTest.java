@@ -66,15 +66,13 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
      */
     private OpenOfficeManager officeManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        this.xhtmlDocumentBuilder = getComponentManager().lookup(XHTMLOfficeDocumentBuilder.class);
-        this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
+        this.xhtmlDocumentBuilder = getComponentManager().getInstance(XHTMLOfficeDocumentBuilder.class);
+        this.officeManager = getComponentManager().getInstance(OpenOfficeManager.class);
     }
 
     /**

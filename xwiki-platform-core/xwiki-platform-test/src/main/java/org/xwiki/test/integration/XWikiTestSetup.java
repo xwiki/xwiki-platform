@@ -47,6 +47,7 @@ import java.util.Properties;
  * @version $Id$
  * @deprecated use {@link XWikiExecutorSuite} instead
  */
+@Deprecated
 public class XWikiTestSetup extends TestSetup
 {
     private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
@@ -73,11 +74,6 @@ public class XWikiTestSetup extends TestSetup
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestSetup#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -86,11 +82,6 @@ public class XWikiTestSetup extends TestSetup
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestSetup#tearDown()
-     */
     @Override
     protected void tearDown() throws Exception
     {

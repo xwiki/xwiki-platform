@@ -35,11 +35,6 @@ public class AttachedImageSelectPane extends WizardStepElement
     @FindBy(xpath = "//div[@class = 'xSelectorAggregatorStep']//div[. = 'Current page']")
     private WebElement currentPageTab;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStepElement#waitToLoad()
-     */
     @Override
     public AttachedImageSelectPane waitToLoad()
     {

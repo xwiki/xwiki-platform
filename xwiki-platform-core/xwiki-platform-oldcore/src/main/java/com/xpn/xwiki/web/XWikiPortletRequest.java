@@ -64,11 +64,13 @@ public class XWikiPortletRequest implements XWikiRequest
         return request;
     }
 
+    @Override
     public String get(String name)
     {
         return request.getParameter(name);
     }
 
+    @Override
     public String getParameter(String name)
     {
         String retVal = request.getParameter(name);
@@ -83,161 +85,193 @@ public class XWikiPortletRequest implements XWikiRequest
         return retVal;
     }
 
+    @Override
     public Enumeration getParameterNames()
     {
         return request.getParameterNames();
     }
 
+    @Override
     public String[] getParameterValues(String name)
     {
         return request.getParameterValues(name);
     }
 
+    @Override
     public boolean isWindowStateAllowed(WindowState windowState)
     {
         return request.isWindowStateAllowed(windowState);
     }
 
+    @Override
     public boolean isPortletModeAllowed(PortletMode portletMode)
     {
         return request.isPortletModeAllowed(portletMode);
     }
 
+    @Override
     public PortletMode getPortletMode()
     {
         return request.getPortletMode();
     }
 
+    @Override
     public WindowState getWindowState()
     {
         return request.getWindowState();
     }
 
+    @Override
     public PortletPreferences getPreferences()
     {
         return request.getPreferences();
     }
 
+    @Override
     public PortletSession getPortletSession()
     {
         return request.getPortletSession();
     }
 
+    @Override
     public PortletSession getPortletSession(boolean b)
     {
         return request.getPortletSession(b);
     }
 
+    @Override
     public String getProperty(String s)
     {
         return request.getProperty(s);
     }
 
+    @Override
     public Enumeration getProperties(String s)
     {
         return request.getProperties(s);
     }
 
+    @Override
     public Enumeration getPropertyNames()
     {
         return request.getPropertyNames();
     }
 
+    @Override
     public PortalContext getPortalContext()
     {
         return request.getPortalContext();
     }
 
+    @Override
     public String getRemoteUser()
     {
         return request.getRemoteUser();
     }
 
+    @Override
     public boolean isUserInRole(String s)
     {
         return request.isUserInRole(s);
     }
 
+    @Override
     public Principal getUserPrincipal()
     {
         return request.getUserPrincipal();
     }
 
+    @Override
     public String getRequestedSessionId()
     {
         return request.getRequestedSessionId();
     }
 
+    @Override
     public Locale getLocale()
     {
         return request.getLocale();
     }
 
+    @Override
     public Enumeration getLocales()
     {
         return request.getLocales();
     }
 
+    @Override
     public boolean isSecure()
     {
         return request.isSecure();
     }
 
+    @Override
     public Map getParameterMap()
     {
         return request.getParameterMap();
     }
 
+    @Override
     public String getScheme()
     {
         return request.getScheme();
     }
 
+    @Override
     public String getServerName()
     {
         return request.getServerName();
     }
 
+    @Override
     public int getServerPort()
     {
         return request.getServerPort();
     }
 
+    @Override
     public void setAttribute(String s, Object o)
     {
         request.setAttribute(s, o);
     }
 
+    @Override
     public void removeAttribute(String s)
     {
         request.removeAttribute(s);
     }
 
+    @Override
     public String getResponseContentType()
     {
         return request.getResponseContentType();
     }
 
+    @Override
     public Enumeration getResponseContentTypes()
     {
         return request.getResponseContentTypes();
     }
 
+    @Override
     public String getContextPath()
     {
         return request.getContextPath();
     }
 
+    @Override
     public Object getAttribute(String s)
     {
         return request.getAttribute(s);
     }
 
+    @Override
     public Enumeration getAttributeNames()
     {
         return request.getAttributeNames();
     }
 
+    @Override
     public boolean isRequestedSessionIdValid()
     {
         return request.isRequestedSessionIdValid();
@@ -248,6 +282,7 @@ public class XWikiPortletRequest implements XWikiRequest
      * extends HttpServletRequest Modified getHttpServletRequest to work with WebLogic Portal Implementation
      */
 
+    @Override
     public HttpServletRequest getHttpServletRequest()
     {
         HttpServletRequest req = null;
@@ -266,6 +301,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return req;
     }
 
+    @Override
     public String getPathInfo()
     {
         if (request instanceof HttpServletRequest)
@@ -273,6 +309,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getServletPath()
     {
         if (request instanceof HttpServletRequest)
@@ -280,6 +317,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public StringBuffer getRequestURL()
     {
         if (request instanceof HttpServletRequest)
@@ -287,6 +325,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getQueryString()
     {
         if (request instanceof HttpServletRequest)
@@ -294,6 +333,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getRequestURI()
     {
         if (request instanceof HttpServletRequest)
@@ -301,6 +341,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getAuthType()
     {
         if (request instanceof HttpServletRequest)
@@ -308,6 +349,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public Cookie[] getCookies()
     {
         if (request instanceof HttpServletRequest)
@@ -315,6 +357,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public Cookie getCookie(String cookieName)
     {
         if (request instanceof HttpServletRequest)
@@ -323,6 +366,7 @@ public class XWikiPortletRequest implements XWikiRequest
             return null;
     }
 
+    @Override
     public long getDateHeader(String s)
     {
         if (request instanceof HttpServletRequest)
@@ -330,6 +374,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return 0;
     }
 
+    @Override
     public String getHeader(String s)
     {
         if (request instanceof HttpServletRequest)
@@ -337,6 +382,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public Enumeration getHeaders(String s)
     {
         if (request instanceof HttpServletRequest)
@@ -344,6 +390,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public Enumeration getHeaderNames()
     {
         if (request instanceof HttpServletRequest)
@@ -351,6 +398,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public int getIntHeader(String s)
     {
         if (request instanceof HttpServletRequest)
@@ -358,6 +406,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return 0;
     }
 
+    @Override
     public String getMethod()
     {
         if (request instanceof HttpServletRequest)
@@ -365,6 +414,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getCharacterEncoding()
     {
         if (request instanceof HttpServletRequest)
@@ -372,6 +422,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public InputStream getPortletInputStream() throws IOException
     {
         if (request instanceof ActionRequest)
@@ -379,12 +430,14 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException
     {
         if (request instanceof HttpServletRequest)
             getHttpServletRequest().setCharacterEncoding(s);
     }
 
+    @Override
     public int getContentLength()
     {
         if (request instanceof HttpServletRequest)
@@ -392,6 +445,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return 0;
     }
 
+    @Override
     public String getContentType()
     {
         if (request instanceof HttpServletRequest)
@@ -399,6 +453,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public ServletInputStream getInputStream() throws IOException
     {
         if (request instanceof HttpServletRequest)
@@ -406,6 +461,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public HttpSession getSession(boolean b)
     {
         if (request instanceof HttpServletRequest)
@@ -413,6 +469,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public HttpSession getSession()
     {
         if (request instanceof HttpServletRequest)
@@ -420,6 +477,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public boolean isRequestedSessionIdFromCookie()
     {
         if (request instanceof HttpServletRequest)
@@ -427,6 +485,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return false;
     }
 
+    @Override
     public boolean isRequestedSessionIdFromURL()
     {
         if (request instanceof HttpServletRequest)
@@ -437,6 +496,7 @@ public class XWikiPortletRequest implements XWikiRequest
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public boolean isRequestedSessionIdFromUrl()
     {
@@ -445,6 +505,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return false;
     }
 
+    @Override
     public String getPathTranslated()
     {
         if (request instanceof HttpServletRequest)
@@ -452,6 +513,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public RequestDispatcher getRequestDispatcher(String s)
     {
         if (request instanceof HttpServletRequest)
@@ -462,6 +524,7 @@ public class XWikiPortletRequest implements XWikiRequest
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public String getRealPath(String s)
     {
@@ -470,6 +533,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return s;
     }
 
+    @Override
     public int getRemotePort()
     {
         if (request instanceof HttpServletRequest)
@@ -477,6 +541,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return 0;
     }
 
+    @Override
     public String getLocalName()
     {
         if (request instanceof HttpServletRequest)
@@ -484,6 +549,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return "";
     }
 
+    @Override
     public String getLocalAddr()
     {
         if (request instanceof HttpServletRequest)
@@ -491,6 +557,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return "";
     }
 
+    @Override
     public int getLocalPort()
     {
         if (request instanceof HttpServletRequest)
@@ -498,6 +565,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return 0;
     }
 
+    @Override
     public String getProtocol()
     {
         if (request instanceof HttpServletRequest)
@@ -505,6 +573,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public BufferedReader getReader() throws IOException
     {
         if (request instanceof HttpServletRequest)
@@ -512,6 +581,7 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getRemoteAddr()
     {
         if (request instanceof HttpServletRequest)
@@ -519,11 +589,11 @@ public class XWikiPortletRequest implements XWikiRequest
         return null;
     }
 
+    @Override
     public String getRemoteHost()
     {
         if (request instanceof HttpServletRequest)
             return getHttpServletRequest().getRemoteHost();
         return null;
     }
-
 }

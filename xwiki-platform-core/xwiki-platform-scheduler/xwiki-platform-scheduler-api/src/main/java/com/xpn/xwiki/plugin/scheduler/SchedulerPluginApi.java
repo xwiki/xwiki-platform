@@ -78,7 +78,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner value of the state
      * and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException, SchedulerPluginException
+    public JobState getJobStatus(BaseObject object) throws SchedulerException
     {
         return getProtectedPlugin().getJobStatus(object, this.context);
     }
@@ -103,7 +103,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         try {
 
             XWikiDocument jobHolder = this.context.getWiki().getDocument(docName, this.context);
-            BaseObject jobObject = jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, objNb);
+            BaseObject jobObject = jobHolder.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, objNb);
             return jobObject;
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
@@ -154,7 +154,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         boolean result = true;
         try {
             XWikiDocument doc = this.context.getWiki().getDocument(document.getFullName(), this.context);
-            List<BaseObject> objects = doc.getObjects(SchedulerPlugin.XWIKI_JOB_CLASS);
+            List<BaseObject> objects = doc.getXObjects(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             for (BaseObject object : objects) {
                 result &= scheduleJob(object);
             }

@@ -86,7 +86,7 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
+        CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
 
         CacheFactory factory = cacheManager.getCacheFactory();
 

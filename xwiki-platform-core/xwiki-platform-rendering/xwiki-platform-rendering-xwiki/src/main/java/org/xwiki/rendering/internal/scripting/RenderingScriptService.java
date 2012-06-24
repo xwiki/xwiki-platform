@@ -33,12 +33,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -65,13 +67,19 @@ public class RenderingScriptService implements ScriptService
     private RenderingConfiguration configuration;
 
     /**
+     * @see #resolveSyntax(String)
+     */
+    @Inject
+    private SyntaxFactory syntaxFactory;
+
+    /**
      * @return the list of syntaxes for which a Parser is available
      */
     public List<Syntax> getAvailableParserSyntaxes()
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (Parser parser : this.componentManager.lookupList(Parser.class)) {
+            for (Parser parser : this.componentManager.<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -88,7 +96,8 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (PrintRendererFactory factory : this.componentManager.lookupList(PrintRendererFactory.class)) {
+            List<PrintRendererFactory> factories = this.componentManager.getInstanceList(PrintRendererFactory.class);
+            for (PrintRendererFactory factory : factories) {
                 syntaxes.add(factory.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -119,7 +128,8 @@ public class RenderingScriptService implements ScriptService
     {
         XDOM result;
         try {
-            result = this.componentManager.lookup(Parser.class, syntaxId).parse(new StringReader(text));
+            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
+            result = parser.parse(new StringReader(text));
         } catch (Exception e) {
             result = null;
         }
@@ -139,11 +149,29 @@ public class RenderingScriptService implements ScriptService
         String result;
         WikiPrinter printer = new DefaultWikiPrinter();
         try {
-            this.componentManager.lookup(BlockRenderer.class, outputSyntaxId).render(block, printer);
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId);
+            renderer.render(block, printer);
             result = printer.toString();
         } catch (Exception e) {
             result = null;
         }
         return result;
+    }
+
+    /**
+     * Converts a Syntax specified as a String into a proper Syntax object.
+     *
+     * @param syntaxId the syntax as a string (eg "xwiki/2.0", "html/4.01", etc)
+     * @return the proper Syntax object representing the passed syntax
+     */
+    public Syntax resolveSyntax(String syntaxId)
+    {
+        Syntax syntax;
+        try {
+            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+        } catch (ParseException exception) {
+            syntax = null;
+        }
+        return syntax;
     }
 }

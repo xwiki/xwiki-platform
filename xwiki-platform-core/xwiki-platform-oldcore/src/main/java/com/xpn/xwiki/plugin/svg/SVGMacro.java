@@ -68,6 +68,7 @@ public class SVGMacro extends BaseLocaleMacro
      * 
      * @see org.radeox.macro.BaseLocaleMacro#getLocaleKey()
      */
+    @Override
     public String getLocaleKey()
     {
         return "macro.svg";

@@ -49,14 +49,14 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current/reference");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "current");
     }
 
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
         EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+            resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
 
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
@@ -73,7 +73,7 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
         getContext().setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+            resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
 
         Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());

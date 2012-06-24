@@ -46,6 +46,7 @@ public class MozillaSelection extends DefaultSelection
      * 
      * @see DefaultSelection#removeAllRanges()
      */
+    @Override
     public void removeAllRanges()
     {
         if (getRangeCount() > 0) {

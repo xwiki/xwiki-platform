@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.chart;
 import java.util.Map;
 
 import org.xwiki.chart.model.ChartModel;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentRole
+@Role
 public interface ChartDataSource
 {
     /**

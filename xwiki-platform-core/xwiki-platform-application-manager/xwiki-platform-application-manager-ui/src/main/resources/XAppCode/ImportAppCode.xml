@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XAppCode</web>
-<name>ImportAppCode</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XAppCode.WebHome</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1192218584000</creationDate>
-<date>1204111366000</date>
-<contentUpdateDate>1205423816000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment>Imported from XAR</comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<content>#if($action &amp;&amp; $action == "import")
+  <web>XAppCode</web>
+  <name>ImportAppCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XAppCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1192218584000</creationDate>
+  <date>1204111366000</date>
+  <contentUpdateDate>1205423816000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <content>#if($action &amp;&amp; $action == "import")
   #set($result = $AppManager.importApplication($packagename))
   #if ($result == $Exception.ERROR_NOERROR)
     #info($msg.get("xapp.successimportapp", [$packagename]))
@@ -32,4 +33,5 @@
     #error($msg.get("xapp.errorimportapp", [$packagename, $result]))
   #end
 #end
-</content></xwikidoc>
+</content>
+</xwikidoc>

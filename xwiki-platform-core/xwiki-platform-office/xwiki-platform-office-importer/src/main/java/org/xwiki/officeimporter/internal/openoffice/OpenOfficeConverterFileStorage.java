@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Keeps track of file system storage used by {@link OpenOfficeConverter} for a particular conversion.
+ * Keeps track of file system storage used by {@link org.xwiki.officeimporter.openoffice.OpenOfficeConverter} for a
+ * particular conversion.
  * 
  * @version $Id$
  * @since 2.2M2
@@ -71,13 +72,13 @@ public class OpenOfficeConverterFileStorage
         boolean success = false;
 
         // Realize the temporary directory hierarchy.
-        rootDir = new File(parentDir, UUID.randomUUID().toString());
-        if (rootDir.mkdir()) {
-            inputDir = new File(rootDir, "input");
-            outputDir = new File(rootDir, "output");
-            if (inputDir.mkdir() && outputDir.mkdir()) {
-                inputFile = new File(inputDir, inputFileName);
-                outputFile = new File(outputDir, outputFileName);
+        this.rootDir = new File(parentDir, UUID.randomUUID().toString());
+        if (this.rootDir.mkdir()) {
+            this.inputDir = new File(this.rootDir, "input");
+            this.outputDir = new File(this.rootDir, "output");
+            if (this.inputDir.mkdir() && this.outputDir.mkdir()) {
+                this.inputFile = new File(this.inputDir, inputFileName);
+                this.outputFile = new File(this.outputDir, outputFileName);
                 success = true;
             }
         }
@@ -95,7 +96,7 @@ public class OpenOfficeConverterFileStorage
      */
     public File getInputDir()
     {
-        return inputDir;
+        return this.inputDir;
     }
 
     /**
@@ -103,7 +104,7 @@ public class OpenOfficeConverterFileStorage
      */
     public File getInputFile()
     {
-        return inputFile;
+        return this.inputFile;
     }
 
     /**
@@ -112,7 +113,7 @@ public class OpenOfficeConverterFileStorage
      */
     public File getOutputDir()
     {
-        return outputDir;
+        return this.outputDir;
     }
 
     /**
@@ -120,7 +121,7 @@ public class OpenOfficeConverterFileStorage
      */
     public File getOutputFile()
     {
-        return outputFile;
+        return this.outputFile;
     }
 
     /**
@@ -130,8 +131,8 @@ public class OpenOfficeConverterFileStorage
      */
     public boolean cleanUp()
     {
-        if (rootDir.exists()) {
-            return delete(rootDir);
+        if (this.rootDir.exists()) {
+            return delete(this.rootDir);
         }
 
         return true;

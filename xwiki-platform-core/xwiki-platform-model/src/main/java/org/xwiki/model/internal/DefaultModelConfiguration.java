@@ -92,7 +92,7 @@ public class DefaultModelConfiguration implements ModelConfiguration
             // Wiki, Space and User preferences cause some cyclic dependencies (we'll be able to do that when all
             // code has been migrated to use References instead of Strings).
             ConfigurationSource configuration =
-                this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties");
+                this.componentManager.getInstance(ConfigurationSource.class, "xwikiproperties");
             name = configuration.getProperty(PREFIX + "reference.default." + type.toString().toLowerCase(),
                 DEFAULT_VALUES.get(type));
         } catch (ComponentLookupException e) {

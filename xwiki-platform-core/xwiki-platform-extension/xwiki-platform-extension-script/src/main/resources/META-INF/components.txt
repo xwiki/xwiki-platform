@@ -1,1 +1,6 @@
 org.xwiki.extension.script.internal.ExtensionManagerScriptService
+org.xwiki.extension.script.internal.safe.ExtensionPlanScriptSafeProvider
+org.xwiki.extension.script.internal.safe.ExtensionRepositoryScriptSafeProvider
+org.xwiki.extension.script.internal.safe.ExtensionScriptSafeProvider
+org.xwiki.extension.script.internal.safe.IterableResultScriptSafeProvider
+org.xwiki.extension.script.internal.safe.JobStatusScriptSafeProvider

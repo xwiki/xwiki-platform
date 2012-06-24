@@ -40,11 +40,7 @@ public class GetAction extends XWikiAction
      */
     public static final String GET_ACTION = "get";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         boolean shouldRender = true;
@@ -54,11 +50,7 @@ public class GetAction extends XWikiAction
         return shouldRender;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         handleRevision(context);

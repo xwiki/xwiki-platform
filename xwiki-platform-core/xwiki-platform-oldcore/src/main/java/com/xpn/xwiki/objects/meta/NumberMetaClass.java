@@ -53,6 +53,7 @@ public class NumberMetaClass extends PropertyMetaClass
         safeput("size", size_class);
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new NumberClass();

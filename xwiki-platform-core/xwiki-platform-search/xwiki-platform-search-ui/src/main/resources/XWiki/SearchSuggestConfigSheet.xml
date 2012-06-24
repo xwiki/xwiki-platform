@@ -1,56 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>SearchSuggestConfigSheet</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.SearchSuggestConfig</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1280310959000</creationDate>
-<date>1297439261000</date>
-<contentUpdateDate>1297439261000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.EditModeClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultEditMode>
-<disabled>0</disabled>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
-</class>
-<name>XWiki.SearchSuggestConfigSheet</name>
-<number>0</number>
-<className>XWiki.EditModeClass</className>
-<guid>4514612b-ad6d-49e0-8cb6-6bf91d999474</guid>
-<property>
-<defaultEditMode>inline</defaultEditMode>
-</property>
-</object>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>SearchSuggestConfigSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.SearchSuggestConfig</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1280310959000</creationDate>
+  <date>1297439261000</date>
+  <contentUpdateDate>1297439261000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.EditModeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultEditMode>
+        <disabled>0</disabled>
+        <name>defaultEditMode</name>
+        <number>1</number>
+        <prettyName>Default Edit Mode</prettyName>
+        <size>15</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultEditMode>
+    </class>
+    <name>XWiki.SearchSuggestConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>4514612b-ad6d-49e0-8cb6-6bf91d999474</guid>
+    <property>
+      <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <content>{{velocity}}
 =Search Suggest=
 
 #set($searchSuggestConfigClass = $xwiki.getDocument("XWiki.SearchSuggestConfig").xWikiClass)
@@ -70,4 +71,5 @@ A suggest source is a URL that takes 3 parameters: query, input and nb. The quer
 #if($context.display == 'edit')
 [[Add a new source&gt;&gt;$doc.getExternalURL('objectadd', "classname=${searchSuggestSourceClassname}&amp;xredirect=${doc.getURL('inline')}")]]
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

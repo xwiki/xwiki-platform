@@ -30,11 +30,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.PluginManager;
  */
 public class DefaultPluginManagerTest extends AbstractPluginManagerTest
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginManagerTest#newPluginManager()
-     */
+    @Override
     protected PluginManager newPluginManager()
     {
         return new DefaultPluginManager(null, null);

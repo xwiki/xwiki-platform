@@ -49,9 +49,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
 @Component("officeimporter/paragraph")
 public class ParagraphFilter extends AbstractHTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         for (Node p : findEmptyLineParagraphSequences(document)) {
@@ -78,6 +76,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
         List<Element> emptyLineParagraphs =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_P}, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     return isEmptyLineParagraph(element);

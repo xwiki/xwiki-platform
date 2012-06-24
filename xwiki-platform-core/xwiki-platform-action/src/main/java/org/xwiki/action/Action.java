@@ -19,9 +19,9 @@
  */
 package org.xwiki.action;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
-@ComponentRole
+@Role
 public interface Action
 {
     void execute() throws ActionException;

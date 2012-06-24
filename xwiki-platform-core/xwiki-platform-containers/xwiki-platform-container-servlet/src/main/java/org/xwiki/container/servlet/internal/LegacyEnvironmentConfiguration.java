@@ -19,8 +19,6 @@
  */
 package org.xwiki.container.servlet.internal;
 
-import java.io.File;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -54,19 +52,18 @@ public class LegacyEnvironmentConfiguration extends DefaultEnvironmentConfigurat
     private Logger logger;
 
     @Override
-    public File getPermanentDirectory()
+    public String getPermanentDirectoryPath()
     {
-        File directory = super.getPermanentDirectory();
-        if (directory == null) {
+        String dirPath = super.getPermanentDirectoryPath();
+        if (dirPath == null) {
             // Fallback to the old deprecated permanent directory configuration property
-            directory = initializeDirectory(
-                getConfigurationSource().getProperty(PROPERTY_DEPRECATED_PERMANENTDIRECTORY, String.class));
+            dirPath = getConfigurationSource().getProperty(PROPERTY_DEPRECATED_PERMANENTDIRECTORY, String.class);
             // Display a warning to the user so that he upgrades
-            if (directory != null) {
+            if (dirPath != null) {
                 this.logger.warn("You're using the deprecated [{}] configuration property. You should instead use the "
                     + "newer [{}] one", PROPERTY_DEPRECATED_PERMANENTDIRECTORY, "environment.permanentDirectory");
             }
         }
-        return directory;
+        return dirPath;
     }
 }

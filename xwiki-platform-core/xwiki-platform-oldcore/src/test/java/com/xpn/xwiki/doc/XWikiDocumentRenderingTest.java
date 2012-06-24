@@ -110,6 +110,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiRenderingEngine.stubs().method("interpretText").will(
             new CustomStub("Implements XWikiRenderingEngine.interpretText")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return invocation.parameterValues.get(0);
@@ -143,7 +144,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
-        this.baseClass = this.document.getxWikiClass();
+        this.baseClass = this.document.getXClass();
         this.baseClass.addTextField("string", "String", 30);
         this.baseClass.addTextAreaField("area", "Area", 10, 10);
         this.baseClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);
@@ -185,7 +186,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
     }
 
-    public void testGetRenderedTitleWithTitle() throws XWikiException
+    public void testGetRenderedTitleWithTitle()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -211,7 +212,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
 
-    public void testGetRenderedTitleWithoutTitleHTML() throws XWikiException
+    public void testGetRenderedTitleWithoutTitleHTML()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -248,7 +249,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
 
-    public void testGetRenderedTitleWithoutTitlePLAIN() throws XWikiException
+    public void testGetRenderedTitleWithoutTitlePLAIN()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -263,7 +264,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
     }
 
-    public void testGetRenderedTitleNoTitleAndContent() throws XWikiException
+    public void testGetRenderedTitleNoTitleAndContent()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
@@ -273,61 +274,12 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     /**
      * Make sure title extracted from content is protected from cycles
      */
-    public void testGetRenderedTitleRecursive() throws XWikiException
+    public void testGetRenderedTitleRecursive()
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
         this.document.setContent("= {{groovy}}print doc.getDisplayTitle(){{/groovy}}");
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-    }
-
-    public void testExtractTitle()
-    {
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
-
-        assertEquals("header 1", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
-
-        assertEquals("<strong>header 1</strong>", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
-
-        this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
-
-        assertEquals("<span class=\"wikicreatelink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
-            + "Page" + "</span></a></span>", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
-
-        assertEquals("#set($var = \"value\")", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n"
-            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        assertEquals("value", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n=== header 3===");
-
-        assertEquals("", this.document.extractTitle());
-    }
-
-    public void testExtractTitle10()
-    {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
-
-        assertEquals("header 1", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n");
-
-        assertEquals("", this.document.extractTitle());
     }
 
     /**
@@ -348,7 +300,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
         // called in the execution flow.
-        VelocityManager originalVelocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager originalVelocityManager = getComponentManager().getInstance(VelocityManager.class);
         VelocityContext vcontext = originalVelocityManager.getVelocityContext();
         vcontext.put("doc", new Document(this.document, getContext()));
 
@@ -356,7 +308,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
         mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
 
-        VelocityEngine vengine = getComponentManager().lookup(VelocityFactory.class).createVelocityEngine(
+        VelocityFactory velocityFactory = getComponentManager().getInstance(VelocityFactory.class);
+        VelocityEngine vengine = velocityFactory.createVelocityEngine(
             "default", new Properties());
         // Save the number of cached macro templates in the Velocity engine so that we can compare after the
         // document is rendered.

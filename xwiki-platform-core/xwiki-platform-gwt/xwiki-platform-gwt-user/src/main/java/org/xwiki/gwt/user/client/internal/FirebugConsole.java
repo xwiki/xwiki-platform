@@ -26,16 +26,12 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Node;
 
 /**
- * @see http://getfirebug.com/console.html
+ * @see "http://getfirebug.com/console.html"
  * @version $Id$
  */
 public class FirebugConsole extends Console
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#count(String)
-     */
+    @Override
     public native void count(String title)
     /*-{
         try {
@@ -45,11 +41,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#profile(String)
-     */
+    @Override
     public native void profile(String title)
     /*-{
         try {
@@ -59,11 +51,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#profileEnd()
-     */
+    @Override
     public native void profileEnd()
     /*-{
         try {
@@ -73,11 +61,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#time(String)
-     */
+    @Override
     public native void time(String name)
     /*-{
         try {
@@ -87,11 +71,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#timeEnd(String)
-     */
+    @Override
     public native void timeEnd(String name)
     /*-{
         try {
@@ -127,11 +107,7 @@ public class FirebugConsole extends Console
         jsArray.push(object);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#assertTrue(boolean, Object...)
-     */
+    @Override
     public native void assertTrue(boolean expression, Object... objects)
     /*-{
         try {
@@ -143,11 +119,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#debug(Object, Object...)
-     */
+    @Override
     public native void debug(Object object, Object... objects)
     /*-{
         try {
@@ -159,11 +131,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#dir(Object)
-     */
+    @Override
     public native void dir(Object object)
     /*-{
         try {
@@ -173,11 +141,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#dirxml(Node)
-     */
+    @Override
     public native void dirxml(Node node)
     /*-{
         try {
@@ -187,11 +151,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#error(Object, Object...)
-     */
+    @Override
     public native void error(Object object, Object... objects)
     /*-{
         try {
@@ -203,11 +163,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#group(Object, Object...)
-     */
+    @Override
     public native void group(Object object, Object... objects)
     /*-{
         try {
@@ -219,11 +175,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#groupEnd()
-     */
+    @Override
     public native void groupEnd()
     /*-{
         try {
@@ -233,11 +185,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#info(Object, Object...)
-     */
+    @Override
     public native void info(Object object, Object... objects)
     /*-{
         try {
@@ -249,11 +197,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#log(Object, Object...)
-     */
+    @Override
     public native void log(Object object, Object... objects)
     /*-{
         try {
@@ -265,11 +209,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#trace()
-     */
+    @Override
     public native void trace()
     /*-{
         try {
@@ -279,11 +219,7 @@ public class FirebugConsole extends Console
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Console#warn(Object, Object...)
-     */
+    @Override
     public native void warn(Object object, Object... objects)
     /*-{
         try {

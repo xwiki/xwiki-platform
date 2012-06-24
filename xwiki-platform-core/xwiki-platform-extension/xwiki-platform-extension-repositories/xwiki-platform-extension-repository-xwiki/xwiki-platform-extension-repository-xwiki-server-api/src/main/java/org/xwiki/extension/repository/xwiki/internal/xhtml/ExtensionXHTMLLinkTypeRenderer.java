@@ -29,9 +29,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.context.Execution;
-import org.xwiki.extension.internal.reference.ExtensionResourceReference;
 import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.UriBuilder;
+import org.xwiki.extension.repository.xwiki.internal.reference.ExtensionResourceReference;
 import org.xwiki.rendering.internal.renderer.xhtml.link.AbstractXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -39,7 +39,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Handle XHTML rendering for links to documents.
+ * Handle XHTML rendering for links to extensions.
  * 
  * @version $Id$
  * @since 3.4RC1

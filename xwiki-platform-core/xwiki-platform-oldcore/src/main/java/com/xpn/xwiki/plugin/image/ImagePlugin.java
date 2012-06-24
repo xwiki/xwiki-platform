@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -83,6 +85,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private final ImageProcessor imageProcessor = Utils.getComponent(ImageProcessor.class);
 
     /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
+
+    /**
      * Creates a new instance of this plugin.
      * 
      * @param name the name of the plugin
@@ -97,22 +104,12 @@ public class ImagePlugin extends XWikiDefaultPlugin
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ImagePluginAPI((ImagePlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
@@ -150,7 +147,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
             configuration.setConfigurationId("xwiki.plugin.image");
 
             // Set folder to store cache.
-            File tempDir = context.getWiki().getTempDirectory(context);
+            File tempDir = this.environment.getTemporaryDirectory();
             File imgTempDir = new File(tempDir, configuration.getConfigurationId());
             try {
                 imgTempDir.mkdirs();
@@ -182,11 +179,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#flushCache()
-     */
     @Override
     public void flushCache()
     {

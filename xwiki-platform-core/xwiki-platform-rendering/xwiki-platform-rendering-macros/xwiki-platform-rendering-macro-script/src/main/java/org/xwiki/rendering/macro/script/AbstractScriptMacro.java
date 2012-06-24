@@ -66,7 +66,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
     /**
      * Used to find if the current document's author has programming rights.
-     * 
+     *
      * @deprecated since 2.5M1 (not used any more)
      */
     @Inject

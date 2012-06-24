@@ -29,7 +29,9 @@ import org.jfree.chart.plot.Plot;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.chart.internal.plot.AreaPlotGenerator;
+import org.xwiki.chart.internal.plot.Bar3DPlotGenerator;
 import org.xwiki.chart.internal.plot.BarPlotGenerator;
+import org.xwiki.chart.internal.plot.Line3DPlotGenerator;
 import org.xwiki.chart.internal.plot.LinePlotGenerator;
 import org.xwiki.chart.internal.plot.PiePlotGenerator;
 import org.xwiki.chart.internal.plot.PlotGenerator;
@@ -47,15 +49,18 @@ import org.xwiki.component.phase.InitializationException;
  */
 @Component
 public class DefaultChartGenerator implements ChartGenerator, Initializable
-{    
+{
     /**
      * Map of available plot generators.
      */
     private Map<String, PlotGenerator> plotGenerators;
-    
+
     /**
-     * {@inheritDoc}
+     * Allows providing custom colors.
      */
+    private DrawingSupplierFactory drawingSupplierFactory = new DrawingSupplierFactory();
+
+    @Override
     public void initialize() throws InitializationException
     {
         plotGenerators = new HashMap<String, PlotGenerator>();        
@@ -63,11 +68,11 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
         plotGenerators.put("bar", new BarPlotGenerator());    
         plotGenerators.put("area", new AreaPlotGenerator());
         plotGenerators.put("pie", new PiePlotGenerator());
+        plotGenerators.put("line3D", new Line3DPlotGenerator());
+        plotGenerators.put("bar3D", new Bar3DPlotGenerator());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public byte[] generate(ChartModel model, Map<String, String> parameters) throws ChartGeneratorException
     {
         setDefaultParams(parameters);
@@ -78,6 +83,10 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
             throw new ChartGeneratorException(String.format("No such chart type : [%s].", type));
         }
         Plot plot = generator.generate(model, parameters);
+
+        // Set the default colors to use if the user has specified some colors.
+        plot.setDrawingSupplier(this.drawingSupplierFactory.createDrawingSupplier(parameters));
+
         JFreeChart jfchart = new JFreeChart(title, plot);
         int width = Integer.parseInt(parameters.get(WIDTH_PARAM));
         int height = Integer.parseInt(parameters.get(HEIGHT_PARAM));

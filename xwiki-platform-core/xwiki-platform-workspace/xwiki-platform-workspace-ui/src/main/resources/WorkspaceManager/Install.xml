@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>WorkspaceManager</web>
-<name>Install</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WorkspaceManager.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1187017247000</creationDate>
-<date>1316551734000</date>
-<contentUpdateDate>1316551734000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>true</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>WorkspaceManager</web>
+  <name>Install</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WorkspaceManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1187017247000</creationDate>
+  <date>1316551734000</date>
+  <contentUpdateDate>1316551734000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
 #set ($needsAdminRights = false)
 ##
 ## 1. Register translations
@@ -56,7 +57,7 @@
   #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestSourceClass', 'name', 'Workspaces'))
   #if (!$searchSuggestConfigObject)
     #if ($hasGlobalAdmin)
-      #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject("$wikiName:XWiki.SearchSuggestSourceClass"))
+      #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject('XWiki.SearchSuggestSourceClass'))
       #set ($discard = $searchSuggestConfigObject.set('name', 'Workspaces'))
       #set ($discard = $searchSuggestConfigObject.set('query', 'XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass'))
       #set ($discard = $searchSuggestConfigObject.set('resultsNumber', '3'))
@@ -109,7 +110,7 @@
 #set ($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
 #if ("$!template" == '')
   #if ($hasGlobalAdmin)
-    #if ($xcontext.doc.getAttachment($TEMPLATE_PACKAGE))
+    #if ($doc.getAttachment($TEMPLATE_PACKAGE))
       #if ("$!request.confirmTemplateInstall" == '1')
         #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
@@ -143,7 +144,7 @@
       #end
     #else
 
-      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $xcontext.doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
+      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
     #end
   #else
     #set ($needsAdminRights = true)
@@ -173,7 +174,7 @@
     {{error}}Workspace template features can not be installed without the workspace base template being installed first.{{/error}}
   #end
 #elseif (!$xwiki.exists($manageWorkspaceDocumentReference))
-  #set ($templateFeaturesAttachment = $xcontext.doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
+  #set ($templateFeaturesAttachment = $doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
   #if (!$hasGlobalAdmin)
     #set ($needsAdminRights = true)
   #elseif ($templateFeaturesAttachment)
@@ -181,8 +182,7 @@
     #set ($currentDatabase = $xcontext.database)
     #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
     #set ($packager = $xwiki.package)
-    ## FIXME: This way of retrieving the attachment's content is a workaround for XWIKI-7184 since $xcontext.doc.getAttachment(...) outputs an XWikiAttachment and not an api.Attachment.
-    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.getContent($xcontext.context)))
+    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.content))
     #set ($templateFeaturesAttachmentInstallResult = $packager.install())
     ## Change back to the current wiki.
     #set ($discard = $xcontext.setDatabase($currentDatabase))
@@ -370,7 +370,7 @@
     #end
   #else
 
-    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $xcontext.doc.fullName]){{/error}}
+    {{error}}$msg.get('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $doc.fullName]){{/error}}
   #end
 #else
   ##
@@ -392,4 +392,5 @@
     {{error}}$msg.get('workspacemanager.install.notallowed'){{/error}}
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

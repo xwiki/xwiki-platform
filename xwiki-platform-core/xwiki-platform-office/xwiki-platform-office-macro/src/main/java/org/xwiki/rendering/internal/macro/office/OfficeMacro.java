@@ -81,11 +81,7 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(OfficeMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -102,11 +98,7 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;

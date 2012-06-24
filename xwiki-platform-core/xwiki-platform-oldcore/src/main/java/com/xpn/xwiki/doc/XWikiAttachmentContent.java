@@ -24,10 +24,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.xwiki.environment.Environment;
+import org.xwiki.store.UnexpectedException;
 
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
@@ -85,19 +88,20 @@ public class XWikiAttachmentContent implements Cloneable
      */
     private void newFileItem()
     {
-        String tempFileLocation = System.getProperty("java.io.tmpdir");
-        // TODO try to get a different temp file location.
+        final Environment env = Utils.getComponent(Environment.class);
+        final File dir = new File(env.getTemporaryDirectory(), "attachment-cache");
         try {
-            final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, new File(tempFileLocation));
+            if (!dir.mkdirs() && !dir.exists()) {
+                throw new UnexpectedException("Failed to create directory for attachments " + dir);
+            }
+            final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, dir);
             // This causes the temp file to be created.
             dfi.getOutputStream();
             // Make sure this file is marked for deletion on VM exit because DiskFileItem does not.
             dfi.getStoreLocation().deleteOnExit();
             this.file = dfi;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create new attachment temporary file."
-                + " Are you sure you have permission to write to "
-                + tempFileLocation + "?", e);
+            throw new UnexpectedException("Failed to create new attachment temporary file.", e);
         }
     }
 
@@ -122,11 +126,6 @@ public class XWikiAttachmentContent implements Cloneable
         // The id is taken from the attachment which is set in XWikiHibernateAttachmentStore#loadAttachmentContent.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>IRC</web>
+  <name>WikiSearchBotListener</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>IRC.IRCBot</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1331911358000</creationDate>
+  <date>1331912036000</date>
+  <contentUpdateDate>1331912036000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Wiki Search Bot Listener</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>IRC.IRCBotListenerClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <description>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Description</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </description>
+      <inactive>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>inactive</name>
+        <number>3</number>
+        <prettyName>Inactive</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </inactive>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>IRC.WikiSearchBotListener</name>
+    <number>0</number>
+    <className>IRC.IRCBotListenerClass</className>
+    <guid>1f66c5c3-0d3b-4769-9767-e98da715cdb4</guid>
+    <property>
+      <description>!search &lt;search term&gt;: Searches the wiki for the passed terms and return the first results</description>
+    </property>
+    <property>
+      <inactive/>
+    </property>
+    <property>
+      <name>Wiki Search</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>IRC.IRCBotListenerEventClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <event>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>event</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Event</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </event>
+      <script>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>script</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Script</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </script>
+    </class>
+    <name>IRC.WikiSearchBotListener</name>
+    <number>0</number>
+    <className>IRC.IRCBotListenerEventClass</className>
+    <guid>47a1cc0c-fd42-4e0e-8e54-1dc46aa3b58d</guid>
+    <property>
+      <event>onMessage</event>
+    </property>
+    <property>
+      <script>{{groovy}}
+import com.xpn.xwiki.*
+
+def irccontext = services.get("ircbot").getContext() 
+def message = irccontext.get("message")
+def xwikiContext = xcontext.getContext()
+
+if (message.startsWith("!search")) {
+  def lucenePlugin = xwiki.getXWiki().getPlugin("lucene", xwikiContext)
+  if (lucenePlugin) {
+    // Number of search results to display
+    int maxResults = 4
+
+    // Remove the prefix "search " from the message to extract the query
+    String query = message[8..-1]
+
+    println "Results for [${query}] (${maxResults} results only)"
+
+    try {
+      def results = lucenePlugin.getSearchResults(query, (String) null,  null, null, xwikiContext)
+      if (results.hitcount &gt; 0) {
+        for (result in results.getResults(1, maxResults)) {
+          def itemDoc = xwiki.getXWiki().getDocument("${result.wiki}:${result.web}.${result.name}", xwikiContext)
+          println "  * ${itemDoc.database}:${itemDoc.fullName} - ${itemDoc.getExternalURL("view", xwikiContext)}"
+        }
+      } else {
+        println "No match found"
+      }
+    } catch (e) {
+      e.printStackTrace();
+      println "Error: ${e.message}"
+    }
+  } else {
+    println "Lucene plugin is not installed!"
+  }
+}
+{{/groovy}}</script>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

@@ -105,32 +105,20 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#getCaughtException()
-     */
+    @Override
     public Exception getCaughtException()
     {
         return (Exception) this.execution.getContext().getProperty(OFFICE_VIEW_EXCEPTION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#view(AttachmentReference)
-     */
+    @Override
     public String view(AttachmentReference attachmentReference)
     {
         Map<String, String> parameters = Collections.emptyMap();
         return view(attachmentReference, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#view(AttachmentReference, Map)
-     */
+    @Override
     public String view(AttachmentReference attachmentReference, Map<String, String> parameters)
     {
         // Clear previous caught exception.
@@ -154,11 +142,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#isMimeTypeSupported(String)
-     */
+    @Override
     public boolean isMimeTypeSupported(String mimeType)
     {
         OpenOfficeConverter converter = this.officeManager.getConverter();
@@ -182,7 +166,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
         this.transformationManager.performTransformations(xdom, context);
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, toSyntax.toIdString());
+        BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, toSyntax.toIdString());
         renderer.render(xdom, printer);
         return printer.toString();
     }

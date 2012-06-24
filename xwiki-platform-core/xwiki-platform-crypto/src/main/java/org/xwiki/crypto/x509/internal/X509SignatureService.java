@@ -28,14 +28,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.CMSSignedGenerator;
-import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
-
 import org.xwiki.crypto.internal.Convert;
 import org.xwiki.crypto.x509.XWikiX509Certificate;
 import org.xwiki.crypto.x509.XWikiX509KeyPair;
@@ -60,9 +59,14 @@ public class X509SignatureService
     private static final String CERT_STORE_TYPE = "Collection";
 
     /**
-     * {@inheritDoc}
+     * Produce a pkcs#7 signature for the given text.
+     * Text will be signed with the key belonging to the author of the code which calls this.
      *
-     * @see org.xwiki.crypto.CryptoService#signText(java.lang.String, org.xwiki.crypto.data.XWikiX509KeyPair)
+     * @param textToSign the text which the user wishes to sign.
+     * @param toSignWith the certificate and matching private key to sign the text with.
+     * @param password to access the private key in the key pair.
+     * @return a signature which can be used to validate the signed text.
+     * @throws GeneralSecurityException if anything goes wrong during signing.
      */
     public String signText(final String textToSign,
                            final XWikiX509KeyPair toSignWith,
@@ -90,9 +94,12 @@ public class X509SignatureService
     }
 
     /**
-     * {@inheritDoc}
+     * Verify a pkcs#7 signature and return the certificate of the user who signed it.
      *
-     * @see org.xwiki.crypto.CryptoService#verifyText(java.lang.String, java.lang.String)
+     * @param signedText the text which has been signed.
+     * @param base64Signature the signature on the text in Base64 encoded DER format.
+     * @return the certificate used to sign the text or null if it's invalid.
+     * @throws GeneralSecurityException if anything goes wrong.
      */
     public XWikiX509Certificate verifyText(String signedText, String base64Signature) throws GeneralSecurityException
     {

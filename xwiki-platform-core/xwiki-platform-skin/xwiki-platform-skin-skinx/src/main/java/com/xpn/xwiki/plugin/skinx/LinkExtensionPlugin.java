@@ -57,11 +57,6 @@ public class LinkExtensionPlugin extends AbstractSkinExtensionPlugin
         super("linkx", className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
-     */
     @Override
     public String getLink(String link, XWikiContext context)
     {

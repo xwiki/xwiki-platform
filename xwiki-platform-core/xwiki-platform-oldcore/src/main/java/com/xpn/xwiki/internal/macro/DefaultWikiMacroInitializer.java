@@ -93,17 +93,13 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void registerExistingWikiMacros() throws Exception
     {
         registerExistingWikiMacros(false, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void registerExistingWikiMacros(String wiki) throws Exception
     {
         registerExistingWikiMacros(true, wiki);
@@ -261,13 +257,15 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
 
         return needsUpdate;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void installOrUpgradeWikiMacroClasses() throws Exception
     {
         XWikiContext xcontext = getContext();

@@ -21,12 +21,10 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jmock.Mock;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -44,11 +42,6 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
     private AttachmentData attachmentData;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -72,7 +65,7 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
     }
 
-    private void assertGetFullText(String expect, String filename) throws XWikiException, IOException
+    private void assertGetFullText(String expect, String filename) throws IOException
     {
         this.attachment.setFilename(filename);
         this.attachment.setContent(getClass().getResourceAsStream("/" + filename));
@@ -84,32 +77,32 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Wrong attachment content indexed", expect, fullText);
     }
 
-    public void testGetFullTextFromTxt() throws XWikiException, IOException
+    public void testGetFullTextFromTxt() throws IOException
     {
         assertGetFullText("text content\n", "txt.txt");
     }
 
-    public void testGetFullTextFromMSOffice97() throws XWikiException, IOException
+    public void testGetFullTextFromMSOffice97() throws IOException
     {
         assertGetFullText("ms office 97 content\n\n", "msoffice97.doc");
     }
 
-    public void testGetFullTextFromOpenXML() throws XWikiException, IOException
+    public void testGetFullTextFromOpenXML() throws IOException
     {
         assertGetFullText("openxml content\n", "openxml.docx");
     }
 
-    public void testGetFullTextFromOpenDocument() throws XWikiException, IOException
+    public void testGetFullTextFromOpenDocument() throws IOException
     {
         assertGetFullText("opendocument content\n", "opendocument.odt");
     }
 
-    public void testGetFullTextFromPDF() throws XWikiException, IOException
+    public void testGetFullTextFromPDF() throws IOException
     {
-        assertGetFullText("pdf content\n\n", "pdf.pdf");
+        assertGetFullText("\npdf content\n\n\n", "pdf.pdf");
     }
 
-    public void testGetFullTextFromZIP() throws XWikiException, IOException
+    public void testGetFullTextFromZIP() throws IOException
     {
         assertGetFullText("zip.txt\nzip content\n\n\n\n", "zip.zip");
     }

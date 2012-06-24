@@ -19,21 +19,39 @@
  */
 package org.xwiki.model.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import java.lang.reflect.ParameterizedType;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 
 /**
  * Generate a different representation of an Entity Reference (eg as a String).
- *
+ * 
  * @param <T> the type of the new representation
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentRole
+@Role
 public interface EntityReferenceSerializer<T>
 {
     /**
+     * Type instance for EntityReferenceResolver<String>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class);
+
+    /**
+     * Type instance for EntityReferenceResolver<EntityReference>.
+     * 
+     * @since 4.0M1
+     */
+    ParameterizedType TYPE_REFERENCE = new DefaultParameterizedType(null, EntityReferenceSerializer.class,
+        EntityReference.class);
+
+    /**
      * Serialize an entity reference into a new representation of type <T>.
-     *
+     * 
      * @param reference the reference to serialize
      * @param parameters optional parameters. Their meaning depends on the serializer implementation
      * @return the new representation (eg as a String)

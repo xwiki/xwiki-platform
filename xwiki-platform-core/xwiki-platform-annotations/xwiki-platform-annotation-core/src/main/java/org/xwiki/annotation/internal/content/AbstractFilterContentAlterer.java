@@ -41,11 +41,7 @@ public abstract class AbstractFilterContentAlterer extends AbstractContentAltere
      */
     protected abstract Filter getFilter();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.internal.content.AbstractContentAlterer#alter(java.lang.CharSequence)
-     */
+    @Override
     public AlteredContent alter(CharSequence sequence)
     {
         StringBuffer buffer = new StringBuffer();

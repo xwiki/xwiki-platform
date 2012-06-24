@@ -299,6 +299,12 @@ public class MacroDisplayer implements InnerHTMLListener
         // we couldn't find a way to hide the image selection when a collapsed macro is selected.
         Element macroIcon = Element.as(document.createSpanElement());
         macroIcon.setClassName("macro-icon");
+        // HACK: Insert a Non-Breaking Space in the element used to display the macro icon in order to overcome the
+        // following problem: Firefox leaves the caret inside the hidden macro place-holder if you delete the text
+        // before an expanded macro; obviously the caret disappears. Another solution would be to put the macro
+        // place-holder in the DOM only when the macro is collapsed but this complicates the code that toggles the
+        // collapsed state (and we'd need to recreate the macro place-holder after undo/redo operations).
+        macroIcon.appendChild(document.createTextNode("\u00A0"));
 
         Element placeHolder = document.createSpanElement().cast();
         placeHolder.appendChild(macroIcon);

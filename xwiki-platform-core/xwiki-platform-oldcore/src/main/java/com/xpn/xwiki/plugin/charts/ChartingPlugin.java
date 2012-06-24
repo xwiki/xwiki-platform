@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import org.apache.batik.apps.rasterizer.SVGConverterException;
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -50,6 +52,7 @@ import com.xpn.xwiki.plugin.charts.plots.PlotFactory;
 import com.xpn.xwiki.plugin.charts.source.DataSource;
 import com.xpn.xwiki.plugin.charts.source.MainDataSourceFactory;
 import com.xpn.xwiki.plugin.svg.SVGPlugin;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 
 /**
@@ -59,6 +62,11 @@ import com.xpn.xwiki.web.XWikiResponse;
  */
 public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
+    /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
+
     public ChartingPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
@@ -71,7 +79,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         super.init(context);
         LOGGER.info("Charting Plugin - init");
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         tempDir = new File(dir, "charts");
         try {
             tempDir.mkdirs();

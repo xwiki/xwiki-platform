@@ -46,11 +46,6 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
      */
     private DocumentAccessBridge dabMock;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
-     */
     @Override
     protected void registerComponents() throws Exception
     {
@@ -60,18 +55,13 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         this.dabMock = registerMockComponent(DocumentAccessBridge.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
         // get the default io target service
-        ioTargetService = getComponentManager().lookup(IOTargetService.class);
+        ioTargetService = getComponentManager().getInstance(IOTargetService.class);
     }
 
     @Test

@@ -39,23 +39,13 @@ public class IndentVelocityMacroFilter implements VelocityMacroFilter
      */
     private static final Pattern INDENT_PATTERN = Pattern.compile("^[ \t]++", Pattern.MULTILINE);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#before(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String before(String content, VelocityContext velocityContect)
     {
         return INDENT_PATTERN.matcher(content).replaceAll("");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#after(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String after(String content, VelocityContext velocityContect)
     {
         return content;

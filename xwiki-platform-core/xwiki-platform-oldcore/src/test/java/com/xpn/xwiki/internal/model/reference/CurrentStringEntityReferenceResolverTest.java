@@ -57,13 +57,13 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
 
         getContext().setDatabase(CURRENT_WIKI);
 
-        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
     }
 
     @Test
     public void testResolveDocumentReferenceWhenNoContext() throws Exception
     {
-        getComponentManager().lookup(Execution.class).setContext(null);
+        getComponentManager().<Execution>getInstance(Execution.class).setContext(null);
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 

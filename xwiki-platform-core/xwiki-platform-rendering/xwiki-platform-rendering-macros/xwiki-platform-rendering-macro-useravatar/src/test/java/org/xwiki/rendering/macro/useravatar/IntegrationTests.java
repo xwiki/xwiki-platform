@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.useravatar;
 
+import java.lang.reflect.Type;
+
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -28,6 +30,7 @@ import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -80,7 +83,7 @@ public class IntegrationTests
 
         // Document Resolver Mock
         final DocumentReferenceResolver<String> mockDocumentReferenceResolver =
-            registerMockComponent(componentManager, mockery, DocumentReferenceResolver.class, "current");
+            registerMockComponent(componentManager, mockery, DocumentReferenceResolver.TYPE_STRING, "current");
         mockery.checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve("XWiki.Admin",
                 new EntityReference("XWiki", EntityType.SPACE));
@@ -95,7 +98,7 @@ public class IntegrationTests
 
         // Entity Reference Serializer Mock
         final EntityReferenceSerializer<String> mockEntityReferenceSerializer =
-            registerMockComponent(componentManager, mockery, EntityReferenceSerializer.class, "compactwiki");
+            registerMockComponent(componentManager, mockery, EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         mockery.checking(new Expectations() {{
             allowing(mockEntityReferenceSerializer).serialize(
                 new AttachmentReference("mockAvatar.png", adminUserReference));
@@ -113,31 +116,34 @@ public class IntegrationTests
     }
 
     private static <T> T registerMockComponent(ComponentManager componentManager, Mockery mockery,
-        Class<T> role, String hint) throws Exception
+        Type role, String hint) throws Exception
     {
         DefaultComponentDescriptor<T> descriptor = createComponentDescriptor(role);
         descriptor.setRoleHint(hint);
+
         return registerMockComponent(componentManager, mockery, descriptor);
     }
 
     private static <T> T registerMockComponent(ComponentManager componentManager, Mockery mockery,
-        Class<T> role) throws Exception
+        Type role) throws Exception
     {
-        return registerMockComponent(componentManager, mockery, createComponentDescriptor(role));
+        return registerMockComponent(componentManager, mockery, IntegrationTests.<T> createComponentDescriptor(role));
     }
 
     private static <T> T registerMockComponent(ComponentManager componentManager, Mockery mockery,
         ComponentDescriptor<T> descriptor) throws Exception
     {
-        T mock = mockery.mock(descriptor.getRole());
+        T mock = mockery.mock((Class<T>)ReflectionUtils.getTypeClass(descriptor.getRoleType()));
         componentManager.registerComponent(descriptor, mock);
+
         return mock;
     }
 
-    private static <T> DefaultComponentDescriptor<T> createComponentDescriptor(Class<T> role)
+    private static <T> DefaultComponentDescriptor<T> createComponentDescriptor(Type role)
     {
         DefaultComponentDescriptor<T> descriptor = new DefaultComponentDescriptor<T>();
-        descriptor.setRole(role);
+        descriptor.setRoleType(role);
+
         return descriptor;
     }
 }

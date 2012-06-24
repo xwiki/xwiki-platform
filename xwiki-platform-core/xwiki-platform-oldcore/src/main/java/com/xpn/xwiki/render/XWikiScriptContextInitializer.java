@@ -49,11 +49,7 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
     @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.script.ScriptContextInitializer#initialize(javax.script.ScriptContext)
-     */
+    @Override
     public void initialize(ScriptContext scriptContext)
     {
         XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");

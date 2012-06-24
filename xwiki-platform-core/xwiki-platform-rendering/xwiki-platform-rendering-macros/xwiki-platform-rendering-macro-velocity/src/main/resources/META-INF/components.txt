@@ -1,5 +1,6 @@
 org.xwiki.rendering.internal.macro.velocity.VelocityMacro
 org.xwiki.rendering.internal.macro.velocity.DefaultVelocityMacroConfiguration
+org.xwiki.rendering.internal.macro.velocity.VelocityMacroPermissionPolicy
 org.xwiki.rendering.internal.macro.velocity.filter.NoneVelocityMacroFilter
 org.xwiki.rendering.internal.macro.velocity.filter.HTMLVelocityMacroFilter
 org.xwiki.rendering.internal.macro.velocity.filter.IndentVelocityMacroFilter

@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -36,16 +37,24 @@ public class RenderingScriptServiceTest extends AbstractComponentTestCase
 {
     private RenderingScriptService rss;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        this.rss = (RenderingScriptService) getComponentManager().lookup(ScriptService.class, "rendering");
+        this.rss = (RenderingScriptService) getComponentManager().getInstance(ScriptService.class, "rendering");
     }
+
     @Test
     public void parseAndRender()
     {
         XDOM xdom = this.rss.parse("some [[TODO]] stuff", "plain/1.0");
         Assert.assertEquals("some ~[~[TODO]] stuff", this.rss.render(xdom, "xwiki/2.0"));
+    }
+
+    @Test
+    public void resolveSyntax()
+    {
+        Assert.assertEquals(Syntax.XWIKI_2_1, this.rss.resolveSyntax("xwiki/2.1"));
     }
 }

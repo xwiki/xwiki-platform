@@ -114,11 +114,13 @@ public class AnnotationsMockSetup
                 // update the list of document annotations
                 will(new Action()
                 {
+                    @Override
                     public void describeTo(Description description)
                     {
                         description.appendText("Updates the annotations");
                     }
 
+                    @Override
                     public Object invoke(Invocation invocation) throws Throwable
                     {
                         String documentName = (String) invocation.getParameter(0);

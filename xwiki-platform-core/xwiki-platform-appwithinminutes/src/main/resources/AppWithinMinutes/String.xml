@@ -1,140 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>AppWithinMinutes</web>
-<name>String</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>AppWithinMinutes.FormFieldClass</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1318180915000</creationDate>
-<date>1319487592000</date>
-<contentUpdateDate>1319487592000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('platform.appwithinminutes.classEditorStringFieldName')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<class>
-<name>AppWithinMinutes.String</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<shortText>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>shortText</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Short Text</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</shortText>
-</class>
-<object>
-<class>
-<name>AppWithinMinutes.FormFieldClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<classname>AppWithinMinutes.FormFieldCategoryClass</classname>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<idField></idField>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators></separators>
-<size>1</size>
-<sort>none</sort>
-<sql></sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</category>
-<icon>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>icon</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<priority>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>priority</name>
-<number>3</number>
-<numberType>long</numberType>
-<prettyName>Priority</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-</priority>
-<properties>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>properties</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>Properties</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</properties>
-</class>
-<name>AppWithinMinutes.String</name>
-<number>0</number>
-<className>AppWithinMinutes.FormFieldClass</className>
-<guid>97fd5dca-22ef-4bb3-98a6-4e4af3ba8ffe</guid>
-<property>
-<category>AppWithinMinutes.Standard</category>
-</property>
-<property>
-<icon>icons/datamodel/string.png</icon>
-</property>
-<property>
-<priority>0</priority>
-</property>
-<property>
-<properties></properties>
-</property>
-</object>
-<content></content></xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>String</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.FormFieldClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1318180915000</creationDate>
+  <date>1319487592000</date>
+  <contentUpdateDate>1319487592000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('platform.appwithinminutes.classEditorStringFieldName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <class>
+    <name>AppWithinMinutes.String</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <shortText>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>shortText</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Short Text</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </shortText>
+  </class>
+  <object>
+    <class>
+      <name>AppWithinMinutes.FormFieldClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <classname>AppWithinMinutes.FormFieldCategoryClass</classname>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>1</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </category>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <priority>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>3</number>
+        <numberType>long</numberType>
+        <prettyName>Priority</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
+      <properties>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>properties</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Properties</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </properties>
+    </class>
+    <name>AppWithinMinutes.String</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldClass</className>
+    <guid>97fd5dca-22ef-4bb3-98a6-4e4af3ba8ffe</guid>
+    <property>
+      <category>AppWithinMinutes.Standard</category>
+    </property>
+    <property>
+      <icon>icons/datamodel/string.png</icon>
+    </property>
+    <property>
+      <priority>0</priority>
+    </property>
+    <property>
+      <properties/>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

@@ -45,7 +45,6 @@ import javax.inject.Singleton;
 public class EntityXWikiURLBuilder implements XWikiURLBuilder
 {
     @Inject
-    @Named("default/reference")
     private EntityReferenceResolver<EntityReference> defaultReferenceEntityReferenceResolver;
     
     @Override

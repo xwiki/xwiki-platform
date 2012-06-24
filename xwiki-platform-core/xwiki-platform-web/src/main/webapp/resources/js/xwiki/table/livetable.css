@@ -161,7 +161,6 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter in
 thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter select {
   box-shadow: none;
   width: 100%;
-  border: 1px solid $theme.backgroundSecondaryColor;
   color: $theme.textPrimaryColor;
   margin: 0;
   padding: 0 0 0 2px;
@@ -240,6 +239,9 @@ tbody.xwiki-livetable-display-body td a.actionrights {
 }
 tbody.xwiki-livetable-display-body td a.actionedit {
   background-image: url($xwiki.getSkinFile("icons/silk/page_white_edit.png"));
+}
+tbody.xwiki-livetable-display-body td._images img {
+  margin-right: 2px;
 }
 /* </ Live Table Body> */
 /* <Dialog Box> */

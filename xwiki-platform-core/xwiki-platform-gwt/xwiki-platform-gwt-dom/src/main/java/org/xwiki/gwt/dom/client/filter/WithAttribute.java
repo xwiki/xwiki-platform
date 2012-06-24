@@ -63,11 +63,7 @@ public class WithAttribute implements NodeFilter
         this.value = value;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NodeFilter#acceptNode(Node)
-     */
+    @Override
     public Action acceptNode(Node node)
     {
         return (node.getNodeType() == Node.ELEMENT_NODE && (value == null ? Element.as(node).hasAttribute(name) : value

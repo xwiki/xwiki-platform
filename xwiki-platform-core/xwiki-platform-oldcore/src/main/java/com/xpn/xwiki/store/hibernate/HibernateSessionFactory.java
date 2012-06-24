@@ -21,7 +21,7 @@ package com.xpn.xwiki.store.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Class used by Hibernate stores for obtain sessions. Simple holder for real sessionFactory and configuration for now.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 1.6M1
  */
-@ComponentRole
+@Role
 public interface HibernateSessionFactory
 {
     /**

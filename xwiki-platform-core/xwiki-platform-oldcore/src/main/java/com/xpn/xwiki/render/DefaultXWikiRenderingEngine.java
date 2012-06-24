@@ -101,6 +101,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         initCache(context);
     }
 
+    @Override
     public void virtualInit(XWikiContext context)
     {
         XWikiMacrosMappingRenderer mmrendered = (XWikiMacrosMappingRenderer) getRenderer("mapping");
@@ -143,22 +144,26 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return this.cache;
     }
 
+    @Override
     public void addRenderer(String name, XWikiRenderer renderer)
     {
         this.renderers.add(renderer);
         this.renderermap.put(name, renderer);
     }
 
+    @Override
     public XWikiRenderer getRenderer(String name)
     {
         return this.renderermap.get(name);
     }
 
+    @Override
     public List<XWikiRenderer> getRendererList()
     {
         return new ArrayList<XWikiRenderer>(this.renderers);
     }
 
+    @Override
     public List<String> getRendererNames()
     {
         return new LinkedList<String>(this.renderermap.keySet());
@@ -173,22 +178,26 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return result;
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return renderText(doc.getTranslatedContent(context), doc, context);
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiDocument includingdoc, XWikiContext context)
         throws XWikiException
     {
         return renderText(doc.getTranslatedContent(context), includingdoc, context);
     }
 
+    @Override
     public String renderText(String text, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, includingdoc, includingdoc, context);
     }
 
+    @Override
     public String interpretText(String text, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, true, includingdoc, includingdoc, context);
@@ -216,6 +225,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         cached.add(key);
     }
 
+    @Override
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, false, contentdoc, includingdoc, context);
@@ -381,6 +391,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return db + "-" + cdoc + "-" + idoc + "-" + qs + "-" + action + "-" + lang + "-" + text.hashCode();
     }
 
+    @Override
     public void flushCache()
     {
         for (int i = 0; i < this.renderers.size(); i++) {
@@ -392,6 +403,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
@@ -404,6 +416,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {

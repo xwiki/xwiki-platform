@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.server.filter;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,8 +88,7 @@ public class ConversionFilter implements Filter
         String[] parametersRequiringHTMLConversion = req.getParameterValues(REQUIRES_HTML_CONVERSION);
         if (parametersRequiringHTMLConversion != null) {
             MutableServletRequestFactory mreqFactory =
-                (MutableServletRequestFactory) Utils
-                    .getComponent(MutableServletRequestFactory.class, req.getProtocol());
+                Utils.getComponent((Type) MutableServletRequestFactory.class, req.getProtocol());
             // Wrap the current request in order to be able to change request parameters.
             MutableServletRequest mreq = mreqFactory.newInstance(req);
             // Remove the list of request parameters that require HTML conversion to avoid recurrency.
@@ -105,7 +105,7 @@ public class ConversionFilter implements Filter
                 // Remove the syntax parameter from the request to avoid interference with further request processing.
                 String syntax = mreq.removeParameter(parameterName + "_syntax");
                 try {
-                    HTMLConverter converter = Utils.getComponent(HTMLConverter.class);
+                    HTMLConverter converter = Utils.getComponent((Type) HTMLConverter.class);
                     mreq.setParameter(parameterName, converter.fromHTML(req.getParameter(parameterName), syntax));
                 } catch (Exception e) {
                     LOGGER.error(e.getLocalizedMessage(), e);

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Blog</web>
-<name>Unpublished</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Blog.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1231916998000</creationDate>
-<date>1231919168000</date>
-<contentUpdateDate>1231919168000</contentUpdateDate>
-<version>1.1</version>
-<title>Unpublished blog posts</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{include document="Blog.BlogCode"/}}
+  <web>Blog</web>
+  <name>Unpublished</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1231916998000</creationDate>
+  <date>1231919168000</date>
+  <contentUpdateDate>1231919168000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Unpublished blog posts</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Blog.BlogCode"/}}
 
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
@@ -34,4 +34,5 @@
 #getUnpublishedBlogEntries($xwiki.getDocument('Blog.WebHome') $query $entries)
 #displayBlog($entries 'unpublished' true true)
 {{/html}}
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

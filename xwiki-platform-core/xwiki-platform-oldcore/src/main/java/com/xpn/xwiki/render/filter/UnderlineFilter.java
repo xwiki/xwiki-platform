@@ -24,6 +24,7 @@ import org.radeox.filter.regex.LocaleRegexReplaceFilter;
 
 public class UnderlineFilter extends LocaleRegexReplaceFilter implements CacheFilter
 {
+    @Override
     protected String getLocaleKey()
     {
         return "filter.underline";

@@ -56,11 +56,7 @@ public class SerializationStreamProvider<R> implements StreamProvider
         this.toSerialize = toSerialize;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see StreamProvider#getStream()
-     */
+    @Override
     public InputStream getStream() throws IOException
     {
         return this.serializer.serialize(this.toSerialize);

@@ -46,10 +46,7 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
     @Requirement
     protected Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // Set the Bundle priority

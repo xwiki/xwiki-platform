@@ -79,7 +79,8 @@ public class HistoryPlugin extends AbstractPlugin implements ClickHandler
         super.init(textArea, config);
 
         // Register custom executables.
-        History history = new DefaultHistory(textArea, 10);
+        int historySize = Integer.parseInt(config.getParameter("historySize", "10"));
+        History history = new DefaultHistory(textArea, Math.max(historySize, 1));
         getTextArea().getCommandManager().registerCommand(Command.REDO, new RedoExecutable(history));
         getTextArea().getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(history));
 

@@ -150,7 +150,6 @@ isc.XWEResultTree.addMethods({
         var treeRelations = this.treeRelations, childDataSources = nodeDS.getChildDataSources();
         // manage XWiki dynamic DS instantiation
         // it can't be managed with getChildDataSources since it needs the node to be created.
-        node.resource = XWiki.resource.get(node.id);
         if (nodeDS.Class == "XWEDataSource") {
             childDSName = isc.XWEWikiDataSource.getOrCreate(node.name).getID();
         } else if (nodeDS.Class == "XWEWikiDataSource") {
@@ -200,12 +199,15 @@ isc.XWEResultTree.addMethods({
                 title = isc.XWEResultTree.formatTitle(title, hint);
             }
 
+            var reference = currentDS.getReference(children[i], this.getEntityReference(parentNode));
+
             // Overwrite node properties.
             isc.addProperties(children[i], {
                 // Overwrite children icon with the one defined in the XWiki DataSource.
                 icon: currentDS.icon,
                 // Store the entity reference to know that this node corresponds to a server-side entity.
-                reference: currentDS.getReference(children[i], this.getEntityReference(parentNode)),
+                reference: reference,
+                resource: XWiki.resource.fromEntityReference(reference),
                 plainTitle: children[i].title,
                 title: title,
                 isNewPage: false,
@@ -406,8 +408,7 @@ isc.XWEResultTree.addMethods({
                 xwikiRelativeURL: node.xwikiRelativeURL + XWiki.constants.anchorSeparator +
                                   XWiki.constants.docextraAttachmentsAnchor,
                 icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.png')",
-                resource: XWiki.resource.get(node.id + XWiki.constants.anchorSeparator +
-                                            XWiki.constants.docextraAttachmentsAnchor),
+                resource: XWiki.resource.fromEntityReference(this.getEntityReference(node), XWiki.constants.docextraAttachmentsAnchor),
                 isXWikiAttachment: true,
                 isNewPage: false,
                 isNewAttachment: false

@@ -256,7 +256,10 @@
             <exclude>com/xpn/xwiki/plugin/PluginApi</exclude>
             <exclude>com/xpn/xwiki/XWikiCompatibilityAspect</exclude>
             <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
-            <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
+            <!-- Renamed HistoryTab to HistoryPane because it models also viewer=history -->
+            <exclude>org/xwiki/test/ui/po/HistoryTab</exclude>
+            <!-- Changed return type of method openHistoryDocExtraPane() from HistoryTab to HistoryPane -->
+            <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -35,7 +35,6 @@
   <description>XWiki Platform - Extension - Parent POM</description>
   <modules>
     <module>xwiki-platform-extension-handlers</module>
-    <module>xwiki-platform-extension-repositories</module>
     <module>xwiki-platform-extension-cluster</module>
     <module>xwiki-platform-extension-script</module>
     <module>xwiki-platform-extension-ui</module>

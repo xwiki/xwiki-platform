@@ -26,15 +26,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-extension</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-repositories</artifactId>
-  <name>XWiki Platform - Extension - Repository - Parent POM</name>
+  <artifactId>xwiki-platform-repository</artifactId>
+  <name>XWiki Platform - Repository</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Extension - Repository - Parent POM</description>
+  <description>XWiki Platform - Repository</description>
   <modules>
-    <module>xwiki-platform-extension-repository-xwiki</module>
+    <module>xwiki-platform-repository-server-api</module>
+    <module>xwiki-platform-repository-server-ui</module>
   </modules>
 </project>
        

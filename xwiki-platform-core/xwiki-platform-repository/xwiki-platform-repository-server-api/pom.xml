@@ -26,15 +26,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-extension-repository-xwiki</artifactId>
+    <artifactId>xwiki-platform-repository</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-repository-xwiki-server-api</artifactId>
-  <name>XWiki Platform - Extension - Repository - XWiki server api</name>
+  <artifactId>xwiki-platform-repository-server-api</artifactId>
+  <name>XWiki Platform - Repository - Server api</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Repository - XWiki server api</description>
-    <properties>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  <description>XWiki Platform - Repository - Server api</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-server-api</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
@@ -44,7 +45,7 @@
     </dependency>   
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-repository-xwiki-api</artifactId>
+      <artifactId>xwiki-commons-repository-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

@@ -957,27 +957,6 @@ ul.extension-metadata li {
   text-decoration: none;
 }
 
-#xwikicontent .controlPagination {
-  height: 15px;
-  line-height: 1.6em !important;
-  margin: 0.35em 0 0 1em !important;
-  vertical-align: bottom;
-  width: 27px;
-}
-#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination, #xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
-  height: 13px;
-  width: 13px;
-}
-#xwikicontent .controlPagination .prevPagination, #xwikicontent .controlPagination .noPrevPagination {
-  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowleft.gif");
-  background-position: left top;
-}
-#xwikicontent .controlPagination .nextPagination, #xwikicontent .controlPagination .noNextPagination {
-  background-image: url("/xwiki/bin/download/Improvements/ExtensionManagerProposal1/arrowright.gif");
-  background-position: right top;
-  left: 14px;
-}
-
 .ui-progress {
   margin-top: .5em;
 }

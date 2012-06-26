@@ -48,7 +48,7 @@ Lightbox = Class.create({
     if(this.loadedForms[url]) {
       $('lb-content').innerHTML = '';
       this.lbPlaceContentInDocument(this.loadedForms[url], $('lb-content'));
-      this.form = c.getElementsByTagName('form')[0];
+      this.form = $('lb-content').down('form');
     } else {
       new Ajax.Request(url, {onSuccess: this.lbFormDataLoaded.bind(this)});
     }

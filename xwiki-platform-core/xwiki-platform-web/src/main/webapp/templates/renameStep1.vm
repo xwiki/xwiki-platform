@@ -2,7 +2,7 @@
 ### Rename document template, step 1: choose new name + updated backlinks + updated parents
 ###
 ## TODO: check if this information should be displayed?
-<div id="document-title"><h1>$msg.get('core.rename.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
+<div id="document-title"><h1>$msg.get('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
 #set($newname = $msg.get('core.rename.inputPrompt'))
 <form action="?xpage=rename&amp;step=2" method="post" class="xform third"
     onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">

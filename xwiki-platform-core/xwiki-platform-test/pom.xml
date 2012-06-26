@@ -96,7 +96,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-repository-xwiki-model</artifactId>
+      <artifactId>xwiki-commons-repository-model</artifactId>
       <version>${commons.version}</version>
     </dependency>
 

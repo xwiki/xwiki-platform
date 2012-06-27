@@ -31,10 +31,10 @@
   </parent>
   <artifactId>xwiki-platform-administration</artifactId>
   <name>XWiki Platform - Administration</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-administration-ui</module>
+    <module>xwiki-platform-administration-test-pageobjects</module>
+  </modules>
 </project>

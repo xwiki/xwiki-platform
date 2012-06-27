@@ -31,10 +31,10 @@
   </parent>
   <artifactId>xwiki-platform-blog</artifactId>
   <name>XWiki Platform - Blog</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>Blog application for XWiki</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-blog-ui</module>
+    <module>xwiki-platform-blog-test-pageobjects</module>
+  </modules>
 </project>

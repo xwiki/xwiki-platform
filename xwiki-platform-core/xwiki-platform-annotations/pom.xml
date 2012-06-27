@@ -38,5 +38,6 @@
     <module>xwiki-platform-annotation-rest</module>
     <module>xwiki-platform-annotation-scripting</module>
     <module>xwiki-platform-annotation-ui</module>
+    <module>xwiki-platform-annotation-test-pageobjects</module>
   </modules>
 </project>

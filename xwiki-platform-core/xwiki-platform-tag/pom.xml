@@ -36,5 +36,6 @@
   <modules>
     <module>xwiki-platform-tag-api</module>
     <module>xwiki-platform-tag-ui</module>
+    <module>xwiki-platform-tag-test-pageobjects</module>
   </modules>
 </project>

@@ -33,6 +33,9 @@ import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
  */
 public class WatchlistUserProfilePage extends AbstractUserProfilePage
 {
+    @FindBy(xpath = "//a[@href='?category=watchlist']")
+    private WebElement watchlistCategory;
+
     @FindBy(xpath = "//div[@id='watchlistPane']//div[@class='editProfileCategory']/a")
     private WebElement editPreferences;
 
@@ -52,6 +55,12 @@ public class WatchlistUserProfilePage extends AbstractUserProfilePage
     public WatchlistUserProfilePage(String username)
     {
         super(username);
+    }
+
+    public WatchlistUserProfilePage switchToWatchlist()
+    {
+        this.watchlistCategory.click();
+        return new WatchlistUserProfilePage(getUsername());
     }
 
     public String getNotifier()

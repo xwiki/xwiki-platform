@@ -37,9 +37,6 @@ public class AbstractUserProfilePage extends ViewPage
     @FindBy(xpath = "//a[@href='?category=preferences']")
     private WebElement preferencesCategory;
 
-    @FindBy(xpath = "//a[@href='?category=watchlist']")
-    private WebElement watchlistCategory;
-
     @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[3]/dd[1]")
     private WebElement defaultEditorToUse;
 

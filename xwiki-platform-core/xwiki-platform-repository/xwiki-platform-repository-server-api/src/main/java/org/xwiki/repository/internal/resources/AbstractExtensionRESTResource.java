@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal.resources;
+package org.xwiki.repository.internal.resources;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
-import org.xwiki.extension.repository.xwiki.internal.RepositoryManager;
-import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
@@ -48,6 +46,8 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.repository.internal.RepositoryManager;
+import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWikiContext;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.xwiki.internal.xhtml;
+package org.xwiki.repository.internal.xhtml;
 
 import java.net.URI;
 import java.util.Map;
@@ -29,12 +29,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.context.Execution;
-import org.xwiki.extension.repository.xwiki.Resources;
-import org.xwiki.extension.repository.xwiki.UriBuilder;
-import org.xwiki.extension.repository.xwiki.internal.reference.ExtensionResourceReference;
 import org.xwiki.rendering.internal.renderer.xhtml.link.AbstractXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.repository.Resources;
+import org.xwiki.repository.UriBuilder;
+import org.xwiki.repository.internal.reference.ExtensionResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 

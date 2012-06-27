@@ -36,6 +36,7 @@
   <modules>
     <module>xwiki-platform-repository-server-api</module>
     <module>xwiki-platform-repository-server-ui</module>
+    <module>xwiki-platform-repository-test-pageobjects</module>
   </modules>
 </project>
        

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.xwiki.internal.resources;
+package org.xwiki.repository.internal.resources;
 
 import java.io.IOException;
 import java.net.ProxySelector;
@@ -55,14 +55,14 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
-import org.xwiki.extension.repository.xwiki.Resources;
-import org.xwiki.extension.repository.xwiki.internal.XWikiRepositoryModel;
-import org.xwiki.extension.repository.xwiki.internal.reference.ExtensionResourceReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.query.QueryException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.repository.Resources;
+import org.xwiki.repository.internal.XWikiRepositoryModel;
+import org.xwiki.repository.internal.reference.ExtensionResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal.resources;
+package org.xwiki.repository.internal.resources;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -26,9 +26,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Extension;
 import org.xwiki.query.QueryException;
+import org.xwiki.repository.Resources;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;

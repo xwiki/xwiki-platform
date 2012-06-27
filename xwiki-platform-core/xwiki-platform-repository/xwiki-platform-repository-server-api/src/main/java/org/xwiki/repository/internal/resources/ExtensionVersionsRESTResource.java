@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.extension.repository.xwiki.internal.resources;
+package org.xwiki.repository.internal.resources;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,7 +33,6 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.repository.xwiki.Resources;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.extension.version.InvalidVersionRangeException;
@@ -42,6 +41,7 @@ import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.repository.Resources;
 
 /**
  * @version $Id$

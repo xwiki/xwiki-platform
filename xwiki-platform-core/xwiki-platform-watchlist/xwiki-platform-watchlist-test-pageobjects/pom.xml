@@ -33,6 +33,10 @@
   <name>XWiki Platform - Watchlist - Page Objects</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Watchlist - Page Objects</description>
+  <properties>
+    <!-- None of the classes is valid -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

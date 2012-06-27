@@ -34,7 +34,7 @@ import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
  * The "Inline form" edit mode page for a blog post.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class BlogPostInlinePage extends InlinePage
 {

@@ -119,7 +119,7 @@ public class SchedulerHomePage extends ViewPage
     /**
      * @return true if the scheduler home page contains an error message or false otherwise. An error message appears
      *         when one of the scheduler actions fails to execute properly.
-     * @since 3.2M3
+     * @since 4.2M1
      */
     public boolean hasError()
     {
@@ -129,7 +129,7 @@ public class SchedulerHomePage extends ViewPage
 
     /**
      * @return the text of the error message (see {@link #hasError()}
-     * @since 3.2M3
+     * @since 4.2M1
      */
     public String getErrorMessage()
     {

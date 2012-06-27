@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents the static list items editor present on the configuration pane of a static list field.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.2M1
  */
 public class StaticListItemsEditor extends BaseElement
 {

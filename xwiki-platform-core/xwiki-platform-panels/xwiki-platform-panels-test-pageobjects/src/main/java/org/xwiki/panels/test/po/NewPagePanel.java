@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  * Represents the NewPage panel.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class NewPagePanel extends ViewPage
 {

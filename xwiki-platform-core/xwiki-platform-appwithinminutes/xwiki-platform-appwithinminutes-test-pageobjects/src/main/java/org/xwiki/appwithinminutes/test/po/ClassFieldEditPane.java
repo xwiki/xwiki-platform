@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.ConfirmationBox;
  * Represents the pane used to edit a class field.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class ClassFieldEditPane extends BaseElement
 {

@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Pane that opens when you click on the Annotation menu entry.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class AnnotationsPane extends BaseElement
 {

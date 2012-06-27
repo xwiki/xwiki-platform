@@ -30,7 +30,7 @@ import org.openqa.selenium.support.ui.Select;
  * Represents the pane used to edit a 'Static List' class field.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.2M1
  */
 public class StaticListClassFieldEditPane extends ClassFieldEditPane
 {

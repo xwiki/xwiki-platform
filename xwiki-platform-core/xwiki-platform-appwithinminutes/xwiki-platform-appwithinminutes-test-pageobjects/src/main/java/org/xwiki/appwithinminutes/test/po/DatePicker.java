@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents the actions possible on the date picker.
  * 
  * @version $Id$
- * @since 3.5
+ * @since 4.2M1
  */
 public class DatePicker extends BaseElement
 {

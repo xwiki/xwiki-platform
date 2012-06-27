@@ -33,7 +33,7 @@ import org.xwiki.test.ui.po.TableElement;
  * Represents the actions possible on the invitation sender page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class InvitationSenderPage extends BasePage
 {

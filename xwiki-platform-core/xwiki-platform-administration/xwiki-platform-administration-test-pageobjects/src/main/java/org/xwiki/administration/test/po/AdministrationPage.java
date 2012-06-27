@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the main Administration Page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class AdministrationPage extends ViewPage
 {

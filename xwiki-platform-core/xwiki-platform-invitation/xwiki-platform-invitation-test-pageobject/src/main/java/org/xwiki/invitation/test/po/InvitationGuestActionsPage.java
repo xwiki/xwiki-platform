@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.BasePage;
  * Represents the actions possible by guests on the invitation application.
  *
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class InvitationGuestActionsPage extends BasePage
 {

@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Common page object for all Profile page tabs (profile tab, preferences tab, watchlist tab).
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class AbstractUserProfilePage extends ViewPage
 {

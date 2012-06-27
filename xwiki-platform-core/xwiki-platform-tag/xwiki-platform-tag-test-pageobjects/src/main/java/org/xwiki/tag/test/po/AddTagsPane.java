@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Models the panel that is displayed when we want to add new tags to a wiki page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class AddTagsPane extends BaseElement
 {

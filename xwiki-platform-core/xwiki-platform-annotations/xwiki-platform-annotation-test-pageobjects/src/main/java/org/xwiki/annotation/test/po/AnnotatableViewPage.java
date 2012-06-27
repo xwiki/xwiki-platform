@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * @since 3.2M3
+ * @since 4.2M1
  * @version $Id$
  */
 public class AnnotatableViewPage extends BaseElement

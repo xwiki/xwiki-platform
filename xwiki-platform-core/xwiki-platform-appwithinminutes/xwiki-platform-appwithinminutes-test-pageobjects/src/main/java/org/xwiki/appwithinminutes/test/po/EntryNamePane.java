@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents the pane used to input the entry name.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class EntryNamePane extends BaseElement
 {

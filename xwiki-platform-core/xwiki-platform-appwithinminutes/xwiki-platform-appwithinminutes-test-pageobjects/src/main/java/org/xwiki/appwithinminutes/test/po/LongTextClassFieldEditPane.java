@@ -27,7 +27,7 @@ import org.openqa.selenium.support.ui.Select;
  * Represents the pane used to edit a 'Long Text' class field.
  * 
  * @version $Id$
- * @since 3.4M1
+ * @since 4.2M1
  */
 public class LongTextClassFieldEditPane extends ClassFieldEditPane
 {

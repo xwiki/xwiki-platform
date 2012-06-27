@@ -30,7 +30,7 @@ import org.openqa.selenium.support.FindBy;
  * Represents the actions possible on the WYSIWYG Editor administration section.
  * 
  * @version $Id$
- * @since 3.3M2
+ * @since 4.2M1
  */
 public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectionPage
 {

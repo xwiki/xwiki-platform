@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents the Annotation window that appears when selecting a text and pressing CTRL+M.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class AnnotationsWindow extends BaseElement
 {

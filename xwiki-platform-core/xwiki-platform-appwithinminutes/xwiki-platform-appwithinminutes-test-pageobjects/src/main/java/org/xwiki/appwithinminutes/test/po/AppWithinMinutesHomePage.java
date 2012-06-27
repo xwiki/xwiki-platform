@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the App Within Minutes home page.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class AppWithinMinutesHomePage extends ViewPage
 {

@@ -33,7 +33,7 @@ import org.xwiki.test.ui.po.TableElement;
  * Represents the actions possible when inspecting invitations.
  *
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public abstract class InspectInvitationsPage extends BasePage
 {

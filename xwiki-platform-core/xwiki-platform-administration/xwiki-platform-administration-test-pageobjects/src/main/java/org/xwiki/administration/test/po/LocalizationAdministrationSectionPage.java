@@ -27,7 +27,7 @@ import org.openqa.selenium.support.ui.Select;
  * Represents the actions possible on the Localization Administration Page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class LocalizationAdministrationSectionPage extends AdministrationSectionPage
 {

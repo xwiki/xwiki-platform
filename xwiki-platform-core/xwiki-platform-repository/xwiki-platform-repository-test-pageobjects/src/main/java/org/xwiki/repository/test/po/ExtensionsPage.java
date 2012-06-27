@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * @version $Id$
- * @since 3.3M1
+ * @since 4.2M1
  */
 public class ExtensionsPage extends ViewPage
 {

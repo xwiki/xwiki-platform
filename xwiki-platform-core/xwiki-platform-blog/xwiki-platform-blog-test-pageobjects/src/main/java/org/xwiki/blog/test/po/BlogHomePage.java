@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the blog home page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class BlogHomePage extends ViewPage
 {

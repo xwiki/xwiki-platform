@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
  * Within Minutes wizard, in which the presentation of the application home page is customized.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class ApplicationHomeEditPage extends InlinePage
 {

@@ -6,7 +6,7 @@ import org.xwiki.administration.test.po.AdministrationSectionPage;
 
 /**
  * @version $Id$
- * @since 3.3M2
+ * @since 4.2M1
  */
 public class RepositoryAdminPage extends AdministrationSectionPage
 {

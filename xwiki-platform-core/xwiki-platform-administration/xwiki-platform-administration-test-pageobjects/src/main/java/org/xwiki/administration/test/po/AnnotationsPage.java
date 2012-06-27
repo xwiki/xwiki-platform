@@ -26,7 +26,7 @@ import org.openqa.selenium.support.FindBy;
  * Represents the actions possible on the Annotations Administration Page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 
 public class AnnotationsPage extends AdministrationSectionPage

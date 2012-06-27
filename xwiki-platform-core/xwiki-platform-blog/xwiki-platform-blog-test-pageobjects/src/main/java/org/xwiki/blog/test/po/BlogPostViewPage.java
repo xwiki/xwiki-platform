@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * The page that displays a blog post.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class BlogPostViewPage extends ViewPage
 {

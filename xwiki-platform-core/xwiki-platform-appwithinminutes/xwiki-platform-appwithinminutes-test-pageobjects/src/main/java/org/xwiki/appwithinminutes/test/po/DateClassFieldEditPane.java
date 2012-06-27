@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
  * Represents the pane used to edit a 'Date' class field.
  * 
  * @version $Id$
- * @since 3.5
+ * @since 4.2M1
  */
 public class DateClassFieldEditPane extends ClassFieldEditPane
 {

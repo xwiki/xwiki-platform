@@ -25,12 +25,12 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * @version $Id$
- * @since 3.3M1
+ * @since 4.2M1
  */
 public class ExtensionPage extends ViewPage
 {
     /**
-     * @since 3.3M2
+     * @since 4.2M1
      */
     public boolean isValidExtension()
     {

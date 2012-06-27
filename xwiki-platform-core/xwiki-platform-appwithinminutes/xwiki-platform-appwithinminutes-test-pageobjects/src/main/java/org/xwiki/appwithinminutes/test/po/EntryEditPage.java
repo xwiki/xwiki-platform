@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.InlinePage;
  * Represents the actions possible when editing an application entry.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class EntryEditPage extends InlinePage
 {

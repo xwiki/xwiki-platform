@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the first step of the App Within Minutes wizard.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class ApplicationCreatePage extends ViewPage
 {

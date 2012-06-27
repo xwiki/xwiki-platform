@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
  * Represents the live table that lists the existing applications on the AppWithinMinuts home page.
  * 
  * @version $Id$
- * @since 4.0M2
+ * @since 4.2M1
  */
 public class ApplicationsLiveTableElement extends LiveTableElement
 {

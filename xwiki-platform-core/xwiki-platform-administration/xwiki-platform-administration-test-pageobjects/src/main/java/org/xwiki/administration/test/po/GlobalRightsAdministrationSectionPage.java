@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.EditRightsPane;
  * Represents the actions possible on the Global Rights Administration Page.
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class GlobalRightsAdministrationSectionPage extends AdministrationSectionPage
 {
@@ -46,7 +46,7 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
     }
 
     /**
-     * @since 3.2M3
+     * @since 4.2M1
      */
     public static GlobalRightsAdministrationSectionPage gotoPage()
     {

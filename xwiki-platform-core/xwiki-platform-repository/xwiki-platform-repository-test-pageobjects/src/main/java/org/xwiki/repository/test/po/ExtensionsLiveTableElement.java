@@ -5,7 +5,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * @version $Id$
- * @since 3.3M2
+ * @since 4.2M1
  */
 public class ExtensionsLiveTableElement extends LiveTableElement
 {

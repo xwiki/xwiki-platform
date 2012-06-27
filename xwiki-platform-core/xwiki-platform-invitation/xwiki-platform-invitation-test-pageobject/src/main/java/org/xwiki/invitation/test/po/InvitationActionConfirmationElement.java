@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents the actions possible on the confirmation dialog for the invitation appliaction.
  *
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class InvitationActionConfirmationElement extends BaseElement
 {

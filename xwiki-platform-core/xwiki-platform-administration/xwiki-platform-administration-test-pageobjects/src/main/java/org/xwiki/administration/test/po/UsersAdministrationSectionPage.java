@@ -26,7 +26,7 @@ import org.openqa.selenium.support.FindBy;
  * Represents the actions possible on the Users Administration Page.
  *
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 public class UsersAdministrationSectionPage extends AdministrationSectionPage
 {
@@ -34,7 +34,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     private WebElement addNewUserButton;
 
     /**
-     * @since 3.2M3
+     * @since 4.2M1
      */
     public static UsersAdministrationSectionPage gotoPage()
     {

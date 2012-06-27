@@ -69,7 +69,7 @@ public class SchedulerEditPage extends EditPage
     }
 
     /**
-     * @since 3.2M2
+     * @since 4.2M1
      */
     public void waitForJobEditionToLoad()
     {

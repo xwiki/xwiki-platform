@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Implements the Annotation window that appears when selecting an annotation
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 4.2M1
  */
 
 public class AnnotationsLabel extends BaseElement

@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Minutes wizard, in which the application structure defined.
  * 
  * @version $Id$
- * @since 3.3
+ * @since 4.2M1
  */
 public class ApplicationClassEditPage extends InlinePage
 {

@@ -23,7 +23,6 @@ package org.xwiki.repository.internal.resources;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;

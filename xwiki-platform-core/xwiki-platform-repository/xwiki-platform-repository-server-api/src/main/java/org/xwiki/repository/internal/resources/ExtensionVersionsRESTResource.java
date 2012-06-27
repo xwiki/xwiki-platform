@@ -47,7 +47,7 @@ import org.xwiki.repository.Resources;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionsRESTResource")
+@Component("org.xwiki.repository.internal.resources.ExtensionVersionsRESTResource")
 @Path(Resources.EXTENSION_VERSIONS)
 @Singleton
 public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource

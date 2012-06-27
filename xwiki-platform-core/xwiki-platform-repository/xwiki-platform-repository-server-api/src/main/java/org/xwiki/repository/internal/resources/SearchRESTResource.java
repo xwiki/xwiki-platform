@@ -36,7 +36,7 @@ import org.xwiki.repository.Resources;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.resources.SearchRESTResource")
+@Component("org.xwiki.repository.internal.resources.SearchRESTResource")
 @Path(Resources.SEARCH)
 @Singleton
 public class SearchRESTResource extends AbstractExtensionRESTResource

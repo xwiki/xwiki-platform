@@ -74,7 +74,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.extension.repository.xwiki.internal.resources.ExtensionVersionFileRESTResource")
+@Component("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
 @Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource

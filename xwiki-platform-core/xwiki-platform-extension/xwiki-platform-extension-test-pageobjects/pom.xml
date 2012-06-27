@@ -26,19 +26,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-extension</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension</artifactId>
-  <name>XWiki Platform - Extension - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Extension - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-extension-handlers</module>
-    <module>xwiki-platform-extension-cluster</module>
-    <module>xwiki-platform-extension-script</module>
-    <module>xwiki-platform-extension-ui</module>
-    <module>xwiki-platform-extension-test-pageobjects</module>
-  </modules>
+  <artifactId>xwiki-platform-extension-test-pageobjects</artifactId>
+  <name>XWiki Platform - Extension - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>The page objects used in the functional tests of the Extension Manager UI.</description>
+  <properties>
+    <!-- Don't run CLIRR in test modules because we don't care about backward compatibility for tests. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>
-

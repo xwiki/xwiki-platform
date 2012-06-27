@@ -36,5 +36,6 @@
   <modules>
     <module>xwiki-platform-watchlist-api</module>
     <module>xwiki-platform-watchlist-ui</module>
+    <module>xwiki-platform-watchlist-test-pageobjects</module>
   </modules>
 </project>

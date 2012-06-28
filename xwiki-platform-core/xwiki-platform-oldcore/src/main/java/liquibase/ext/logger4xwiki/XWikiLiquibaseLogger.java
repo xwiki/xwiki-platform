@@ -122,6 +122,7 @@ public class XWikiLiquibaseLogger implements liquibase.logging.Logger
     @Override
     public void info(String s)
     {
+        // TODO: Improve message saying "but failOnError was false"
         LOGGER.info(s);
     }
 

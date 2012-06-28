@@ -876,7 +876,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Preamble
         String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
+            .append("-").append(String.format("%03d", this.logCount++))
+            .append("\" author=\"sdumitriu\" failOnError=\"false\">\n")
             .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
 
         // Concrete Property types should each have a foreign key referencing the BaseProperty

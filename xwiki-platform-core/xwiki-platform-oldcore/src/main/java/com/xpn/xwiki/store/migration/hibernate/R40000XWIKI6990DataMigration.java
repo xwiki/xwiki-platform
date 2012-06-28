@@ -77,8 +77,8 @@ import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.util.Util;
@@ -599,10 +599,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     String statsName = (String) result[1];
                     Integer number = (Integer) result[2];
 
-                    long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
+                    // Do not try to convert broken records which would cause duplicated ids
+                    if (!statsName.startsWith(".") && !statsName.endsWith(".")) {
+                        long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
 
-                    if (oldId != newId) {
-                        map.put(oldId, newId);
+                        if (oldId != newId) {
+                            map.put(oldId, newId);
+                        }
                     }
                 }
 

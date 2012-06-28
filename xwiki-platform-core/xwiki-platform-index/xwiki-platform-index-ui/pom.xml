@@ -40,7 +40,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livetable-ui</artifactId>
+      <artifactId>xwiki-platform-livetable</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

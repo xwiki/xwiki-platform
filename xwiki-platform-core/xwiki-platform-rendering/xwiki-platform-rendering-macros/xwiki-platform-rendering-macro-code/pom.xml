@@ -42,19 +42,10 @@
       <artifactId>xwiki-rendering-macro-box</artifactId>
       <version>${rendering.version}</version>
     </dependency>
-
-    <!-- Having the standard libraries bundled with Jython is required in some situations (Eclipse, Maven)
-     and in others they need to be packaged separately (JBoss AS). -->
     <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython-standalone</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython-lib</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
     <dependency>
       <groupId>pygments</groupId>
       <artifactId>pygments</artifactId>

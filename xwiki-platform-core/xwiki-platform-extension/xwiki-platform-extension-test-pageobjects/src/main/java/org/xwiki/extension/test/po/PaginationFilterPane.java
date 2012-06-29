@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
@@ -31,6 +32,16 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class PaginationFilterPane extends BaseElement
 {
+    /**
+     * The class name of the next page button.
+     */
+    private static final String NEXT_PAGE_CLASS_NAME = "nextPagination";
+
+    /**
+     * The class name of the previous page button.
+     */
+    private static final String PREVIOUS_PAGE_CLASS_NAME = "prevPagination";
+
     /**
      * The elements that displays the total number of results.
      */
@@ -52,19 +63,19 @@ public class PaginationFilterPane extends BaseElement
     /**
      * The index of the last page.
      */
-    @FindBy(xpath = "//span[@class = 'pagination']/a[last()]")
+    @FindBy(xpath = "//span[@class = 'pagination']/*[last()]")
     private WebElement lastPageIndex;
 
     /**
      * The button used to navigate to the previous page.
      */
-    @FindBy(className = "prevPagination")
+    @FindBy(className = PREVIOUS_PAGE_CLASS_NAME)
     private WebElement previousPageButton;
 
     /**
      * The button used to navigate to the next page.
      */
-    @FindBy(className = "nextPagination")
+    @FindBy(className = NEXT_PAGE_CLASS_NAME)
     private WebElement nextPageButton;
 
     /**
@@ -111,6 +122,14 @@ public class PaginationFilterPane extends BaseElement
     }
 
     /**
+     * @return {@code true} if the previous page button is active, {@code false} otherwise
+     */
+    public boolean hasNextPage()
+    {
+        return getUtil().findElementsWithoutWaiting(getDriver(), By.className(NEXT_PAGE_CLASS_NAME)).size() > 0;
+    }
+
+    /**
      * Navigates to the previous page.
      * 
      * @return the new pagination filter matching the previous page
@@ -118,6 +137,27 @@ public class PaginationFilterPane extends BaseElement
     public PaginationFilterPane previousPage()
     {
         previousPageButton.click();
+        return new PaginationFilterPane();
+    }
+
+    /**
+     * @return {@code true} if the previous page button is active, {@code false} otherwise
+     */
+    public boolean hasPreviousPage()
+    {
+        return getUtil().findElementsWithoutWaiting(getDriver(), By.className(PREVIOUS_PAGE_CLASS_NAME)).size() > 0;
+    }
+
+    /**
+     * Loads the specified page of results.
+     * 
+     * @param index the page index
+     * @return the specified page
+     */
+    public PaginationFilterPane gotoPage(int index)
+    {
+        getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//span[@class = 'pagination']/a[. = '" + index + "']")).click();
         return new PaginationFilterPane();
     }
 }

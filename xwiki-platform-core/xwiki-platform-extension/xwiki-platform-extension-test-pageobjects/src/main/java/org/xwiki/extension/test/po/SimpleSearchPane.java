@@ -93,4 +93,18 @@ public class SimpleSearchPane extends BaseElement
         searchInput.sendKeys(Keys.RETURN);
         return new SearchResultsPane();
     }
+
+    /**
+     * Searches for the extensions matching the given keywords.
+     * 
+     * @param keywords the keywords to search for
+     * @return the search results pane
+     */
+    public SearchResultsPane search(CharSequence keywords)
+    {
+        searchInput.clear();
+        searchInput.sendKeys(keywords);
+        searchInput.sendKeys(Keys.RETURN);
+        return new SearchResultsPane();
+    }
 }

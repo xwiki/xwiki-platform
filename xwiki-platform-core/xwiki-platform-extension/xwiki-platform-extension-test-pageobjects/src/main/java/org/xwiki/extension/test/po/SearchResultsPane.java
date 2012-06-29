@@ -19,7 +19,10 @@
  */
 package org.xwiki.extension.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -52,10 +55,9 @@ public class SearchResultsPane extends BaseElement
      */
     public String getNoResultsMessage()
     {
-        return getUtil().findElementWithoutWaiting(
-            getDriver(),
-            By.xpath("//div[contains(@class, 'box') and "
-                + "preceding-sibling::div[1][@class = 'extension-search-bar']]")).getText();
+        String xpath = "//div[contains(@class, 'box') and preceding-sibling::div[1][@class = 'extension-search-bar']]";
+        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), By.xpath(xpath));
+        return found.size() > 0 ? found.get(0).getText() : null;
     }
 
     /**

@@ -82,7 +82,7 @@ public class ExtensionPane extends BaseElement
     public String getName()
     {
         String nameAndVersion = getUtil().findElementWithoutWaiting(getDriver(), container, EXTENSION_NAME).getText();
-        return nameAndVersion.substring(0, nameAndVersion.length() - getVersion().length());
+        return nameAndVersion.substring(0, nameAndVersion.length() - getVersion().length() - 1);
     }
 
     /**
@@ -127,21 +127,23 @@ public class ExtensionPane extends BaseElement
             return this;
         } else {
             // Wait until the extension body is not loading.
-            return clickAndWaitUntilElementIsVisible(By.name("actionShowDetails"), "/*[@class = 'extension-body']");
+            WebElement button =
+                getUtil().findElementWithoutWaiting(getDriver(), container, By.name("actionShowDetails"));
+            return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']");
         }
     }
 
     /**
-     * Clicks on the specified button and waits for the specified element to be visible.
+     * Clicks on the given button and waits for the specified element to be visible.
      * 
-     * @param buttonLocator the button to be clicked
+     * @param button the button to be clicked
      * @param xpathSuffix the XPath suffix inside the 'extension-item' element
      * @return the new extension pane, after the specified element became visible
      */
-    private ExtensionPane clickAndWaitUntilElementIsVisible(By buttonLocator, String xpathSuffix)
+    private ExtensionPane clickAndWaitUntilElementIsVisible(WebElement button, String xpathSuffix)
     {
         String nameAndVersion = getUtil().findElementWithoutWaiting(getDriver(), container, EXTENSION_NAME).getText();
-        getUtil().findElementWithoutWaiting(getDriver(), container, buttonLocator).click();
+        button.click();
         waitUntilElementIsVisible(By.xpath(String.format("//*[contains(@class, 'extension-item') and "
             + "descendant::*[contains(@class, 'extension-name') and . = '%s']]%s", nameAndVersion, xpathSuffix)));
         // We have to create a new extension pane because the DOM has changed.
@@ -163,15 +165,15 @@ public class ExtensionPane extends BaseElement
     }
 
     /**
-     * Clicks on the specified button and waits for a confirmation or for the job/action to be done.
+     * Clicks on the given button and waits for a confirmation or for the job/action to be done.
      * 
-     * @param buttonLocator the button to be clicked
+     * @param button the button to be clicked
      * @return the extension pane showing the confirmation or the job log
      */
-    private ExtensionPane clickAndWaitForConfirmationOrJobDone(By buttonLocator)
+    private ExtensionPane clickAndWaitForConfirmationOrJobDone(WebElement button)
     {
         // Wait until the progress section contains a confirmation button or no loading log items.
-        return clickAndWaitUntilElementIsVisible(buttonLocator, "/*[@class = 'extension-body']/*"
+        return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']/*"
             + "[@class = 'extension-body-progress extension-body-section' and "
             + "(descendant::input[@name = 'confirm'] or "
             + "not(descendant::div[contains(@class, 'extension-log-item-loading')]))]");
@@ -184,8 +186,25 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane install()
     {
-        return clickAndWaitForConfirmationOrJobDone(By
-            .xpath(".//input[@name = 'actionInstall' and @value = 'Install']"));
+        return clickAndWaitForConfirmationOrJobDone(getInstallButton());
+    }
+
+    /**
+     * @return the install button, if present
+     */
+    public WebElement getInstallButton()
+    {
+        return maybeFindElement(By.xpath(".//input[@name = 'actionInstall' and @value = 'Install']"));
+    }
+
+    /**
+     * @param locator specifies the element to look for
+     * @return the specified element, if found, {@code null} otherwise
+     */
+    private WebElement maybeFindElement(By locator)
+    {
+        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, locator);
+        return found.size() > 0 ? found.get(0) : null;
     }
 
     /**
@@ -195,7 +214,15 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane uninstall()
     {
-        return clickAndWaitForConfirmationOrJobDone(By.name("actionUninstall"));
+        return clickAndWaitForConfirmationOrJobDone(getUninstallButton());
+    }
+
+    /**
+     * @return the uninstall button, if present
+     */
+    public WebElement getUninstallButton()
+    {
+        return maybeFindElement(By.name("actionUninstall"));
     }
 
     /**
@@ -205,8 +232,15 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane upgrade()
     {
-        return clickAndWaitForConfirmationOrJobDone(By
-            .xpath(".//input[@name = 'actionInstall' and @value = 'Upgrade']"));
+        return clickAndWaitForConfirmationOrJobDone(getUpgradeButton());
+    }
+
+    /**
+     * @return the upgrade button, if present
+     */
+    public WebElement getUpgradeButton()
+    {
+        return maybeFindElement(By.xpath(".//input[@name = 'actionInstall' and @value = 'Upgrade']"));
     }
 
     /**
@@ -216,8 +250,15 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane downgrade()
     {
-        return clickAndWaitForConfirmationOrJobDone(By
-            .xpath(".//input[@name = 'actionInstall' and @value = 'Downgrade']"));
+        return clickAndWaitForConfirmationOrJobDone(getDowngradeButton());
+    }
+
+    /**
+     * @return the downgrade button, if present
+     */
+    public WebElement getDowngradeButton()
+    {
+        return maybeFindElement(By.xpath(".//input[@name = 'actionInstall' and @value = 'Downgrade']"));
     }
 
     /**
@@ -227,7 +268,8 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane confirm()
     {
-        return clickAndWaitForConfirmationOrJobDone(By.name("confirm"));
+        WebElement button = getUtil().findElementWithoutWaiting(getDriver(), container, By.name("confirm"));
+        return clickAndWaitForConfirmationOrJobDone(button);
     }
 
     /**

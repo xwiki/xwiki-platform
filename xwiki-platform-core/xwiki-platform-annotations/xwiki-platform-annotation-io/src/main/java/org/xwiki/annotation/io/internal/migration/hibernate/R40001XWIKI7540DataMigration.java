@@ -106,6 +106,10 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
+        // Clear any existing migration data/cache from previously migrated wikis.
+        documentToDatedObjectsMap.clear();
+        objectToPropertiesMap.clear();
+
         logger.info("Computing the work to be done.");
 
         // 1st step: populate the 2 maps with the work to be done.

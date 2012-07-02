@@ -38,6 +38,13 @@
     workflows). These can be added by programmers.</description>
   <modules>
     <module>xwiki-platform-appwithinminutes-ui</module>
-    <module>xwiki-platform-appwithinminutes-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-appwithinminutes-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

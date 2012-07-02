@@ -36,6 +36,13 @@
   <modules>
     <module>xwiki-platform-tag-api</module>
     <module>xwiki-platform-tag-ui</module>
-    <module>xwiki-platform-tag-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-tag-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

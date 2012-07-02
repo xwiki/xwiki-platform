@@ -38,7 +38,14 @@
     <module>xwiki-platform-extension-cluster</module>
     <module>xwiki-platform-extension-script</module>
     <module>xwiki-platform-extension-ui</module>
-    <module>xwiki-platform-extension-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-extension-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
 

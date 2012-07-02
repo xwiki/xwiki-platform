@@ -36,6 +36,13 @@
   <modules>
     <module>xwiki-platform-scheduler-api</module>
     <module>xwiki-platform-scheduler-ui</module>
-    <module>xwiki-platform-scheduler-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-scheduler-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

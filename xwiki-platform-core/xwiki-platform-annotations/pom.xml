@@ -38,6 +38,13 @@
     <module>xwiki-platform-annotation-rest</module>
     <module>xwiki-platform-annotation-scripting</module>
     <module>xwiki-platform-annotation-ui</module>
-    <module>xwiki-platform-annotation-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-annotation-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

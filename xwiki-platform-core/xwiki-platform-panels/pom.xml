@@ -35,6 +35,13 @@
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
   <modules>
     <module>xwiki-platform-panels-ui</module>
-    <module>xwiki-platform-panels-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-panels-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -35,6 +35,13 @@
   <description>Blog application for XWiki</description>
   <modules>
     <module>xwiki-platform-blog-ui</module>
-    <module>xwiki-platform-blog-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-blog-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

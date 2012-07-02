@@ -35,6 +35,13 @@
   <description>Application allowing users to invite friends to join a wiki by email.</description>
   <modules>
     <module>xwiki-platform-invitation-ui</module>
-    <module>xwiki-platform-invitation-test-pageobject</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-invitation-test-pageobject</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

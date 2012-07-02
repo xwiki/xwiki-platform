@@ -48,7 +48,7 @@
     <!-- TODO: put it back when the admin application is a real application and doesn't contain datas anymore
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration</artifactId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

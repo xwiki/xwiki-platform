@@ -17,32 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.model;
-
-import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.Axis;
+package org.xwiki.chart.axis;
 
 /**
- * Interface defining the input for the chart generator.
- *
+ * Enumeration of supported axis types.
+ * 
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-public interface ChartModel
+public enum AxisType
 {
+    /** Number axis. */
+    NUMBER("number"),
+    /** Category axis. */
+    CATEGORY("category"),
+    /** Date axis. */
+    DATE("date");
+    
+    /** The name. */
+    private final String name;
 
     /**
-     * @return the dataset for this chart model.
-     * @since 4.2M1
+     * @param name the name.
      */
-    Dataset getDataset();
+    AxisType(String name)
+    {
+        this.name = name;
+    }
+
+    /** @return the name. */
+    public String getName()
+    {
+        return name;
+    }
 
     /**
-     * @param index the index of the axis.
-     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
-     * description.
-     * @since 4.2M1
+     * @param name A plot type.
+     * @return the axis type corresponding to the name, or {@code null}.
      */
-    Axis getAxis(int index);
+    public static AxisType forName(String name)
+    {
+        for (AxisType type : values())
+        {
+            if (name.equals(type.getName())) {
+                return type;
+            }
+        }
 
+        return null;
+    }
 }

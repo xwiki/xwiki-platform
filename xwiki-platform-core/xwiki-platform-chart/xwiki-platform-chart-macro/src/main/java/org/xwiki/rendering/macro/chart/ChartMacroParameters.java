@@ -25,6 +25,7 @@ import java.util.Map;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.chart.internal.source.DataSource;
 
 /**
  * Parameters for chart macro.
@@ -178,8 +179,8 @@ public class ChartMacroParameters
         map.put(ChartGenerator.WIDTH_PARAM, String.valueOf(getWidth()));
         map.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(getHeight()));
         map.put(ChartGenerator.TYPE_PARAM, getType());
-        map.put(ChartDataSource.SOURCE, getSource());
-        map.put(ChartDataSource.PARAMS, getParams());
+        map.put(DataSource.SOURCE_PARAM, getSource());
+        map.put(DataSource.PARAMS_PARAM, getParams());
         return map;
     }
 }

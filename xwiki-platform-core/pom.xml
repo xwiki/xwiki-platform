@@ -240,6 +240,8 @@
             -->
             <exclude>com/xpn/xwiki/XWikiCompatibilityAspect</exclude>
             <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
+            <exclude>org/xwiki/chart/model/ChartModel</exclude>
+            <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
             <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
             <!-- Minor modification in the AS event implementation, can be removed after the 4.1 release -->
             <exclude>com/xpn/xwiki/plugin/activitystream/impl/ActivityEventImpl</exclude>

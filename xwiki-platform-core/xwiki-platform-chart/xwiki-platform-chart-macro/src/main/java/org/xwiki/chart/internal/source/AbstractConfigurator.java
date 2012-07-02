@@ -17,32 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.model;
+package org.xwiki.chart.internal.source;
 
-import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.Axis;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Interface defining the input for the chart generator.
+ * Configurator interface.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-public interface ChartModel
+public abstract class AbstractConfigurator implements Configurator
 {
+    @Override
+    public void validateParameters() throws MacroExecutionException
+    {
+    }
 
     /**
-     * @return the dataset for this chart model.
-     * @since 4.2M1
+     * Indicate that an invalid parameter value was found.
+     *
+     * @param parameterName The name of the parameter.
+     * @param value The value.
+     * @throws MacroExecutionException always.
      */
-    Dataset getDataset();
+    protected void invalidParameterValue(String parameterName, String value) throws MacroExecutionException
+    {
+        throw new MacroExecutionException(String.format("Invalid value for parameter [%s]: [%s]",
+                                                        parameterName, value));
 
-    /**
-     * @param index the index of the axis.
-     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
-     * description.
-     * @since 4.2M1
-     */
-    Axis getAxis(int index);
-
+    }
 }

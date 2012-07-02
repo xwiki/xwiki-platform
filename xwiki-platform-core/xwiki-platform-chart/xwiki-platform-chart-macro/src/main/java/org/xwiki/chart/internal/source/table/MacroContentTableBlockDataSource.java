@@ -17,19 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.chart.internal.source.table;
 
 import java.io.StringReader;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
@@ -46,7 +46,7 @@ import org.xwiki.rendering.parser.Parser;
  */
 @Component
 @Named("inline")
-@Singleton
+@InstantiationStrategy(PER_LOOKUP)
 public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSource
 {
     /**
@@ -62,7 +62,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
     private DocumentAccessBridge docBridge;
 
     @Override
-    protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
+    protected TableBlock getTableBlock(String macroContent)
         throws MacroExecutionException
     {
         // Since we are using an inline source the macro content cannot be empty/null.

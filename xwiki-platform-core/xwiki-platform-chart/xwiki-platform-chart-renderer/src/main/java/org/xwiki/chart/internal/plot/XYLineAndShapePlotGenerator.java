@@ -17,32 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.model;
+package org.xwiki.chart.internal.plot;
 
-import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.Axis;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+
 
 /**
- * Interface defining the input for the chart generator.
+ * Generate Plots for XY data sets using a line and shape renderer.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-public interface ChartModel
+public class XYLineAndShapePlotGenerator extends AbstractXYPlotGenerator
 {
 
-    /**
-     * @return the dataset for this chart model.
-     * @since 4.2M1
-     */
-    Dataset getDataset();
-
-    /**
-     * @param index the index of the axis.
-     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
-     * description.
-     * @since 4.2M1
-     */
-    Axis getAxis(int index);
-
+    @Override
+    public XYItemRenderer getRenderer()
+    {
+        return new XYLineAndShapeRenderer();
+    }
 }

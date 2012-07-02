@@ -17,32 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.model;
+package org.xwiki.chart.internal.source;
 
-import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.Axis;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Interface defining the input for the chart generator.
+ * Configurator interface.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-public interface ChartModel
+public interface Configurator
 {
 
     /**
-     * @return the dataset for this chart model.
-     * @since 4.2M1
+     * Let an implementation set a parameter.
+     *
+     * @param key The key of the parameter.
+     * @param value The value of the parameter.
+     * @return {@code true} if the parameter was claimed.
+     * @throws MacroExecutionException if the parameter is not supported by the data source.
      */
-    Dataset getDataset();
+    boolean setParameter(String key, String value) throws MacroExecutionException;
 
     /**
-     * @param index the index of the axis.
-     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
-     * description.
-     * @since 4.2M1
+     * Let an implementation validate the value of the previously set parameters, and set default values.
+     *
+     * @throws MacroExecutionException if the previously set value is invalid.
      */
-    Axis getAxis(int index);
+    void validateParameters() throws MacroExecutionException;
 
 }

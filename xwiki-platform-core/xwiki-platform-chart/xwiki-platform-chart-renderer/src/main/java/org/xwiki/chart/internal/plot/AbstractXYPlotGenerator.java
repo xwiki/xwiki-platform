@@ -21,31 +21,55 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
-import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.plot.Plot;
-import org.jfree.data.general.PieDataset;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.PlotGeneratorException;
 
 /**
- * A {@link PlotGenerator} for generating pie charts.
+ * Generate Plots for XY data sets.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-public class PiePlotGenerator implements PlotGenerator
+public abstract class AbstractXYPlotGenerator implements PlotGenerator
 {
+
     @Override
     public Plot generate(ChartModel model, Map<String, String> parameters)
         throws PlotGeneratorException
     {
-        PieDataset dataset;
-        try {
-            dataset = (PieDataset) model.getDataset();
-        } catch (ClassCastException e) {
-            throw new PlotGeneratorException("Incompatible dataset for the pie plot.");
+        XYDataset dataset;
+        ValueAxis domainAxis;
+        ValueAxis rangeAxis;
+
+        if (model.getDataset() instanceof XYDataset) {
+            dataset = (XYDataset) model.getDataset();
+        } else {
+            throw new PlotGeneratorException("Incompatible dataset for xy plot.");
         }
 
-        return new PiePlot(dataset);
+        if (model.getAxis(0) instanceof ValueAxis) {
+            domainAxis = (ValueAxis) model.getAxis(0);
+        } else {
+            throw new PlotGeneratorException("Incompatible axis 0 for xy plot.");
+        } 
+
+        if (model.getAxis(1) instanceof ValueAxis) {
+            rangeAxis  = (ValueAxis) model.getAxis(1);
+        } else {
+            throw new PlotGeneratorException("Incompatible axis 1 for xy plot.");
+        }
+
+        return new XYPlot(dataset, domainAxis, rangeAxis, getRenderer());
     }
+
+    /**
+     * @return an {@link CategoryItemRenderer} to be used for plotting the chart.
+     */
+    protected abstract XYItemRenderer getRenderer();
+
 }

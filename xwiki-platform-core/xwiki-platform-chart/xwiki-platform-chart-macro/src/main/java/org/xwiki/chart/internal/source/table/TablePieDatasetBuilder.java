@@ -17,32 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.model;
+package org.xwiki.chart.internal.source.table;
 
+import org.jfree.data.category.CategoryToPieDataset;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.Axis;
+import org.jfree.util.TableOrder;
 
 /**
- * Interface defining the input for the chart generator.
+ * Dataset builder that builds a pie dataset from a table data source.
  *
+ * @since 4.2M1
  * @version $Id$
- * @since 2.0M1
  */
-public interface ChartModel
+public class TablePieDatasetBuilder extends TableCategoryDatasetBuilder
 {
 
-    /**
-     * @return the dataset for this chart model.
-     * @since 4.2M1
-     */
-    Dataset getDataset();
+    @Override
+    @SuppressWarnings("unchecked")
+    public Dataset getDataset()
+    {
+        CategoryDataset dataset = (CategoryDataset) super.getDataset();
 
-    /**
-     * @param index the index of the axis.
-     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
-     * description.
-     * @since 4.2M1
-     */
-    Axis getAxis(int index);
+        return new CategoryToPieDataset(dataset, TableOrder.BY_ROW, 0);
+    }
 
 }

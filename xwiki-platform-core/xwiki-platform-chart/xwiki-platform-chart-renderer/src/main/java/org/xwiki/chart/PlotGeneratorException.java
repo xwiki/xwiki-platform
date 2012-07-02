@@ -17,32 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.model;
-
-import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.Axis;
+package org.xwiki.chart;
 
 /**
- * Interface defining the input for the chart generator.
- *
+ * The class used to indicate exceptions specific to the plot generator.
+ * 
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-public interface ChartModel
+public class PlotGeneratorException extends ChartGeneratorException
 {
+    /**
+     * Class version.
+     */
+    private static final long serialVersionUID = 1;
 
     /**
-     * @return the dataset for this chart model.
-     * @since 4.2M1
+     * Constructs a new exception with the specified message.
+     * 
+     * @param message The explanation of the exception.
      */
-    Dataset getDataset();
-
-    /**
-     * @param index the index of the axis.
-     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
-     * description.
-     * @since 4.2M1
-     */
-    Axis getAxis(int index);
+    public PlotGeneratorException(String message)
+    {
+        super(message);
+    }
 
 }

@@ -22,13 +22,13 @@ package org.xwiki.chart.internal.plot;
 import java.util.Map;
 
 import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.category.CategoryDataset;
 import org.xwiki.chart.model.ChartModel;
+import org.xwiki.chart.PlotGeneratorException;
 
 /**
  * Generate Plots for Category data sets.
@@ -40,10 +40,31 @@ public abstract class AbstractCategoryPlotGenerator implements PlotGenerator
 {
     @Override
     public Plot generate(ChartModel model, Map<String, String> parameters)
+        throws PlotGeneratorException
     {
-        CategoryAxis domainAxis = new CategoryAxis();
-        ValueAxis rangeAxis = new NumberAxis();
-        return new CategoryPlot(buildCategoryDataset(model, parameters), domainAxis, rangeAxis, getRenderer());
+        CategoryDataset dataset;
+        CategoryAxis domainAxis;
+        ValueAxis rangeAxis;
+
+        if (model.getDataset() instanceof CategoryDataset) {
+            dataset = (CategoryDataset) model.getDataset();
+        } else {
+            throw new PlotGeneratorException("Incompatible dataset for category plot.");
+        }
+
+        if (model.getAxis(0) instanceof CategoryAxis) {
+            domainAxis = (CategoryAxis) model.getAxis(0);
+        } else {
+            throw new PlotGeneratorException("Incompatible axis 0 for category plot.");
+        } 
+
+        if (model.getAxis(1) instanceof ValueAxis) {
+            rangeAxis  = (ValueAxis) model.getAxis(1);
+        } else {
+            throw new PlotGeneratorException("Incompatible axis 1 for category plot.");
+        }
+
+        return new CategoryPlot(dataset, domainAxis, rangeAxis, getRenderer());
     }
 
     /**
@@ -51,56 +72,4 @@ public abstract class AbstractCategoryPlotGenerator implements PlotGenerator
      */
     protected abstract CategoryItemRenderer getRenderer();
 
-    /**
-     * Builds a new {@link org.jfree.data.category.DefaultCategoryDataset} corresponding to the provided {@link ChartModel}.
-     *
-     * @param model the {@link ChartModel} instance.
-     * @param parameters additional parameters.
-     * @return a {@link org.jfree.data.category.DefaultCategoryDataset} corresponding to the provided {@link ChartModel}.
-     */
-    public DefaultCategoryDataset buildCategoryDataset(ChartModel model, Map<String, String> parameters)
-    {
-        String dataSeries = parameters.get("series");
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        if ("rows".equals(dataSeries)) {
-            extractRows(model, dataset);
-        } else {
-            extractColumns(model, dataset);
-        }
-        return dataset;
-    }
-
-    /**
-     * Extracts data rows from the {@link ChartModel} provided and populates the {@link DefaultCategoryDataset}
-     * accordingly.
-     *
-     * @param model the {@link ChartModel} instance.
-     * @param dataset the {@link DefaultCategoryDataset} to be populated.
-     */
-    private void extractRows(ChartModel model, DefaultCategoryDataset dataset)
-    {
-        for (int row = 0; row < model.getRowCount(); row++) {
-            for (int column = 0; column < model.getColumnCount(); column++) {
-                dataset.addValue(model.getCellValue(row, column), model.getRowHeader(row), model
-                    .getColumnHeader(column));
-            }
-        }
-    }
-
-    /**
-     * Extracts data columns from the {@link ChartModel} provided and populates the {@link DefaultCategoryDataset}
-     * accordingly.
-     *
-     * @param model the {@link ChartModel} instance.
-     * @param dataset the {@link DefaultCategoryDataset} to be populated.
-     */
-    private void extractColumns(ChartModel model, DefaultCategoryDataset dataset)
-    {
-        for (int row = 0; row < model.getRowCount(); row++) {
-            for (int column = 0; column < model.getColumnCount(); column++) {
-                dataset.addValue(model.getCellValue(row, column), model.getColumnHeader(column), model
-                    .getRowHeader(row));
-            }
-        }
-    }
 }

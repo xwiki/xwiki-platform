@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.chart.internal.source.table;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,13 +32,14 @@ public class RangeParserTest
     @Test
     public void getColumnNumberFromIdentifier()
     {
-        Assert.assertEquals(0, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("A4"));
-        Assert.assertEquals(1, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("B4"));
-        Assert.assertEquals(25, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("Z4"));
-        Assert.assertEquals(26, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AA4"));
-        Assert.assertEquals(27, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AB4"));
-        Assert.assertEquals(52, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BA4"));
-        Assert.assertEquals(53, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BB4"));
-        Assert.assertEquals(701, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("ZZ4"));
+        Assert.assertTrue(0 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("A4"));
+        Assert.assertTrue(1 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("B4"));
+        Assert.assertTrue(25 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("Z4"));
+        Assert.assertTrue(26 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AA4"));
+        Assert.assertTrue(27 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AB4"));
+        Assert.assertTrue(52 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BA4"));
+        Assert.assertTrue(53 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BB4"));
+        Assert.assertTrue(701 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("ZZ4"));
+        Assert.assertTrue(null == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("."));
     }
 }

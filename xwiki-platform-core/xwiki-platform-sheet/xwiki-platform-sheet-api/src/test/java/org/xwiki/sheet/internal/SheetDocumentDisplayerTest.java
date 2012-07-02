@@ -32,6 +32,8 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -189,6 +191,7 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
 
                 oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
                 inSequence(displaySequence);
+                will(returnValue(new XDOM(Collections.<Block> emptyList())));
 
                 // Document author must be reverted.
                 oneOf(modelBridge).setContentAuthorReference(document, ALICE);
@@ -241,6 +244,7 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
             {
                 oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
                 inSequence(displaySequence);
+                will(returnValue(new XDOM(Collections.<Block> emptyList())));
 
                 // Document content author must be restored.
                 oneOf(modelBridge).setContentAuthorReference(document, ALICE);

@@ -21,6 +21,7 @@ package org.xwiki.extension.test.po;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -286,7 +287,7 @@ public class ExtensionPane extends BaseElement
             return null;
         }
         found.get(0).click();
-        String sectionAnchor = found.get(0).getAttribute("href").substring(1);
+        String sectionAnchor = StringUtils.substringAfterLast(found.get(0).getAttribute("href"), "#");
         By sectionXPath =
             By.xpath(".//div[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
                 + sectionAnchor + "']]");

@@ -144,15 +144,6 @@ widgets.Notification.getContainer = function() {
     widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
     // Insert the container in the document body.
     $(document.body).insert(widgets.Notification.container);
-    // Register a scroll listener to reposition the notifications at the bottom of the screen in IE.
-    if (Prototype.Browser.IE) {
-      widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});
-      Event.observe(window, "scroll", function() {
-        var span = new Element("div");
-        widgets.Notification.container.insert({top: span});
-        setTimeout(span.remove.bind(span), 1);
-      });
-    }
   }
   return widgets.Notification.container;
 };

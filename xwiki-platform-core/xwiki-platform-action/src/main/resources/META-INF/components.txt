@@ -1,2 +1,0 @@
-org.xwiki.action.internal.ErrorAction
-org.xwiki.action.internal.DefaultActionManager

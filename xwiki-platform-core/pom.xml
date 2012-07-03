@@ -231,6 +231,10 @@
             <exclude>org/xwiki/chart/model/ChartModel</exclude>
             <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
 	          <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+            <!-- These classes below have never been used. It was supposed to be the start of the removal of Struts but
+                 since it hasn't progressed so far we're removing stray code from master. Experiments should be done
+                 on feature branches -->
+            <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -246,7 +250,6 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>

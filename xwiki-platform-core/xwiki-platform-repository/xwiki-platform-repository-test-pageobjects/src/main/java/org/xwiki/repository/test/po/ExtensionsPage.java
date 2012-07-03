@@ -39,6 +39,9 @@ public class ExtensionsPage extends ViewPage
     @FindBy(id = "contributeSubmit")
     private WebElement contributeSubmit;
 
+    @FindBy(linkText = "Import")
+    private WebElement contributeImportLink;
+
     private ExtensionsLiveTableElement liveTable;
 
     public static ExtensionsPage gotoPage()
@@ -65,5 +68,12 @@ public class ExtensionsPage extends ViewPage
         this.contributeSubmit.click();
 
         return new ExtensionInlinePage();
+    }
+    
+    public ExtensionImportPage clickImport()
+    {
+        this.contributeImportLink.click();
+
+        return new ExtensionImportPage();
     }
 }

@@ -35,6 +35,8 @@ import org.xwiki.chart.internal.plot.Line3DPlotGenerator;
 import org.xwiki.chart.internal.plot.LinePlotGenerator;
 import org.xwiki.chart.internal.plot.PiePlotGenerator;
 import org.xwiki.chart.internal.plot.PlotGenerator;
+import org.xwiki.chart.internal.plot.XYAreaPlotGenerator;
+import org.xwiki.chart.internal.plot.XYLineAndShapePlotGenerator;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -70,10 +72,13 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
         plotGenerators.put("pie", new PiePlotGenerator());
         plotGenerators.put("line3D", new Line3DPlotGenerator());
         plotGenerators.put("bar3D", new Bar3DPlotGenerator());
+        plotGenerators.put("xy_area", new XYAreaPlotGenerator());
+        plotGenerators.put("xy_line_and_shape", new XYLineAndShapePlotGenerator());
     }
 
     @Override
-    public byte[] generate(ChartModel model, Map<String, String> parameters) throws ChartGeneratorException
+    public byte[] generate(ChartModel model, Map<String, String> parameters)
+        throws ChartGeneratorException
     {
         setDefaultParams(parameters);
         String type = parameters.get(TYPE_PARAM);

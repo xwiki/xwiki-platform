@@ -227,22 +227,10 @@
             <!-- Remove the following excludes after we release the current version as final -->
             <!-- Add a method to the oldcore/wikimacro bridge -->
             <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroFactory</exclude>
-            <!-- The following excludes are needed because we've upgraded from AspectJ 1.6.7 to AspectJ 1.6.11
-                 in 4.0-milestone-1 and AspectJ has changed the way they weave stuff in class files thus leading to
-                 false CLIRR errors (see http://www.eclipse.org/aspectj/doc/released/README-169.html - search for
-                 "Intertype fields preserve visibility and name" for details).
-
-                 Thus we have to add those excludes. However those excludes could hide real breakages and thus before
-                 the release is done the Release Manager must absolutely remove those excludes below and try running
-                 CLIRR with AspectJ 1.6.7 to verify that no breakages have been added. To do so simply edit the
-                 Legacy OldCore pom.xml and add <version>1.6.7</version> for aspectjrt and <version>1.3</version> for
-                 the AspectJ Maven plugin version.
-            -->
-            <exclude>com/xpn/xwiki/XWikiCompatibilityAspect</exclude>
-            <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
-            <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
-            <!-- Minor modification in the AS event implementation, can be removed after the 4.1 release -->
-            <exclude>com/xpn/xwiki/plugin/activitystream/impl/ActivityEventImpl</exclude>
+            <!-- TODO: Explain why we have to break backward compatibility for the Chart module -->
+            <exclude>org/xwiki/chart/model/ChartModel</exclude>
+            <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
+	          <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -303,6 +291,7 @@
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-rendering</module>
+    <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>

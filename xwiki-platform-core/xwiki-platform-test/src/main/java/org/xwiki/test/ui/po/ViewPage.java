@@ -133,12 +133,12 @@ public class ViewPage extends BasePage
         return new CommentsTab();
     }
 
-    public HistoryTab openHistoryDocExtraPane()
+    public HistoryPane openHistoryDocExtraPane()
     {
         this.getDriver().findElement(By.id("Historylink")).click();
         this.waitUntilElementIsVisible(By.id("historycontent"));
 
-        return new HistoryTab();
+        return new HistoryPane();
     }
 
     public AttachmentsPane openAttachmentsDocExtraPane()

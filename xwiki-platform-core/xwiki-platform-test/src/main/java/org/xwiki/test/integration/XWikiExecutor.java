@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -188,6 +189,7 @@ public class XWikiExecutor
     {
         Thread startThread = new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 try {
@@ -290,8 +292,8 @@ public class XWikiExecutor
                 response.responseBody = method.getResponseBody();
 
                 if (DEBUG) {
-                    System.out.println(String.format("Result of pinging [%s] = [%s], Message = [%s]",
-                        url, response.responseCode, new String(response.responseBody)));
+                    System.out.println(String.format("Result of pinging [%s] = [%s], Message = [%s]", url,
+                        response.responseCode, new String(response.responseBody)));
                 }
 
                 // check the http response code is either not an error, either "unauthorized"
@@ -343,9 +345,41 @@ public class XWikiExecutor
         return getProperties(getXWikiPropertiesPath());
     }
 
+    public PropertiesConfiguration loadXWikiPropertiesConfiguration() throws Exception
+    {
+        return getPropertiesConfiguration(getXWikiPropertiesPath());
+    }
+
+    /**
+     * @deprecated since 4.2M1 use {@link #getPropertiesConfiguration(String)} instead
+     */
+    @Deprecated
     private Properties getProperties(String path) throws Exception
     {
         Properties properties = new Properties();
+
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(path);
+
+            try {
+                properties.load(fis);
+            } finally {
+                fis.close();
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.debug("Failed to load properties [" + path + "]", e);
+        }
+
+        return properties;
+    }
+
+    /**
+     * @since 4.2M1
+     */
+    private PropertiesConfiguration getPropertiesConfiguration(String path) throws Exception
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
 
         FileInputStream fis;
         try {
@@ -368,9 +402,21 @@ public class XWikiExecutor
         saveProperties(getXWikiCfgPath(), properties);
     }
 
+    /**
+     * @deprecated since 4.2M1 use {@link #saveXWikiProperties(PropertiesConfiguration)} instead
+     */
+    @Deprecated
     public void saveXWikiProperties(Properties properties) throws Exception
     {
         saveProperties(getXWikiPropertiesPath(), properties);
+    }
+
+    /**
+     * @since 4.2M1
+     */
+    public void saveXWikiProperties(PropertiesConfiguration properties) throws Exception
+    {
+        savePropertiesConfiguration(getXWikiPropertiesPath(), properties);
     }
 
     private void saveProperties(String path, Properties properties) throws Exception
@@ -378,6 +424,16 @@ public class XWikiExecutor
         FileOutputStream fos = new FileOutputStream(path);
         try {
             properties.store(fos, null);
+        } finally {
+            fos.close();
+        }
+    }
+
+    private void savePropertiesConfiguration(String path, PropertiesConfiguration properties) throws Exception
+    {
+        FileOutputStream fos = new FileOutputStream(path);
+        try {
+            properties.save(fos);
         } finally {
             fos.close();
         }

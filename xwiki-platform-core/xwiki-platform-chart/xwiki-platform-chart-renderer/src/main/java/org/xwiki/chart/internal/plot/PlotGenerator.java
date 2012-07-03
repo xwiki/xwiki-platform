@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.jfree.chart.plot.Plot;
 import org.xwiki.chart.model.ChartModel;
+import org.xwiki.chart.PlotGeneratorException;
 
 /**
  * Interface for defining various jfreechart {@link Plot} generators.
@@ -38,6 +39,7 @@ public interface PlotGenerator
      * @param model the {@link ChartModel} instance.
      * @param parameters extra parameters.
      * @return the generated {@link Plot}.
+     * @throws PlotGeneratorException if the dataset or the axes does not match the plot.
      */
-    Plot generate(ChartModel model, Map<String, String> parameters);
+    Plot generate(ChartModel model, Map<String, String> parameters) throws PlotGeneratorException;
 }

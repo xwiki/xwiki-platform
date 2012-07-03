@@ -80,7 +80,7 @@
     <!-- We need the livetable for the IRC Home page that lists all archives -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livetable</artifactId>
+      <artifactId>xwiki-platform-livetable-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

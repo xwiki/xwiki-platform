@@ -58,6 +58,12 @@
       <version>1.7.0</version>
     </dependency>
 
+    <!-- Manipulate xwiki.properrties -->
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
+
     <!-- Dependencies for the UI test framework -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -96,7 +102,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-repository-xwiki-model</artifactId>
+      <artifactId>xwiki-commons-repository-model</artifactId>
       <version>${commons.version}</version>
     </dependency>
 

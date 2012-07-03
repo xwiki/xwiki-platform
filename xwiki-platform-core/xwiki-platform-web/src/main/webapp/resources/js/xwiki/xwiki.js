@@ -67,7 +67,7 @@ Object.extend(XWiki, {
             // NOTE: The given name can be an attachment reference, a document reference, a space reference or a wiki
             // reference. Since we don't know the entity type we try to deduce it. This can fail if the given name is a
             // relative reference.
-            var reference = XWiki.Model.resolve(name, XWiki.EntityType.ATTACHMENT);
+            reference = XWiki.Model.resolve(name, XWiki.EntityType.ATTACHMENT);
             if (!reference.parent) {
                 // Attachment references must be prefixed with at least the document name.
                 reference = XWiki.Model.resolve(name, XWiki.EntityType.DOCUMENT);
@@ -85,6 +85,10 @@ Object.extend(XWiki, {
             }
         }
 
+        return this.fromEntityReference(reference, anchor);
+    },
+
+    fromEntityReference : function(reference, anchor) {
         var wiki = reference.extractReference(XWiki.EntityType.WIKI);
         wiki = (wiki && wiki.name) || XWiki.currentWiki;
 

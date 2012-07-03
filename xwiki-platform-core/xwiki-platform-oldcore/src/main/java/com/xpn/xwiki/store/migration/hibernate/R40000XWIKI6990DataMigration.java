@@ -77,8 +77,8 @@ import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.util.Util;
@@ -216,6 +216,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         /** The new identifier. */
         private Session session;
 
+        /** The current timer. */
+        public int timer;
+
         @Override
         public void setNewId(long newId)
         {
@@ -231,6 +234,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         @Override
         public Object doInHibernate(Session session)
         {
+            timer = 0;
             this.session = session;
             doUpdate();
             this.session = null;
@@ -247,10 +251,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          * 
          * @param klass the class of the persisted object
          * @param field the field name of the persisted object
+         * @return the time elapsed during the operation
          */
-        public void executeIdUpdate(Class< ? > klass, String field)
+        public long executeIdUpdate(Class< ? > klass, String field)
         {
-            executeIdUpdate(klass.getName(), field);
+            return executeIdUpdate(klass.getName(), field);
         }
 
         /**
@@ -258,17 +263,20 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          *
          * @param name the entity name of the table
          * @param field the field name of the column
+         * @return the time elapsed during the operation
          */
-        public void executeIdUpdate(String name, String field)
+        public long executeIdUpdate(String name, String field)
         {
             StringBuilder sb = new StringBuilder(128);
             sb.append("update ").append(name)
                 .append(" klass set klass.").append(field).append('=').append(':').append(NEWID)
                 .append(" where klass.").append(field).append('=').append(':').append(OLDID);
+            long now = System.nanoTime();
             this.session.createQuery(sb.toString())
                 .setLong(NEWID, this.newId)
                 .setLong(OLDID, this.oldId)
                 .executeUpdate();
+            return System.nanoTime() - now;
         }
 
         /**
@@ -276,17 +284,20 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
          *
          * @param name the native name of the table
          * @param field the native name of the column
+         * @return the time elapsed during the operation
          */
-        public void executeSqlIdUpdate(String name, String field)
+        public long executeSqlIdUpdate(String name, String field)
         {
             StringBuilder sb = new StringBuilder(128);
             sb.append("UPDATE ").append(name)
                 .append(" SET ").append(field).append('=').append(':').append(NEWID)
                 .append(" WHERE ").append(field).append('=').append(':').append(OLDID);
+            long now = System.nanoTime();
             this.session.createSQLQuery(sb.toString())
                 .setLong(NEWID, this.newId)
                 .setLong(OLDID, this.oldId)
                 .executeUpdate();
+            return System.nanoTime() - now;
         }
     }
 
@@ -448,7 +459,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         getStore().executeWrite(getXWikiContext(), callback);
                     } catch (Exception e) {
                         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
+                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
+                            + " migration failed while converting ID from [" + entry.getKey()
+                            + "] to [" + entry.getValue() + "]", e);
                     }
                     it.remove();
                 }
@@ -599,10 +612,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     String statsName = (String) result[1];
                     Integer number = (Integer) result[2];
 
-                    long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
+                    // Do not try to convert broken records which would cause duplicated ids
+                    if (!statsName.startsWith(".") && !statsName.endsWith(".")) {
+                        long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
 
-                    if (oldId != newId) {
-                        map.put(oldId, newId);
+                        if (oldId != newId) {
+                            map.put(oldId, newId);
+                        }
                     }
                 }
 
@@ -654,22 +670,36 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
             logProgress("Converting %d document IDs in %d tables and %d collection tables...",
                 docs.size(), DOC_CLASSES.length + DOCLINK_CLASSES.length, docsColl.size());
+
+            final long[] times = new long[DOC_CLASSES.length + DOCLINK_CLASSES.length + docsColl.size()];
             convertDbId(docs, new AbstractIdConversionHibernateCallback()
             {
                 @Override
                 public void doUpdate()
                 {
                     for (String[] coll : docsColl) {
-                        executeSqlIdUpdate(coll[0], coll[1]);
+                        times[timer++] += executeSqlIdUpdate(coll[0], coll[1]);
                     }
 
                     for (Class< ? > doclinkClass : DOCLINK_CLASSES) {
-                        executeIdUpdate(doclinkClass, DOCID);
+                        times[timer++] += executeIdUpdate(doclinkClass, DOCID);
                     }
-                    executeIdUpdate(XWikiRCSNodeInfo.class, ID + '.' + DOCID);
-                    executeIdUpdate(XWikiDocument.class, ID);
+                    times[timer++] += executeIdUpdate(XWikiRCSNodeInfo.class, ID + '.' + DOCID);
+                    times[timer++] += executeIdUpdate(XWikiDocument.class, ID);
                 }
             });
+            if (logger.isDebugEnabled()) {
+                int timer = 0;
+                for (String[] coll : docsColl) {
+                    logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++]/1000000);
+                }
+                for (Class< ? > doclinkClass : DOCLINK_CLASSES) {
+                    logger.debug("Time elapsed for {} class: {} ms", doclinkClass.getName(), times[timer++]/1000000);
+                }
+                logger.debug("Time elapsed for {} class: {} ms", XWikiRCSNodeInfo.class.getName(),
+                    times[timer++]/1000000);
+                logger.debug("Time elapsed for {} class: {} ms", XWikiDocument.class.getName(), times[timer++]/1000000);
+            }
             logProgress("All document IDs has been converted successfully.");
         } else {
             logProgress("No document IDs to convert, skipping.");
@@ -711,26 +741,41 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
             logProgress("Converting %d object IDs in %d tables, %d custom mapped tables and %d collection tables...",
                 objs.size(), classToProcess.size() + 1, customClassToProcess.size(), objsColl.size());
+
+            final long[] times = new long[classToProcess.size() + 1 + customClassToProcess.size() + objsColl.size()];
             convertDbId(objs, new AbstractIdConversionHibernateCallback()
             {
                 @Override
                 public void doUpdate()
                 {
                     for (String[] coll : objsColl) {
-                        executeSqlIdUpdate(coll[0], coll[1]);
+                        times[timer++] += executeSqlIdUpdate(coll[0], coll[1]);
                     }
 
                     for (String customMappedClass : customClassToProcess) {
-                        executeIdUpdate(customMappedClass, ID);
+                        times[timer++] += executeIdUpdate(customMappedClass, ID);
                     }
 
                     for (String propertyClass : classToProcess) {
-                        executeIdUpdate(propertyClass, IDID);
+                        times[timer++] += executeIdUpdate(propertyClass, IDID);
                     }
 
-                    executeIdUpdate(BaseObject.class, ID);
+                    times[timer++] += executeIdUpdate(BaseObject.class, ID);
                 }
             });
+            if (logger.isDebugEnabled()) {
+                int timer = 0;
+                for (String[] coll : objsColl) {
+                    logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++]/1000000);
+                }
+                for (String customMappedClass : customClassToProcess) {
+                    logger.debug("Time elapsed for {} custom table: {} ms", customMappedClass, times[timer++]/1000000);
+                }
+                for (String propertyClass : classToProcess) {
+                    logger.debug("Time elapsed for {} property table: {} ms", propertyClass, times[timer++]/1000000);
+                }
+                logger.debug("Time elapsed for {} class: {} ms", BaseObject.class.getName(), times[timer++]/1000000);
+            }
             logProgress("All object IDs has been converted successfully.");
         } else {
             logProgress("No object IDs to convert, skipping.");
@@ -748,17 +793,26 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                 logProgress("Converting %d %s statistics IDs in 1 tables and %d collection tables...",
                     map.size(), klassName, statsColl.size());
+
+                final long[] times = new long[statsColl.size() + 1];
                 convertDbId(map, new AbstractIdConversionHibernateCallback()
                 {
                     @Override
                     public void doUpdate()
                     {
                         for (String[] coll : statsColl) {
-                            executeSqlIdUpdate(coll[0], coll[1]);
+                            times[timer++] += executeSqlIdUpdate(coll[0], coll[1]);
                         }
-                        executeIdUpdate(statsClass, ID);
+                        times[timer++] += executeIdUpdate(statsClass, ID);
                     }
                 });
+                if (logger.isDebugEnabled()) {
+                    int timer = 0;
+                    for (String[] coll : statsColl) {
+                        logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++]/1000000);
+                    }
+                    logger.debug("Time elapsed for {} class: {} ms", statsClass.getName(), times[timer++]/1000000);
+                }
                 logProgress("All %s statistics IDs has been converted successfully.", klassName);
             } else {
                 logProgress("No %s statistics IDs to convert, skipping.", klassName);
@@ -873,7 +927,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Preamble
         String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
+            .append("-").append(String.format("%03d", this.logCount++))
+            .append("\" author=\"sdumitriu\" failOnError=\"false\">\n")
             .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
 
         // Concrete Property types should each have a foreign key referencing the BaseProperty

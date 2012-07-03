@@ -31,10 +31,9 @@
   </parent>
   <artifactId>xwiki-platform-statistics</artifactId>
   <name>XWiki Platform - Statistics</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>Panels and pages providing XWiki statistics</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-statistics-ui</module>
+  </modules>
 </project>

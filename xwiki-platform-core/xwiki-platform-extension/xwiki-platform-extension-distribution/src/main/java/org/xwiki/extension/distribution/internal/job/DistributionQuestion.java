@@ -19,9 +19,31 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
-import org.xwiki.job.DefaultRequest;
+import org.xwiki.extension.distribution.internal.job.DistributionJobStatus.UpdateState;
 
-public class DistributionRequest extends DefaultRequest
+public class DistributionQuestion
 {
+    private UpdateState updateState;
 
+    private boolean save = true;
+
+    public UpdateState getUpdateState()
+    {
+        return this.updateState;
+    }
+
+    public void setUpdateState(UpdateState updateState)
+    {
+        this.updateState = updateState;
+    }
+
+    public boolean isSave()
+    {
+        return this.save;
+    }
+
+    public void setSave(boolean save)
+    {
+        this.save = save;
+    }
 }

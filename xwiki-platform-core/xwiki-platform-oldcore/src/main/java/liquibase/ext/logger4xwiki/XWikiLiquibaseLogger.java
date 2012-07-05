@@ -42,6 +42,7 @@ public class XWikiLiquibaseLogger implements liquibase.logging.Logger
         DataMigrationManager.class.getPackage().getName() + '.'
             + liquibase.Liquibase.class.getPackage().getName());
 
+    /** "but failOnError was false" error message to be replaced for clarity. */
     private static final String BUT_FAILONERROR_WAS_FALSE  = "but failOnError was false";
 
     @Override
@@ -128,7 +129,7 @@ public class XWikiLiquibaseLogger implements liquibase.logging.Logger
         int idx = s.indexOf(BUT_FAILONERROR_WAS_FALSE);
         if (idx != -1) {
             msg = s.substring(0, idx) + "this error could be safely ignored until something worse happens"
-                + s.substring(idx+BUT_FAILONERROR_WAS_FALSE.length());
+                + s.substring(idx + BUT_FAILONERROR_WAS_FALSE.length());
         }
         LOGGER.info(msg);
     }

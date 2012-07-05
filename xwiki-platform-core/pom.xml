@@ -237,6 +237,8 @@
                  since it hasn't progressed so far we're removing stray code from master. Experiments should be done
                  on feature branches -->
             <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
+            <!-- Chart plugin has been moved from oldcore to its own module. There's no API breakage for the user -->
+            <exclude>com/xpn/xwiki/plugin/charts/**</exclude>
           </excludes>
         </configuration>
       </plugin>

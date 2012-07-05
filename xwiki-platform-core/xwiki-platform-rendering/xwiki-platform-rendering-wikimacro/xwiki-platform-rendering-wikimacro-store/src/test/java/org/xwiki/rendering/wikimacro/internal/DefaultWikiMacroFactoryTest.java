@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.macro;
+package org.xwiki.rendering.wikimacro.internal;
 
 import org.jmock.Mock;
 import org.xwiki.model.reference.DocumentReference;
@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory;
 
 /**
  * Unit test for {@link DefaultWikiMacroFactory}.
@@ -48,6 +49,7 @@ public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTe
     protected void setUp() throws Exception
     {
         super.setUp();
+
         this.wikiMacroFactory = getComponentManager().getInstance(WikiMacroFactory.class);
 
         // Build the macro definition document.

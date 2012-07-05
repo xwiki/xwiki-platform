@@ -90,12 +90,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             }
 
             @Override
-            protected void registerWikiMacros()
-            {
-
-            }
-
-            @Override
             public XWikiRightService getRightService()
             {
                 return new XWikiRightServiceImpl()

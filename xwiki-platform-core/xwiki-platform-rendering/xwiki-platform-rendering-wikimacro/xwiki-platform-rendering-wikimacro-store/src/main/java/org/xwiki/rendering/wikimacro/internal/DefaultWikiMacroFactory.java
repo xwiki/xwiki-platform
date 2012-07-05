@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.macro;
+package org.xwiki.rendering.wikimacro.internal;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -34,6 +34,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.MacroId;
@@ -75,6 +76,12 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
      */
     @Inject
     private Execution execution;
+
+    /**
+     * Used to serialize references of documents.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     /**
      * The logger to log.
@@ -243,8 +250,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
 
         // Create & return the macro.
-        return new DefaultWikiMacro(documentReference, macroSupportsInlineMode, macroDescriptor, xdom, doc.getSyntax(),
-            this.componentManager);
+        return new DefaultWikiMacro(documentReference, doc.getAuthorReference(), macroSupportsInlineMode,
+            macroDescriptor, xdom, doc.getSyntax(), this.componentManager);
     }
 
     @Override
@@ -262,25 +269,57 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     }
 
     @Override
-    // FXME: It's not right to check the current use, the document author should be checked instead. This makes
-    // initialization more complex and does not bring any security
     public boolean isAllowed(DocumentReference documentReference, WikiMacroVisibility visibility)
     {
         boolean isAllowed = false;
 
         XWikiContext xcontext = getContext();
 
-        switch (visibility) {
-            case GLOBAL:
-                // Verify that the user has programming rights
-                isAllowed = xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
-                break;
-            case WIKI:
-                // Verify that the user has admin right on the macro wiki
-                isAllowed = xcontext.getWiki().getRightService().hasWikiAdminRights(xcontext);
-                break;
-            default:
-                isAllowed = true;
+        DocumentReference authorReference;
+
+        XWikiDocument doc;
+        try {
+            doc = xcontext.getWiki().getDocument(documentReference, getContext());
+            authorReference = doc.getAuthorReference();
+        } catch (XWikiException ex) {
+            doc = null;
+            authorReference = null;
+        }
+
+        try {
+            switch (visibility) {
+                case GLOBAL:
+                    // Verify that the user has programming rights
+                    if (doc != null && authorReference != null) {
+                        isAllowed =
+                            xcontext
+                                .getWiki()
+                                .getRightService()
+                                .hasAccessLevel("programming", this.serializer.serialize(authorReference),
+                                    this.serializer.serialize(doc.getDocumentReference()), xcontext);
+                    } else {
+                        isAllowed = xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
+                    }
+                    break;
+                case WIKI:
+                    // Verify that the user has admin right on the macro wiki
+                    if (doc != null && authorReference != null) {
+                        isAllowed =
+                            xcontext
+                                .getWiki()
+                                .getRightService()
+                                .hasAccessLevel("admin", this.serializer.serialize(authorReference),
+                                    doc.getDocumentReference().getWikiReference().getName() + "XWiki.XWikiPreferences",
+                                    xcontext);
+                    } else {
+                        isAllowed = xcontext.getWiki().getRightService().hasWikiAdminRights(xcontext);
+                    }
+                    break;
+                default:
+                    isAllowed = true;
+            }
+        } catch (XWikiException ex) {
+            isAllowed = false;
         }
 
         return isAllowed;

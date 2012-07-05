@@ -29,74 +29,38 @@
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
-  <name>XWiki Platform - Rendering - Wiki Macro Bridge - API</name>
-  <description>XWiki Platform - Rendering - Wiki Macro Bridge - API</description>
+  <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+  <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
+  <description>Module dealing with actual data representing wiki macros (wiki pages, objects, etc.)</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
+      <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-properties</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-script</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
-    <!-- Make sure the Multi Components components are available for the tests -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-component-multi</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-script</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-toc</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-observation-local</artifactId>
+      <artifactId>xwiki-commons-test</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-test</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -111,11 +75,17 @@
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Macro parameters validation -->
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-validator</artifactId>
-      <version>4.2.0.Final</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Used to mock XWiki class -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -126,7 +96,9 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            org/xwiki/rendering/internal/macro/wikibridge/DefaultWikiMacro.java
+              **/DefaultWikiMacroFactory.java,
+              **/DefaultWikiMacroInitializer.java,
+              **/WikiMacroConstants.java
           </excludes>
         </configuration>
       </plugin>

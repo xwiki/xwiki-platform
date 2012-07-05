@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.macro;
+package org.xwiki.rendering.wikimacro.internal;
 
 import java.util.HashSet;
 import java.util.List;
@@ -161,7 +161,8 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacrosForWiki(String wikiName, XWikiContext xcontext)
     {
         try {
-            this.logger.debug("Registering wiki macros for wiki " + wikiName);
+            this.logger.debug("Registering wiki macros for wiki {}", wikiName);
+
             // Set the context to be in that wiki so that both the search for XWikiMacro class objects and the
             // registration of macros registered for the current wiki will work.
             // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current user
@@ -179,7 +180,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }
         } catch (Exception ex) {
-            this.logger.warn("Failed to register macros for wiki [" + wikiName + "]: " + ex.getMessage());
+            this.logger.warn("Failed to register macros for wiki [{}]: {}", wikiName, ex.getMessage());
         }
     }
 
@@ -208,17 +209,14 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
         XWikiContext xcontext)
     {
-        this.logger.debug("Found macro: " + wikiMacroDocumentReference);
+        this.logger.debug("Found macro: {}", wikiMacroDocumentReference);
 
         DocumentReference originalAuthor = xcontext.getUserReference();
         try {
             WikiMacro macro = this.wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
 
-            // Set the author in the context to be the author who last modified the document containing
-            // the wiki macro class definition, so that if the Macro has the "Current User" visibility
-            // the correct user will be found in the Execution Context.
-            xcontext.setUser(wikiMacroDocumentAuthor);
             this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
+
             this.logger.debug("Registered macro " + wikiMacroDocumentReference);
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.

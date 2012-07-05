@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.macro;
+package org.xwiki.rendering.wikimacro.internal;
 
 import java.io.StringReader;
 import java.util.Arrays;
@@ -123,6 +123,8 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockXWiki).isVirtualMode();
                 will(returnValue(false));
+                allowing(mockXWiki).isReadOnly();
+                will(returnValue(false));
                 allowing(mockXWiki).getLanguagePreference(with(any(XWikiContext.class)));
                 will(returnValue(null));
                 allowing(mockXWiki).getRightService();
@@ -204,7 +206,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                 WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
         DefaultWikiMacro wikiMacro =
-            new DefaultWikiMacro(wikiMacroDocumentReference, true, descriptor,
+            new DefaultWikiMacro(wikiMacroDocumentReference, this.user.getDocumentReference(), true, descriptor,
                 this.xwiki20Parser.parse(new StringReader(macroContent)), Syntax.XWIKI_2_0, getComponentManager());
 
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);

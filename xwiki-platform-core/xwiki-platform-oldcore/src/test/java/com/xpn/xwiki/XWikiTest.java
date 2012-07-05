@@ -88,11 +88,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
-            @Override
-            protected void registerWikiMacros()
-            {
-            }
-
             // Avoid all the error at XWiki initialization
             @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)

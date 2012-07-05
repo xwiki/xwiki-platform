@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.macro;
+package org.xwiki.rendering.wikimacro.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,8 +136,7 @@ public class WikiMacroExecutionEventListener implements EventListener
             // user. It's cloned to make sure it not really modifying the real document but only do that for the
             // current context.
             contextDoc = contextDoc.clone();
-            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference());
-
+            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference()); 
             xwikiContext.setDoc(contextDoc);
         } catch (Exception e) {
             Log.error("Failed to setup context before wiki macro execution");

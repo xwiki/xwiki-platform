@@ -230,7 +230,9 @@
             <!-- TODO: Explain why we have to break backward compatibility for the Chart module -->
             <exclude>org/xwiki/chart/model/ChartModel</exclude>
             <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
-	          <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+	        <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+            <!-- Added method to get the author of the macro -->
+            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacro</exclude>
             <!-- These classes below have never been used. It was supposed to be the start of the removal of Struts but
                  since it hasn't progressed so far we're removing stray code from master. Experiments should be done
                  on feature branches -->

@@ -14,11 +14,6 @@ com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.internal.display.scripting.DisplayScriptService
 com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
-com.xpn.xwiki.internal.macro.CoreWikiMacroBindingInitializer
-com.xpn.xwiki.internal.macro.DefaultWikiMacroFactory
-com.xpn.xwiki.internal.macro.DefaultWikiMacroInitializer
-com.xpn.xwiki.internal.macro.WikiMacroExecutionEventListener
-com.xpn.xwiki.internal.macro.RegisterMacrosOnImportListener
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver

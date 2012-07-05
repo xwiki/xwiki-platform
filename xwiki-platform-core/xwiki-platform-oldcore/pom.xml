@@ -529,11 +529,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -762,9 +757,6 @@
               **/export/html/HtmlPackager.java,
               **/i18n/i18n.java,
               **/internal/DefaultCoreConfiguration.java,
-              **/internal/macro/DefaultWikiMacroFactory.java,
-              **/internal/macro/DefaultWikiMacroInitializer.java,
-              **/internal/macro/WikiMacroConstants.java,
               **/internal/DefaultXWikiStubContextProvider.java,
               **/internal/model/reference/CompactStringEntityReferenceSerializer.java,
               **/internal/model/reference/CompactWikiStringEntityReferenceSerializer.java,

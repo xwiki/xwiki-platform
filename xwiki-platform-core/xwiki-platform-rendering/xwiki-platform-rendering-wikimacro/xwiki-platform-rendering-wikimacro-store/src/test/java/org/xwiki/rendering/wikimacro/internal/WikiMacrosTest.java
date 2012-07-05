@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.macro;
+package org.xwiki.rendering.wikimacro.internal;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -29,7 +29,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -46,8 +45,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 {
-    private WikiMacroManager macroManager;
-
     private XWiki xwiki;
 
     private XWikiRightService rightService;
@@ -64,7 +61,6 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.macroManager = getComponentManager().getInstance(WikiMacroManager.class);
         this.wikiMacroEventListener = getComponentManager().getInstance(EventListener.class, "wikimacrolistener");
 
         this.xwiki = getMockery().mock(XWiki.class);
@@ -87,6 +83,8 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         this.macroObject.setStringValue("id", "macroid");
         this.macroObject.setLargeStringValue("code", "code");
         this.macroDocument.addXObject(macroObject);
+
+        getContext().setDatabase("wiki");
     }
 
     private ComponentManager getWikiComponentManager() throws Exception
@@ -113,10 +111,11 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
                 will(returnValue(macroDocument));
                 allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)),
                     with(any(String.class)), with(any(XWikiContext.class)));
+                will(returnValue(true));
                 allowing(rightService).hasWikiAdminRights(with(any(XWikiContext.class)));
-                    will(returnValue(true));
+                will(returnValue(true));
                 allowing(rightService).hasProgrammingRights(with(any(XWikiContext.class)));
-                    will(returnValue(true));
+                will(returnValue(true));
             }
         });
 
@@ -145,7 +144,8 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(xwiki).isVirtualMode(); will(returnValue(true));
+                allowing(xwiki).isVirtualMode();
+                will(returnValue(true));
                 allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())),
                     with(any(XWikiContext.class)));
                 will(returnValue(macroDocument));

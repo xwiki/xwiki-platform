@@ -905,6 +905,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         if (oldId != newId) {
                             map.put(oldId, newId);
                         }
+                    } else {
+                        logger.debug("Skipping invalid statistical entry [{}] with name [{}]", oldId, statsName);
                     }
                 }
 

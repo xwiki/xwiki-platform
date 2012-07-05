@@ -129,6 +129,12 @@ public class IntegrationTests
             allowing(velocityEngine).stoppedUsingMacroNamespace(with(any(String.class)));
             allowing(mockDocument).getXDOM();
                 will(returnValue(xdom));
+
+            // Methods for Multiwiki component managers
+            allowing(mockDocumentAccessBridge).getCurrentUser();
+                will(returnValue("XWiki.UnknownUser"));
+            allowing(mockDocumentAccessBridge).getCurrentWiki();
+                will(returnValue("wiki"));
        }});
 
         // Document Name Serializer Mock

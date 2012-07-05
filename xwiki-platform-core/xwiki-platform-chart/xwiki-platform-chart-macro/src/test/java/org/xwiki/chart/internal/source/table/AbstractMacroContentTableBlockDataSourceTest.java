@@ -21,7 +21,6 @@ package org.xwiki.chart.internal.source.table;
 
 import org.xwiki.test.AbstractMockingComponentTestCase;
 
-import java.io.Reader;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -32,10 +31,8 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.annotation.MockingRequirement;
 
-import org.xwiki.chart.internal.source.DataSource;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
@@ -56,8 +53,6 @@ public abstract class AbstractMacroContentTableBlockDataSourceTest extends Abstr
     public void configure() throws Exception
     {
         // Mock components
-        final EntityReferenceSerializer<String> serializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         final DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "page");
         final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);

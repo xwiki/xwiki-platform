@@ -52,6 +52,7 @@ import org.xwiki.velocity.VelocityManager;
 public class IntegrationTest
 {
     @RenderingTestSuite.Initialized
+    @SuppressWarnings("unchecked")
     public void initialize(final MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();

@@ -85,4 +85,10 @@ public class SafeCoreExtensionRepository<T extends CoreExtensionRepository> exte
     {
         return (CoreExtension) super.resolve(extensionId);
     }
+
+    @Override
+    public CoreExtension getEnvironmentExtension()
+    {
+        return safe(getWrapped().getEnvironmentExtension());
+    }
 }

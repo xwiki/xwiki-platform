@@ -3,7 +3,9 @@
 ###
 ### General wrapper for view actions
 ###
-#if ($request.getParameter("raw").equals("1"))
+#if ($xwiki.hasProgrammingRights() && $services.distribution.jobStatus)
+  #template("distribution.vm")
+#elseif ($request.getParameter("raw").equals("1"))
   #template("code.vm")
 #else
   #template("startpage.vm")

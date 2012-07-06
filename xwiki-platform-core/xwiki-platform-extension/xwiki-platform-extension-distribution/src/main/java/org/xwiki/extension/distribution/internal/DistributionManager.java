@@ -51,5 +51,7 @@ public interface DistributionManager
 
     DistributionJobStatus getPreviousJobStatus();
 
+    DistributionJob startJob();
+
     DistributionJob getJob();
 }

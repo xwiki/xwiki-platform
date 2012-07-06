@@ -1,1 +1,2 @@
+#template("xwikivars.vm")
 $services.distribution.state

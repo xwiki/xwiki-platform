@@ -23,21 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.ExtensionRepositoryManager;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.job.JobManager;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -57,61 +49,11 @@ public class DistributionScriptService implements ScriptService
      */
     public static final String EXTENSIONERROR_KEY = "scriptservice.distribution.error";
 
-    /**
-     * The real extension manager bridged by this script service.
-     */
-    @Inject
-    private ExtensionManager extensionManager;
-
-    /**
-     * Needed for checking programming rights.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * The repository containing installed extensions.
-     */
-    @Inject
-    private InstalledExtensionRepository installedExtensionRepository;
-
-    /**
-     * The repository containing local extensions.
-     */
-    @Inject
-    private LocalExtensionRepository localExtensionRepository;
-
-    /**
-     * The repository with core modules provided by the platform.
-     */
-    @Inject
-    private CoreExtensionRepository coreExtensionRepository;
-
-    /**
-     * Repository manager, needed for cross-repository operations.
-     */
-    @Inject
-    private ExtensionRepositoryManager repositoryManager;
-
-    /**
-     * Handles and provides status feedback on extension operations (installation, upgrade, removal).
-     */
-    @Inject
-    private JobManager jobManager;
-
-    /**
-     * Provides access to the current context.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
-     * 
-     */
     @Inject
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider scriptProvider;
 
+    @Inject
     private DistributionManager distributionManager;
 
     /**

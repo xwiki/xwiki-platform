@@ -28,6 +28,10 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
@@ -52,6 +56,18 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
     @Inject
     private ComponentManager componentManager;
+
+    /**
+     * Used to get the Execution Context.
+     */
+    @Inject
+    private Execution execution;
+
+    /**
+     * Used to create a new Execution Context from scratch.
+     */
+    @Inject
+    private ExecutionContextManager executionContextManager;
 
     @Inject
     private Logger logger;
@@ -80,7 +96,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             // Distribution state
             if (this.previousStatus == null) {
                 this.distributionState = DistributionState.NEW;
-                startJob();
             } else {
                 ExtensionId previousExtensionId = this.previousStatus.getDistributionExtension();
                 ExtensionId distributionExtensionId = this.distributionExtension.getId();
@@ -90,15 +105,12 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 } else if (!distributionExtensionId.getId().equals(previousExtensionId.getId())
                     && !this.distributionExtension.getFeatures().contains(previousExtensionId.getId())) {
                     this.distributionState = DistributionState.DIFFERENT;
-                    startJob();
                 } else {
                     int diff = distributionExtensionId.getVersion().compareTo(previousExtensionId.getVersion());
                     if (diff > 0) {
                         this.distributionState = DistributionState.UPGRADE;
-                        startJob();
                     } else {
                         this.distributionState = DistributionState.DOWNGRADE;
-                        startJob();
                     }
                 }
             }
@@ -114,12 +126,13 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         }
     }
 
-    private void startJob()
+    @Override
+    public DistributionJob startJob()
     {
         try {
             this.distributionJob = this.componentManager.getInstance(Job.class, "distribution");
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to create distribution job");
+            this.logger.error("Failed to create distribution job", e);
         }
 
         final DistributionRequest request = new DistributionRequest();
@@ -129,6 +142,17 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             @Override
             public void run()
             {
+                // Create a clean Execution Context
+                ExecutionContext context = new ExecutionContext();
+
+                try {
+                    executionContextManager.initialize(context);
+                } catch (ExecutionContextException e) {
+                    throw new RuntimeException("Failed to initialize IRC Bot's execution context", e);
+                }
+
+                execution.pushContext(context);
+
                 distributionJob.start(request);
             }
         });
@@ -136,6 +160,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         distributionJobThread.setDaemon(true);
         distributionJobThread.setName("Distribution initialization");
         distributionJobThread.start();
+
+        return this.distributionJob;
     }
 
     @Override

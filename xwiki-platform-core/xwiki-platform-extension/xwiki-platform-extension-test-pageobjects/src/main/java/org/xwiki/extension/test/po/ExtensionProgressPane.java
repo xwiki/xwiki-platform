@@ -54,7 +54,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public List<DependencyPane> getJobPlan()
     {
-        return new ExtensionDependenciesPane(container).getDependenciesAfter("The following new extensions will be ");
+        return new ExtensionDependenciesPane(container).getDependenciesAfter("The following ");
     }
 
     /**

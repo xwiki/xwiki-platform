@@ -111,6 +111,13 @@
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Macro parameters validation -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.2.0.Final</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

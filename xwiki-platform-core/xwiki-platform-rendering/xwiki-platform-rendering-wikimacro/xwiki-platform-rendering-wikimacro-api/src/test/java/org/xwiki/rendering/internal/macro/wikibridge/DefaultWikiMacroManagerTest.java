@@ -61,9 +61,9 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
     private MacroManager macroManager;
 
     private DocumentAccessBridge mockDocumentAccessBridge;
-    
+
     private WikiMacroFactory mockWikiMacroFactory;
-    
+
     private Parser xwiki20Parser;
 
     @Override
@@ -86,20 +86,36 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         this.macroManager = getComponentManager().getInstance(MacroManager.class);
         this.wikiMacroManager = getComponentManager().getInstance(WikiMacroManager.class);
+
+        // Simulate a user with programming rights
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).getCurrentWiki();
+                will(returnValue("wiki"));
+                allowing(mockDocumentAccessBridge).getCurrentUser();
+                will(returnValue("dummy"));
+                allowing(mockDocumentAccessBridge).setCurrentUser("dummy");
+                allowing(mockDocumentAccessBridge).setCurrentUser(with(any(String.class)));
+                allowing(mockDocumentAccessBridge).getCurrentUserReference();
+                will(returnValue(new DocumentReference("wiki", "XWiki", "dummy")));
+            }
+        });
     }
-    
+
     @Test
     public void testRegisterWikiMacroWhenGlobalVisibilityAndAllowed() throws Exception
     {
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
 
         // Simulate a user with programming rights
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-            allowing(mockDocumentAccessBridge).setCurrentUser("dummy");
-            allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL); will(returnValue(true));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL);
+                will(returnValue(true));
+            }
+        });
 
         Assert.assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
@@ -121,11 +137,13 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.WIKI);
 
         // Simulate a user with programming rights
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-            allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI); will(returnValue(true));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI);
+                will(returnValue(true));
+            }
+        });
 
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
         Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
@@ -140,10 +158,13 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
 
         // Simulate a user with programming rights
-        getMockery().checking(new Expectations() {{
-            allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER); will(returnValue(true));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER);
+                will(returnValue(true));
+            }
+        });
 
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
         Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
@@ -152,15 +173,19 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
     }
 
-    @org.junit.Test(expected=InsufficientPrivilegesException.class)
+    @org.junit.Test(expected = InsufficientPrivilegesException.class)
     public void testRegisterWikiMacroWhenGlobalVisibilityAndNotAllowed() throws Exception
     {
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
 
         // Simulate a user without programming rights
-        getMockery().checking(new Expectations() {{
-            allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL); will(returnValue(false));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL);
+                will(returnValue(false));
+            }
+        });
 
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
@@ -171,11 +196,13 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.WIKI);
 
         // Simulate a user without edit rights
-        getMockery().checking(new Expectations() {{
-            allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI); will(returnValue(true));
-            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI);
+                will(returnValue(true));
+            }
+        });
 
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
@@ -186,11 +213,13 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
 
         // Simulate a user without edit rights
-        getMockery().checking(new Expectations() {{
-            allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER); will(returnValue(true));
-            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiMacroFactory).isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER);
+                will(returnValue(true));
+            }
+        });
 
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
@@ -199,10 +228,12 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("xwiki", "Main", "TestWikiMacro");
 
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", 
-            "Test", visibility, new DefaultContentDescriptor(), new ArrayList<WikiMacroParameterDescriptor>());
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocReference, true, descriptor,
-            this.xwiki20Parser.parse(new StringReader("== Test ==")), Syntax.XWIKI_2_0, getComponentManager());
+        WikiMacroDescriptor descriptor =
+            new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", "Test", visibility,
+                new DefaultContentDescriptor(), new ArrayList<WikiMacroParameterDescriptor>());
+        DefaultWikiMacro wikiMacro =
+            new DefaultWikiMacro(wikiMacroDocReference, null, true, descriptor,
+                this.xwiki20Parser.parse(new StringReader("== Test ==")), Syntax.XWIKI_2_0, getComponentManager());
 
         return wikiMacro;
     }

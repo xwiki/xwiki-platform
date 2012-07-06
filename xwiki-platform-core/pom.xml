@@ -230,7 +230,17 @@
             <!-- TODO: Explain why we have to break backward compatibility for the Chart module -->
             <exclude>org/xwiki/chart/model/ChartModel</exclude>
             <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
-	          <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+	        <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+            <!-- Added method to get the author of the macro -->
+            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacro</exclude>
+            <!-- Removed protected method that was not supposed to be used from outside (was protected for unit tests hacks. -->
+            <exclude>com/xpn/xwiki/XWiki</exclude>
+            <!-- These classes below have never been used. It was supposed to be the start of the removal of Struts but
+                 since it hasn't progressed so far we're removing stray code from master. Experiments should be done
+                 on feature branches -->
+            <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
+            <!-- Chart plugin has been moved from oldcore to its own module. There's no API breakage for the user -->
+            <exclude>com/xpn/xwiki/plugin/charts/**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -246,7 +256,6 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>

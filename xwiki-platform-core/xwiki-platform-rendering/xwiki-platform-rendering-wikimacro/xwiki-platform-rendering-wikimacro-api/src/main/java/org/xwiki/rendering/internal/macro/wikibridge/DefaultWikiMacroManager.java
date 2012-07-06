@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
@@ -78,6 +79,12 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     private WikiMacroFactory wikiMacroFactory;
 
     /**
+     * Used to serialize references of documents.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    /**
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
      * are deleted.
      */
@@ -99,20 +106,13 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         private WikiMacro wikiMacro;
 
         /**
-         * @see #getAuthor()
-         */
-        private String author;
-
-        /**
          * @param hint see {@link #getHint()}
          * @param wikiMacro see {@link #getWikiMacro()}
-         * @param author see {@link #getAuthor()}
          */
-        public WikiMacroData(String hint, WikiMacro wikiMacro, String author)
+        public WikiMacroData(String hint, WikiMacro wikiMacro)
         {
             this.hint = hint;
             this.wikiMacro = wikiMacro;
-            this.author = author;
         }
 
         /**
@@ -129,14 +129,6 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         public WikiMacro getWikiMacro()
         {
             return this.wikiMacro;
-        }
-
-        /**
-         * @return the author of the macro
-         */
-        public String getAuthor()
-        {
-            return author;
         }
     }
 
@@ -155,17 +147,30 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         // Verify that the user has the right to register this wiki macro the chosen visibility
         if (this.wikiMacroFactory.isAllowed(documentReference, macroDescriptor.getVisibility())) {
             DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<Macro>();
-            componentDescriptor.setRole(Macro.class);
+            componentDescriptor.setRoleType(Macro.class);
             componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
 
+            // Save current context informations
+            String currentUser = this.bridge.getCurrentUser();
+            EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
             try {
+                // Put the proper context information to let components manager use the proper keys to find
+                // components to unregister
+                this.bridge.setCurrentUser(this.serializer.serialize(wikiMacro.getAuthorReference() != null ? wikiMacro
+                    .getAuthorReference() : this.bridge.getCurrentUserReference()));
+                this.modelContext.setCurrentEntityReference(documentReference);
+
                 // Register the macro against the right Component Manager, depending on the defined macro visibility.
                 findComponentManager(macroDescriptor.getVisibility()).registerComponent(componentDescriptor, wikiMacro);
-                this.wikiMacroMap.put(documentReference, new WikiMacroData(componentDescriptor.getRoleHint(),
-                    wikiMacro, this.bridge.getCurrentUser()));
+                this.wikiMacroMap.put(documentReference,
+                    new WikiMacroData(componentDescriptor.getRoleHint(), wikiMacro));
             } catch (Exception e) {
                 throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
                     wikiMacro.getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()), e);
+            } finally {
+                // Restore previous context informations
+                this.bridge.setCurrentUser(currentUser);
+                this.modelContext.setCurrentEntityReference(currentEntityReference);
             }
         } else {
             throw new InsufficientPrivilegesException(String.format(
@@ -188,7 +193,8 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 try {
                     // Put the proper context information to let components manager use the proper keys to find
                     // components to unregister
-                    this.bridge.setCurrentUser(macroData.getAuthor());
+                    this.bridge
+                        .setCurrentUser(this.serializer.serialize(macroData.getWikiMacro().getAuthorReference()));
                     this.modelContext.setCurrentEntityReference(documentReference);
 
                     findComponentManager(macroDescriptor.getVisibility()).unregisterComponent(Macro.class,

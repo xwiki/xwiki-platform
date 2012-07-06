@@ -117,7 +117,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -801,11 +800,6 @@ public class XWiki implements EventListener
         String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
         this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
-        // Initialize all wiki macros.
-        // TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note
-        // that we need DB access to be available (at component initialization) to make this possible.
-        registerWikiMacros();
-
         ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
         observationManager.addListener(this);
 
@@ -830,34 +824,9 @@ public class XWiki implements EventListener
         getSheetClass(context);
         getEditModeClass(context);
 
-        try {
-            WikiMacroInitializer wikiMacroInitializer =
-                Utils.getComponentManager().getInstance(WikiMacroInitializer.class);
-            wikiMacroInitializer.installOrUpgradeWikiMacroClasses();
-        } catch (Exception ex) {
-            LOGGER.error("Error while installing / upgrading xwiki classes required for wiki macros.", ex);
-        }
-
         if (context.getDatabase().equals(context.getMainXWiki())
             && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
             getRedirectClass(context);
-        }
-    }
-
-    /**
-     * TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note that we
-     * need DB access to be available (at component initialization) to make this possible.
-     * <p>
-     * This method is protected to be able to skip it in unit tests.
-     */
-    protected void registerWikiMacros()
-    {
-        try {
-            WikiMacroInitializer wikiMacroInitializer =
-                Utils.getComponentManager().getInstance(WikiMacroInitializer.class);
-            wikiMacroInitializer.registerExistingWikiMacros();
-        } catch (Exception ex) {
-            LOGGER.error("Error while registering wiki macros.", ex);
         }
     }
 
@@ -3053,11 +3022,11 @@ public class XWiki implements EventListener
             builder.append("  {{html}}\n");
             builder.append("    #if($xwiki.jodatime)\n");
             builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
-            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>" +
-                "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
+            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
+                + "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
             builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
-            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>" +
-                "$tz</option>\n");
+            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
+                + "$tz</option>\n");
             builder.append("        #end\n");
             builder.append("      </select>\n");
             builder.append("    #else\n");

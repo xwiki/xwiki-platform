@@ -40,12 +40,6 @@
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- CaptchaAction extends Action -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-action</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- CaptchaVelocityContextInitializer needs ConfigurationSource to tell whether captchas should be enabled -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

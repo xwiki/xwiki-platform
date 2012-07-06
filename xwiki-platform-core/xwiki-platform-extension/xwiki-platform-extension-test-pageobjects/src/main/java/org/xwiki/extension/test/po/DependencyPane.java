@@ -72,11 +72,26 @@ public class DependencyPane extends BaseElement
     }
 
     /**
-     * @return the extension name, which is a link that can be clicked to view more details
+     * @return the extension link that can be clicked to view more details
      */
-    public WebElement getName()
+    public WebElement getLink()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.tagName("A"));
+        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, By.tagName("A"));
+        return found.isEmpty() ? null : found.get(0);
+    }
+
+    /**
+     * @return the extension name
+     */
+    public String getName()
+    {
+        WebElement link = getLink();
+        if (link != null) {
+            return link.getText();
+        }
+        // Unknown dependency, with no link.
+        String innerText = container.getText();
+        return innerText.substring(0, innerText.indexOf(getVersion()));
     }
 
     /**

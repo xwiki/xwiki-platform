@@ -134,11 +134,6 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         final XWiki xwiki = new XWiki(new XWikiConfig(), context)
         {
             @Override
-            protected void registerWikiMacros()
-            {
-            }
-
-            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;

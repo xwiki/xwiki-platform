@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
@@ -40,20 +41,18 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.internal.macro.chart.source.DataSource;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.chart.internal.source.DataSource;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * A macro for rendering charts.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -117,7 +116,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     {
         String imageLocation =
             this.documentAccessBridge.getDocumentURL(null, "charting", null, null)
-            + "/" + generateChart(macroParams, content);
+                + "/" + generateChart(macroParams, content);
         String title = macroParams.getTitle();
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
@@ -138,7 +137,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 
     /**
      * Builds the chart image according to the specifications passed in.
-     * 
+     *
      * @param parameters macro parameters
      * @param content macro content
      * @return the name of the generated image file
@@ -161,7 +160,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
             fos.close();
         } catch (ComponentLookupException ex) {
             throw new MacroExecutionException(String.format("Invalid source parameter [%s].",
-                                                            parameters.getSource()), ex);
+                parameters.getSource()), ex);
         } catch (ChartGeneratorException ex) {
             throw new MacroExecutionException("Error while rendering chart.", ex);
         } catch (Exception ex) {
@@ -172,7 +171,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 
     /**
      * Returns the temporary file into which the chart image will be saved.
-     * 
+     *
      * @param parameters macro parameters
      * @return the chart image file
      */
@@ -184,7 +183,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 
     /**
      * TODO There is no way to escape the ';' character.
-     * 
+     *
      * @param chartMacroParameters The macro parameters.
      * @return A map containing the source parameters.
      */
@@ -209,5 +208,4 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 
         return parameters;
     }
-
 }

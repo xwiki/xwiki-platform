@@ -35,6 +35,7 @@
   <description>XWiki Platform - Rendering - Wiki Macro Bridge</description>
   <modules>
     <module>xwiki-platform-rendering-wikimacro-api</module>
+    <module>xwiki-platform-rendering-wikimacro-store</module>
     <module>xwiki-platform-rendering-wikimacro-ui</module>
   </modules>
 </project>

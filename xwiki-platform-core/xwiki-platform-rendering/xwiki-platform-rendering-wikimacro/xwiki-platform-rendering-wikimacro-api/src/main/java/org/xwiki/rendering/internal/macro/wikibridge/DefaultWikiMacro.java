@@ -109,6 +109,11 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     private DocumentReference macroDocumentReference;
 
     /**
+     * User to be used to check rights for the macro.
+     */
+    private DocumentReference macroAuthor;
+
+    /**
      * Whether this macro supports inline mode or not.
      */
     private boolean supportsInlineMode;
@@ -139,10 +144,12 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
      * @param componentManager {@link ComponentManager} component used to look up for other components.
      * @since 2.3M1
      */
-    public DefaultWikiMacro(DocumentReference macroDocumentReference, boolean supportsInlineMode,
-        MacroDescriptor descriptor, XDOM macroContent, Syntax syntax, ComponentManager componentManager)
+    public DefaultWikiMacro(DocumentReference macroDocumentReference, DocumentReference macroAuthor,
+        boolean supportsInlineMode, MacroDescriptor descriptor, XDOM macroContent, Syntax syntax,
+        ComponentManager componentManager)
     {
         this.macroDocumentReference = macroDocumentReference;
+        this.macroAuthor = macroAuthor;
         this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
         this.content = macroContent;
@@ -353,6 +360,12 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     public DocumentReference getDocumentReference()
     {
         return this.macroDocumentReference;
+    }
+
+    @Override
+    public DocumentReference getAuthorReference()
+    {
+        return this.macroAuthor;
     }
 
     @Override

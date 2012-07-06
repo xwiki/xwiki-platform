@@ -45,6 +45,8 @@ import org.xwiki.job.JobManager;
 @Component
 public class DefaultDistributionManager implements DistributionManager, Initializable
 {
+    private static final String JOBID = "distribution";
+
     /**
      * The repository with core modules provided by the platform.
      */
@@ -89,7 +91,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         this.distributionExtension = this.coreExtensionRepository.getEnvironmentExtension();
 
         // Get previous state
-        this.previousStatus = (DistributionJobStatus) this.jobManager.getJobStatus("distribution");
+        this.previousStatus = (DistributionJobStatus) this.jobManager.getJobStatus(JOBID);
 
         // Determine distribution status
         if (this.distributionExtension != null) {
@@ -136,6 +138,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         }
 
         final DistributionRequest request = new DistributionRequest();
+        request.setId(JOBID);
 
         Thread distributionJobThread = new Thread(new Runnable()
         {

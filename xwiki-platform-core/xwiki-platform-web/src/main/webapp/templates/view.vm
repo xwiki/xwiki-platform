@@ -3,7 +3,7 @@
 ###
 ### General wrapper for view actions
 ###
-#if ($xwiki.hasProgrammingRights() && $services.distribution.jobStatus)
+#if ($xwiki.hasProgrammingRights() && $services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED')
   #template("distribution.vm")
 #elseif ($request.getParameter("raw").equals("1"))
   #template("code.vm")

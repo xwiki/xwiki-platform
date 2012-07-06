@@ -1,2 +1,69 @@
 #template("xwikivars.vm")
-$services.distribution.state
+
+#if ($request.distributioncancel)
+  #set($distributionJobStatus = $services.distribution.jobStatus)
+  #set($distributionQuestion = $distributionJobStatus.question)
+  #if ($distributionQuestion)
+    $distributionQuestion.setUpdateState('CANCELED')
+    $distributionJobStatus.answered()
+  #end
+#end
+
+#set($distributionState = $services.distribution.state.name())
+#if ($distributionState == 'NONE')
+  Can't get any information about the distribution.
+#else
+  #set($distributionExtension = $services.distribution.distributionExtension)
+  #set($distributionUIId = $services.distribution.getUIExtensionId())
+
+  #if ($request.installui)
+    <p>Installing $distributionUIId...<p>
+    <p><tt><i>TODO: start extension installation</i></tt></p>
+  #end
+  
+  <p>The distribution is <strong>$distributionExtension.name ($distributionExtension.id.id)</strong> in version <strong>$distributionExtension.id.version</strong>.</p>
+
+  #if ($distributionUIId)
+    <form method='get' action="">
+      <div>
+        <p>The default distribution UI id is <strong>${distributionUIId.id}.</strong>
+
+        #if ($distributionState == 'SAME')
+          <p>Already up to date. Nothing to do.</p>
+        #elseif ($distributionState == 'NEW')
+          <p>No previous status could be found, either:</p>
+          <ul>
+            <li>it's a new install</li>
+            <li>the previous version was not including distribution module</li>
+          </ul>
+
+          ##TODO: propose to indicate what's already installed but not known as such by Extension Manager (when upgrading old distributions)
+
+          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Install UI"/></span>
+        #elseif ($distributionState == 'UPGRADE')
+          <p>Upgrading.</p>
+
+          ## Install job will take care of upgrade
+          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Upgrade UI"/></span>
+        #elseif ($distributionState == 'DOWNGRADE')
+          <p>Downgrading.</p>
+
+          ## Install job will take care of downgrade
+          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Downgrade UI"/></span>
+        #elseif ($distributionState == 'DIFFERENT')
+          <p>Installing a different distribution.</p>
+
+          ## TODO: Might need to indicate what was the previous distribution UI to uinstall it while installing the new one
+
+          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Install UI"/></span>
+        #else
+          <p>Unkown status.</p>
+        #end
+
+        <span class="buttonwrapper"><input class="button" type="submit" name="distributioncancel" value="Cancel"/></span>
+      </div>
+    </form>
+  #else
+    <p>No default UI is indicated for this distribution.</p>
+  #end
+#end

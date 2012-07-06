@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.chart;
+package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.macro.chart.ChartMacro;
+import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
 /**
  * Extension of the {@link ChartMacro} for testing.
@@ -38,9 +38,6 @@ import org.xwiki.rendering.internal.macro.chart.ChartMacro;
 @Singleton
 public class TestChartMacro extends ChartMacro
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected File getChartImageFile(ChartMacroParameters parameters)
     {

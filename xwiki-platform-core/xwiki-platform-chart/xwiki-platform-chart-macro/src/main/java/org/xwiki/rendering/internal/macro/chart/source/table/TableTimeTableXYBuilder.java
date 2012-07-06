@@ -17,71 +17,81 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.chart.time.TimePeriodType;
-import org.xwiki.chart.internal.source.LocaleConfiguration;
-
-import org.jfree.data.general.Dataset;
-import org.jfree.data.time.TimePeriod;
-import org.jfree.data.time.RegularTimePeriod;
-import org.jfree.data.time.SimpleTimePeriod;
-import org.jfree.data.time.TimeTableXYDataset;
-import org.jfree.data.time.Millisecond;
-import org.jfree.data.time.Second;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.Hour;
-import org.jfree.data.time.Day;
-import org.jfree.data.time.Week;
-import org.jfree.data.time.Month;
-import org.jfree.data.time.Quarter;
-import org.jfree.data.time.Year;
-
-import org.apache.commons.lang3.StringUtils;
-
+import java.lang.reflect.Constructor;
+import java.text.ParseException;
 import java.util.Date;
-import java.util.TimeZone;
+import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.EnumMap;
-import java.text.ParseException;
-import java.lang.reflect.Constructor;
+import java.util.TimeZone;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jfree.data.general.Dataset;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.Hour;
+import org.jfree.data.time.Millisecond;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.Quarter;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.SimpleTimePeriod;
+import org.jfree.data.time.TimePeriod;
+import org.jfree.data.time.TimeTableXYDataset;
+import org.jfree.data.time.Week;
+import org.jfree.data.time.Year;
+import org.xwiki.chart.time.TimePeriodType;
+import org.xwiki.rendering.internal.macro.chart.source.LocaleConfiguration;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * Dataset builder that builds a time table dataset from a table data source.
  *
- * @since 4.2M1
  * @version $Id$
+ * @since 4.2M1
  */
 public class TableTimeTableXYBuilder implements TableDatasetBuilder
 {
-
-    /** The name of the time period type parameter. */
+    /**
+     * The name of the time period type parameter.
+     */
     public static final String TIMEPERIOD_TYPE_PARAM = "time_period";
 
-    /** Indicates if the transpose of the table should be used. */
+    /**
+     * Indicates if the transpose of the table should be used.
+     */
     private boolean transpose;
 
-    /** The dates. */
-    private Date [] dates;
+    /**
+     * The dates.
+     */
+    private Date[] dates;
 
-    /** The series names. */
-    private String [] seriesNames;
+    /**
+     * The series names.
+     */
+    private String[] seriesNames;
 
-    /** The dataset. */
+    /**
+     * The dataset.
+     */
     private TimeTableXYDataset dataset;
 
-    /** The time period type. */
+    /**
+     * The time period type.
+     */
     private TimePeriodType timePeriodType = TimePeriodType.SIMPLE;
 
-    /** Map of time period classes. */
+    /**
+     * Map of time period classes.
+     */
     private final Map<TimePeriodType, Class<? extends RegularTimePeriod>> timePeriodClasses
         = new EnumMap<TimePeriodType, Class<? extends RegularTimePeriod>>(TimePeriodType.class) {
             /** Serial version uid. */
             private static final long serialVersionUID = 1L;
-    
+
             {
                 put(TimePeriodType.MILLISECOND, Millisecond.class);
                 put(TimePeriodType.SECOND,      Second.class);
@@ -95,7 +105,9 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
             }
         };
 
-    /** The locale configuration. */
+    /**
+     * The locale configuration.
+     */
     private LocaleConfiguration localeConfiguration;
 
     @Override
@@ -163,7 +175,7 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
 
     /**
      * Get a time period in the series.
-     * 
+     *
      * @param index The index of the time period.
      * @return The corresponding time period.
      */
@@ -176,7 +188,7 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
 
         if (timePeriodClass == null) {
             Date start = index == 0 ? new Date(0) : dates[index - 1];
-            Date   end = time;
+            Date end = time;
             return new SimpleTimePeriod(start, end);
         }
 
@@ -185,11 +197,10 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
                 = timePeriodClass.getConstructor(Date.class, TimeZone.class, Locale.class);
 
             return constructor.newInstance(time, localeConfiguration.getTimeZone(),
-                                           localeConfiguration.getLocale());
+                localeConfiguration.getLocale());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -219,7 +230,7 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
     {
         return dataset;
     }
- 
+
     @Override
     public void setParameters(Map<String, String> parameters) throws MacroExecutionException
     {
@@ -229,12 +240,12 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
             this.timePeriodType = TimePeriodType.forName(timePeriodTypeString);
             if (this.timePeriodType == null) {
                 throw new MacroExecutionException(String.format("Invalid time period type [%s].",
-                                                                timePeriodTypeString));
+                    timePeriodTypeString));
             }
         }
 
-        dataset = new TimeTableXYDataset(localeConfiguration.getTimeZone(), 
-                                         localeConfiguration.getLocale());
+        dataset = new TimeTableXYDataset(localeConfiguration.getTimeZone(),
+            localeConfiguration.getLocale());
     }
 
     @Override
@@ -254,5 +265,4 @@ public class TableTimeTableXYBuilder implements TableDatasetBuilder
     {
         this.localeConfiguration = localeConfiguration;
     }
-
 }

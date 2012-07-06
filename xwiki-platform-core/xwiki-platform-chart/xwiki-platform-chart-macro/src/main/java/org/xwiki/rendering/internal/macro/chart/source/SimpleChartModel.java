@@ -17,15 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.rendering.internal.macro.chart.source;
 
-import org.xwiki.chart.model.ChartModel;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jfree.chart.axis.Axis;
 import org.jfree.data.general.Dataset;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.xwiki.chart.model.ChartModel;
 
 /**
  * Internal implementation of chart model.
@@ -35,17 +34,20 @@ import java.util.ArrayList;
  */
 public class SimpleChartModel implements ChartModel
 {
-
-    /** The dataset. */
+    /**
+     * The dataset.
+     */
     private Dataset dataset;
 
-    /** The axes. */
+    /**
+     * The axes.
+     */
     private final List<Axis> axes = new ArrayList<Axis>();
 
     /**
      * Public constructor.
      */
-    public SimpleChartModel() 
+    public SimpleChartModel()
     {
     }
 
@@ -95,5 +97,4 @@ public class SimpleChartModel implements ChartModel
     {
         axes.add(axis);
     }
-
 }

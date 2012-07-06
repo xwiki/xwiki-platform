@@ -17,29 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source;
 
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.general.Dataset;
-import org.jfree.util.TableOrder;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Dataset builder that builds a pie dataset from a table data source.
+ * Configurator interface.
  *
- * @since 4.2M1
  * @version $Id$
+ * @since 4.2M1
  */
-public class TablePieDatasetBuilder extends TableCategoryDatasetBuilder
+public abstract class AbstractConfigurator implements Configurator
 {
-
     @Override
-    @SuppressWarnings("unchecked")
-    public Dataset getDataset()
+    public void validateParameters() throws MacroExecutionException
     {
-        CategoryDataset dataset = (CategoryDataset) super.getDataset();
-
-        return new CategoryToPieDataset(dataset, TableOrder.BY_ROW, 0);
     }
 
+    /**
+     * Indicate that an invalid parameter value was found.
+     *
+     * @param parameterName The name of the parameter.
+     * @param value The value.
+     * @throws MacroExecutionException always.
+     */
+    protected void invalidParameterValue(String parameterName, String value) throws MacroExecutionException
+    {
+        throw new MacroExecutionException(String.format("Invalid value for parameter [%s]: [%s]",
+            parameterName, value));
+    }
 }

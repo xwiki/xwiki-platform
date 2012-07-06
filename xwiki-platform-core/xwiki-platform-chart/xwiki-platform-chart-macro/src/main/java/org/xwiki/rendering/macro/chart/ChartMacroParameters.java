@@ -25,11 +25,11 @@ import java.util.Map;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.chart.internal.source.DataSource;
+import org.xwiki.rendering.internal.macro.chart.source.DataSource;
 
 /**
  * Parameters for chart macro.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -144,7 +144,6 @@ public class ChartMacroParameters
 
     /**
      * @param source - refer to {@link #getSource()
-
      */
     @PropertyDescription("The string describing the type of input data source (Ex. xdom or inline)")
     public void setSource(String source)

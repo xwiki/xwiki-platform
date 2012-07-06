@@ -17,76 +17,99 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
-
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.chart.plot.PlotType;
-import org.xwiki.chart.axis.AxisType;
-
-import org.jfree.chart.axis.Axis;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickMarkPosition;
+package org.xwiki.rendering.internal.macro.chart.source;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickMarkPosition;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.xwiki.chart.axis.AxisType;
+import org.xwiki.chart.plot.PlotType;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * A configurator object for the axes.
  *
  * This super class provides basic parameter validation.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public class AxisConfigurator extends AbstractConfigurator
 {
-        /** The name of the domain axis parameter. */
+    /**
+     * The name of the domain axis parameter.
+     */
     public static final String DOMAIN_AXIS_PARAM = "domain_axis_type";
 
-    /** The name of the range axis parameter. */
+    /**
+     * The name of the range axis parameter.
+     */
     public static final String RANGE_AXIS_PARAM = "range_axis_type";
 
-    /** The name of the domain axis date format parameter.  Used only if the axis type is date. */
+    /**
+     * The name of the domain axis date format parameter.  Used only if the axis type is date.
+     */
     public static final String DOMAIN_AXIS_DATE_FORMAT_PARAM = "domain_axis_date_format";
 
-    /** The name of the range axis date format parameter.  Used only if the axis type is date. */
+    /**
+     * The name of the range axis date format parameter.  Used only if the axis type is date.
+     */
     public static final String RANGE_AXIS_DATE_FORMAT_PARAM = "range_axis_date_format";
 
-    /** The lower limit on the domain axis. */
+    /**
+     * The lower limit on the domain axis.
+     */
     public static final String DOMAIN_AXIS_LOWER_PARAM = "domain_axis_lower";
 
-    /** The upper limit on the domain axis. */
+    /**
+     * The upper limit on the domain axis.
+     */
     public static final String DOMAIN_AXIS_UPPER_PARAM = "domain_axis_upper";
 
-    /** The lower limit on the range axis. */
+    /**
+     * The lower limit on the range axis.
+     */
     public static final String RANGE_AXIS_LOWER_PARAM = "range_axis_lower";
 
-    /** The upper limit on the range axis. */
+    /**
+     * The upper limit on the range axis.
+     */
     public static final String RANGE_AXIS_UPPER_PARAM = "range_axis_upper";
 
-    /** The configured axis types. */
-    private AxisType [] axisTypes = {null, null, null};
+    /**
+     * The configured axis types.
+     */
+    private AxisType[] axisTypes = {null, null, null};
 
-    /** The configured axis date formats. */
-    private String [] axisDateFormat = {null, null, null};
+    /**
+     * The configured axis date formats.
+     */
+    private String[] axisDateFormat = {null, null, null};
 
-    /** The locale configuration. */
+    /**
+     * The locale configuration.
+     */
     private final LocaleConfiguration localeConfiguration;
 
-    /** The lower limits. */
-    private String [] axisLowerLimit = {null, null, null};
+    /**
+     * The lower limits.
+     */
+    private String[] axisLowerLimit = {null, null, null};
 
-    /** The upper limits. */
-    private String [] axisUpperLimit = {null, null, null};
-
+    /**
+     * The upper limits.
+     */
+    private String[] axisUpperLimit = {null, null, null};
 
     /**
      * @param localeConfiguration The locale configuration.
@@ -182,12 +205,12 @@ public class AxisConfigurator extends AbstractConfigurator
      */
     public void setAxes(PlotType plotType, SimpleChartModel chartModel) throws MacroExecutionException
     {
-        AxisType [] defaultAxisTypes = plotType.getDefaultAxisTypes();
+        AxisType[] defaultAxisTypes = plotType.getDefaultAxisTypes();
 
         for (int i = 0; i < axisTypes.length; i++) {
             AxisType type = axisTypes[i];
             if (i >= defaultAxisTypes.length) {
-                if  (type != null) {
+                if (type != null) {
                     throw new MacroExecutionException("To many axes for plot type.");
                 }
                 continue;
@@ -214,11 +237,11 @@ public class AxisConfigurator extends AbstractConfigurator
                     if (axisDateFormat[i] != null) {
                         try {
                             DateFormat dateFormat = new SimpleDateFormat(axisDateFormat[i],
-                                                                         localeConfiguration.getLocale());
+                                localeConfiguration.getLocale());
                             dateAxis.setDateFormatOverride(dateFormat);
                         } catch (IllegalArgumentException e) {
                             throw new MacroExecutionException(String.format("Invalid date format [%s].",
-                                                                            axisDateFormat[i]));
+                                axisDateFormat[i]));
                         }
                     }
                     setDateLimits(dateAxis, i);

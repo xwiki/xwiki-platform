@@ -17,38 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.MacroExecutionException;
-
-import org.xwiki.display.internal.DocumentDisplayerParameters;
-import org.xwiki.display.internal.DocumentDisplayer;
-
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-import org.slf4j.Logger;
+import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 
 /**
  * A data source that allows building charts from {@link XDOM} sources.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -57,7 +55,6 @@ import org.slf4j.Logger;
 @InstantiationStrategy(PER_LOOKUP)
 public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
 {
-
     /**
      * Identifies which xdom to process.
      */
@@ -68,13 +65,19 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
      */
     private static final String TABLE_PARAM = "table";
 
-    /** The document name of the document holding the table.  */
+    /**
+     * The document name of the document holding the table.
+     */
     private DocumentReference documentRef;
 
-    /** The id of the table holding the data. */
+    /**
+     * The id of the table holding the data.
+     */
     private String tableId;
 
-    /** A logger. */
+    /**
+     * A logger.
+     */
     @Inject
     private Logger logger;
 
@@ -96,11 +99,15 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    /** A document reference resolver. */
+    /**
+     * A document reference resolver.
+     */
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    /** The authorization manager. */
+    /**
+     * The authorization manager.
+     */
     @Inject
     private AuthorizationManager authorizationManager;
 
@@ -118,14 +125,14 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
             xdom = documentDisplayer.display(document, parameters);
         } catch (Exception ex) {
             throw new MacroExecutionException(String.format("Error while parsing document: [%s].",
-                                                            entityReferenceSerializer.serialize(documentRef)), ex);
+                entityReferenceSerializer.serialize(documentRef)), ex);
         }
-        
+
         // Find the correct table block.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
         logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-                     new Object [] {tableId, tableBlocks.size(),  documentRef});
+            new Object[]{tableId, tableBlocks.size(), documentRef});
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
@@ -137,11 +144,11 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         } else {
             result = (tableBlocks.size() > 0) ? tableBlocks.get(0) : null;
         }
-        
+
         if (null == result) {
             throw new MacroExecutionException("Unable to find a matching data table.");
         }
-        
+
         return result;
     }
 
@@ -169,17 +176,15 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         if (null == documentRef) {
             documentRef = this.docBridge.getCurrentDocumentReference();
         } else if (!authorizationManager.hasAccess(Right.VIEW,
-                                                   docBridge.getCurrentUserReference(),
-                                                   documentRef)) {
+            docBridge.getCurrentUserReference(),
+            documentRef))
+        {
             throw new MacroExecutionException("You do not have permission to view the document.");
-
         }
 
         if (!docBridge.exists(documentRef)) {
             throw new MacroExecutionException(String.format("Document [%s] does not exist.",
-                                                            entityReferenceSerializer.serialize(documentRef)));
+                entityReferenceSerializer.serialize(documentRef)));
         }
-
-
     }
 }

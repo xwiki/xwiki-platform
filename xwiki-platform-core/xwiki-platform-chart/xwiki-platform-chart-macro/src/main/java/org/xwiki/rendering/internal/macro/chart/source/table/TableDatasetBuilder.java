@@ -17,20 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
-
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.chart.internal.source.LocaleConfiguration;
-
-import org.jfree.data.general.Dataset;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import java.util.Map;
 
+import org.jfree.data.general.Dataset;
+import org.xwiki.rendering.internal.macro.chart.source.LocaleConfiguration;
+import org.xwiki.rendering.macro.MacroExecutionException;
+
 /**
  * A dataset builder interface for table data sources.
- * 
- * @since 4.2M1
+ *
  * @version $Id$
+ * @since 4.2M1
  */
 public interface TableDatasetBuilder
 {
@@ -43,7 +42,7 @@ public interface TableDatasetBuilder
 
     /**
      * Set the number of columns in the table.
-     * 
+     *
      * @param numberOfColumns the number of columns.
      */
     void setNumberOfColumns(int numberOfColumns);
@@ -78,11 +77,14 @@ public interface TableDatasetBuilder
 
     /**
      * Set wether the table should be transposed.
+     *
      * @param transpose Indicates that the table shoudl be transposed.
      */
     void setTranspose(boolean transpose);
 
-    /** @return the built dataset. */
+    /**
+     * @return the built dataset.
+     */
     Dataset getDataset();
 
     /**
@@ -95,20 +97,19 @@ public interface TableDatasetBuilder
 
     /**
      * @return indication of whether column headings should be forced.  I.e., if the first column must be headings even
-     * if included in the range.
+     *         if included in the range.
      */
     boolean forceColumnHeadings();
 
     /**
      * @return indication of whether row headings should be forced.  I.e., if the first row must be headings even
-     * if included in the range.
+     *         if included in the range.
      */
     boolean forceRowHeadings();
 
-
     /**
      * Set the locale configuration for the builders that needs it.
-     * 
+     *
      * @param localeConfiguration The locale configuration
      */
     void setLocaleConfiguration(LocaleConfiguration localeConfiguration);

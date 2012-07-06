@@ -1,60 +1,70 @@
-
 /*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.chart.internal.source;
+* See the NOTICE file distributed with this work for additional
+* information regarding copyright ownership.
+*
+* This is free software; you can redistribute it and/or modify it
+* under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 2.1 of
+* the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the Free
+* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+*/
+package org.xwiki.rendering.internal.macro.chart.source;
 
-import org.xwiki.rendering.macro.MacroExecutionException;
-
-import java.util.Locale;
-import java.util.TimeZone;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * A configuration object for locale and time zone.
  *
  * This super class provides basic parameter validation.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public class LocaleConfiguration extends AbstractConfigurator
 {
-    /** The name of the locale parameter. */
+    /**
+     * The name of the locale parameter.
+     */
     public static final String LOCALE_PARAM = "locale";
 
-    /** The name of the dateformat parameter. */
+    /**
+     * The name of the dateformat parameter.
+     */
     public static final String DATEFORMAT_PARAM = "date_format";
 
-    /** The locale used for generating date format. */
+    /**
+     * The locale used for generating date format.
+     */
     private Locale locale = Locale.getDefault();
 
-    /** The time zone. */
+    /**
+     * The time zone.
+     */
     private TimeZone timeZone = TimeZone.getDefault();
 
-    /** The dateformat.  Default is taken from the server locale. */
+    /**
+     * The dateformat.  Default is taken from the server locale.
+     */
     private DateFormat dateFormat = DateFormat.getInstance();
 
-    /** A configured date format pattern string. */
+    /**
+     * A configured date format pattern string.
+     */
     private String dateFormatString;
 
     /**
@@ -106,20 +116,25 @@ public class LocaleConfiguration extends AbstractConfigurator
         }
     }
 
-    /** @return the date format. */
+    /**
+     * @return the date format.
+     */
     public DateFormat getDateFormat()
     {
         return dateFormat;
     }
 
-
-    /** @return the locale. */
+    /**
+     * @return the locale.
+     */
     public Locale getLocale()
     {
         return locale;
     }
 
-    /** @return the time zone. */
+    /**
+     * @return the time zone.
+     */
     public TimeZone getTimeZone()
     {
         return timeZone;

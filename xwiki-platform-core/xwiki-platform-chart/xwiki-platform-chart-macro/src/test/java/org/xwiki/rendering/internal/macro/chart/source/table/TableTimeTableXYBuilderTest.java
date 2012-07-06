@@ -17,12 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.jfree.data.general.Dataset;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.axis.DateAxis;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import java.io.StringReader;
 import java.util.List;
@@ -29,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
@@ -37,6 +36,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Parser;
+
+import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 
 /**
  * A data source for building charts from macro content.
@@ -80,13 +81,13 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while parsing macro content.", ex);
         }
-        
+
         // Take the first TableBlock found in the macro content.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         if (tableBlocks.size() == 0) {
             throw new MacroExecutionException("Unable to locate a suitable data table.");
         }
-        
+
         return tableBlocks.get(0);
-    }    
+    }
 }

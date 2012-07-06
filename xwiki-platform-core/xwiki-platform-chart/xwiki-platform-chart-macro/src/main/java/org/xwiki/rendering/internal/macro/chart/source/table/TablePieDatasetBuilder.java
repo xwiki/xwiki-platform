@@ -17,34 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.xwiki.rendering.macro.MacroExecutionException;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.CategoryToPieDataset;
+import org.jfree.data.general.Dataset;
+import org.jfree.util.TableOrder;
 
 /**
- * Configurator interface.
+ * Dataset builder that builds a pie dataset from a table data source.
  *
  * @version $Id$
  * @since 4.2M1
  */
-public interface Configurator
+public class TablePieDatasetBuilder extends TableCategoryDatasetBuilder
 {
+    @Override
+    @SuppressWarnings("unchecked")
+    public Dataset getDataset()
+    {
+        CategoryDataset dataset = (CategoryDataset) super.getDataset();
 
-    /**
-     * Let an implementation set a parameter.
-     *
-     * @param key The key of the parameter.
-     * @param value The value of the parameter.
-     * @return {@code true} if the parameter was claimed.
-     * @throws MacroExecutionException if the parameter is not supported by the data source.
-     */
-    boolean setParameter(String key, String value) throws MacroExecutionException;
-
-    /**
-     * Let an implementation validate the value of the previously set parameters, and set default values.
-     *
-     * @throws MacroExecutionException if the previously set value is invalid.
-     */
-    void validateParameters() throws MacroExecutionException;
-
+        return new CategoryToPieDataset(dataset, TableOrder.BY_ROW, 0);
+    }
 }

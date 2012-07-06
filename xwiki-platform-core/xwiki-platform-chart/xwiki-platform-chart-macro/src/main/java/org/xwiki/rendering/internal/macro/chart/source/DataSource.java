@@ -17,37 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.rendering.internal.macro.chart.source;
 
 import java.util.Map;
 
+import org.xwiki.chart.model.ChartModel;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.chart.model.ChartModel;
 
 /**
  * A data source is able to provide a data set for chart generation.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 @Role
 public interface DataSource
 {
-
     /**
      * Parameter identifier for data source.
      */
     String SOURCE_PARAM = "source";
-    
     /**
      * Parameter identifier for data source specific parameters.
      */
-    String PARAMS_PARAM = "params";    
+    String PARAMS_PARAM = "params";
 
     /**
-     * Decodes the given macroContent / extraParams and builds a {@link Dataset}.
-     * 
+     * Decodes the given macroContent / extraParams and builds a Data Set.
+     *
      * @param macroContent content of the macro.
      * @param parameters parameters provided for the source.
      * @throws MacroExecutionException if something goes wrong while decoding source / parameters.
@@ -55,11 +53,9 @@ public interface DataSource
     void buildDataset(String macroContent, Map<String, String> parameters) throws MacroExecutionException;
 
     /**
-     * {@link buildDataset} must be called before this method.
+     * {@link #buildDataset} must be called before this method.
      *
-     * @return the {@link ChartModel} for the dataset. 
+     * @return the {@link ChartModel} for the dataset.
      */
     ChartModel getChartModel();
-
-
 }

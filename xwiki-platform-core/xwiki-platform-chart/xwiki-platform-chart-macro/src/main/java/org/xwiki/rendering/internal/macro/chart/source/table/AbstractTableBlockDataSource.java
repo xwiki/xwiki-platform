@@ -17,39 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.xwiki.chart.dataset.DatasetType;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
+import org.xwiki.rendering.internal.macro.chart.source.AbstractDataSource;
+import org.xwiki.rendering.internal.macro.chart.source.SimpleChartModel;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.chart.internal.source.AbstractDataSource;
-import org.xwiki.chart.internal.source.SimpleChartModel;
-import org.xwiki.chart.dataset.DatasetType;
-
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Class for representing values extracted from a table block.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public abstract class AbstractTableBlockDataSource extends AbstractDataSource
 {
-    /** The number of letters that can be used in the column identifier. */
+    /**
+     * The number of letters that can be used in the column identifier.
+     */
     private static final int LETTER_RANGE_LENGTH = 'Z' - 'A' + 1;
 
     /**
@@ -62,10 +64,14 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      */
     private static final String SERIES_PARAM = "series";
 
-    /** The columns value for the series parameter. */
+    /**
+     * The columns value for the series parameter.
+     */
     private static final String SERIES_COLUMNS = "columns";
 
-    /** The rows value for the series parameter. */
+    /**
+     * The rows value for the series parameter.
+     */
     private static final String SERIES_ROWS = "rows";
 
     /**
@@ -73,26 +79,40 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      */
     private static final String NO_LIMIT_SYMBOL = ".";
 
-    /** Pattern matching the cell range. */
+    /**
+     * Pattern matching the cell range.
+     */
     private static final Pattern RANGE_PATTERN =
         Pattern.compile("^([A-Z]+|\\.)([0-9]+|\\.)-([A-Z]+|\\.)([0-9]+|\\.)$");
 
-    /** The name of the category dataset. */
+    /**
+     * The name of the category dataset.
+     */
     private static final String CATEGORY_DATASET = "category";
 
-    /** The name of the time series dataset. */
+    /**
+     * The name of the time series dataset.
+     */
     private static final String TIME_SERIES_DATASET = "timeseries";
 
-    /** The name of the pie dataset. */
+    /**
+     * The name of the pie dataset.
+     */
     private static final String PIE_DATASET = "pie";
 
-    /** The default dataset. */
+    /**
+     * The default dataset.
+     */
     private static final String DEFAULT_DATASET = CATEGORY_DATASET;
 
-    /** The range parameter. */
+    /**
+     * The range parameter.
+     */
     private String range;
 
-    /** The series parameter. */
+    /**
+     * The series parameter.
+     */
     private String series;
 
     /**
@@ -110,7 +130,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
 
         TableBlock tableBlock = getTableBlock(macroContent);
 
-        int [] dataRange = getDataRange(tableBlock);
+        int[] dataRange = getDataRange(tableBlock);
 
         DatasetType datasetType = getDatasetType();
 
@@ -129,14 +149,14 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
                 break;
             default:
                 throw new MacroExecutionException(String.format("Unsupported dataset type [%s]",
-                                                                getDatasetType().getName()));
+                    getDatasetType().getName()));
         }
 
         setAxes();
 
         datasetBuilder.setLocaleConfiguration(getLocaleConfiguration());
         datasetBuilder.setParameters(parameters);
-        
+
         if (SERIES_COLUMNS.equals(series)) {
             datasetBuilder.setTranspose(true);
         }
@@ -155,7 +175,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * @throws MacroExecutionException if there are any errors in the table.
      */
     private void getRowKeys(TableBlock tableBlock, int startRow, int endRow, int startColumn,
-                            TableDatasetBuilder datasetBuilder)
+        TableDatasetBuilder datasetBuilder)
         throws MacroExecutionException
     {
 
@@ -184,7 +204,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * @throws MacroExecutionException if there are any errors in the table.
      */
     private void getColumnKeys(TableBlock tableBlock, int startColumn, int endColumn, int startRow,
-                               TableDatasetBuilder datasetBuilder)
+        TableDatasetBuilder datasetBuilder)
         throws MacroExecutionException
     {
         datasetBuilder.setNumberOfColumns(endColumn - startColumn + 1);
@@ -202,7 +222,6 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
         }
     }
 
-
     /**
      * Build a category dataset.
      *
@@ -211,8 +230,8 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * @param datasetBuilder The dataset builder.
      * @throws MacroExecutionException if there are any errors.
      */
-    private void buildDataset(TableBlock tableBlock, int [] dataRange,
-                              TableDatasetBuilder datasetBuilder) throws MacroExecutionException
+    private void buildDataset(TableBlock tableBlock, int[] dataRange,
+        TableDatasetBuilder datasetBuilder) throws MacroExecutionException
     {
         int startRow = dataRange[0];
         int startColumn = dataRange[1];
@@ -250,7 +269,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
 
     /**
      * Converts a column identifier ('G') into a column index number (6).
-     * 
+     *
      * @param identifier the cell identifier, containing a column ([A-Z]{1,2})
      * @return the column number extracted from the identifier
      */
@@ -274,7 +293,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
 
     /**
      * Converts a row identifier ('6') into a column index number (6).
-     * 
+     *
      * @param identifier the cell identifier, containing a column.
      * @return the column number extracted from the identifier
      */
@@ -288,7 +307,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
 
     /**
      * Tries to parse the cell content as a number.
-     * 
+     *
      * @param cell the {@link TableCellBlock}.
      * @return cell content parsed as a {@link Number}.
      * @throws MacroExecutionException if the cell does not represent a number.
@@ -305,7 +324,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
 
     /**
      * Renders the cell content as a string.
-     * 
+     *
      * @param cell the {@link TableCellBlock}.
      * @return cell content rendered as a string.
      */
@@ -323,13 +342,13 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * @return An array as described above.
      * @throws MacroExecutionException if the range parameter cannot be parsed.
      */
-    private Integer [] getDataRangeFromParameter()
+    private Integer[] getDataRangeFromParameter()
         throws MacroExecutionException
     {
         Integer startColumn = null;
-        Integer endColumn   = null;
-        Integer startRow    = null;
-        Integer endRow      = null;
+        Integer endColumn = null;
+        Integer startRow = null;
+        Integer endRow = null;
 
         if (range != null) {
 
@@ -353,34 +372,33 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
                 throw new MacroExecutionException(
                     String.format("Invalid data range, end row mustn't come before start row: [%s].", range));
             }
-
         }
 
-        return new Integer [] {startRow, startColumn, endRow, endColumn};
+        return new Integer[]{startRow, startColumn, endRow, endColumn};
     }
 
     /**
      * Calculates the data-range that is to be used for plotting the chart.
-     * 
+     *
      * @param tableBlock the {@link TableBlock}.
      * @return an integer array consisting of start-row, start-column, end-row and end-column of the data range.
      * @throws MacroExecutionException if it's not possible to determine the data range correctly.
      */
-    protected int [] getDataRange(TableBlock tableBlock)
+    protected int[] getDataRange(TableBlock tableBlock)
         throws MacroExecutionException
     {
 
-        Integer [] r = getDataRangeFromParameter();
-        
+        Integer[] r = getDataRangeFromParameter();
+
         int rowCount = tableBlock.getChildren().size();
         if (rowCount > 0) {
             TableRowBlock firstRow = (TableRowBlock) tableBlock.getChildren().get(0);
             int columnCount = firstRow.getChildren().size();
             if (columnCount > 0) {
-                return new int[] {r[0] != null ? r[0] : 0,
-                                  r[1] != null ? r[1] : 0,
-                                  r[2] != null ? r[2] : rowCount - 1,
-                                  r[3] != null ? r[3] : columnCount - 1};
+                return new int[]{r[0] != null ? r[0] : 0,
+                    r[1] != null ? r[1] : 0,
+                    r[2] != null ? r[2] : rowCount - 1,
+                    r[3] != null ? r[3] : columnCount - 1};
             }
         }
 
@@ -402,14 +420,13 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
             default:
                 throw new MacroExecutionException(
                     String.format("Dataset type [%s] is not supported by the table data source.",
-                                  getDatasetType().getName()));
+                        getDatasetType().getName()));
         }
-
     }
 
     /**
      * Returns the {@link TableBlock} which contains the data to be plotted.
-     * 
+     *
      * @param macroContent macro content.
      * @return the {@link TableBlock} containing the data to be plotted.
      * @throws MacroExecutionException if it's not possible to locate the {@link TableBlock} specified by the user.
@@ -441,9 +458,8 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
         } else {
             if (!(SERIES_COLUMNS.equals(series) || SERIES_ROWS.equals(series))) {
                 throw new MacroExecutionException(String.format("Unsupported value for parameter [%s]: [%s]",
-                                                                SERIES_PARAM, series));
+                    SERIES_PARAM, series));
             }
         }
     }
-
 }

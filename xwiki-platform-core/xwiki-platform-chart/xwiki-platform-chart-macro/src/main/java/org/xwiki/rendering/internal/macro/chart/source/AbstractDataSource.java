@@ -17,47 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.rendering.internal.macro.chart.source;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.MacroExecutionException;
+import org.jfree.data.general.Dataset;
+import org.xwiki.chart.dataset.DatasetType;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.plot.PlotType;
-import org.xwiki.chart.dataset.DatasetType;
-
-import org.jfree.data.general.Dataset;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * A data source is able to provide a data set for chart generation.
  *
  * This super class provides basic parameter validation.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public abstract class AbstractDataSource implements DataSource
 {
-
-    /** The name of the dataset parameter. */
+    /**
+     * The name of the dataset parameter.
+     */
     public static final String DATASET_PARAM = "dataset";
 
-    /** The name of the plot type parameter. */
+    /**
+     * The name of the plot type parameter.
+     */
     public static final String PLOT_TYPE_PARAM = "type";
 
-    /** The dataset type.  */
+    /**
+     * The dataset type.
+     */
     private DatasetType datasetType;
 
-    /** The plot type. */
+    /**
+     * The plot type.
+     */
     private PlotType plotType;
 
-    /** The built chart model. */
+    /**
+     * The built chart model.
+     */
     private SimpleChartModel chartModel;
 
-    /** A configuartion object for time zone and locale. */
+    /**
+     * A configuartion object for time zone and locale.
+     */
     private LocaleConfiguration localeConfiguration = new LocaleConfiguration();
 
-    /** An axis configurator. */
+    /**
+     * An axis configurator.
+     */
     private AxisConfigurator axisConfigurator = new AxisConfigurator(localeConfiguration);
 
     /**
@@ -68,7 +80,6 @@ public abstract class AbstractDataSource implements DataSource
      */
     protected void validateParameters(Map<String, String> parameters) throws MacroExecutionException
     {
-
         for (String key : parameters.keySet()) {
             if (DATASET_PARAM.equals(key)) {
                 datasetType = DatasetType.forName(parameters.get(key));
@@ -102,7 +113,6 @@ public abstract class AbstractDataSource implements DataSource
         validateDatasetType();
 
         validateParameters();
-
     }
 
     /**
@@ -124,7 +134,6 @@ public abstract class AbstractDataSource implements DataSource
      */
     protected abstract void validateParameters() throws MacroExecutionException;
 
-
     /**
      * Validate the dataset parameter.  If no dataset was given as a parameter, set a default value.
      *
@@ -136,7 +145,6 @@ public abstract class AbstractDataSource implements DataSource
             setDatasetType(plotType.getDefaultDatasetType());
         }
     }
-
 
     /**
      * Validate the plot type parameter.
@@ -176,7 +184,6 @@ public abstract class AbstractDataSource implements DataSource
         this.datasetType = datasetType;
     }
 
-
     @Override
     public ChartModel getChartModel()
     {
@@ -211,14 +218,14 @@ public abstract class AbstractDataSource implements DataSource
     protected void invalidParameterValue(String parameterName, String value) throws MacroExecutionException
     {
         throw new MacroExecutionException(String.format("Invalid value for parameter [%s]: [%s]",
-                                                        parameterName, value));
-
+            parameterName, value));
     }
 
-    /** @return The locale configuration. */
+    /**
+     * @return The locale configuration.
+     */
     protected LocaleConfiguration getLocaleConfiguration()
     {
         return localeConfiguration;
     }
-
 }

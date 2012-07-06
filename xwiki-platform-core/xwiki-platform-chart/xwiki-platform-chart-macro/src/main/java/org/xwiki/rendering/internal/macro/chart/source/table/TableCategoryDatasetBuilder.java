@@ -17,43 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
-
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.chart.internal.source.LocaleConfiguration;
+import java.util.Set;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.Dataset;
+import org.xwiki.rendering.internal.macro.chart.source.LocaleConfiguration;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * A table dataset builder for building category datasets.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public class TableCategoryDatasetBuilder implements TableDatasetBuilder
 {
-
-    /** The catetegory dataset. */
+    /**
+     * The catetegory dataset.
+     */
     private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    /** The array of row keys. */
-    private String [] rowKeys;
+    /**
+     * The array of row keys.
+     */
+    private String[] rowKeys;
 
-    /** The array of column keys. */
-    private String [] columnKeys;
+    /**
+     * The array of column keys.
+     */
+    private String[] columnKeys;
 
-    /** Indicates if the transpose of the table should be used. */
+    /**
+     * Indicates if the transpose of the table should be used.
+     */
     private boolean transpose;
 
-    /** Row key set used for validating the absense of duplicate row keys. */
+    /**
+     * Row key set used for validating the absense of duplicate row keys.
+     */
     private final Set<String> rowKeySet = new HashSet<String>();
 
-    /** Column key set used for validating the absense of duplicate column keys. */
+    /**
+     * Column key set used for validating the absense of duplicate column keys.
+     */
     private final Set<String> columnKeySet = new HashSet<String>();
 
     @Override
@@ -109,7 +119,7 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     {
         return dataset;
     }
- 
+
     @Override
     public void setParameters(Map<String, String> parameters)
     {
@@ -128,6 +138,7 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     }
 
     @Override
-    public void setLocaleConfiguration(LocaleConfiguration localeConfiguration) {
+    public void setLocaleConfiguration(LocaleConfiguration localeConfiguration)
+    {
     }
 }

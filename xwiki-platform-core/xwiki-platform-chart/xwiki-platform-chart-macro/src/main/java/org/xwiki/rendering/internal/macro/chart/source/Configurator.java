@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source;
+package org.xwiki.rendering.internal.macro.chart.source;
 
 import org.xwiki.rendering.macro.MacroExecutionException;
 
@@ -27,24 +27,22 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * @version $Id$
  * @since 4.2M1
  */
-public abstract class AbstractConfigurator implements Configurator
+public interface Configurator
 {
-    @Override
-    public void validateParameters() throws MacroExecutionException
-    {
-    }
+    /**
+     * Let an implementation set a parameter.
+     *
+     * @param key The key of the parameter.
+     * @param value The value of the parameter.
+     * @return {@code true} if the parameter was claimed.
+     * @throws MacroExecutionException if the parameter is not supported by the data source.
+     */
+    boolean setParameter(String key, String value) throws MacroExecutionException;
 
     /**
-     * Indicate that an invalid parameter value was found.
+     * Let an implementation validate the value of the previously set parameters, and set default values.
      *
-     * @param parameterName The name of the parameter.
-     * @param value The value.
-     * @throws MacroExecutionException always.
+     * @throws MacroExecutionException if the previously set value is invalid.
      */
-    protected void invalidParameterValue(String parameterName, String value) throws MacroExecutionException
-    {
-        throw new MacroExecutionException(String.format("Invalid value for parameter [%s]: [%s]",
-                                                        parameterName, value));
-
-    }
+    void validateParameters() throws MacroExecutionException;
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.source.table;
+package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +25,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * Unit tests for {@link MacroContentTableBlockDataSource}.
+ *
  * @version $Id$
  * @since 2.4M2
  */

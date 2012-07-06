@@ -40,6 +40,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Class for representing values extracted from a table block.
@@ -123,16 +124,14 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
     private BlockRenderer plainTextBlockRenderer;
 
     @Override
-    public void buildDataset(String macroContent, Map<String, String> parameters)
+    public void buildDataset(String macroContent, Map<String, String> parameters, MacroTransformationContext context)
         throws MacroExecutionException
     {
         validateParameters(parameters);
 
-        TableBlock tableBlock = getTableBlock(macroContent);
+        TableBlock tableBlock = getTableBlock(macroContent, context);
 
         int[] dataRange = getDataRange(tableBlock);
-
-        DatasetType datasetType = getDatasetType();
 
         TableDatasetBuilder datasetBuilder;
         setChartModel(new SimpleChartModel());
@@ -175,8 +174,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * @throws MacroExecutionException if there are any errors in the table.
      */
     private void getRowKeys(TableBlock tableBlock, int startRow, int endRow, int startColumn,
-        TableDatasetBuilder datasetBuilder)
-        throws MacroExecutionException
+        TableDatasetBuilder datasetBuilder) throws MacroExecutionException
     {
 
         datasetBuilder.setNumberOfRows(endRow - startRow + 1);
@@ -428,10 +426,12 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * Returns the {@link TableBlock} which contains the data to be plotted.
      *
      * @param macroContent macro content.
+     * @param context the macro transformation context, used for example to find out the current document reference
      * @return the {@link TableBlock} containing the data to be plotted.
      * @throws MacroExecutionException if it's not possible to locate the {@link TableBlock} specified by the user.
      */
-    protected abstract TableBlock getTableBlock(String macroContent) throws MacroExecutionException;
+    protected abstract TableBlock getTableBlock(String macroContent, MacroTransformationContext context)
+        throws MacroExecutionException;
 
     @Override
     protected boolean setParameter(String key, String value) throws MacroExecutionException

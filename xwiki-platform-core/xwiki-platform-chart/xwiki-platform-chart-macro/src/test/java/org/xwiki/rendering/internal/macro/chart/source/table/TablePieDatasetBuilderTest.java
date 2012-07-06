@@ -35,14 +35,16 @@ import org.xwiki.chart.model.ChartModel;
  */
 public class TablePieDatasetBuilderTest extends AbstractMacroContentTableBlockDataSourceTest
 {
-
     @Test
-    public void testBuildPieDataset() throws Exception {
-        getDataSource().buildDataset("| column 1 | column 2 | column 3 | column 4\n" +
-                                     "| row 1 | 12 | 13 | 14 \n" +
-                                     "| row 2 | 22 | 23 | 24 \n",
-                                     map("type",  "pie",
-                                         "range", "B2-D3"));
+    public void testBuildPieDataset() throws Exception
+    {
+        String content =
+            "| column 1 | column 2 | column 3 | column 4\n" +
+            "| row 1 | 12 | 13 | 14 \n" +
+            "| row 2 | 22 | 23 | 24 \n";
+        setUpContentExpectation(content);
+
+        getDataSource().buildDataset(content, map("type", "pie", "range", "B2-D3"), null);
 
         ChartModel chartModel = getDataSource().getChartModel();
 
@@ -60,13 +62,15 @@ public class TablePieDatasetBuilderTest extends AbstractMacroContentTableBlockDa
     }
 
     @Test
-    public void testBuildPieDatasetRowsSeries() throws Exception {
-        getDataSource().buildDataset("| column 1 | column 2 | column 3 | column 4\n" +
-                                     "| row 1 | 12 | 13 | 14 \n" +
-                                     "| row 2 | 22 | 23 | 24 \n",
-                                     map("type", "pie",
-                                         "range", "B2-D3",
-                                         "series", "rows"));
+    public void testBuildPieDatasetRowsSeries() throws Exception
+    {
+        String content =
+            "| column 1 | column 2 | column 3 | column 4\n" +
+            "| row 1 | 12 | 13 | 14 \n" +
+            "| row 2 | 22 | 23 | 24 \n";
+        setUpContentExpectation(content);
+
+        getDataSource().buildDataset(content, map("type", "pie", "range", "B2-D3", "series", "rows"), null);
 
         ChartModel chartModel = getDataSource().getChartModel();
 
@@ -83,8 +87,5 @@ public class TablePieDatasetBuilderTest extends AbstractMacroContentTableBlockDa
         Assert.assertTrue(pieDataset.getValue(0).intValue() == 12);
         Assert.assertTrue(pieDataset.getValue(1).intValue() == 13);
         Assert.assertTrue(pieDataset.getValue(2).intValue() == 14);
-
     }
-
-
 }

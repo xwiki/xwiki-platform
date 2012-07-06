@@ -39,6 +39,7 @@ import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -112,31 +113,30 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     private AuthorizationManager authorizationManager;
 
     @Override
-    protected TableBlock getTableBlock(String macroContent)
+    protected TableBlock getTableBlock(String macroContent, MacroTransformationContext context)
         throws MacroExecutionException
     {
         // Parse the document content into an XDOM.
         XDOM xdom;
         try {
-            String language = docBridge.getDocument(docBridge.getCurrentDocumentReference()).getRealLanguage();
-            DocumentModelBridge document = docBridge.getDocument(documentRef);
+            DocumentModelBridge document = this.docBridge.getDocument(this.documentRef);
             DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
             parameters.setContentTranslated(true);
-            xdom = documentDisplayer.display(document, parameters);
+            xdom = this.documentDisplayer.display(document, parameters);
         } catch (Exception ex) {
-            throw new MacroExecutionException(String.format("Error while parsing document: [%s].",
-                entityReferenceSerializer.serialize(documentRef)), ex);
+            throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
+                this.entityReferenceSerializer.serialize(this.documentRef)), ex);
         }
 
         // Find the correct table block.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
-        logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-            new Object[]{tableId, tableBlocks.size(), documentRef});
+        this.logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
+            new Object[]{this.tableId, tableBlocks.size(), this.documentRef});
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
-                if (null != id && id.equals(tableId)) {
+                if (null != id && id.equals(this.tableId)) {
                     result = tableBlock;
                     break;
                 }
@@ -156,12 +156,12 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     protected boolean setParameter(String key, String value) throws MacroExecutionException
     {
         if (DOCUMENT_PARAM.equals(key)) {
-            documentRef = documentReferenceResolver.resolve(value);
+            this.documentRef = this.documentReferenceResolver.resolve(value);
             return true;
         }
 
         if (TABLE_PARAM.equals(key)) {
-            tableId = value;
+            this.tableId = value;
             return true;
         }
 
@@ -173,18 +173,18 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     {
         super.validateParameters();
 
-        if (null == documentRef) {
-            documentRef = this.docBridge.getCurrentDocumentReference();
+        if (null == this.documentRef) {
+            this.documentRef = this.docBridge.getCurrentDocumentReference();
         } else if (!authorizationManager.hasAccess(Right.VIEW,
-            docBridge.getCurrentUserReference(),
-            documentRef))
+            this.docBridge.getCurrentUserReference(),
+            this.documentRef))
         {
             throw new MacroExecutionException("You do not have permission to view the document.");
         }
 
-        if (!docBridge.exists(documentRef)) {
+        if (!this.docBridge.exists(this.documentRef)) {
             throw new MacroExecutionException(String.format("Document [%s] does not exist.",
-                entityReferenceSerializer.serialize(documentRef)));
+                this.entityReferenceSerializer.serialize(this.documentRef)));
         }
     }
 }

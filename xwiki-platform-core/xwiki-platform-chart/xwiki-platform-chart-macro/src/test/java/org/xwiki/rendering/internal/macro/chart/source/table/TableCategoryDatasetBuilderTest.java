@@ -37,14 +37,16 @@ import org.xwiki.chart.model.ChartModel;
  */
 public class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBlockDataSourceTest
 {
-
     @Test
-    public void testBuildCategoryDataset() throws Exception {
-        getDataSource().buildDataset("| column 1 | column 2 | column 3 | column 4\n" +
-                                     "| row 1 | 12 | 13 | 14 \n" +
-                                     "| row 2 | 22 | 23 | 24 \n",
-                                     map("type",  "line",
-                                         "range", "B2-D3"));
+    public void testBuildCategoryDataset() throws Exception
+    {
+        String content =
+            "| column 1 | column 2 | column 3 | column 4\n" +
+            "| row 1 | 12 | 13 | 14 \n" +
+            "| row 2 | 22 | 23 | 24 \n";
+        setUpContentExpectation(content);
+
+        getDataSource().buildDataset(content, map("type", "line", "range", "B2-D3"), null);
 
         ChartModel chartModel = getDataSource().getChartModel();
 
@@ -72,13 +74,15 @@ public class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBl
     }
 
     @Test
-    public void testBuildCategoryDatasetColumnsSeries() throws Exception {
-        getDataSource().buildDataset("| column 1 | column 2 | column 3 | column 4\n" +
-                                     "| row 1 | 12 | 13 | 14 \n" +
-                                     "| row 2 | 22 | 23 | 24 \n",
-                                     map("type", "line",
-                                         "range", "B2-D3",
-                                         "series", "columns"));
+    public void testBuildCategoryDatasetColumnsSeries() throws Exception
+    {
+        String content =
+            "| column 1 | column 2 | column 3 | column 4\n" +
+            "| row 1 | 12 | 13 | 14 \n" +
+            "| row 2 | 22 | 23 | 24 \n";
+        setUpContentExpectation(content);
+
+        getDataSource().buildDataset(content, map("type", "line", "range", "B2-D3", "series", "columns"), null);
 
         ChartModel chartModel = getDataSource().getChartModel();
 
@@ -104,5 +108,4 @@ public class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBl
         Assert.assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
         Assert.assertTrue(categoryDataset.getValue(2, 1).intValue() == 24);
     }
-
 }

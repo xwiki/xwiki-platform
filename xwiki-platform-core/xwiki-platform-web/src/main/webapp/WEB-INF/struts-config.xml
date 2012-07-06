@@ -363,12 +363,6 @@
             <forward name="logout" path="/templates/logout.vm"/>
         </action>
 
-        <action path="/charting/"
-                type="com.xpn.xwiki.plugin.charts.actions.ChartingAction"
-                name="charting"
-                scope="request">
-        </action>
-
         <action path="/lock/"
                 type="com.xpn.xwiki.web.LockAction"
                 name="lock"

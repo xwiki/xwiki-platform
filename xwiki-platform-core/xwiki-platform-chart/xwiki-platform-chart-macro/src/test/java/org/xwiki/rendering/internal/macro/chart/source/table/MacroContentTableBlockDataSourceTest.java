@@ -35,7 +35,7 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMacroContentTa
     public void testGetTableBlockWhenNullMacroContent() throws Exception
     {
         try {
-            getDataSource().getTableBlock(null);
+            getDataSource().getTableBlock(null, null);
             Assert.fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
@@ -47,7 +47,7 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMacroContentTa
     public void testGetTableBlockWhenEmptyMacroContent() throws Exception
     {
         try {
-            getDataSource().getTableBlock("");
+            getDataSource().getTableBlock("", null);
             Assert.fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
@@ -58,8 +58,11 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMacroContentTa
     @Test
     public void testGetTableBlockWhenMacroContentDoesntContainTable() throws Exception
     {
+        // Simulate a macro content of "not a table", i.e. not containing a table.
+        setUpContentExpectation("not a table");
+
         try {
-            getDataSource().getTableBlock("not a table");
+            getDataSource().getTableBlock("not a table", null);
             Assert.fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("Unable to locate a suitable data table.", expected.getMessage());

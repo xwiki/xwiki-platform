@@ -19,28 +19,36 @@
  */
 package org.xwiki.rendering.internal.macro.chart;
 
-import java.io.File;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
 /**
- * Extension of the {@link ChartMacro} for testing.
- * 
+ * Compute a unique id for the image that the chart macro generates.
+ *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
-@Component
-@Named("testchart")
-@Singleton
-public class TestChartMacro extends ChartMacro
+public class ImageId
 {
-    @Override
-    protected File getChartImageFile(ChartMacroParameters parameters)
+    /**
+     * @see ImageId#ImageId(org.xwiki.rendering.macro.chart.ChartMacroParameters)
+     */
+    private ChartMacroParameters macroParameters;
+
+    /**
+     * @param macroParameters the chart macro parameters
+     */
+    public ImageId(ChartMacroParameters macroParameters)
     {
-        return new File(System.getProperty("java.io.tmpdir") + "/chart.png");
+        this.macroParameters = macroParameters;
+    }
+
+    /**
+     * Compute a unique id based on the macro parameters.
+     *
+     * @return the unique image id used for storing the generated chart image
+     */
+    public String getId()
+    {
+        return String.format("%s", Math.abs(this.macroParameters.hashCode()));
     }
 }

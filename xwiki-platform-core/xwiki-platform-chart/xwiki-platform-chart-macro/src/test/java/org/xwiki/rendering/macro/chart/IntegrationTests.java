@@ -77,12 +77,6 @@ public class IntegrationTests
             componentManager.registerMockComponent(mockery,  AuthorizationManager.class);
 
         mockery.checking(new Expectations() {{
-            // Methods for Multiwiki component managers
-            allowing(dab).getCurrentUser();
-                will(returnValue("XWiki.CurrentUser"));
-            allowing(dab).getCurrentWiki();
-                will(returnValue("currentWiki"));
-
             allowing(dab).getDocumentURL(new DocumentReference("unused", "space", "page"), "temp", null, null);
                 will(returnValue("temppath"));
 

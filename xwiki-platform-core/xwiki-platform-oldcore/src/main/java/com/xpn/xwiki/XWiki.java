@@ -403,6 +403,10 @@ public class XWiki implements EventListener
                 // object) which make it unusable
                 Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
                     .initialize(context);
+
+                // Send Event to signal that the application is ready to service requests.
+                Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
+                    new ApplicationReadyEvent(), xwiki, context);
             } else {
                 context.setWiki(xwiki);
             }
@@ -802,9 +806,6 @@ public class XWiki implements EventListener
 
         ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
         observationManager.addListener(this);
-
-        // Send Event to signal that the application is ready to service requests.
-        observationManager.notify(new ApplicationReadyEvent(), this, context);
     }
 
     /**

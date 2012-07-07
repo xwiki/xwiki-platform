@@ -22,31 +22,28 @@ package org.xwiki.security.authorization.testwikibuilding;
 import org.junit.Test;
 import org.junit.Assert;
 
-import org.xwiki.test.annotation.MockingRequirement;
-
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
 import org.xwiki.security.authorization.internal.XWikiCachingRightService;
 import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
 
-
 public class TestLegacyTestWiki extends AbstractLegacyWikiTestCase
 {
-
     @Test
-    public void testLegacyWikiBuilding() throws Exception {
-
+    public void testLegacyWikiBuilding() throws Exception
+    {
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "test.xml");
 
         XWikiRightServiceImpl legacyImpl = new XWikiRightServiceImpl();
 
         testWiki.getXWikiContext().setDatabase("xwiki");
 
-        Assert.assertTrue(legacyImpl.hasAccessLevel("view", "AllanSvensson", "Main.WebHome", testWiki.getXWikiContext()));
+        Assert.assertTrue(
+            legacyImpl.hasAccessLevel("view", "AllanSvensson", "Main.WebHome", testWiki.getXWikiContext()));
 
         XWikiCachingRightService cachingImpl = new XWikiCachingRightService();
 
-        Assert.assertTrue(cachingImpl.hasAccessLevel("view", "AllanSvensson", "Main.WebHome", testWiki.getXWikiContext()));
+        Assert.assertTrue(
+            cachingImpl.hasAccessLevel("view", "AllanSvensson", "Main.WebHome", testWiki.getXWikiContext()));
     }
-
 }

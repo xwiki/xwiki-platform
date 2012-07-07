@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
@@ -44,6 +45,7 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.2
  */
+@AllComponents
 public abstract class AbstractLegacyWikiTestCase extends AbstractMockingComponentTestCase
 {
     /**

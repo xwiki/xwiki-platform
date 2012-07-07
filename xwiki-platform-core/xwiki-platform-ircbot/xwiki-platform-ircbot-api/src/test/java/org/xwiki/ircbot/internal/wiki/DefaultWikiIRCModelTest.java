@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
@@ -52,6 +53,7 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
 public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase implements WikiIRCBotConstants
 {
     @MockingRequirement(exceptions = {EntityReferenceSerializer.class})

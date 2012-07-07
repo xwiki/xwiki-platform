@@ -52,7 +52,7 @@ import junit.framework.Assert;
  */
 public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
+    @MockingRequirement
     DefaultWikiIRCBotManager manager;
 
     private void prepareStartBotTests(boolean isBotActive) throws Exception

@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
@@ -35,6 +36,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.0M1
  */
+@AllComponents
 public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(XWikiRenderingConfiguration.class)

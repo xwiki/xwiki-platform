@@ -20,7 +20,16 @@
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import org.jmock.Expectations;
+import org.xwiki.component.internal.DefaultComponentManager;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
+import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
+import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
+import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -31,6 +40,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -41,6 +51,17 @@ import org.xwiki.rendering.renderer.BlockRenderer;
  * @version $Id$
  * @since 4.2M1
  */
+@ComponentList({
+    PlainTextBlockRenderer.class,
+    PlainTextRendererFactory.class,
+    DefaultComponentManager.class,
+    XWiki20Parser.class,
+    XWiki20LinkReferenceParser.class,
+    URLResourceReferenceTypeParser.class,
+    XWiki20ImageReferenceParser.class,
+    PlainTextRenderer.class,
+    DefaultLinkLabelGenerator.class
+})
 public abstract class AbstractMacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(exceptions={ComponentManager.class, BlockRenderer.class})

@@ -30,15 +30,17 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
- * Test class for various {@link VelocityContextInitializer} implementations.
+ * Unit tests for various {@link VelocityContextInitializer} implementations.
  * 
  * @version $Id$
  * @since 1.9RC2
  */
+@AllComponents
 public class VelocityContextInitializerTest extends AbstractMockingComponentTestCase
 {
     /**

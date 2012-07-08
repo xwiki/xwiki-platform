@@ -385,7 +385,7 @@ var XWiki = (function(XWiki){
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
 
       // Get position of target textfield
-      var pos = this.fld.cumulativeOffset();
+      var pos = $(this.options.parentContainer).tagName.toLowerCase() == 'body' ? this.fld.cumulativeOffset() : this.fld.positionedOffset();
 
       // Container width is passed as an option, or field width if no width provided.
       // The 2px substracted correspond to one pixel of border on each side of the field,

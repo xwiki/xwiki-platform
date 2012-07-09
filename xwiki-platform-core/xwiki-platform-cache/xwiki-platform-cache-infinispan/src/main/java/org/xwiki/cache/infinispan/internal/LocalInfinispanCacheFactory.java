@@ -39,7 +39,7 @@ import org.xwiki.component.annotation.Component;
 @Named("infinispan/local")
 @Singleton
 @Deprecated
-public class LocaInfinispanCacheFactory implements CacheFactory
+public class LocalInfinispanCacheFactory implements CacheFactory
 {
     /**
      * Don't do anything special and redirect to standard Infinispan implementation instead.

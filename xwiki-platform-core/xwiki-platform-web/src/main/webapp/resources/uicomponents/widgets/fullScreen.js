@@ -43,6 +43,13 @@ widgets.FullScreen = Class.create({
     $$('textarea', '.maximizable').each(function(element) {
       this.addBehavior(element);
     }.bind(this));
+    document.observe('xwiki:dom:updated', function(event) {
+      event.memo.elements.each(function(element) {
+        element.select('textarea', '.maximizable').each(function(element) {
+          this.addBehavior(element);
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
     // The GWT editor removes the textarea from the document, thus should be treated separately
     $$('.xRichTextEditor').each(function(item) {
       this.addBehavior(item);

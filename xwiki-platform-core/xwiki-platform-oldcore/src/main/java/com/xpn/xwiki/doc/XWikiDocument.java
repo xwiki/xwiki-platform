@@ -7309,7 +7309,12 @@ public class XWikiDocument implements DocumentModelBridge
         execution.pushContext(clonedEc);
 
         // Make sure the execution context and the XWiki context point to the same Velocity context instance.
-        context.put("vcontext", velocityManager.getVelocityContext());
+        vcontext = velocityManager.getVelocityContext();
+        if (vcontext != null) {
+            context.put("vcontext", vcontext);
+        } else {
+            context.remove("vcontext");
+        }
     }
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
@@ -7348,14 +7353,16 @@ public class XWikiDocument implements DocumentModelBridge
             if (backup.get("vtdoc") != null) {
                 vcontext.put("tdoc", backup.get("vtdoc"));
             }
+
+            // Make sure the execution context and the XWiki context point to the same Velocity context instance.
+            context.put("vcontext", vcontext);
+        } else {
+            context.remove("vcontext");
         }
 
         if (backup.get("doc") != null) {
             context.setDoc((XWikiDocument) backup.get("doc"));
         }
-
-        // Make sure the execution context and the XWiki context point to the same Velocity context instance.
-        context.put("vcontext", vcontext);
     }
 
     public void setAsContextDoc(XWikiContext context)

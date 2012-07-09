@@ -1441,6 +1441,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             ((Document) velocityContext.get("cdoc")).getDocumentReference());
     }
 
+    /**
+     * XWIKI-8025: XWikiDocument#backup/restoreContext doesn't update the reference to the Velocity context stored on
+     * the XWiki context
+     */
     public void testBackupRestoreContextUpdatesVContext() throws Exception
     {
         final Execution execution = getComponentManager().getInstance(Execution.class);

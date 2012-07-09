@@ -7307,6 +7307,9 @@ public class XWikiDocument implements DocumentModelBridge
             throw new RuntimeException("Failed to clone the Execution Context", e);
         }
         execution.pushContext(clonedEc);
+
+        // Make sure the execution context and the XWiki context point to the same Velocity context instance.
+        context.put("vcontext", velocityManager.getVelocityContext());
     }
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
@@ -7350,6 +7353,9 @@ public class XWikiDocument implements DocumentModelBridge
         if (backup.get("doc") != null) {
             context.setDoc((XWikiDocument) backup.get("doc"));
         }
+
+        // Make sure the execution context and the XWiki context point to the same Velocity context instance.
+        context.put("vcontext", vcontext);
     }
 
     public void setAsContextDoc(XWikiContext context)

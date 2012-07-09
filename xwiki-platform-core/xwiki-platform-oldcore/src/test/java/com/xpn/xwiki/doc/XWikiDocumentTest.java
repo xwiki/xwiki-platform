@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -1437,5 +1439,34 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             ((Document) velocityContext.get("tdoc")).getDocumentReference());
         Assert.assertEquals(this.document.getDocumentReference(),
             ((Document) velocityContext.get("cdoc")).getDocumentReference());
+    }
+
+    public void testBackupRestoreContextUpdatesVContext() throws Exception
+    {
+        final Execution execution = getComponentManager().getInstance(Execution.class);
+        this.mockVelocityManager.stubs().method("getVelocityContext")
+            .will(new CustomStub("Implements VelocityManager.getVelocityContext")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return execution.getContext().getProperty("velocityContext");
+                }
+            });
+
+        VelocityContext oldVelocityContext = new VelocityContext();
+        execution.getContext().setProperty("velocityContext", oldVelocityContext);
+
+        Map<String, Object> backup = new HashMap<String, Object>();
+        XWikiDocument.backupContext(backup, getContext());
+
+        VelocityContext newVelocityContext = (VelocityContext) execution.getContext().getProperty("velocityContext");
+        assertNotNull(newVelocityContext);
+        assertNotSame(oldVelocityContext, newVelocityContext);
+        assertSame(newVelocityContext, getContext().get("vcontext"));
+
+        XWikiDocument.restoreContext(backup, getContext());
+
+        assertSame(oldVelocityContext, execution.getContext().getProperty("velocityContext"));
+        assertSame(oldVelocityContext, getContext().get("vcontext"));
     }
 }

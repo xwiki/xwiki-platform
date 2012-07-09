@@ -169,6 +169,9 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             // (see below) to the WikiMacroManager's implementation.
             xcontext.setDatabase(wikiName);
 
+            // Make sure classes exists and are up to date in this wiki
+            installOrUpgradeWikiMacroClasses();
+
             // Search for all those documents with macro definitions and for each register the macro
             for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
                 // In the database the space and page names are always specified for a document. However the wiki

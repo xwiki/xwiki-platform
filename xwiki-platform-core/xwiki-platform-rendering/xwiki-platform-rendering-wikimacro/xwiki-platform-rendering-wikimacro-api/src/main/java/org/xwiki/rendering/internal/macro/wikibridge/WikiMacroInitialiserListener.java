@@ -37,7 +37,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 
 /**
- * Called at startup to initialize existing wiki macros.
+ * Called at startup to initialize classes and existing wiki macros.
  * 
  * @version $Id$
  */

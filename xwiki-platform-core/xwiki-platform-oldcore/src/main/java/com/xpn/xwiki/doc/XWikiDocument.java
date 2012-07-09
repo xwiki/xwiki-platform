@@ -7281,7 +7281,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
-        backup.put("doc", context.getDoc());
         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         if (vcontext != null) {
@@ -7297,6 +7296,8 @@ public class XWikiDocument implements DocumentModelBridge
             backup.put("gcdoc", gcontext.get("cdoc"));
             backup.put("gtdoc", gcontext.get("tdoc"));
         }
+
+        backup.put("doc", context.getDoc());
 
         // Clone the Execution Context to provide isolation
         Execution execution = Utils.getComponent(Execution.class);
@@ -7322,6 +7323,12 @@ public class XWikiDocument implements DocumentModelBridge
         // Restore the Execution Context
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
+
+        // Restore the context document before accessing the Velocity context because the script context initialization
+        // triggered by the Velocity manager must take into account the restored document.
+        if (backup.get("doc") != null) {
+            context.setDoc((XWikiDocument) backup.get("doc"));
+        }
 
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
@@ -7358,10 +7365,6 @@ public class XWikiDocument implements DocumentModelBridge
             context.put("vcontext", vcontext);
         } else {
             context.remove("vcontext");
-        }
-
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
         }
     }
 

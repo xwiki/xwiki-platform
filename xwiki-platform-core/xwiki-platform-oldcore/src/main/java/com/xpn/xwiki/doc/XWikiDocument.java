@@ -7365,11 +7365,13 @@ public class XWikiDocument implements DocumentModelBridge
             if (vcontext != null) {
                 vcontext.put("doc", apidoc);
                 vcontext.put("tdoc", tdoc);
+                vcontext.put("cdoc", tdoc);
             }
 
             if (gcontext != null) {
                 gcontext.put("doc", apidoc);
                 gcontext.put("tdoc", tdoc);
+                gcontext.put("cdoc", tdoc);
             }
         } catch (XWikiException ex) {
             LOGGER.warn("Unhandled exception setting context", ex);

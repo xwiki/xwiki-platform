@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import junit.framework.Assert;
 
+import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -46,13 +47,13 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
@@ -101,6 +102,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiMessageTool;
 
     private Mock mockXWikiRightService;
+
+    private Mock mockVelocityManager;
 
     private Mock mockVelocityEngine;
 
@@ -199,10 +202,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
 
         // Setup the mock Velocity engine.
-        Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
+        this.mockVelocityManager = registerMockComponent(VelocityManager.class);
         this.mockVelocityEngine = mock(VelocityEngine.class);
-        mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(null));
-        mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
+        this.mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(null));
+        this.mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
         velocityEngineEvaluateStub = new CustomStub("Implements VelocityEngine.evaluate")
         {
             public Object invoke(Invocation invocation) throws Throwable
@@ -1414,5 +1417,25 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("good {{include reference=\"One.Two\"/}}");
         assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
+    }
+
+    /**
+     * XWIKI-8024: XWikiDocument#setAsContextDoc doesn't set the 'cdoc' in the Velocity context
+     */
+    public void testSetAsContextDoc() throws Exception
+    {
+        VelocityContext velocityContext = new VelocityContext();
+        this.mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(velocityContext));
+
+        assertNotSame(this.document, getContext().getDoc());
+        this.document.setAsContextDoc(getContext());
+        assertSame(this.document, getContext().getDoc());
+
+        Assert.assertEquals(this.document.getDocumentReference(),
+            ((Document) velocityContext.get("doc")).getDocumentReference());
+        Assert.assertEquals(this.document.getDocumentReference(),
+            ((Document) velocityContext.get("tdoc")).getDocumentReference());
+        Assert.assertEquals(this.document.getDocumentReference(),
+            ((Document) velocityContext.get("cdoc")).getDocumentReference());
     }
 }

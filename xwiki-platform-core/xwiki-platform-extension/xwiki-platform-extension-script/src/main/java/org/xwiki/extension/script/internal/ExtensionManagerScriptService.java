@@ -393,6 +393,30 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
+     * Create an {@link InstallRequest} instance based on passed parameters.
+     * 
+     * @param id the identifier of the extension to install
+     * @param version the version to install
+     * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
+     *            will be installed globally
+     * @return the {@link InstallRequest}
+     */
+    public InstallRequest createInstallRequest(String id, String version, String namespace)
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
+        installRequest.setInteractive(true);
+        installRequest.addExtension(new ExtensionId(id, version));
+        if (StringUtils.isNotBlank(namespace)) {
+            installRequest.addNamespace(namespace);
+        }
+
+        installRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
+
+        return installRequest;
+    }
+
+    /**
      * Start the asynchronous installation process for an extension if the context document has programming rights.
      * 
      * @param id the identifier of the extension to install
@@ -404,6 +428,16 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job install(String id, String version, String namespace)
     {
+        return install(createInstallRequest(id, version, namespace), true);
+    }
+
+    /**
+     * @param installRequest installation instructions
+     * @param async true of the method return right away and let the install job run in a separate thread
+     * @return the {@link Job}, or {@code null} in case of failure
+     */
+    public Job install(InstallRequest installRequest, boolean async)
+    {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             setError(new JobException("Need programming right to install an extension"));
 
@@ -412,19 +446,13 @@ public class ExtensionManagerScriptService implements ScriptService
 
         setError(null);
 
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
-        installRequest.setInteractive(true);
-        installRequest.addExtension(new ExtensionId(id, version));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
-        }
-
-        installRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
-
         Job job = null;
         try {
-            job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
+            if (async) {
+                job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
+            } else {
+                job = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
+            }
         } catch (JobException e) {
             setError(e);
         }

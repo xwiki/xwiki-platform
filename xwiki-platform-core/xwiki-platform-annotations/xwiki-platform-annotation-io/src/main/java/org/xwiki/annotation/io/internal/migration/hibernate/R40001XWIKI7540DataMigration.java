@@ -35,12 +35,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
+import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -48,6 +51,7 @@ import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -83,6 +87,10 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Inject
     protected EntityReferenceSerializer<String> referenceSerializer;
 
+    /** Used to determine the current annotation class. */
+    @Inject
+    protected AnnotationConfiguration configuration;
+
     /** Holds the work to be done by grouping datedComments by documents. */
     protected Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap =
         new HashMap<DocumentReference, List<Entry<Date, BaseObject>>>();
@@ -101,6 +109,38 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     {
         // XWiki 4.0, second migration.
         return new XWikiDBVersion(40001);
+    }
+
+    @Override
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        XWikiContext context = getXWikiContext();
+        String resultOfSkippingDatabase = "Comments and anotations will remain separated";
+
+        EntityReference currentAnnotationClassReference = configuration.getAnnotationClassReference();
+        currentAnnotationClassReference =
+            currentAnnotationClassReference.removeParent(new WikiReference(context.getDatabase()));
+        if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
+            logger.warn(
+                "Skipping database [{}] because it uses a custom annotation class. " + resultOfSkippingDatabase,
+                context.getDatabase());
+            return false;
+        }
+
+        try {
+            BaseClass commentsClass = context.getWiki().getCommentsClass(context);
+            if (commentsClass.hasCustomMapping()) {
+                logger.warn("Skipping database [{}] because it uses a custom mapping for comments. "
+                    + resultOfSkippingDatabase, context.getDatabase());
+                return false;
+            }
+        } catch (Exception e) {
+            // Should not happen
+            logger.error("Failed to check the comments class for custom mappings. Migration will not execute", e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override

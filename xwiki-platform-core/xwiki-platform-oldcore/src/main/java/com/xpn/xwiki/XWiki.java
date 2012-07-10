@@ -2982,11 +2982,23 @@ public class XWiki implements EventListener
         PropertyClass emailProperty = (PropertyClass) bclass.get("email");
         if (!emailProperty.isCustomDisplayed(context)) {
             StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
+
+            // Permanently check the syntax of the class document to ensure that the custom displayer is properly
+            // rendered.
+            boolean is10Syntax = doc.is10Syntax();
+            if (!is10Syntax) {
+                builder.append("{{velocity}}\n");
+            }
             builder.append("#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n");
-            // Line broken in 2 because it was too long.
-            builder.append("  {{html}}<input id='$prefix$name' type='text'");
-            builder.append(" name='$prefix$name' value='$value' />{{/html}}\n");
+            builder.append("  ");
+            if (!is10Syntax) {
+                builder.append("{{html}}");
+            }
+            builder.append("<input id='${prefix}${name}' type='text' name='${prefix}${name}' value='$value' />");
+            if (!is10Syntax) {
+                builder.append("{{/html}}");
+            }
+            builder.append("\n");
             builder.append("#else\n");
             builder.append("  ## Allow $obfuscateEmail to be set in some other place.\n");
             builder.append("  #if(\"$obfuscateEmail\" == 'false')\n");
@@ -2994,8 +3006,11 @@ public class XWiki implements EventListener
             builder.append("  #else\n");
             builder.append("    $value.replaceAll('@.*', '@ xxxxxx')\n");
             builder.append("  #end\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}");
+            builder.append("#end");
+            if (!is10Syntax) {
+                builder.append("\n{{/velocity}}");
+            }
+
             emailProperty.setCustomDisplay(builder.toString());
             needsUpdate = true;
         }

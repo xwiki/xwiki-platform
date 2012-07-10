@@ -155,6 +155,9 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         private void replaceVariables(Configuration hibernateConfiguration)
         {
             String url = hibernateConfiguration.getProperty(Environment.URL);
+            if (StringUtils.isEmpty(url)) {
+                return;
+            }
 
             // Replace variables
             if (url.matches(".*\\$\\{.*\\}.*")) {

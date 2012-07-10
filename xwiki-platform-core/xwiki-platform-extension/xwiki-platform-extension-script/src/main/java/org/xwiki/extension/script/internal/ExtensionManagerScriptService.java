@@ -428,15 +428,17 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job install(String id, String version, String namespace)
     {
-        return install(createInstallRequest(id, version, namespace), true);
+        return install(createInstallRequest(id, version, namespace));
     }
 
     /**
+     * Start the asynchronous installation process for an extension if the context document has programming rights.
+     * 
      * @param installRequest installation instructions
-     * @param async true of the method return right away and let the install job run in a separate thread
-     * @return the {@link Job}, or {@code null} in case of failure
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    public Job install(InstallRequest installRequest, boolean async)
+    public Job install(InstallRequest installRequest)
     {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             setError(new JobException("Need programming right to install an extension"));
@@ -448,11 +450,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         Job job = null;
         try {
-            if (async) {
-                job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
-            } else {
-                job = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
-            }
+            job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
         }

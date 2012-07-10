@@ -19,22 +19,34 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
-import org.xwiki.extension.distribution.internal.job.DistributionJobStatus.UpdateState;
 
 public class DistributionQuestion
 {
-    private UpdateState updateState;
+    public enum Action
+    {
+        /**
+         * Cancel the job.
+         */
+        CANCEL,
+
+        /**
+         * Go to next step.
+         */
+        CONTINUE
+    }
+
+    private Action action;
 
     private boolean save = true;
 
-    public UpdateState getUpdateState()
+    public Action getAction()
     {
-        return this.updateState;
+        return this.action;
     }
 
-    public void setUpdateState(UpdateState updateState)
+    public void setUpdateState(Action action)
     {
-        this.updateState = updateState;
+        this.action = action;
     }
 
     public boolean isSave()

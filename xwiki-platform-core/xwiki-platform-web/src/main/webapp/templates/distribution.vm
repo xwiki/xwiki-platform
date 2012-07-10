@@ -4,9 +4,17 @@
   #set($distributionJobStatus = $services.distribution.jobStatus)
   #set($distributionQuestion = $distributionJobStatus.question)
   #if ($distributionQuestion)
-    $distributionQuestion.setUpdateState('CANCELED')
+    $distributionQuestion.setUpdateState('CANCEL')
     $distributionJobStatus.answered()
   #end
+#elseif ($request.distributioncontinue)
+  #set($distributionJobStatus = $services.distribution.jobStatus)
+  #set($distributionQuestion = $distributionJobStatus.question)
+  #if ($distributionQuestion)
+    $distributionQuestion.setUpdateState('CONTINUE')
+    $distributionJobStatus.answered()
+  #end
+## TODO: add SKIP action when there will be several step
 #end
 
 #set($distributionState = $services.distribution.state.name())
@@ -18,9 +26,21 @@
 
   #if ($request.installui)
     <p>Installing $distributionUIId...<p>
-    <p><tt><i>TODO: start extension installation</i></tt></p>
+
+    #set($installRequest = $services.extension.createInstallRequest($distributionUIId.id, $distributionUIId.version.value, 'wiki:xwiki'))
+    $installRequest.setInteractive(false)
+    #set($installJob = $services.extension.install($installRequest))
+    $installJob.join()
+    <ul>
+    #foreach ($logevent in $installJob.status.log)
+      <li>
+        $logevent
+        $logevent.throwable.printStackTrace()
+      </li>
+    #end
+    </ul>
   #end
-  
+
   <p>The distribution is <strong>$distributionExtension.name ($distributionExtension.id.id)</strong> in version <strong>$distributionExtension.id.version</strong>.</p>
 
   #if ($distributionUIId)
@@ -31,15 +51,23 @@
         #if ($distributionState == 'SAME')
           <p>Already up to date. Nothing to do.</p>
         #elseif ($distributionState == 'NEW')
-          <p>No previous status could be found, either:</p>
-          <ul>
-            <li>it's a new install</li>
-            <li>the previous version was not including distribution module</li>
-          </ul>
+          #set($installedExtension = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
+$services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki')
+          #if ($installedExtension.isValid('wiki:xwiki'))
+            <p>No previous status could be found but the right UI already seems to be installed.</p>
 
-          ##TODO: propose to indicate what's already installed but not known as such by Extension Manager (when upgrading old distributions)
+            <span class="buttonwrapper"><input class="button" type="submit" name="distributioncontinue" value="Continue"/></span>
+          #else
+            <p>No previous status could be found, either:</p>
+            <ul>
+              <li>it's a new install</li>
+              <li>the previous version was not including distribution module</li>
+            </ul>
 
-          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Install UI"/></span>
+            ##TODO: propose to indicate what's already installed but not known as such by Extension Manager (when upgrading old distributions)
+
+            <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Install UI"/></span>
+          #end
         #elseif ($distributionState == 'UPGRADE')
           <p>Upgrading.</p>
 

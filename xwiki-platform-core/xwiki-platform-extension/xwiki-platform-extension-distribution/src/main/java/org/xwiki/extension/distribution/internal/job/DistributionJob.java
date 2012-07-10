@@ -24,6 +24,7 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.job.DistributionJobStatus.UpdateState;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.internal.AbstractJobStatus;
 
@@ -50,7 +51,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
 
         return status;
     }
-    
+
     protected DistributionJobStatus getDistributionJobStatus()
     {
         return (DistributionJobStatus) getStatus();
@@ -65,7 +66,16 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         getStatus().ask(question);
 
         if (question.isSave()) {
-            getDistributionJobStatus().setUpdateState(question.getUpdateState());
+            switch (question.getAction()) {
+                case CANCEL:
+                    getDistributionJobStatus().setUpdateState(UpdateState.CANCELED);
+                    break;
+                case CONTINUE:
+                    getDistributionJobStatus().setUpdateState(UpdateState.COMPLETED);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

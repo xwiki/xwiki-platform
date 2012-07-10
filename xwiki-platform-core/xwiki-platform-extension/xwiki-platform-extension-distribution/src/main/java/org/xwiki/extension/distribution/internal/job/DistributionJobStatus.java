@@ -33,8 +33,9 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     public enum UpdateState
     {
+        PARTIAL,
         CANCELED,
-        COMPLETE
+        COMPLETED
     }
 
     private UpdateState updateState;
@@ -48,12 +49,12 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     {
         super(request, observationManager, loggerManager);
     }
-    
+
     public UpdateState getUpdateState()
     {
         return this.updateState;
     }
-    
+
     public void setUpdateState(UpdateState updateState)
     {
         this.updateState = updateState;

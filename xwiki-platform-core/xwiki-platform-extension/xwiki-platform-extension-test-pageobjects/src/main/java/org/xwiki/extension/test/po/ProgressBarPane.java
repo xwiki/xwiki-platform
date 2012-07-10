@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.test.po;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -31,6 +34,11 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class ProgressBarPane extends BaseElement
 {
+    /**
+     * The pattern used to extract the progress percent. Note that the process percent is a positive integer.
+     */
+    private static final Pattern PERCENT_PATTERN = Pattern.compile("(\\d+)%");
+
     /**
      * The progress bar container.
      */
@@ -54,7 +62,8 @@ public class ProgressBarPane extends BaseElement
         WebElement progressBar =
             getUtil().findElementWithoutWaiting(getDriver(), container, By.className("ui-progress-bar"));
         String style = progressBar.getAttribute("style");
-        return Integer.parseInt(style.substring("width:".length(), style.length() - "%".length()));
+        Matcher matcher = PERCENT_PATTERN.matcher(style);
+        return matcher.find() ? Integer.parseInt(matcher.group(1)) : -1;
     }
 
     /**

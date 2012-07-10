@@ -3475,7 +3475,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Datas
 
-        if (!equalsDatas(doc)) {
+        if (!equalsData(doc)) {
             return false;
         }
 
@@ -3497,7 +3497,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return true if bith documents have the same datas
      * @since 4.1.1
      */
-    public boolean equalsDatas(XWikiDocument doc)
+    public boolean equalsData(XWikiDocument doc)
     {
         // Same Java object, they sure are equal
         if (this == doc) {

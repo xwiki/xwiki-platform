@@ -7,6 +7,7 @@ widgets.ModalPopup = Class.create({
     globalDialog : true,
     title : "",
     displayCloseButton : true,
+    extraClassName : false,
     screenColor : "",
     borderColor : "",
     titleColor : "",
@@ -44,6 +45,9 @@ widgets.ModalPopup = Class.create({
     this.dialog.update(screen);
     // The dialog chrome
     this.dialogBox = new Element('div', {'class': 'xdialog-box'});
+    if (this.options.extraClassName) {
+      this.dialogBox.addClassName(this.options.extraClassName);
+    }
     // Insert the content
     this.dialogBox._x_contentPlug = new Element('div', {'class' : 'xdialog-content'});
     this.dialogBox.update(this.dialogBox._x_contentPlug);

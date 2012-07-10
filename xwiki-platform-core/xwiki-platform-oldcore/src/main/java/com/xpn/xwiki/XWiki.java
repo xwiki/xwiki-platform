@@ -926,17 +926,16 @@ public class XWiki implements EventListener
                         getPluginManager().virtualInit(context);
                         getRenderingEngine().virtualInit(context);
                     }
+
+                    // Add initdone which will allow to
+                    // bypass some initializations
+                    context.put("initdone", "1");
+
+                    // Send event to notify listeners that the subwiki is ready
+                    ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
+                    observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
                 }
             }
-
-            // Add initdone which will allow to
-            // bypass some initializations
-            context.put("initdone", "1");
-
-            // Send event to notify listeners that the subwiki is ready
-            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-            observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
-
         } finally {
             context.setDatabase(database);
         }

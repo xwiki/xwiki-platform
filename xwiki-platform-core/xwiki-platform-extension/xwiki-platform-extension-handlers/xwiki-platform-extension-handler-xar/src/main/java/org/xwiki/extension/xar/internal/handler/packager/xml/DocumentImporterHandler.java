@@ -204,7 +204,7 @@ public class DocumentImporterHandler extends DocumentHandler
                             mergedDocument.getLanguage()), documentMergeResult);
                 } else {
                     // already existing document in database but without previous version
-                    if (!currentDocument.equals(nextDocument)) {
+                    if (!currentDocument.equalsDatas(nextDocument)) {
                         XWikiDocument documentToSave;
                         if (this.configuration.isInteractive()) {
                             documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, null);

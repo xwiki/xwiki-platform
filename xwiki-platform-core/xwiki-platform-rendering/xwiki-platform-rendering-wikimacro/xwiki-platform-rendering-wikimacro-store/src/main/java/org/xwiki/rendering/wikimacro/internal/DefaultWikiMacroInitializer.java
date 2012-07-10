@@ -121,14 +121,6 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     {
         XWikiContext xcontext = getContext();
 
-        // Check whether xwiki classes required for defining wiki macros are present.
-        XWikiDocument wikiMacroClass = xcontext.getWiki().getDocument(WIKI_MACRO_CLASS, xcontext);
-        XWikiDocument wikiMacroParameterClass = xcontext.getWiki().getDocument(WIKI_MACRO_PARAMETER_CLASS, xcontext);
-        if (wikiMacroClass.isNew() || wikiMacroParameterClass.isNew()) {
-            String message = "Unable to locate [%s] & [%s] classes required for defining wiki macros.";
-            throw new Exception(String.format(message, WIKI_MACRO_CLASS, WIKI_MACRO_PARAMETER_CLASS));
-        }
-
         // Register the wiki macros that exist
         String originalWiki = xcontext.getDatabase();
         try {

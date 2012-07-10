@@ -31,6 +31,7 @@ com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolv
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
+com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.sheet.scripting.SheetScriptService

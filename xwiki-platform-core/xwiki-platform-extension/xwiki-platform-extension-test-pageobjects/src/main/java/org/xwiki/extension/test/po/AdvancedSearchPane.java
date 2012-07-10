@@ -21,6 +21,7 @@ package org.xwiki.extension.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -102,5 +103,16 @@ public class AdvancedSearchPane extends BaseElement
         versionInput.sendKeys(extensionVersion);
         searchButton.click();
         return new SearchResultsPane();
+    }
+
+    /**
+     * Searches for the specified extension.
+     * 
+     * @param extensionId the extension identifier
+     * @return the search results pane
+     */
+    public SearchResultsPane search(ExtensionId extensionId)
+    {
+        return search(extensionId.getId(), extensionId.getVersion().getValue());
     }
 }

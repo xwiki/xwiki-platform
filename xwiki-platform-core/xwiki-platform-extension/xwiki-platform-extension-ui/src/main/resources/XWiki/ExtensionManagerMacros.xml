@@ -1168,8 +1168,7 @@ ul.extension-metadata li {
           #if ($extension.id.version.compareTo($currentVersion) &gt; 0)
             #em_submitButton('extensions.actions.upgrade' 'actionInstall')
           #else
-            ## TODO: Uncomment the following line when extension manager will support downgrading an extension.
-            ##em_submitButton('extensions.actions.downgrade' 'actionInstall' true)
+            #em_submitButton('extensions.actions.downgrade' 'actionInstall' true)
           #end
         #end
       #end
@@ -1528,33 +1527,28 @@ ul.extension-metadata li {
     #if ($hasError)
       #printStatusLog($installPlan)
     #else
-      #set($extensionsToInstall = [])
-      #set($extensionsToUpgrade = [])
-      ##
+      ## Group the extensions by the actions that will be performed on them.
+      #set($extensionsByAction = {'INSTALL': [], 'UPGRADE': [], 'DOWNGRADE': [], 'UNINSTALL': []})
+      #set ($noAction = true)
       #foreach($planAction in $installPlan.actions)
-        #if ($planAction.action.name() == "INSTALL")
-          #set($void = $extensionsToInstall.add($planAction))
-        #elseif ($planAction.action.name() == "UPGRADE")
-          #set($void = $extensionsToUpgrade.add($planAction))
+        #set ($targetExtensions = $extensionsByAction.get($planAction.action.name()))
+        #if ($targetExtensions)
+          #set ($discard = $targetExtensions.add($planAction))
+          #set ($noAction = false)
         #end
       #end
       ##
-      #if ($extensionsToInstall.isEmpty() &amp;&amp; $extensionsToUpgrade.isEmpty())
+      #if ($noAction)
         {{info}}$msg.get('extensions.install.error.alreadyInstalled'){{/info}}
       #else
-        #if (!$extensionsToInstall.isEmpty())
-          $msg.get('extensions.install.list.new')
-          #foreach ($planAction in $extensionsToInstall)
-            * #displayDependency($planAction.extension $planAction.namespace)
-          #end
+        #foreach($entry in $extensionsByAction.entrySet())
+          #if (!$entry.value.isEmpty())
+            $msg.get("extensions.install.list.$entry.key.toLowerCase()")
+            #foreach ($planAction in $entry.value)
+              * #displayDependency($planAction.extension $planAction.namespace)
+            #end
 
-        #end
-        #if (!$extensionsToUpgrade.isEmpty())
-          $msg.get('extensions.install.list.upgrade')
-          #foreach ($planAction in $extensionsToUpgrade)
-            * #displayDependency($planAction.extension $planAction.namespace)
           #end
-
         #end
         {{html}}
           &lt;form action="" class="xform"&gt;
@@ -1618,7 +1612,7 @@ ul.extension-metadata li {
       #if ($extensionsToUninstall.isEmpty())
         {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
       #else
-        The following extensions will be removed:
+        $msg.get('extensions.uninstall.list')
         #foreach ($planAction in $extensionsToUninstall)
           * #displayDependency($planAction.extension $planAction.namespace)
         #end

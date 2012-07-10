@@ -26,7 +26,7 @@ import java.net.URL;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.tools.ant.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -159,11 +159,11 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             // Replace variables
             if (url.matches(".*\\$\\{.*\\}.*")) {
                 String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                    environment.getPermanentDirectory().getAbsolutePath());
+                    DefaultHibernateSessionFactory.this.environment.getPermanentDirectory().getAbsolutePath());
 
                 // Set the new URL
                 hibernateConfiguration.setProperty(Environment.URL, newURL);
-                logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+                DefaultHibernateSessionFactory.this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
             }
         }
     };

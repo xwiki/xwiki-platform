@@ -1486,7 +1486,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument otherDocyment = document.clone();
 
         Assert.assertTrue(document.equals(otherDocyment));
-        Assert.assertTrue(document.equalsDatas(otherDocyment));
+        Assert.assertTrue(document.equalsData(otherDocyment));
 
         otherDocyment.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
         otherDocyment.setContentAuthorReference(otherDocyment.getAuthorReference());
@@ -1498,6 +1498,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         document.setMinorEdit(false);
 
         Assert.assertFalse(document.equals(otherDocyment));
-        Assert.assertTrue(document.equalsDatas(otherDocyment));
+        Assert.assertTrue(document.equalsData(otherDocyment));
     }
 }

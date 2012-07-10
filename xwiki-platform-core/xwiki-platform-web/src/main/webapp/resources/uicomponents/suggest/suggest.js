@@ -567,7 +567,7 @@ var XWiki = (function(XWiki){
     //
     for (var i=0,len=arr.length;i<len;i++)
     {
-	  // Output is either emphasized or row value depending on source option
+      // Output is either emphasized or row value depending on source option
       var output = source.highlight ? this.emphasizeMatches(this.sInput, arr[i].value) : arr[i].value;
       if (arr[i].hint) {
         output += "<span class='hint'>" + arr[i].hint + "</span>";
@@ -629,6 +629,9 @@ var XWiki = (function(XWiki){
    */
   emphasizeMatches:function(input, value)
   {
+    if (!input) {
+      return value;
+    }
     // If the source declares that results are matching, we highlight them in the value
     var output = value,
         // Separate words (called fragments hereafter) in user input

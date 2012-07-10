@@ -1300,8 +1300,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set
-     * to true).
+     * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set to
+     * true).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetCreatorReferenceSetsMetadataDirtyFlag()
@@ -1316,8 +1317,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision
-     * (we verify that the metadata dirty flag is not set).
+     * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision (we
+     * verify that the metadata dirty flag is not set).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
@@ -1334,8 +1336,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set
-     * to true).
+     * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set to
+     * true).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetAuthorReferenceSetsMetadataDirtyFlag()
@@ -1350,8 +1353,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision
-     * (we verify that the metadata dirty flag is not set).
+     * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision (we
+     * verify that the metadata dirty flag is not set).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
@@ -1370,6 +1374,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Verify that setting a new content author will create a new revision (we verify that that metadata dirty flag is
      * set to true).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
@@ -1386,6 +1391,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Verify that setting a new content author that is the same as the currenet creator doesn't create a new revision
      * (we verify that the metadata dirty flag is not set).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
@@ -1472,5 +1478,26 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertSame(oldVelocityContext, execution.getContext().getProperty("velocityContext"));
         assertSame(oldVelocityContext, getContext().get("vcontext"));
+    }
+
+    public void testEqualsDatas()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument otherDocyment = document.clone();
+
+        Assert.assertTrue(document.equals(otherDocyment));
+        Assert.assertTrue(document.equalsDatas(otherDocyment));
+
+        otherDocyment.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
+        otherDocyment.setContentAuthorReference(otherDocyment.getAuthorReference());
+        otherDocyment.setCreatorReference(otherDocyment.getAuthorReference());
+        otherDocyment.setVersion("42.0");
+        otherDocyment.setComment("other comment");
+        otherDocyment.setMinorEdit(true);
+
+        document.setMinorEdit(false);
+
+        Assert.assertFalse(document.equals(otherDocyment));
+        Assert.assertTrue(document.equalsDatas(otherDocyment));
     }
 }

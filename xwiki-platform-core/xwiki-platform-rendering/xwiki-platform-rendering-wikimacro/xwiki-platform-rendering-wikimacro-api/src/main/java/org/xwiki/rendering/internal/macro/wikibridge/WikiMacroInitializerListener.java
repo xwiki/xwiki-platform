@@ -40,11 +40,12 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
  * Called at startup to initialize classes and existing wiki macros.
  * 
  * @version $Id$
+ * @since 4.2M1
  */
 @Component
 @Singleton
-@Named("WikiMacroInitialiserListener")
-public class WikiMacroInitialiserListener implements EventListener
+@Named("WikiMacroInitializerListener")
+public class WikiMacroInitializerListener implements EventListener
 {
     /**
      * The events observed by this event listener.
@@ -73,7 +74,7 @@ public class WikiMacroInitialiserListener implements EventListener
     @Override
     public String getName()
     {
-        return "WikiMacroInitialiserListener";
+        return "WikiMacroInitializerListener";
     }
 
     @Override

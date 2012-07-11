@@ -24,6 +24,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -52,6 +54,9 @@ import com.xpn.xwiki.doc.merge.MergeResult;
  */
 public class DocumentImporterHandler extends DocumentHandler
 {
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentImporterHandler.class);
+
     private XarFile previousXarFile;
 
     private DefaultPackager packager;
@@ -172,6 +177,8 @@ public class DocumentImporterHandler extends DocumentHandler
 
             XWikiDocument currentDocument = getDatabaseDocument();
             XWikiDocument nextDocument = getDocument();
+
+            LOGGER.info("Importing document [{}]...", nextDocument.getDocumentReference());
 
             // Merge and save
             if (currentDocument != null && this.hasCurrentDocument == Boolean.TRUE) {

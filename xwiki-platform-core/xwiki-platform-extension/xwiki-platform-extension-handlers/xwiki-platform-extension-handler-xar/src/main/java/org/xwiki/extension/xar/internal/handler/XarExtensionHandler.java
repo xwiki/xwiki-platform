@@ -116,7 +116,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
             XarInstalledExtension previousXarExtension;
             try {
-                previousXarExtension = (XarInstalledExtension) this.xarRepository.resolve(previousLocalExtension.getId());
+                previousXarExtension =
+                    (XarInstalledExtension) this.xarRepository.resolve(previousLocalExtension.getId());
             } catch (ResolveException e) {
                 // Not supposed to be possible
                 throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
@@ -214,9 +215,10 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setInteractive(request.isInteractive());
         configuration.setUser((DocumentReference) request.getProperty(PROPERTY_USERREFERENCE));
         configuration.setWiki(wiki);
+        configuration.setLogEnabled(true);
 
         try {
-            Job currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
+            Job currentJob = this.componentManager.<JobContext> getInstance(JobContext.class).getCurrentJob();
             if (currentJob != null) {
                 configuration.setJobStatus(currentJob.getStatus());
             }

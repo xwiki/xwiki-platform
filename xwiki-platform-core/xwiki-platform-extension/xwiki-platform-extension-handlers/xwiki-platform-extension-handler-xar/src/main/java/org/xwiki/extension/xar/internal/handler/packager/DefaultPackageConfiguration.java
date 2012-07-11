@@ -25,7 +25,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 /**
- * 
  * @version $Id$
  * @since 4.0M2
  */
@@ -40,6 +39,8 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     private boolean interactive;
 
     private JobStatus jobStatus;
+
+    private boolean logEnabled = false;
 
     @Override
     public String getWiki()
@@ -94,5 +95,15 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     public void setJobStatus(JobStatus jobStatus)
     {
         this.jobStatus = jobStatus;
+    }
+
+    public boolean isLogEnabled()
+    {
+        return this.logEnabled;
+    }
+
+    public void setLogEnabled(boolean logEnabled)
+    {
+        this.logEnabled = logEnabled;
     }
 }

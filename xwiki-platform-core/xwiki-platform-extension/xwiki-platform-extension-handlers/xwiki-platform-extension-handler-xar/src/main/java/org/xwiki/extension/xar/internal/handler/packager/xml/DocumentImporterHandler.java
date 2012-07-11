@@ -178,7 +178,9 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument currentDocument = getDatabaseDocument();
             XWikiDocument nextDocument = getDocument();
 
-            LOGGER.info("Importing document [{}]...", nextDocument.getDocumentReference());
+            if (this.configuration.isLogEnabled()) {
+                LOGGER.info("Importing document [{}]...", nextDocument.getDocumentReference());
+            }
 
             // Merge and save
             if (currentDocument != null && this.hasCurrentDocument == Boolean.TRUE) {
@@ -221,7 +223,7 @@ public class DocumentImporterHandler extends DocumentHandler
 
                         if (documentToSave != currentDocument) {
                             saveDocument(documentToSave, comment, context);
-                        }   
+                        }
                     }
                 }
             } else {

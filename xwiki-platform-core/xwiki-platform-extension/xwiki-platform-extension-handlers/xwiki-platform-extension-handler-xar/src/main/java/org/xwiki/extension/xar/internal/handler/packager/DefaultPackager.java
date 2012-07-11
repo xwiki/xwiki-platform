@@ -172,16 +172,20 @@ public class DefaultPackager implements Packager, Initializable
                             mergeResult.addMergeResult(documentHandler.getMergeResult());
                         }
 
-                        this.logger.info("Successfully imported document [{}] in language [{}]", documentHandler
-                            .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                        if (configuration.isLogEnabled()) {
+                            this.logger.info("Successfully imported document [{}] in language [{}]", documentHandler
+                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                        }
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                         this.logger.debug("Entry [" + entry + "] is not a document", e);
                     } catch (Exception e) {
                         this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
 
-                        this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
-                            .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                        if (configuration.isLogEnabled()) {
+                            this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
+                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                        }
                     }
                 }
             }

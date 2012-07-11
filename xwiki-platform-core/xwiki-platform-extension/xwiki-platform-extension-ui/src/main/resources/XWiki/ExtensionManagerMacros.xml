@@ -1046,7 +1046,18 @@ ul.extension-metadata li {
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
 
 #set ($extensionManager = $services.extension)
-#set ($extensionNamespace = "wiki:$xcontext.database")
+
+#if ($request.extensionWiki &amp;&amp; $request.extensionWiki.trim() != '')
+  #set($extensionWiki = $request.extensionWiki)
+#else
+  #if (!$xcontext.isMainWiki())
+    #set($extensionWiki = $xcontext.database)
+  #end
+#end
+
+#if ($extensionWiki)
+  #set($extensionNamespace = "wiki:${extensionWiki}")
+#end
 
 #macro (displayExtensionSearchBar)
   (% class="extension-search-bar" %)(((
@@ -1085,6 +1096,10 @@ ul.extension-metadata li {
             &lt;dd&gt;&lt;input type="text" name="extensionId" id="advancedExtensionSearch-id" value="" /&gt;&lt;/dd&gt;
             &lt;dt&gt;&lt;label for="advancedExtensionSearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;&lt;input type="text" name="extensionVersion" id="advancedExtensionSearch-version" value="" /&gt;&lt;/dd&gt;
+            #if ($xcontext.isMainWiki() &amp;&amp; $xwiki.isVirtualMode())
+              &lt;dt&gt;&lt;label for="advancedExtensionSearch-wiki"&gt;$msg.get('extensions.advancedSearch.wiki.label')&lt;/label&gt;&lt;/dt&gt;
+              &lt;dd&gt;&lt;input type="text" name="extensionWiki" id="advancedExtensionSearch-wiki" value="" /&gt;&lt;/dd&gt;
+            #end
           &lt;/dl&gt;
           &lt;p&gt;
             #em_submitButton('extensions.advancedSearch.actions.submit')
@@ -1480,7 +1495,11 @@ ul.extension-metadata li {
   #set ($discard = $extensionManager.install($extensionId, $extensionVersion, $extensionNamespace))
   #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
-    #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
+    #if ($extensionWiki)
+      #set ($errorMessage = $msg.get('extensions.install.error.installFailure.onWiki', [$extensionId, $extensionVersion, $extensionWiki]))
+    #else
+      #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
+    #end
     #if ($xcontext.action == 'get')
       ## AJAX request. Send error back.
       $response.sendError(400, $errorMessage)
@@ -1645,25 +1664,6 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
-  ## Retrieve the job status for the current wiki and for the entire farm (if the current wiki is the main wiki).
-  #getExtensionJobStatusForNamespace($extensionId $extensionVersion $extensionNamespace $jobStatusForWiki)
-  #if ($xcontext.isMainWiki())
-    #getExtensionJobStatusForNamespace($extensionId $extensionVersion $NULL $jobStatusForFarm)
-  #end
-  #set ($return = $NULL)
-  #if (!$jobStatusForWiki)
-    #setVariable ("$return" $jobStatusForFarm)
-  #elseif (!$jobStatusForFarm)
-    #setVariable ("$return" $jobStatusForWiki)
-  ## Return the most recent job status.
-  #elseif ($jobStatusForFarm.startDate.after($jobStatusForWiki.startDate))
-    #setVariable ("$return" $jobStatusForFarm)
-  #else
-    #setVariable ("$return" $jobStatusForWiki)
-  #end
-#end
-
-#macro (getExtensionJobStatusForNamespace $extensionId $extensionVersion $extensionNamespace $return)
   ## Make sure the value of $return is always reset.
   #set ($return = $NULL)
   #setVariable ("$return" $NULL)
@@ -1848,6 +1848,9 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #end
   &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
   &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
+  #if ($extensionWiki)
+    &lt;input name="extensionWiki" value="${escapetool.xml($extensionWiki)}" type="hidden" /&gt;
+  #end
   #if ($request.section)
     &lt;input name="section" value="$escapetool.xml($request.section)" type="hidden" /&gt;
   #end

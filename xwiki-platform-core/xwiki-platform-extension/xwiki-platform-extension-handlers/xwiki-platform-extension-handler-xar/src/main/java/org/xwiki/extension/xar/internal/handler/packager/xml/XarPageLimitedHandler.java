@@ -57,7 +57,7 @@ public class XarPageLimitedHandler extends AbstractHandler
     }
 
     @Override
-    public void endElementInternal(String uri, String localName, String qName) throws SAXException
+    protected void endElementInternal(String uri, String localName, String qName) throws SAXException
     {
         if (qName.equals("language")) {
             if (this.value.length() > 0) {

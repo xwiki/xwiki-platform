@@ -197,6 +197,15 @@ public class DocumentImporterHandler extends DocumentHandler
                     if (documentMergeResult.isModified()) {
                         if (this.configuration.isInteractive()
                             && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+                            // Indicate future author to whoever is going to answer the question
+                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            DocumentReference userReference = getUserReference(context);
+                            nextDocument.setAuthorReference(userReference);
+                            nextDocument.setContentAuthorReference(userReference);
+                            mergedDocument.setAuthorReference(userReference);
+                            mergedDocument.setContentAuthorReference(userReference);
+
                             XWikiDocument documentToSave =
                                 askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument);
 
@@ -216,6 +225,12 @@ public class DocumentImporterHandler extends DocumentHandler
                     if (!currentDocument.equalsData(nextDocument)) {
                         XWikiDocument documentToSave;
                         if (this.configuration.isInteractive()) {
+                            // Indicate future author to whoever is going to answer the question
+                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            DocumentReference userReference = getUserReference(context);
+                            nextDocument.setAuthorReference(userReference);
+                            nextDocument.setContentAuthorReference(userReference);
+
                             documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, null);
                         } else {
                             documentToSave = nextDocument;

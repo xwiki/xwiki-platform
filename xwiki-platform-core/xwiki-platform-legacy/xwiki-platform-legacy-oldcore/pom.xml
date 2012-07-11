@@ -38,6 +38,7 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-oldcore,com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
   </properties>
   <dependencies>
+    <!-- We need this dependency so that the oldcore module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
@@ -153,6 +154,17 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <!-- We need to exclude the org.xwiki.platform:xwiki-platform-oldcore artifact form the test classpath since
+           this module wraps it and having it in the test classpath will result in components loaded twice -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-oldcore:jar</classpathDependencyExcludes>
+          </classpathDependencyExcludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

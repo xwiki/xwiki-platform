@@ -526,16 +526,16 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(extensionId.getId());
+        uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId.getId(), null));
         uninstallRequest.addExtension(extensionId);
 
-        Job job;
+        uninstallRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
+
+        Job job = null;
         try {
             job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
         } catch (Exception e) {
             setError(e);
-
-            job = null;
         }
 
         return job;
@@ -580,7 +580,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * Start the asynchronous uninstallation plan creation process for an extension if no other job is in progress
      * already.
      * <p>
-     * Uninstall from all namepspace.
+     * Uninstall from all namespace.
      * 
      * @param extensionId the identifier of the extension to install
      * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
@@ -588,7 +588,23 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
     {
-        return createUninstallPlan(extensionId.getId(), null);
+        setError(null);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId.getId(), null));
+        uninstallRequest.addExtension(extensionId);
+
+        ExtensionPlan status;
+        try {
+            status =
+                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
+        } catch (JobException e) {
+            setError(e);
+
+            status = null;
+        }
+
+        return status;
     }
 
     /**

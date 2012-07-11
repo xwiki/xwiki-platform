@@ -479,6 +479,37 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job uninstall(String id, String namespace)
     {
+        return uninstall(new ExtensionId(id, (Version) null), namespace);
+    }
+
+    /**
+     * Start the asynchronous uninstall process for an extension if the context document has programming rights.
+     * <p>
+     * Uninstall from all namespaces.
+     * 
+     * @param extensionId the identifier of the extension to remove
+     * @return the {@link Job} object which can be used to monitor the progress of the uninstallation process, or
+     *         {@code null} in case of failure
+     */
+    public Job uninstall(ExtensionId extensionId)
+    {
+        return uninstall(extensionId, null);
+    }
+
+    /**
+     * Adds a new job to the job queue to remove the specified extension from the specified namespace. If the namespace
+     * is {@code null} or blank and the extension version is specified the extension is removed from all namespaces.
+     * <p>
+     * This method requires programming rights.
+     * 
+     * @param extensionId the id of the extension to remove
+     * @param namespace the namespace from where to remove the specified extension, {@code null} or blank string to
+     *            remove the extension from all namespaces
+     * @return the {@link Job} object which can be used to monitor the progress of the job, or {@code null} in case of
+     *         failure
+     */
+    private Job uninstall(ExtensionId extensionId, String namespace)
+    {
         if (!this.documentAccessBridge.hasProgrammingRights()) {
             setError(new JobException("Need programming right to uninstall an extension"));
 
@@ -488,8 +519,8 @@ public class ExtensionManagerScriptService implements ScriptService
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
-        uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
+        uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId.getId(), namespace));
+        uninstallRequest.addExtension(extensionId);
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
         }
@@ -507,92 +538,55 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous uninstall process for an extension if the context document has programming rights.
-     * <p>
-     * Uninstall from all namespaces.
-     * 
-     * @param extensionId the identifier of the extension to remove
-     * @return the {@link Job} object which can be used to monitor the progress of the uninstallation process, or
-     *         {@code null} in case of failure
-     */
-    public Job uninstall(ExtensionId extensionId)
-    {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to uninstall an extension"));
-
-            return null;
-        }
-
-        setError(null);
-
-        UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId.getId(), null));
-        uninstallRequest.addExtension(extensionId);
-
-        uninstallRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
-
-        Job job = null;
-        try {
-            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return job;
-    }
-
-    /**
      * Start the asynchronous uninstallation plan creation process for an extension.
      * <p>
      * Only uninstall from the provided namespace.
      * 
-     * @param id the identifier of the extension to install
+     * @param id the identifier of the extension that is going to be removed
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
-     *            extension will be installed globally
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
-     *         {@code null} in case of failure
+     *            extension will be removed from all namespaces
+     * @return the uninstall plan
      */
     public ExtensionPlan createUninstallPlan(String id, String namespace)
     {
-        setError(null);
-
-        UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
-        uninstallRequest.addExtension(new ExtensionId(id, (Version) null));
-        if (StringUtils.isNotBlank(namespace)) {
-            uninstallRequest.addNamespace(namespace);
-        }
-
-        ExtensionPlan status;
-        try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
-        } catch (JobException e) {
-            setError(e);
-
-            status = null;
-        }
-
-        return status;
+        return createUninstallPlan(new ExtensionId(id, (Version) null), namespace);
     }
 
     /**
      * Start the asynchronous uninstallation plan creation process for an extension if no other job is in progress
      * already.
      * <p>
-     * Uninstall from all namespace.
+     * Uninstall from all namespaces.
      * 
-     * @param extensionId the identifier of the extension to install
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
-     *         {@code null} in case of failure
+     * @param extensionId the identifier of the extension that is going to be removed
+     * @return the uninstall plan
      */
     public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
+    {
+        return createUninstallPlan(extensionId, null);
+    }
+
+    /**
+     * Adds a new job to the job queue to remove the specified extension from the specified namespace. If the namespace
+     * is {@code null} or blank and the extension version is specified the extension is removed from all namespaces.
+     * <p>
+     * This method requires programming rights.
+     * 
+     * @param extensionId the id of the extension for which to create the uninstall plan
+     * @param namespace the namespace from where the specified extension is going to be removed, {@code null} or blank
+     *            string if the extension is supposed to be removed from all namespaces
+     * @return the uninstall plan
+     */
+    private ExtensionPlan createUninstallPlan(ExtensionId extensionId, String namespace)
     {
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId.getId(), null));
+        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.addExtension(extensionId);
+        if (StringUtils.isNotBlank(namespace)) {
+            uninstallRequest.addNamespace(namespace);
+        }
 
         ExtensionPlan status;
         try {

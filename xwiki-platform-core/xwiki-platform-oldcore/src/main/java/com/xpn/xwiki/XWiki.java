@@ -2975,6 +2975,13 @@ public class XWiki implements EventListener
             return bclass;
         }
 
+        // Force the class document to use the currently default syntax.
+        Syntax defaultSyntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
+        if (!defaultSyntax.equals(doc.getSyntax())) {
+            doc.setSyntax(defaultSyntax);
+            needsUpdate = true;
+        }
+
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
         needsUpdate |= bclass.addTextField("email", "e-Mail", 30);

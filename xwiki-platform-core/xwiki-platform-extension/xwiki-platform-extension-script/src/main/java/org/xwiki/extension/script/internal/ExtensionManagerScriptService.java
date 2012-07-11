@@ -509,7 +509,7 @@ public class ExtensionManagerScriptService implements ScriptService
     /**
      * Start the asynchronous uninstall process for an extension if the context document has programming rights.
      * <p>
-     * Uninstall from all namepspace.
+     * Uninstall from all namespaces.
      * 
      * @param extensionId the identifier of the extension to remove
      * @return the {@link Job} object which can be used to monitor the progress of the uninstallation process, or
@@ -517,7 +517,28 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job uninstall(ExtensionId extensionId)
     {
-        return uninstall(extensionId.getId(), null);
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            setError(new JobException("Need programming right to uninstall an extension"));
+
+            return null;
+        }
+
+        setError(null);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(extensionId.getId());
+        uninstallRequest.addExtension(extensionId);
+
+        Job job;
+        try {
+            job = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
+        } catch (Exception e) {
+            setError(e);
+
+            job = null;
+        }
+
+        return job;
     }
 
     /**

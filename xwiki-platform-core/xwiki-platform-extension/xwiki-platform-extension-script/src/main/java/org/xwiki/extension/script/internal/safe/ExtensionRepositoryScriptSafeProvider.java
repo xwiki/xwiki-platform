@@ -64,11 +64,11 @@ public class ExtensionRepositoryScriptSafeProvider implements ScriptSafeProvider
             safe =
                 new SafeCoreExtensionRepository<CoreExtensionRepository>((CoreExtensionRepository) unsafe,
                     this.defaultSafeProvider, this.execution);
-        } else if (unsafe instanceof LocalExtension) {
+        } else if (unsafe instanceof InstalledExtensionRepository) {
             safe =
                 new SafeInstalledExtensionRepository<InstalledExtensionRepository>(
                     (InstalledExtensionRepository) unsafe, this.defaultSafeProvider, this.execution);
-        } else if (unsafe instanceof LocalExtension) {
+        } else if (unsafe instanceof LocalExtensionRepository) {
             safe =
                 new SafeLocalExtensionRepository<LocalExtensionRepository>((LocalExtensionRepository) unsafe,
                     this.defaultSafeProvider, this.execution);

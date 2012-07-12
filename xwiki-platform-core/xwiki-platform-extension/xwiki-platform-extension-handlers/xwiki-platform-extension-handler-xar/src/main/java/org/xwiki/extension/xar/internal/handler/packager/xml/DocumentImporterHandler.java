@@ -179,7 +179,8 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument nextDocument = getDocument();
 
             if (this.configuration.isLogEnabled()) {
-                LOGGER.info("Importing document [{}]...", nextDocument.getDocumentReference());
+                LOGGER.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
+                    nextDocument.getRealLanguage());
             }
 
             // Merge and save

@@ -40,6 +40,9 @@ public class AttachmentHandler extends AbstractHandler
 
         // skip useless known elements
         this.skippedElements.add("version");
+        this.skippedElements.add("author");
+        this.skippedElements.add("date");
+        this.skippedElements.add("comment");
     }
 
     public XWikiAttachment getAttachment()
@@ -57,6 +60,8 @@ public class AttachmentHandler extends AbstractHandler
             } catch (IOException e) {
                 // TODO: log error
             }
+        } else if (qName.equals("filesize")) {
+            getAttachment().setFilesize(Integer.valueOf(this.value.toString()));
         } else {
             super.endElementInternal(uri, localName, qName);
         }

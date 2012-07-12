@@ -25,6 +25,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.jmock.Expectations;
 import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
@@ -46,6 +47,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -121,7 +123,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                             documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get("en");
+                        XWikiDocument document = documentLanguages.get("");
 
                         if (document == null) {
                             document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
@@ -146,7 +148,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                             documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get(providedDocument.getRealLanguage());
+                        XWikiDocument document = documentLanguages.get(providedDocument.getLanguage());
 
                         if (document == null) {
                             document = new XWikiDocument(providedDocument.getDocumentReference());
@@ -173,12 +175,23 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
                         Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
+                        XWikiDocument previousDocument;
                         if (documentLanguages == null) {
                             documentLanguages = new HashMap<String, XWikiDocument>();
                             documents.put(document.getDocumentReference(), documentLanguages);
+                            previousDocument = null;
+                        } else {
+                            previousDocument = documentLanguages.get(document.getLanguage());
                         }
 
-                        documentLanguages.put(document.getRealLanguage(), document);
+                        for (XWikiAttachment attachment : document.getAttachmentList()) {
+                            if (!attachment.isContentDirty()) {
+                                attachment.setAttachment_content(previousDocument.getAttachment(
+                                    attachment.getFilename()).getAttachment_content());
+                            }
+                        }
+
+                        documentLanguages.put(document.getLanguage(), document.clone());
 
                         return null;
                     }
@@ -195,7 +208,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
                         if (documentLanguages != null) {
-                            documentLanguages.remove(document.getRealLanguage());
+                            documentLanguages.remove(document.getLanguage());
                         }
 
                         return null;
@@ -303,12 +316,25 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("Wrong content", "content", page.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "2.1", page.getVersion());
+        Assert.assertEquals("Wrong version", "1.1", page.getVersion());
 
         BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
         Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+
+        // space.pagewithattachment
+
+        XWikiDocument pagewithattachment =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getContext());
+        Assert.assertFalse(pagewithattachment.isNew());
+        Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
+        
+        XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
+        Assert.assertNotNull(attachment);
+        Assert.assertEquals("attachment.txt", attachment.getFilename());
+        Assert.assertEquals(18, attachment.getContentSize(getContext()));
+        Assert.assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getContext())));
 
         // space1.page1
 
@@ -326,7 +352,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("Wrong content", "translated content", translated.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "1.1", translated.getVersion());
+        Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
     }
 
     @Test
@@ -340,11 +366,13 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // validate
 
-        XWikiDocument samepage = this.mockXWiki.getDocument(new DocumentReference("wiki", "samespace", "samepage"), getContext());
+        XWikiDocument samepage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "samespace", "samepage"), getContext());
 
         Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
-        
-        XWikiDocument modifiedpage = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+
+        XWikiDocument modifiedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
 
         Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
 

@@ -41,6 +41,7 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,6 +66,8 @@ public class DocumentImporterHandler extends DocumentHandler
 
     private PackageConfiguration configuration;
 
+    private EntityReferenceSerializer<String> compactWikiSerializer;
+
     /**
      * Attachment are imported before trying to merge a document for memory handling reasons so we need to know if there
      * was really an existing document before starting to import attachments.
@@ -72,8 +75,12 @@ public class DocumentImporterHandler extends DocumentHandler
     private Boolean hasCurrentDocument;
 
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
+        throws ComponentLookupException
     {
         super(componentManager, wiki);
+
+        this.compactWikiSerializer =
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
         this.packager = packager;
     }
@@ -102,6 +109,11 @@ public class DocumentImporterHandler extends DocumentHandler
         }
 
         return userReference;
+    }
+
+    private String getUserString(XWikiContext context)
+    {
+        return this.compactWikiSerializer.serialize(getUserReference(context), getDocument().getDocumentReference());
     }
 
     private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws Exception
@@ -307,16 +319,16 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiContext context = getXWikiContext();
 
             // Set proper author
-            // TODO: add a setAuthorReference in XWikiAttachment
             XWikiDocument document = getDocument();
-            document.setAuthorReference(context.getUserReference());
-            attachment.setAuthor(document.getAuthor());
+            document.setAuthorReference(getUserReference(context));
+            attachment.setAuthor(getUserString(context));
 
             XWikiDocument dbDocument = getDatabaseDocument();
 
             XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());
 
             if (dbAttachment == null) {
+                attachment.setDoc(dbDocument);
                 dbDocument.getAttachmentList().add(attachment);
             } else {
                 dbAttachment.setContent(attachment.getContentInputStream(context));

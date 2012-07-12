@@ -45,6 +45,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -109,7 +110,7 @@ public class DefaultPackager implements Packager, Initializable
 
     @Override
     public void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration)
-        throws IOException, XWikiException
+        throws IOException, XWikiException, ComponentLookupException
     {
         if (configuration.getWiki() == null) {
             XWikiContext context = getXWikiContext();
@@ -132,7 +133,7 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     private XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki,
-        PackageConfiguration configuration) throws IOException
+        PackageConfiguration configuration) throws IOException, ComponentLookupException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
@@ -143,7 +144,7 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     private XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki,
-        PackageConfiguration configuration) throws IOException
+        PackageConfiguration configuration) throws IOException, ComponentLookupException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 

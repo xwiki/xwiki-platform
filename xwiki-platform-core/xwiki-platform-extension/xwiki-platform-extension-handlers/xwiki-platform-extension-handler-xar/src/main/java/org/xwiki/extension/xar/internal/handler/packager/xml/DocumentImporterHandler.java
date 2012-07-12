@@ -177,7 +177,7 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument currentDocument = getDatabaseDocument();
             XWikiDocument nextDocument = getDocument();
 
-            LOGGER.info("Importing document [{}]...", nextDocument.getDocumentReference());
+            LOGGER.info("Importing document [{}]...", nextDocument.getPrefixedFullName());
 
             // Merge and save
             if (currentDocument != null && this.hasCurrentDocument == Boolean.TRUE) {

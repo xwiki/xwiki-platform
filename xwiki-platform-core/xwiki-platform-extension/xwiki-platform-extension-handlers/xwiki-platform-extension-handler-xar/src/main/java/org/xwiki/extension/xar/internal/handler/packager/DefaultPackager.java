@@ -57,6 +57,7 @@ import org.xwiki.extension.xar.internal.handler.packager.xml.XarPageLimitedHandl
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 
@@ -86,6 +87,9 @@ public class DefaultPackager implements Packager, Initializable
     @Inject
     @Named("explicit")
     private DocumentReferenceResolver<EntityReference> resolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     /**
      * The logger to log.
@@ -172,9 +176,9 @@ public class DefaultPackager implements Packager, Initializable
                         }
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
-                        this.logger.debug("Entry [" + entry + "] is not a document", e);
+                        this.logger.debug("Entry [{}] is not a document", entry.getName(), e);
                     } catch (Exception e) {
-                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+                        this.logger.error("Failed to parse document [{}]", entry.getName(), e);
                     }
                 }
             }
@@ -258,7 +262,7 @@ public class DefaultPackager implements Packager, Initializable
                     }
                 }
             } catch (XWikiException e) {
-                this.logger.error("Failed to delete document [" + documentReference + "]", e);
+                this.logger.error("Failed to delete document [{}]", this.serializer.serialize(documentReference), e);
             }
         }
     }
@@ -290,7 +294,7 @@ public class DefaultPackager implements Packager, Initializable
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                     } catch (Exception e) {
-                        this.logger.error("Failed to parse document [" + zipEntry.getName() + "]", e);
+                        this.logger.error("Failed to parse document [{}]", zipEntry.getName(), e);
                     }
                 }
             }

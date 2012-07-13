@@ -52,7 +52,6 @@
           <p>Already up to date. Nothing to do.</p>
         #elseif ($distributionState == 'NEW')
           #set($installedExtension = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
-$services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki')
           #if ($installedExtension.isValid('wiki:xwiki'))
             <p>No previous status could be found but the right UI already seems to be installed.</p>
 

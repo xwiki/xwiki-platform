@@ -37,7 +37,7 @@ import org.xwiki.script.service.ScriptService;
  * Various APIs to make it easy to perform Git commands from within scripts.
  *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.2M1
  */
 @Component
 @Named("git")

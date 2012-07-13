@@ -230,8 +230,9 @@
             <!-- Added method to get the author of the macro -->
             <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacro</exclude>
             <!-- Chart plugin has been moved from oldcore to its own module. There's no API breakage for the user -->
-            <exclude>org/xwiki/chart/model/ChartModel</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/**</exclude>
             <!-- TODO Andreas: Explain why we have to break backward compatibility for the Chart module -->
+            <exclude>org/xwiki/chart/model/ChartModel</exclude>
             <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
             <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
             <!-- Removed protected method (registerWikiMacros) that was not supposed to be used from outside

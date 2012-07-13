@@ -1215,8 +1215,13 @@ ul.extension-metadata li {
         #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
         (% class="ui-progress-bar green" style="width:${percent}%" %)((()))
       )))
-      (% class="ui-progress-message" %)
-      $!jobStatus.log.peek().formattedMessage
+      #if (!$jobStatus.log.isEmpty())
+        (% class="ui-progress-message" %)
+        ## We need the tail of the log queue.
+        #set ($logList = [])
+        #set ($discard = $logList.addAll($jobStatus.log))
+        $!logList.get($mathtool.sub($logList.size(), 1)).formattedMessage
+      #end
     )))
   #end
 #end

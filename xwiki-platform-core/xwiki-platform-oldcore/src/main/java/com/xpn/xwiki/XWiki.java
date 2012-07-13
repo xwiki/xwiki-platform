@@ -2975,10 +2975,9 @@ public class XWiki implements EventListener
             return bclass;
         }
 
-        // Force the class document to use the currently default syntax.
-        Syntax defaultSyntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
-        if (!defaultSyntax.equals(doc.getSyntax())) {
-            doc.setSyntax(defaultSyntax);
+        // Force the class document to use the 2.1 syntax default syntax, the same syntax used in the custom displayer.
+        if (!Syntax.XWIKI_2_1.equals(doc.getSyntax())) {
+            doc.setSyntax(Syntax.XWIKI_2_1);
             needsUpdate = true;
         }
 

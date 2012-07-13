@@ -237,6 +237,10 @@
             <!-- Removed protected method (registerWikiMacros) that was not supposed to be used from outside
                 (was protected for unit tests hacks. -->
             <exclude>com/xpn/xwiki/XWiki</exclude>
+            <!-- These classes below have never been used. It was supposed to be the start of the removal of Struts but
+                 since it hasn't progressed so far we're removing stray code from master. Experiments should be done
+                 on feature branches -->
+            <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
           </excludes>
         </configuration>
       </plugin>

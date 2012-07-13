@@ -27,11 +27,15 @@ import org.jmock.Expectations;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.internal.DefaultComponentManager;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -42,7 +46,12 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
+
+import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
 
 /**
  * Unit tests for {@link DefaultWikiIRCBotListenerManager}.
@@ -50,6 +59,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
 public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
@@ -72,10 +82,10 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
 
         // Assume we have two Wiki Bot Listeners in the wiki
         final WikiBotListenerData listenerData1 = new WikiBotListenerData(
-            new DocumentReference("wik1", "space1", "page1"),
+            new DocumentReference("wiki1", "space1", "page1"),
             "space1.page1", "wikiname1", "wikidescription1");
         final WikiBotListenerData listenerData2 = new WikiBotListenerData(
-            new DocumentReference("wik2", "space2", "page2"),
+            new DocumentReference("wiki2", "space2", "page2"),
             "space2.page2", "wikiname2", "wikidescription2");
         final DocumentReferenceResolver<String> resolver =
             getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");

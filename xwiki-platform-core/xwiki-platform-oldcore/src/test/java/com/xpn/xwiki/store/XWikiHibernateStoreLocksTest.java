@@ -45,8 +45,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
-
 
 /**
  * Make sure the user's locks are released when they logout.
@@ -54,6 +54,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.1M1
  */
+@AllComponents
 public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement

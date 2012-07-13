@@ -17,33 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.component.manager.ComponentLookupException;
-
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Take care of parsing xar files and handling database actions.
- * 
+ * Returns location for the generated chart image, both for where it's stored in the store and the URL to retrieve it.
+ *
  * @version $Id$
- * @since 4.0M1
+ * @since 4.2M1
  */
 @Role
-public interface Packager
+public interface ImageLocator
 {
-    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException, ComponentLookupException;
+    /**
+     * Compute the location where to store the generated chart image.
+     *
+     * @param imageId the image id that we use to generate a unique storage location
+     * @return the location where to store the generated chart image
+     * @throws MacroExecutionException if an error happened when computing the location
+     */
+    File getStorageLocation(ImageId imageId) throws MacroExecutionException;
 
-    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
-
-    List<XarEntry> getEntries(File xarFile) throws IOException;
-
-    void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
+    /**
+     * Compute the URL to use to access the stored generate chart image.
+     *
+     * @param imageId the image id for the image that we have stored
+     * @return the URL to use to access the stored generate chart image
+     */
+    String getURL(ImageId imageId);
 }

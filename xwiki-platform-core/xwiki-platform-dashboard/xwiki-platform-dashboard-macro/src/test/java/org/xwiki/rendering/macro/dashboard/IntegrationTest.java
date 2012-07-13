@@ -31,7 +31,6 @@ import org.jmock.api.Invocation;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.action.CustomAction;
 import org.junit.runner.RunWith;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
@@ -39,6 +38,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
+import org.xwiki.test.MockingComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -52,18 +52,21 @@ import org.xwiki.velocity.VelocityManager;
 public class IntegrationTest
 {
     @RenderingTestSuite.Initialized
-    public void initialize(final ComponentManager componentManager) throws Exception
+    @SuppressWarnings("unchecked")
+    public void initialize(final MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
 
-        // Since we have a dependency on xwiki-core the Context Component Manager will be found and the test will try
-        // to look up the Dashboard macro in the User and Wiki Component Manager and thus need a Current User and a
-        // Current Wiki. It's easier for this test to simply unregister the Context Component Manager rather than
-        // have to provide mocks for them.
+        // Since we have a dependency on XWiki Platform Oldcore the Context Component Manager will be found and the
+        // test will try to look up the Dashboard macro in the User and Wiki Component Manager and thus need a Current
+        // User and a Current Wiki. It's easier for this test to simply unregister the Context Component Manager rather
+        // than have to provide mocks for them.
         componentManager.unregisterComponent(ComponentManager.class, "context");
 
-        final SkinExtension mockSsfx = mockery.mock(SkinExtension.class, "ssfxMock");
-        final SkinExtension mockJsfx = mockery.mock(SkinExtension.class, "jsfxMock");
+        final SkinExtension mockSsfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx",
+            "ssfxMock");
+        final SkinExtension mockJsfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "jsfx",
+            "jsfxMock");
         mockery.checking(new Expectations()
         {
             {
@@ -83,16 +86,8 @@ public class IntegrationTest
                 allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
             }
         });
-        DefaultComponentDescriptor<SkinExtension> ssfxDesc = new DefaultComponentDescriptor<SkinExtension>();
-        ssfxDesc.setRole(SkinExtension.class);
-        ssfxDesc.setRoleHint("ssfx");
-        componentManager.registerComponent(ssfxDesc, mockSsfx);
-        DefaultComponentDescriptor<SkinExtension> jsfxDesc = new DefaultComponentDescriptor<SkinExtension>();
-        jsfxDesc.setRole(SkinExtension.class);
-        jsfxDesc.setRoleHint("jsfx");
-        componentManager.registerComponent(jsfxDesc, mockJsfx);
 
-        final GadgetSource mockGadgetSource = mockery.mock(GadgetSource.class);
+        final GadgetSource mockGadgetSource = componentManager.registerMockComponent(mockery, GadgetSource.class);
         mockery.checking(new Expectations()
         {
             {
@@ -118,13 +113,11 @@ public class IntegrationTest
                 will(returnValue(true));
             }
         });
-        DefaultComponentDescriptor<GadgetSource> descriptorGR = new DefaultComponentDescriptor<GadgetSource>();
-        descriptorGR.setRole(GadgetSource.class);
-        componentManager.registerComponent(descriptorGR, mockGadgetSource);
 
         // Mock VelocityManager used in macrodashboard_nested_velocity.test because we do not have an XWikiContext
         // instance in the ExecutionContext.
-        final VelocityManager mockVelocityManager = mockery.mock(VelocityManager.class, "velocityManagerMock");
+        final VelocityManager mockVelocityManager =
+            componentManager.registerMockComponentWithId(mockery, VelocityManager.class, "velocityManagerMock");
         mockery.checking(new Expectations()
         {
             {
@@ -148,8 +141,5 @@ public class IntegrationTest
                 }));
             }
         });
-        DefaultComponentDescriptor<VelocityManager> descriptorVM = new DefaultComponentDescriptor<VelocityManager>();
-        descriptorVM.setRole(VelocityManager.class);
-        componentManager.registerComponent(descriptorVM, mockVelocityManager);
     }
 }

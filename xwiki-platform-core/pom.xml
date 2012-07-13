@@ -98,7 +98,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.0.10.Final</version>
+        <version>3.1.0.Final</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
@@ -241,6 +241,8 @@
             <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
             <!-- Chart plugin has been moved from oldcore to its own module. There's no API breakage for the user -->
             <exclude>com/xpn/xwiki/plugin/charts/**</exclude>
+            <!-- Fix method name introduced in 4.1.1 -->
+            <exclude>com/xpn/xwiki/doc/XWikiDocument</exclude>
           </excludes>
         </configuration>
       </plugin>

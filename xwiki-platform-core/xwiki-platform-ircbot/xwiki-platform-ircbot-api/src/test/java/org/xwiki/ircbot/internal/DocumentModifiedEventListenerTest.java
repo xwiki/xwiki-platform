@@ -33,6 +33,7 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
 public class DocumentModifiedEventListenerTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement

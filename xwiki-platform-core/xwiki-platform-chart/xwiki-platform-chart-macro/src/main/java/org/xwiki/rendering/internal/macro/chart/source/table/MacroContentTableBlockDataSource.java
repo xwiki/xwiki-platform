@@ -19,28 +19,26 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import java.io.StringReader;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
 
 /**
- * A data source for building charts from macro content.
+ * A data source for building charts from a wiki table defined in the macro content.
  *
  * @version $Id$
  * @since 2.0M1
@@ -51,19 +49,13 @@ import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_
 public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSource
 {
     /**
-     * {@link ComponentManager} used to dynamically lookup for various {@link Parser} implementations.
+     * Used to parse macro content containing wiki syntax.
      */
     @Inject
-    private ComponentManager componentManager;
-
-    /**
-     * {@link DocumentAccessBridge} component.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
+    private MacroContentParser macroContentParser;
 
     @Override
-    protected TableBlock getTableBlock(String macroContent)
+    protected TableBlock getTableBlock(String macroContent, MacroTransformationContext context)
         throws MacroExecutionException
     {
         // Since we are using an inline source the macro content cannot be empty/null.
@@ -73,14 +65,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         }
 
         // Parse the macro content into an XDOM.
-        XDOM xdom;
-        try {
-            Parser parser = componentManager.getInstance(Parser.class,
-                docBridge.getDocument(this.docBridge.getCurrentDocumentReference()).getSyntax().toIdString());
-            xdom = parser.parse(new StringReader(macroContent));
-        } catch (Exception ex) {
-            throw new MacroExecutionException("Error while parsing macro content.", ex);
-        }
+        XDOM xdom = this.macroContentParser.parse(macroContent, context, true, false);
 
         // Take the first TableBlock found in the macro content.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);

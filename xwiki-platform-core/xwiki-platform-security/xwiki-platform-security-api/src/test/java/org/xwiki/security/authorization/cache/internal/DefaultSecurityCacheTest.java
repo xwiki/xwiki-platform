@@ -49,6 +49,7 @@ import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -65,6 +66,7 @@ import static org.junit.Assert.fail;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
 public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
     @MockingRequirement(exceptions = {EntityReferenceSerializer.class})

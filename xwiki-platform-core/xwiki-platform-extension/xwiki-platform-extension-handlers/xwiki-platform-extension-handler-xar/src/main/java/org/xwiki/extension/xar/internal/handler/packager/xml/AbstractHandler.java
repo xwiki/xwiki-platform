@@ -137,19 +137,23 @@ public class AbstractHandler extends DefaultHandler
     {
         --this.depth;
 
-        if (this.currentHandler != null) {
-            this.currentHandler.endElement(uri, localName, qName);
+        try {
+            if (this.currentHandler != null) {
+                this.currentHandler.endElement(uri, localName, qName);
 
-            if (this.depth == this.currentHandlerLevel) {
-                endElementInternal(uri, localName, qName);
-                this.currentHandler = null;
+                if (this.depth == this.currentHandlerLevel) {
+                    endElementInternal(uri, localName, qName);
+                    this.currentHandler = null;
+                }
+            } else {
+                if (this.depth == 0) {
+                    endHandlerElement(uri, localName, qName);
+                } else if (this.depth == 1) {
+                    endElementInternal(uri, localName, qName);
+                }
             }
-        } else {
-            if (this.depth == 0) {
-                endHandlerElement(uri, localName, qName);
-            } else if (this.depth == 1) {
-                endElementInternal(uri, localName, qName);
-            }
+        } finally {
+            this.value = null;
         }
     }
 
@@ -219,7 +223,7 @@ public class AbstractHandler extends DefaultHandler
 
     protected ExecutionContext getExecutionContext() throws ComponentLookupException
     {
-        return getComponentManager().<Execution>getInstance(Execution.class).getContext();
+        return getComponentManager().<Execution> getInstance(Execution.class).getContext();
     }
 
     protected XWikiContext getXWikiContext() throws ComponentLookupException

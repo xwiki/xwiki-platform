@@ -403,6 +403,10 @@ public class XWiki implements EventListener
                 // object) which make it unusable
                 Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
                     .initialize(context);
+
+                // Send Event to signal that the application is ready to service requests.
+                Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
+                    new ApplicationReadyEvent(), xwiki, context);
             } else {
                 context.setWiki(xwiki);
             }
@@ -802,9 +806,6 @@ public class XWiki implements EventListener
 
         ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
         observationManager.addListener(this);
-
-        // Send Event to signal that the application is ready to service requests.
-        observationManager.notify(new ApplicationReadyEvent(), this, context);
     }
 
     /**
@@ -891,17 +892,16 @@ public class XWiki implements EventListener
                         getPluginManager().virtualInit(context);
                         getRenderingEngine().virtualInit(context);
                     }
+
+                    // Add initdone which will allow to
+                    // bypass some initializations
+                    context.put("initdone", "1");
+
+                    // Send event to notify listeners that the subwiki is ready
+                    ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
+                    observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
                 }
             }
-
-            // Add initdone which will allow to
-            // bypass some initializations
-            context.put("initdone", "1");
-
-            // Send event to notify listeners that the subwiki is ready
-            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-            observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
-
         } finally {
             context.setDatabase(database);
         }
@@ -2973,6 +2973,13 @@ public class XWiki implements EventListener
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
+        }
+
+        // Force the class document to use the currently default syntax.
+        Syntax defaultSyntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
+        if (!defaultSyntax.equals(doc.getSyntax())) {
+            doc.setSyntax(defaultSyntax);
+            needsUpdate = true;
         }
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);

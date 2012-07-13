@@ -19,26 +19,49 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
+import org.jmock.Expectations;
+import org.xwiki.component.internal.DefaultComponentManager;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
+import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
+import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
+import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
+import org.xwiki.rendering.macro.MacroContentParser;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 
+import java.io.StringReader;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.jmock.Expectations;
-
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
+ * Helper to write unit tests for Table-based data sources.
+ *
  * @version $Id$
  * @since 4.2M1
  */
+@ComponentList({
+    PlainTextBlockRenderer.class,
+    PlainTextRendererFactory.class,
+    DefaultComponentManager.class,
+    XWiki20Parser.class,
+    XWiki20LinkReferenceParser.class,
+    URLResourceReferenceTypeParser.class,
+    XWiki20ImageReferenceParser.class,
+    PlainTextRenderer.class,
+    DefaultLinkLabelGenerator.class
+})
 public abstract class AbstractMacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(exceptions={ComponentManager.class, BlockRenderer.class})
@@ -46,24 +69,7 @@ public abstract class AbstractMacroContentTableBlockDataSourceTest extends Abstr
 
     protected MacroContentTableBlockDataSource getDataSource()
     {
-        return source;
-    }
-
-    @Override
-    public void configure() throws Exception
-    {
-        // Mock components
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "page");
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations() {{
-            allowing(dab).getCurrentDocumentReference();
-                will(returnValue(currentDocumentReference));
-            allowing(dab).getDocument(currentDocumentReference);
-                will(returnValue(dmb));
-            allowing(dmb).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-        }});
+        return this.source;
     }
 
     protected Map<String, String> map(String... keyValues)
@@ -77,5 +83,19 @@ public abstract class AbstractMacroContentTableBlockDataSourceTest extends Abstr
         return map;
     }
 
+    protected void setUpContentExpectation(final String macroContent) throws Exception
+    {
+        final MacroContentParser parser = getComponentManager().getInstance(MacroContentParser.class);
 
+        // In order to make it easy to write unit tests, we allow tests to pass a string written in XWiki/2.0 synyax
+        // which we then parser to generate an XDOM that we use in the expectation.
+        final XDOM expectedXDOM = getComponentManager().<Parser>getInstance(Parser.class,
+            Syntax.XWIKI_2_0.toIdString()).parse(new StringReader(macroContent));
+
+        getMockery().checking(new Expectations() {{
+            // Simulate parsing the macro content that returns a XDOM not containing a table
+            oneOf(parser).parse(macroContent, null, true, false);
+                will(returnValue(expectedXDOM));
+        }});
+    }
 }

@@ -17,36 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.charts.params;
+package org.xwiki.rendering.internal.macro.chart;
 
-import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import org.junit.Test;
+import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
-public class IntegerChartParam extends AbstractChartParam implements ChartParam
+import junit.framework.Assert;
+
+/**
+ * Unit tests for {@link ImageId}.
+ *
+ * @version $Id$
+ * @since 4.2M1
+ */
+public class ImageIdTest
 {
-    public IntegerChartParam(String name)
+    /**
+     * Verify id are different even when using same parameters (but different instances of parameters).
+     */
+    @Test
+    public void testGetIdWithSameParametersButDifferentInstances()
     {
-        super(name);
-    }
+        ChartMacroParameters parameters1 = new ChartMacroParameters();
+        ChartMacroParameters parameters2 = new ChartMacroParameters();
 
-    public IntegerChartParam(String name, boolean isOptional)
-    {
-        super(name, isOptional);
-    }
-
-    @Override
-    public Class getType()
-    {
-        return Integer.class;
-    }
-
-    @Override
-    public Object convert(String value) throws ParamException
-    {
-        try {
-            return new Integer(value);
-        } catch (NumberFormatException nfe) {
-            throw new InvalidParamException("Noninteger value for the " + getName() + " parameter", nfe);
-        }
+        Assert.assertFalse(new ImageId(parameters1).getId().equals(new ImageId(parameters2).getId()));
     }
 }

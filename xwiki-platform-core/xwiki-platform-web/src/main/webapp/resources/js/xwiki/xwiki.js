@@ -1251,7 +1251,7 @@ document.observe('xwiki:dom:loading', function() {
       this.value=this.defaultValue;
     }
   }
-  document.observe('xwiki:addBehavior:withTip', function(event){
+  document.observe('xwiki:addBehavior:withTip', function(event) {
     var item = event.memo.element;
     if (item) {
       item.observe('focus', onFocus.bindAsEventListener(item));
@@ -1261,6 +1261,13 @@ document.observe('xwiki:dom:loading', function() {
   document.observe('xwiki:dom:loaded', function() {
     $$("input.withTip", "textarea.withTip").each(function(item) {
       document.fire("xwiki:addBehavior:withTip", {'element' : item});
+    });
+  });
+  document.observe('xwiki:dom:updated', function(event) {
+    event.memo.elements.each(function(element) {
+      element.select("input.withTip", "textarea.withTip").each(function(item) {
+        document.fire("xwiki:addBehavior:withTip", {'element' : item});
+      });
     });
   });
 })();
@@ -1312,24 +1319,30 @@ document.observe('xwiki:dom:loaded', function() {
             noresults: "Group not found"
         }
     };
-    if (typeof(XWiki.widgets.Suggest) != "undefined") {
-      var keys = Object.keys(suggestionsMapping);
-      for (var i=0;i<keys.length;i++) {
-        var selector = 'input.suggest' + keys[i].capitalize();
-        $$(selector).each(function(item) {
-          if (!item.hasClassName('initialized')) {
-            var options = {
-              timeout : 30000,
-              parentContainer : item.up()
-            };
-            Object.extend(options, suggestionsMapping[keys[i]]);
-            // Create the Suggest.
-            var suggest = new XWiki.widgets.Suggest(item, options);
-            item.addClassName('initialized');
-          }
-        });
+    var addSuggests = function(elements) {
+      if (typeof(XWiki.widgets.Suggest) != "undefined") {
+        var keys = Object.keys(suggestionsMapping);
+        for (var i=0;i<keys.length;i++) {
+          var selector = 'input.suggest' + keys[i].capitalize();
+          elements.each(function(element) {$(element).select(selector).each(function(item) {
+            if (!item.hasClassName('initialized')) {
+              var options = {
+                timeout : 30000,
+                parentContainer : item.up()
+              };
+              Object.extend(options, suggestionsMapping[keys[i]]);
+              // Create the Suggest.
+              var suggest = new XWiki.widgets.Suggest(item, options);
+              item.addClassName('initialized');
+            }
+          })});
+        }
       }
-    }
+    };
+    addSuggests([$(document.documentElement)]);
+    document.observe('xwiki:dom:updated', function(event) {
+      addSuggests(event.memo.elements);
+    });
 });
 
 /**
@@ -1338,16 +1351,21 @@ document.observe('xwiki:dom:loaded', function() {
  *
  * To activate this behavior on an input elements, add the "suggested" classname to it.
  */
-document.observe('xwiki:dom:loaded', function() {
-  if (typeof(XWiki.widgets.Suggest) != "undefined") {
-    $$(".suggested").each(function(item) {
-      item.setAttribute("autocomplete", "off");
-      if (typeof item.onfocus === "function") {
-        item.onfocus();
-        item.removeAttribute("onfocus");
-      }
-    });
-  }
+['xwiki:dom:loaded', 'xwiki:dom:updated'].each(function(eventName) {
+  document.observe(eventName, function(event) {
+    if (typeof(XWiki.widgets.Suggest) != "undefined") {
+      var elements = event.memo && event.memo.elements || [document.documentElement];
+      elements.each(function(element) {
+        element.select(".suggested").each(function(item) {
+          item.setAttribute("autocomplete", "off");
+          if (typeof item.onfocus === "function") {
+            item.onfocus();
+            item.removeAttribute("onfocus");
+          }
+        });
+      });
+    }
+  });
 });
 
 /*

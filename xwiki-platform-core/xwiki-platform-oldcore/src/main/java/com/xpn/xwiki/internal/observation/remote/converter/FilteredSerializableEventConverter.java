@@ -17,30 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.chart;
+package com.xpn.xwiki.internal.observation.remote.converter;
 
-import java.io.File;
-
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.chart.ChartMacroParameters;
+import org.xwiki.observation.remote.LocalEventData;
+import org.xwiki.observation.remote.RemoteEventData;
+import org.xwiki.observation.remote.internal.converter.SerializableEventConverter;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Extension of the {@link ChartMacro} for testing.
+ * Overwrite {@link SerializableEventConverter} to filter some known types which are declared as Serialized and are for
+ * really being so.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 4.1.3
  */
+// TODO: find a more generic way to filter those bad classes at SerializableEventConverter level
 @Component
-@Named("testchart")
 @Singleton
-public class TestChartMacro extends ChartMacro
+public class FilteredSerializableEventConverter extends SerializableEventConverter
 {
     @Override
-    protected File getChartImageFile(ChartMacroParameters parameters)
+    public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        return new File(System.getProperty("java.io.tmpdir") + "/chart.png");
+        if (localEvent.getData() instanceof XWikiContext || localEvent.getSource() instanceof XWikiContext) {
+            return false;
+        } else {
+            return super.toRemote(localEvent, remoteEvent);
+        }
     }
 }

@@ -45,6 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
@@ -53,6 +54,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 3.0M1
  */
+@AllComponents
 public class ContextMacroTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(exceptions = { BeanManager.class, MacroContentParser.class })

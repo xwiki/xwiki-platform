@@ -25,8 +25,6 @@ import java.util.TreeSet;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.RightSet;
 
 import com.google.common.collect.testing.SampleElements;
 import com.google.common.collect.testing.SetTestSuiteBuilder;

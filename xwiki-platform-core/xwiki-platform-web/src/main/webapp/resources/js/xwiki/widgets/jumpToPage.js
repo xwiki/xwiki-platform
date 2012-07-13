@@ -67,7 +67,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
         resultValue : "pageFullName",
         resultInfo : "pageFullName",
         timeout : 30000,
-        parentContainer : this.dialog
+        parentContainer : this.dialogBox
       });
     }
   },

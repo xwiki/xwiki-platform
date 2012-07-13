@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -100,5 +101,13 @@ public class DependencyPane extends BaseElement
     public String getVersion()
     {
         return getUtil().findElementWithoutWaiting(getDriver(), container, By.className("extension-version")).getText();
+    }
+
+    /**
+     * @return the extension id
+     */
+    public ExtensionId getId()
+    {
+        return new ExtensionId(getName(), getVersion());
     }
 }

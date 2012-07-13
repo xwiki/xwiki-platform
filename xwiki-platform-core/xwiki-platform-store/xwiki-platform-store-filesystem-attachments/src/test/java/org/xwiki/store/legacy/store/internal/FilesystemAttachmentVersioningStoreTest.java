@@ -45,7 +45,6 @@ import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
 import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
 import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
 import org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer;
-import org.xwiki.test.AbstractMockingComponentTestCase;
 
 /**
  * Tests for FilesystemAttachmentVersioningStore.

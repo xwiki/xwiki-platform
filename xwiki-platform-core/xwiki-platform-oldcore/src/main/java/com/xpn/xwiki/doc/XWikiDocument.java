@@ -3505,7 +3505,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Datas
 
-        if (!equalsDatas(doc)) {
+        if (!equalsData(doc)) {
             return false;
         }
 
@@ -3527,7 +3527,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return true if bith documents have the same datas
      * @since 4.1.1
      */
-    public boolean equalsDatas(XWikiDocument doc)
+    public boolean equalsData(XWikiDocument doc)
     {
         // Same Java object, they sure are equal
         if (this == doc) {
@@ -7281,7 +7281,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
-        backup.put("doc", context.getDoc());
         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         if (vcontext != null) {
@@ -7298,6 +7297,8 @@ public class XWikiDocument implements DocumentModelBridge
             backup.put("gtdoc", gcontext.get("tdoc"));
         }
 
+        backup.put("doc", context.getDoc());
+
         // Clone the Execution Context to provide isolation
         Execution execution = Utils.getComponent(Execution.class);
         ExecutionContext clonedEc;
@@ -7307,6 +7308,14 @@ public class XWikiDocument implements DocumentModelBridge
             throw new RuntimeException("Failed to clone the Execution Context", e);
         }
         execution.pushContext(clonedEc);
+
+        // Make sure the execution context and the XWiki context point to the same Velocity context instance.
+        vcontext = velocityManager.getVelocityContext();
+        if (vcontext != null) {
+            context.put("vcontext", vcontext);
+        } else {
+            context.remove("vcontext");
+        }
     }
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
@@ -7314,6 +7323,12 @@ public class XWikiDocument implements DocumentModelBridge
         // Restore the Execution Context
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
+
+        // Restore the context document before accessing the Velocity context because the script context initialization
+        // triggered by the Velocity manager must take into account the restored document.
+        if (backup.get("doc") != null) {
+            context.setDoc((XWikiDocument) backup.get("doc"));
+        }
 
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
@@ -7345,10 +7360,11 @@ public class XWikiDocument implements DocumentModelBridge
             if (backup.get("vtdoc") != null) {
                 vcontext.put("tdoc", backup.get("vtdoc"));
             }
-        }
 
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
+            // Make sure the execution context and the XWiki context point to the same Velocity context instance.
+            context.put("vcontext", vcontext);
+        } else {
+            context.remove("vcontext");
         }
     }
 
@@ -7365,11 +7381,13 @@ public class XWikiDocument implements DocumentModelBridge
             if (vcontext != null) {
                 vcontext.put("doc", apidoc);
                 vcontext.put("tdoc", tdoc);
+                vcontext.put("cdoc", tdoc);
             }
 
             if (gcontext != null) {
                 gcontext.put("doc", apidoc);
                 gcontext.put("tdoc", tdoc);
+                gcontext.put("cdoc", tdoc);
             }
         } catch (XWikiException ex) {
             LOGGER.warn("Unhandled exception setting context", ex);

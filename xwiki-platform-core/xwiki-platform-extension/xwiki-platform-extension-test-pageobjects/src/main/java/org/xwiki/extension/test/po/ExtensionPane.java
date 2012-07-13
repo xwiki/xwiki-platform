@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -75,6 +76,14 @@ public class ExtensionPane extends BaseElement
         By xpath = By.xpath("*[@class = 'extension-header']//*[@class = 'extension-status']");
         List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, xpath);
         return found.size() > 0 ? found.get(0).getText() : null;
+    }
+
+    /**
+     * @return the extension identifier
+     */
+    public ExtensionId getId()
+    {
+        return new ExtensionId(getName(), getVersion());
     }
 
     /**

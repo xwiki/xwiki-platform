@@ -66,7 +66,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<String> result;
         try {
-            result = diffManager.merge(toLines(previousStr), toLines(currentStr), toLines(newStr), null);
+            result = diffManager.merge(toLines(previousStr), toLines(newStr), toLines(currentStr), null);
 
             mergeResult.getLog().addAll(result.getLog());
 
@@ -97,7 +97,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<Character> result;
         try {
-            result = diffManager.merge(toCharacters(previousStr), toCharacters(currentStr), toCharacters(newStr), null);
+            result = diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr), null);
 
             mergeResult.getLog().addAll(result.getLog());
 
@@ -128,7 +128,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<T> result;
         try {
-            result = diffManager.merge(commonAncestor, current, next, null);
+            result = diffManager.merge(commonAncestor, next, current, null);
 
             current.clear();
             current.addAll(result.getMerged());

@@ -17,34 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.charts.params;
+package org.xwiki.cache.infinispan.internal;
 
-import org.jfree.ui.RectangleEdge;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public class RectangleEdgeChartParam extends ChoiceChartParam
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.component.annotation.Component;
+
+/**
+ * Implements {@link org.xwiki.cache.CacheFactory} based on Infinispan.
+ * 
+ * @version $Id$
+ * @since 3.3M1
+ */
+@Component
+@Named("infinispan/local")
+@Singleton
+@Deprecated
+public class LocalInfinispanCacheFactory implements CacheFactory
 {
-    public RectangleEdgeChartParam(String name)
-    {
-        super(name);
-    }
-
-    public RectangleEdgeChartParam(String name, boolean isOptional)
-    {
-        super(name, isOptional);
-    }
+    /**
+     * Don't do anything special and redirect to standard Infinispan implementation instead.
+     */
+    @Inject
+    @Named("infinispan")
+    private CacheFactory infinispanCacheFactory;
 
     @Override
-    public Class getType()
+    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
     {
-        return RectangleEdge.class;
-    }
-
-    @Override
-    protected void init()
-    {
-        addChoice("top", RectangleEdge.TOP);
-        addChoice("bottom", RectangleEdge.BOTTOM);
-        addChoice("left", RectangleEdge.LEFT);
-        addChoice("right", RectangleEdge.RIGHT);
+        return this.infinispanCacheFactory.newCache(config);
     }
 }

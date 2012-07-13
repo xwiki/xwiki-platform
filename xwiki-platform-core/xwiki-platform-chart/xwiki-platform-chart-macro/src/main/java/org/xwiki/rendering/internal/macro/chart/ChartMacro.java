@@ -30,13 +30,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.environment.Environment;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -78,22 +76,17 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     private ChartGenerator chartGenerator;
 
     /**
-     * Used for getting web URLs from specific filenames.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
      * The component manager needed for instantiating the datasource factory.
      */
     @Inject
     private ComponentManager componentManager;
 
     /**
-     * The environment of the current module.
+     * Used to compute the chart image storage location and URL to access it.
      */
     @Inject
-    private Environment environment;
+    @Named("tmp")
+    private ImageLocator imageLocator;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -114,9 +107,10 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     public List<Block> execute(ChartMacroParameters macroParams, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        String imageLocation =
-            this.documentAccessBridge.getDocumentURL(null, "charting", null, null)
-                + "/" + generateChart(macroParams, content);
+        // Generate the chart image in a temporary location.
+        generateChart(macroParams, content, context);
+
+        String imageLocation = this.imageLocator.getURL(new ImageId(macroParams));
         String title = macroParams.getTitle();
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
@@ -138,24 +132,23 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     /**
      * Builds the chart image according to the specifications passed in.
      *
-     * @param parameters macro parameters
-     * @param content macro content
-     * @return the name of the generated image file
+     * @param parameters the macro parameters
+     * @param content the macro content
+     * @param context the macro transformation context, used for example to find out the current document reference
      * @throws MacroExecutionException if an error occurs while generating / saving the chart image
      */
-    private String generateChart(ChartMacroParameters parameters, String content)
+    private void generateChart(ChartMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        File chartFile;
         try {
             DataSource dataSource = this.componentManager.getInstance(DataSource.class, parameters.getSource());
             Map<String, String> sourceParameters = getSourceParameters(parameters);
 
-            dataSource.buildDataset(content, sourceParameters);
+            dataSource.buildDataset(content, sourceParameters, context);
 
             byte[] chart = this.chartGenerator.generate(dataSource.getChartModel(), sourceParameters);
-            chartFile = getChartImageFile(parameters);
-            FileOutputStream fos = new FileOutputStream(chartFile);
+            File imageFile = this.imageLocator.getStorageLocation(new ImageId(parameters));
+            FileOutputStream fos = new FileOutputStream(imageFile);
             fos.write(chart);
             fos.close();
         } catch (ComponentLookupException ex) {
@@ -166,19 +159,6 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while saving chart image.", ex);
         }
-        return chartFile.getName();
-    }
-
-    /**
-     * Returns the temporary file into which the chart image will be saved.
-     *
-     * @param parameters macro parameters
-     * @return the chart image file
-     */
-    protected File getChartImageFile(ChartMacroParameters parameters)
-    {
-        File chartsDir = new File(this.environment.getTemporaryDirectory(), "charts");
-        return new File(chartsDir, Math.abs(parameters.hashCode()) + ".png");
     }
 
     /**

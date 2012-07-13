@@ -24,6 +24,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -39,6 +41,7 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,6 +55,9 @@ import com.xpn.xwiki.doc.merge.MergeResult;
  */
 public class DocumentImporterHandler extends DocumentHandler
 {
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentImporterHandler.class);
+
     private XarFile previousXarFile;
 
     private DefaultPackager packager;
@@ -60,6 +66,8 @@ public class DocumentImporterHandler extends DocumentHandler
 
     private PackageConfiguration configuration;
 
+    private EntityReferenceSerializer<String> compactWikiSerializer;
+
     /**
      * Attachment are imported before trying to merge a document for memory handling reasons so we need to know if there
      * was really an existing document before starting to import attachments.
@@ -67,8 +75,12 @@ public class DocumentImporterHandler extends DocumentHandler
     private Boolean hasCurrentDocument;
 
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
+        throws ComponentLookupException
     {
         super(componentManager, wiki);
+
+        this.compactWikiSerializer =
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
         this.packager = packager;
     }
@@ -97,6 +109,11 @@ public class DocumentImporterHandler extends DocumentHandler
         }
 
         return userReference;
+    }
+
+    private String getUserString(XWikiContext context)
+    {
+        return this.compactWikiSerializer.serialize(getUserReference(context), getDocument().getDocumentReference());
     }
 
     private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws Exception
@@ -173,6 +190,11 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument currentDocument = getDatabaseDocument();
             XWikiDocument nextDocument = getDocument();
 
+            if (this.configuration.isLogEnabled()) {
+                LOGGER.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
+                    nextDocument.getRealLanguage());
+            }
+
             // Merge and save
             if (currentDocument != null && this.hasCurrentDocument == Boolean.TRUE) {
                 XWikiDocument previousDocument = getPreviousDocument();
@@ -188,6 +210,15 @@ public class DocumentImporterHandler extends DocumentHandler
                     if (documentMergeResult.isModified()) {
                         if (this.configuration.isInteractive()
                             && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+                            // Indicate future author to whoever is going to answer the question
+                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            DocumentReference userReference = getUserReference(context);
+                            nextDocument.setAuthorReference(userReference);
+                            nextDocument.setContentAuthorReference(userReference);
+                            mergedDocument.setAuthorReference(userReference);
+                            mergedDocument.setContentAuthorReference(userReference);
+
                             XWikiDocument documentToSave =
                                 askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument);
 
@@ -204,9 +235,15 @@ public class DocumentImporterHandler extends DocumentHandler
                             mergedDocument.getLanguage()), documentMergeResult);
                 } else {
                     // already existing document in database but without previous version
-                    if (!currentDocument.equals(nextDocument)) {
+                    if (!currentDocument.equalsData(nextDocument)) {
                         XWikiDocument documentToSave;
                         if (this.configuration.isInteractive()) {
+                            // Indicate future author to whoever is going to answer the question
+                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            DocumentReference userReference = getUserReference(context);
+                            nextDocument.setAuthorReference(userReference);
+                            nextDocument.setContentAuthorReference(userReference);
+
                             documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, null);
                         } else {
                             documentToSave = nextDocument;
@@ -214,7 +251,7 @@ public class DocumentImporterHandler extends DocumentHandler
 
                         if (documentToSave != currentDocument) {
                             saveDocument(documentToSave, comment, context);
-                        }   
+                        }
                     }
                 }
             } else {
@@ -282,16 +319,16 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiContext context = getXWikiContext();
 
             // Set proper author
-            // TODO: add a setAuthorReference in XWikiAttachment
             XWikiDocument document = getDocument();
-            document.setAuthorReference(context.getUserReference());
-            attachment.setAuthor(document.getAuthor());
+            document.setAuthorReference(getUserReference(context));
+            attachment.setAuthor(getUserString(context));
 
             XWikiDocument dbDocument = getDatabaseDocument();
 
             XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());
 
             if (dbAttachment == null) {
+                attachment.setDoc(dbDocument);
                 dbDocument.getAttachmentList().add(attachment);
             } else {
                 dbAttachment.setContent(attachment.getContentInputStream(context));

@@ -24,6 +24,7 @@ import java.util.Map;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * A data source is able to provide a data set for chart generation.
@@ -46,11 +47,13 @@ public interface DataSource
     /**
      * Decodes the given macroContent / extraParams and builds a Data Set.
      *
-     * @param macroContent content of the macro.
-     * @param parameters parameters provided for the source.
-     * @throws MacroExecutionException if something goes wrong while decoding source / parameters.
+     * @param macroContent the content of the macro
+     * @param parameters the parameters provided for the source
+     * @param context the macro transformation context, used for example to find out the current document reference
+     * @throws MacroExecutionException if something goes wrong while decoding source / parameters
      */
-    void buildDataset(String macroContent, Map<String, String> parameters) throws MacroExecutionException;
+    void buildDataset(String macroContent, Map<String, String> parameters, MacroTransformationContext context)
+        throws MacroExecutionException;
 
     /**
      * {@link #buildDataset} must be called before this method.

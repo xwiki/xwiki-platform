@@ -56,12 +56,6 @@ import org.xwiki.velocity.VelocityManager;
 
 import static org.xwiki.rendering.test.BlockAssert.*;
 
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-
-
 /**
  * Unit tests for {@link IncludeMacro}.
  * 

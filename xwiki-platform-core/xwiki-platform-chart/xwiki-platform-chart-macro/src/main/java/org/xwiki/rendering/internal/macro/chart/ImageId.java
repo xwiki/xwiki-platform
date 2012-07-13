@@ -17,33 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.charts.params;
+package org.xwiki.rendering.internal.macro.chart;
 
-import org.jfree.chart.axis.DateTickMarkPosition;
+import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
-public class DateTickMarkPositionChartParam extends ChoiceChartParam
+/**
+ * Compute a unique id for the image that the chart macro generates.
+ *
+ * @version $Id$
+ * @since 4.2M1
+ */
+public class ImageId
 {
-    public DateTickMarkPositionChartParam(String name)
+    /**
+     * @see ImageId#ImageId(org.xwiki.rendering.macro.chart.ChartMacroParameters)
+     */
+    private ChartMacroParameters macroParameters;
+
+    /**
+     * @param macroParameters the chart macro parameters
+     */
+    public ImageId(ChartMacroParameters macroParameters)
     {
-        super(name);
+        this.macroParameters = macroParameters;
     }
 
-    public DateTickMarkPositionChartParam(String name, boolean optional)
+    /**
+     * Compute a unique id based on the macro parameters.
+     *
+     * @return the unique image id used for storing the generated chart image
+     */
+    public String getId()
     {
-        super(name, optional);
-    }
-
-    @Override
-    protected void init()
-    {
-        addChoice("start", DateTickMarkPosition.START);
-        addChoice("middle", DateTickMarkPosition.MIDDLE);
-        addChoice("end", DateTickMarkPosition.END);
-    }
-
-    @Override
-    public Class getType()
-    {
-        return DateTickMarkPosition.class;
+        return String.format("%s", Math.abs(this.macroParameters.hashCode()));
     }
 }

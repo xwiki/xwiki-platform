@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1321509118000</creationDate>
-  <date>1332154820000</date>
-  <contentUpdateDate>1332154820000</contentUpdateDate>
+  <date>1342023498000</date>
+  <contentUpdateDate>1342023498000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -278,6 +278,8 @@ XWiki.ExtensionBehaviour = Class.create({
   _enhanceInstallBehaviour : function() {
     var installButton = this.container.down('input[name="actionInstall"]');
     installButton &amp;&amp; installButton.observe('click', this._startJob.bindAsEventListener(this));
+    var installGloballyButton = this.container.down('input[name="actionInstallGlobally"]');
+    installGloballyButton &amp;&amp; installGloballyButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
   /**
@@ -286,6 +288,8 @@ XWiki.ExtensionBehaviour = Class.create({
   _enhanceUninstallBehaviour : function() {
     var uninstallButton = this.container.down('input[name="actionUninstall"]');
     uninstallButton &amp;&amp; uninstallButton.observe('click', this._startJob.bindAsEventListener(this));
+    var uninstallGloballyButton = this.container.down('input[name="actionUninstallGlobally"]');
+    uninstallGloballyButton &amp;&amp; uninstallGloballyButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
   /**
@@ -668,7 +672,7 @@ return XWiki;
   padding: 2px 0 2px 1.8em;
 }
 
-.extension-version {
+.extension-version, .extension-namespace {
   color: $theme.textSecondaryColor;
   margin-left: 1em;
   font-weight: normal;
@@ -1046,18 +1050,7 @@ ul.extension-metadata li {
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
 
 #set ($extensionManager = $services.extension)
-
-#if ($request.extensionWiki &amp;&amp; $request.extensionWiki.trim() != '')
-  #set($extensionWiki = $request.extensionWiki)
-#else
-  #if (!$xcontext.isMainWiki())
-    #set($extensionWiki = $xcontext.database)
-  #end
-#end
-
-#if ($extensionWiki)
-  #set($extensionNamespace = "wiki:${extensionWiki}")
-#end
+#set ($extensionNamespace = "wiki:$xcontext.database")
 
 #macro (displayExtensionSearchBar)
   (% class="extension-search-bar" %)(((
@@ -1096,10 +1089,6 @@ ul.extension-metadata li {
             &lt;dd&gt;&lt;input type="text" name="extensionId" id="advancedExtensionSearch-id" value="" /&gt;&lt;/dd&gt;
             &lt;dt&gt;&lt;label for="advancedExtensionSearch-version"&gt;$msg.get('extensions.advancedSearch.version.label')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;&lt;input type="text" name="extensionVersion" id="advancedExtensionSearch-version" value="" /&gt;&lt;/dd&gt;
-            #if ($xcontext.isMainWiki() &amp;&amp; $xwiki.isVirtualMode())
-              &lt;dt&gt;&lt;label for="advancedExtensionSearch-wiki"&gt;$msg.get('extensions.advancedSearch.wiki.label')&lt;/label&gt;&lt;/dt&gt;
-              &lt;dd&gt;&lt;input type="text" name="extensionWiki" id="advancedExtensionSearch-wiki" value="" /&gt;&lt;/dd&gt;
-            #end
           &lt;/dl&gt;
           &lt;p&gt;
             #em_submitButton('extensions.advancedSearch.actions.submit')
@@ -1155,21 +1144,20 @@ ul.extension-metadata li {
         #if(!$extensionStatus)
           #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
         #end
-        #if ($extensionStatus == 'installed' &amp;&amp; ($xcontext.isMainWiki() || !$extension.isInstalled(null)))
+        #if ($extensionStatus == 'installed')
           ## This extension can be uninstalled.
-          #em_submitButton('extensions.actions.uninstall' 'actionUninstall' true)
+          #extensionActionButton($extension 'uninstall' true)
         #elseif ($extensionStatus == 'remote')
           ## Installable extension.
-          #em_submitButton('extensions.actions.install' 'actionInstall')
+          #extensionActionButton($NULL 'install')
         #elseif ($extensionStatus == 'remote-installed')
           ## An extension that can be either upgraded or downgraded.
           ## Compare this version with the version that is currently installed to determine which button to display.
-          #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace).id.version)
-          #if ($extension.id.version.compareTo($currentVersion) &gt; 0)
-            #em_submitButton('extensions.actions.upgrade' 'actionInstall')
+          #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+          #if ($extension.id.version.compareTo($installedExtension.id.version) &gt; 0)
+            #extensionActionButton($installedExtension 'upgrade')
           #else
-            ## TODO: Uncomment the following line when extension manager will support downgrading an extension.
-            ##em_submitButton('extensions.actions.downgrade' 'actionInstall' true)
+            #extensionActionButton($installedExtension 'downgrade' true)
           #end
         #end
       #end
@@ -1226,7 +1214,7 @@ ul.extension-metadata li {
   #end
   ## Display the progress tab if the install/uninstall plan is requested or if there is 
   ## a previously stored job status for this extension (a previous install or uninstall).
-  #set ($planRequested = $request.actionInstall || $request.actionUninstall)
+  #set ($planRequested = $request.actionInstall || $request.actionInstallGlobally || $request.actionUninstall || $request.actionUninstallGlobally)
   #if (!$planRequested)
     #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #end
@@ -1257,18 +1245,32 @@ ul.extension-metadata li {
     #if ($extension.features.size() &gt; 0)
       * $msg.get('extensions.info.features') $extension.features
     #end
-    #if ($xwiki.virtualMode)
-      #if (!$extension.namespaces || $extension.namespaces.size() == 0)
-        * $msg.get('extensions.info.namespaces.global')
-      #else
-        * $msg.get('extensions.info.namespaces.list') #foreach ($namespace in $extension.namespaces)$namespace#if($foreach.hasNext), #end#end
-
-      #end
+    #if ($xwiki.isVirtualMode())
+      * #displayExtensionDetails_description_wikis($extension)
     #end
     ##
     ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax, server side generated HTML, etc)
     ## $!extension.description
   )))
+#end
+
+#macro (displayExtensionDetails_description_wikis $extension)
+  #if (!$extension.namespaces || $extension.namespaces.isEmpty())
+    ## The given extension was installed globally.
+    $msg.get('extensions.info.namespaces.global')
+  #else
+    ## List the wikis where the given extension was installed.
+    #set ($firstWiki = true)
+    $msg.get('extensions.info.namespaces.list') ##
+    #foreach ($namespace in $extension.namespaces)
+      #if (!$firstWiki), #end##
+      #if ($namespace.startsWith('wiki:'))
+        #set ($firstWiki = false)
+        $namespace.substring(5)##
+      #end
+    #end
+
+  #end
 #end
 
 #macro (displayExtensionDetails_releaseNotes $extension)
@@ -1303,8 +1305,8 @@ ul.extension-metadata li {
   #end
   (% class="dependency-item extension-item-$dependencyStatus" %)(((
     ${dependencyName}(% class="extension-version" %)$!{dependencyVersion}##
-    #if ("$!namespace" != '')
-      (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace])##
+    #if ($xwiki.isVirtualMode() &amp;&amp; $namespace.startsWith('wiki:'))
+      (% class="extension-namespace" %)$msg.get('extensions.info.dependency.wiki', [$namespace.substring(5)])##
     #end
     (% class="extension-status" %)$!dependencyStatusMessage
   )))
@@ -1343,14 +1345,18 @@ ul.extension-metadata li {
 
 #macro (displayExtensionDetails_progress $extension)
   #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-  #if ($jobStatus || $request.actionInstall || $request.actionUninstall)
+  #if ($jobStatus || $request.actionInstall || $request.actionInstallGlobally || $request.actionUninstall || $request.actionUninstallGlobally)
 
     {{id name="extension-body-progress-${extension.id.id}-${extension.id.version}" /}}
     (% class="extension-body-progress extension-body-section" %)(((
       #if ($request.actionInstall)
         #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
+      #elseif ($request.actionInstallGlobally)
+        #computeInstallPlan($extension.id.id $extension.id.version.value $NULL)
       #elseif ($request.actionUninstall)
         #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
+      #elseif ($request.actionUninstallGlobally)
+        #computeUninstallPlan($extension.id.id $extension.id.version.value $NULL)
       #else
         #printStatusLog($jobStatus)
         #if ($jobStatus.state == 'WAITING')
@@ -1496,11 +1502,7 @@ ul.extension-metadata li {
   #set ($discard = $extensionManager.install($extensionId, $extensionVersion, $extensionNamespace))
   #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
-    #if ($extensionWiki)
-      #set ($errorMessage = $msg.get('extensions.install.error.installFailure.onWiki', [$extensionId, $extensionVersion, $extensionWiki]))
-    #else
-      #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
-    #end
+    #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
     #if ($xcontext.action == 'get')
       ## AJAX request. Send error back.
       $response.sendError(400, $errorMessage)
@@ -1528,39 +1530,34 @@ ul.extension-metadata li {
     #if ($hasError)
       #printStatusLog($installPlan)
     #else
-      #set($extensionsToInstall = [])
-      #set($extensionsToUpgrade = [])
-      ##
+      ## Group the extensions by the actions that will be performed on them.
+      #set($extensionsByAction = {'INSTALL': [], 'UPGRADE': [], 'DOWNGRADE': [], 'UNINSTALL': []})
+      #set ($noAction = true)
       #foreach($planAction in $installPlan.actions)
-        #if ($planAction.action.name() == "INSTALL")
-          #set($void = $extensionsToInstall.add($planAction))
-        #elseif ($planAction.action.name() == "UPGRADE")
-          #set($void = $extensionsToUpgrade.add($planAction))
+        #set ($targetExtensions = $extensionsByAction.get($planAction.action.name()))
+        #if ($targetExtensions)
+          #set ($discard = $targetExtensions.add($planAction))
+          #set ($noAction = false)
         #end
       #end
       ##
-      #if ($extensionsToInstall.isEmpty() &amp;&amp; $extensionsToUpgrade.isEmpty())
+      #if ($noAction)
         {{info}}$msg.get('extensions.install.error.alreadyInstalled'){{/info}}
       #else
-        #if (!$extensionsToInstall.isEmpty())
-          $msg.get('extensions.install.list.new')
-          #foreach ($planAction in $extensionsToInstall)
-            * #displayDependency($planAction.extension $planAction.namespace)
-          #end
+        #foreach($entry in $extensionsByAction.entrySet())
+          #if (!$entry.value.isEmpty())
+            $msg.get("extensions.install.list.$entry.key.toLowerCase()")
+            #foreach ($planAction in $entry.value)
+              * #displayDependency($planAction.extension $planAction.namespace)
+            #end
 
-        #end
-        #if (!$extensionsToUpgrade.isEmpty())
-          $msg.get('extensions.install.list.upgrade')
-          #foreach ($planAction in $extensionsToUpgrade)
-            * #displayDependency($planAction.extension $planAction.namespace)
           #end
-
         #end
         {{html}}
           &lt;form action="" class="xform"&gt;
             &lt;div&gt;
               #extensionHiddenFormFields($extensionId $extensionVersion)
-              &lt;input name="actionInstall" type="hidden" /&gt;
+              &lt;input name="actionInstall#if ($request.actionInstallGlobally)Globally#end" type="hidden" /&gt;
               &lt;p&gt;
                 #em_submitButton('extensions.install.actions.submit' 'confirm')
                 #if ("$!{request.xback}" != '')
@@ -1576,7 +1573,16 @@ ul.extension-metadata li {
 #end
 
 #macro (uninstallExtension $extensionId $extensionVersion $extensionNamespace)
-  #set($discard = $extensionManager.uninstall($extensionId, $extensionNamespace))
+  #if ($extensionNamespace &amp;&amp; $xwiki.isVirtualMode())
+    ## Uninstall only from the specified wiki.
+    #set ($discard = $extensionManager.uninstall($extensionId, $extensionNamespace))
+  #else
+    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
+    #if ($extension)
+      ## Uninstall from the entire farm.
+      #set ($discard = $extensionManager.uninstall($extension.id))
+    #end
+  #end
   #set($lastError = $extensionManager.lastError)
   #if ($lastError)
     #set ($errorMessage = $msg.get('extensions.uninstall.error.uninstallFailure', [$extensionId, $extensionVersion]))
@@ -1593,7 +1599,18 @@ ul.extension-metadata li {
 #end
 
 #macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #set($uninstallPlan = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
+  #if ($extensionNamespace &amp;&amp; $xwiki.isVirtualMode())
+    ## Create the uninstall plan only for the specified wiki.
+    #set ($uninstallPlan = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
+  #else
+    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
+    #if ($extension)
+      ## Create the uninstall plan for the entire farm.
+      #set ($uninstallPlan = $extensionManager.createUninstallPlan($extension.id))
+    #else
+      #set ($uninstallPlan = $NULL)
+    #end
+  #end
   #if (!$uninstallPlan)
     {{error}}$msg.get('extensions.uninstall.error.prepareFailure', [$extensionId, $extensionVersion, $lasterror.message]){{/error}}
   #else
@@ -1618,7 +1635,7 @@ ul.extension-metadata li {
       #if ($extensionsToUninstall.isEmpty())
         {{info}}$msg.get('extensions.uninstall.error.notInstalled'){{/info}}
       #else
-        The following extensions will be removed:
+        $msg.get('extensions.uninstall.list')
         #foreach ($planAction in $extensionsToUninstall)
           * #displayDependency($planAction.extension $planAction.namespace)
         #end
@@ -1627,7 +1644,7 @@ ul.extension-metadata li {
           &lt;form action="" class="xform"&gt;
             &lt;div&gt;
               #extensionHiddenFormFields($extensionId $extensionVersion)
-              &lt;input name="actionUninstall" type="hidden" /&gt;
+              &lt;input name="actionUninstall#if ($request.actionUninstallGlobally)Globally#end" type="hidden" /&gt;
               &lt;p&gt;
                 #em_submitButton('extensions.uninstall.actions.submit' 'confirm')
                 #if ("$!{request.xback}" != '')
@@ -1670,6 +1687,25 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
+  ## Retrieve the job status for the current wiki and for the entire farm (if the current wiki is the main wiki).
+  #getExtensionJobStatusForNamespace($extensionId $extensionVersion $extensionNamespace $jobStatusForWiki)
+  #if ($xcontext.isMainWiki())
+    #getExtensionJobStatusForNamespace($extensionId $extensionVersion $NULL $jobStatusForFarm)
+  #end
+  #set ($return = $NULL)
+  #if (!$jobStatusForWiki)
+    #setVariable ("$return" $jobStatusForFarm)
+  #elseif (!$jobStatusForFarm)
+    #setVariable ("$return" $jobStatusForWiki)
+  ## Return the most recent job status.
+  #elseif ($jobStatusForFarm.startDate.after($jobStatusForWiki.startDate))
+    #setVariable ("$return" $jobStatusForFarm)
+  #else
+    #setVariable ("$return" $jobStatusForWiki)
+  #end
+#end
+
+#macro (getExtensionJobStatusForNamespace $extensionId $extensionVersion $extensionNamespace $return)
   ## Make sure the value of $return is always reset.
   #set ($return = $NULL)
   #setVariable ("$return" $NULL)
@@ -1707,8 +1743,12 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #if ($services.csrf.isTokenValid($request.form_token))
       #if ($request.actionInstall)
         #installExtension($request.extensionId $request.extensionVersion $extensionNamespace)
+      #elseif ($request.actionInstallGlobally)
+        #installExtension($request.extensionId $request.extensionVersion $NULL)
       #elseif ($request.actionUninstall)
         #uninstallExtension($request.extensionId $request.extensionVersion $extensionNamespace)
+      #elseif ($request.actionUninstallGlobally)
+        #uninstallExtension($request.extensionId $request.extensionVersion $NULL)
       #elseif ($request.actionContinue)
         #continueExtensionUpgrade($request.extensionId $request.extensionVersion)
       #else
@@ -1848,15 +1888,27 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   &lt;/span&gt;
 #end
 
+#macro(extensionActionButton $installedExtension $action $secondary)
+  #set ($actionName = 'Install')
+  #if ($action == 'uninstall')
+    #set ($actionName = 'Uninstall')
+  #end
+  #if (!$installedExtension || $installedExtension.isInstalled($extensionNamespace) || !$xwiki.isVirtualMode())
+    ## Button that targets only the current wiki.
+    #em_submitButton("extensions.actions.$action" "action$actionName" $secondary)
+  #end
+  #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+    ## Button that targets the entire farm.
+    #em_submitButton("extensions.actions.${action}Globally" "action${actionName}Globally" true)
+  #end
+#end
+
 #macro(extensionHiddenFormFields $extensionId $extensionVersion $noCSRFToken)
   #if (!$noCSRFToken)
     &lt;input name="form_token" value="$!services.csrf.getToken()" type="hidden" /&gt;
   #end
   &lt;input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" /&gt;
   &lt;input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" /&gt;
-  #if ($extensionWiki)
-    &lt;input name="extensionWiki" value="${escapetool.xml($extensionWiki)}" type="hidden" /&gt;
-  #end
   #if ($request.section)
     &lt;input name="section" value="$escapetool.xml($request.section)" type="hidden" /&gt;
   #end

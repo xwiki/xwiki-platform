@@ -60,7 +60,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
-import org.xwiki.test.AbstractMockingComponentTestCase;
 
 /**
  * Tests for FilesystemAttachmentStore.

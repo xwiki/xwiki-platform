@@ -385,7 +385,7 @@ var XWiki = (function(XWiki){
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
 
       // Get position of target textfield
-      var pos = this.fld.cumulativeOffset();
+      var pos = $(this.options.parentContainer).tagName.toLowerCase() == 'body' ? this.fld.cumulativeOffset() : this.fld.positionedOffset();
 
       // Container width is passed as an option, or field width if no width provided.
       // The 2px substracted correspond to one pixel of border on each side of the field,
@@ -567,7 +567,7 @@ var XWiki = (function(XWiki){
     //
     for (var i=0,len=arr.length;i<len;i++)
     {
-	  // Output is either emphasized or row value depending on source option
+      // Output is either emphasized or row value depending on source option
       var output = source.highlight ? this.emphasizeMatches(this.sInput, arr[i].value) : arr[i].value;
       if (arr[i].hint) {
         output += "<span class='hint'>" + arr[i].hint + "</span>";
@@ -629,6 +629,9 @@ var XWiki = (function(XWiki){
    */
   emphasizeMatches:function(input, value)
   {
+    if (!input) {
+      return value;
+    }
     // If the source declares that results are matching, we highlight them in the value
     var output = value,
         // Separate words (called fragments hereafter) in user input

@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -65,7 +66,7 @@ public class SearchResultsPane extends BaseElement
      * 
      * @param name the extension pretty name
      * @param version the extension version
-     * @return the pane displaying the specified extension
+     * @return the pane displaying the specified extension, {@code null} if not found
      */
     public ExtensionPane getExtension(String name, String version)
     {
@@ -73,7 +74,19 @@ public class SearchResultsPane extends BaseElement
         By xpath =
             By.xpath("//div[contains(@class, 'extension-item') and "
                 + "descendant::h2[contains(@class, 'extension-name') and . = '" + nameAndVersion + "']]");
-        return new ExtensionPane(getUtil().findElementWithoutWaiting(getDriver(), xpath));
+        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), xpath);
+        return found.size() == 1 ? new ExtensionPane(found.get(0)) : null;
+    }
+
+    /**
+     * Looks for the specified extension on the current results page.
+     * 
+     * @param extensionId the extension identifier
+     * @return the pane displaying the specified extension, {@code null} if not found
+     */
+    public ExtensionPane getExtension(ExtensionId extensionId)
+    {
+        return getExtension(extensionId.getId(), extensionId.getVersion().getValue());
     }
 
     /**

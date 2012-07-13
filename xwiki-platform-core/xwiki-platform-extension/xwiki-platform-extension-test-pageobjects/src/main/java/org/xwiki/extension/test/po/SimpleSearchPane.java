@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.BasePage;
 
 /**
  * Represents the simple extension search form.
@@ -68,6 +69,19 @@ public class SimpleSearchPane extends BaseElement
     }
 
     /**
+     * Selects the specified extension repository and waits for the search results to update.
+     * 
+     * @param repositoryId the repository identifier
+     * @return the search results pane
+     */
+    public SearchResultsPane selectRepository(String repositoryId)
+    {
+        getRepositorySelect().selectByValue(repositoryId);
+        new BasePage().waitUntilPageIsLoaded();
+        return new SearchResultsPane();
+    }
+
+    /**
      * Clicks on the 'Advanced search' link to open the advanced search pane.
      * 
      * @return the advanced search form
@@ -76,22 +90,6 @@ public class SimpleSearchPane extends BaseElement
     {
         advancedSearchLink.click();
         return new AdvancedSearchPane();
-    }
-
-    /**
-     * Searches for the extensions matching the given keywords.
-     * 
-     * @param keywords the keywords to search for
-     * @param repositoryId the extension repository to search into
-     * @return the search results pane
-     */
-    public SearchResultsPane search(CharSequence keywords, String repositoryId)
-    {
-        searchInput.clear();
-        getRepositorySelect().selectByValue(repositoryId);
-        searchInput.sendKeys(keywords);
-        searchInput.sendKeys(Keys.RETURN);
-        return new SearchResultsPane();
     }
 
     /**

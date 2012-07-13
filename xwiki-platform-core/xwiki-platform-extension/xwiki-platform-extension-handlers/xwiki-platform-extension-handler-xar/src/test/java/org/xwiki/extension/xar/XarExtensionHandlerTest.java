@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.xar;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.jmock.Expectations;
 import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
@@ -38,9 +40,14 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
+import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
+import org.xwiki.extension.xar.internal.handler.packager.Packager;
+import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -63,6 +70,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private XWikiStoreInterface mockStore;
 
+    private JobStatus mockJobStatus;
+
     private Map<DocumentReference, Map<String, XWikiDocument>> documents =
         new HashMap<DocumentReference, Map<String, XWikiDocument>>();
 
@@ -80,6 +89,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private DocumentReference contextUser;
 
+    private DefaultPackager defaultPackager;
+
     @Override
     @Before
     public void setUp() throws Exception
@@ -90,6 +101,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         this.repositoryUtil.setup();
 
         // mock
+
+        this.mockJobStatus = getMockery().mock(JobStatus.class);
 
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
@@ -247,6 +260,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         this.taskManager = getComponentManager().getInstance(JobManager.class);
         this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
+        this.defaultPackager = getComponentManager().getInstance(Packager.class);
 
         // Get rid of wiki macro listener
         getComponentManager().<ObservationManager> getInstance(ObservationManager.class).removeListener(
@@ -293,16 +307,10 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     public void testInstallOnWiki() throws Throwable
     {
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        existingDocument.setDefaultLanguage("en");
-        existingDocument.setTranslation(0);
-        existingDocument.setNew(false);
-        existingDocument.setVersion("1.1");
         BaseObject object = new BaseObject();
-        object.setXClassReference(new DocumentReference("wiki", "space", "object"));
+        object.setXClassReference(new DocumentReference("wiki", "space", "class"));
         existingDocument.addXObject(object);
-        Map<String, XWikiDocument> documentMap = new HashMap<String, XWikiDocument>();
-        documentMap.put(existingDocument.getRealLanguage(), existingDocument);
-        this.documents.put(existingDocument.getDocumentReference(), documentMap);
+        this.mockXWiki.saveDocument(existingDocument, "", getContext());
 
         // install
 
@@ -319,7 +327,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("Wrong content", "content", page.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", page.getVersion());
+        Assert.assertEquals("Wrong version", "2.1", page.getVersion());
 
         BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -332,7 +340,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getContext());
         Assert.assertFalse(pagewithattachment.isNew());
         Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
-        
+
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);
         Assert.assertEquals("attachment.txt", attachment.getFilename());
@@ -460,5 +468,54 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         pageWiki2 = this.mockXWiki.getDocument(new DocumentReference("wiki2", "space1", "page1"), getContext());
 
         Assert.assertTrue(pageWiki2.isNew());
+    }
+
+    // DocumentImporterHandler
+
+    private XWikiDocument importDocument(String resource, boolean interactive, String wiki)
+        throws ComponentLookupException, Exception
+    {
+        DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
+        if (interactive) {
+            configuration.setInteractive(interactive);
+            configuration.setJobStatus(this.mockJobStatus);
+        }
+
+        DocumentImporterHandler documentHandler =
+            new DocumentImporterHandler(this.defaultPackager, getComponentManager(), wiki);
+        documentHandler.setConfiguration(configuration);
+
+        InputStream is = getClass().getResourceAsStream(resource);
+        this.defaultPackager.parseDocument(is, documentHandler);
+
+        return documentHandler.getDocument();
+    }
+
+    @Test
+    public void testImportDocumentWithDifferentExistingDocument() throws Throwable
+    {
+        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                // Make sure it produces a conflict
+                oneOf(mockJobStatus).ask(with(anything()));
+            }
+        });
+
+        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
+
+        this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+    }
+
+    @Test
+    public void testImportDocumentWithEqualsExistingDocument() throws Throwable
+    {
+        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
+
+        // Does not produces any conflict
+        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
     }
 }

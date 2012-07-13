@@ -233,6 +233,7 @@
             <exclude>org/xwiki/chart/model/ChartModel</exclude>
             <!-- TODO Andreas: Explain why we have to break backward compatibility for the Chart module -->
             <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+            <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
             <!-- Removed protected method (registerWikiMacros) that was not supposed to be used from outside
                 (was protected for unit tests hacks. -->
             <exclude>com/xpn/xwiki/XWiki</exclude>

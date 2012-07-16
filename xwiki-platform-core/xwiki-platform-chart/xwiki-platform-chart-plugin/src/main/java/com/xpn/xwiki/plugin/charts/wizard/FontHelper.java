@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,24 +16,35 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package com.xpn.xwiki.plugin.charts.wizard;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-chart</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Chart - Parent POM</name>
-  <description>Support for generating charts inside XWiki</description>
-  <modules>
-    <!-- Sorted alphabetically -->
-    <module>xwiki-platform-chart-macro</module>
-    <module>xwiki-platform-chart-plugin</module>
-    <module>xwiki-platform-chart-renderer</module>
-  </modules>
-</project>
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+
+public class FontHelper
+{
+    public FontHelper()
+    {
+    }
+
+    public String getFontStyleAsString(Font font)
+    {
+        int style = font.getStyle();
+        if (style == Font.BOLD) {
+            return "bold";
+        }
+        if (style == Font.ITALIC) {
+            return "italic";
+        }
+        if (style == Font.BOLD + Font.ITALIC) {
+            return "bold+italic";
+        }
+        return "plain";
+    }
+
+    public String[] getAvailableFonts()
+    {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    }
+}

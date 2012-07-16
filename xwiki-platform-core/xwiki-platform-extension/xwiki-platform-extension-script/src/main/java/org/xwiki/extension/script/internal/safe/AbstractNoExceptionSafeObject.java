@@ -49,7 +49,19 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
      */
     public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider< ? > safeProvider, Execution execution)
     {
-        super(wrapped, safeProvider);
+        this(wrapped, safeProvider, execution, false);
+    }
+
+    /**
+     * @param wrapped the wrapped object
+     * @param safeProvider the provider of instances safe for public scripts
+     * @param execution provide access to the current context
+     * @param hasProgrammingRight does the caller script has programming right
+     */
+    public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider< ? > safeProvider, Execution execution,
+        boolean hasProgrammingRight)
+    {
+        super(wrapped, safeProvider, hasProgrammingRight);
 
         this.execution = execution;
     }

@@ -31,10 +31,10 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
 /**
- * Proxy Component Manager that creates and queries individual Component Managers specific to the current wiki in
- * the Execution Context. These Component Managers are created on the fly the first time a component is registered
- * for the current wiki.
- *  
+ * Proxy Component Manager that creates and queries individual Component Managers specific to the current wiki in the
+ * Execution Context. These Component Managers are created on the fly the first time a component is registered for the
+ * current wiki.
+ * 
  * @version $Id$
  * @since 2.1RC1
  */
@@ -48,7 +48,7 @@ public class WikiComponentManager extends AbstractGenericComponentManager implem
      */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
-    
+
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */

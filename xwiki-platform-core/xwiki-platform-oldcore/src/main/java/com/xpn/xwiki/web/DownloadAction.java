@@ -89,6 +89,17 @@ public class DownloadAction extends XWikiAction
         XWikiPluginManager plugins = context.getWiki().getPluginManager();
         attachment = plugins.downloadAttachment(attachment, context);
 
+        // Try to load the attachment content just to make sure that the attachment really exists
+        // This will throw an exception if the attachment content isn't available
+        try {
+            attachment.getContentSize(context);
+        } catch (XWikiException e) {
+            Object[] args = {filename};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                "Attachment content {0} not found", null, args);
+        }
+
         long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
         long lastModifiedOnServer = attachment.getDate().getTime();
         if (lastModifiedOnClient != -1 && lastModifiedOnClient >= lastModifiedOnServer) {
@@ -215,11 +226,6 @@ public class DownloadAction extends XWikiAction
             response.setContentLength(attachment.getContentSize(context));
             stream = attachment.getContentInputStream(context);
             IOUtils.copy(stream, response.getOutputStream());
-        } catch (XWikiException e) {
-            Object[] args = {filename};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                "Attachment content {0} not found", null, args);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,

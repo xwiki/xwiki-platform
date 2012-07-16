@@ -25,8 +25,10 @@ import java.util.Map;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
@@ -44,10 +46,12 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
      * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
      * @param execution provide access to the current context
+     * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
+    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+        boolean hasProgrammingRight)
     {
-        super(repository, safeProvider, execution);
+        super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
     // LocalExtensionRepository
@@ -67,13 +71,39 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     @Override
     public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
     {
-        throw new UnsupportedOperationException("Calling installExtension is forbidden in script proxy");
+        if (!this.hasProgrammingRight) {
+            setError(new UnsupportedOperationException(FORBIDDEN));
+
+            return null;
+        }
+
+        setError(null);
+
+        try {
+            return safe(getWrapped().installExtension(extension, namespace, dependency));
+        } catch (InstallException e) {
+            setError(e);
+        }
+
+        return null;
     }
 
     @Override
     public void uninstallExtension(InstalledExtension extension, String namespace)
     {
-        throw new UnsupportedOperationException("Calling uninstallExtension is forbidden in script proxy");
+        if (!this.hasProgrammingRight) {
+            setError(new UnsupportedOperationException(FORBIDDEN));
+
+            return;
+        }
+
+        setError(null);
+
+        try {
+            getWrapped().uninstallExtension(extension, namespace);
+        } catch (UninstallException e) {
+            setError(e);
+        }
     }
 
     @Override

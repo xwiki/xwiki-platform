@@ -157,14 +157,24 @@ public class ExtensionManagerScriptService implements ScriptService
     private ScriptSafeProvider scriptProvider;
 
     /**
+     * Wrap the passed value in proper readonly wrapper if the script does not have programming right.
+     * 
      * @param <T> the type of the object
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
      */
     @SuppressWarnings("unchecked")
-    private <T> T safe(T unsafe)
+    private <S, T> S safe(T unsafe)
     {
-        return (T) this.scriptProvider.get(unsafe);
+        S safe;
+
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            safe = (S) this.scriptProvider.get(unsafe);
+        } else {
+            safe = (S) unsafe;
+        }
+
+        return safe;
     }
 
     // Repositories

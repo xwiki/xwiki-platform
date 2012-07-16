@@ -185,8 +185,8 @@ public class ExtensionPane extends BaseElement
         // Wait until the progress section contains a confirmation button or no loading log items.
         return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']/*"
             + "[@class = 'extension-body-progress extension-body-section' and "
-            + "(descendant::input[@name = 'confirm'] or "
-            + "not(descendant::div[contains(@class, 'extension-log-item-loading')]))]");
+            + "(descendant::input[@name = 'confirm' and not(@disabled)] or "
+            + "count(descendant::div[contains(@class, 'extension-log-item-loading')]) = 0)]");
     }
 
     /**
@@ -341,7 +341,8 @@ public class ExtensionPane extends BaseElement
      */
     public ProgressBarPane getProgressBar()
     {
-        return new ProgressBarPane(getUtil().findElementWithoutWaiting(getDriver(), container,
-            By.className("ui-progress")));
+        List<WebElement> found =
+            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("ui-progress"));
+        return found.size() != 1 ? null : new ProgressBarPane(found.get(0));
     }
 }

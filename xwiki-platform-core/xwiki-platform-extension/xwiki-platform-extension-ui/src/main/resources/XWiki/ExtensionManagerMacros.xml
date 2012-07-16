@@ -332,8 +332,8 @@ XWiki.ExtensionBehaviour = Class.create({
       // Add the progress menu.
       this.container.down('.innerMenu').insert('&lt;li&gt;&lt;span class="wikilink"&gt;&lt;a href="#' + progressSectionAnchor + '"&gt;$msg.get('extensions.info.category.progress')&lt;/a&gt;&lt;/span&gt;&lt;/li&gt;');
     } else if (progressSection.down('.extension-log-item-loading')) {
-      // Just hide the question that has been answered if there is any progress item loading.
-      progressSection.down('form').hide();
+      // Disable and hide the question that has been answered if there is any progress item loading.
+      progressSection.down('form').disable().hide();
     } else {
       // Hide all the contents of the progress section and display the loading animation.
       progressSection.childElements().invoke('hide');
@@ -367,6 +367,9 @@ XWiki.ExtensionBehaviour = Class.create({
       // Show the contents of the progress section and remove the loading animation.
       progressSection.childElements().invoke('show');
       progressSection.removeClassName('loading');
+      // Re-enable the form that failed to be submitted.
+      var form = progressSection.down('form');
+      form &amp;&amp; form.enable();
     }
   },
 
@@ -1440,16 +1443,17 @@ ul.extension-metadata li {
     #em_submitButton('extensions.actions.diff' 'diff' true)
   )))
   #if ($originalDocument &amp;&amp; $revisedDocument)
-
-    {{html}}
-    #set ($rev1 = $originalVersion.toLowerCase())
-    #set ($rev2 = $revisedVersion.toLowerCase())
-    #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
-    #set ($origdoc = $wrappedDocs.get(0))
-    #set ($newdoc = $wrappedDocs.get(1))
-    #set ($headingLevel = 4)
-    #template('changesdoc.vm')
-    {{/html}}
+    (% id="changescontent" %)(((
+      {{html}}
+      #set ($rev1 = $originalVersion.toLowerCase())
+      #set ($rev2 = $revisedVersion.toLowerCase())
+      #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
+      #set ($origdoc = $wrappedDocs.get(0))
+      #set ($newdoc = $wrappedDocs.get(1))
+      #set ($headingLevel = 4)
+      #template('changesdoc.vm')
+      {{/html}}
+    )))
   #end
 #end
 

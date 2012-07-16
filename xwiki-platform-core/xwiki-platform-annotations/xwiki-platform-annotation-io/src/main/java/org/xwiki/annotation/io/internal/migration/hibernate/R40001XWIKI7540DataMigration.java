@@ -111,23 +111,31 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         return new XWikiDBVersion(40001);
     }
 
-    @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    /**
+     * Check if the migration can be executed by verifying if the current annotation class is the default one and that
+     * the comments class does not have any custom mappings set up.
+     * <p/>
+     * Note: We can not do this in {@link #shouldExecute(XWikiDBVersion)} because we need to read the database and we
+     * can not do that until the previous migrations are executed.
+     * 
+     * @return true if the migration can be executed, false otherwise.
+     * @throws DataMigrationException if the annotation or comments class can not be properly retrieved
+     */
+    protected boolean checkAnnotationsAndComments() throws DataMigrationException
     {
         XWikiContext context = getXWikiContext();
         String resultOfSkippingDatabase = "Comments and anotations will remain separated";
 
-        EntityReference currentAnnotationClassReference = configuration.getAnnotationClassReference();
-        currentAnnotationClassReference =
-            currentAnnotationClassReference.removeParent(new WikiReference(context.getDatabase()));
-        if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
-            logger.warn(
-                "Skipping database [{}] because it uses a custom annotation class. " + resultOfSkippingDatabase,
-                context.getDatabase());
-            return false;
-        }
-
         try {
+            EntityReference currentAnnotationClassReference = configuration.getAnnotationClassReference();
+            currentAnnotationClassReference =
+                currentAnnotationClassReference.removeParent(new WikiReference(context.getDatabase()));
+            if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
+                logger.warn("Skipping database [{}] because it uses a custom annotation class. "
+                    + resultOfSkippingDatabase, context.getDatabase());
+                return false;
+            }
+
             BaseClass commentsClass = context.getWiki().getCommentsClass(context);
             if (commentsClass.hasCustomMapping()) {
                 logger.warn("Skipping database [{}] because it uses a custom mapping for comments. "
@@ -136,8 +144,11 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             }
         } catch (Exception e) {
             // Should not happen
-            logger.error("Failed to check the comments class for custom mappings. Migration will not execute", e);
-            return false;
+            String message =
+                "Failed to check the current annotation and comments classes for customizations. "
+                    + "Migration will not execute";
+            logger.error(message, e);
+            throw new DataMigrationException(message, e);
         }
 
         return true;
@@ -146,6 +157,11 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
+        // Check if the migration can be executed.
+        if (!checkAnnotationsAndComments()) {
+            return;
+        }
+
         // Clear any existing migration data/cache from previously migrated wikis.
         documentToDatedObjectsMap.clear();
         objectToPropertiesMap.clear();

@@ -1836,7 +1836,8 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       &lt;a href="$xwiki.getURL($argument)"&gt;$escapetool.xml($services.model.serialize($argument))&lt;/a&gt;##
     #elseif ($className == 'org.xwiki.extension.ExtensionId')
       #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
-      &lt;a href="#getExtensionURL($argument.id, $argument.version.value)" class="extension-link"&gt;$escapetool.xml($_extension.name)&lt;/a&gt;##
+      #set ($_extensionName = "#displayExtensionName($_extension)")
+      &lt;a href="#getExtensionURL($argument.id, $argument.version.value)" class="extension-link"&gt;$escapetool.xml($_extensionName) $escapetool.xml($argument.version.value)&lt;/a&gt;##
     #else
       $escapetool.xml($argument)##
     #end

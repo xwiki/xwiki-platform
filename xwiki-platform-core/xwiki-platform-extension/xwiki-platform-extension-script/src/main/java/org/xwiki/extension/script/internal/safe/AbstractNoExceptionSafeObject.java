@@ -37,6 +37,13 @@ import org.xwiki.extension.script.internal.ExtensionManagerScriptService;
 public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObject<T>
 {
     /**
+     * Indicate of the object should behave as if the caller scripts had programming right.
+     * 
+     * @since 4.2M1
+     */
+    protected boolean hasProgrammingRight;
+
+    /**
      * Provides access to the current context.
      */
     @Inject
@@ -61,9 +68,10 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
     public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider< ? > safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
-        super(wrapped, safeProvider, hasProgrammingRight);
+        super(wrapped, safeProvider);
 
         this.execution = execution;
+        this.hasProgrammingRight = hasProgrammingRight;
     }
 
     /**

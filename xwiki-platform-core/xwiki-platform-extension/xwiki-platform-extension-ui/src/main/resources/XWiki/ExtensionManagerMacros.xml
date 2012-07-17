@@ -1198,7 +1198,7 @@ ul.extension-metadata li {
         ## We need the tail of the log queue.
         #set ($logList = [])
         #set ($discard = $logList.addAll($jobStatus.log))
-        $!logList.get($mathtool.sub($logList.size(), 1)).formattedMessage
+        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
       #end
     )))
   #end
@@ -1808,7 +1808,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
         #if ($log.throwable)
           #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
           #if ($message.trim() == '')
-            #set ($message = $log.formattedMessage)
+            #set ($message = "#printLogMessage($log)")
           #end
           $message
 
@@ -1816,10 +1816,30 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
             #printThrowable($log.throwable)
           )))
         #else
-          $log.formattedMessage
+          #printLogMessage($log)
         #end
       )))
   #end
+#end
+
+#macro (printLogMessage $log)
+  ## We use the HTML macro because currently there's no easy way to escape wiki syntax.
+  {{html}}##
+  #set ($messageElements = $log.messageElements)
+  #foreach ($argument in $log.argumentArray)
+    $escapetool.xml($messageElements.get($mathtool.sub($velocityCount, 1)))##
+    #set ($className = $argument.class.name)
+    #if ($className == 'org.xwiki.model.reference.DocumentReference')
+      &lt;a href="$xwiki.getURL($argument)"&gt;$escapetool.xml($services.model.serialize($argument))&lt;/a&gt;##
+    #elseif ($className == 'org.xwiki.extension.ExtensionId')
+      #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
+      &lt;a href="#getExtensionURL($argument.id, $argument.version.value)"&gt;$escapetool.xml($_extension.name)&lt;/a&gt;##
+    #else
+      $escapetool.xml($argument)##
+    #end
+  #end
+  $escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
+  {{/html}}##
 #end
 
 #macro (computeXBack)

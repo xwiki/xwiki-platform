@@ -115,6 +115,11 @@ XWiki.ExtensionBehaviour = Class.create({
 
     this.container = container;
 
+    // The extension links (links to extension dependencies, links inside log messages) use the 'get' action when
+    // extension details are loaded asynchronously so we need to replace it with 'view' or 'admin' action, depending
+    // whether the extension is displayed alone or in the administration.
+    this._fixExtensionLinks();
+
     // Handle extension details.
     this._enhanceShowDetailsBehaviour();
 
@@ -124,9 +129,6 @@ XWiki.ExtensionBehaviour = Class.create({
 
     // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
     this._enhanceMenuBehaviour();
-
-    // Enhances the behaviour of the Dependencies section.
-    this._enhanceDependenciesBehaviour();
 
     // Enhances the behaviour of the Progress section.
     this._enhanceProgressBehaviour();
@@ -448,11 +450,12 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
-   * Enhances the behaviour of the Dependencies section within the extension details.
+   * Fix the extension links (links to extension dependencies, links inside log messages) when the extension details
+   * are loaded asynchronously because they use the 'get' action (specific to AJAX requests) instead of the 'view' or
+   * 'admin' action (depending whether the extension is displayed alone or in the administration section).
    */
-  _enhanceDependenciesBehaviour : function() {
-    // Fix dependencies links when the extension details are loaded asynchronously in the administration section.
-    this.container.select(".extension-body-dependencies a").each(function (link) {
+  _fixExtensionLinks : function() {
+    this.container.select("a.extension-link").each(function (link) {
       var action = XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view';
       var queryString = link.getAttribute('href').replace(/.*\?/, '');
       link.setAttribute('href', XWiki.currentDocument.getURL(action, queryString));
@@ -1307,7 +1310,7 @@ ul.extension-metadata li {
   #if ($dependencyExtension)
     #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage $dependencyOrExtension.versionConstraint)
     #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
-    #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$dependencyURL]]")
+    #set ($dependencyName = "[[#displayExtensionName($dependencyExtension)&gt;&gt;path:$dependencyURL||class=""extension-link""]]")
   #end
   (% class="dependency-item extension-item-$dependencyStatus" %)(((
     ${dependencyName}(% class="extension-version" %)$!{dependencyVersion}##
@@ -1833,7 +1836,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       &lt;a href="$xwiki.getURL($argument)"&gt;$escapetool.xml($services.model.serialize($argument))&lt;/a&gt;##
     #elseif ($className == 'org.xwiki.extension.ExtensionId')
       #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
-      &lt;a href="#getExtensionURL($argument.id, $argument.version.value)"&gt;$escapetool.xml($_extension.name)&lt;/a&gt;##
+      &lt;a href="#getExtensionURL($argument.id, $argument.version.value)" class="extension-link"&gt;$escapetool.xml($_extension.name)&lt;/a&gt;##
     #else
       $escapetool.xml($argument)##
     #end

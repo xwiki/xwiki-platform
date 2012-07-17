@@ -108,5 +108,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Required by wiki macros -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

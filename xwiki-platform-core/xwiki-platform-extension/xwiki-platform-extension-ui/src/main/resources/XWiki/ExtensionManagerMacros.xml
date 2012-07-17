@@ -162,15 +162,12 @@ XWiki.ExtensionBehaviour = Class.create({
   _submit : function(event, ajaxRequestParameters) {
     event.stop();
 
-    // Ignore consecutive requests, just handle the first one.
-    var form = event.element().form;
-    if (form.__disabled) {
-      return false;
-    }
-    form.__disabled = true;
-
     // Prepare the data for the AJAX call.
+    var form = event.element().form;
     var formData = new Hash(form.serialize({submit: event.element().name}));
+
+    // Disable the form to prevent it from being re-submitted while we wait for the response.
+    form.disable();
 
     // Default AJAX request parameters.
     var defaultAJAXRequestParameters = {
@@ -186,8 +183,8 @@ XWiki.ExtensionBehaviour = Class.create({
         response.request.options.onFailure(response);
       },
       onComplete : function() {
-        // Re-enable the button.
-        form.__disabled = false;
+        // Re-enable the form.
+        form.enable();
       }
     }
 
@@ -332,8 +329,8 @@ XWiki.ExtensionBehaviour = Class.create({
       // Add the progress menu.
       this.container.down('.innerMenu').insert('&lt;li&gt;&lt;span class="wikilink"&gt;&lt;a href="#' + progressSectionAnchor + '"&gt;$msg.get('extensions.info.category.progress')&lt;/a&gt;&lt;/span&gt;&lt;/li&gt;');
     } else if (progressSection.down('.extension-log-item-loading')) {
-      // Disable and hide the question that has been answered if there is any progress item loading.
-      progressSection.down('form').disable().hide();
+      // Just hide the question that has been answered if there is any progress item loading.
+      progressSection.down('form').hide();
     } else {
       // Hide all the contents of the progress section and display the loading animation.
       progressSection.childElements().invoke('hide');
@@ -367,9 +364,6 @@ XWiki.ExtensionBehaviour = Class.create({
       // Show the contents of the progress section and remove the loading animation.
       progressSection.childElements().invoke('show');
       progressSection.removeClassName('loading');
-      // Re-enable the form that failed to be submitted.
-      var form = progressSection.down('form');
-      form &amp;&amp; form.enable();
     }
   },
 
@@ -482,6 +476,9 @@ XWiki.ExtensionBehaviour = Class.create({
     // Execute Extension Manager jobs asynchronously.
     var confirmJobButton = this.container.down('input[name="confirm"]');
     confirmJobButton &amp;&amp; confirmJobButton.observe('click', this._startJob.bindAsEventListener(this));
+    // Compute the changes asynchronously when there is a merge conflict.
+    var diffButton = this.container.down('input[name="diff"]');
+    diffButton &amp;&amp; diffButton.observe('click', this._startJob.bindAsEventListener(this));
   }
 });
 
@@ -1227,7 +1224,8 @@ ul.extension-metadata li {
     #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #end
   #if ($planRequested || $jobStatus)
-    * #displayExtensionDetails_menuLink('progress' $planRequested)
+    #set ($selected = $planRequested || $jobStatus.state != 'FINISHED')
+    * #displayExtensionDetails_menuLink('progress' $selected)
   #end
 #end
 

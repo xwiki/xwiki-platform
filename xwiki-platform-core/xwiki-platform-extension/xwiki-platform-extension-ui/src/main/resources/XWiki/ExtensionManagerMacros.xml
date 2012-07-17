@@ -1831,15 +1831,22 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #set ($messageElements = $log.messageElements)
   #foreach ($argument in $log.argumentArray)
     $escapetool.xml($messageElements.get($mathtool.sub($velocityCount, 1)))##
-    #set ($className = $argument.class.name)
-    #if ($className == 'org.xwiki.model.reference.DocumentReference')
-      &lt;a href="$xwiki.getURL($argument)"&gt;$escapetool.xml($services.model.serialize($argument))&lt;/a&gt;##
-    #elseif ($className == 'org.xwiki.extension.ExtensionId')
-      #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
-      #set ($_extensionName = "#displayExtensionName($_extension)")
-      &lt;a href="#getExtensionURL($argument.id, $argument.version.value)" class="extension-link"&gt;$escapetool.xml($_extensionName) $escapetool.xml($argument.version.value)&lt;/a&gt;##
+    ## Assume the argument is an entity reference.
+    #set ($reference = $services.model.serialize($argument))
+    #if ($reference)
+      &lt;a href="$xwiki.getURL($argument)"&gt;$escapetool.xml($reference)&lt;/a&gt;##
     #else
-      $escapetool.xml($argument)##
+      ## Assume the argument is an extension dependency.
+      #set ($_extension = $extensionManager.resolve($argument))
+      #if (!$_extension)
+        ## Assume the argument is an extension id.
+        #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
+      #end
+      #if ($_extension)
+        &lt;a href="#getExtensionURL($_extension.id.id, $_extension.id.version.value)" class="extension-link"&gt;$escapetool.xml("#displayExtensionName($_extension)") $escapetool.xml($_extension.id.version.value)&lt;/a&gt;##
+      #else
+        $escapetool.xml($argument)##
+      #end
     #end
   #end
   $escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##

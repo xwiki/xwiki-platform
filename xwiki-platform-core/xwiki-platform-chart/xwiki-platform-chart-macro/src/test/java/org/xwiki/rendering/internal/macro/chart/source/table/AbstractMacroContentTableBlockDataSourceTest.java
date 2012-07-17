@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import org.jmock.Expectations;
-import org.xwiki.component.internal.DefaultComponentManager;
+import org.xwiki.component.internal.RootComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
@@ -54,7 +54,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 @ComponentList({
     PlainTextBlockRenderer.class,
     PlainTextRendererFactory.class,
-    DefaultComponentManager.class,
+    RootComponentManager.class,
     XWiki20Parser.class,
     XWiki20LinkReferenceParser.class,
     URLResourceReferenceTypeParser.class,

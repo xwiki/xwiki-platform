@@ -27,7 +27,6 @@ import org.jmock.Expectations;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.internal.DefaultComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.ircbot.IRCBot;

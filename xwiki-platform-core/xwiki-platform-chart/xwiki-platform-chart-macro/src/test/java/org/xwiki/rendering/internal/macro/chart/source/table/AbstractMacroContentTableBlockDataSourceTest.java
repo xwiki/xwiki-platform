@@ -19,8 +19,12 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jmock.Expectations;
-import org.xwiki.component.internal.RootComponentManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
@@ -32,18 +36,11 @@ import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-
-import java.io.StringReader;
-import java.util.Map;
-import java.util.HashMap;
-
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
-
-import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
  * Helper to write unit tests for Table-based data sources.
@@ -54,7 +51,6 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 @ComponentList({
     PlainTextBlockRenderer.class,
     PlainTextRendererFactory.class,
-    RootComponentManager.class,
     XWiki20Parser.class,
     XWiki20LinkReferenceParser.class,
     URLResourceReferenceTypeParser.class,

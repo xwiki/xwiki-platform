@@ -28,7 +28,7 @@ var XWiki = (function(XWiki){
     // Display a "no results" message, or simply hide the suggest box when no suggestions are available
     shownoresults : true,
     // The message to display as the "no results" message
-    noresults : "No results!",
+    noresults : "$msg.get('core.widgets.suggest.noResults')",
     maxheight : 250,
     cache : false,
     seps : "",
@@ -59,8 +59,8 @@ var XWiki = (function(XWiki){
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
-    displayValueText: "Value :",
-    // How to align the suggestion list when its with is different than the input field width
+    displayValueText: "$msg.get('core.widgets.suggest.valuePrefix')",
+    // How to align the suggestion list when its width is different from the input field width
     align: "left",
     // When there are several suggest sources, should the widget displays only one, unified, "loading" indicator for all requests undergoing,
     // Or should it displays one loading indicator per request next to the corresponding source.
@@ -309,7 +309,7 @@ var XWiki = (function(XWiki){
         requestHeaders: headers,
         onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
         onFailure: function (response) {
-          new XWiki.widgets.Notification("Failed to retrieve suggestions : ')" + response.statusText, "error", {timeout: 5});
+          new XWiki.widgets.Notification("$msg.get('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
         }
       });
     }

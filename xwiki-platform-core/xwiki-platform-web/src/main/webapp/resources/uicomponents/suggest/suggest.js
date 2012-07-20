@@ -55,6 +55,8 @@ var XWiki = (function(XWiki){
     highlight: true,
     // Fade the suggestion container on clear
     fadeOnClear: true,
+    // Show a 'hide suggestions' button
+    enableHideButton: true,
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
@@ -276,6 +278,7 @@ var XWiki = (function(XWiki){
       var pointer = this;
       var requestId = this.latestRequest;
       clearTimeout(this.ajID);
+      this.container.select('.hide-button-wrapper').invoke('hide');
       this.ajID = setTimeout( function() { pointer.doAjaxRequests(requestId) }, this.options.delay );
 
     }
@@ -502,6 +505,16 @@ var XWiki = (function(XWiki){
       }
     }
 
+    if (this.options.enableHideButton && !this.container.down('.hide-button')) {
+      var hideButton = new Element('span', {'class' : 'hide-button'}).update("$msg.get('core.widgets.suggest.hide')");
+      hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
+      this.container.insert({top : new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton)});
+
+      hideButton = new Element('span', {'class' : 'hide-button'}).update("$msg.get('core.widgets.suggest.hide')");
+      hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
+      this.container.insert({bottom : new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton)});
+    }
+
     var ev = this.container.fire("xwiki:suggest:containerPrepared", {
       'container' : this.container,
       'suggest' : this
@@ -551,6 +564,9 @@ var XWiki = (function(XWiki){
     if (div.down('ul')) {
       div.down('ul').remove();
     }
+
+    // Show the "hide suggestions" buttons
+    this.container.select('.hide-button-wrapper').invoke('show');
 
     // create and populate list
     var list = new XWiki.widgets.XList([], {

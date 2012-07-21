@@ -19,9 +19,11 @@
  */
 package org.xwiki.rest.resources.objects;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -47,7 +49,8 @@ public class ObjectPropertiesResource extends BaseObjectsResource
     @GET
     public Properties getObjectProperties(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
-        @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber)
+        @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -61,7 +64,7 @@ public class ObjectPropertiesResource extends BaseObjectsResource
 
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
 
         Properties properties = objectFactory.createProperties();
         properties.getProperties().addAll(object.getProperties());

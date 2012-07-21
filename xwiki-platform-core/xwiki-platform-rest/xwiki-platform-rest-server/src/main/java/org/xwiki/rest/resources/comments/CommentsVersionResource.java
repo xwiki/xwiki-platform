@@ -48,7 +48,8 @@ public class CommentsVersionResource extends XWikiResource
     public Comments getCommentsVersion(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
         @PathParam("version") String version, @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+        @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
 
@@ -63,7 +64,7 @@ public class CommentsVersionResource extends XWikiResource
 
         for (com.xpn.xwiki.api.Object xwikiComment : ri) {
             comments.getComments().add(
-                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment, Utils.getXWikiApi(componentManager)));
+                DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment, Utils.getXWikiApi(componentManager), withPrettyNames));
         }
 
         return comments;

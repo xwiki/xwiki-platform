@@ -81,6 +81,7 @@ import org.xwiki.rest.resources.spaces.SpaceResource;
 import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 
 import com.xpn.xwiki.XWikiContext;
@@ -149,6 +150,12 @@ public class DomainObjectFactory
         searchLink.setHref(searchUri);
         searchLink.setRel(Relations.SEARCH);
         wiki.getLinks().add(searchLink);
+
+        String queryUri = UriBuilder.fromUri(baseUri).path(WikiSearchQueryResource.class).build(wikiName).toString();
+        Link queryLink = objectFactory.createLink();
+        queryLink.setHref(queryUri);
+        queryLink.setRel(Relations.QUERY);
+        wiki.getLinks().add(queryLink);
 
         return wiki;
     }
@@ -255,7 +262,7 @@ public class DomainObjectFactory
 
     /* This method is used to fill the "common part" of a Page and a PageSummary */
     private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri,
-        Document doc, boolean useVersion, XWiki xwikiApi) throws XWikiException
+        Document doc, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
         pageSummary.setWiki(doc.getWiki());
         pageSummary.setFullName(doc.getFullName());
@@ -269,7 +276,8 @@ public class DomainObjectFactory
         pageSummary.setSyntax(doc.getSyntaxId());
         pageSummary.setVersion(doc.getVersion());
         pageSummary.setAuthor(doc.getAuthor());
-        pageSummary.setAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
+        if (withPrettyNames)
+            pageSummary.setAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
         pageSummary.setParent(doc.getParent());
@@ -389,11 +397,11 @@ public class DomainObjectFactory
         pageSummary.getLinks().add(syntaxesLink);
     }
 
-    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi)
+    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi, Boolean withPrettyNames)
         throws XWikiException
     {
         PageSummary pageSummary = objectFactory.createPageSummary();
-        fillPageSummary(pageSummary, objectFactory, baseUri, doc, false, xwikiApi);
+        fillPageSummary(pageSummary, objectFactory, baseUri, doc, false, xwikiApi, withPrettyNames);
 
         String pageUri =
             UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
@@ -407,23 +415,27 @@ public class DomainObjectFactory
     }
 
     public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion,
-        XWiki xwikiApi) throws XWikiException
+        XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
         Page page = objectFactory.createPage();
-        fillPageSummary(page, objectFactory, baseUri, doc, useVersion, xwikiApi);
+        fillPageSummary(page, objectFactory, baseUri, doc, useVersion, xwikiApi, withPrettyNames);
 
         page.setVersion(doc.getVersion());
         page.setMajorVersion(doc.getRCSVersion().at(0));
         page.setMinorVersion(doc.getRCSVersion().at(1));
         page.setLanguage(doc.getLanguage());
         page.setCreator(doc.getCreator());
-        page.setCreatorName(xwikiApi.getUserName(doc.getCreator(), false));
+        if (withPrettyNames)
+            page.setCreatorName(xwikiApi.getUserName(doc.getCreator(), false));
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(doc.getCreationDate());
         page.setCreated(calendar);
 
         page.setModifier(doc.getContentAuthor());
+        if (withPrettyNames)
+            page.setModifierName(xwikiApi.getUserName(doc.getContentAuthor(), false));
+            
 
         calendar = Calendar.getInstance();
         calendar.setTime(doc.getContentUpdateDate());
@@ -453,7 +465,7 @@ public class DomainObjectFactory
     }
 
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
-        String spaceName, String pageName, String language, Version version, String modifier, Date modified)
+        String spaceName, String pageName, String language, Version version, String modifier, Date modified, XWiki xwikiApi, Boolean withPrettyNames)
     {
         HistorySummary historySummary = objectFactory.createHistorySummary();
 
@@ -467,6 +479,9 @@ public class DomainObjectFactory
         historySummary.setMajorVersion(version.at(0));
         historySummary.setMinorVersion(version.at(1));
         historySummary.setModifier(modifier);
+        if (withPrettyNames)
+            historySummary.setModifierName(xwikiApi.getUserName(modifier, false));
+
         historySummary.setLanguage(language);
 
         Calendar calendar = Calendar.getInstance();
@@ -495,7 +510,7 @@ public class DomainObjectFactory
     }
 
     private static void fillAttachment(Attachment attachment, ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi, Boolean withPrettyNames)
     {
         Document doc = xwikiAttachment.getDocument();
 
@@ -507,7 +522,8 @@ public class DomainObjectFactory
         attachment.setPageVersion(doc.getVersion());
         attachment.setMimeType(xwikiAttachment.getMimeType());
         attachment.setAuthor(xwikiAttachment.getAuthor());
-        attachment.setAuthorName(xwikiApi.getUserName(xwikiAttachment.getAuthor(), false));
+        if (withPrettyNames)
+            attachment.setAuthorName(xwikiApi.getUserName(xwikiAttachment.getAuthor(), false));
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(xwikiAttachment.getDate());
@@ -566,11 +582,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi, Boolean withPrettyNames)
     {
         Attachment attachment = objectFactory.createAttachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi, withPrettyNames);
 
         String attachmentUri = createAttachmentUri(baseUri, xwikiAttachment, xwikiAttachment.getDocument(), false);
 
@@ -583,11 +599,11 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachmentAtVersion(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi)
+        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi, Boolean withPrettyNames)
     {
         Attachment attachment = new Attachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi, withPrettyNames);
 
         Document doc = xwikiAttachment.getDocument();
 
@@ -602,7 +618,7 @@ public class DomainObjectFactory
     }
 
     public static Comment createComment(ObjectFactory objectFactory, URI baseUri, Document doc,
-        com.xpn.xwiki.api.Object xwikiComment, XWiki xwikiApi)
+        com.xpn.xwiki.api.Object xwikiComment, XWiki xwikiApi, Boolean withPrettyNames)
     {
         Comment comment = objectFactory.createComment();
         comment.setId(xwikiComment.getNumber());
@@ -610,7 +626,8 @@ public class DomainObjectFactory
         com.xpn.xwiki.api.Property property = xwikiComment.getProperty("author");
         if (property != null) {
             comment.setAuthor((String) property.getValue());
-            comment.setAuthorName(xwikiApi.getUserName((String) property.getValue(), false));
+            if (withPrettyNames)
+                comment.setAuthorName(xwikiApi.getUserName((String) property.getValue(), false));
         }
 
         property = xwikiComment.getProperty("date");
@@ -647,14 +664,17 @@ public class DomainObjectFactory
     }
 
     private static void fillObjectSummary(ObjectSummary objectSummary, ObjectFactory objectFactory, URI baseUri,
-        Document doc, BaseObject xwikiObject, XWiki xwikiApi) throws XWikiException
+        Document doc, BaseObject xwikiObject, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
+        
+        
         objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
         objectSummary.setGuid(xwikiObject.getGuid());
         objectSummary.setPageId(doc.getPrefixedFullName());
         objectSummary.setPageVersion(doc.getVersion());
-        objectSummary.setPageAuthor(doc.getAuthor());
-        objectSummary.setPageAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
+        objectSummary.setPageAuthor(doc.getAuthor());       
+        if (withPrettyNames)
+            objectSummary.setPageAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
         objectSummary.setWiki(doc.getWiki());
         objectSummary.setSpace(doc.getSpace());
         objectSummary.setPageName(doc.getName());
@@ -669,10 +689,10 @@ public class DomainObjectFactory
     }
 
     public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri,
-        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi) throws XWikiException
+        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
         ObjectSummary objectSummary = objectFactory.createObjectSummary();
-        fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject, xwikiApi);
+        fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject, xwikiApi, withPrettyNames);
 
         Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.OBJECT);
         objectSummary.getLinks().add(objectLink);
@@ -704,10 +724,10 @@ public class DomainObjectFactory
     }
 
     public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
-        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi) throws XWikiException
+        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
         Object object = objectFactory.createObject();
-        fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject, xwikiApi);
+        fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject, xwikiApi, withPrettyNames);
 
         BaseClass xwikiClass = xwikiObject.getXClass(xwikiContext);
 

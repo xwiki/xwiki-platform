@@ -42,9 +42,10 @@ public class SpaceAttachmentsResource extends BaseAttachmentsResource
     public Attachments getAttachments(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("name") @DefaultValue("") String name, @QueryParam("page") @DefaultValue("") String page,
         @QueryParam("author") @DefaultValue("") String author, @QueryParam("types") @DefaultValue("") String types,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("25") Integer number)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("25") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws QueryException
     {
-        return super.getAttachments(wikiName, name, page, spaceName, author, types, start, number);
+        return super.getAttachments(wikiName, name, page, spaceName, author, types, start, number, withPrettyNames);
     }
 }

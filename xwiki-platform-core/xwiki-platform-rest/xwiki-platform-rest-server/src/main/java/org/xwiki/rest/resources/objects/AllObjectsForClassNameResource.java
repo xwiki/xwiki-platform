@@ -50,7 +50,8 @@ public class AllObjectsForClassNameResource extends XWikiResource
 {
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("className") String className,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("order") String order, @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException, QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -63,6 +64,8 @@ public class AllObjectsForClassNameResource extends XWikiResource
 
             String query =
                 "select doc, obj from BaseObject as obj, XWikiDocument as doc where obj.name=doc.fullName and obj.className=:className";
+            if ("date".equals(order))
+                query += " order by doc.date desc";
 
             List<Object> queryResult = null;
             queryResult =
@@ -79,7 +82,7 @@ public class AllObjectsForClassNameResource extends XWikiResource
 
                 ObjectSummary objectSummary =
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                        .getXWikiContext(componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager));
+                        .getXWikiContext(componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
 
                 objects.getObjectSummaries().add(objectSummary);
             }

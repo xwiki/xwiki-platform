@@ -20,10 +20,12 @@
 package org.xwiki.rest.resources.pages;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
@@ -43,14 +45,15 @@ public class PageTranslationResource extends ModifiablePageResource
 {
     @GET
     public Page getPageTranslation(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @PathParam("pageName") String pageName, @PathParam("language") String language) throws XWikiException
+        @PathParam("pageName") String pageName, @PathParam("language") String language,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
 
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-            false, Utils.getXWikiApi(componentManager));
+            false, Utils.getXWikiApi(componentManager), withPrettyNames);
     }
 
     @PUT

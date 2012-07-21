@@ -168,6 +168,7 @@
             org/xwiki/rest/resources/wikis/WikiAttachmentsResource.java,
             org/xwiki/rest/resources/wikis/WikiPagesResource.java,
             org/xwiki/rest/resources/wikis/WikiSearchResource.java,
+            org/xwiki/rest/resources/wikis/WikiSearchQueryResource.java,
             org/xwiki/rest/resources/wikis/WikisResource.java,
             org/xwiki/rest/Utils.java,
             org/xwiki/rest/XWikiAuthentication.java,

@@ -46,7 +46,8 @@ public class ObjectsForClassNameResource extends BaseObjectsResource
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -63,7 +64,7 @@ public class ObjectsForClassNameResource extends BaseObjectsResource
         for (com.xpn.xwiki.objects.BaseObject object : ri) {
             objects.getObjectSummaries().add(
                 DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                    .getXWikiContext(componentManager), doc, object, false, Utils.getXWikiApi(componentManager)));
+                    .getXWikiContext(componentManager), doc, object, false, Utils.getXWikiApi(componentManager), withPrettyNames));
         }
 
         return objects;

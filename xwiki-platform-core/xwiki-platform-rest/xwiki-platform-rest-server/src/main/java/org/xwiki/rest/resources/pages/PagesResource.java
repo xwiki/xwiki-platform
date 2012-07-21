@@ -52,7 +52,7 @@ public class PagesResource extends XWikiResource
     public Pages getPages(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parentId") String parentFilterExpression,
-        @QueryParam("order") String order)
+        @QueryParam("order") String order, @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException, QueryException, ComponentLookupException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -104,7 +104,7 @@ public class PagesResource extends XWikiResource
                         if (add) {
                             pages.getPageSummaries().add(
                                 DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, Utils
-                                    .getXWikiApi(componentManager)));
+                                    .getXWikiApi(componentManager), withPrettyNames));
                         }
                     }
                 }

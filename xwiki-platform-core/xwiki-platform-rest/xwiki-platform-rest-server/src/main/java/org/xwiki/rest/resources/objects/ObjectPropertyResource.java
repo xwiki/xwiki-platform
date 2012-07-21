@@ -19,10 +19,12 @@
  */
 package org.xwiki.rest.resources.objects;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -51,7 +53,8 @@ public class ObjectPropertyResource extends XWikiResource
     @GET
     public Property getObjectProperty(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @PathParam("objectNumber") Integer objectNumber, @PathParam("propertyName") String propertyName)
+        @PathParam("objectNumber") Integer objectNumber, @PathParam("propertyName") String propertyName,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -69,7 +72,7 @@ public class ObjectPropertyResource extends XWikiResource
 
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
 
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
@@ -118,7 +121,7 @@ public class ObjectPropertyResource extends XWikiResource
         baseObject = xwikiDocument.getObject(className, objectNumber);
         Object object =
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager));
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), false);
 
         for (Property p : object.getProperties()) {
             if (p.getName().equals(propertyName)) {

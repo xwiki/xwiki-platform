@@ -127,7 +127,7 @@
       if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
         startup();
       } else {
-        document.observe('xwiki:dom:loading', startup);
+        document.observe('xwiki:livetable:loading', startup);
       }
     })();
     //]]&gt;

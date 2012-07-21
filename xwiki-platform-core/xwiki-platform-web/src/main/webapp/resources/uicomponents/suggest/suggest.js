@@ -232,19 +232,17 @@ var XWiki = (function(XWiki){
    */
   getSuggestions: function (val)
   {
-    // if input stays the same, do nothing
-    //
-    val = val.strip();
+    // If input stays the same, do nothing.
+    val = val.strip().toLowerCase();
     if (val == this.sInput) {
       return false;
     }
 
-    // input length is less than the min required to trigger a request
-    // reset input string
-    // do nothing
-    //
+    // Input length is less than the min required to trigger a request.
+    // Reset input string, hide the suggestions (if any), and return.
     if (val.length < this.options.minchars) {
       this.sInput = "";
+      this.clearSuggestions();
       return false;
     }
 
@@ -255,7 +253,7 @@ var XWiki = (function(XWiki){
     {
       var arr = [];
       for (var i=0;i<this.aSuggestions.length;i++) {
-        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val.toLowerCase()) {
+        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val) {
           arr.push( this.aSuggestions[i] );
         }
       }

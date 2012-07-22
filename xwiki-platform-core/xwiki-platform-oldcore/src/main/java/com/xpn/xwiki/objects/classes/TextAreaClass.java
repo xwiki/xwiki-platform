@@ -36,11 +36,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    private static final String XCLASSNAME = "textarea";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
 
     public TextAreaClass(PropertyMetaClass wclass)
     {
-        super("textarea", "Text Area", wclass);
+        super(XCLASSNAME, "Text Area", wclass);
 
         setSize(40);
         setRows(5);

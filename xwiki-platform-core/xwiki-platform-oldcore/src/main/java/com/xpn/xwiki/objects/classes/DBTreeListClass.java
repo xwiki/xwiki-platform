@@ -42,6 +42,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  */
 public class DBTreeListClass extends DBListClass
 {
+    private static final String XCLASSNAME = "dbtreelist";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DBTreeListClass.class);
 
     /** In-memory cache of the ordered tree values, to be used in case it is supposed to be cached. */
@@ -49,7 +51,7 @@ public class DBTreeListClass extends DBListClass
 
     public DBTreeListClass(PropertyMetaClass wclass)
     {
-        super("dbtreelist", "DB Tree List", wclass);
+        super(XCLASSNAME, "DB Tree List", wclass);
     }
 
     public DBTreeListClass()

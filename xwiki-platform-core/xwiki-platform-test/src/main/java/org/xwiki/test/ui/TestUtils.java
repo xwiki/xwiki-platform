@@ -80,8 +80,12 @@ public class TestUtils
     private static final String SCREENSHOT_DIR = System.getProperty("screenshotDirectory");
 
     private static PersistentTestContext context;
+    
+    private static final String URL = System.getProperty("xe.url", "http://localhost");
+    
+    public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
-    private static final String BASE_URL = "http://localhost:8080/xwiki/";
+    private static final String BASE_URL = URL + ":" + DEFAULT_PORT + "/xwiki/";
 
     private static final String BASE_BIN_URL = BASE_URL + "bin/";
 

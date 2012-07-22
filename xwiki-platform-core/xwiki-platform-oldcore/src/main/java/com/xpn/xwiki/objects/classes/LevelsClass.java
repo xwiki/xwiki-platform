@@ -40,9 +40,11 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class LevelsClass extends ListClass
 {
+    private static final String XCLASSNAME = "levelslist";
+
     public LevelsClass(PropertyMetaClass wclass)
     {
-        super("levelslist", "Levels List", wclass);
+        super(XCLASSNAME, "Levels List", wclass);
         setSize(6);
     }
 

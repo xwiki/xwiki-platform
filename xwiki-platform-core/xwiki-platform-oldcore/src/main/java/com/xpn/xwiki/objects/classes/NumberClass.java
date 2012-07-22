@@ -34,12 +34,14 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class NumberClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "number";
+
     /** Logging helper object. */
     private static final Logger LOG = LoggerFactory.getLogger(NumberClass.class);
 
     public NumberClass(PropertyMetaClass wclass)
     {
-        super("number", "Number", wclass);
+        super(XCLASSNAME, "Number", wclass);
         setSize(30);
         setNumberType("long");
     }

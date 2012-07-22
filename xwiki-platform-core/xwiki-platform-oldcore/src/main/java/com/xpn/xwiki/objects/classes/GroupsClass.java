@@ -41,9 +41,11 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class GroupsClass extends ListClass
 {
+    private static final String XCLASSNAME = "groupslist";
+
     public GroupsClass(PropertyMetaClass wclass)
     {
-        super("groupslist", "Groups List", wclass);
+        super(XCLASSNAME, "Groups List", wclass);
 
         setSize(6);
         setUsesList(true);

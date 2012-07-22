@@ -35,10 +35,11 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StaticListClass extends ListClass
 {
+    private static final String XCLASSNAME = "staticlist";
 
     public StaticListClass(PropertyMetaClass wclass)
     {
-        super("staticlist", "Static List", wclass);
+        super(XCLASSNAME, "Static List", wclass);
         setSeparators(" ,|");
     }
 

@@ -40,6 +40,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class DBListClass extends ListClass
 {
+    private static final String XCLASSNAME = "dblist";
+
     /**
      * Logging helper object.
      */
@@ -56,7 +58,7 @@ public class DBListClass extends ListClass
 
     public DBListClass(PropertyMetaClass wclass)
     {
-        super("dblist", "DB List", wclass);
+        super(XCLASSNAME, "DB List", wclass);
     }
 
     public DBListClass()

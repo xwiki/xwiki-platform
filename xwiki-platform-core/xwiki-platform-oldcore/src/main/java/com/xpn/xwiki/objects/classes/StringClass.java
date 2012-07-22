@@ -30,6 +30,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StringClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "string";
 
     public StringClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -39,7 +40,7 @@ public class StringClass extends PropertyClass
 
     public StringClass(PropertyMetaClass wclass)
     {
-        this("string", "String", wclass);
+        this(XCLASSNAME, "String", wclass);
     }
 
     public StringClass()

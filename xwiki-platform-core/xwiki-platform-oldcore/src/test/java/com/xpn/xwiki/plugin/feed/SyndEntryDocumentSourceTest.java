@@ -172,6 +172,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
                 }
             });
         mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
+        mockXWikiStore.stubs().method("exists").will(returnValue(false));
 
         final Mock mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {

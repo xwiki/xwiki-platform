@@ -25,7 +25,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
- * Same as LocalReferenceEntityReferenceSerializer but with the extended type in the role hint instead of the role type.
+ * Same as LocalReferenceEntityReferenceSerializer but with the extended type in both the role hint and the role type.
  * 
  * @version $Id$
  * @since 2.2.3
@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  */
 @Deprecated
 @Component("local/reference")
-public class DeprecatedLocalReferenceEntityReferenceSerializer implements EntityReferenceSerializer
+public class DeprecatedLocalReferenceEntityReferenceSerializer2 implements EntityReferenceSerializer<EntityReference>
 {
     @Override
     public EntityReference serialize(EntityReference reference, Object... parameters)

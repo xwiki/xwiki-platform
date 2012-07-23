@@ -37,6 +37,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class BooleanClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "boolean";
+
     /** Other string values that might be used to represent "true" values. */
     private static final Pattern TRUE_PATTERN = Pattern.compile("yes|true", Pattern.CASE_INSENSITIVE);
 
@@ -45,7 +47,7 @@ public class BooleanClass extends PropertyClass
 
     public BooleanClass(PropertyMetaClass wclass)
     {
-        super("boolean", "Boolean", wclass);
+        super(XCLASSNAME, "Boolean", wclass);
     }
 
     public BooleanClass()

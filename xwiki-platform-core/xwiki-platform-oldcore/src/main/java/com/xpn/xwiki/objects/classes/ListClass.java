@@ -44,6 +44,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public abstract class ListClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "list";
 
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -58,7 +59,7 @@ public abstract class ListClass extends PropertyClass
 
     public ListClass(PropertyMetaClass wclass)
     {
-        this("list", "List", wclass);
+        this(XCLASSNAME, "List", wclass);
     }
 
     public ListClass()

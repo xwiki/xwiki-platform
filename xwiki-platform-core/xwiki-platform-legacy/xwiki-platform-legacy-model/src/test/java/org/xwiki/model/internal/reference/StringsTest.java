@@ -21,27 +21,29 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReferenceResolver;
+import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.test.AbstractComponentTestCase;
 
-public class ReferencesTest extends AbstractComponentTestCase
+public class StringsTest extends AbstractComponentTestCase
 {
     @Test
     public void testLookup() throws ComponentLookupException, Exception
     {
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "default/reference");
-        getComponentManager().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default/reference");
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "explicit/reference");
-        getComponentManager().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "explicit/reference");
-
-        getComponentManager().getInstance(EntityReferenceResolver.class, "default/reference");
-        getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "default/reference");
-        getComponentManager().getInstance(EntityReferenceResolver.class, "explicit/reference");
-        getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit/reference");
-
-        getComponentManager().getInstance(EntityReferenceSerializer.class, "local/reference");
-        getComponentManager().getInstance(EntityReferenceSerializer.TYPE_REFERENCE, "local/reference");
+        getComponentManager().getInstance(AttachmentReferenceResolver.class, "default");
+        getComponentManager().getInstance(DocumentReferenceResolver.class, "default");
+        getComponentManager().getInstance(EntityReferenceResolver.class, "default");
+        getComponentManager().getInstance(EntityReferenceSerializer.class, "default");
+        getComponentManager().getInstance(ObjectPropertyReferenceResolver.class, "default");
+        getComponentManager().getInstance(ObjectReferenceResolver.class, "default");
+        getComponentManager().getInstance(AttachmentReferenceResolver.class, "explicit");
+        getComponentManager().getInstance(DocumentReferenceResolver.class, "explicit");
+        getComponentManager().getInstance(EntityReferenceResolver.class, "explicit");
+        getComponentManager().getInstance(EntityReferenceSerializer.class, "local");
+        getComponentManager().getInstance(EntityReferenceResolver.class, "relative");
     }
 }

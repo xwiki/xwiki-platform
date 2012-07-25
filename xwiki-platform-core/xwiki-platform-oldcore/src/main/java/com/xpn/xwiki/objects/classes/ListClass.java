@@ -161,6 +161,22 @@ public abstract class ListClass extends PropertyClass
         setStringValue("separator", separator);
     }
 
+    /*
+     * Returns the current default custom displayer for the PropertyClass
+     * When it cannot find one for the current class it will call the same
+     * function for the super class
+     * This function should be implemented by any derivative PropertyClass
+     * if this PropertyClass wants to have a default custom displayer
+     */
+    @Override
+    public String getDefaultCustomDisplayer(XWikiContext context) {
+        String customDisplayer = getDefaultCustomDisplayer(XCLASSNAME, context);
+        if (customDisplayer==null)
+            return super.getDefaultCustomDisplayer(context);
+        else
+            return customDisplayer;
+    }
+
     public static List<String> getListFromString(String value)
     {
         return getListFromString(value, "|", true);

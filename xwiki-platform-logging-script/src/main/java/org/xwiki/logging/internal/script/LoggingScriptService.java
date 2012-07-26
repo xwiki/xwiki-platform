@@ -19,10 +19,16 @@
  */
 package org.xwiki.logging.internal.script;
 
+import java.util.logging.LogManager;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.logging.LogQueue;
+import org.xwiki.logging.event.LogQueueListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.script.service.ScriptService;
 
 @Component
@@ -30,5 +36,35 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class LoggingScriptService implements ScriptService
 {
-    
+    @Inject
+    private LogManager logManager;
+
+    @Inject
+    private ObservationManager observation;
+
+    private LogQueue logQueue = new LogQueue();
+
+    private LogQueueListener logQueueListener = new LogQueueListener("logging.script", this.logQueue);
+
+    // Get/Set log levels
+
+    // LogGueue
+
+    public void startLog()
+    {
+        this.logQueue.clear();
+        if (this.observation.getListener(this.logQueueListener.getName()) != this.logQueueListener) {
+            this.observation.addListener(this.logQueueListener);
+        }
+    }
+
+    public void endLog()
+    {
+        this.observation.removeListener(this.logQueueListener.getName());
+    }
+
+    public LogQueue getLogQueue()
+    {
+        return this.logQueue;
+    }
 }

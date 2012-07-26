@@ -110,7 +110,7 @@ public class LoggingScriptService implements ScriptService, Initializable
     private String jmxreloadDefaultConfiguration() throws InstanceNotFoundException, ReflectionException,
         MBeanException
     {
-        return (String) this.jmxServer.invoke(this.jmxName, "reloadDefaultConfiguration()",
+        return (String) this.jmxServer.invoke(this.jmxName, "reloadDefaultConfiguration",
             ArrayUtils.EMPTY_OBJECT_ARRAY, ArrayUtils.EMPTY_STRING_ARRAY);
     }
 

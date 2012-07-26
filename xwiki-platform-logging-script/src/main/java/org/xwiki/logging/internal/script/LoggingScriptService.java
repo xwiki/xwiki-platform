@@ -103,7 +103,7 @@ public class LoggingScriptService implements ScriptService, Initializable
     private String jmxsetLevel(String logger, String level) throws InstanceNotFoundException, ReflectionException,
         MBeanException
     {
-        return (String) this.jmxServer.invoke(this.jmxName, "setLevel", new Object[] {logger, level}, new String[] {
+        return (String) this.jmxServer.invoke(this.jmxName, "setLoggerLevel", new Object[] {logger, level}, new String[] {
         "java.lang.String", "java.lang.String"});
     }
 

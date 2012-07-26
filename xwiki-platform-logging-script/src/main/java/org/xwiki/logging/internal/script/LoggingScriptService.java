@@ -23,7 +23,6 @@ import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,23 +39,41 @@ import org.xwiki.script.service.ScriptService;
 
 import ch.qos.logback.classic.jmx.JMXConfiguratorMBean;
 
+/**
+ * Provide logging related script oriented APIs.
+ * 
+ * @version $Id$
+ */
 @Component
 @Named("logging")
 @Singleton
 public class LoggingScriptService implements ScriptService
 {
-    @Inject
-    private LogManager logManager;
-
+    /**
+     * Used to listen to logs.
+     */
     @Inject
     private ObservationManager observation;
 
+    /**
+     * All the produced log since last call to {@link #startLog()}.
+     */
     private LogQueue logQueue = new LogQueue();
 
+    /**
+     * The actual log listener.
+     */
     private LogQueueListener logQueueListener = new LogQueueListener("logging.script", this.logQueue);
 
+    /**
+     * The JMX mbean to manipulate Logback.
+     */
     private JMXConfiguratorMBean mbean;
 
+    /**
+     * @return the JMX mbean to manipulate Logback.
+     * @throws InstanceNotFoundException failed to access JMX bean
+     */
     // TODO: put needed generic methods in LogManager instead of using JMX directly
     public JMXConfiguratorMBean getJMXConfiguratorMBean() throws InstanceNotFoundException
     {
@@ -78,6 +95,10 @@ public class LoggingScriptService implements ScriptService
 
     // Get/Set log levels
 
+    /**
+     * @return all the loggers (usually packages) with corresponding levels.
+     * @throws InstanceNotFoundException failed to access JMX bean
+     */
     public Map<String, String> getLevels() throws InstanceNotFoundException
     {
         List<String> loggers = getJMXConfiguratorMBean().getLoggerList();
@@ -91,11 +112,21 @@ public class LoggingScriptService implements ScriptService
         return levels;
     }
 
+    /**
+     * @param logger the logger name (usually packages)
+     * @return the level associated to the logger
+     * @throws InstanceNotFoundException failed to access JMX bean
+     */
     public String getLevel(String logger) throws InstanceNotFoundException
     {
         return getJMXConfiguratorMBean().getLoggerLevel(logger);
     }
 
+    /**
+     * @param logger the logger name (usually package)
+     * @param level the level associated to the logger
+     * @throws InstanceNotFoundException failed to access JMX bean
+     */
     public void setLevel(String logger, String level) throws InstanceNotFoundException
     {
         getJMXConfiguratorMBean().setLoggerLevel(logger, level);
@@ -103,6 +134,13 @@ public class LoggingScriptService implements ScriptService
 
     // LogGueue
 
+    /**
+     * Start listening to produced logs and fill the log queue.
+     * <p>
+     * The previous log is removed first.
+     * 
+     * @see #getLogQueue()
+     */
     public void startLog()
     {
         this.logQueue.clear();
@@ -111,11 +149,17 @@ public class LoggingScriptService implements ScriptService
         }
     }
 
+    /**
+     * Stop listening to logs.
+     */
     public void endLog()
     {
         this.observation.removeListener(this.logQueueListener.getName());
     }
 
+    /**
+     * @return all the log produced since {@link #startLog()} has been called
+     */
     public LogQueue getLogQueue()
     {
         return this.logQueue;

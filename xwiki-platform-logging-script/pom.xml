@@ -33,7 +33,15 @@
   <name>XWiki Platform - Logging - Script</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Logging - Script</description>
+  <properties>
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-logging-api</artifactId>
@@ -48,6 +56,20 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    
+    <!-- Tests dependencies -->
+    
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
       <version>${commons.version}</version>
     </dependency>
   </dependencies>

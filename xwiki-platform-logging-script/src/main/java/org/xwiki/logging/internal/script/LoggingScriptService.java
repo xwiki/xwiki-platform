@@ -27,17 +27,20 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogQueueListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.script.service.ScriptService;
-
-import ch.qos.logback.classic.jmx.JMXConfiguratorMBean;
 
 /**
  * Provide logging related script oriented APIs.
@@ -47,7 +50,7 @@ import ch.qos.logback.classic.jmx.JMXConfiguratorMBean;
 @Component
 @Named("logging")
 @Singleton
-public class LoggingScriptService implements ScriptService
+public class LoggingScriptService implements ScriptService, Initializable
 {
     /**
      * Used to listen to logs.
@@ -65,43 +68,51 @@ public class LoggingScriptService implements ScriptService
      */
     private LogQueueListener logQueueListener = new LogQueueListener("logging.script", this.logQueue);
 
-    /**
-     * The JMX mbean to manipulate Logback.
-     */
-    private JMXConfiguratorMBean mbean;
+    private MBeanServer jmxServer;
 
-    /**
-     * @return the JMX mbean to manipulate Logback.
-     * @throws InstanceNotFoundException failed to access JMX bean
-     */
+    private ObjectName jmxName;
+
     // TODO: put needed generic methods in LogManager instead of using JMX directly
-    public JMXConfiguratorMBean getJMXConfiguratorMBean() throws InstanceNotFoundException
+    @Override
+    public void initialize() throws InitializationException
     {
-        if (this.mbean == null) {
-            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name;
-            try {
-                name = new ObjectName("logback:type=xwiki");
-            } catch (Exception e) {
-                // That should never happen
-                name = null;
-            }
-
-            this.mbean = (JMXConfiguratorMBean) server.getObjectInstance(name);
+        this.jmxServer = ManagementFactory.getPlatformMBeanServer();
+        try {
+            this.jmxName = new ObjectName("logback:type=xwiki");
+        } catch (Exception e) {
+            // That should never happen
         }
+    }
 
-        return this.mbean;
+    private List<String> jmxLoggerList() throws ReflectionException, MBeanException, InstanceNotFoundException,
+        AttributeNotFoundException
+    {
+        return (List<String>) this.jmxServer.getAttribute(this.jmxName, "LoggerList");
+    }
+
+    private String jmxgetLoggerLevel(String level) throws InstanceNotFoundException, ReflectionException,
+        MBeanException
+    {
+        return (String) this.jmxServer.invoke(this.jmxName, "getLoggerLevel", new Object[] {level},
+            new String[] {"java.lang.String"});
+    }
+
+    private String jmxsetLevel(String logger, String level) throws InstanceNotFoundException, ReflectionException,
+        MBeanException
+    {
+        return (String) this.jmxServer.invoke(this.jmxName, "setLevel", new Object[] {logger, level}, new String[] {
+        "java.lang.String", "java.lang.String"});
     }
 
     // Get/Set log levels
 
     /**
      * @return all the loggers (usually packages) with corresponding levels.
-     * @throws InstanceNotFoundException failed to access JMX bean
      */
-    public Map<String, String> getLevels() throws InstanceNotFoundException
+    public Map<String, String> getLevels() throws InstanceNotFoundException, ReflectionException, MBeanException,
+        AttributeNotFoundException
     {
-        List<String> loggers = getJMXConfiguratorMBean().getLoggerList();
+        List<String> loggers = jmxLoggerList();
 
         Map<String, String> levels = new HashMap<String, String>(loggers.size());
 
@@ -115,24 +126,23 @@ public class LoggingScriptService implements ScriptService
     /**
      * @param logger the logger name (usually packages)
      * @return the level associated to the logger
-     * @throws InstanceNotFoundException failed to access JMX bean
      */
-    public String getLevel(String logger) throws InstanceNotFoundException
+    public String getLevel(String logger) throws InstanceNotFoundException, ReflectionException, MBeanException
     {
-        return getJMXConfiguratorMBean().getLoggerLevel(logger);
+        return jmxgetLoggerLevel(logger);
     }
 
     /**
      * @param logger the logger name (usually package)
      * @param level the level associated to the logger
-     * @throws InstanceNotFoundException failed to access JMX bean
      */
-    public void setLevel(String logger, String level) throws InstanceNotFoundException
+    public void setLevel(String logger, String level) throws InstanceNotFoundException, ReflectionException,
+        MBeanException
     {
-        getJMXConfiguratorMBean().setLoggerLevel(logger, level);
+        jmxsetLevel(logger, level);
     }
 
-    // LogGueue
+    // Log queue
 
     /**
      * Start listening to produced logs and fill the log queue.

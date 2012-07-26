@@ -34,6 +34,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -84,6 +85,8 @@ public class LoggingScriptService implements ScriptService, Initializable
         }
     }
 
+    // JMX
+
     private List<String> jmxLoggerList() throws ReflectionException, MBeanException, InstanceNotFoundException,
         AttributeNotFoundException
     {
@@ -102,6 +105,20 @@ public class LoggingScriptService implements ScriptService, Initializable
     {
         return (String) this.jmxServer.invoke(this.jmxName, "setLevel", new Object[] {logger, level}, new String[] {
         "java.lang.String", "java.lang.String"});
+    }
+
+    private String jmxreloadDefaultConfiguration() throws InstanceNotFoundException, ReflectionException,
+        MBeanException
+    {
+        return (String) this.jmxServer.invoke(this.jmxName, "reloadDefaultConfiguration()",
+            ArrayUtils.EMPTY_OBJECT_ARRAY, ArrayUtils.EMPTY_STRING_ARRAY);
+    }
+
+    // Configuration
+
+    public void reloadDefaultConfiguration() throws InstanceNotFoundException, ReflectionException, MBeanException
+    {
+        jmxreloadDefaultConfiguration();
     }
 
     // Get/Set log levels

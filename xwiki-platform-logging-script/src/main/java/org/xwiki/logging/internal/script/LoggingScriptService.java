@@ -179,7 +179,7 @@ public class LoggingScriptService implements ScriptService, Initializable
     /**
      * Stop listening to logs.
      */
-    public void endLog()
+    public void stopLog()
     {
         this.observation.removeListener(this.logQueueListener.getName());
     }

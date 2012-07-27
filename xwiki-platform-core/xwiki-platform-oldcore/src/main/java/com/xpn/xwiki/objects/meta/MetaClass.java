@@ -60,6 +60,8 @@ public class MetaClass extends BaseClass
         safeput(pageclass.getName(), pageclass);
         EmailMetaClass emailclass = new EmailMetaClass();
         safeput(emailclass.getName(), emailclass);
+        ComputedFieldMetaClass computedclass = new ComputedFieldMetaClass();
+        safeput(computedclass.getName(), computedclass);
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
@@ -91,7 +92,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     {
         return getxWikiClass();
     }
-    
+
     public BaseClass getxWikiClass()
     {
         if (this.pMetaClass == null) {
@@ -259,19 +260,22 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
                 vcontext.put("value", prop.getValue());
             }
 
-                String customDisplayer = getCachedDefaultCustomDisplayer(context);
-                System.out.println("CUSTOM: " + cachedCustomDisplayer);
-            if (customDisplayer!=null&&!customDisplayer.equals("")) {
+            String customDisplayer = getCachedDefaultCustomDisplayer(context);
+            System.out.println("CUSTOM: " + this.cachedCustomDisplayer);
+            if (customDisplayer != null && !customDisplayer.equals("")) {
                 if (customDisplayer.equals("class")) {
                     content = getCustomDisplay();
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
+                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
+                        .getSyntax().toIdString();
                     content = context.getDoc().getRenderedContent(content, classSyntax, context);
                 } else if (customDisplayer.startsWith("page:")) {
-                    content = context.getWiki().getDocument (customDisplayer.substring(5), context).getContent();
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
+                    content = context.getWiki().getDocument(customDisplayer.substring(5), context).getContent();
+                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
+                        .getSyntax().toIdString();
                     content = context.getDoc().getRenderedContent(content, classSyntax, context);
                 } else if (customDisplayer.startsWith("template:")) {
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
+                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
+                        .getSyntax().toIdString();
                     content = context.getWiki().evaluateTemplate(customDisplayer.substring(9), context);
                 }
             }
@@ -577,7 +581,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     @Override
     public void flushCache()
     {
-        cachedCustomDisplayer = null;
+        this.cachedCustomDisplayer = null;
     }
 
     /**
@@ -607,58 +611,74 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         return "obj." + getName();
     }
 
-    /*
-     * Returns the current cached default custom displayer for the PropertyClass
-     * The result will be cached and can be flushed using flushCache
-     * If it returns empty ("") then there is no default custom displayer for this class
+    /**
+     * Returns the current cached default custom displayer for the PropertyClass. The result will be cached and can be
+     * flushed using {@link #flushCache()}. If it returns the empty string, then there is no default custom displayer
+     * for this class.
+     * 
+     * @param context the current request context
+     * @return An identifier for the location of a custom displayer. This can be {@code class} if there's custom display
+     *         code specified in the class itself, {@code page:currentwiki:XWiki.BooleanDisplayer} if such a document
+     *         exists in the current wiki, {@code page:xwiki:XWiki.StringDisplayer} if such a document exists in the
+     *         main wiki, or {@code template:displayer_boolean.vm} if a template on the filesystem or in the current
+     *         skin exists.
      */
-    protected String getCachedDefaultCustomDisplayer(XWikiContext context) {
-        // first look at custom displayer in class. We should not cache this one.
+    protected String getCachedDefaultCustomDisplayer(XWikiContext context)
+    {
+        // First look at custom displayer in class. We should not cache this one.
         String customDisplay = getCustomDisplay();
-        if (customDisplay!=null && customDisplay.length()>0)
+        if (StringUtils.isNotEmpty(customDisplay)) {
             return "class";
-
-        // then look for pages or templates
-        if (cachedCustomDisplayer==null) {
-                cachedCustomDisplayer = getDefaultCustomDisplayer(context);
         }
-        return cachedCustomDisplayer;
-    }
 
-    /*
-     * Returns the current default custom displayer for the PropertyClass
-     * If it returns empty ("") then there is no default custom displayer for this class
-     * This function is overridden in every derivative PropertyClass so that it will look
-     * for a custom displayer named by the derivative class and then if it cannot find one
-     * will look for a custom displayer named by the super class
-     * This function returns empty because at the level of the PropertyClass
-     * there is no customer displayer
-     * @param context XWikiContext
-     */
-    protected String getDefaultCustomDisplayer(XWikiContext context) {
-       return "";
+        // Then look for pages or templates
+        if (this.cachedCustomDisplayer == null) {
+            this.cachedCustomDisplayer = getDefaultCustomDisplayer(context);
+        }
+        return this.cachedCustomDisplayer;
     }
 
     /**
-     * Method to find the default custom displayer to use for a specific Property Class
-     * @param propertyClassName
-     * @param context XWikiContext
-     * @return
+     * Returns the current default custom displayer for the PropertyClass. If it returns an empty string, then there is
+     * no default custom displayer for this class. This function is overridden in every derivative PropertyClass so that
+     * it will look for a custom displayer named by the derivative class and then if it cannot find one will look for a
+     * custom displayer named by the super class. This function returns empty because at the level of the PropertyClass
+     * there is no customer displayer.
+     * 
+     * @param context the current request context
      */
-    protected String getDefaultCustomDisplayer(String propertyClassName, XWikiContext context) {
+    protected String getDefaultCustomDisplayer(XWikiContext context)
+    {
+        return "";
+    }
+
+    /**
+     * Method to find the default custom displayer to use for a specific Property Class.
+     * 
+     * @param propertyClassName the type of the property; this is defined in each subclass, such as {@code boolean},
+     *        {@code string} or {@code dblist}
+     * @param context the current request context
+     * @return An identifier for the location of a custom displayer. This can be {@code class} if there's custom display
+     *         code specified in the class itself, {@code page:currentwiki:XWiki.BooleanDisplayer} if such a document
+     *         exists in the current wiki, {@code page:xwiki:XWiki.StringDisplayer} if such a document exists in the
+     *         main wiki, or {@code template:displayer_boolean.vm} if a template on the filesystem or in the current
+     *         skin exists.
+     */
+    protected String getDefaultCustomDisplayer(String propertyClassName, XWikiContext context)
+    {
         LOGGER.debug("Looking up default custom displayer for property class name " + propertyClassName);
 
         try {
-            // first look into the Wiki
-            String pageName = propertyClassName.substring(0,1).toUpperCase() + propertyClassName.substring(1) + "Displayer";
+            // First look into the current wiki
+            String pageName = StringUtils.capitalize(propertyClassName) + "Displayer";
             DocumentReference reference = new DocumentReference(context.getDatabase(), "XWiki", pageName);
             if (context.getWiki().exists(reference, context)) {
                 LOGGER.debug("Found default custom displayer for property class name in local wiki: " + pageName);
                 return "page:XWiki." + pageName;
             }
 
-            // look in the main wiki
-            if (context.getWiki().isVirtualMode()) {
+            // Look in the main wiki
+            if (context.getWiki().isVirtualMode() && !StringUtils.equals(context.getDatabase(), context.getMainXWiki())) {
                 reference = new DocumentReference(context.getMainXWiki(), "XWiki", pageName);
                 if (context.getWiki().exists(reference, context)) {
                     LOGGER.debug("Found default custom displayer for property class name in main wiki: " + pageName);
@@ -671,13 +691,14 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             String result = "";
             try {
                 result = context.getWiki().evaluateTemplate(template, context);
-                if (!result.equals("")) {
+                if (StringUtils.isNotEmpty(result)) {
                     LOGGER.debug("Found default custom displayer for property class name as template: " + template);
                     return "template:" + template;
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         } catch (Throwable e) {
-            // if we fail we consider there is no custom displayer
+            // If we fail we consider there is no custom displayer
             LOGGER.error("Error while trying to evaluate if a property has a custom displayer", e);
         }
 

@@ -56,6 +56,10 @@ public class MetaClass extends BaseClass
         safeput(usersclass.getName(), usersclass);
         LevelsMetaClass levelsclass = new LevelsMetaClass();
         safeput(levelsclass.getName(), levelsclass);
+        PageMetaClass pageclass = new PageMetaClass();
+        safeput(pageclass.getName(), pageclass);
+        EmailMetaClass emailclass = new EmailMetaClass();
+        safeput(emailclass.getName(), emailclass);
     }
 
     @Override

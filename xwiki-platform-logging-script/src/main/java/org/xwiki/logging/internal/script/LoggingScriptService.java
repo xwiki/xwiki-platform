@@ -35,6 +35,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -58,6 +59,9 @@ public class LoggingScriptService implements ScriptService, Initializable
      */
     @Inject
     private ObservationManager observation;
+
+    @Inject
+    private Logger logger;
 
     /**
      * All the produced log since last call to {@link #startLog()}.
@@ -103,8 +107,8 @@ public class LoggingScriptService implements ScriptService, Initializable
     private String jmxsetLevel(String logger, String level) throws InstanceNotFoundException, ReflectionException,
         MBeanException
     {
-        return (String) this.jmxServer.invoke(this.jmxName, "setLoggerLevel", new Object[] {logger, level}, new String[] {
-        "java.lang.String", "java.lang.String"});
+        return (String) this.jmxServer.invoke(this.jmxName, "setLoggerLevel", new Object[] {logger, level},
+            new String[] {"java.lang.String", "java.lang.String"});
     }
 
     private String jmxreloadDefaultConfiguration() throws InstanceNotFoundException, ReflectionException,
@@ -173,6 +177,7 @@ public class LoggingScriptService implements ScriptService, Initializable
         this.logQueue.clear();
         if (this.observation.getListener(this.logQueueListener.getName()) != this.logQueueListener) {
             this.observation.addListener(this.logQueueListener);
+            this.logger.info("Start listening events");
         }
     }
 

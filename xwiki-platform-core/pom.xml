@@ -222,7 +222,6 @@
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>org/xwiki/rest/**</exclude>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
@@ -244,6 +243,8 @@
             <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
             <!-- Minor modification in the AS event implementation, can be removed after the 4.1 release -->
             <exclude>com/xpn/xwiki/plugin/activitystream/impl/ActivityEventImpl</exclude>
+            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
+            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
           </excludes>
         </configuration>
       </plugin>

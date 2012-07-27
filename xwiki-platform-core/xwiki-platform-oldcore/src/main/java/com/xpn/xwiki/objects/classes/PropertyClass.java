@@ -688,7 +688,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             String pageName = StringUtils.capitalize(propertyClassName) + "Displayer";
             DocumentReference reference = new DocumentReference(context.getDatabase(), "XWiki", pageName);
             if (context.getWiki().exists(reference, context)) {
-                LOGGER.debug("Found default custom displayer for property class name in local wiki: " + pageName);
+                LOGGER.debug("Found default custom displayer for property class name in local wiki: [{}]", pageName);
                 return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + "XWiki." + pageName;
             }
 
@@ -696,7 +696,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             if (context.getWiki().isVirtualMode() && !StringUtils.equals(context.getDatabase(), context.getMainXWiki())) {
                 reference = new DocumentReference(context.getMainXWiki(), "XWiki", pageName);
                 if (context.getWiki().exists(reference, context)) {
-                    LOGGER.debug("Found default custom displayer for property class name in main wiki: " + pageName);
+                    LOGGER.debug("Found default custom displayer for property class name in main wiki: [{}]", pageName);
                     return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + context.getMainXWiki() + ":XWiki." + pageName;
                 }
             }
@@ -707,7 +707,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             try {
                 result = context.getWiki().evaluateTemplate(template, context);
                 if (StringUtils.isNotEmpty(result)) {
-                    LOGGER.debug("Found default custom displayer for property class name as template: " + template);
+                    LOGGER.debug("Found default custom displayer for property class name as template: [{}]", template);
                     return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + template;
                 }
             } catch (IOException e) {

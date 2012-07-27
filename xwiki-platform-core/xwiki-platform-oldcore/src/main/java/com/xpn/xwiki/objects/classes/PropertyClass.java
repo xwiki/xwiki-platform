@@ -667,7 +667,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
      */
     protected String getDefaultCustomDisplayer(String propertyClassName, XWikiContext context)
     {
-        LOGGER.debug("Looking up default custom displayer for property class name " + propertyClassName);
+        LOGGER.debug("Looking up default custom displayer for property class name [{}]", propertyClassName);
 
         try {
             // First look into the current wiki

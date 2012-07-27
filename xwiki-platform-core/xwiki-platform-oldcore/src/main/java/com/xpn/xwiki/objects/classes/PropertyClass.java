@@ -648,23 +648,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
         // Then look for pages or templates
         if (this.cachedCustomDisplayer == null) {
-            this.cachedCustomDisplayer = getDefaultCustomDisplayer(context);
+            this.cachedCustomDisplayer = getDefaultCustomDisplayer(getTypeName(), context);
         }
         return this.cachedCustomDisplayer;
-    }
-
-    /**
-     * Returns the current default custom displayer for the PropertyClass. If it returns an empty string, then there is
-     * no default custom displayer for this class. This function is overridden in every derivative PropertyClass so that
-     * it will look for a custom displayer named by the derivative class and then if it cannot find one will look for a
-     * custom displayer named by the super class. This function returns empty because at the level of the PropertyClass
-     * there is no customer displayer.
-     * 
-     * @param context the current request context
-     */
-    protected String getDefaultCustomDisplayer(XWikiContext context)
-    {
-        return "";
     }
 
     /**
@@ -718,5 +704,16 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         }
 
         return null;
+    }
+
+    /**
+     * Get a short name identifying this type of property. This is derived from the java class name, lowercasing the
+     * part before {@code Class}.
+     * 
+     * @return a string, for example {@code string}, {@code dblist}, {@code number}
+     */
+    private String getTypeName()
+    {
+        return StringUtils.substringBeforeLast(this.getClass().getSimpleName(), "Class").toLowerCase();
     }
 }

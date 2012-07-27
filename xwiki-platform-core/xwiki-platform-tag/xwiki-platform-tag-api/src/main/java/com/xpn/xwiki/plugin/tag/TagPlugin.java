@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.query.Query;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -222,6 +223,31 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     /**
      * Get cardinality map of tags matching a parameterized hql query.
+     *
+     * @param fromClause the <code>from</code> fragment of the query
+     * @param whereClause the <code>where</code> fragment of the query
+     * @param queryType the type of query language used
+     * @param parameterValues list of parameter values for the query
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     * @since 1.18
+     */
+    public Map<String, Integer> getTagCountForQuery(String fromClause, String whereClause, List<?> parameterValues,
+        String queryType,
+        XWikiContext context) throws XWikiException
+    {
+        if (Query.XWQL.equals(queryType)) {
+            return getTagCountForXWQLQuery(fromClause, whereClause, parameterValues, context);
+        } else if (Query.HQL.equals(queryType)) {
+            return getTagCountForQuery(fromClause, whereClause, parameterValues, context);
+        }
+        throw new RuntimeException("Invalid query type: " + queryType);
+    }
+
+    /**
+     * Get cardinality map of tags matching a parameterized hql query.
      * 
      * @param fromHql the <code>from</code> fragment of the hql query
      * @param whereHql the <code>where</code> fragment of the hql query
@@ -254,7 +280,72 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (params == null) {
             params = new ArrayList<String>();
         }
+
+
         results = context.getWiki().getStore().search(from + where, 0, 0, params, context);
+        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
+        Map<String, String> processedTags = new HashMap<String, String>();
+
+        // We have to manually build a cardinality map since we have to ignore tags case.
+        for (String result : results) {
+            // This key allows to keep track of the case variants we've encountered.
+            String lowerTag = result.toLowerCase();
+
+            // We store the first case variant to reuse it in the final result set.
+            if (!processedTags.containsKey(lowerTag)) {
+                processedTags.put(lowerTag, result);
+            }
+
+            String tagCountKey = processedTags.get(lowerTag);
+            int tagCountForTag = 0;
+            if (tagCount.get(tagCountKey) != null) {
+                tagCountForTag = tagCount.get(tagCountKey);
+            }
+            tagCount.put(tagCountKey, tagCountForTag + 1);
+        }
+
+        return tagCount;
+    }
+
+    /**
+     * Get cardinality map of tags matching a parameterized xwql query.
+     *
+     * @param fromXwql the <code>from</code> fragment of the xwql query
+     * @param whereXwql the <code>where</code> fragment of the xwql query
+     * @param parameterValues list of parameter values for the query
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     * @since 1.18
+     */
+    private Map<String, Integer> getTagCountForXWQLQuery(String fromXwql, String whereXwql, List<?> parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        List<String> results = null;
+        Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+
+        String from = "select obj.tags from Document doc, doc.object(XWiki.TagClass) as obj ";
+        String where = "where 1=1 ";
+
+        // If at least one of the fragments is passed, the query should be matching XWiki documents
+        if (!StringUtils.isBlank(fromXwql) || !StringUtils.isBlank(whereXwql)) {
+            from += fromXwql;
+        }
+        if (!StringUtils.isBlank(whereXwql)) {
+            where += whereXwql;
+        }
+
+        List<?> params = parameterValues;
+        if (params == null) {
+            params = new ArrayList<String>();
+        }
+
+        try {
+            results = context.getWiki().getStore().getQueryManager().createQuery(from + where, Query.XWQL).execute();
+        } catch (Exception e) {
+            return Collections.emptyMap();
+        }
         Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
         Map<String, String> processedTags = new HashMap<String, String>();
 

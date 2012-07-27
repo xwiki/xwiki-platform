@@ -145,6 +145,30 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
+     * Get cardinality map of tags matching an hql query (parametrized version). Example of usage:
+     * <ul>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("", "doc.creator = ?", ["$!{request.creator}"])
+     * </code> will return the cardinality map of tags for documents created by user-provided creator name</li>
+     * </ul>
+     *
+     * @param from the from fragment of the query
+     * @param where the parameterized where fragment from the query
+     * @param parameterValues list of parameter values for the query
+     * @param queryType the type of the query language
+     * @return map of tags with their occurrences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
+     * @since 1.18
+     */
+    public Map<String, Integer> getTagCountForQuery(String from, String where, List<?> parameterValues,
+        String queryType)
+        throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCountForQuery(from, where, parameterValues, queryType, this.context);
+    }
+
+    /**
      * Get all the documents containing the given tag.
      * 
      * @param tag tag to match.

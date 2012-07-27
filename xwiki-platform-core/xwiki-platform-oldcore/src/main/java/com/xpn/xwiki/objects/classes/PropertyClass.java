@@ -82,7 +82,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
     private PropertyMetaClass pMetaClass;
 
-    protected String cachedCustomDisplayer = null;
+    protected String cachedCustomDisplayer;
 
     public PropertyClass()
     {

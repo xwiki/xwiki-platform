@@ -37,6 +37,7 @@ import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -59,6 +60,21 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
      * Logging helper object.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyClass.class);
+
+    /**
+     * Identifier used to specify that the property has a custom displayer in the XClass itself.
+     */
+    private static final String CLASS_DISPLAYER_IDENTIFIER = "class";
+
+    /**
+     * Identifier prefix used to specify that the property has a custom displayer in a wiki document.
+     */
+    private static final String DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX = "doc:";
+
+    /**
+     * Identifier prefix used to specify that the property has a custom displayer in a velocity template.
+     */
+    private static final String TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX = "template:";
 
     private BaseClass xclass;
 
@@ -240,7 +256,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
     public boolean isCustomDisplayed(XWikiContext context)
     {
-        return (!getCachedDefaultCustomDisplayer(context).equals(""));
+        return (StringUtils.isNotEmpty(getCachedDefaultCustomDisplayer(context)));
     }
 
     public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object,
@@ -261,22 +277,21 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             }
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
-            System.out.println("CUSTOM: " + this.cachedCustomDisplayer);
-            if (customDisplayer != null && !customDisplayer.equals("")) {
-                if (customDisplayer.equals("class")) {
+            if (StringUtils.isNotEmpty(customDisplayer)) {
+                if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
                     content = getCustomDisplay();
                     String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
                         .getSyntax().toIdString();
                     content = context.getDoc().getRenderedContent(content, classSyntax, context);
-                } else if (customDisplayer.startsWith("page:")) {
-                    content = context.getWiki().getDocument(customDisplayer.substring(5), context).getContent();
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
-                        .getSyntax().toIdString();
+                } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
+                    XWikiDocument displayerDoc = context.getWiki().getDocument(
+                        StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
+                    content = displayerDoc.getContent();
+                    String classSyntax = displayerDoc.getSyntax().toIdString();
                     content = context.getDoc().getRenderedContent(content, classSyntax, context);
-                } else if (customDisplayer.startsWith("template:")) {
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
-                        .getSyntax().toIdString();
-                    content = context.getWiki().evaluateTemplate(customDisplayer.substring(9), context);
+                } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
+                    content = context.getWiki().evaluateTemplate(
+                        StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
                 }
             }
         } catch (Exception e) {
@@ -628,7 +643,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         // First look at custom displayer in class. We should not cache this one.
         String customDisplay = getCustomDisplay();
         if (StringUtils.isNotEmpty(customDisplay)) {
-            return "class";
+            return CLASS_DISPLAYER_IDENTIFIER;
         }
 
         // Then look for pages or templates
@@ -674,7 +689,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             DocumentReference reference = new DocumentReference(context.getDatabase(), "XWiki", pageName);
             if (context.getWiki().exists(reference, context)) {
                 LOGGER.debug("Found default custom displayer for property class name in local wiki: " + pageName);
-                return "page:XWiki." + pageName;
+                return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + "XWiki." + pageName;
             }
 
             // Look in the main wiki
@@ -682,7 +697,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
                 reference = new DocumentReference(context.getMainXWiki(), "XWiki", pageName);
                 if (context.getWiki().exists(reference, context)) {
                     LOGGER.debug("Found default custom displayer for property class name in main wiki: " + pageName);
-                    return "page:" + context.getMainXWiki() + ":XWiki." + pageName;
+                    return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + context.getMainXWiki() + ":XWiki." + pageName;
                 }
             }
 
@@ -693,7 +708,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
                 result = context.getWiki().evaluateTemplate(template, context);
                 if (StringUtils.isNotEmpty(result)) {
                     LOGGER.debug("Found default custom displayer for property class name as template: " + template);
-                    return "template:" + template;
+                    return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + template;
                 }
             } catch (IOException e) {
             }

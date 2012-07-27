@@ -611,10 +611,10 @@ public class BaseSearchResult extends XWikiResource
                     if (withPrettyNames)
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
                     if (className!=null&&!className.equals("")) {
-                        BaseObject baseObject = Utils.getBaseObject(doc, className, 0);
+                        BaseObject baseObject = Utils.getBaseObject(doc, className, 0, componentManager);
                         if (baseObject!=null)
-                            searchResult.setObjectSummary(DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames));
+                            searchResult.setObject(DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
+                                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), false));
                     }
 
                     String pageUri = null;

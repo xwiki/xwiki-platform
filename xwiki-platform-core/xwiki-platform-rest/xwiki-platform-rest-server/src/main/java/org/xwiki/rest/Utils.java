@@ -241,7 +241,7 @@ public class Utils
      * @return The BaseObject field
      * @throws XWikiException
      */
-    public static BaseObject getBaseObject(Document doc, String className, int objectNumber) throws XWikiException
+    public static BaseObject getBaseObject(Document doc, String className, int objectNumber, ComponentManager componentManager) throws XWikiException
     {
         XWikiDocument xwikiDocument =
             Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),

@@ -465,7 +465,7 @@
           <element name="objectNumber" type="int" minOccurs="0"></element>
           <element name="filename" type="string" minOccurs="0"></element>
           <element name="score" type="float" minOccurs="0"></element>
-          <element name="objectSummary" type="xwiki:ObjectSummary" minOccurs="0"></element>
+          <element name="object" type="xwiki:Object" minOccurs="0"></element>
 	  </sequence>
       </extension>
     </complexContent>

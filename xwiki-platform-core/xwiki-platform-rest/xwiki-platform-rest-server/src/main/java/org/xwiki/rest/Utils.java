@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -229,5 +230,25 @@ public class Utils
     {
         return getXWikiContext(componentManager).getWiki().getUserName(author, null, false, getXWikiContext(componentManager));
     }
+
+    /**
+     * <p>
+     * Retrieve the BaseObject from the Document
+     * </p>
+     * @param doc Public API document
+     * @param className Classname
+     * @param objectNumber Object Number
+     * @return The BaseObject field
+     * @throws XWikiException
+     */
+    public static BaseObject getBaseObject(Document doc, String className, int objectNumber) throws XWikiException
+    {
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
+
+        return xwikiDocument.getObject(className, objectNumber);
+    }
+
 
 }

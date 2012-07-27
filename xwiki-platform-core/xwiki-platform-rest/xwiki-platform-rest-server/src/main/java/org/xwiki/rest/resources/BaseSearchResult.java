@@ -31,6 +31,7 @@ import javax.ws.rs.core.UriBuilderException;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -43,8 +44,10 @@ import org.xwiki.rest.resources.spaces.SpaceResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.plugin.lucene.SearchResults;
 
@@ -499,6 +502,7 @@ public class BaseSearchResult extends XWikiResource
      * @param number
      * @param start
      * @param withPrettyNames 
+     * @param className 
      * @return
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -506,7 +510,7 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchQuery(String query, String queryType, String wikiName, String wikis,
-        boolean hasProgrammingRights, String order, boolean distinct, int number, int start, Boolean withPrettyNames) throws QueryException,
+        boolean hasProgrammingRights, String order, boolean distinct, int number, int start, Boolean withPrettyNames, String className) throws QueryException,
         IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -522,7 +526,7 @@ public class BaseSearchResult extends XWikiResource
                 result.addAll(searchLucene(query, wikiName, wikis, hasProgrammingRights, order, number, start, withPrettyNames));
                 } else {
                     result.addAll(searchDatabaseQuery(query, QueryType.XWQL.equals(queryType) ? Query.XWQL : Query.HQL, 
-                        wikiName, hasProgrammingRights, distinct, number, start, withPrettyNames));
+                        wikiName, hasProgrammingRights, distinct, number, start, withPrettyNames, className));
                 }
             return result;
         } finally {
@@ -540,15 +544,16 @@ public class BaseSearchResult extends XWikiResource
      * @param distinct
      * @param number
      * @param start
-     * @param withPrettyNames 
-     * @return
+     * @param withPrettyNames Add the pretty names for users
+     * @param className Add object of type className
      * @throws QueryException
      * @throws IllegalArgumentException
      * @throws UriBuilderException
      * @throws XWikiException
+     * @return list of results
      */
     protected List<SearchResult> searchDatabaseQuery(String query, String queryType, String wikiName,
-        boolean hasProgrammingRights, boolean distinct, int number, int start, Boolean withPrettyNames) throws QueryException,
+        boolean hasProgrammingRights, boolean distinct, int number, int start, Boolean withPrettyNames, String className) throws QueryException,
         IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -605,6 +610,12 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setAuthor(doc.getAuthor());
                     if (withPrettyNames)
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
+                    if (className!=null&&!className.equals("")) {
+                        BaseObject baseObject = Utils.getBaseObject(doc, className, 0);
+                        if (baseObject!=null)
+                            searchResult.setObjectSummary(DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
+                                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames));
+                    }
 
                     String pageUri = null;
                     try {

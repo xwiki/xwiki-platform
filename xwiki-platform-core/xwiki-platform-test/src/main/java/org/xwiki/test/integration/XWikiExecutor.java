@@ -52,11 +52,11 @@ public class XWikiExecutor
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
-    public static final String SKIP_STARTING_XWIKI_INSTANCE = System.getProperty("xe.start.skip", "false");
+    public static final String SKIP_STARTING_XWIKI_INSTANCE = System.getProperty("xwiki.test.skipStart", "false");
     
     public static final String BASEDIR = System.getProperty("basedir");
     
-    public static final String URL = System.getProperty("xe.url", "http://localhost");
+    public static final String URL = System.getProperty("xwiki.test.baseURL", "http://localhost");
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 

@@ -41,13 +41,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

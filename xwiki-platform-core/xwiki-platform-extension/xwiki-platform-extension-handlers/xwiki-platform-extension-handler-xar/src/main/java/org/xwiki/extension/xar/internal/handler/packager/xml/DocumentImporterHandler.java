@@ -131,11 +131,15 @@ public class DocumentImporterHandler extends DocumentHandler
             }
         } else {
             currentDocument = document;
-            currentDocument.setCreatorReference(userReference);
+            if (userReference != null) {
+                currentDocument.setCreatorReference(userReference);
+            }
         }
 
-        currentDocument.setAuthorReference(userReference);
-        currentDocument.setContentAuthorReference(userReference);
+        if (userReference != null) {
+            currentDocument.setAuthorReference(userReference);
+            currentDocument.setContentAuthorReference(userReference);
+        }
 
         context.getWiki().saveDocument(currentDocument, comment, context);
     }
@@ -214,10 +218,12 @@ public class DocumentImporterHandler extends DocumentHandler
                             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
                             mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
                             DocumentReference userReference = getUserReference(context);
-                            nextDocument.setAuthorReference(userReference);
-                            nextDocument.setContentAuthorReference(userReference);
-                            mergedDocument.setAuthorReference(userReference);
-                            mergedDocument.setContentAuthorReference(userReference);
+                            if (userReference != null) {
+                                nextDocument.setAuthorReference(userReference);
+                                nextDocument.setContentAuthorReference(userReference);
+                                mergedDocument.setAuthorReference(userReference);
+                                mergedDocument.setContentAuthorReference(userReference);
+                            }
 
                             XWikiDocument documentToSave =
                                 askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument);
@@ -318,10 +324,14 @@ public class DocumentImporterHandler extends DocumentHandler
         try {
             XWikiContext context = getXWikiContext();
 
-            // Set proper author
             XWikiDocument document = getDocument();
-            document.setAuthorReference(getUserReference(context));
-            attachment.setAuthor(getUserString(context));
+
+            // Set proper author
+            DocumentReference userReference = getUserReference(context);
+            if (userReference != null) {
+                document.setAuthorReference(userReference);
+                attachment.setAuthor(getUserString(context));
+            }
 
             XWikiDocument dbDocument = getDatabaseDocument();
 

@@ -104,8 +104,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
                 if (previousExtensionId.equals(distributionExtensionId)) {
                     this.distributionState = DistributionState.SAME;
-                } else if (!distributionExtensionId.getId().equals(previousExtensionId.getId())
-                    && !this.distributionExtension.getFeatures().contains(previousExtensionId.getId())) {
+                } else if (!distributionExtensionId.getId().equals(previousExtensionId.getId())) {
                     this.distributionState = DistributionState.DIFFERENT;
                 } else {
                     int diff = distributionExtensionId.getVersion().compareTo(previousExtensionId.getVersion());

@@ -29,6 +29,7 @@
 
     #set($installRequest = $services.extension.createInstallRequest($distributionUIId.id, $distributionUIId.version.value, 'wiki:xwiki'))
     $installRequest.setInteractive(false)
+    $installRequest.setProperty($null)
     #set($installJob = $services.extension.install($installRequest))
     $installJob.join()
     <ul>

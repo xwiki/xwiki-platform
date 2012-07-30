@@ -46,7 +46,9 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     {
         DistributionJobStatus status = new DistributionJobStatus(request, observationManager, loggerManager);
 
-        status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
+        if (this.distributionManager.getDistributionExtension() != null) {
+            status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
+        }
         status.setDistributionExtensionUi(this.distributionManager.getUIExtensionId());
 
         return status;

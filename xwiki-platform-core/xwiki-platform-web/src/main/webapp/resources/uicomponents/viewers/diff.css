@@ -1,7 +1,7 @@
 #template('colorThemeInit.vm')
 .diff-container {
   border: 1px solid $theme.borderColor;
-  font-family: Courier, monospace;
+  font-family: Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
   overflow: auto;
 }

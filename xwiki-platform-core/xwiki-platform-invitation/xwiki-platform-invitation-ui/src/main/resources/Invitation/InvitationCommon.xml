@@ -866,6 +866,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
                                   + "$config.get('emailContainer')" + '"]){{/info}}{{/velo' + 'city}}')
     #set($discard = $emailContainer.setContent($emailContainerContent))
     #set($discard = $emailContainer.setHidden(true))
+    #set($discard = $emailContainer.saveAsAuthor())
   #end
   ##
   ## Load messages into a Map by messageID.

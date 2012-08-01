@@ -81,10 +81,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             // Script context there. However if we create a new Script context we need to populate it with
             // the message tool. This needs to be refactored to be made clean.
             Object msg = xcontext.get("msg");
-            if (msg != null) {
-                if (scriptContext.getAttribute("msg") == null) {
-                    scriptContext.setAttribute("msg", msg, ScriptContext.ENGINE_SCOPE);
-                }
+            if (msg != null && scriptContext.getAttribute("msg") == null) {
+                scriptContext.setAttribute("msg", msg, ScriptContext.ENGINE_SCOPE);
             }
         }
 

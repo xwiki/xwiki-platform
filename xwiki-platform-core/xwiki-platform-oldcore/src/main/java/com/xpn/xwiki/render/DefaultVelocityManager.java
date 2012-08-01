@@ -31,7 +31,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
@@ -42,8 +41,6 @@ import org.xwiki.velocity.XWikiWebappResourceLoader;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -80,6 +77,7 @@ public class DefaultVelocityManager implements VelocityManager
     private ScriptContextManager scriptContextManager;
 
     @Override
+    @SuppressWarnings("unchecked")
     public VelocityContext getVelocityContext()
     {
         // The Velocity Context is set in VelocityRequestInterceptor, when the XWiki Request is initialized so we are
@@ -88,56 +86,21 @@ public class DefaultVelocityManager implements VelocityManager
             (VelocityContext) this.execution.getContext().getProperty(
                 VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
 
-        // Bridge. To be removed later.
-        if (vcontext.get("util") == null) {
-            XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-
-            // Put the Util API in the Velocity context.
-            vcontext.put("util", new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext));
-
-            // We put the com.xpn.xwiki.api.XWiki object into the context and not the com.xpn.xwiki.XWiki one which is
-            // for internal use only. In this manner we control what the user can access.
-            vcontext.put("xwiki", new XWiki(xcontext.getWiki(), xcontext));
-
-            vcontext.put("request", xcontext.getRequest());
-            vcontext.put("response", xcontext.getResponse());
-
-            // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
-            // which is for internal use only. In this manner we control what the user can access.
-            // "context" binding is deprecated since 1.9.1
-            Context apiContext = new Context(xcontext);
-            vcontext.put("context", apiContext);
-            vcontext.put("xcontext", apiContext);
-
-            // Make the Syntax Factory component available from Velocity.
-            // This is @Depecated in XWiki 4.0M2 and shouldn't be used. Instead the Rendering Script Service should be
-            // used.
-            vcontext.put("syntaxFactory", Utils.getComponent(SyntaxFactory.class));
-
-            // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
-            // Velocity context there. However if we create a new Velocity context we need to populate it with
-            // the message tool. This needs to be refactored to be made clean.
-            Object msg = xcontext.get("msg");
-            if (msg != null) {
-                if (vcontext.get("msg") == null) {
-                    vcontext.put("msg", msg);
-                }
-            }
-
-            // Save the Velocity Context in the XWiki context so that users can access the objects we've put in it
-            // (xwiki, request, response, etc).
-            xcontext.put("vcontext", vcontext);
-        }
-
-        // Copy current JSR223 ScriptContext binding
-        for (Map.Entry<String, Object> entry : this.scriptContextManager.getScriptContext()
-            .getBindings(ScriptContext.ENGINE_SCOPE).entrySet()) {
-            // Not ideal since it does not allow to modify a binding but it's too dangerous for existing velocity script
-            // otherwise
+        // Copy current JSR223 ScriptContext binding.
+        ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
+        for (Map.Entry<String, Object> entry : scriptContext.getBindings(ScriptContext.ENGINE_SCOPE).entrySet()) {
+            // Not ideal since it does not allow to modify a binding but it's too dangerous for existing velocity
+            // scripts otherwise.
             if (!vcontext.containsKey(entry.getKey())) {
                 vcontext.put(entry.getKey(), entry.getValue());
             }
         }
+
+        // Add the "context" binding which is deprecated since 1.9.1.
+        vcontext.put("context", vcontext.get("xcontext"));
+
+        // Save the Velocity Context in the XWiki context so that users can access the bindings.
+        ((Map<String, Object>) this.execution.getContext().getProperty("xwikicontext")).put("vcontext", vcontext);
 
         return vcontext;
     }

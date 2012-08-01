@@ -1462,7 +1462,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             {
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    return execution.getContext().getProperty("velocityContext");
+                    VelocityContext velocityContext =
+                        (VelocityContext) execution.getContext().getProperty("velocityContext");
+                    // See DefaultVelocityManagerTest#testGetVelocityContextUpdatesXContext()
+                    getContext().put("vcontext", velocityContext);
+                    return velocityContext;
                 }
             });
 

@@ -115,6 +115,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -7281,14 +7282,11 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
-        if (vcontext != null) {
-            backup.put("vdoc", vcontext.get("doc"));
-            backup.put("vcdoc", vcontext.get("cdoc"));
-            backup.put("vtdoc", vcontext.get("tdoc"));
-        }
+        // The XWiki Context isn't recreated when the Execution Context is cloned so we have to backup some of its data.
+        // Backup the current document on the XWiki Context.
+        backup.put("doc", context.getDoc());
 
+        // Backup the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext != null) {
@@ -7297,74 +7295,54 @@ public class XWikiDocument implements DocumentModelBridge
             backup.put("gtdoc", gcontext.get("tdoc"));
         }
 
-        backup.put("doc", context.getDoc());
-
-        // Clone the Execution Context to provide isolation
+        // Clone the Execution Context to provide isolation. The clone will have a new Velocity and Script Context.
         Execution execution = Utils.getComponent(Execution.class);
-        ExecutionContext clonedEc;
         try {
-            clonedEc = Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext());
+            execution.pushContext(Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext()));
         } catch (ExecutionContextException e) {
             throw new RuntimeException("Failed to clone the Execution Context", e);
         }
-        execution.pushContext(clonedEc);
 
-        // Make sure the execution context and the XWiki context point to the same Velocity context instance.
-        vcontext = velocityManager.getVelocityContext();
+        // Trigger the initialization of the new Velocity and Script Context. This will also ensure that the Execution
+        // Context and the XWiki Context point to the same Velocity Context instance. There is old code that accesses
+        // the Velocity Context from the XWiki Context.
+        Utils.getComponent(VelocityManager.class).getVelocityContext();
+    }
+
+    public static void restoreContext(Map<String, Object> backup, XWikiContext context)
+    {
+        // Restore the Execution Context. This will also restore the previous Velocity and Script Context.
+        Execution execution = Utils.getComponent(Execution.class);
+        execution.popContext();
+
+        // Restore the Velocity Context reference from the XWiki Context, which is still used by some old code. Note
+        // that we take the Velocity Context directly from the Execution Context in order to avoid triggering a
+        // reinitialization of the Velocity Context.
+        VelocityContext vcontext = (VelocityContext) execution.getContext().getProperty("velocityContext");
         if (vcontext != null) {
             context.put("vcontext", vcontext);
         } else {
             context.remove("vcontext");
         }
-    }
 
-    public static void restoreContext(Map<String, Object> backup, XWikiContext context)
-    {
-        // Restore the Execution Context
-        Execution execution = Utils.getComponent(Execution.class);
-        execution.popContext();
-
-        // Restore the context document before accessing the Velocity context because the script context initialization
-        // triggered by the Velocity manager must take into account the restored document.
+        // Restore the current document on the XWiki Context.
         if (backup.get("doc") != null) {
             context.setDoc((XWikiDocument) backup.get("doc"));
         }
 
+        // Restore the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext != null) {
             if (backup.get("gdoc") != null) {
                 gcontext.put("doc", backup.get("gdoc"));
             }
-
             if (backup.get("gcdoc") != null) {
                 gcontext.put("cdoc", backup.get("gcdoc"));
             }
-
             if (backup.get("gtdoc") != null) {
                 gcontext.put("tdoc", backup.get("gtdoc"));
             }
-        }
-
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
-        if (vcontext != null) {
-            if (backup.get("vdoc") != null) {
-                vcontext.put("doc", backup.get("vdoc"));
-            }
-
-            if (backup.get("vcdoc") != null) {
-                vcontext.put("cdoc", backup.get("vcdoc"));
-            }
-
-            if (backup.get("vtdoc") != null) {
-                vcontext.put("tdoc", backup.get("vtdoc"));
-            }
-
-            // Make sure the execution context and the XWiki context point to the same Velocity context instance.
-            context.put("vcontext", vcontext);
-        } else {
-            context.remove("vcontext");
         }
     }
 
@@ -7374,16 +7352,17 @@ public class XWikiDocument implements DocumentModelBridge
             context.setDoc(this);
             com.xpn.xwiki.api.Document apidoc = newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
+
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
             if (vcontext != null) {
                 vcontext.put("doc", apidoc);
                 vcontext.put("tdoc", tdoc);
                 vcontext.put("cdoc", tdoc);
             }
 
+            @SuppressWarnings("unchecked")
+            Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
             if (gcontext != null) {
                 gcontext.put("doc", apidoc);
                 gcontext.put("tdoc", tdoc);

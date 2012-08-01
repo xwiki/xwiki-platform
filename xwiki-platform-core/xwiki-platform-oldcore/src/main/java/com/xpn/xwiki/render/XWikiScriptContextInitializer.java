@@ -24,13 +24,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.web.Utils;
 
@@ -46,6 +49,9 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class XWikiScriptContextInitializer implements ScriptContextInitializer
 {
+    @Inject
+    private Logger logger;
+
     @Inject
     private Execution execution;
 
@@ -87,9 +93,17 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
         }
 
         if (xcontext.getDoc() != null) {
-            scriptContext.setAttribute("doc", xcontext.getDoc().newDocument(xcontext), ScriptContext.ENGINE_SCOPE);
-            scriptContext.setAttribute("cdoc", scriptContext.getAttribute("doc"), ScriptContext.ENGINE_SCOPE);
-            scriptContext.setAttribute("tdoc", scriptContext.getAttribute("doc"), ScriptContext.ENGINE_SCOPE);
+            Document apiDocument = xcontext.getDoc().newDocument(xcontext);
+            Document translatedDocument = apiDocument;
+            try {
+                translatedDocument = apiDocument.getTranslatedDocument();
+            } catch (XWikiException e) {
+                logger.warn("Failed to retrieve the translated document for [{}]. "
+                    + "Continue using the default translation.", apiDocument.getFullName(), e);
+            }
+            scriptContext.setAttribute("doc", apiDocument, ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("cdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("tdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
         }
     }
 }

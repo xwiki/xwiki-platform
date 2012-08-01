@@ -99,7 +99,8 @@ public class DefaultVelocityManager implements VelocityManager
         // Add the "context" binding which is deprecated since 1.9.1.
         vcontext.put("context", vcontext.get("xcontext"));
 
-        // Save the Velocity Context in the XWiki context so that users can access the bindings.
+        // Make sure the execution context and the XWiki context point to the same Velocity context instance. There is
+        // old code that accesses the Velocity context from the XWiki context.
         ((Map<String, Object>) this.execution.getContext().getProperty("xwikicontext")).put("vcontext", vcontext);
 
         return vcontext;

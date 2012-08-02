@@ -1143,25 +1143,23 @@ ul.extension-metadata li {
       ##
       ## Specific actions.
       ##
-      #if ($hasProgramming)
-        #if(!$extensionStatus)
-          #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
-        #end
-        #if ($extensionStatus == 'installed')
-          ## This extension can be uninstalled.
-          #extensionActionButton($extension 'uninstall' true)
-        #elseif ($extensionStatus == 'remote')
-          ## Installable extension.
-          #extensionActionButton($NULL 'install')
-        #elseif ($extensionStatus == 'remote-installed')
-          ## An extension that can be either upgraded or downgraded.
-          ## Compare this version with the version that is currently installed to determine which button to display.
-          #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
-          #if ($extension.id.version.compareTo($installedExtension.id.version) &gt; 0)
-            #extensionActionButton($installedExtension 'upgrade')
-          #else
-            #extensionActionButton($installedExtension 'downgrade' true)
-          #end
+      #if(!$extensionStatus)
+        #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
+      #end
+      #if ($extensionStatus == 'installed')
+        ## This extension can be uninstalled.
+        #extensionActionButton($extension 'uninstall' true)
+      #elseif ($extensionStatus == 'remote')
+        ## Installable extension.
+        #extensionActionButton($NULL 'install')
+      #elseif ($extensionStatus == 'remote-installed')
+        ## An extension that can be either upgraded or downgraded.
+        ## Compare this version with the version that is currently installed to determine which button to display.
+        #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+        #if ($extension.id.version.compareTo($installedExtension.id.version) &gt; 0)
+          #extensionActionButton($installedExtension 'upgrade')
+        #else
+          #extensionActionButton($installedExtension 'downgrade' true)
         #end
       #end
     &lt;/div&gt;

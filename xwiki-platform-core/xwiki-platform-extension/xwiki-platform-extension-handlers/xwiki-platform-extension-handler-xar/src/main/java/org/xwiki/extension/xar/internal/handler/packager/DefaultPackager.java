@@ -260,12 +260,17 @@ public class DefaultPackager implements Packager, Initializable
                     if (language != null) {
                         document = document.getTranslatedDocument(language, xcontext);
                         xcontext.getWiki().deleteDocument(document, xcontext);
+
+                        this.logger.info("Successfully deleted document [{}] in language [{}]",
+                            document.getDocumentReference(), document.getRealLanguage());
                     } else {
                         xcontext.getWiki().deleteAllDocuments(document, xcontext);
+
+                        this.logger.info("Successfully deleted document [{}]", document.getDocumentReference());
                     }
                 }
             } catch (XWikiException e) {
-                this.logger.error("Failed to delete document [" + documentReference + "]", e);
+                this.logger.error("Failed to delete document [{}]", documentReference, e);
             }
         }
     }

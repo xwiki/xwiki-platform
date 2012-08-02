@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +68,9 @@ import org.xwiki.job.JobManager;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * Entry point of extension manager from scripts.
  * <p>
@@ -100,6 +104,12 @@ public class ExtensionManagerScriptService implements ScriptService
      * The prefix put behind all job ids which are information gathering.
      */
     public static final String EXTENSIONPLAN_JOBID_PREFIX = "plan";
+
+    private static final String PROPERTY_USERREFERENCE = "user.reference";
+
+    private static final String PROPERTY_CALLERREFERENCE = "caller.reference";
+
+    private static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
     /**
      * The real extension manager bridged by this script service.
@@ -148,6 +158,9 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * 
@@ -379,6 +392,17 @@ public class ExtensionManagerScriptService implements ScriptService
 
     // Actions
 
+    private XWikiDocument getCallerDocument()
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        if (sdoc == null) {
+            sdoc = xcontext.getDoc();
+        }
+
+        return sdoc;
+    }
+
     private List<String> getJobId(String prefix, String extensionId, String namespace)
     {
         List<String> jobId;
@@ -404,12 +428,6 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job install(String id, String version, String namespace)
     {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to install an extension"));
-
-            return null;
-        }
-
         setError(null);
 
         InstallRequest installRequest = new InstallRequest();
@@ -420,7 +438,13 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(namespace);
         }
 
-        installRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
+        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
 
         Job job = null;
         try {
@@ -452,6 +476,14 @@ public class ExtensionManagerScriptService implements ScriptService
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
         }
+
+        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
 
         ExtensionPlan status;
         try {
@@ -510,12 +542,6 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     private Job uninstall(ExtensionId extensionId, String namespace)
     {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to uninstall an extension"));
-
-            return null;
-        }
-
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
@@ -525,7 +551,13 @@ public class ExtensionManagerScriptService implements ScriptService
             uninstallRequest.addNamespace(namespace);
         }
 
-        uninstallRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
+        uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
 
         Job job = null;
         try {
@@ -588,6 +620,14 @@ public class ExtensionManagerScriptService implements ScriptService
             uninstallRequest.addNamespace(namespace);
         }
 
+        uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
+
         ExtensionPlan status;
         try {
             status =
@@ -618,6 +658,14 @@ public class ExtensionManagerScriptService implements ScriptService
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
         }
+
+        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
 
         ExtensionPlan status;
         try {

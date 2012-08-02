@@ -4278,39 +4278,54 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-
-        // Inform notification mechanisms that a document is about to be deleted
-        // Note that for the moment the event being send is a bridge event, as we are still passing around
-        // an XWikiDocument as source and an XWikiContext as data.
-        om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), new XWikiDocument(doc.getDocumentReference()),
-            context);
-
-        if (hasRecycleBin(context) && totrash) {
-            getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
-        }
-
-        getStore().deleteXWikiDoc(doc, context);
-
+        String server = null, database = null;
         try {
-            // Inform notification mecanisms that a document has been deleted
+            server = doc.getDocumentReference().getWikiReference().getName();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            ObservationManager om = Utils.getComponent(ObservationManager.class);
+
+            // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            // The source document is a new empty XWikiDocument to follow
-            // DocumentUpdatedEvent policy: source document in new document and the old version is available using
-            // doc.getOriginalDocument()
-            if (om != null) {
-                XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
-                // Again to follow general event policy, new document author is the user who modified the document (here
-                // the modification is delete)
-                blankDoc.setOriginalDocument(doc);
-                blankDoc.setAuthor(context.getUser());
-                blankDoc.setContentAuthor(context.getUser());
-                om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+            om.notify(new DocumentDeletingEvent(doc.getDocumentReference()),
+                new XWikiDocument(doc.getDocumentReference()), context);
+
+            if (hasRecycleBin(context) && totrash) {
+                getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
             }
-        } catch (Exception ex) {
-            LOGGER.error("Failed to send document delete notifications for document [" + doc.getPrefixedFullName()
-                + "]", ex);
+
+            getStore().deleteXWikiDoc(doc, context);
+
+            try {
+                // Inform notification mecanisms that a document has been deleted
+                // Note that for the moment the event being send is a bridge event, as we are still passing around
+                // an XWikiDocument as source and an XWikiContext as data.
+                // The source document is a new empty XWikiDocument to follow
+                // DocumentUpdatedEvent policy: source document in new document and the old version is available using
+                // doc.getOriginalDocument()
+                if (om != null) {
+                    XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
+                    // Again to follow general event policy, new document author is the user who modified the document
+                    // (here
+                    // the modification is delete)
+                    blankDoc.setOriginalDocument(doc);
+                    blankDoc.setAuthor(context.getUser());
+                    blankDoc.setContentAuthor(context.getUser());
+                    om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Failed to send document delete notifications for document [{}]",
+                    doc.getDocumentReference(), ex);
+            }
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
         }
     }
 

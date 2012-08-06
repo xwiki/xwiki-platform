@@ -1857,7 +1857,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #end
   #end
   $!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
-  {{/html}}##
+  {{/html}}
 #end
 
 #macro (computeXBack)

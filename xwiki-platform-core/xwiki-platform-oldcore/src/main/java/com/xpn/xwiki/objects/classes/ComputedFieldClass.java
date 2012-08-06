@@ -122,4 +122,17 @@ public class ComputedFieldClass extends PropertyClass
         }
         buffer.append(content);
     }
+
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix,
+        BaseCollection object, XWikiContext context)
+    {
+        displayView(buffer, name, prefix, object, context);
+    }
+
+    @Override
+    public void displayHidden(StringBuffer buffer, String name, String prefix,
+        BaseCollection object, XWikiContext context)
+    {
+    }
 }

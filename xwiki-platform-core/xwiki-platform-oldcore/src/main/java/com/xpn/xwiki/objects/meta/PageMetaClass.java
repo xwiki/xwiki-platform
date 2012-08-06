@@ -25,6 +25,7 @@ import com.xpn.xwiki.objects.classes.PageClass;
 
 /**
  * Page Field Class allows to create a field for storing page references.
+ *
  * @version $Id$
  * @since 4.2M2
  */

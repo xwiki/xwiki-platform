@@ -55,6 +55,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -561,5 +562,32 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // Does not produces any conflict
         importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
+    }
+
+    @Test
+    public void testInstallwithoutAdminRights() throws XWikiException
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(false));
+            }
+        });
+
+        // install
+
+        try {
+            install(this.localXarExtensiontId1, "wiki");
+        } catch (Throwable e) {
+            // expected
+        }
+
+        try {
+            install(this.localXarExtensiontId1, null);
+        } catch (Throwable e) {
+            // expected
+        }
     }
 }

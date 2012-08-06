@@ -298,7 +298,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (caller != null) {
                 hasAccess =
                     xcontext.getWiki().getRightService()
-                        .hasAccessLevel("admin", caller, "XWiki.XWikiPreferences", xcontext);
+                        .hasAccessLevel(right, caller, "XWiki.XWikiPreferences", xcontext);
             }
 
             if (hasAccess) {
@@ -306,7 +306,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 if (user != null) {
                     hasAccess =
                         xcontext.getWiki().getRightService()
-                            .hasAccessLevel("admin", user, "XWiki.XWikiPreferences", xcontext);
+                            .hasAccessLevel(right, user, "XWiki.XWikiPreferences", xcontext);
                 }
             }
         } finally {
@@ -330,7 +330,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request);
+                if (!hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request)) {
+                    if (namespace != null) {
+                        throw new InstallException(String.format("Admin right is required to install extension [%s]",
+                            extension.getId()));
+                    } else {
+                        throw new InstallException(String.format(
+                            "Admin right is required to install extension [%s] on namespace [%s]", extension.getId(),
+                            namespace));
+                    }
+                }
             } catch (XWikiException e) {
                 throw new InstallException("Failed to check rights", e);
             }
@@ -352,7 +361,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request);
+                if (!hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request)) {
+                    if (namespace != null) {
+                        throw new UninstallException(String.format(
+                            "Admin right is required to uninstall extension [%s]", extension.getId()));
+                    } else {
+                        throw new UninstallException(String.format(
+                            "Admin right is required to uninstall extension [%s] from namespace [%s]",
+                            extension.getId(), namespace));
+                    }
+                }
             } catch (XWikiException e) {
                 throw new UninstallException("Failed to check rights", e);
             }

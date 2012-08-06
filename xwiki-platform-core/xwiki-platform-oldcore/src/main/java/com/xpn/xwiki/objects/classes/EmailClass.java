@@ -22,10 +22,9 @@ package com.xpn.xwiki.objects.classes;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
- * Email Field Class allows to create a field for email values. 
- * This will allow using a custom displayer assigned to
- * that field by default.
- * The field also includes a default regexp for validation.
+ * Email Field Class allows to create a field for email values. This will allow using a custom displayer assigned to
+ * that field by default. The field also includes a default regexp for validation.
+ *
  * @version $Id$
  * @since 4.2M2
  */
@@ -44,6 +43,7 @@ public class EmailClass extends StringClass
 
     /**
      * Constructor for Email Class.
+     *
      * @param wclass Meta Class
      **/
     public EmailClass(PropertyMetaClass wclass)

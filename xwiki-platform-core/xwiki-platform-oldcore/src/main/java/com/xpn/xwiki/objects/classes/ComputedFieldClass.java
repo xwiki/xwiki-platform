@@ -31,9 +31,9 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Computed Field Class allows to create a field without storage 
- * that will display computed values based on other data
+ * Computed Field Class allows to create a field without storage that will display computed values based on other data
  * in the object or wiki.
+ *
  * @version $Id$
  * @since 4.2M2
  */
@@ -51,6 +51,7 @@ public class ComputedFieldClass extends PropertyClass
 
     /**
      * Constructor for ComputedFieldClass.
+     *
      * @param wclass Meta Class
      */
     public ComputedFieldClass(PropertyMetaClass wclass)
@@ -68,8 +69,9 @@ public class ComputedFieldClass extends PropertyClass
 
     /**
      * Setter for the script value.
+     *
      * @param sValue script to be used for the computed field
-     */    
+     */
     public void setScript(String sValue)
     {
         setLargeStringValue(FIELD_SCRIPT, sValue);
@@ -77,8 +79,9 @@ public class ComputedFieldClass extends PropertyClass
 
     /**
      * Getter for the script value.
+     *
      * @return script to be used for the computed field
-     */    
+     */
     public String getScript()
     {
         String sValue = getLargeStringValue(FIELD_SCRIPT);
@@ -100,8 +103,8 @@ public class ComputedFieldClass extends PropertyClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, 
-                            BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix,
+        BaseCollection object, XWikiContext context)
     {
         String script = getScript();
         String content = "";

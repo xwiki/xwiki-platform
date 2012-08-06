@@ -1533,7 +1533,7 @@ function (row, i, table) {
             var tag = event.element().down("span");
             if (!tag)
              tag = event.element();
-            editProperty(row["doc_fullname"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+            editProperty(row["doc_fullName"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
           });
         ## Author
         #elseif($colprop.link == "author")
@@ -1598,7 +1598,7 @@ function (row, i, table) {
   #end
   }
   else {
-    var page = row["doc_fullname"];
+    var page = row["doc_fullName"];
     var dp = page.indexOf(':');
     var p = page.indexOf('.');
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);

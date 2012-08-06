@@ -122,7 +122,7 @@ public class XWikiExtensionValidator implements ExtensionValidator
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
                 if (!hasAccessLevel("programming", namespace + "XWiki.XWikiPreferences", request)) {
-                    if (namespace != null) {
+                    if (namespace == null) {
                         throw new InstallException(String.format(
                             "Programming right is required to install extension [%s]", extension.getId()));
                     } else {
@@ -144,7 +144,7 @@ public class XWikiExtensionValidator implements ExtensionValidator
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
                 if (!hasAccessLevel("programming", namespace + "XWiki.XWikiPreferences", request)) {
-                    if (namespace != null) {
+                    if (namespace == null) {
                         throw new UninstallException(String.format(
                             "Programming right is required to uninstall extension [%s]", extension.getId()));
                     } else {

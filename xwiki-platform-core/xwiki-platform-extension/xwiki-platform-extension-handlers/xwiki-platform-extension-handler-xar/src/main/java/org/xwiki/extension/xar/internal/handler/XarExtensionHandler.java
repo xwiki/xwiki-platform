@@ -331,7 +331,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
                 if (!hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request)) {
-                    if (namespace != null) {
+                    if (namespace == null) {
                         throw new InstallException(String.format("Admin right is required to install extension [%s]",
                             extension.getId()));
                     } else {
@@ -362,7 +362,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
                 if (!hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request)) {
-                    if (namespace != null) {
+                    if (namespace == null) {
                         throw new UninstallException(String.format(
                             "Admin right is required to uninstall extension [%s]", extension.getId()));
                     } else {

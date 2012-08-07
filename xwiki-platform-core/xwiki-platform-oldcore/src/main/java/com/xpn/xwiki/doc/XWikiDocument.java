@@ -7326,9 +7326,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         // Restore the current document on the XWiki Context.
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
-        }
+        context.setDoc((XWikiDocument) backup.get("doc"));
 
         // Restore the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
@@ -7336,12 +7334,20 @@ public class XWikiDocument implements DocumentModelBridge
         if (gcontext != null) {
             if (backup.get("gdoc") != null) {
                 gcontext.put("doc", backup.get("gdoc"));
+            } else {
+                gcontext.remove("doc");
             }
+
             if (backup.get("gcdoc") != null) {
                 gcontext.put("cdoc", backup.get("gcdoc"));
+            } else {
+                gcontext.remove("cdoc");
             }
+
             if (backup.get("gtdoc") != null) {
                 gcontext.put("tdoc", backup.get("gtdoc"));
+            } else {
+                gcontext.remove("tdoc");
             }
         }
     }

@@ -362,6 +362,7 @@ public class DBListClass extends ListClass
     public void flushCache()
     {
         this.cachedDBList = null;
+        super.flushCache();
     }
 
     // return first or second column from user query

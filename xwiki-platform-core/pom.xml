@@ -34,8 +34,8 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.4.0</gwt.version>
-    <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
+    <gwt.version>2.5.0-rc1</gwt.version>
+    <gwt.maven.plugin.version>2.5.0-rc1</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
   </properties>
   <dependencies>
@@ -93,12 +93,30 @@
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
         <version>1.0.14</version>
+        <exclusions>
+          <!-- Not actually needed -->
+          <exclusion>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
         <version>3.1.0.Final</version>
+      </dependency>
+      <!-- Apache Tika used by Lucene and Office modules -->
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parsers</artifactId>
+        <version>1.2</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>

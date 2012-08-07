@@ -20,45 +20,52 @@
 package com.xpn.xwiki.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.inject.Provider;
 
-import org.apache.velocity.VelocityContext;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.velocity.VelocityContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
- * Puts the {@code $msg} variable in the context.
+ * Provide current {@link XWikiContext} or create one from {@link XWikiStubContextProvider} if there is no current one
+ * yet.
  * 
  * @version $Id$
- * @since 3.2M3
  */
-@Component
-@Named("messagetool")
-@Singleton
-public class MessageToolVelocityContextInitializer implements VelocityContextInitializer
+public class XWikiContextProvider implements Provider<XWikiContext>
 {
-    /** The key under which the message tool should be found. */
-    private static final String CONTEXT_KEY = "msg";
+    /**
+     * Used to create a new {@link XWikiContext}.
+     */
+    @Inject
+    private XWikiStubContextProvider contextProvider;
 
-    /** The component used to access the XWiki context. */
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
     @Inject
     private Execution execution;
 
     @Override
-    public void initialize(VelocityContext context)
+    public XWikiContext get()
     {
-        XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-        if (xcontext == null || xcontext.getWiki() == null) {
-            // Nothing we can do yet, incomplete context
-            return;
+        return getXWikiContext();
+    }
+
+    /**
+     * @return current XWikiContext or new one
+     */
+    private XWikiContext getXWikiContext()
+    {
+        XWikiContext context =
+            (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+        if (context == null) {
+            context = this.contextProvider.createStubContext();
+            this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
         }
-        if (xcontext.get(CONTEXT_KEY) == null) {
-            xcontext.getWiki().prepareResources(xcontext);
-        }
-        context.put(CONTEXT_KEY, xcontext.get(CONTEXT_KEY));
+
+        return context;
     }
 }

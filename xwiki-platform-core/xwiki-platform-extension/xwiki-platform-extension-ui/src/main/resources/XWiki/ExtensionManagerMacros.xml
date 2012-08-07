@@ -466,13 +466,17 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enhances the behaviour of the Progress section within the extension details.
    */
   _enhanceProgressBehaviour : function() {
-    // Toggle stack trace display in extension log.
+    // Toggle stacktrace display in extension log.
     this.container.select('.extension-log-item').each(function (logItem) {
-      // If the log item has details.
-      if (logItem.down('div')) {
+      var stacktrace = logItem.down('.stacktrace');
+      if (stacktrace) {
+        // Hide the stacktrace by default.
+        stacktrace.toggle();
+        // Show the stacktrace when the log message is clicked.
         var logMessage = logItem.down('p');
+        logMessage.setStyle({"cursor": "pointer"});
         logMessage.observe('click', function() {
-          logItem.toggleClassName('extension-log-item-expanded');
+          stacktrace.toggle();
         });
       }
     });
@@ -845,12 +849,8 @@ ul.extension-metadata li {
   background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
   color: $theme.notificationErrorColor;
 }
-.extension-log-item &gt; div {
-  /* Hide log details by default */
-  display: none;
-}
-.extension-log-item-expanded &gt; div {
-  display: block;
+.extension-log-item .stacktrace {
+  white-space: pre-wrap;
 }
 
 .extension-search-bar {
@@ -1143,25 +1143,23 @@ ul.extension-metadata li {
       ##
       ## Specific actions.
       ##
-      #if ($hasProgramming)
-        #if(!$extensionStatus)
-          #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
-        #end
-        #if ($extensionStatus == 'installed')
-          ## This extension can be uninstalled.
-          #extensionActionButton($extension 'uninstall' true)
-        #elseif ($extensionStatus == 'remote')
-          ## Installable extension.
-          #extensionActionButton($NULL 'install')
-        #elseif ($extensionStatus == 'remote-installed')
-          ## An extension that can be either upgraded or downgraded.
-          ## Compare this version with the version that is currently installed to determine which button to display.
-          #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
-          #if ($extension.id.version.compareTo($installedExtension.id.version) &gt; 0)
-            #extensionActionButton($installedExtension 'upgrade')
-          #else
-            #extensionActionButton($installedExtension 'downgrade' true)
-          #end
+      #if(!$extensionStatus)
+        #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
+      #end
+      #if ($extensionStatus == 'installed')
+        ## This extension can be uninstalled.
+        #extensionActionButton($extension 'uninstall' true)
+      #elseif ($extensionStatus == 'remote')
+        ## Installable extension.
+        #extensionActionButton($NULL 'install')
+      #elseif ($extensionStatus == 'remote-installed')
+        ## An extension that can be either upgraded or downgraded.
+        ## Compare this version with the version that is currently installed to determine which button to display.
+        #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+        #if ($extension.id.version.compareTo($installedExtension.id.version) &gt; 0)
+          #extensionActionButton($installedExtension 'upgrade')
+        #else
+          #extensionActionButton($installedExtension 'downgrade' true)
         #end
       #end
     &lt;/div&gt;
@@ -1781,14 +1779,23 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #end
 #end
 
-#macro (printThrowable $throwable)
-  $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
+#macro (printThrowable $throwable $isCause)
+  #if (!$isCause)
+    ## We use the HTML macro because we don't have a better way to escape the wiki syntax.
+    {{html}}
+    &lt;div class="stacktrace"&gt;##
+  #end
+  $throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
 
   #foreach($stackTraceElement in $throwable.stackTrace)
-    ~    at $stackTraceElement
+#**#    at $stackTraceElement
   #end
   #if ($throwable.cause)
-    Caused by: #printThrowable($throwable.cause)
+    Caused by: #printThrowable($throwable.cause true)
+  #end
+  #if (!$isCause)
+    &lt;/div&gt;
+    {{/html}}
   #end
 #end
 
@@ -1810,14 +1817,14 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     * (% class="extension-log-item extension-log-item-$logLevel" %)(((
         #if ($log.throwable)
           #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
-          #if ($message.trim() == '')
-            #set ($message = "#printLogMessage($log)")
+          #if ("$!message" != '')
+            ## We use the HTML macro because currently there's no easy way to escape wiki syntax.
+            {{html}}$escapetool.xml($message){{/html}}
+          #else
+            #printLogMessage($log)
           #end
-          $message
 
-          (((
-            #printThrowable($log.throwable)
-          )))
+          #printThrowable($log.throwable)
         #else
           #printLogMessage($log)
         #end
@@ -1849,8 +1856,8 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       #end
     #end
   #end
-  $escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
-  {{/html}}##
+  $!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
+  {{/html}}
 #end
 
 #macro (computeXBack)

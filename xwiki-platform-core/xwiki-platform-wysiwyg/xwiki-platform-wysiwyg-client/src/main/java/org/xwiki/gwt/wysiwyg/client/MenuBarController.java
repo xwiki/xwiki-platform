@@ -94,7 +94,7 @@ public class MenuBarController
                     MenuItem menuItem = (MenuItem) uiObject;
                     if (!descriptor.getSubMenu().isEmpty()) {
                         menuItem.setSubMenu(new MenuBar(true));
-                        fillMenuBar((MenuBar) menuItem.getSubMenu(), descriptor.getSubMenu(), pluginManager);
+                        fillMenuBar(menuItem.getSubMenu(), descriptor.getSubMenu(), pluginManager);
                     }
                     menuBar.addItem(menuItem);
                 }

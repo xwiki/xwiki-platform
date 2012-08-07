@@ -43,7 +43,7 @@
     <!-- Scripting -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -65,7 +65,8 @@
         <configuration>
           <excludes>
             <!-- Fan-Out complexity -->
-            **/ExtensionManagerScriptService.java
+            **/ExtensionManagerScriptService.java,
+            **/XWikiExtensionValidator.java
           </excludes>
         </configuration>
       </plugin>

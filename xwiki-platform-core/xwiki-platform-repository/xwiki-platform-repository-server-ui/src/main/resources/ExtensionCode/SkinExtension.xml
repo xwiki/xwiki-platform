@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1319452630000</creationDate>
-  <date>1333642532000</date>
-  <contentUpdateDate>1333642532000</contentUpdateDate>
+  <date>1343909563000</date>
+  <contentUpdateDate>1343909563000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -119,7 +119,7 @@
       <parse>0</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -330,7 +330,7 @@ padding: 5px 10px;
       <parse>0</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
   <content/>

@@ -441,6 +441,8 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+
         return installRequest;
     }
 
@@ -511,7 +513,7 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
 
         ExtensionPlan status;
         try {
@@ -585,7 +587,7 @@ public class ExtensionManagerScriptService implements ScriptService
             uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
-        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
+        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
 
         Job job = null;
         try {
@@ -654,7 +656,7 @@ public class ExtensionManagerScriptService implements ScriptService
             uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
-        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
+        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
 
         ExtensionPlan status;
         try {

@@ -23,6 +23,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
  * Page Field Class allows to create a field for storing page references.
+ *
  * @version $Id$
  * @since 4.2M2
  */
@@ -35,6 +36,7 @@ public class PageClass extends DBListClass
 
     /**
      * Constructor for PageClass.
+     *
      * @param wclass MetaClass
      */
     public PageClass(PropertyMetaClass wclass)

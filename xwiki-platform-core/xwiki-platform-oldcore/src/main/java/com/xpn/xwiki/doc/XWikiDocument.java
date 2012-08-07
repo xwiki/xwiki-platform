@@ -7317,9 +7317,7 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
 
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
-        }
+        context.setDoc((XWikiDocument) backup.get("doc"));
     }
 
     public void setAsContextDoc(XWikiContext context)

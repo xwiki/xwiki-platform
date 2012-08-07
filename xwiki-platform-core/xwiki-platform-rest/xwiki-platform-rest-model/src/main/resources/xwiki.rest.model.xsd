@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  *
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  *
--->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org"
-  xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
+<!-- * * See the NOTICE file distributed with this work for additional * information regarding copyright ownership. * * This 
+  is free software; you can redistribute it and/or modify it * under the terms of the GNU Lesser General Public License as 
+  * published by the Free Software Foundation; either version 2.1 of * the License, or (at your option) any later version. 
+  * * This software is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied 
+  warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU * Lesser General Public License for more details. 
+  * * You should have received a copy of the GNU Lesser General Public * License along with this software; if not, write to 
+  the Free * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA * 02110-1301 USA, or see the FSF site: http://www.fsf.org. 
+  * -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org" xmlns:xwiki="http://www.xwiki.org"
+  elementFormDefault="qualified">
 
   <complexType name="Link">
     <attribute name="href" type="string"></attribute>
@@ -40,8 +27,7 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="translation" type="xwiki:Translation"
-            minOccurs="0" maxOccurs="unbounded"></element>
+          <element name="translation" type="xwiki:Translation" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
         <attribute name="default" type="string"></attribute>
       </extension>
@@ -76,6 +62,16 @@
         </sequence>
       </extension>
     </complexContent>
+  </complexType>
+
+  <complexType name="WikiDescriptor">
+    <sequence>
+      <element name="id" type="string"></element>
+      <element name="description" type="string"></element>      
+      <element name="owner" type="string"></element>       
+      <element name="prettyName" type="string"></element>
+      <element name="template" type="string"></element>
+    </sequence>
   </complexType>
 
   <complexType name="Space">
@@ -209,8 +205,7 @@
     <complexContent>
       <extension base="xwiki:ObjectSummary">
         <sequence>
-          <element name="property" type="xwiki:Property" minOccurs="0"
-            maxOccurs="unbounded">
+          <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded">
           </element>
         </sequence>
       </extension>
@@ -221,8 +216,7 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="attribute" type="xwiki:Attribute" maxOccurs="unbounded"
-            minOccurs="0"></element>
+          <element name="attribute" type="xwiki:Attribute" maxOccurs="unbounded" minOccurs="0"></element>
           <element name="value" type="string"></element>
         </sequence>
 
@@ -251,8 +245,7 @@
         <sequence>
           <element name="id" type="string"></element>
           <element name="name" type="string"></element>
-          <element name="property" type="xwiki:Property" minOccurs="0"
-            maxOccurs="unbounded"></element>
+          <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
 
       </extension>
@@ -260,11 +253,7 @@
   </complexType>
 
 
-  <!--
-  *
-  * ELEMENTS
-  *
-  -->
+  <!-- * * ELEMENTS * -->
 
   <element name="xwiki" type="xwiki:XWiki"></element>
 
@@ -273,8 +262,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="wiki" type="xwiki:Wiki" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="wiki" type="xwiki:Wiki" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -287,8 +275,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="space" type="xwiki:Space" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="space" type="xwiki:Space" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -301,8 +288,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="pageSummary" type="xwiki:PageSummary"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="pageSummary" type="xwiki:PageSummary" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -310,6 +296,8 @@
   </element>
 
   <element name="wiki" type="xwiki:Wiki"></element>
+  
+  <element name="wikiDescriptor" type="xwiki:WikiDescriptor"></element>
 
   <element name="space" type="xwiki:Space"></element>
 
@@ -320,8 +308,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="historySummary" type="xwiki:HistorySummary"
-              minOccurs="0" maxOccurs="unbounded">
+            <element name="historySummary" type="xwiki:HistorySummary" minOccurs="0" maxOccurs="unbounded">
             </element>
           </sequence>
 
@@ -335,8 +322,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="attachment" type="xwiki:Attachment"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="attachment" type="xwiki:Attachment" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -348,8 +334,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="comment" type="xwiki:Comment" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="comment" type="xwiki:Comment" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -369,8 +354,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="class" type="xwiki:Class" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -383,8 +367,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="objectSummary" type="xwiki:ObjectSummary"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="objectSummary" type="xwiki:ObjectSummary" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -402,8 +385,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="property" type="xwiki:Property" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -428,8 +410,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="tag" type="xwiki:Tag" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="tag" type="xwiki:Tag" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -461,8 +442,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="searchResult" type="xwiki:SearchResult"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="searchResult" type="xwiki:SearchResult" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
           <attribute name="template" type="string"></attribute>
         </extension>

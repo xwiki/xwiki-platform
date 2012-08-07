@@ -65,8 +65,7 @@
         <configuration>
           <excludes>
             <!-- Fan-Out complexity -->
-            **/ExtensionManagerScriptService.java,
-            **/XWikiExtensionValidator.java
+            **/ExtensionManagerScriptService.java
           </excludes>
         </configuration>
       </plugin>

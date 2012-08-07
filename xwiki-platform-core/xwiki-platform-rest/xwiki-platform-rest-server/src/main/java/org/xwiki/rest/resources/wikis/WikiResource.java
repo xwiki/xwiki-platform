@@ -19,9 +19,12 @@
  */
 package org.xwiki.rest.resources.wikis;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
@@ -33,7 +36,10 @@ import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Wiki;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+
+import com.xpn.xwiki.plugin.packaging.PackageAPI;
 
 /**
  * @version $Id$
@@ -50,6 +56,34 @@ public class WikiResource extends XWikiResource
         }
 
         throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    @POST
+    public Wiki importXAR(@PathParam("wikiName") String wikiName, InputStream is) throws XWikiException
+    {
+        if (!wikiExists(wikiName)) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        /* Use the package plugin for importing pages */
+        XWikiContext xwikiContext = getXWikiContext();
+        PackageAPI importer = ((PackageAPI) xwikiContext.getWiki().getPluginApi("package", xwikiContext));
+
+        String database = xwikiContext.getDatabase();
+
+        try {
+            xwikiContext.setDatabase(wikiName);
+            importer.Import(is);
+            if (importer.install() == com.xpn.xwiki.plugin.packaging.DocumentInfo.INSTALL_IMPOSSIBLE) {
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+            }
+        } catch (IOException e) {
+            throw new WebApplicationException(e);
+        } finally {
+            xwikiContext.setDatabase(database);
+        }
+
+        return DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wikiName);
     }
 
     protected boolean wikiExists(String wikiName) throws XWikiException

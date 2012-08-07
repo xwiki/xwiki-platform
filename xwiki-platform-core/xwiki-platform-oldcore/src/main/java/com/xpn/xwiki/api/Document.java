@@ -183,6 +183,9 @@ public class Document extends Api
     }
 
     /**
+     * returns the DocumentReference for the current document
+     *
+     * @return the DocumentReference of the current document
      * @since 2.3M1
      */
     public DocumentReference getDocumentReference()
@@ -314,6 +317,8 @@ public class Document extends Api
     }
 
     /**
+     * Returns the document title as plain text
+     *
      * @return the document title as plain text (all markup removed)
      * @since 3.0M1
      */
@@ -323,6 +328,9 @@ public class Document extends Api
     }
 
     /**
+     * Returns the title of the document rendered through wiki syntax and velocity
+     *
+     * @return the title rendered through wiki syntax and velocity
      * @see XWikiDocument#getRenderedTitle(Syntax, XWikiContext)
      */
     public String getRenderedTitle(String syntaxId) throws XWikiException
@@ -343,7 +351,10 @@ public class Document extends Api
         }
     }
 
-    // TODO: document this.
+    /**
+     * TODO document this or mark it deprecated
+     *
+     */
     public String getFormat()
     {
         return this.doc.getFormat();
@@ -367,10 +378,10 @@ public class Document extends Api
     }
 
     /**
-     * Get fullName of the profile document of the author of the last content modification in the document. Example:
-     * XWiki.Admin.
+     * Get fullName of the profile document of the author of the content modification of this document version.
+     * Example: XWiki.Admin.
      * 
-     * @return The fullName of the profile document of the author of the last content modification in the document.
+     * @return The fullName of the profile document of the author of the content modification in this document version.
      */
     public String getContentAuthor()
     {
@@ -386,10 +397,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the date when the current document version has been created, i.e. the date of the last modification of the
-     * document.
-     * 
-     * @return The date where the current document version has been created.
+     * @return The date when this document version has been modified.
      */
     public Date getDate()
     {
@@ -397,9 +405,10 @@ public class Document extends Api
     }
 
     /**
-     * Get the date when the last content modification has been done on the document.
-     * 
-     * @return The date where the last content modification has been done on the document.
+     * Get the date when the content modification has been done on this document version.
+     * A content update excludes modifications to meta data fields or comments of the document.
+     *
+     * @return The date where the content modification has been done on this document version.
      */
     public Date getContentUpdateDate()
     {
@@ -407,7 +416,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the date when the document has been created. return The date when the document has been created.
+     * @return the original creation date of the document.
      */
     public Date getCreationDate()
     {
@@ -483,6 +492,10 @@ public class Document extends Api
         return this.doc.getLanguage();
     }
 
+    /**
+     * TODO document this or mark it deprecated
+     *
+     */
     public String getTemplate()
     {
         String templateReferenceAsString = "";
@@ -494,7 +507,11 @@ public class Document extends Api
     }
 
     /**
-     * return the real language of the document
+     * Gets the real language of the document. The real language is either the default language field 
+     * when the language field is empty (when the document is the default document) or the language field otherwise
+     * when the document is a translation document
+     *
+     * @return the release language as a two character code (en,fr,de)
      */
     public String getRealLanguage() throws XWikiException
     {
@@ -502,20 +519,24 @@ public class Document extends Api
     }
 
     /**
-     * return the language of the default document
+     * @return the language of the default document
      */
     public String getDefaultLanguage()
     {
         return this.doc.getDefaultLanguage();
     }
 
+    /**
+     * TODO document this or mark it deprecated
+     *
+     */
     public String getDefaultTemplate()
     {
         return this.doc.getDefaultTemplate();
     }
 
     /**
-     * @return the comment of the latest update of the document.
+     * @return the comment of of the document version
      */
     public String getComment()
     {
@@ -523,7 +544,7 @@ public class Document extends Api
     }
 
     /**
-     * @return true if the last change to this document was a minor edit.
+     * @return true if the this document version was a minor edit.
      */
     public boolean isMinorEdit()
     {
@@ -557,7 +578,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the translated document in the given document
+     * @return the translated document in the given language
      */
     public Document getTranslatedDocument(String language) throws XWikiException
     {
@@ -637,7 +658,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the archive of the document in a string format.
+     * @return the archive of this document's history in string format
      */
     public String getArchive() throws XWikiException
     {
@@ -667,7 +688,7 @@ public class Document extends Api
     }
 
     /**
-     * Return the URL of download for the the given attachment name.
+     * Return the relative URL of download for the the given attachment name.
      * 
      * @param filename the name of the attachment
      * @return A String with the URL
@@ -678,7 +699,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the URL of the given action for the the given attachment name.
+     * Get the relative URL of the given action for the the given attachment name.
      * 
      * @param filename the name of the attachment.
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev".
@@ -690,7 +711,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the URL of an action on an attachment.
+     * Get the relative URL of an action on an attachment.
      * the given action for the the given attachment name with "queryString" parameters
      * 
      * @param filename the name of the attachment.
@@ -803,11 +824,18 @@ public class Document extends Api
         return this.doc.getExternalURL(action, queryString, getXWikiContext());
     }
 
+    /**
+     * @return the relative URL of the parent document of this document
+     *
+     */
     public String getParentURL() throws XWikiException
     {
         return this.doc.getParentURL(getXWikiContext());
     }
 
+    /**
+     * @return the XClass associated to this document when the document represents an XWiki Class
+     */
     public Class getxWikiClass()
     {
         BaseClass bclass = this.getDoc().getXClass();
@@ -818,6 +846,9 @@ public class Document extends Api
         }
     }
 
+    /**
+     * @return the array of XClasses representing the objects of this document
+     */
     public Class[] getxWikiClasses()
     {
         List<BaseClass> list = this.getDoc().getXClasses(getXWikiContext());
@@ -831,27 +862,50 @@ public class Document extends Api
         return result;
     }
 
+    /**
+     * Creates a New XWiki Object of the given classname
+     *
+     * @param classname the classname used
+     * @return the number of the object created
+     */
     public int createNewObject(String classname) throws XWikiException
     {
         return getDoc().createNewObject(classname, getXWikiContext());
     }
 
+    /**
+     * Creates a New XWiki Object of the given classname
+     *
+     * @param classname the classname used
+     * @return the object created 
+     */
     public Object newObject(String classname) throws XWikiException
     {
         int nb = createNewObject(classname);
         return getObject(classname, nb);
     }
 
+    /**
+     * @return true of the document has been loaded from cache
+     */
     public boolean isFromCache()
     {
         return this.doc.isFromCache();
     }
 
+    /**
+     * @param classname the classname used
+     * @return the number of objects available for a given classname
+     */
     public int getObjectNumbers(String classname)
     {
         return this.doc.getObjectNumbers(classname);
     }
 
+    /**
+     * Get the list of all objects available in this document organized in a Map by classname 
+     * @return the map of objects 
+     */
     public Map<String, Vector<Object>> getxWikiObjects()
     {
         Map<DocumentReference, List<BaseObject>> map = this.getDoc().getXObjects();
@@ -879,12 +933,21 @@ public class Document extends Api
         return result;
     }
 
+    /**
+     * Get the list of objects for a given classname classname 
+     * @return the vector of objects
+     */
     public Vector<Object> getObjects(String className)
     {
         List<BaseObject> objects = this.getDoc().getXObjects(this.doc.resolveClassReference(className));
         return getXObjects(objects);
     }
 
+    /**
+     * Get the first object that contains the given fieldname
+     * @param fieldname name of the field to find in the object
+     * @return the XWiki Object
+     */
     public Object getFirstObject(String fieldname)
     {
         try {
@@ -899,6 +962,15 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Get the first object of a given classname that has a field name matching the given value
+     *
+     * @param classname name of the class of the object to look for 
+     * @param key name of the field to find in the object
+     * @param value value of the field to find in the object
+     * @param failover true if the first object will be given when none found
+     * @return the XWiki Object
+     */
     public Object getObject(String classname, String key, String value, boolean failover)
     {
         try {
@@ -950,6 +1022,15 @@ public class Document extends Api
         return result;
     }
 
+    /**
+     * Get the first object of a given classname that has a field name matching the given value
+     * When none found this method will return null
+     *
+     * @param classname name of the class of the object to look for 
+     * @param key name of the field to find in the object
+     * @param value value of the field to find in the object
+     * @return the XWiki Object
+     */
     public Object getObject(String classname, String key, String value)
     {
         try {
@@ -964,6 +1045,12 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Get the first object matching the given classname
+     *
+     * @param classname name of the class of the object to look for 
+     * @return the XWiki Object
+     */
     public Object getObject(String classname)
     {
         return getObject(classname, false);
@@ -972,6 +1059,10 @@ public class Document extends Api
     /**
      * get the object of the given className. If there is no object of this className and the create parameter at true,
      * the object is created.
+     *
+     * @param classname name of the class of the object to look for 
+     * @param create true of the object should be created when it does not exist
+     * @return the XWiki Object
      */
     public Object getObject(String classname, boolean create)
     {
@@ -988,6 +1079,13 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Get the object matching the given classname and given object number
+     *
+     * @param classname name of the class of the object
+     * @param nb number of the object
+     * @return the XWiki Object
+     */
     public Object getObject(String classname, int nb)
     {
         try {
@@ -1090,21 +1188,46 @@ public class Document extends Api
         return getXObjects(this.getDoc().getComments(asc));
     }
 
+    /**
+     * Setting the current object to the given object.
+     * Following calls to display() will use this object 
+     * as the reference for finding properties.
+     *
+     * @param object Object to use as a reference for further display calls
+     */
     public void use(Object object)
     {
         this.currentObj = object;
     }
 
+    /**
+     * Setting the current object to the first object of the given class name.
+     * Following calls to display() will use this object 
+     * as the reference for finding properties.
+     *
+     * @param className class used to find the first object to use as the reference for display calls
+     */
     public void use(String className)
     {
         this.currentObj = getObject(className);
     }
 
+    /**
+     * Setting the current object to the object of the given class name and the given number.
+     * Following calls to display() will use this object 
+     * as the reference for finding properties.
+     *
+     * @param className class used to find the object to use as the reference for display calls
+     * @param nb number of the object to use as the reference for display calls
+     */
     public void use(String className, int nb)
     {
         this.currentObj = getObject(className, nb);
     }
 
+    /**
+     * @return the className of the current active object use for display calls.
+     */
     public String getActiveClass()
     {
         if (this.currentObj == null) {
@@ -1114,6 +1237,14 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the pretty name of the given field.
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     *
+     * @param fieldname fieldname to display the pretty name of
+     * @return the pretty name display of the field.
+     */
     public String displayPrettyName(String fieldname)
     {
         if (this.currentObj == null) {
@@ -1123,6 +1254,13 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the pretty name of the given field of the given object.
+     * 
+     * @param fieldname fieldname to display the pretty name of
+     * @param object Object to find the class to display the pretty name of
+     * @return the pretty name display of the field.
+     */
     public String displayPrettyName(String fieldname, Object obj)
     {
         if (obj == null) {
@@ -1131,6 +1269,16 @@ public class Document extends Api
         return this.doc.displayPrettyName(fieldname, obj.getBaseObject(), getXWikiContext());
     }
 
+    /**
+     * Displays the pretty name of the given field.
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     * with the optional addition of a mandatory field.
+     *
+     * @param fieldname fieldname to display the pretty name of
+     * @param showMandatory true to display a mandatory sign
+     * @return the pretty name display of the field.
+     */
     public String displayPrettyName(String fieldname, boolean showMandatory)
     {
         if (this.currentObj == null) {
@@ -1141,6 +1289,15 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the pretty name of the given field of the given object.
+     * with the optional addition of a mandatory field.
+     *
+     * @param fieldname fieldname to display the pretty name of
+     * @param object Object to find the class to display the pretty name of
+     * @param showMandatory true to display a mandatory sign
+     * @return the pretty name display of the field.
+     */
     public String displayPrettyName(String fieldname, boolean showMandatory, Object obj)
     {
         if (obj == null) {
@@ -1149,6 +1306,17 @@ public class Document extends Api
         return this.doc.displayPrettyName(fieldname, showMandatory, obj.getBaseObject(), getXWikiContext());
     }
 
+    /**
+     * Displays the pretty name of the given field.
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     * with the optional addition of a mandatory field before or after the field
+     *
+     * @param fieldname fieldname to display the pretty name of
+     * @param showMandatory true to display a mandatory sign
+     * @param before true if the mandatory sign should be before the field
+     * @return the pretty name display of the field.
+     */
     public String displayPrettyName(String fieldname, boolean showMandatory, boolean before)
     {
         if (this.currentObj == null) {
@@ -1159,6 +1327,16 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the pretty name of the given field of the given object.
+     * with the optional addition of a mandatory field before or after the field
+     *
+     * @param fieldname fieldname to display the pretty name of
+     * @param object Object to find the class to display the pretty name of
+     * @param showMandatory true to display a mandatory sign
+     * @param before true if the mandatory sign should be before the field
+     * @return the pretty name display of the field.
+     */
     public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, Object obj)
     {
         if (obj == null) {
@@ -1167,6 +1345,14 @@ public class Document extends Api
         return this.doc.displayPrettyName(fieldname, showMandatory, before, obj.getBaseObject(), getXWikiContext());
     }
 
+    /**
+     * Displays the tooltip of the given field.
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     *
+     * @param fieldname fieldname to display the tooltip of
+     * @return the tooltip display of the field.
+     */
     public String displayTooltip(String fieldname)
     {
         if (this.currentObj == null) {
@@ -1176,6 +1362,13 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the tooltip of the given field of the given object.
+     * 
+     * @param fieldname fieldname to display the tooltip of
+     * @param object Object to find the class to display the tooltip of
+     * @return the tooltip display of the field.
+     */
     public String displayTooltip(String fieldname, Object obj)
     {
         if (obj == null) {
@@ -1184,6 +1377,17 @@ public class Document extends Api
         return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
     }
 
+    /**
+     * Displays the given field.
+     * The display mode will be decided depending on page context
+     * (edit or inline context will display in edit, view context in view)
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     * This function can return html inside and html macro
+     *
+     * @param fieldname fieldname to display
+     * @return the display of the field.
+     */
     public String display(String fieldname)
     {
         if (this.currentObj == null) {
@@ -1193,6 +1397,16 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the given field in the given mode.
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     * This function can return html inside and html macro
+     *
+     * @param fieldname fieldname to display
+     * @param mode display mode to use (view, edit, hidden, search) 
+     * @return the display of the field.
+     */
     public String display(String fieldname, String mode)
     {
         if (this.currentObj == null) {
@@ -1202,6 +1416,18 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the given field in the given mode.
+     * This function uses the active object
+     * or will find the first object that has the given field.
+     * This function can return html inside and html macro
+     * A given prefix is added to the field names when these are forms.
+     *
+     * @param fieldname fieldname to display
+     * @param mode display mode to use (view, edit, hidden, search) 
+     * @param prefix prefix to use for the form names
+     * @return the display of the field.
+     */
     public String display(String fieldname, String mode, String prefix)
     {
         if (this.currentObj == null) {
@@ -1212,6 +1438,16 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Displays the given field of the given object
+     * The display mode will be decided depending on page context
+     * (edit or inline context will display in edit, view context in view)
+     * This function can return html inside and html macro
+     *
+     * @param fieldname fieldname to display
+     * @param object object from which to take the field
+     * @return the display of the field.
+     */
     public String display(String fieldname, Object obj)
     {
         if (obj == null) {
@@ -1221,6 +1457,11 @@ public class Document extends Api
     }
 
     /**
+     * Displays the given field of the given object using the given mode and syntax rendering
+     * The display mode will be decided depending on page context
+     * (edit or inline context will display in edit, view context in view)
+     * This function can return html inside and html macro
+     *
      * @param fieldname the name of the field to display
      * @param type the type of the field to display
      * @param obj the object containing the field to display
@@ -1236,6 +1477,15 @@ public class Document extends Api
         return this.doc.display(fieldname, type, obj.getBaseObject(), wrappingSyntaxId, getXWikiContext());
     }
 
+    /**
+     * Displays the given field of the given object in the given mode.
+     * This function can return html inside and html macro
+     *
+     * @param fieldname fieldname to display
+     * @param mode display mode to use (view, edit, hidden, search) 
+     * @param object the object containing the field to display
+     * @return the display of the field.
+     */
     public String display(String fieldname, String mode, Object obj)
     {
         if (obj == null) {
@@ -1244,6 +1494,17 @@ public class Document extends Api
         return this.doc.display(fieldname, mode, obj.getBaseObject(), getXWikiContext());
     }
 
+    /**
+     * Displays the given field of the given object in the given mode.
+     * This function can return html inside and html macro
+     * A given prefix is added to the field names when these are forms.
+     *
+     * @param fieldname fieldname to display
+     * @param mode display mode to use (view, edit, hidden, search) 
+     * @param prefix prefix to use for the form names
+     * @param object the object containing the field to display
+     * @return the display of the field.
+     */
     public String display(String fieldname, String mode, String prefix, Object obj)
     {
         if (obj == null) {

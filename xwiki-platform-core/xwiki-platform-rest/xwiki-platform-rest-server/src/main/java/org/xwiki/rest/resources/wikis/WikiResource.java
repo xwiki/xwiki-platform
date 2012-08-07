@@ -48,6 +48,11 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 @Path("/wikis/{wikiName}")
 public class WikiResource extends XWikiResource
 {
+    /**
+     * @param wikiName the wiki name.
+     * @return information about the corresponding wiki.
+     * @throws XWikiException if an error occurs.
+     */
     @GET
     public Wiki get(@PathParam("wikiName") String wikiName) throws XWikiException
     {
@@ -58,6 +63,14 @@ public class WikiResource extends XWikiResource
         throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    /**
+     * Import the pages contained in a XAR sent using a POST request into a given wiki.
+     * 
+     * @param wikiName the name of the wiki where to import the XAR.
+     * @param is the input stream associated to the request body containing the XAR.
+     * @return a description of the wiki where the XAR has been imported.
+     * @throws XWikiException if an error occurs.
+     */
     @POST
     public Wiki importXAR(@PathParam("wikiName") String wikiName, InputStream is) throws XWikiException
     {
@@ -86,6 +99,11 @@ public class WikiResource extends XWikiResource
         return DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wikiName);
     }
 
+    /**
+     * @param wikiName the name of the wiki to be checked.
+     * @return if the wiki exists.
+     * @throws XWikiException if an error occurs.
+     */
     protected boolean wikiExists(String wikiName) throws XWikiException
     {
         List<String> databaseNames =

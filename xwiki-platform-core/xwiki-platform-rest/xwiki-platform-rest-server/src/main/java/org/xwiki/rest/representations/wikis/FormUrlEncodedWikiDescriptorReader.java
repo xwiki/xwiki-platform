@@ -40,7 +40,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
-import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.WikiDescriptor;
 
 /**
@@ -51,14 +50,29 @@ import org.xwiki.rest.model.jaxb.WikiDescriptor;
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 public class FormUrlEncodedWikiDescriptorReader implements MessageBodyReader<WikiDescriptor>, XWikiRestComponent
 {
+    /**
+     * Id field name in URL encoded form data.
+     */
     private static final String ID_FIELD_NAME = "id";
 
+    /**
+     * Owner field name in URL encoded form data.
+     */
     private static final String OWNER_FIELD_NAME = "owner";
 
+    /**
+     * Pretty name field name in URL encoded form data.
+     */
     private static final String PRETTYNAME_FIELD_NAME = "prettyName";
 
+    /**
+     * Description field name in URL encoded form data.
+     */
     private static final String DESCRIPTION_FIELD_NAME = "description";
 
+    /**
+     * Template field name in URL encoded form data.
+     */
     private static final String TEMPLATE_FIELD_NAME = "template";
 
     @Override

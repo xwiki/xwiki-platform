@@ -87,13 +87,6 @@ public class WikisResource extends XWikiResource
         WikiManagerPluginApi wikiManager =
             (WikiManagerPluginApi) wikiManagerPlugin.getPluginApi(wikiManagerPlugin, xwikiContext);
 
-        /*
-         * Put the document associated to the current user in order to avoid side effects and faulty interactions in
-         * code that restores the context. See http://jira.xwiki.org/browse/XWIKI-8119
-         */
-        XWikiDocument userDocument = xwikiContext.getWiki().getDocument(xwikiContext.getUserReference(), xwikiContext);
-        xwikiContext.setDoc(userDocument);
-
         /* Create the wiki */
         XWikiServer wikiServer = wikiManager.createWikiDocument();
         if (wiki.getId() != null) {

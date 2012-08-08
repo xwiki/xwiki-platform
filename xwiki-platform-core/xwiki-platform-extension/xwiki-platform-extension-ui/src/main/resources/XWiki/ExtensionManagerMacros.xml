@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1321509118000</creationDate>
-  <date>1342023498000</date>
-  <contentUpdateDate>1342023498000</contentUpdateDate>
+  <date>1344433141000</date>
+  <contentUpdateDate>1344433141000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -1938,7 +1938,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #if ($action == 'uninstall')
     #set ($actionName = 'Uninstall')
   #end
-  #if (!$installedExtension || $installedExtension.isInstalled($extensionNamespace) || !$xwiki.isVirtualMode())
+  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace) &amp;&amp; !$installedExtension.isInstalled($null)) || !$xwiki.isVirtualMode())
     ## Button that targets only the current wiki.
     #em_submitButton("extensions.actions.$action" "action$actionName" $secondary)
   #end

@@ -40,15 +40,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
-import org.xwiki.rest.model.jaxb.WikiDescriptor;
+import org.xwiki.rest.model.jaxb.Wiki;
 
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.representations.wikis.FormUrlEncodedWikiDescriptorReader")
+@Component("org.xwiki.rest.representations.wikis.FormUrlEncodedWikiReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-public class FormUrlEncodedWikiDescriptorReader implements MessageBodyReader<WikiDescriptor>, XWikiRestComponent
+public class FormUrlEncodedWikiReader implements MessageBodyReader<Wiki>, XWikiRestComponent
 {
     /**
      * Id field name in URL encoded form data.
@@ -63,31 +63,26 @@ public class FormUrlEncodedWikiDescriptorReader implements MessageBodyReader<Wik
     /**
      * Pretty name field name in URL encoded form data.
      */
-    private static final String PRETTYNAME_FIELD_NAME = "prettyName";
+    private static final String NAME_FIELD_NAME = "name";
 
     /**
      * Description field name in URL encoded form data.
      */
     private static final String DESCRIPTION_FIELD_NAME = "description";
 
-    /**
-     * Template field name in URL encoded form data.
-     */
-    private static final String TEMPLATE_FIELD_NAME = "template";
-
     @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
-        return WikiDescriptor.class.isAssignableFrom(type);
+        return Wiki.class.isAssignableFrom(type);
     }
 
     @Override
-    public WikiDescriptor readFrom(Class<WikiDescriptor> type, Type genericType, Annotation[] annotations,
-        MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
+    public Wiki readFrom(Class<Wiki> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+        MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
         WebApplicationException
     {
         ObjectFactory objectFactory = new ObjectFactory();
-        WikiDescriptor wikiDescriptor = objectFactory.createWikiDescriptor();
+        Wiki wikiDescriptor = objectFactory.createWiki();
 
         HttpServletRequest httpServletRequest =
             (HttpServletRequest) Context.getCurrent().getAttributes().get(Constants.HTTP_REQUEST);
@@ -102,16 +97,14 @@ public class FormUrlEncodedWikiDescriptorReader implements MessageBodyReader<Wik
          */
         if (form.getNames().isEmpty()) {
             wikiDescriptor.setId(httpServletRequest.getParameter(ID_FIELD_NAME));
-            wikiDescriptor.setOwner(httpServletRequest.getParameter(OWNER_FIELD_NAME));            
-            wikiDescriptor.setPrettyName(httpServletRequest.getParameter(PRETTYNAME_FIELD_NAME));
+            wikiDescriptor.setName(httpServletRequest.getParameter(NAME_FIELD_NAME));
+            wikiDescriptor.setOwner(httpServletRequest.getParameter(OWNER_FIELD_NAME));
             wikiDescriptor.setDescription(httpServletRequest.getParameter(DESCRIPTION_FIELD_NAME));
-            wikiDescriptor.setTemplate(httpServletRequest.getParameter(TEMPLATE_FIELD_NAME));
         } else {
             wikiDescriptor.setId(form.getFirstValue(ID_FIELD_NAME));
-            wikiDescriptor.setOwner(form.getFirstValue(OWNER_FIELD_NAME));            
-            wikiDescriptor.setPrettyName(form.getFirstValue(PRETTYNAME_FIELD_NAME));
+            wikiDescriptor.setName(form.getFirstValue(NAME_FIELD_NAME));
+            wikiDescriptor.setOwner(form.getFirstValue(OWNER_FIELD_NAME));
             wikiDescriptor.setDescription(form.getFirstValue(DESCRIPTION_FIELD_NAME));
-            wikiDescriptor.setTemplate(form.getFirstValue(TEMPLATE_FIELD_NAME));
         }
 
         return wikiDescriptor;

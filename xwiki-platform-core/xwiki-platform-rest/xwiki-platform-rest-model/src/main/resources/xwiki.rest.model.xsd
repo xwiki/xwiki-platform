@@ -72,19 +72,11 @@
         <sequence>
           <element name="id" type="string"></element>
           <element name="name" type="string"></element>
+          <element name="description" type="string"></element>
+          <element name="owner" type="string"></element>
         </sequence>
       </extension>
     </complexContent>
-  </complexType>
-
-  <complexType name="WikiDescriptor">
-    <sequence>
-      <element name="id" type="string"></element>
-      <element name="description" type="string"></element>      
-      <element name="owner" type="string"></element>       
-      <element name="prettyName" type="string"></element>
-      <element name="template" type="string"></element>
-    </sequence>
   </complexType>
 
   <complexType name="Space">
@@ -266,7 +258,11 @@
   </complexType>
 
 
-  <!-- * * ELEMENTS * -->
+  <!--
+    *
+    * ELEMENTS
+    *
+  -->
 
   <element name="xwiki" type="xwiki:XWiki"></element>
 
@@ -309,8 +305,6 @@
   </element>
 
   <element name="wiki" type="xwiki:Wiki"></element>
-  
-  <element name="wikiDescriptor" type="xwiki:WikiDescriptor"></element>
 
   <element name="space" type="xwiki:Space"></element>
 

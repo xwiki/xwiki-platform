@@ -232,7 +232,7 @@ public class XWikiAttachmentContent implements Cloneable
         try {
             fios = fi.getOutputStream();
         } catch (IOException e) {
-            // DiskFileItem does not do anything which could cause an excpetion to throw
+            // DiskFileItem does not do anything which could cause an exception to be thrown.
             // so unless it is modified, this should not happen.
             throw new RuntimeException("Exception getting attachment OutputStream.", e);
         }

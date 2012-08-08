@@ -21,8 +21,10 @@ package org.xwiki.extension.script.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
@@ -44,6 +46,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 // The rationale for being in this module is that checking right is useless if you don't also provide public script
 // service but if there is other things to put in a new xwiki-platform-extension-xwiki we might want to move it.
+@Component
+@Singleton
 public class XWikiExtensionValidator implements ExtensionValidator
 {
     /**
@@ -64,7 +68,7 @@ public class XWikiExtensionValidator implements ExtensionValidator
     /**
      * The full name (space.page) of the XWikiPreference page.
      */
-    private static final String XWIKIPREFERENCES_FULLNAME = "XWiki.XWikiPreference";
+    private static final String XWIKIPREFERENCES_FULLNAME = "XWiki.XWikiPreferences";
 
     /**
      * The identifier of the programming right.

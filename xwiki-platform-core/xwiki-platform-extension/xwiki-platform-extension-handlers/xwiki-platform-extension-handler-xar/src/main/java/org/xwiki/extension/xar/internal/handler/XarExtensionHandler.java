@@ -75,6 +75,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     private static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
+    /**
+     * The full name (space.page) of the XWikiPreference page.
+     */
+    private static final String XWIKIPREFERENCES_FULLNAME = "XWiki.XWikiPreferences";
+
+    /**
+     * The identifier of the programming right.
+     */
+    private static final String RIGHTS_ADMIN = "admin";
+
     @Inject
     private Packager packager;
 
@@ -296,17 +306,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
             String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
             if (caller != null) {
-                hasAccess =
-                    xcontext.getWiki().getRightService()
-                        .hasAccessLevel(right, caller, "XWiki.XWikiPreferences", xcontext);
+                hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, caller, document, xcontext);
             }
 
             if (hasAccess) {
                 String user = getRequestUserString(PROPERTY_USERREFERENCE, request);
                 if (user != null) {
-                    hasAccess =
-                        xcontext.getWiki().getRightService()
-                            .hasAccessLevel(right, user, "XWiki.XWikiPreferences", xcontext);
+                    hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, user, document, xcontext);
                 }
             }
         } finally {
@@ -330,7 +336,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                if (!hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request)) {
+                if (!hasAccessLevel(wiki, RIGHTS_ADMIN, XWIKIPREFERENCES_FULLNAME, request)) {
                     if (namespace == null) {
                         throw new InstallException(String.format("Admin right is required to install extension [%s]",
                             extension.getId()));
@@ -361,7 +367,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                if (!hasAccessLevel(wiki, "admin", namespace + "XWiki.XWikiPreferences", request)) {
+                if (!hasAccessLevel(wiki, RIGHTS_ADMIN, XWIKIPREFERENCES_FULLNAME, request)) {
                     if (namespace == null) {
                         throw new UninstallException(String.format(
                             "Admin right is required to uninstall extension [%s]", extension.getId()));

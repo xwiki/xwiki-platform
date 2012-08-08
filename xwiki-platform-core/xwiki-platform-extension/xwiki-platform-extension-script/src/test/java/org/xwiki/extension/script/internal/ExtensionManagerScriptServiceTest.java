@@ -26,6 +26,8 @@ import java.util.Map;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.extension.InstallException;
+import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
@@ -35,9 +37,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
@@ -46,12 +46,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
 {
     private XWiki mockXWiki;
 
-    private XWikiStoreInterface mockStore;
-
     private XWikiRightService mockRightService;
-
-    private Map<DocumentReference, Map<String, XWikiDocument>> documents =
-        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
 
     private RepositoryUtil repositoryUtil;
 
@@ -76,8 +71,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
         this.contextUser = new DocumentReference(getContext().getDatabase(), "XWiki", "ExtensionUser");
-
-        this.mockStore = getMockery().mock(XWikiStoreInterface.class);
 
         this.mockRightService = getMockery().mock(XWikiRightService.class);
 
@@ -112,9 +105,28 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         this.scriptService = getComponentManager().getInstance(ScriptService.class, "extension");
     }
 
+    // tools
+
     private Job install(String id, String version, String namespace) throws Throwable
     {
-        Job job = this.scriptService.install("extension", "version", null);
+        Job job = this.scriptService.install(id, version, namespace);
+        if (job == null) {
+            throw this.scriptService.getLastError();
+        }
+
+        job.join();
+
+        List<LogEvent> errors = job.getStatus().getLog().getLogsFrom(LogLevel.WARN);
+        if (!errors.isEmpty()) {
+            throw errors.get(0).getThrowable();
+        }
+
+        return job;
+    }
+
+    private Job uninstall(String id, String namespace) throws Throwable
+    {
+        Job job = this.scriptService.uninstall(id, namespace);
         if (job == null) {
             throw this.scriptService.getLastError();
         }
@@ -131,6 +143,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
 
     // Tests
 
+    // install
+
     @Test
     public void testInstallOnRoot() throws Throwable
     {
@@ -144,8 +158,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
 
             }
         });
-
-        // install
 
         install("extension", "version", null);
     }
@@ -164,8 +176,109 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
             }
         });
 
-        // install
+        install("extension", "version", "namespace");
+    }
+
+    @Test(expected = InstallException.class)
+    public void testInstallOnRootWithoutPgrammingRigths() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(false));
+
+            }
+        });
+
+        install("extension", "version", null);
+    }
+
+    @Test(expected = InstallException.class)
+    public void testInstallOnNamespaceWithoutPgrammingRigths() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(false));
+
+            }
+        });
 
         install("extension", "version", "namespace");
+    }
+
+    // uninstall
+
+    @Test
+    public void testUninstallFromRoot() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
+        uninstall("installedonroot", null);
+    }
+
+    @Test
+    public void testUninstallOnNamespace() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(true));
+
+            }
+        });
+
+        uninstall("installedonnamespace", "namespace");
+    }
+
+    @Test(expected = UninstallException.class)
+    public void testUninstallOnRootWithoutPgrammingRigths() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(false));
+
+            }
+        });
+
+        uninstall("installedonroot", null);
+    }
+
+    @Test(expected = UninstallException.class)
+    public void testUninstallOnNamespaceWithoutPgrammingRigths() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(false));
+
+            }
+        });
+
+        uninstall("installedonnamespace", "namespace");
     }
 }

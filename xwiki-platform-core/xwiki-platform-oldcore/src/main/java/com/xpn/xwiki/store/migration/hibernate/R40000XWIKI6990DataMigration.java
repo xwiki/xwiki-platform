@@ -791,19 +791,38 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get all table to process, including collections if needed.
-     * @param pClass the persistent class
+     * @param className the persistent class
      * @return a list of pair of table name and key field name.
      */
-    private List<String[]> getAllTableToProcess(PersistentClass pClass) {
-        return getAllTableToProcess(pClass, null);
+    private List<String[]> getAllTableToProcess(String className) throws DataMigrationException
+    {
+        return getAllTableToProcess(className, null);
     }
 
     /**
-    * get all table to process, including collections if needed.
-    * @param pClass the persistent class
-    * @param propertyName the name of the property for which the column name is returned
-    * @return a list of pair of table name and the property field name.
-    */
+     * get all table to process, including collections if needed.
+     * @param className the persistent class
+     * @param propertyName the name of the property for which the column name is returned
+     * @return a list of pair of table name and the property field name.
+     */
+    private List<String[]> getAllTableToProcess(String className, String propertyName) throws DataMigrationException
+    {
+        PersistentClass pClass = configuration.getClassMapping(className);
+
+        if (pClass == null) {
+            throw new DataMigrationException(
+                String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", className));
+        }
+
+        return getAllTableToProcess(pClass, propertyName);
+    }
+
+    /**
+        * get all table to process, including collections if needed.
+        * @param pClass the persistent class
+        * @param propertyName the name of the property for which the column name is returned
+        * @return a list of pair of table name and the property field name.
+        */
     private List<String[]> getAllTableToProcess(PersistentClass pClass, String propertyName) {
         List<String[]> list = new ArrayList<String[]>();
 
@@ -1011,11 +1030,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 final List<String[]> tableToProcess = new ArrayList<String[]>();
 
                 for (Class< ? > docClass : DOC_CLASSES) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(docClass.getName())));
+                    tableToProcess.addAll(getAllTableToProcess(docClass.getName()));
                 }
                 for (Class< ? > docClass : DOCLINK_CLASSES) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(docClass.getName()),
-                        "docId"));
+                    tableToProcess.addAll(getAllTableToProcess(docClass.getName(), "docId"));
                 }
 
                 logProgress("Converting %d document IDs in %d tables...", docs.size(), tableToProcess.size());
@@ -1107,10 +1125,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 tableToProcess.addAll(getCollectionProperties(objklass));
 
                 for (Class< ? > propertyClass : PROPERTY_CLASS) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(propertyClass.getName())));
+                    tableToProcess.addAll(getAllTableToProcess(propertyClass.getName()));
                 }
                 for (String customClass : customMappedClasses) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(customClass)));
+                    tableToProcess.addAll(getAllTableToProcess(customClass));
                 }
                 tableToProcess.add(new String[] {objklass.getTable().getName(), getKeyColumnName(objklass)});
 

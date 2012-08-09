@@ -82,7 +82,7 @@ public class FormUrlEncodedWikiReader implements MessageBodyReader<Wiki>, XWikiR
         WebApplicationException
     {
         ObjectFactory objectFactory = new ObjectFactory();
-        Wiki wikiDescriptor = objectFactory.createWiki();
+        Wiki wiki = objectFactory.createWiki();
 
         HttpServletRequest httpServletRequest =
             (HttpServletRequest) Context.getCurrent().getAttributes().get(Constants.HTTP_REQUEST);
@@ -96,18 +96,18 @@ public class FormUrlEncodedWikiReader implements MessageBodyReader<Wiki>, XWikiR
          * read data using getParameter()
          */
         if (form.getNames().isEmpty()) {
-            wikiDescriptor.setId(httpServletRequest.getParameter(ID_FIELD_NAME));
-            wikiDescriptor.setName(httpServletRequest.getParameter(NAME_FIELD_NAME));
-            wikiDescriptor.setOwner(httpServletRequest.getParameter(OWNER_FIELD_NAME));
-            wikiDescriptor.setDescription(httpServletRequest.getParameter(DESCRIPTION_FIELD_NAME));
+            wiki.setId(httpServletRequest.getParameter(ID_FIELD_NAME));
+            wiki.setName(httpServletRequest.getParameter(NAME_FIELD_NAME));
+            wiki.setOwner(httpServletRequest.getParameter(OWNER_FIELD_NAME));
+            wiki.setDescription(httpServletRequest.getParameter(DESCRIPTION_FIELD_NAME));
         } else {
-            wikiDescriptor.setId(form.getFirstValue(ID_FIELD_NAME));
-            wikiDescriptor.setName(form.getFirstValue(NAME_FIELD_NAME));
-            wikiDescriptor.setOwner(form.getFirstValue(OWNER_FIELD_NAME));
-            wikiDescriptor.setDescription(form.getFirstValue(DESCRIPTION_FIELD_NAME));
+            wiki.setId(form.getFirstValue(ID_FIELD_NAME));
+            wiki.setName(form.getFirstValue(NAME_FIELD_NAME));
+            wiki.setOwner(form.getFirstValue(OWNER_FIELD_NAME));
+            wiki.setDescription(form.getFirstValue(DESCRIPTION_FIELD_NAME));
         }
 
-        return wikiDescriptor;
+        return wiki;
     }
 
 }

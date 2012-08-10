@@ -507,10 +507,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public long executeSqlIdUpdate(String name, String field) {
             StringBuilder sb = new StringBuilder(128);
             if (isMySQL) {
+                // MySQL does not support multiple references to a temporary table in a single statement but support
+                // this non-standard SQL syntax with a single reference to the temporary table
                 sb.append("UPDATE ").append(name).append(" t, ").append(TEMPTABLE).append(" m")
                     .append(" SET t.").append(field).append('=').append("m.").append(NEWIDCOL)
                     .append(" WHERE t.").append(field).append('=').append("m.").append(OLDIDCOL);
             } else if (isMSSQL) {
+                // MS-SQL does support aliases on updated table, but support inner joins during updates
                 sb.append("UPDATE ").append(name)
                     .append(" SET ").append(field).append('=').append("m.").append(NEWIDCOL)
                     .append(" FROM ").append(name).append(" AS [t] INNER JOIN ")
@@ -1357,6 +1360,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         final String tableName = table.getName();
         String pkName = table.getPrimaryKey().getName();
 
+        // MS-SQL require a constraints name, and the one provided from the mapping is necessarily appropriate
+        // since during database creation, that name has not been used, and a name has been assigned by the
+        // database itself. We need to retrieve that name from the schema.
         if (this.isMSSQL) {
             try {
                 pkName = getStore().failSafeExecuteRead(getXWikiContext(), new HibernateCallback<String>()
@@ -1465,6 +1471,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             .append("\"  columnName=\"").append(column)
             .append("\" newDataType=\"BIGINT\"/>\n");
 
+        // MS-SQL drop the NOT NULL constraints while modifying datatype, so we add it back
         if (this.isMSSQL) {
             sb.append("    <addNotNullConstraint tableName=\"").append(table)
                 .append("\"  columnName=\"").append(column)
@@ -1489,11 +1496,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(tableName)
             .append("] to BIGINT type</comment >\n");
 
+        // MS-SQL require that primary key constraints and all indexes related to the changed column be dropped before
+        // changing the column type.
         if (this.isMSSQL) {
             if (table.hasPrimaryKey()) {
                 appendDropPrimaryKey(sb, table);
             }
 
+            // We drop all index related to the table, this is overkill, but does not hurt
             for (@SuppressWarnings("unchecked") Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
                 Index index = it.next();
                 appendDropIndex(sb, index);
@@ -1502,6 +1512,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         appendModifyColumn(sb, tableName, column);
 
+        // Add back dropped PK constraints and indexes for MS-SQL
         if (this.isMSSQL) {
             if (table.hasPrimaryKey()) {
                 appendAddPrimaryKey(sb, table);
@@ -1717,7 +1728,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             });
 
         this.isMySQLMyISAM = (createTable != null && createTable.contains("ENGINE=MyISAM"));
-        // Test MSSQL using MySQL innoDB: this.isMSSQL = !this.isMySQLMyISAM;
     }
 
     @Override

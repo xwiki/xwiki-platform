@@ -347,7 +347,7 @@
       <artifactId>yuicompressor</artifactId>
       <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
            yuicompressor -->
-      <version>2.4.2-xwiki</version>
+      <version>2.4.7-xwiki</version>
     </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>

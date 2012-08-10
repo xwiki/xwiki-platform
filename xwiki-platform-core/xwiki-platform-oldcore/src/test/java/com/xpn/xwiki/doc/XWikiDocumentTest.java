@@ -403,6 +403,16 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(new DocumentReference("copywiki", DOCSPACE, DOCNAME), bobject.getXClassReference());
     }
 
+    public void testCustomMappingAfterDocumentCopy() throws Exception
+    {
+        this.document.getXClass().setCustomMapping("internal");
+
+        XWikiDocument copy =
+            this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"), getContext());
+
+        assertEquals("",copy.getXClass().getCustomMapping());
+    }
+
     public void testCloneNullObjects() throws XWikiException
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));

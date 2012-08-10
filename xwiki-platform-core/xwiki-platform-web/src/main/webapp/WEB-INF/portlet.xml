@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<portlet-app version="1.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd">
+<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+  version="2.0">
   <portlet>
-    <description xml:lang="EN">XWiki Portlet</description>
+    <description xml:lang="en">Portlet dispatching requests to an XWiki instance running on the same context path</description>
     <portlet-name>xwiki</portlet-name>
-    <display-name xml:lang="EN">xwiki</display-name>
-    <portlet-class>com.xpn.xwiki.web.XWikiPortlet</portlet-class>
-
-    <expiration-cache>0</expiration-cache>
-
+    <display-name xml:lang="en">XWiki Dispatch Portlet</display-name>
+    <portlet-class>org.xwiki.portlet.XWikiDispatchPortlet</portlet-class>
     <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>edit</portlet-mode>
-      <portlet-mode>config</portlet-mode>
+      <mime-type>*/*</mime-type>
+      <portlet-mode>EDIT</portlet-mode>
     </supports>
-
-    <supported-locale>en</supported-locale>
-
     <portlet-info>
-      <title>XWiki</title>
+      <title>XWiki Dispatch Portlet</title>
       <short-title>XWiki</short-title>
       <keywords>xwiki</keywords>
     </portlet-info>
-      <portlet-preferences>
-          <preference>
-              <name>rootTopic</name>
-              <value>Main</value>
-              <read-only>false</read-only>
-          </preference>
-      </portlet-preferences>
+    <portlet-preferences>
+      <preference>
+        <name>editURL</name>
+        <value>/bin/edit/Portlet/?xpage=editportlet</value>
+        <read-only>true</read-only>
+      </preference>
+      <preference>
+        <name>servletPath</name>
+        <value>/bin</value>
+        <read-only>true</read-only>
+      </preference>
+      <preference>
+        <name>pathInfo</name>
+        <value>/view/Main/</value>
+      </preference>
+      <preference>
+        <name>title</name>
+        <value>XWiki Dispatch Portlet</value>
+      </preference>
+    </portlet-preferences>
   </portlet>
-
 </portlet-app>

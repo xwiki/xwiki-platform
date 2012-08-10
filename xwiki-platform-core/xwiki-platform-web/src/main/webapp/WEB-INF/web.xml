@@ -85,6 +85,23 @@
     </init-param>
   </filter>
 
+  <!-- Filter that rewrites the XWiki output to be able to include it in a portal page. -->
+  <filter>
+    <filter-name>XWiki Portlet Filter</filter-name>
+    <filter-class>org.xwiki.portlet.controller.DispatchFilter</filter-class>
+  </filter>
+
+  <!--
+    This filter must be the first one applied in portlet mode because it wraps the request and response objects to fix
+    some of the differences between portlet and servlet mode.
+  -->
+  <filter-mapping>
+    <filter-name>XWiki Portlet Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>

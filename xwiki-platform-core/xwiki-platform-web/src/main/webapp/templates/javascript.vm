@@ -43,10 +43,14 @@ $xwiki.jsfx.use('uicomponents/suggest/suggest.js')
    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
   #end
 #end
+#if($isInPortletMode)
+$xwiki.jsfx.use('js/xwiki/portletOverwrites.js', {'forceSkinAction': true})
+#end
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
 <script type="text/javascript">
 // <![CDATA[
+var ID = function(id){return id};
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";

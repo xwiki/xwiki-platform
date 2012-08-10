@@ -1,0 +1,13 @@
+<form action="" method="post">
+  <div>
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" value="$!{request.getAttribute('title').get(0)}" />
+  </div>
+  <div>
+    <label for="pathInfo">Home Page:</label>
+    <input type="text" id="pathInfo" name="pathInfo" value="$!{request.getAttribute('pathInfo').get(0)}" />
+  </div>
+  <div>
+    <input type="submit" value="Save" />
+  </div>
+</form>

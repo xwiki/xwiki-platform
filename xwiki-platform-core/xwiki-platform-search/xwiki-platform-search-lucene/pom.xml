@@ -66,6 +66,11 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
     </dependency>
+    <dependency>
+      <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+      <groupId>de.l3s.boilerpipe</groupId>
+      <artifactId>boilerpipe</artifactId>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

@@ -800,12 +800,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * get all table to process, including collections if needed.
-     * @param className the persistent class
-     * @param propertyName the name of the property for which the column name is returned
+     * get hibernate mapping of the given class or entity name
+     * @param className the class or entity name
      * @return a list of pair of table name and the property field name.
      */
-    private List<String[]> getAllTableToProcess(String className, String propertyName) throws DataMigrationException
+    private PersistentClass getClassMapping(String className) throws DataMigrationException
     {
         PersistentClass pClass = configuration.getClassMapping(className);
 
@@ -814,7 +813,18 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", className));
         }
 
-        return getAllTableToProcess(pClass, propertyName);
+        return pClass;
+    }
+
+    /**
+    * get all table to process, including collections if needed.
+    * @param className the class or entity name
+    * @param propertyName the name of the property for which the column name is returned
+    * @return a list of pair of table name and the property field name.
+    */
+    private List<String[]> getAllTableToProcess(String className, String propertyName) throws DataMigrationException
+    {
+        return getAllTableToProcess(getClassMapping(className), propertyName);
     }
 
     /**
@@ -1068,10 +1078,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             } else {
                 final List<String[]> docsColl = new ArrayList<String[]>();
                 for (Class< ? > docClass : DOC_CLASSES) {
-                    docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
+                    docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
                 for (Class< ? > docClass : DOCLINK_CLASSES) {
-                    docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
+                    docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
 
                 logProgress("Converting %d document IDs in %d tables and %d collection tables...",
@@ -1121,7 +1131,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 // Pair table,key for table that need manual updates
                 final List<String[]> tableToProcess = new ArrayList<String[]>();
 
-                PersistentClass objklass = configuration.getClassMapping(BaseObject.class.getName());
+                PersistentClass objklass = getClassMapping(BaseObject.class.getName());
                 tableToProcess.addAll(getCollectionProperties(objklass));
 
                 for (Class< ? > propertyClass : PROPERTY_CLASS) {
@@ -1169,10 +1179,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 // Pair table,key for collection table that need manual updates
                 final List<String[]> objsColl = new ArrayList<String[]>();
 
-                objsColl.addAll(getCollectionProperties(configuration.getClassMapping(BaseObject.class.getName())));
+                objsColl.addAll(getCollectionProperties(getClassMapping(BaseObject.class.getName())));
                 for (Class< ? > propertyClass : PROPERTY_CLASS) {
                     String className = propertyClass.getName();
-                    PersistentClass klass = configuration.getClassMapping(className);
+                    PersistentClass klass = getClassMapping(className);
+
+                    if (klass == null) {
+                        throw new DataMigrationException(
+                            String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", className));
+                    }
 
                     // Add collection table that will not be updated by cascaded updates
                     objsColl.addAll(getCollectionProperties(klass));
@@ -1183,7 +1198,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 }
                 for (String customClass : customMappedClasses) {
-                    PersistentClass klass = configuration.getClassMapping(customClass);
+                    PersistentClass klass = getClassMapping(customClass);
+
+                    if (klass == null) {
+                        throw new DataMigrationException(
+                            String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", customClass));
+                    }
 
                     // Add collection table that will not be updated by cascaded updates
                     objsColl.addAll(getCollectionProperties(klass));
@@ -1254,7 +1274,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     final List<String[]> tableToProcess = new ArrayList<String[]>();
                     final Map<Long, Long> statids = map;
 
-                    PersistentClass statklass = configuration.getClassMapping(statsClass.getName());
+                    PersistentClass statklass = getClassMapping(statsClass.getName());
                     tableToProcess.addAll(getCollectionProperties(statklass));
                     tableToProcess.add(new String[] {statklass.getTable().getName(), getKeyColumnName(statklass)});
 
@@ -1292,7 +1312,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 } else {
                     final List<String[]> statsColl = new ArrayList<String[]>();
-                    statsColl.addAll(getCollectionProperties(configuration.getClassMapping(statsClass.getName())));
+                    statsColl.addAll(getCollectionProperties(getClassMapping(statsClass.getName())));
 
                     logProgress("Converting %d %s statistics IDs in 1 tables and %d collection tables...",
                         map.size(), klassName, statsColl.size());
@@ -1727,12 +1747,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         // Build the list of classes to check for updates
-        classes.add(configuration.getClassMapping(BaseObject.class.getName()));
+        classes.add(getClassMapping(BaseObject.class.getName()));
         for (Class< ? > klass : PROPERTY_CLASS) {
-            classes.add(configuration.getClassMapping(klass.getName()));
+            classes.add(getClassMapping(klass.getName()));
         }
         for (Class< ? > klass : STATS_CLASSES) {
-            classes.add(configuration.getClassMapping(klass.getName()));
+            classes.add(getClassMapping(klass.getName()));
         }
 
         // Initialize the counter of Change Logs

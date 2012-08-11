@@ -513,7 +513,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     .append(" SET t.").append(field).append('=').append("m.").append(NEWIDCOL)
                     .append(" WHERE t.").append(field).append('=').append("m.").append(OLDIDCOL);
             } else if (isMSSQL) {
-                // MS-SQL does support aliases on updated table, but support inner joins during updates
+                // MS-SQL does not support aliases on updated table, but support inner joins during updates
                 sb.append("UPDATE ").append(name)
                     .append(" SET ").append(field).append('=').append("m.").append(NEWIDCOL)
                     .append(" FROM ").append(name).append(" AS [t] INNER JOIN ")

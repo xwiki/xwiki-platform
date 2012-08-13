@@ -39,7 +39,7 @@
     <!-- Useful for Platform extensions -->
     <platform.version>portlet-3.5-SNAPSHOT</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>${platform.version}</rendering.version>
+    <rendering.version>${commons.version}</rendering.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

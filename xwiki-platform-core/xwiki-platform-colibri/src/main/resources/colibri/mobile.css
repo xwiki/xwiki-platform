@@ -1,0 +1,223 @@
+#template('colorThemeInit.vm')
+
+#body {
+  background-color: $theme.pageBackgroundColor;
+  font-size: 110%;
+  padding: 0 .5em .5em;
+  min-width: inherit;
+}
+
+#headerspace {
+  
+}
+
+#menu { 
+  padding: .5em 25px;
+}
+
+#menu a, #menu .menuarrow {
+  color: $theme.buttonSecondaryTextColor;
+  text-shadow: 0 1px 0 $theme.pageContentBackgroundColor;
+}
+
+#menu .menuarrow {
+  left: 50px;
+  position: absolute;
+  top: 30px;
+  opacity: .4;
+}
+
+#menu a.other:hover, #menu a.other:active, #menu a.other:target {
+  text-decoration: none;
+}
+
+#menu .action{
+  background: none no-repeat scroll 50% 13px transparent;
+  font-size: 0.7em;
+  float: left;
+  padding-top: 60px;
+  position: relative;
+  margin: 0 .5em;
+  min-width: 60px;
+  text-align: center;
+  text-transform: uppercase;
+  background-size: 40px;
+}
+
+#menu .logo {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/xwiki.png")');
+  background-size: 100%;
+  display: inline-block;
+  float: left;
+  margin: 6px 1em 0 0;
+  height: 60px;
+  width: 60px;
+}
+#menu .view {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/document_24.png")');
+}
+#menu .edit {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/pencil_24.png")');
+}
+#menu .comment {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/comment_24.png")');
+}
+#menu .attach {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/attach_24.png")');
+}
+#menu .syntax {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/pencil_24.png")');
+}
+#menu .other {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/book_bookmark_24.png")');
+  background-position: 30% 13px;
+}
+#menu .panelslist {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/link_24.png")');
+}
+#menu .info {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/info_24.png")');
+}
+#menu .profile {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/man_24.png")');
+}
+#menu .login {
+  background-image: url('$xwiki.getSkinFile("icons/mobile/outbox_24.png")');
+  float: right;
+}
+#menu .separator {
+  float: left;
+  margin: 0 0.7em;
+  padding-top: 20px;
+}
+
+#navigation {
+  background: $theme.pageContentBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  border-width: 0 1px 1px;
+  border-radius: 0 0 4px 4px;
+  padding: 10px 25px;
+}
+
+#breadcrumbs {
+  float: left;
+}
+
+#search.ios, #languages.ios {
+  float: right;
+  clear: right;
+}
+
+#languages.ios, .globalsearchinput {
+  margin-right: 0;
+}
+
+#languages.ios {
+  font-size: 85%;
+}
+
+#breadcrumbs { 
+  padding: 0.2em 0 0;
+  font-size: 140%;
+}
+
+
+#headerlanguages a {
+  margin: 0px;
+}
+
+.globalsearchinput {
+  padding: 0.3em;
+  margin-right: -0.5em;
+  width: 210px;
+}
+
+#document-title h1 {
+  font-size: 2.5em;
+  margin: 0.3em 0 0;
+}
+
+#footerglobal {
+  font-size: .5em;
+  padding: 1em 0 0;
+}
+
+#ioslink {
+  clear: both;
+  font-size: .7em;
+  margin: 0 225px;
+  padding: 0 0 25px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.alleditcontent {
+  margin-left: 0;
+}
+
+.panel {
+  width: 100%;
+}
+
+#xwikieditorinner .panel {
+  width: 210px;
+}
+
+h1.xwikipaneltitle {
+  background-color: #ffffff;
+  border-bottom: none;
+  color: #000000;
+  padding: 5px;
+  text-size: auto;
+}
+
+.xwikipanelcontents  {
+  background-color: none;
+  color: none;
+}
+
+#contentmenu, #editmenu, 
+#annotationsshortcut, #commentsshortcut, #attachmentsshortcut, #informationshortcut, #historyshortcut, #document-info .separator {
+  display: none;
+}
+
+#body.hideleft #contentcolumn .main {
+  margin: 0;
+}
+
+.main {
+  margin: 0;
+  padding: 0;
+}
+
+#body.hideleft #footerglobal {
+  margin: 0;
+}
+
+#quicklinks {
+  position: absolute;
+  top: 130px;
+  left: 100px;
+  border: 1px solid $theme.borderColor;
+  background-color: $theme.pageBackgroundColor;
+  padding: .5em;
+  z-index: 100014; 
+  font-size: 130%;
+}
+
+#document-info-mobile {
+ float: left;
+ clear: left;
+ padding: 3px;
+ padding-left: 0px;
+ font-size: 70%;
+}
+
+.xdocLastModification, .xdocCreation {
+  width: auto;
+  float: none;
+}
+
+#xwikieditcontent textarea#content {
+  font-size: 120%;
+}

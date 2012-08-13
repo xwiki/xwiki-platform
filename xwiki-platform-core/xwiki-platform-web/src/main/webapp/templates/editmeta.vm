@@ -1,3 +1,4 @@
+#if($mobile=="off")
 #set($docTitle = $request.getParameter('title'))
 #if("$!docTitle" == '')
   #set($docTitle = $!tdoc.title)
@@ -21,4 +22,5 @@
   <div id="contentMeta">
     <label for="content">$msg.get('core.editors.content.contentField.label')</label>
   </div>
+#end
 #end

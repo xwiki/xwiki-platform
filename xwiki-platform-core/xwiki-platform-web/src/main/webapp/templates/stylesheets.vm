@@ -31,6 +31,10 @@
 <!--[if IE 6]>
   <link href="$xwiki.getSkinFile('ie-6.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" />
 <![endif]-->
+## Mobile CSS
+#if($mobile=="on")
+  <link href="$xwiki.getSkinFile('mobile.css', true)" rel="stylesheet" type="text/css" />
+#end
 ## Hook for inserting CSS skin extensions
 <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
 <!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->

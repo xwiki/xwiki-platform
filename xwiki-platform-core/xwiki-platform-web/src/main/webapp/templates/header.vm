@@ -3,4 +3,8 @@
 ###
 ### Contains the global and space zones
 ###
+#if($mobile=="off")
 #template("global.vm")
+#else
+#template("mobileheader.vm")
+#end

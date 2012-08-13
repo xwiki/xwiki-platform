@@ -1,0 +1,122 @@
+<div id="quicklinks" style="display: none;">
+###
+###    Display Panel
+###
+### Extract and display the panel code from the panel object
+###
+#macro(iosdisplaypanel $name)
+  #set ($pobj = "")
+  ## Since Velocity does not do any assignment if the RHS is null we need to reset the paneldoc
+  ## as otherwise the previously set panel will be displayed. getDocument() returns null if the
+  ## user doesn't have the right to view a document.
+  #set ($paneldoc = "")
+  #set ($paneldoc = $xwiki.getDocument($name))
+  #if ($paneldoc != "")
+    #set ($pobj = $paneldoc.getObject("Panels.PanelClass"))
+    #if (!$pobj)
+      ## discarded
+    #else
+      $!doc.display("content", "view", $pobj)
+    #end
+  #end
+#end
+#iosdisplaypanel("Panels.QuickLinks")
+</div>
+<script type="text/javascript">
+function showQuickLinks() {
+  $("quicklinks").toggle();
+}
+</script>
+#set($parents = $util.arrayList)
+#set($discard = $parents.add($doc.fullName))
+#macro(breadcrumb $doc $string $level)
+  #set($parent = $doc.parent)
+  #if(($parent != "") && ($level < 6) && (!$parents.contains($parent)))
+    #set($discard = $parents.add($parent))
+    #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
+    #set($pdocurl = $pdoc.getURL("view"))
+    #set($nstring = "<a href='$pdocurl'>$xwiki.getXMLEncoded(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&raquo;</span> $string")
+    #set($level = $level + 1)
+    #breadcrumb($pdoc $nstring $level)
+  #else
+    $string
+  #end
+#end
+#if($context.getMode()==0) ## Visible only in a page
+<div id="headerspace" class="layoutsection">
+  <div id="navigation" class="ios">
+    <div class="ios" id="breadcrumbs">
+      <span class="breadcrumbspace"><a href="$spaceViewUrl">$xwiki.getXMLEncoded(${doc.space})</a>: </span>
+  #breadcrumb($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+    </div>
+    <div class="ios" id="search">
+      <form action="$xwiki.getURL('Main.WebSearch')">
+        <input type="hidden" name="skin" value="${xwiki.skin}" />
+          <label class="hidden" for="headerglobalsearchinput">$msg.get('panels.search.inputLabel')</label><input class="globalsearchinput withTip" id="headerglobalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="10"/>
+      </form>
+    </div>
+    <div class="ios" id="languages">
+    #if($xwiki.isMultiLingual())
+      <span class="glink" id="headerlanguages">
+      #set($defaultLanguage = "$!{doc.getDefaultLanguage()}")
+      #if($defaultLanguage == '')
+        #set($defaultLanguage = "$!{doc.getLanguage()}")
+      #end
+      #if($defaultLanguage == '')
+        #set($defaultLanguage = "default")
+      #end
+      <a href="$!doc.getURL("view", "language=$defaultLanguage")" class="language-default#if($tdoc.realLanguage == $defaultLanguage || ($defaultLanguage == 'default' && $tdoc.realLanguage == '')) language-current#end">$defaultLanguage</a>
+      #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+      #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
+      #foreach($lang in $doc.translationList)
+        #if(!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang))
+          <a href="$!doc.getURL("view", "language=$lang")" class="language-translation#if($tdoc.realLanguage == $lang) language-current#end">$!lang</a>
+        #end
+      #end
+      </span>
+    #end
+    </div>
+    <div id="document-info-mobile">
+     <span class="xdocLastModification"> ## Last modification
+      $msg.get('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+     </span>
+     <span class="xdocSeparator">
+     - 
+     </span>
+     <span class="xdocCreation">
+     $msg.get('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])
+      #if($tdoc.realLanguage != $doc.realLanguage)
+        $msg.get('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
+      #end
+     </span>
+    </div>
+    <div class="clearfloats"></div>
+  </div>
+  <div class="ios" id="menu">
+    ## Edit Menu
+    ## Compute the default edit mode
+    #set($editaction = $doc.getDefaultEditMode())
+    <a class="logo" href="$!xwiki.getURL('Main.WebHome')" title="Home" rel="home"></a>
+    <a class="action other" href="$doc.getURL("view", "viewer=panels")" onclick="showQuickLinks(); return false;"><span class="menuarrow">&#9660;</span>$msg.get('XWiki.XWikiPreferences_menu')</a>
+    <span class="separator">&#183;</span>
+    <a class="action view" href="$doc.getURL("view", "")">$msg.get('view')</a>
+    <a class="action syntax" href="$doc.getURL("edit", "editor=wiki&$!languageparams")">$msg.get('core.menu.edit.wiki')</a>
+    <a class="action edit" href="$doc.getURL($editaction, $!languageparams)">$msg.get('core.menu.edit.wysiwyg')</a>
+    <span class="separator">&#183;</span>
+    <a class="action panelslist" href="$doc.getURL("view", "viewer=panels")">$msg.get('admin.panels')</a>
+    <a class="action comment" href="$doc.getURL("view", "viewer=comments")">$msg.get('docextra.comments')</a>
+    <a class="action attach" href="$doc.getURL("view", "viewer=attachments")">$msg.get('docextra.attachments')</a> 
+    <a class="action info" href="$doc.getURL("view", "viewer=information")">$msg.get('docextra.information')</a>
+      #if (!$xcontext.action.startsWith('login'))
+        #if ($isGuest)
+          #set ($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+          <a class="action login" href="$!loginurl">$!msg.get('login')</a>
+        #else
+          #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+          <a class="action login" href="$!logouturl">$!msg.get('logout')</a>
+        #end
+      #end
+    <div class="clearfloats"></div>
+  </div>
+</div>
+#end

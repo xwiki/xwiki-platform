@@ -13,6 +13,7 @@
     #set ($version = $!xwiki.version)
   #end
   <div id="xwikiplatformversion">$version</div>
+#template("mobileversion.vm")
 <hr/>
 </div>
 #end

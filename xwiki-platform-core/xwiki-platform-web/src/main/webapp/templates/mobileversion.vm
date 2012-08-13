@@ -1,0 +1,5 @@
+#if($mobile=="on")
+  <div id="mobile"><a href="$doc.getURL("view")" onclick="createCookie('xwikimobile','off',0);">Normal Version</a></div>
+#elseif($ismobile || $request.showmobile)
+ <a href="$doc.getURL("view")" onclick="createCookie('xwikimobile','on',0);">Mobile Version</a>
+#end

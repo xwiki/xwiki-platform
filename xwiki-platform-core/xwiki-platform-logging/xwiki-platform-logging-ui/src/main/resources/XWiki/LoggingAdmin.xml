@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1342879439000</creationDate>
-  <date>1344937307000</date>
-  <contentUpdateDate>1344937307000</contentUpdateDate>
+  <date>1344947579000</date>
+  <contentUpdateDate>1344947579000</contentUpdateDate>
   <version>1.1</version>
   <title>Logging Administration</title>
   <template/>
@@ -171,6 +171,10 @@
     </property>
   </object>
   <content>{{velocity}}
+$msg.get('logging.admin.intro')
+{{/velocity}}
+
+{{velocity}}
 #set( $logging = $services.logging )
 #set( $logger_list = $logging.getLevels() )
 ##

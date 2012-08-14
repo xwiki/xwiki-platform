@@ -52,6 +52,17 @@ var XWiki = (function(XWiki){
     if (!browser.isIE6x) {
       document.observe("dom:loaded", function() {
         hookRichImporterUI();
+        /** Attach the HTML5 uploader, if available */
+        var form = $('AddAttachment');
+        if (form && typeof(XWiki.FileUploader) != 'undefined') {
+          var html5Uploader = new XWiki.FileUploader(form.down("input[type='file']"), {
+            'progressAutohide' : true,
+            'responseContainer' : $('packagelistcontainer'),
+            'responseURL' : window.docgeturl + '?xpage=packagelist&forceTestRights=1'
+          });
+          form.observe("xwiki:html5upload:done", hookRichImporterUI);
+          html5Uploader.hideFormButtons();
+        }
       });
     }
 

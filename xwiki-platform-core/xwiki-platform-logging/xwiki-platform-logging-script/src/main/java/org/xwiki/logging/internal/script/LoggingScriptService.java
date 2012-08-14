@@ -37,6 +37,7 @@ import org.xwiki.script.service.ScriptService;
 /**
  * Provide logging related script oriented APIs.
  * 
+ * @since 4.2M3
  * @version $Id$
  */
 @Component

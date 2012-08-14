@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1342879439000</creationDate>
-  <date>1344947579000</date>
-  <contentUpdateDate>1344947579000</contentUpdateDate>
+  <date>1344951394000</date>
+  <contentUpdateDate>1344951394000</contentUpdateDate>
   <version>1.1</version>
   <title>Logging Administration</title>
   <template/>
@@ -146,7 +146,7 @@
     <className>XWiki.ConfigurableClass</className>
     <guid>c0cc3e5d-7495-41c0-80a9-0e168624656b</guid>
     <property>
-      <codeToExecute>{{include document="XWiki.LoggingAdmin"/}}</codeToExecute>
+      <codeToExecute>{{display reference="XWiki.LoggingAdmin"/}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -175,22 +175,22 @@ $msg.get('logging.admin.intro')
 {{/velocity}}
 
 {{velocity}}
-#set( $logging = $services.logging )
-#set( $logger_list = $logging.getLevels() )
+#set($logging = $services.logging)
 ##
 ## Setting the logger level if button has been pressed ##
 ##
-#if ($request.loggeraction_set)
-  #if( $!logger_list.containsKey("$request.logger_name") )
-        #if ($request.logger_level == '')
-          {{success}}Logger ${request.logger_name} level has been unset.{{/success}}
-          $logging.setLevel($request.logger_name, $null)
-        #else
-          {{success}}Logger ${request.logger_name} level has been set to ${request.logger_level}.{{/success}}
-          $logging.setLevel($request.logger_name, $request.logger_level)
-        #end
+#if ($request.loggeraction_set &amp;&amp; $request.logger_name &amp;&amp; $xwiki.hasAccessLevel('programming'))
+  #set($logger_list = $logging.getLevels())
+  #if ($!logger_list.containsKey($request.logger_name))
+    #if ($request.logger_level == '')
+      {{success}}Logger ${request.logger_name} level has been unset.{{/success}}
+      #set($void = $logging.setLevel($request.logger_name, $null))
+    #else
+      {{success}}Logger ${request.logger_name} level has been set to ${request.logger_level}.{{/success}}
+      #set($void = $logging.setLevel($request.logger_name, $request.logger_level))
+    #end
   #else
-        The logger "$request.logger_name" doesn't exist
+    {{error}}Failed to set log level: the logger "$request.logger_name" doesn't exist.{{/error}}
   #end
 #end
 ##
@@ -201,16 +201,21 @@ $msg.get('logging.admin.intro')
 ##
 ## Livetable #
 ##
-#set($columns = [ "logger"  , "level" , "actions"])
+#set($columns = [ 'logger'  , 'level'])
 #set($columnsProperties = {
     'logger' : { 'type' : 'text' },
-    'level' : { 'type' : 'text', 'size' : '3' },
-    'actions': { 'html' : true, 'sortable' : false }
+    'level' : { 'type' : 'text', 'size' : '3' }
 })
 #set($options = {
     'resultPage': 'XWiki.LoggingAdminTableJson',
     'translationPrefix' : 'logging.admin.livetable.'
 })
+##
+#if ($xwiki.hasAccessLevel('programming'))
+  #set($void = $columns.add('actions'))
+  #set($void = $columnsProperties.put('actions', { 'html' : true, 'sortable' : false }))
+#end
+##
 #livetable("logging" $columns $columnsProperties $options)
 {{/velocity}}</content>
 </xwikidoc>

@@ -19,29 +19,19 @@
  */
 package org.xwiki.logging.internal.script;
 
-import java.lang.management.ManagementFactory;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.logging.LogQueue;
-import org.xwiki.logging.event.LogQueueListener;
-import org.xwiki.observation.ObservationManager;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LoggerManager;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -52,148 +42,59 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("logging")
 @Singleton
-public class LoggingScriptService implements ScriptService, Initializable
+public class LoggingScriptService implements ScriptService
 {
     /**
-     * Used to listen to logs.
+     * Used to manipulate loggers.
      */
     @Inject
-    private ObservationManager observation;
+    private LoggerManager loggerManager;
 
+    /**
+     * Used to check rights.
+     */
     @Inject
-    private Logger logger;
-
-    /**
-     * All the produced log since last call to {@link #startLog()}.
-     */
-    private LogQueue logQueue = new LogQueue();
-
-    /**
-     * The actual log listener.
-     */
-    private LogQueueListener logQueueListener = new LogQueueListener("logging.script", this.logQueue);
-
-    private MBeanServer jmxServer;
-
-    private ObjectName jmxName;
-
-    // TODO: put needed generic methods in LogManager instead of using JMX directly
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.jmxServer = ManagementFactory.getPlatformMBeanServer();
-        try {
-            this.jmxName = new ObjectName("logback:type=xwiki");
-        } catch (Exception e) {
-            // That should never happen
-        }
-    }
-
-    // JMX
-
-    private List<String> jmxLoggerList() throws ReflectionException, MBeanException, InstanceNotFoundException,
-        AttributeNotFoundException
-    {
-        return (List<String>) this.jmxServer.getAttribute(this.jmxName, "LoggerList");
-    }
-
-    private String jmxgetLoggerLevel(String level) throws InstanceNotFoundException, ReflectionException,
-        MBeanException
-    {
-        return (String) this.jmxServer.invoke(this.jmxName, "getLoggerLevel", new Object[] {level},
-            new String[] {"java.lang.String"});
-    }
-
-    private String jmxsetLevel(String logger, String level) throws InstanceNotFoundException, ReflectionException,
-        MBeanException
-    {
-        return (String) this.jmxServer.invoke(this.jmxName, "setLoggerLevel", new Object[] {logger, level},
-            new String[] {"java.lang.String", "java.lang.String"});
-    }
-
-    private String jmxreloadDefaultConfiguration() throws InstanceNotFoundException, ReflectionException,
-        MBeanException
-    {
-        return (String) this.jmxServer.invoke(this.jmxName, "reloadDefaultConfiguration",
-            ArrayUtils.EMPTY_OBJECT_ARRAY, ArrayUtils.EMPTY_STRING_ARRAY);
-    }
-
-    // Configuration
-
-    public void reloadDefaultConfiguration() throws InstanceNotFoundException, ReflectionException, MBeanException
-    {
-        jmxreloadDefaultConfiguration();
-    }
+    private DocumentAccessBridge bridge;
 
     // Get/Set log levels
 
     /**
      * @return all the loggers (usually packages) with corresponding levels.
      */
-    public Map<String, String> getLevels() throws InstanceNotFoundException, ReflectionException, MBeanException,
-        AttributeNotFoundException
+    public Map<String, LogLevel> getLevels()
     {
-        List<String> loggers = jmxLoggerList();
+        Collection<Logger> loggers = this.loggerManager.getLoggers();
 
-        Map<String, String> levels = new HashMap<String, String>(loggers.size());
+        Map<String, LogLevel> levels = new HashMap<String, LogLevel>(loggers.size());
 
-        for (String logger : loggers) {
-            levels.put(logger, getLevel(logger));
+        for (Logger logger : loggers) {
+            levels.put(logger.getName(), getLevel(logger.getName()));
         }
 
         return levels;
     }
 
     /**
-     * @param logger the logger name (usually packages)
+     * @param loggerName the logger name (usually packages)
      * @return the level associated to the logger
      */
-    public String getLevel(String logger) throws InstanceNotFoundException, ReflectionException, MBeanException
+    public LogLevel getLevel(String loggerName)
     {
-        return jmxgetLoggerLevel(logger);
+        return this.loggerManager.getLoggerLevel(loggerName);
     }
 
     /**
      * @param logger the logger name (usually package)
      * @param level the level associated to the logger
      */
-    public void setLevel(String logger, String level) throws InstanceNotFoundException, ReflectionException,
-        MBeanException
+    public void setLevel(String logger, LogLevel level)
     {
-        jmxsetLevel(logger, level);
-    }
-
-    // Log queue
-
-    /**
-     * Start listening to produced logs and fill the log queue.
-     * <p>
-     * The previous log is removed first.
-     * 
-     * @see #getLogQueue()
-     */
-    public void startLog()
-    {
-        this.logQueue.clear();
-        if (this.observation.getListener(this.logQueueListener.getName()) != this.logQueueListener) {
-            this.observation.addListener(this.logQueueListener);
-            this.logger.info("Start listening events");
+        // Not allow anyone to set log level or it could be a window to produce a real mess even if not exactly a
+        // security issue
+        if (!this.bridge.hasProgrammingRights()) {
+            return;
         }
-    }
 
-    /**
-     * Stop listening to logs.
-     */
-    public void stopLog()
-    {
-        this.observation.removeListener(this.logQueueListener.getName());
-    }
-
-    /**
-     * @return all the log produced since {@link #startLog()} has been called
-     */
-    public LogQueue getLogQueue()
-    {
-        return this.logQueue;
+        this.loggerManager.setLoggerLevel(logger, level);
     }
 }

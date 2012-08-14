@@ -81,10 +81,29 @@ viewers.Attachments = Class.create({
     this.form = $("attachform").up("form");
     this.defaultFileDiv = this.form.down("input[type='file']").up("div");
     this.inputSize = this.form.down("input[type='file']").size;
-    this.addInitialRemoveButton();
-    this.addAddButton();
+
+    var html5Uploader = this.attachHTML5Uploader(this.form.down("input[type='file']"));
+    if (html5Uploader) {
+      this.addDeleteListener = this.addDeleteListener.bindAsEventListener(this);
+      this.form.observe("xwiki:html5upload:done", this.addDeleteListener);
+      html5Uploader.hideFormButtons();
+    } else {
+      this.addInitialRemoveButton();
+      this.addAddButton();
+      this.resetOnCancel();
+    }
     this.blockEmptySubmit();
-    this.resetOnCancel();
+  },
+  /** If available in the current browser, enable HTML5 upload for a given file input */
+  attachHTML5Uploader : function(input) {
+    if (typeof(XWiki.FileUploader) != 'undefined') {
+      input.multiple = true;
+      return new XWiki.FileUploader(input, {
+        'responseContainer' : $('_attachments'),
+        'responseURL' : XWiki.currentDocument.getURL('get', 'xpage=attachmentslist&forceTestRights=1')
+      });
+    }
+    return false;
   },
   /** By default the form contains one upload field. Add a "remove" button for this one, too. */
   addInitialRemoveButton : function() {
@@ -122,7 +141,7 @@ viewers.Attachments = Class.create({
     // For the moment, specifying a different name is not used anymore.
     var filenameInput = new Element("input", {type: "hidden", name : "filename_" + this.counter});
     var removeButton = this.createRemoveButton();
-    var containerDiv = new Element("div");
+    var containerDiv = new Element("div", {'class' : 'fileupload-field'});
     containerDiv.insert(filenameInput).insert(fileInput).insert(removeButton);
     this.addDiv.parentNode.insertBefore(containerDiv, this.addDiv);
     // Remove the focus border from the button

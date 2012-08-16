@@ -426,7 +426,7 @@ var XWiki = (function(XWiki) {
 
       // Any mentions of a filename filter present in the form?
       var customFilter = this.form.down('input[type=hidden][name=' + input.name + '__filter]');
-      if (!options.fileFilter && customFilter && customFilter.value != '') {
+      if (!this.options.fileFilter && customFilter && customFilter.value != '') {
          this.options.fileFilter = new RegExp(customFilter.value, "i");
       }
 

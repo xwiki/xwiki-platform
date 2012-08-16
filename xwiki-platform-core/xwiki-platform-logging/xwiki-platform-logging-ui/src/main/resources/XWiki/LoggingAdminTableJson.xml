@@ -30,16 +30,25 @@
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $mathtool.toInteger($request.get('offset')))
-## offset starts from 0 in velocity and 1 in javascript
-#set($offset = $offset - 1)
-#if($offset &lt; 0)
+#set($offset = $mathtool.toInteger($request.offset))
+## If no offset is specified, start at 0
+#if (!$offset)
   #set($offset = 0)
+#else
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
+  #if($offset &lt; 0)
+    #set($offset = 0)
+  #end
 #end
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $mathtool.toInteger($request.get('limit')))
+#set($limit = $mathtool.toInteger($request.limit))
+## If no limit is specified, limit at 15 items
+#if (!$limit)
+  #set ($limit = 15)
+#end
 ##==================
 ## Tag = one parameter per tag
 ##==================
@@ -64,17 +73,14 @@
 ## TODO: Add code to filter data
 ## Each column can be filtered and the filter for a column can be retrieved with:
 ## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
-
 ## ===
 ## JSON
 ## ===
-## 
-
 #set ($logger_list = $services.logging.getLevels())
 #set ($logs = $logger_list.entrySet())
 #set ($logsSize = $logs.size())
-
-## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null properties (it is fixed in VelocityTools 2)
+## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null
+## properties (it is fixed in VelocityTools 2)
 #foreach ($log in $logs)
   #if (!$log.value)
     #set($void = $log.setValue(''))
@@ -82,7 +88,6 @@
     #set($void = $log.setValue("${log.value.ordinal()}${log.value.name()}"))
   #end
 #end
-
 ## Sort
 #if ($request.sort)
   #if ($request.sort == "logger" )
@@ -93,7 +98,6 @@
 
   #set( $logs = $sorttool.sort($logs, ["${propertyName}:${request.dir}"]) )
 #end
-
 ## Filter
 #set($resultLog = [])
 #foreach($logger in $logs)
@@ -113,7 +117,6 @@
     #end
   #end
 #end
-
 {
   "totalrows": $logsSize,
   "matchingtags": {},
@@ -127,8 +130,8 @@
   #foreach( $logger in $resultLog )
     #if($velocityCount &gt; 1) , #end
     #set($loggLevelName = "$!logger.value")
-
-    ## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null properties (it is fixed in VelocityTools 2)
+    ## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null
+    ## properties (it is fixed in VelocityTools 2)
     #if ($loggLevelName != '')
       #set ($loggLevelName = $loggLevelName.substring(1))
     #end
@@ -138,9 +141,7 @@
       "level" : "$loggLevelName",
       "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
         &lt;fieldset&gt;
-
           &lt;input name='logger_name' value='$logger.key' type='hidden'/&gt;
- 
           &lt;select name='logger_level' size='1' style='width: 80px'&gt;
             #if ($loggLevelName != 'TRACE')
               &lt;option label='TRACE' value='TRACE'&gt;TRACE&lt;/option&gt;
@@ -161,15 +162,12 @@
               &lt;option label='default' value=''&gt;&amp;lt;default&amp;gt;&lt;/option&gt;
             #end
           &lt;/select&gt;
-
           &lt;span class='buttonwrapper'&gt;&lt;input name='loggeraction_set' value='${escapetool.xml($msg.get('logging.admin.livetable.actions.set'))}' class='button' type='submit'&gt;&lt;/span&gt;
-
         &lt;/fieldset&gt;
         &lt;/form&gt;")}"
     }
   #end
   ]
 }
-
 {{/velocity}}</content>
 </xwikidoc>

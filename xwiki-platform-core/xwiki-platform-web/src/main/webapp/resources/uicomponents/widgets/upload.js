@@ -484,6 +484,8 @@ var XWiki = (function(XWiki) {
     showUploadStatus : function() {
       this.inputContainer.hide();
       this.inputContainer.insert({after: this.statusUI.CONTAINER});
+      this.statusUI.HIDE.hide();
+      this.statusUI.CANCEL.show();
     },
 
     /**

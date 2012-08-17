@@ -1,4 +1,4 @@
-/*  Prototype JavaScript framework, version 1.7.1
+/*!  Prototype JavaScript framework, version 1.7.1
  *  (c) 2005-2010 Sam Stephenson
  *
  *  Prototype is freely distributable under the terms of an MIT-style license.
@@ -1697,7 +1697,16 @@ Ajax.Request = Class.create(Ajax.Base, {
   },
 
   request: function(url) {
-    this.url = url;
+    // Make sure the URL is a String; the caller could have used window.location, or directly a <link> or <a> element
+    if (typeof(url) == 'string') {
+      this.url = url;
+    } else if (url && typeof(url.href) == 'string') {
+      // Location, Link or A
+      this.url = url.href;
+    } else {
+      // Would it be better to fail here?
+      this.url = url + '';
+    }
     this.method = this.options.method;
     var params = Object.isString(this.options.parameters) ?
           this.options.parameters :
@@ -2441,7 +2450,11 @@ Ajax.PeriodicalUpdater = Class.create(Ajax.Base, {
   }
 
   function getContentFromAnonymousElement(tagName, html, force) {
-    var t = INSERTION_TRANSLATIONS.tags[tagName], div = DIV;
+    var t = INSERTION_TRANSLATIONS.tags[tagName], div = DIV, addedDiv = div;
+    // Workaround for IE not correctly handling on* attributes
+    // Make the temporary div invisible and append it to the document
+    div.style.display = 'none';
+    document.documentElement.appendChild(div);
 
     var workaround = !!t;
     if (!workaround && force) {
@@ -2458,6 +2471,9 @@ Ajax.PeriodicalUpdater = Class.create(Ajax.Base, {
       div.innerHTML = html;
     }
 
+    // Reset the style and remove it from the document
+    document.documentElement.removeChild(addedDiv);
+    addedDiv.style.display = '';
     return $A(div.childNodes);
   }
 

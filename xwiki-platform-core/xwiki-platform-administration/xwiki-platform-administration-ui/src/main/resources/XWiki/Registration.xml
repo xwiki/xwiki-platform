@@ -883,7 +883,7 @@ $heading
         ## We don't want autoLogin if we are administrators adding users...
         #if($autoLogin &amp;&amp; !$assumeLightbox)
           &lt;script type='text/javascript'&gt;
-            document.observe('dom:loaded', function() {
+            document.observe('xwiki:dom:loaded', function() {
               document.forms['loginForm'].submit();
             });
           &lt;/script&gt;
@@ -963,7 +963,7 @@ $heading
 #macro(generateJavascript, $fields)
   &lt;script type='text/javascript'&gt;
   /* &lt;![CDATA[ */
-  document.observe('dom:loaded', function() {
+  document.observe('xwiki:dom:loaded', function() {
   ##
   #foreach($field in $fields)
     #if($field.get('validate') &amp;&amp; $field.get('name'))

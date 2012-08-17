@@ -376,7 +376,7 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
       <cache>long</cache>
     </property>
     <property>
-      <code>document.observe('dom:loaded', function() {
+      <code>document.observe('xwiki:dom:loaded', function() {
   // Hide headers unless they have error messages under them.
   var elementsInPage = $('admin-page-content').childNodes;
   var errorShown = false;

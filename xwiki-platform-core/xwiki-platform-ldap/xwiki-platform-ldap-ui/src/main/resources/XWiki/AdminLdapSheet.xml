@@ -500,7 +500,7 @@ document.observe("xwiki:dom:loaded", function(){
       <cache>long</cache>
     </property>
     <property>
-      <code>document.observe("dom:loaded", function(){
+      <code>document.observe("xwiki:dom:loaded", function(){
    var groupMapping = $('XWiki.XWikiPreferences_0_ldap_group_mapping'),
        fieldMapping = $('XWiki.XWikiPreferences_0_ldap_fields_mapping');
 

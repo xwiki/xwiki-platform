@@ -50,7 +50,7 @@ var XWiki = (function(XWiki){
         });
     }
     if (!browser.isIE6x) {
-      document.observe("dom:loaded", function() {
+      document.observe("xwiki:dom:loaded", function() {
         hookRichImporterUI();
         /** Attach the HTML5 uploader, if available */
         var form = $('AddAttachment');

@@ -415,6 +415,12 @@ var XWiki = (function(XWiki) {
       // Update the options
       this.options = Object.extend(Object.clone(this.options), options || { });
 
+      if (input.__x_html5uploader) {
+        return;
+      } else {
+         input.__x_html5uploader = this;
+      }
+
       // Make sure the input for which the uploader is being generated is of type file, and it belongs to a form
       if (input.type != 'file') {
         return;

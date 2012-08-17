@@ -1,4 +1,5 @@
 var XWiki = (function(XWiki) {
+XWiki.widgets = XWiki.widgets || {};
 /**
  * XWiki namespace.
  * TODO: move everything in it.
@@ -332,7 +333,7 @@ Object.extend(XWiki, {
    */
   insertCreatePageFromTemplateModalBoxes: function() {
       // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
           XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
               initialize : function($super, interactionParameters) {
                   var content =  new Element('div', {'class': 'modal-popup'});

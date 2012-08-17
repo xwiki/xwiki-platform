@@ -387,7 +387,9 @@ var XWiki = (function(XWiki) {
       progressAutohide : false,
       /** Should the upload start as soon as the files are selected, or wait for a submit event? */
       autoUpload : true,
-      /** Where should the server response be displayed? */
+      /** Where to send the files? If no URL is given, then the file is sent to the normal target of the form. */
+      targetURL : null,
+      /** Where should the server response be displayed? If no container is specified, then a new div will be inserted below the upload status progress bar. */
       responseContainer : null,
       /** A custom URL to be used for obtaining the response after the files are uploaded. */
       responseURL : null
@@ -430,10 +432,13 @@ var XWiki = (function(XWiki) {
          this.options.fileFilter = new RegExp(customFilter.value, "i");
       }
 
+      // What is the URL where the file should be sent?
+      this.options.targetURL = this.options.targetURL || this.form.action;
+
       // Prepare common form data to send with each uploaded file
       this.formData = {
         input : this.input,
-        action : this.form.action,
+        action : this.options.targetURL,
         additionalFields : {}
       }
       var redirect = this.form.down('input[name=xredirect]');

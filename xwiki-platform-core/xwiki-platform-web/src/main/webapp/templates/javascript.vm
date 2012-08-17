@@ -80,7 +80,9 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ##
 ## Hooks for inserting JavaScript skin extensions
 ##
-## - Skin file extension hook. Placed first since skin extensions might need to have xwiki or external libraries included first to be able to work properly
+## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+<!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
+## - Skin file extension hook.
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
 ## - Skin extension hook
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->

@@ -531,10 +531,19 @@ Object.extend(XWiki, {
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
-  initialize: function(){
+  initialize: function() {
     // Extra security to make sure we do not get initalized twice.
-    // It would fire the custom dom:loaded event twice, which could make their observers misbehave.
+    // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
+      // This variable is set when the marker script is executed, which should always be the last script to execute.
+      // In case the dom:loaded event was fired prematurely, delay the execution and ask instead the marker script to
+      // re-invoke the initialization process.
+      if (typeof XWiki.lastScriptLoaded == "undefined") {
+        XWiki.failedInit = true;
+        return;
+      }
+
+      // All ready, continue with the initialization.
       this.isInitialized = true;
       document.fire("xwiki:dom:loading");
 

@@ -29,8 +29,9 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div>
     ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
     <div class="fileupload-field"><label class="hidden" for="xwikiuploadfile">$msg.get('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40" class="uploadFileInput"/></div>
-    <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.attachments.upload.submit')" class="button"/></span>
-    <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('core.viewers.attachments.upload.cancel')</a></span> 
+    <div>
+      <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.attachments.upload.submit')" class="button"/></span>
+      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('core.viewers.attachments.upload.cancel')</a></span>
     </div>
   </fieldset>
   </div>

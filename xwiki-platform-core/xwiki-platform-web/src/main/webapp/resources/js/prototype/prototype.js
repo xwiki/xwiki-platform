@@ -4404,7 +4404,7 @@ Ajax.PeriodicalUpdater = Class.create(Ajax.Base, {
   };
 
 })();
-window.$$ = function() {
+var $$ = function() {
   var expression = $A(arguments).join(', ');
   return Prototype.Selector.select(expression, document);
 };
@@ -5793,7 +5793,7 @@ Prototype._original_property = window.Sizzle;
   Prototype.Selector.engine = engine;
   Prototype.Selector.select = select;
   Prototype.Selector.match = match;
-})(Sizzle);
+})(window.Sizzle);
 
 window.Sizzle = Prototype._original_property;
 delete Prototype._original_property;
@@ -6996,8 +6996,8 @@ Object.extend(Element.ClassNames.prototype, Enumerable);
 
 /*--------------------------------------------------------------------------*/
 
-(function() {
-  window.Selector = Class.create({
+var Selector = (function() {
+  var Selector = Class.create({
     initialize: function(expression) {
       this.expression = expression.strip();
     },
@@ -7049,4 +7049,5 @@ Object.extend(Element.ClassNames.prototype, Enumerable);
       return Prototype.Selector.select(selector, element || document);
     }
   });
+  return Selector;
 })();

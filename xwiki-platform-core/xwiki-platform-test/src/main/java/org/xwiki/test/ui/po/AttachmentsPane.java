@@ -50,6 +50,7 @@ public class AttachmentsPane extends BaseElement
     {
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadFileInput"));
         inputs.get(inputs.size() - 1).sendKeys(filePath);
+        waitUntilElementIsVisible(By.xpath("//a[text()='Hide upload status']"));
     }
 
     /**

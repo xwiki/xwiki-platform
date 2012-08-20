@@ -49,7 +49,7 @@ actionButtons.EditActions = Class.create({
   validators : new Array(), 
   addValidators : function() {
     // Add live presence validation for inputs with classname 'required'.
-    var inputs = $(document.body).select("input.required");
+    var inputs = $('body').select("input.required");
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       var validator = new LiveValidation(input, { validMessage: "" });
@@ -222,7 +222,7 @@ actionButtons.AjaxSaveAndContinue = Class.create({
 function init() {
   new actionButtons.EditActions();
   // In preview mode, the &continue part of the save&continue should lead back to the edit action.
-  if (!$(document.body).hasClassName("previewbody")) {
+  if (!$('body').hasClassName("previewbody")) {
     new actionButtons.AjaxSaveAndContinue();
   }
   return true;

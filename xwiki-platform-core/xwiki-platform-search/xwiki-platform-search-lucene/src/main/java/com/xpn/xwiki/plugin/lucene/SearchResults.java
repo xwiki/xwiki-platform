@@ -84,7 +84,7 @@ public class SearchResults extends Api
                     if (result.isWikiContent()) {
                         String prefixedFullName =
                             ((EntityReferenceSerializer<String>)
-                                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING))
+                                Utils.getComponent(EntityReferenceSerializer.class))
                                 .serialize(result.getDocumentReference());
                         if (this.xwiki.exists(result.getDocumentReference())
                             && this.xwiki.hasAccessLevel("view", this.context.getUser(), prefixedFullName)) {

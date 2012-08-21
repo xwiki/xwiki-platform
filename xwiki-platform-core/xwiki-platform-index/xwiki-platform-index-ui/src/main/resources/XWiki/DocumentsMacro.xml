@@ -605,13 +605,9 @@
   </object>
   <content>Example:
 
-{{box}}
-{{{
-{{documents count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title"/}}
-}}}
-{{/box}}
+##{{{{{documents id="example" count="5" actions="false" columns="doc.title"/}}}}}##
 
 Generates:
 
-{{documents count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title"/}}</content>
+{{documents id="example" count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title"/}}</content>
 </xwikidoc>

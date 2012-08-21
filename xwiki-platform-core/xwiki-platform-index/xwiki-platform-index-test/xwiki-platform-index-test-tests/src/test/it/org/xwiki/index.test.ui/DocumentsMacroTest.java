@@ -21,9 +21,8 @@ package org.xwiki.index.test.ui;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.index.test.po.AllDocsPage;
 import org.xwiki.index.test.po.DocumentsMacroPage;
-import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.AbstractGuestTest;
 import org.xwiki.test.ui.po.LiveTableElement;
 
  /**
@@ -32,7 +31,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
   * @version $Id$
   * @since 4.2M3
   */
- public class DocumentsMacroTest extends AbstractTest
+ public class DocumentsMacroTest extends AbstractGuestTest
  {
      /**
       * Verify that the {{documents}} macro works by going to the page defining this wiki macro since it contains

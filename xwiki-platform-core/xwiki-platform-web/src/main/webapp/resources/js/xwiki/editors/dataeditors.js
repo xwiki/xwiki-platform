@@ -478,7 +478,7 @@ editors.XDataEditors = Class.create({
       }.bindAsEventListener());
     });
     // Attach behavior to the move buttons
-    Sortable.create('xclassContent', {
+    Sortable.create($('xclassContent'), {
       tag : 'div',
       only : 'xproperty',
       handle : 'move',

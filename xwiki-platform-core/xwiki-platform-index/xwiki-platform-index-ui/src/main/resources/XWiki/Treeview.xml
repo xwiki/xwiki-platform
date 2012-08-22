@@ -48,7 +48,7 @@ isc.XWETreeGrid.create({
   // defaultValue: "Main.WebHome",
   // defaultValue: "Main.RecentChanges@lquo.gif",
   defaultValue: "",
-  htmlElement: "XWEWrapper", // Mandatory HTML wrapper.
+  htmlElement: ID("XWEWrapper"), // Mandatory HTML wrapper.
   matchElement: true, // Make the widget match HTML wrapper size.
   // Example of data sources:
   // dataSource: isc.XWEDataSource.create({}),

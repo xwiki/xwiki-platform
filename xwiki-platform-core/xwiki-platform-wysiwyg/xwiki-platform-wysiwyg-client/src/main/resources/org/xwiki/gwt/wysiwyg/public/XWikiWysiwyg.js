@@ -1,5 +1,7 @@
 ## The module name must match the value of the rename-to attribute from Wysiwyg.gwt.xml
-#set($moduleName = "xwe")
+#set($moduleName = 'xwe')
+## Store the module name in a variable (instead of using a string literal) to prevent it from being renamed/namespaced.
+var moduleName = '$moduleName';
 // Declare the module name to avoid checking for undefined while the module is loading.
 var $moduleName;
 /**
@@ -34,7 +36,7 @@ var Wysiwyg =
     {
         // Test if the code has been already loaded.
         // GWT loads the WYSIWYG code in an in-line frame with the 'com.xpn.xwiki.wysiwyg.Wysiwyg' id.
-        if (document.getElementById('${moduleName}') || this.readyState != 0) {
+        if (document.getElementById(moduleName) || this.readyState != 0) {
             return;
         }
 
@@ -186,7 +188,7 @@ var Wysiwyg =
      * Wrap gwtOnLoad in order to be notified when the WYSIWYG module is loaded.
      */
     hookGwtOnLoad: function() {
-        var iframe = document.getElementById('${moduleName}');
+        var iframe = document.getElementById(moduleName);
         var gwtOnLoad = iframe.contentWindow.gwtOnLoad;
         iframe.contentWindow.gwtOnLoad = function(errFn, modName, modBase) {
             gwtOnLoad(function() {
@@ -246,6 +248,15 @@ Wysiwyg.onModuleLoad(function() {
         }
     }
     var WysiwygEditorAspect = function() {
+        // Namespace IDs.
+        var options = arguments[0];
+        if (typeof ID == 'function') {
+            ['hookId', 'cacheId'].each(function(key) {
+                if (typeof options[key] == 'string') {
+                  options[key] = ID(options[key]);
+                }
+            });
+        }
         WysiwygEditorAspect.base.constructor.apply(this, arguments);
         if (this.getRichTextArea()) {
             // Register action listeners.

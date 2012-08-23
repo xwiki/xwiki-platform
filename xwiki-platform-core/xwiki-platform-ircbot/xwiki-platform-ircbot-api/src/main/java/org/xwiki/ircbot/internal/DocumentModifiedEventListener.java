@@ -106,21 +106,10 @@ public class DocumentModifiedEventListener implements EventListener
             XWikiDocument document = (XWikiDocument) source;
             DocumentReference reference = document.getDocumentReference();
             String referenceAsString = this.serializer.serialize(reference);
-            boolean shouldSendNotification = true;
 
             try {
-                // Verify if we should send this notification (i.e. that it's not in the exclusion list).
-                // For example we may not want to send notifications when the Log Listener modifies an IRC Archive
-                // since that would cause an infinite loop...
-                for (Pattern pattern : this.configuration.getExclusionPatterns()) {
-                    if (pattern.matcher(referenceAsString).matches()) {
-                        shouldSendNotification = false;
-                        break;
-                    }
-                }
-
                 // Send notification to the IRC channel if we're allowed.
-                if (shouldSendNotification) {
+                if (shouldSendNotification(referenceAsString)) {
                     String message = String.format("%s was modified by %s %s - %s",
                         referenceAsString,
                         getNotificationAuthor(event, document),
@@ -134,6 +123,32 @@ public class DocumentModifiedEventListener implements EventListener
                     this.serializer.serialize(reference), e);
             }
         }
+    }
+
+    /**
+     * Decides if we should send a notification in the IRC channel or not. We don't send if there are some
+     * defined exclusions (an example is to not notify when the IRC Archive documents are modified since that would
+     * cause an infinite loop!).
+     *
+     * @param referenceAsString the reference to the modified document as a String (eg "wiki:space.page")
+     * @return true if we should send notifications on the IRC channel or false otherwise
+     * @throws IRCBotException if there's been an error getting exclusion patterns
+     */
+    private boolean shouldSendNotification(String referenceAsString) throws IRCBotException
+    {
+        boolean shouldSendNotification = true;
+
+        // Verify if we should send this notification (i.e. that it's not in the exclusion list).
+        // For example we may not want to send notifications when the Log Listener modifies an IRC Archive
+        // since that would cause an infinite loop...
+        for (Pattern pattern : this.configuration.getExclusionPatterns()) {
+            if (pattern.matcher(referenceAsString).matches()) {
+                shouldSendNotification = false;
+                break;
+            }
+        }
+
+        return shouldSendNotification;
     }
 
     /**

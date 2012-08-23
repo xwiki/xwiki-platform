@@ -33,6 +33,8 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.DocumentModifiedEventListenerConfiguration;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
@@ -86,10 +88,20 @@ public class DocumentModifiedEventListener implements EventListener
     @Inject
     private WikiIRCModel ircModel;
 
+    /**
+     * Used to get temporary information about the fact that a XAR import is in progress so that we don't send
+     * document modification notifications to the IRC channel, to prevent flooding/spam.
+     */
+    @Inject
+    private Execution execution;
+
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event>asList(new DocumentUpdatedEvent(), new DocumentDeletedEvent(), new DocumentCreatedEvent());
+        return Arrays.<Event>asList(
+                new DocumentUpdatedEvent(),
+                new DocumentDeletedEvent(),
+                new DocumentCreatedEvent());
     }
 
     @Override
@@ -128,7 +140,7 @@ public class DocumentModifiedEventListener implements EventListener
     /**
      * Decides if we should send a notification in the IRC channel or not. We don't send if there are some
      * defined exclusions (an example is to not notify when the IRC Archive documents are modified since that would
-     * cause an infinite loop!).
+     * cause an infinite loop!) or if a XAR import is in progress (to prevent flooding/spam).
      *
      * @param referenceAsString the reference to the modified document as a String (eg "wiki:space.page")
      * @return true if we should send notifications on the IRC channel or false otherwise
@@ -138,13 +150,23 @@ public class DocumentModifiedEventListener implements EventListener
     {
         boolean shouldSendNotification = true;
 
-        // Verify if we should send this notification (i.e. that it's not in the exclusion list).
-        // For example we may not want to send notifications when the Log Listener modifies an IRC Archive
-        // since that would cause an infinite loop...
-        for (Pattern pattern : this.configuration.getExclusionPatterns()) {
-            if (pattern.matcher(referenceAsString).matches()) {
-                shouldSendNotification = false;
-                break;
+        // Don't send notifications if a XAR import is in progress
+        ExecutionContext ec = this.execution.getContext();
+        Object importCounterObject = ec.getProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY);
+        if (importCounterObject != null) {
+            long newCounter = (Long) importCounterObject;
+            newCounter++;
+            ec.setProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY, newCounter);
+            shouldSendNotification = false;
+        } else {
+            // Verify if we should send this notification (i.e. that it's not in the exclusion list).
+            // For example we may not want to send notifications when the Log Listener modifies an IRC Archive
+            // since that would cause an infinite loop...
+            for (Pattern pattern : this.configuration.getExclusionPatterns()) {
+                if (pattern.matcher(referenceAsString).matches()) {
+                    shouldSendNotification = false;
+                    break;
+                }
             }
         }
 

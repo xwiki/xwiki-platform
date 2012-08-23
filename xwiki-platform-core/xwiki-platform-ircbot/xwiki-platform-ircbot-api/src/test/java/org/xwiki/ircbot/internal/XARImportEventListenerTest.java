@@ -87,6 +87,7 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
         Utils.setComponentManager(getComponentManager());
         final XWikiContext xwikiContext = new XWikiContext();
         xwikiContext.setUserReference(userReference);
+        xwikiContext.setDatabase("somewiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -96,13 +97,14 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.singleton("channel")));
             oneOf(execution).getContext();
                 will(returnValue(ec));
-            oneOf(ircModel).getXWikiContext();
+            exactly(2).of(ircModel).getXWikiContext();
                 will(returnValue(xwikiContext));
             oneOf(serializer).serialize(userReference);
                 will(returnValue("userwiki:userspace.userpage"));
 
             // The test is here!
-            oneOf(bot).sendMessage("channel", "A XAR import has been started by userwiki:userspace.userpage");
+            oneOf(bot).sendMessage("channel",
+                "A XAR import has been started by userwiki:userspace.userpage in wiki somewiki");
         }});
 
         this.listener.onEvent(new XARImportingEvent(), null, null);
@@ -128,6 +130,7 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
         Utils.setComponentManager(getComponentManager());
         final XWikiContext xwikiContext = new XWikiContext();
         xwikiContext.setUserReference(userReference);
+        xwikiContext.setDatabase("somewiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -137,14 +140,14 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.singleton("channel")));
             oneOf(execution).getContext();
                 will(returnValue(ec));
-            oneOf(ircModel).getXWikiContext();
+            exactly(2).of(ircModel).getXWikiContext();
                 will(returnValue(xwikiContext));
             oneOf(serializer).serialize(userReference);
                 will(returnValue("userwiki:userspace.userpage"));
 
             // The test is here!
-            oneOf(bot).sendMessage("channel", "The XAR import started by userwiki:userspace.userpage is now finished, "
-                + "100 documents have been imported");
+            oneOf(bot).sendMessage("channel", "The XAR import started by userwiki:userspace.userpage "
+                + "in wiki somewiki is now finished, 100 documents have been imported");
         }});
 
         this.listener.onEvent(new XARImportedEvent(), null, null);

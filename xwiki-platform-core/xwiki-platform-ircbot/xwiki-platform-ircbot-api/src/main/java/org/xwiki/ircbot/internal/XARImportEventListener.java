@@ -113,13 +113,14 @@ public class XARImportEventListener implements EventListener
                 String message;
                 if (event instanceof XARImportingEvent) {
                     ec.setProperty(XAR_IMPORT_COUNTER_KEY, 0L);
-                    message = String.format("A XAR import has been started by %s", getNotificationAuthor());
+                    message = String.format("A XAR import has been started by %s in wiki %s",
+                        getNotificationAuthor(), getNotificationWiki());
                 } else {
                     long counter = (Long) ec.getProperty(XAR_IMPORT_COUNTER_KEY);
                     ec.removeProperty(XAR_IMPORT_COUNTER_KEY);
                     message = String.format(
-                        "The XAR import started by %s is now finished, %d documents have been imported",
-                        getNotificationAuthor(), counter);
+                        "The XAR import started by %s in wiki %s is now finished, %d documents have been imported",
+                        getNotificationAuthor(), getNotificationWiki(), counter);
                 }
                 this.bot.sendMessage(this.bot.getChannelsNames().iterator().next(), message);
             } catch (IRCBotException e) {
@@ -130,7 +131,7 @@ public class XARImportEventListener implements EventListener
     }
 
     /**
-     * Get the author name that we want to print in the notification message we send to the IRC channel.
+     * Get the current author name that we want to print in the notification message we send to the IRC channel.
      *
      * @return the author name
      * @throws IRCBotException if we cannot access the XWikiContext
@@ -139,5 +140,16 @@ public class XARImportEventListener implements EventListener
     {
         DocumentReference authorReference = this.ircModel.getXWikiContext().getUserReference();
         return this.serializer.serialize(authorReference);
+    }
+
+    /**
+     * Get the current wiki name that we want to print in the notification message we send to the IRC channel.
+     *
+     * @return the current wiki name
+     * @throws IRCBotException if we cannot access the XWikiContext
+     */
+    private String getNotificationWiki() throws IRCBotException
+    {
+        return this.ircModel.getXWikiContext().getDatabase();
     }
 }

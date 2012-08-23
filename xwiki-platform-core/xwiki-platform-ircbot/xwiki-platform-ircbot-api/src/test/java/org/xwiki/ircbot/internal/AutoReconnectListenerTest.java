@@ -20,10 +20,12 @@
 package org.xwiki.ircbot.internal;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.slf4j.Logger;
+import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -34,16 +36,16 @@ import org.jmock.lib.legacy.ClassImposteriser;
  * @version $Id$
  * @since 4.0M2
  */
+@MockingRequirement(value = AutoReconnectListener.class, exceptions = { Logger.class })
 public class AutoReconnectListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = { Logger.class })
     private AutoReconnectListener<ExtendedPircBotX> listener;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
         getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        super.setUp();
+        this.listener = getComponentManager().getInstance(IRCBotListener.class, "autoreconnect");
     }
 
     @Test

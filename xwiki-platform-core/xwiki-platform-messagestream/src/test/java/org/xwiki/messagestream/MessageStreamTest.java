@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -52,16 +53,22 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
+@MockingRequirement(DefaultMessageStream.class)
 public class MessageStreamTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private DefaultMessageStream stream;
+    private MessageStream stream;
 
     private final DocumentReference currentUser = new DocumentReference("wiki", "XWiki", "JohnDoe");
 
     private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
 
     private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.stream = getComponentManager().getInstance(MessageStream.class);
+    }
 
     @Test
     public void testPostPublicMessage() throws Exception

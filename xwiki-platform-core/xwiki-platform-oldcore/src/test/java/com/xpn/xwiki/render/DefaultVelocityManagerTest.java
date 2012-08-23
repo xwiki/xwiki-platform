@@ -29,6 +29,7 @@ import junit.framework.Assert;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -42,13 +43,19 @@ import org.xwiki.velocity.VelocityManager;
  * 
  * @version $Id$
  */
+@MockingRequirement(DefaultVelocityManager.class)
 public class DefaultVelocityManagerTest extends AbstractMockingComponentTestCase
 {
     /**
      * The component being tested.
      */
-    @MockingRequirement
-    private DefaultVelocityManager velocityManager;
+    private VelocityManager velocityManager;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.velocityManager = getComponentManager().getInstance(VelocityManager.class);
+    }
 
     /**
      * Tests that the Execution Context and the XWiki Context share the same reference of the Velocity Context after a

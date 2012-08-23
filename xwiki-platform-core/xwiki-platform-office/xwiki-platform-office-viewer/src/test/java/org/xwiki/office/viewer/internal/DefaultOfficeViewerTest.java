@@ -41,6 +41,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.block.Block;
@@ -53,6 +54,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
+@MockingRequirement(DefaultOfficeViewer.class)
 public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
 {
     /**
@@ -84,7 +86,6 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     /**
      * The {@link DefaultOfficeViewer} instance being tested.
      */
-    @MockingRequirement
     private DefaultOfficeViewer defaultOfficeViewer;
 
     /**
@@ -107,23 +108,14 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
      */
     private Cache<OfficeDocumentView> cache;
 
-    @Override
+    /**
+     * Test fixture.
+     *
+     * @throws Exception in case of an exception raised during the fixture preparation
+     */
     @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        entityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        officeDocumentBuilder = getComponentManager().getInstance(XDOMOfficeDocumentBuilder.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
     public void configure() throws Exception
     {
-        super.configure();
-
         final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
         cache = getMockery().mock(Cache.class);
         getMockery().checking(new Expectations()
@@ -133,6 +125,12 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
                 will(returnValue(cache));
             }
         });
+
+        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        entityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
+        officeDocumentBuilder = getComponentManager().getInstance(XDOMOfficeDocumentBuilder.class);
+
+        this.defaultOfficeViewer = getComponentManager().getInstance(OfficeViewer.class);
     }
 
     /**

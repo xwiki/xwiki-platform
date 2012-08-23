@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.chart;
 import java.io.File;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
@@ -40,10 +41,16 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.2M1
  */
+@MockingRequirement(TemporaryImageLocator.class)
 public class TemporaryImageLocatorTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private TemporaryImageLocator imageLocator;
+    private ImageLocator imageLocator;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.imageLocator = getComponentManager().getInstance(ImageLocator.class, "tmp");
+    }
 
     @Test
     public void getStorageLocation() throws Exception

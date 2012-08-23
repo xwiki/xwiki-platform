@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -40,16 +41,16 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @since 4.0M2
  */
 @AllComponents
+@MockingRequirement(HelpIRCBotListener.class)
 public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
     private HelpIRCBotListener<PircBotX> listener;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
         getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        super.setUp();
+        this.listener = getComponentManager().getInstance(IRCBotListener.class, "help");
     }
 
     @Test

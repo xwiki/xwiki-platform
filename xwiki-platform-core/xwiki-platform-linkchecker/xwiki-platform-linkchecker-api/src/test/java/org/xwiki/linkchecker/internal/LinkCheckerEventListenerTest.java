@@ -24,11 +24,13 @@ import java.util.Map;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.transformation.linkchecker.LinkState;
 import org.xwiki.rendering.transformation.linkchecker.LinkStateManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -40,11 +42,17 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 3.3M1
  */
+@MockingRequirement(LinkCheckerEventListener.class)
 public class LinkCheckerEventListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private LinkCheckerEventListener listener;
-    
+    private EventListener listener;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.listener = getComponentManager().getInstance(EventListener.class, "linkchecker");
+    }
+
     @Test
     public void testOnEvent() throws Exception
     {

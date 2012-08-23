@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -43,6 +44,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
+@MockingRequirement(SheetDocumentDisplayer.class)
 public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
 {
     /**
@@ -68,8 +70,7 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     /**
      * The component being tested.
      */
-    @MockingRequirement
-    private SheetDocumentDisplayer sheetDocumentDisplayer;
+    private DocumentDisplayer sheetDocumentDisplayer;
 
     /**
      * The component used to access the documents.
@@ -81,13 +82,11 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
      */
     private ModelBridge modelBridge;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
-
-        modelBridge = getComponentManager().getInstance(ModelBridge.class);
-        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        this.modelBridge = getComponentManager().getInstance(ModelBridge.class);
+        this.documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -100,6 +99,8 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 will(returnValue(true));
             }
         });
+
+        this.sheetDocumentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class, "sheet");
     }
 
     /**

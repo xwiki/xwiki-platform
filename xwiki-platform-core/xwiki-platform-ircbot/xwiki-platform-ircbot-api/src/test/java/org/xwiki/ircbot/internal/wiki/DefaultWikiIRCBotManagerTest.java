@@ -27,6 +27,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.manager.ComponentManager;
@@ -37,6 +38,7 @@ import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
+import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -50,11 +52,16 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.0M2
  */
+@MockingRequirement(DefaultWikiIRCBotManager.class)
 public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    DefaultWikiIRCBotManager manager;
+    private WikiIRCBotManager manager;
 
+    @Before
+    public void configure() throws Exception
+    {
+        this.manager = getComponentManager().getInstance(WikiIRCBotManager.class);
+    }
     private void prepareStartBotTests(boolean isBotActive) throws Exception
     {
         final IRCBot bot = getComponentManager().getInstance(IRCBot.class);

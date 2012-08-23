@@ -26,6 +26,7 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.jmock.Sequence;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -34,6 +35,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.sheet.SheetManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -45,6 +47,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @since 4.2M1
  */
 @AllComponents
+@MockingRequirement(value = DefaultSheetManager.class, exceptions = { DocumentReferenceResolver.class })
 public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
 {
     /**
@@ -71,8 +74,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
     /**
      * The component being tested.
      */
-    @MockingRequirement(exceptions = { DocumentReferenceResolver.class })
-    private DefaultSheetManager sheetManager;
+    private SheetManager sheetManager;
 
     /**
      * The execution context.
@@ -104,11 +106,9 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
      */
     private DocumentModelBridge document;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
-
         documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         documentSheetBinder = getComponentManager().getInstance(SheetBinder.class, "document");
         classSheetBinder = getComponentManager().getInstance(SheetBinder.class, "class");
@@ -125,6 +125,8 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
                 will(returnValue(new DocumentReference(WIKI_NAME, "Space", "Page")));
             }
         });
+
+        this.sheetManager = getComponentManager().getInstance(SheetManager.class);
     }
 
     /**

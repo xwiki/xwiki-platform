@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
@@ -31,7 +31,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.MockingRequirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
 import org.junit.Before;
@@ -46,7 +45,7 @@ import junit.framework.Assert;
  * @since 4.2
  */
 @AllComponents
-public abstract class AbstractLegacyWikiTestCase extends AbstractMockingComponentTestCase
+public abstract class AbstractLegacyWikiTestCase extends AbstractComponentTestCase
 {
     /**
      * Instance of the original implementation for reference.

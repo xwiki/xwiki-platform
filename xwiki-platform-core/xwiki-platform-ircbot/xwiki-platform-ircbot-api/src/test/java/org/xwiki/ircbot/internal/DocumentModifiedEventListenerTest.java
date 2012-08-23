@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.regex.Pattern;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.context.Execution;
@@ -34,6 +35,7 @@ import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -52,10 +54,16 @@ import junit.framework.Assert;
  * @since 4.0M2
  */
 @AllComponents
+@MockingRequirement(DocumentModifiedEventListener.class)
 public class DocumentModifiedEventListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private DocumentModifiedEventListener listener;
+    private EventListener listener;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.listener = getComponentManager().getInstance(EventListener.class, "ircdocumentmodified");
+    }
 
     @Test
     public void onEventWhenBotNotStarted() throws Exception

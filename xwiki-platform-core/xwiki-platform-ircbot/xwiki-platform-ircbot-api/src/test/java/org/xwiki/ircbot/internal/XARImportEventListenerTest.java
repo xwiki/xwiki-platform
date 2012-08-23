@@ -22,6 +22,7 @@ package org.xwiki.ircbot.internal;
 import java.util.Collections;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -29,6 +30,7 @@ import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -37,7 +39,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 import junit.framework.Assert;
 
@@ -48,10 +49,16 @@ import junit.framework.Assert;
  * @since 4.2M3
  */
 @AllComponents
+@MockingRequirement(XARImportEventListener.class)
 public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private XARImportEventListener listener;
+    private EventListener listener;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.listener = getComponentManager().getInstance(EventListener.class, "ircxarimport");
+    }
 
     @Test
     public void onEventWhenBotNotStarted() throws Exception

@@ -29,7 +29,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -49,7 +51,7 @@ public class PagesResource extends XWikiResource
     public Pages getPages(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parentId") String parentFilterExpression)
-        throws XWikiException, QueryException
+        throws XWikiException, QueryException, ComponentLookupException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -61,8 +63,9 @@ public class PagesResource extends XWikiResource
 
             /* Use an explicit query to improve performance */
             List<String> pageNames =
-                queryManager.getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).setOffset(start).setLimit(
-                    number).execute();
+                queryManager.getNamedQuery("getSpaceDocsName")
+                    .addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
+                    .bindValue("space", spaceName).setOffset(start).setLimit(number).execute();
 
             Pattern parentFilter = null;
             if (parentFilterExpression != null) {

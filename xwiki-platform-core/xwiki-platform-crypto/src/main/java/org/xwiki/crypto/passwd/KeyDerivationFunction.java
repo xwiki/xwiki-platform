@@ -23,7 +23,7 @@ import java.util.Properties;
 import java.io.Serializable;
 import java.io.IOException;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A key derivation function.
@@ -35,7 +35,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @since 2.5M1
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface KeyDerivationFunction extends Serializable
 {
     /** Initialize with default values. */

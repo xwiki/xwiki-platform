@@ -24,11 +24,13 @@ import java.util.Map;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.transformation.linkchecker.LinkState;
 import org.xwiki.rendering.transformation.linkchecker.LinkStateManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -40,18 +42,25 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 3.3M1
  */
+@MockingRequirement(LinkCheckerEventListener.class)
 public class LinkCheckerEventListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private LinkCheckerEventListener listener;
-    
+    private EventListener listener;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.listener = getComponentManager().getInstance(EventListener.class, "linkchecker");
+    }
+
     @Test
     public void testOnEvent() throws Exception
     {
         final DocumentModelBridge documentModelBridge = getMockery().mock(DocumentModelBridge.class);
-        final EntityReferenceSerializer serializer = getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING);
+        final EntityReferenceSerializer serializer = getComponentManager().getInstance(
+            EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final LinkStateManager linkStateManager = getComponentManager().lookup(LinkStateManager.class);
+        final LinkStateManager linkStateManager = getComponentManager().getInstance(LinkStateManager.class);
 
         final Map<String, Map<String, LinkState>> states = new HashMap<String, Map<String, LinkState>>();
         Map<String, LinkState> referenceStates1 = new HashMap<String, LinkState>();

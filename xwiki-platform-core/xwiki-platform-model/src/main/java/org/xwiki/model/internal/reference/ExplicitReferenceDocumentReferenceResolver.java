@@ -32,9 +32,10 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
- * defined in {@link org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver}.
- *
+ * component to resolve {@link DocumentReference} objects from their partial representation passed as
+ * {@link org.xwiki.model.reference.EntityReference}. The behavior is the one defined in
+ * {@link org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver}.
+ * 
  * @version $Id$
  * @since 4.0M1
  */
@@ -53,7 +54,7 @@ public class ExplicitReferenceDocumentReferenceResolver implements DocumentRefer
     @Override
     public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(
-            documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
+        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
+            EntityType.DOCUMENT, parameters));
     }
 }

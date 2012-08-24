@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -31,11 +32,13 @@ import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
+import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
@@ -52,24 +55,24 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
+@MockingRequirement(value = DefaultWikiIRCModel.class, exceptions = {EntityReferenceSerializer.class})
 public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase implements WikiIRCBotConstants
 {
-    @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
-    DefaultWikiIRCModel model;
+    private WikiIRCModel model;
 
     private XWiki xwiki;
     private XWikiContext xwikiContext;
     private XWikiDocument configDoc;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
         getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        super.setUp();
 
         Utils.setComponentManager(getComponentManager());
 
-        final Execution execution = getComponentManager().lookupComponent(Execution.class);
+        final Execution execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext context = new ExecutionContext();
 
         this.xwiki = getMockery().mock(XWiki.class);
@@ -94,6 +97,8 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
                 will(returnValue(configDocReference));
             }
         });
+
+        this.model = getComponentManager().getInstance(WikiIRCModel.class);
     }
 
     @Test
@@ -150,7 +155,7 @@ public class DefaultWikiIRCModelTest extends AbstractMockingComponentTestCase im
     @Test
     public void getWikiBotListenerData() throws Exception
     {
-        final QueryManager queryManager = getComponentManager().lookupComponent(QueryManager.class);
+        final QueryManager queryManager = getComponentManager().getInstance(QueryManager.class);
         final Query query = getMockery().mock(Query.class);
 
         final List<Object[]> results = Collections.singletonList(new Object[] {

@@ -70,7 +70,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     /** Token storage (one token per user). */
-    private ConcurrentMap<String, String> tokens;
+    private final ConcurrentMap<String, String> tokens = new ConcurrentHashMap<String, String>();
 
     /** Random number generator. */
     private SecureRandom random;
@@ -101,7 +101,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        this.tokens = new ConcurrentHashMap<String, String>();
         try {
             this.random = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
@@ -115,8 +114,15 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     /**
-     * {@inheritDoc}
+     * Set the source of random numbers manually.
+     *
+     * @param random a source of random numbers to use.
      */
+    protected void setRandom(final SecureRandom random)
+    {
+        this.random = random;
+    }
+
     @Override
     public String getToken()
     {
@@ -141,9 +147,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clearToken()
     {
@@ -151,9 +154,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         this.tokens.remove(getTokenKey());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isTokenValid(String token)
     {
@@ -169,9 +169,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getResubmissionURL()
     {

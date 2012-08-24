@@ -21,10 +21,10 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 /**
  * Test case for filtering redundant html tags in {@link OpenOfficeHTMLCleaner}.
@@ -51,7 +51,7 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             Assert.assertEquals(0, nodes.getLength());
         }
     }
-    
+
     /**
      * Test filtering of those tags which doesn't have any textual content in them.
      */
@@ -61,7 +61,7 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         String htmlTemplate = header + "<p>Test%sRedundant%s%s%sFiltering</p>" + footer;
         String[] filterIfNoContentTags =
             new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr", "acronym", "address",
-            "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
+                "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
         for (String tag : filterIfNoContentTags) {
             String startTag = "<" + tag + ">";
             String endTag = "</" + tag + ">";

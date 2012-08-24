@@ -21,7 +21,7 @@ package org.xwiki.messagestream;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 3.0M3
  */
-@ComponentRole
+@Role
 public interface MessageStream
 {
     /**

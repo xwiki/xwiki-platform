@@ -19,7 +19,7 @@
  */
 package org.xwiki.csrf;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Provides configuration for the {@link CSRFToken} component.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.5M2
  */
-@ComponentRole
+@Role
 public interface CSRFTokenConfiguration
 {
     /**

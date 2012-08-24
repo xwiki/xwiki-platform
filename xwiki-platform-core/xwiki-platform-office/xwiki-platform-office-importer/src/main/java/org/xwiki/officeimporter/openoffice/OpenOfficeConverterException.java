@@ -31,7 +31,7 @@ public class OpenOfficeConverterException extends Exception
      * Class version.
      */
     private static final long serialVersionUID = 7417601047224881884L;
-    
+
     /**
      * Constructs a new {@link OpenOfficeConverterException}.
      * 
@@ -40,8 +40,8 @@ public class OpenOfficeConverterException extends Exception
     public OpenOfficeConverterException(String message)
     {
         super(message);
-    }    
-    
+    }
+
     /**
      * Constructs a new {@link OpenOfficeConverterException}.
      * 

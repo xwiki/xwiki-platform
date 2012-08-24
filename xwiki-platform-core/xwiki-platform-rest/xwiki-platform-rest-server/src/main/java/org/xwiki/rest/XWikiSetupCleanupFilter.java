@@ -19,8 +19,8 @@
  */
 package org.xwiki.rest;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +31,8 @@ import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.routing.Filter;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 
 /**
  * <p>
@@ -62,23 +64,16 @@ public class XWikiSetupCleanupFilter extends Filter
     @Override
     protected void afterHandle(Request request, Response response)
     {
-        Map<String, Object> attributes = getContext().getAttributes();
-
-        /* Remove all the components that have been through the component manager and that have a PER_LOOKUP policy. */
-        ComponentManager componentManager = (ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER);
-        List<XWikiRestComponent> releasableComponents =
-            (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES);
-        if (releasableComponents != null) {
-            /* Release all the releasable components. */
-            for (XWikiRestComponent component : releasableComponents) {
-                try {
-                    componentManager.release(component);
-                } catch (ComponentLifecycleException e) {
-                    getLogger().log(
-                        Level.WARNING,
-                        String.format("Unable to release component %s. (%s)", component.getClass().getName(), e
-                            .getMessage()));
-                }
+        // Release all the JAX-RS resources that are implemented as components with per-lookup policy and that have been
+        // instantiated during this request.
+        ComponentManager componentManager =
+            (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        for (XWikiRestComponent component : getReleasableComponents(componentManager)) {
+            try {
+                componentManager.release(component);
+            } catch (ComponentLifecycleException e) {
+                getLogger().log(Level.WARNING, "Unable to release component [{0}]. ({1})",
+                    new Object[] {component.getClass().getName(), e.getMessage()});
             }
         }
 
@@ -87,6 +82,25 @@ public class XWikiSetupCleanupFilter extends Filter
             if (!response.getEntity().isAvailable()) {
                 response.setEntity(null);
             }
+        }
+    }
+
+    /**
+     * @param componentManager the component manager
+     * @return the list of JAX-RS resources that are implemented as components with per-lookup policy and that have been
+     *         instantiated during this request
+     */
+    private List<XWikiRestComponent> getReleasableComponents(ComponentManager componentManager)
+    {
+        try {
+            ExecutionContext executionContext = componentManager.<Execution> getInstance(Execution.class).getContext();
+            @SuppressWarnings("unchecked")
+            List<XWikiRestComponent> releasableComponents =
+                (List<XWikiRestComponent>) executionContext.getProperty(Constants.RELEASABLE_COMPONENT_REFERENCES);
+            return releasableComponents != null ? releasableComponents : Collections.<XWikiRestComponent> emptyList();
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "Failed to retrieve the list of releasable components.", e);
+            return Collections.emptyList();
         }
     }
 

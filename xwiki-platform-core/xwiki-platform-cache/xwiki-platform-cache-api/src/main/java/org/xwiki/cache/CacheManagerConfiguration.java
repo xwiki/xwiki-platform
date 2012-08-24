@@ -19,14 +19,14 @@
  */
 package org.xwiki.cache;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Get {@link CacheManager} configuration.
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface CacheManagerConfiguration
 {
     /**

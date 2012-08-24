@@ -89,9 +89,6 @@ public class XWikiStats extends BaseCollection
      */
     private static final String XMLNODE_PROPERTY = "property";
 
-    /** Override default page name to easily detect it after resolution. */
-    private static final EntityReference EMPTY_REF = new EntityReference("$$EMPTY$$", EntityType.DOCUMENT);
-
     /** Resolve names into reference for uid string serialization. */
     private final EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
 
@@ -161,15 +158,17 @@ public class XWikiStats extends BaseCollection
         int nb = getNumber();
 
         if (!StringUtils.isEmpty(name)) {
-            // TODO: Refactor to get the original reference without this resolve.
-            EntityReference ref = resolver.resolve(name, EntityType.DOCUMENT, EMPTY_REF);
-            if (ref.getName().equals(EMPTY_REF.getName())) {
-                ref = ref.getParent();
+            // TODO: Refactor to get the original reference and fix the confusion when a space contains escaped chars
+            EntityReference ref = resolver.resolve(name, EntityType.DOCUMENT);
+            if (ref.getName().equals(name)) {
+                ref = new EntityReference(name, EntityType.SPACE);
             }
             sb.append(getLocalUidStringEntityReferenceSerializer().serialize(ref));
         }
-        
-        if (nb > 0) {
+
+        // if number used, serialize it as well. It may happened that the hash is 0, but this is really unlikely
+        // and it will not hurt anyway.
+        if (nb != 0) {
             // TODO: Avoid the hashed number, and use the original info (referer, period, etc...)
             String str = Integer.toString(nb);
             sb.append(str.length()).append(':').append(str);

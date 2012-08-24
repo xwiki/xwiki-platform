@@ -101,7 +101,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     @Override
     public String getHomePath()
     {
-        return this.configuration.getProperty(PREFIX + "homePath", defaultHomePath);
+        return this.configuration.getProperty(PREFIX + "homePath", this.defaultHomePath);
     }
 
     @Override
@@ -126,6 +126,6 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     public void initialize() throws InitializationException
     {
         File defaultHomeFolder = OfficeUtils.getDefaultOfficeHome();
-        defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
+        this.defaultHomePath = defaultHomeFolder != null ? defaultHomeFolder.getAbsolutePath() : null;
     }
 }

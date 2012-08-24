@@ -41,7 +41,7 @@ public abstract class AbstractWikiEvent extends AbstractFilterableEvent implemen
      */
     public AbstractWikiEvent()
     {
-        
+        // Voluntarily empty, default constructor is called automatically.
     }
 
     /**

@@ -43,10 +43,12 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
      * @param repository the wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
      * @param execution provide access to the current context
+     * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
+    public SafeExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+        boolean hasProgrammingRight)
     {
-        super(repository, safeProvider, execution);
+        super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
     // ExtensionRepository
@@ -54,6 +56,8 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
     @Override
     public Extension resolve(ExtensionId extensionId)
     {
+        setError(null);
+
         try {
             return safe(getWrapped().resolve(extensionId));
         } catch (Exception e) {
@@ -66,6 +70,8 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
     @Override
     public Extension resolve(ExtensionDependency extensionDependency)
     {
+        setError(null);
+
         try {
             return safe(getWrapped().resolve(extensionDependency));
         } catch (Exception e) {
@@ -90,6 +96,8 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
     @Override
     public IterableResult<Version> resolveVersions(String id, int offset, int nb)
     {
+        setError(null);
+
         try {
             return getWrapped().resolveVersions(id, offset, nb);
         } catch (Exception e) {

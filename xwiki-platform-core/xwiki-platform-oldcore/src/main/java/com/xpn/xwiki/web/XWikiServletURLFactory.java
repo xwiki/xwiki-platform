@@ -227,7 +227,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             newpath.append("?");
-            newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
+            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
             // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
@@ -344,6 +344,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
@@ -407,7 +408,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             newpath.append("?");
-            newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
+            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         try {
@@ -465,7 +466,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             qstring += "&" + querystring;
         }
         newpath.append("?");
-        newpath.append(StringUtils.chomp(StringUtils.chomp(qstring, "&"), "&amp;"));
+        newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
 
         try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
@@ -503,51 +504,56 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public String getURL(URL url, XWikiContext context)
     {
+        String relativeURL = "";
+
         try {
-            if (url == null) {
-                return "";
-            }
+            if (url != null) {
+                String surl = url.toString();
 
-            String surl = url.toString();
-            if (!surl.startsWith(serverURL.toString())) {
-                // External URL: leave it as is.
-                return surl;
-            } else {
-                // Internal XWiki URL: convert to relative.
-                StringBuffer sbuf = new StringBuffer(url.getPath());
-                String querystring = url.getQuery();
-                if (!StringUtils.isEmpty(querystring)) {
-                    sbuf.append("?");
-                    sbuf.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
-                    // sbuf.append(querystring.replaceAll("&","&amp;"));
-                }
+                if (!surl.startsWith(serverURL.toString())) {
+                    // External URL: leave it as is.
+                    relativeURL = surl;
+                } else {
+                    // Internal XWiki URL: convert to relative.
+                    StringBuffer sbuf = new StringBuffer(url.getPath());
+                    String querystring = url.getQuery();
+                    if (!StringUtils.isEmpty(querystring)) {
+                        sbuf.append("?");
+                        sbuf.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                        // sbuf.append(querystring.replaceAll("&","&amp;"));
+                    }
 
-                String anchor = url.getRef();
-                if (!StringUtils.isEmpty(anchor)) {
-                    sbuf.append("#");
-                    sbuf.append(anchor);
+                    String anchor = url.getRef();
+                    if (!StringUtils.isEmpty(anchor)) {
+                        sbuf.append("#");
+                        sbuf.append(anchor);
+                    }
+
+                    relativeURL = Util.escapeURL(sbuf.toString());
                 }
-                return Util.escapeURL(sbuf.toString());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+            LOGGER.error("Failed to create URL", e);
         }
+
+        return relativeURL;
     }
 
     @Override
     public URL getRequestURL(XWikiContext context)
     {
         final URL url = super.getRequestURL(context);
+
         try {
             final URL servurl = getServerURL(context);
             // if use apache mod_proxy we needed to know external host address
             return new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
-        } catch (MalformedURLException ex) {
+        } catch (MalformedURLException e) {
             // This should not happen
-            ex.printStackTrace();
-            return url;
+            LOGGER.error("Failed to create request URL", e);
         }
+
+        return url;
     }
 
     public XWikiAttachment findAttachmentForDocRevision(XWikiDocument doc, String docRevision, String filename,

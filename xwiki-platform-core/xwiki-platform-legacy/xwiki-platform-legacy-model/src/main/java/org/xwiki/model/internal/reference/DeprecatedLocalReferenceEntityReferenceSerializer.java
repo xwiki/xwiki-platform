@@ -25,11 +25,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
- * Generate a entity reference but without the wiki reference part. This is an implementation use for backward
- * compatibility only and it should be dropped in the future since there's no reason to remove the wiki name
- * systematically
- * (usually we don't want to print it but only if it's the same as the current wiki).
- *
+ * Same as LocalReferenceEntityReferenceSerializer but with the extended type in the role hint instead of the role type.
+ * 
  * @version $Id$
  * @since 2.2.3
  * @deprecated you may use {@link EntityReference#removeParent(org.xwiki.model.reference.EntityReference)} since 4.0M2
@@ -44,8 +41,7 @@ public class DeprecatedLocalReferenceEntityReferenceSerializer implements Entity
         EntityReference newReference = null;
         EntityReference parent;
         for (EntityReference currentReference = reference; currentReference != null; currentReference =
-            currentReference.getParent())
-        {
+            currentReference.getParent()) {
             if (currentReference.getType() == EntityType.WIKI) {
                 return newReference;
             }

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-xwiki</artifactId>
   <name>XWiki Platform - Rendering - XWiki-specific implementation</name>
@@ -69,7 +69,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

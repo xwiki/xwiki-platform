@@ -22,7 +22,7 @@ package org.xwiki.rendering.parser;
 import java.io.Reader;
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.rendering.block.Block;
  * @version $Id$
  * @since 1.7RC1
  */
-@ComponentRole
+@Role
 public interface HighlightParser extends Parser
 {
     /**

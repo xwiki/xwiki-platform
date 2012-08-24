@@ -24,12 +24,14 @@ import java.util.Arrays;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
@@ -38,16 +40,17 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
+@MockingRequirement(HelpIRCBotListener.class)
 public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
     private HelpIRCBotListener<PircBotX> listener;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
         getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        super.setUp();
+        this.listener = getComponentManager().getInstance(IRCBotListener.class, "help");
     }
 
     @Test
@@ -70,13 +73,13 @@ public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
     public void onMessageWhenMessageStartsWithCommand() throws Exception
     {
         final MessageEvent event = getMockery().mock(MessageEvent.class);
-        final ComponentManager componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
+        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
         final IRCBotListener botListener = getMockery().mock(IRCBotListener.class);
 
         // With this we also verify that the default Bot Listeners are correctly registered in the Compnent Manager.
-        final IRCBotListener helpBotListener = getComponentManager().lookupComponent(IRCBotListener.class, "help");
+        final IRCBotListener helpBotListener = getComponentManager().getInstance(IRCBotListener.class, "help");
         final IRCBotListener reconnectBotListener =
-            getComponentManager().lookupComponent(IRCBotListener.class, "autoreconnect");
+            getComponentManager().getInstance(IRCBotListener.class, "autoreconnect");
 
         getMockery().checking(new Expectations()
         {
@@ -84,7 +87,7 @@ public class HelpIRCBotListenerTest extends AbstractMockingComponentTestCase
                 oneOf(event).getMessage();
                 will(returnValue("!help"));
                 oneOf(event).respond("Available Bot listeners:");
-                oneOf(componentManager).lookupList((Type) IRCBotListener.class);
+                oneOf(componentManager).getInstanceList((Type) IRCBotListener.class);
                 will(returnValue(Arrays.asList(botListener, helpBotListener, reconnectBotListener)));
                 oneOf(botListener).getDescription();
                 will(returnValue("listener description"));

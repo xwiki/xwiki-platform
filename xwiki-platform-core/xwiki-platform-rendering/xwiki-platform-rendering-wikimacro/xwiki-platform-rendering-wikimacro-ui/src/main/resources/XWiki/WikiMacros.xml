@@ -21,29 +21,29 @@
 -->
 
 <xwikidoc>
-<web>XWiki</web>
-<name>WikiMacros</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1251716762000</creationDate>
-<date>1288198373000</date>
-<contentUpdateDate>1288198373000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get('xe.wikimacrobridge.wikiMacros')</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>WikiMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1251716762000</creationDate>
+  <date>1288198373000</date>
+  <contentUpdateDate>1288198373000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get('xe.wikimacrobridge.wikiMacros')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
 #set($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
 #if($wikiMacroDocuments.size() &gt; 0)
 |=$msg.get('xe.wikimacrobridge.macroName') {{html}}&lt;tt&gt;($msg.get('xe.wikimacrobridge.macroId'))&lt;/tt&gt;{{/html}}|=$msg.get('xe.wikimacrobridge.macroDescription')|=$msg.get('xe.wikimacrobridge.macroVisibility')|=$msg.get('xe.wikimacrobridge.macroPage')
@@ -55,4 +55,5 @@
 #else
 {{warning}}$msg.get('xe.wikimacrobridge.noWikiMacro'){{/warning}}
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

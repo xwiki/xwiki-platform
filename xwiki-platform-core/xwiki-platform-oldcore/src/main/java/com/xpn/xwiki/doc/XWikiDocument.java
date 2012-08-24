@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -100,7 +100,6 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
-import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -129,12 +128,11 @@ import com.xpn.xwiki.content.parsers.DocumentParser;
 import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -174,14 +172,6 @@ public class XWikiDocument implements DocumentModelBridge
     private static final Pattern HTML_TAG_PATTERN =
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
-
-    /**
-     * Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title.
-     * 
-     * @deprecated since 3.2M3
-     **/
-    @Deprecated
-    private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
 
     private String title;
 
@@ -362,16 +352,16 @@ public class XWikiDocument implements DocumentModelBridge
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks.
      */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Used to resolve a string into a proper Document Reference.
      */
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "explicit");
 
-    private EntityReferenceResolver<String> xClassEntityReferenceResolver = Utils.getComponent(
+    protected EntityReferenceResolver<String> xClassEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "xclass");
 
     /**
@@ -379,75 +369,75 @@ public class XWikiDocument implements DocumentModelBridge
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+    protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_REFERENCE, "current");
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+    protected DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
 
     /**
      * Used to resolve parent references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+    protected EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
 
     /**
      * Used to convert a proper Document Reference to string (compact form).
      */
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> compactEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compact");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
+    protected EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Used to compute document identifier.
      */
-    private EntityReferenceSerializer<String> uidStringEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> uidStringEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "uid");
 
     /**
      * Used to compute document identifier.
      */
-    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer = Utils.getComponent(
+    protected EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "local/uid");
 
     /**
      * Used to normalize references.
      */
-    private ObjectReferenceResolver<EntityReference> currentReferenceObjectReferenceResolver = Utils.getComponent(
+    protected ObjectReferenceResolver<EntityReference> currentReferenceObjectReferenceResolver = Utils.getComponent(
         ObjectReferenceResolver.TYPE_REFERENCE, "current");
 
     /**
      * Used to create proper {@link Syntax} objects.
      */
-    private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
+    protected SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
     /**
      * Use to store rendered documents in #getRenderedContent(). Do not inject the component here to avoid any simple
@@ -935,12 +925,41 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param context the XWiki Context object
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContent(String text, String syntaxId, boolean restrictedTransformationContext,
+        XWikiContext context)
+    {
+        return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(), restrictedTransformationContext,
+            context);
+    }
+
+    /**
+     * @param text the text to render
      * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 2.0M3
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context)
+    {
+        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
+        boolean restrictedTransformationContext, XWikiContext context)
     {
         String result = getRenderingCache().getRenderedContent(getDocumentReference(), text, context);
 
@@ -964,6 +983,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setTransformationContextIsolated(true);
+                parameters.setTransformationContextRestricted(restrictedTransformationContext);
                 XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
                 result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 
@@ -1136,19 +1156,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @param context the XWiki context used to get access to the com.xpn.xwiki.render.XWikiRenderingEngine object
-     * @return the document title. If a title has not been provided, look for a section title in the document's content
-     *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
-     *         use Velocity, Groovy, etc syntax within a title.
-     * @deprecated use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getDisplayTitle(XWikiContext context)
-    {
-        return getRenderedTitle(Syntax.XHTML_1_0, context);
-    }
-
-    /**
      * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
      * the title from the document content. If this fails then the document name is used as title. The Velocity code
      * from the title is evaluated if the title is specified or if it is extracted from the document content.
@@ -1168,60 +1175,6 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (XWikiException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * @deprecated since 3.2M3, use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
-     */
-    @Deprecated
-    public String extractTitle()
-    {
-        String title = "";
-
-        try {
-            if (is10Syntax()) {
-                title = extractTitle10();
-            } else {
-                List<HeaderBlock> blocks =
-                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
-                if (!blocks.isEmpty()) {
-                    HeaderBlock header = blocks.get(0);
-                    if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
-                        XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
-
-                        // transform
-                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
-                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
-
-                        // render
-                        Block headerBlock = headerXDOM.getChildren().get(0);
-                        if (headerBlock instanceof HeaderBlock) {
-                            title = renderXDOM(new XDOM(headerBlock.getChildren()), Syntax.XHTML_1_0);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // Don't stop when there's a problem rendering the title.
-        }
-
-        return title;
-    }
-
-    /**
-     * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
-     * @deprecated since 3.2M3
-     */
-    @Deprecated
-    private String extractTitle10()
-    {
-        String content = getContent();
-        Matcher m = HEADING_PATTERN_10.matcher(content);
-        if (m.find()) {
-            return m.group(1).trim();
-        }
-
-        return "";
     }
 
     public void setTitle(String title)
@@ -1590,11 +1543,19 @@ public class XWikiDocument implements DocumentModelBridge
         return context.getURLFactory().getURL(url, context);
     }
 
+    /**
+     * @param action the action
+     * @param params the URL query string
+     * @param redirect true if the URL is going to be used in {@link HttpServletResponse#sendRedirect(String)}
+     * @param context the XWiki context
+     * @return the URL
+     */
     public String getURL(String action, String params, boolean redirect, XWikiContext context)
     {
         URL url =
             context.getURLFactory().createURL(getSpace(), getName(), action, params, null, getDatabase(), context);
-        if (redirect) {
+
+        if (redirect && isRedirectAbsolute(context)) {
             if (url == null) {
                 return null;
             } else {
@@ -1603,6 +1564,11 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             return context.getURLFactory().getURL(url, context);
         }
+    }
+
+    private boolean isRedirectAbsolute(XWikiContext context)
+    {
+        return StringUtils.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context)
@@ -1900,15 +1866,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1, use {@link #getXClass()} instead
-     */
-    @Deprecated
-    public BaseClass getxWikiClass()
-    {
-        return getXClass();
-    }
-
-    /**
      * @since 2.2M1
      */
     public void setXClass(BaseClass xwikiClass)
@@ -1916,15 +1873,6 @@ public class XWikiDocument implements DocumentModelBridge
         xwikiClass.setDocumentReference(getDocumentReference());
 
         this.xClass = xwikiClass;
-    }
-
-    /**
-     * @deprecated since 2.2M1, use {@link #setXClass(BaseClass)} instead
-     */
-    @Deprecated
-    public void setxWikiClass(BaseClass xwikiClass)
-    {
-        setXClass(xwikiClass);
     }
 
     /**
@@ -1936,46 +1884,11 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObjects()} instead. Warning: if you used to modify the returned Map note
-     *             that since 2.2M1 this will no longer work and you'll need to call the setXObject methods instead (or
-     *             setxWikiObjects()). Obviously the best is to move to the new API.
-     */
-    @Deprecated
-    public Map<String, Vector<BaseObject>> getxWikiObjects()
-    {
-        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
-        Map<String, Vector<BaseObject>> objects = new LinkedHashMap<String, Vector<BaseObject>>();
-
-        for (Map.Entry<DocumentReference, List<BaseObject>> entry : getXObjects().entrySet()) {
-            objects.put(this.compactWikiEntityReferenceSerializer.serialize(entry.getKey()), new Vector<BaseObject>(
-                entry.getValue()));
-        }
-
-        return objects;
-    }
-
-    /**
      * @since 2.2M1
      */
     public void setXObjects(Map<DocumentReference, List<BaseObject>> objects)
     {
         this.xObjects = objects;
-    }
-
-    /**
-     * @deprecated since 2.2M1 use {@link #setXObjects(Map)} instead
-     */
-    @Deprecated
-    public void setxWikiObjects(Map<String, Vector<BaseObject>> objects)
-    {
-        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
-        Map<DocumentReference, List<BaseObject>> newObjects = new LinkedHashMap<DocumentReference, List<BaseObject>>();
-
-        for (Map.Entry<String, Vector<BaseObject>> entry : objects.entrySet()) {
-            newObjects.put(resolveClassReference(entry.getKey()), new ArrayList<BaseObject>(entry.getValue()));
-        }
-
-        setXObjects(newObjects);
     }
 
     /**
@@ -2019,15 +1932,6 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
         return list;
-    }
-
-    /**
-     * @deprecated since 2.2M1 use {@link #getXClasses(XWikiContext)} instead
-     */
-    @Deprecated
-    public List<BaseClass> getxWikiClasses(XWikiContext context)
-    {
-        return getXClasses(context);
     }
 
     /**
@@ -2152,15 +2056,6 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setXObjects(DocumentReference, List)} instead
-     */
-    @Deprecated
-    public void setObjects(String className, Vector<BaseObject> objects)
-    {
-        setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
-    }
-
-    /**
      * @since 3.3M1
      */
     public BaseObject getXObject(EntityReference reference)
@@ -2250,6 +2145,15 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * @since 4.1M1
+     */
+    public BaseObject getXObject(EntityReference classReference, int nb)
+    {
+        return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(classReference,
+            getDocumentReference(), nb));
     }
 
     /**
@@ -3158,6 +3062,11 @@ public class XWikiDocument implements DocumentModelBridge
         if (syntaxId != null) {
             setSyntaxId(syntaxId);
         }
+
+        // Read the hidden checkbox from the form
+        if (eform.getHidden() != null) {
+            setHidden("1".equals(eform.getHidden()));
+        }
     }
 
     /**
@@ -3446,17 +3355,20 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setValidationScript(getValidationScript());
             doc.setLanguage(getLanguage());
             doc.setTranslation(getTranslation());
-            doc.setXClass(getXClass().clone());
-            doc.setXClassXML(getXClassXML());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
 
+            BaseClass bClass = getXClass().clone();
+            doc.setXClass(bClass);
+
             if (keepsIdentity) {
+                doc.setXClassXML(getXClassXML());
                 doc.cloneXObjects(this);
                 doc.cloneAttachments(this);
             } else {
+                bClass.setCustomMapping(null);
                 doc.duplicateXObjects(this);
                 doc.copyAttachments(this);
             }
@@ -3535,24 +3447,10 @@ public class XWikiDocument implements DocumentModelBridge
             return true;
         }
 
+        // Reference/language (document identifier)
+
         XWikiDocument doc = (XWikiDocument) object;
         if (!getDocumentReference().equals(doc.getDocumentReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getAuthorReference(), doc.getAuthorReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getContentAuthorReference(), doc.getContentAuthorReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
-            return false;
-        }
-
-        if (ObjectUtils.notEqual(getCreatorReference(), doc.getCreatorReference())) {
             return false;
         }
 
@@ -3568,6 +3466,26 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
+        // Authors
+
+        if (ObjectUtils.notEqual(getAuthorReference(), doc.getAuthorReference())) {
+            return false;
+        }
+
+        if (ObjectUtils.notEqual(getContentAuthorReference(), doc.getContentAuthorReference())) {
+            return false;
+        }
+
+        if (ObjectUtils.notEqual(getCreatorReference(), doc.getCreatorReference())) {
+            return false;
+        }
+
+        // Version
+
+        if (!getVersion().equals(doc.getVersion())) {
+            return false;
+        }
+
         if (getDate().getTime() != doc.getDate().getTime()) {
             return false;
         }
@@ -3577,6 +3495,49 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         if (getCreationDate().getTime() != doc.getCreationDate().getTime()) {
+            return false;
+        }
+
+        if (!getComment().equals(doc.getComment())) {
+            return false;
+        }
+
+        if (isMinorEdit() != doc.isMinorEdit()) {
+            return false;
+        }
+
+        // Datas
+
+        if (!equalsData(doc)) {
+            return false;
+        }
+
+        // We consider that 2 documents are still equal even when they have different original
+        // documents (see getOriginalDocument() for more details as to what is an original
+        // document).
+
+        return true;
+    }
+
+    /**
+     * Same as {@link #equals(Object)} but only for actual datas of the document.
+     * <p>
+     * The goal being to compare two versions of the same document this method skip every version/reference/author
+     * related information. For example it allows to compare a document comming from a another wiki and easily check if
+     * thoses actually are the same thing whatever the plumbing differences.
+     * 
+     * @param doc the document to compare
+     * @return true if bith documents have the same datas
+     * @since 4.1.1
+     */
+    public boolean equalsData(XWikiDocument doc)
+    {
+        // Same Java object, they sure are equal
+        if (this == doc) {
+            return true;
+        }
+
+        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
             return false;
         }
 
@@ -3592,10 +3553,6 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getVersion().equals(doc.getVersion())) {
-            return false;
-        }
-
         if (ObjectUtils.notEqual(getTemplateDocumentReference(), doc.getTemplateDocumentReference())) {
             return false;
         }
@@ -3605,14 +3562,6 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         if (!getValidationScript().equals(doc.getValidationScript())) {
-            return false;
-        }
-
-        if (!getComment().equals(doc.getComment())) {
-            return false;
-        }
-
-        if (isMinorEdit() != doc.isMinorEdit()) {
             return false;
         }
 
@@ -3653,10 +3602,6 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         }
-
-        // We consider that 2 documents are still equal even when they have different original
-        // documents (see getOriginalDocument() for more details as to what is an original
-        // document).
 
         return true;
     }
@@ -3743,7 +3688,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 4.1M2
      */
+    @Deprecated
     public void addToZip(ZipOutputStream zos, String zipname, boolean withVersions, XWikiContext context)
         throws XWikiException, IOException
     {
@@ -3763,7 +3710,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 4.2M2
      */
+    @Deprecated
     public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws XWikiException,
         IOException
     {
@@ -3786,7 +3735,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 4.1M2
      */
+    @Deprecated
     public void addToZip(ZipOutputStream zos, XWikiContext context) throws XWikiException, IOException
     {
         addToZip(zos, true, context);
@@ -4805,15 +4756,6 @@ public class XWikiDocument implements DocumentModelBridge
         setContentDirty(true);
     }
 
-    /**
-     * @deprecated since 2.2M2 use {@link #setXObjectsToRemove(List)} instead
-     */
-    @Deprecated
-    public void setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
-    {
-        setXObjectsToRemove(objectsToRemove);
-    }
-
     public List<String> getIncludedPages(XWikiContext context)
     {
         if (is10Syntax()) {
@@ -5613,7 +5555,7 @@ public class XWikiDocument implements DocumentModelBridge
                         // TODO: Refactor this so that getDiff() accepts null Object as input.
                         // Only consider added objects, the other case was treated above.
                         originalObj = new BaseObject();
-                        originalObj.setXClassReference(newObj.getXClassReference());
+                        originalObj.setXClassReference(newObj.getRelativeXClassReference());
                         originalObj.setNumber(newObj.getNumber());
                         originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
@@ -6029,7 +5971,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead
+     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead Hibernate uses this through reflection. It cannot be
+     *             removed without altering hibernate.cfg.xml
      */
     @Deprecated
     public String getxWikiClassXML()
@@ -6046,7 +5989,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead
+     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead Hibernate uses this through reflection. It
+     *             cannot be removed without altering hibernate.cfg.xml
      */
     @Deprecated
     public void setxWikiClassXML(String xClassXML)
@@ -6336,12 +6280,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public boolean isCurrentLocalUserPage(XWikiContext context)
     {
-        String username = context.getLocalUser();
-        if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
-            return false;
-        }
-
-        return context.getUserReference().equals(getDocumentReference());
+        final DocumentReference userRef = context.getUserReference();
+        return userRef != null && userRef.equals(this.getDocumentReference());
     }
 
     public void resetArchive(XWikiContext context) throws XWikiException
@@ -6374,15 +6314,6 @@ public class XWikiDocument implements DocumentModelBridge
             object);
 
         return object;
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(XWikiContext)}
-     */
-    @Deprecated
-    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException
-    {
-        return addXObjectFromRequest(context);
     }
 
     /**
@@ -7296,7 +7227,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public BaseObject getObject(String className, boolean create, XWikiContext context)
     {
-        return getXObject(resolveClassReference(className), create, context);
+        return getXObject(
+            this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT, getDocumentReference()), create,
+            context);
     }
 
     public boolean validate(XWikiContext context) throws XWikiException
@@ -7351,15 +7284,11 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
+        // The XWiki Context isn't recreated when the Execution Context is cloned so we have to backup some of its data.
+        // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
-        if (vcontext != null) {
-            backup.put("vdoc", vcontext.get("doc"));
-            backup.put("vcdoc", vcontext.get("cdoc"));
-            backup.put("vtdoc", vcontext.get("tdoc"));
-        }
 
+        // Backup the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext != null) {
@@ -7368,57 +7297,60 @@ public class XWikiDocument implements DocumentModelBridge
             backup.put("gtdoc", gcontext.get("tdoc"));
         }
 
-        // Clone the Execution Context to provide isolation
+        // Clone the Execution Context to provide isolation. The clone will have a new Velocity and Script Context.
         Execution execution = Utils.getComponent(Execution.class);
-        ExecutionContext clonedEc;
         try {
-            clonedEc = Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext());
+            execution.pushContext(Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext()));
         } catch (ExecutionContextException e) {
             throw new RuntimeException("Failed to clone the Execution Context", e);
         }
-        execution.pushContext(clonedEc);
+
+        // Trigger the initialization of the new Velocity and Script Context. This will also ensure that the Execution
+        // Context and the XWiki Context point to the same Velocity Context instance. There is old code that accesses
+        // the Velocity Context from the XWiki Context.
+        Utils.getComponent(VelocityManager.class).getVelocityContext();
     }
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
     {
-        // Restore the Execution Context
+        // Restore the Execution Context. This will also restore the previous Velocity and Script Context.
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
 
+        // Restore the Velocity Context reference from the XWiki Context, which is still used by some old code. Note
+        // that we take the Velocity Context directly from the Execution Context in order to avoid triggering a
+        // reinitialization of the Velocity Context.
+        VelocityContext vcontext = (VelocityContext) execution.getContext().getProperty("velocityContext");
+        if (vcontext != null) {
+            context.put("vcontext", vcontext);
+        } else {
+            context.remove("vcontext");
+        }
+
+        // Restore the current document on the XWiki Context.
+        context.setDoc((XWikiDocument) backup.get("doc"));
+
+        // Restore the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext != null) {
             if (backup.get("gdoc") != null) {
                 gcontext.put("doc", backup.get("gdoc"));
+            } else {
+                gcontext.remove("doc");
             }
 
             if (backup.get("gcdoc") != null) {
                 gcontext.put("cdoc", backup.get("gcdoc"));
+            } else {
+                gcontext.remove("cdoc");
             }
 
             if (backup.get("gtdoc") != null) {
                 gcontext.put("tdoc", backup.get("gtdoc"));
+            } else {
+                gcontext.remove("tdoc");
             }
-        }
-
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
-        if (vcontext != null) {
-            if (backup.get("vdoc") != null) {
-                vcontext.put("doc", backup.get("vdoc"));
-            }
-
-            if (backup.get("vcdoc") != null) {
-                vcontext.put("cdoc", backup.get("vcdoc"));
-            }
-
-            if (backup.get("vtdoc") != null) {
-                vcontext.put("tdoc", backup.get("vtdoc"));
-            }
-        }
-
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
         }
     }
 
@@ -7428,18 +7360,21 @@ public class XWikiDocument implements DocumentModelBridge
             context.setDoc(this);
             com.xpn.xwiki.api.Document apidoc = newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
+
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
             if (vcontext != null) {
                 vcontext.put("doc", apidoc);
                 vcontext.put("tdoc", tdoc);
+                vcontext.put("cdoc", tdoc);
             }
 
+            @SuppressWarnings("unchecked")
+            Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
             if (gcontext != null) {
                 gcontext.put("doc", apidoc);
                 gcontext.put("tdoc", tdoc);
+                gcontext.put("cdoc", tdoc);
             }
         } catch (XWikiException ex) {
             LOGGER.warn("Unhandled exception setting context", ex);
@@ -7469,8 +7404,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Indicates whether the document should be 'hidden' or not, meaning that it should not be returned in public search
-     * results. WARNING: this is a temporary hack until the new data model is designed and implemented. No code should
-     * rely on or use this property, since it will be replaced with a generic metadata.
+     * results.
      * 
      * @param hidden The new value of the {@link #hidden} property.
      */
@@ -7485,8 +7419,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Indicates whether the document is 'hidden' or not, meaning that it should not be returned in public search
-     * results. WARNING: this is a temporary hack until the new data model is designed and implemented. No code should
-     * rely on or use this property, since it will be replaced with a generic metadata.
+     * results.
      * 
      * @return <code>true</code> if the document is hidden and does not appear among the results of
      *         {@link com.xpn.xwiki.api.XWiki#searchDocuments(String)}, <code>false</code> otherwise.
@@ -7715,7 +7648,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the rendered content
      * @throws XWikiException if an exception occurred during the rendering process
      */
-    private static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
+    protected static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
         try {
             BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, targetSyntax.toIdString());
@@ -7867,10 +7800,11 @@ public class XWikiDocument implements DocumentModelBridge
         MergeResult mergeResult = new MergeResult();
 
         // Title
-        setTitle(MergeUtils.mergeString(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
+        setTitle(MergeUtils.mergeCharacters(previousDocument.getTitle(), newDocument.getTitle(), getTitle(),
+            mergeResult));
 
         // Content
-        setContent(MergeUtils.mergeString(previousDocument.getContent(), newDocument.getContent(), getContent(),
+        setContent(MergeUtils.mergeLines(previousDocument.getContent(), newDocument.getContent(), getContent(),
             mergeResult));
 
         // Parent
@@ -7913,9 +7847,7 @@ public class XWikiDocument implements DocumentModelBridge
                             mergeResult.setModified(true);
                         } else {
                             // XXX: collision between DB and new: object to add but already exists in the DB
-                            mergeResult.getErrors().add(
-                                new CollisionException("Collision found on object [" + objectResult.getReference()
-                                    + "]"));
+                            mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
                         if (objectResult != null) {
@@ -7925,16 +7857,12 @@ public class XWikiDocument implements DocumentModelBridge
                             } else {
                                 // XXX: collision between DB and new: object to remove but not the same as previous
                                 // version
-                                mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on object [" + objectResult.getReference()
-                                        + "]"));
+                                mergeResult.getLog().error("Collision found on object [{}]",
+                                    objectResult.getReference());
                             }
                         } else {
                             // Already removed from DB, lets assume the user is prescient
-                            mergeResult.getWarnings()
-                                .add(
-                                    new CollisionException("Object [" + previousObject.getReference()
-                                        + "] already removed"));
+                            mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     } else if (previousObject != null && newObject != null) {
                         if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
@@ -7943,9 +7871,8 @@ public class XWikiDocument implements DocumentModelBridge
                                 mergeResult.setModified(true);
                             } else {
                                 // XXX: collision between DB and new: property to add but already exists in the DB
-                                mergeResult.getErrors().add(
-                                    new CollisionException("Collision found on object property ["
-                                        + propertyResult.getReference() + "]"));
+                                mergeResult.getLog().error("Collision found on object property [{}]",
+                                    propertyResult.getReference());
                             }
                         } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                             if (propertyResult != null) {
@@ -7955,15 +7882,13 @@ public class XWikiDocument implements DocumentModelBridge
                                 } else {
                                     // XXX: collision between DB and new: supposed to be removed but the DB version is
                                     // not the same as the previous version
-                                    mergeResult.getErrors().add(
-                                        new CollisionException("Collision found on object property ["
-                                            + propertyResult.getReference() + "]"));
+                                    mergeResult.getLog().error("Collision found on object property [{}]",
+                                        propertyResult.getReference());
                                 }
                             } else {
                                 // Already removed from DB, lets assume the user is prescient
-                                mergeResult.getWarnings().add(
-                                    new CollisionException("Object property [" + previousProperty.getReference()
-                                        + "] already removed"));
+                                mergeResult.getLog().warn("Object property [{}] already removed",
+                                    previousProperty.getReference());
                             }
                         } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                             if (propertyResult != null) {
@@ -7976,9 +7901,7 @@ public class XWikiDocument implements DocumentModelBridge
                             } else {
                                 // XXX: collision between DB and new: property to modify but does not exists in DB
                                 // Lets assume it's a mistake to fix
-                                mergeResult.getWarnings().add(
-                                    new CollisionException("Object [" + newProperty.getReference()
-                                        + "] does not exists"));
+                                mergeResult.getLog().warn("Object [{}] does not exists", newProperty.getReference());
 
                                 objectResult.addField(diff.getPropName(), newProperty);
                                 mergeResult.setModified(true);
@@ -8009,7 +7932,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                         mergeResult.setModified(true);
                     } catch (XWikiException e) {
-                        mergeResult.getErrors().add(e);
+                        mergeResult.getLog().error("Failed to delete attachment [{}]", diff.getFileName(), e);
                     }
                 }
             }
@@ -8034,9 +7957,6 @@ public class XWikiDocument implements DocumentModelBridge
      * to this method.</li>
      * 
      * @param document the document to apply
-     * @param context the XWiki context
-     * @param attachments indicate if attachment has to be taken into account (this can be pretty expensive and sometime
-     *            done another way)
      * @return false is nothing changed
      */
     public boolean apply(XWikiDocument document)

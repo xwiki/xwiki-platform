@@ -43,6 +43,13 @@ widgets.FullScreen = Class.create({
     $$('textarea', '.maximizable').each(function(element) {
       this.addBehavior(element);
     }.bind(this));
+    document.observe('xwiki:dom:updated', function(event) {
+      event.memo.elements.each(function(element) {
+        element.select('textarea', '.maximizable').each(function(element) {
+          this.addBehavior(element);
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
     // The GWT editor removes the textarea from the document, thus should be treated separately
     $$('.xRichTextEditor').each(function(item) {
       this.addBehavior(item);
@@ -318,7 +325,12 @@ widgets.FullScreen = Class.create({
     };
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
-      iframe._originalStyle = {
+      // We store the original style of the rich text area on the editor element because the in-line frame used to
+      // implement the rich text area is renewed each time the rich text area is reloaded (e.g. when adding or editing a
+      // macro) to prevent the browser from adding a new history entry. The WYSIWYG editor could copy the JavaScript
+      // object properties whenever the in-line frame is cloned but it would have to filter some internal properties
+      // specific to GWT. Let's keep the hack here, for the moment. The code is not generic anyway.
+      targetElement._richTextAreaOriginalStyle = {
         'width' : iframe.style['width'],
         'height' : iframe.style['height']
       };
@@ -426,7 +438,7 @@ widgets.FullScreen = Class.create({
     // Restore the WYSIWYGs
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
-      iframe.setStyle(iframe._originalStyle);
+      iframe.setStyle(targetElement._richTextAreaOriginalStyle);
     } else if (targetElement.hasClassName("mceEditorContainer")) {
       var iframe = targetElement.down(".mceEditorIframe");
       iframe.setStyle(iframe._originalStyle);

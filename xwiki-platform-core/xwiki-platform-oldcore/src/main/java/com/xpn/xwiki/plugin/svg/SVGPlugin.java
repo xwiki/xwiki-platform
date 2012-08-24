@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -32,16 +33,23 @@ import org.apache.batik.apps.rasterizer.SVGConverter;
 import org.apache.batik.apps.rasterizer.SVGConverterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 
 public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     private static Logger LOGGER = LoggerFactory.getLogger(com.xpn.xwiki.plugin.svg.SVGPlugin.class);
+
+    /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
 
     private File tempDir;
 
@@ -83,7 +91,7 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     {
         super.init(context);
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         tempDir = new File(dir, "svg");
         try {
             tempDir.mkdirs();

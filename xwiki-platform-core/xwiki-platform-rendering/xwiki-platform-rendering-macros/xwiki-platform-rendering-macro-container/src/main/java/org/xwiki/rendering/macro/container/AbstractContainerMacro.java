@@ -113,7 +113,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
     protected LayoutManager getLayoutManager(String layoutStyle)
     {
         try {
-            return getComponentManager().lookup(LayoutManager.class, layoutStyle);
+            return getComponentManager().getInstance(LayoutManager.class, layoutStyle);
         } catch (ComponentLookupException e) {
             // TODO: maybe should log?
             return null;

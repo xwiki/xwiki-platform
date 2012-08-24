@@ -43,7 +43,7 @@ public class DocumentEventConverterTest extends AbstractBridgedXWikiComponentTes
 {
     public void testConvertWithOriginalDocNull() throws Exception
     {
-        EventConverterManager eventConverterManager = getComponentManager().lookup(EventConverterManager.class);
+        EventConverterManager eventConverterManager = getComponentManager().getInstance(EventConverterManager.class);
 
         // local -> remote
 

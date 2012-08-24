@@ -42,7 +42,6 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -1211,10 +1210,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // XXX: collision between DB and new: property to add but already exists in the DB
-                    mergeResult.getErrors()
-                        .add(
-                            new CollisionException("Collision found on class property [" + newProperty.getReference()
-                                + "]"));
+                    mergeResult.getLog().error("Collision found on class property [{}]", newProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                 if (propertyResult != null) {
@@ -1225,15 +1221,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                     } else {
                         // XXX: collision between DB and new: property to remove but not the same as previous
                         // version
-                        mergeResult.getErrors().add(
-                            new CollisionException("Collision found on class property ["
-                                + previousProperty.getReference() + "]"));
+                        mergeResult.getLog().error("Collision found on class property [{}]",
+                            previousProperty.getReference());
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getWarnings().add(
-                        new CollisionException("Object property [" + previousProperty.getReference()
-                            + "] already removed"));
+                    mergeResult.getLog().warn("Object property [{}] already removed", previousProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                 if (propertyResult != null) {
@@ -1247,10 +1240,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 } else {
                     // XXX: collision between DB and new: property to modify but does not exists in DB
                     // Lets assume it's a mistake to fix
-                    mergeResult.getWarnings()
-                        .add(
-                            new CollisionException("Collision found on class property [" + newProperty.getReference()
-                                + "]"));
+                    mergeResult.getLog().warn("Collision found on class property [{}]", newProperty.getReference());
 
                     addField(diff.getPropName(), newClass.getField(diff.getPropName()));
                     mergeResult.setModified(true);

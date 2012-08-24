@@ -57,7 +57,7 @@ public class XWikiQuery extends XWikiCriteria
         setDisplayProperties(columns);
         String[] order = request.getParameterValues(className + "_" + "searchorder");
         setOrderProperties(order);
-        BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
+        BaseClass bclass = context.getWiki().getDocument(className, context).getXClass();
         Set<String> properties = bclass.getPropertyList();
         Iterator<String> propid = properties.iterator();
         while (propid.hasNext()) {

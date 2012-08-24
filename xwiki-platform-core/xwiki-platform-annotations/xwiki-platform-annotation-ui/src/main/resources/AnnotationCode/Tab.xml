@@ -21,29 +21,29 @@
 -->
 
 <xwikidoc>
-<web>AnnotationCode</web>
-<name>Tab</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>AnnotationCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1264870914000</creationDate>
-<date>1277458506000</date>
-<contentUpdateDate>1277458506000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{include document="AnnotationCode.Macros" /}}
+  <web>AnnotationCode</web>
+  <name>Tab</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264870914000</creationDate>
+  <date>1277458506000</date>
+  <contentUpdateDate>1277458506000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="AnnotationCode.Macros" /}}
 
 {{velocity filter="none"}}
 {{html wiki="false" clean="false"}}

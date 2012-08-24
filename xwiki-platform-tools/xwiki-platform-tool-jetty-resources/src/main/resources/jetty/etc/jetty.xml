@@ -175,7 +175,7 @@
         <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler">
           <Set name="requestLog">
             <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
-              <Set name="filename"><Property name="jetty.home" default="."/>/logs/yyyy_mm_dd.request.log
+              <Set name="filename"><Property name="xwiki.data.dir" default="."/>/logs/yyyy_mm_dd.request.log
               </Set>
               <Set name="filenameDateFormat">yyyy_MM_dd</Set>
               <Set name="retainDays">90</Set>

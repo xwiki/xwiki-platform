@@ -19,14 +19,14 @@
  */
 package org.xwiki.wysiwyg.server;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * WYSIWYG editor configuration properties.
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface WysiwygEditorConfiguration
 {
     /**

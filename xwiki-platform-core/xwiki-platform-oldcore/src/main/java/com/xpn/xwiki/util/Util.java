@@ -149,15 +149,6 @@ public class Util
         return matches;
     }
 
-    /**
-     * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
-     */
-    @Deprecated
-    public List<String> getMatches(String content, String spattern, int group) throws MalformedPatternException
-    {
-        return getUniqueMatches(content, spattern, group);
-    }
-
     public static String cleanValue(String value)
     {
         value = StringUtils.replace(value, "\r\r\n", "%_N_%");
@@ -245,34 +236,6 @@ public class Util
         getP5util().split(results, pattern, text);
 
         return results;
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File, String)} */
-    @Deprecated
-    public static String getFileContent(File file) throws IOException
-    {
-        return FileUtils.readFileToString(file, XWiki.DEFAULT_ENCODING);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.IOUtils#toString(Reader)} */
-    @Deprecated
-    public static String getFileContent(Reader reader) throws IOException
-    {
-        return IOUtils.toString(reader);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToByteArray(File)} */
-    @Deprecated
-    public static byte[] getFileContentAsBytes(File file) throws IOException
-    {
-        return FileUtils.readFileToByteArray(file);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.IOUtils#toByteArray(InputStream)} */
-    @Deprecated
-    public static byte[] getFileContentAsBytes(InputStream is) throws IOException
-    {
-        return IOUtils.toByteArray(is);
     }
 
     public static boolean contains(String name, String list, String sep)

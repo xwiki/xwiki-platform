@@ -109,9 +109,6 @@ public class VerticalResizePanel extends FlowPanel
         getElement().getStyle().setProperty("overflow", oldOverflow);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onLoad()
     {

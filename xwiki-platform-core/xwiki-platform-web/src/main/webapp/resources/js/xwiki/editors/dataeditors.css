@@ -59,7 +59,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xclass-title {
   margin: 16px 0 2px;
 }
-.xclass-title h2, xproperty-title h2 {
+.xclass-title h2 {
   border: none;
   font-weight: bold;
   font-size: 100%;

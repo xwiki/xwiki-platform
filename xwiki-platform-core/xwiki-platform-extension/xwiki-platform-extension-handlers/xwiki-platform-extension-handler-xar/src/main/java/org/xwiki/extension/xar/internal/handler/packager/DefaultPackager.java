@@ -27,16 +27,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.slf4j.Logger;
 import org.xml.sax.ContentHandler;
@@ -44,11 +46,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.RootHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.UnknownRootElement;
@@ -79,9 +80,6 @@ public class DefaultPackager implements Packager, Initializable
     private ComponentManager componentManager;
 
     @Inject
-    private Execution execution;
-
-    @Inject
     @Named("explicit")
     private DocumentReferenceResolver<EntityReference> resolver;
 
@@ -94,6 +92,9 @@ public class DefaultPackager implements Packager, Initializable
     @Inject
     private ObservationManager observation;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     private SAXParserFactory parserFactory;
 
     @Override
@@ -104,22 +105,22 @@ public class DefaultPackager implements Packager, Initializable
 
     @Override
     public void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration)
-        throws IOException, XWikiException
+        throws IOException, XWikiException, ComponentLookupException
     {
         if (configuration.getWiki() == null) {
-            XWikiContext context = getXWikiContext();
-            if (context.getWiki().isVirtualMode()) {
-                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext.getWiki().isVirtualMode()) {
+                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(context.getMainXWiki())) {
-                    importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), configuration);
+                if (!wikis.contains(xcontext.getMainXWiki())) {
+                    importXARToWiki(previousXarFile, xarFile, xcontext.getMainXWiki(), configuration);
                 }
 
                 for (String subwiki : wikis) {
                     importXARToWiki(previousXarFile, xarFile, subwiki, configuration);
                 }
             } else {
-                importXARToWiki(previousXarFile, xarFile, context.getMainXWiki(), configuration);
+                importXARToWiki(previousXarFile, xarFile, xcontext.getMainXWiki(), configuration);
             }
         } else {
             importXARToWiki(previousXarFile, xarFile, configuration.getWiki(), configuration);
@@ -127,7 +128,7 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     private XarMergeResult importXARToWiki(XarFile previousXarFile, File xarFile, String wiki,
-        PackageConfiguration configuration) throws IOException
+        PackageConfiguration configuration) throws IOException, ComponentLookupException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
@@ -138,13 +139,13 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     private XarMergeResult importXARToWiki(XarFile previousXarFile, InputStream xarInputStream, String wiki,
-        PackageConfiguration configuration) throws IOException
+        PackageConfiguration configuration) throws IOException, ComponentLookupException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
-        ZipInputStream zis = new ZipInputStream(xarInputStream);
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         String currentWiki = xcontext.getDatabase();
         try {
@@ -152,11 +153,12 @@ public class DefaultPackager implements Packager, Initializable
 
             this.observation.notify(new XARImportingEvent(), null, xcontext);
 
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+            for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (!entry.isDirectory()) {
+                    DocumentImporterHandler documentHandler =
+                        new DocumentImporterHandler(this, this.componentManager, wiki);
+
                     try {
-                        DocumentImporterHandler documentHandler =
-                            new DocumentImporterHandler(this, this.componentManager, wiki);
                         documentHandler.setPreviousXarFile(previousXarFile);
                         documentHandler.setConfiguration(configuration);
 
@@ -165,11 +167,21 @@ public class DefaultPackager implements Packager, Initializable
                         if (documentHandler.getMergeResult() != null) {
                             mergeResult.addMergeResult(documentHandler.getMergeResult());
                         }
+
+                        if (configuration.isLogEnabled()) {
+                            this.logger.info("Successfully imported document [{}] in language [{}]", documentHandler
+                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                        }
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                         this.logger.debug("Entry [" + entry + "] is not a document", e);
                     } catch (Exception e) {
                         this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+
+                        if (configuration.isLogEnabled()) {
+                            this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
+                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                        }
                     }
                 }
             }
@@ -186,19 +198,19 @@ public class DefaultPackager implements Packager, Initializable
     public void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException
     {
         if (configuration.getWiki() == null) {
-            XWikiContext context = getXWikiContext();
-            if (context.getWiki().isVirtualMode()) {
-                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext.getWiki().isVirtualMode()) {
+                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(context.getMainXWiki())) {
-                    unimportXARFromWiki(xarFile, context.getMainXWiki(), configuration);
+                if (!wikis.contains(xcontext.getMainXWiki())) {
+                    unimportXARFromWiki(xarFile, xcontext.getMainXWiki(), configuration);
                 }
 
                 for (String subwiki : wikis) {
                     unimportXARFromWiki(xarFile, subwiki, configuration);
                 }
             } else {
-                unimportXARFromWiki(xarFile, context.getMainXWiki(), configuration);
+                unimportXARFromWiki(xarFile, xcontext.getMainXWiki(), configuration);
             }
         } else {
             unimportXARFromWiki(xarFile, configuration.getWiki(), configuration);
@@ -214,19 +226,19 @@ public class DefaultPackager implements Packager, Initializable
     public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException
     {
         if (configuration.getWiki() == null) {
-            XWikiContext context = getXWikiContext();
-            if (context.getWiki().isVirtualMode()) {
-                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext.getWiki().isVirtualMode()) {
+                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(context.getMainXWiki())) {
-                    unimportPagesFromWiki(pages, context.getMainXWiki(), configuration);
+                if (!wikis.contains(xcontext.getMainXWiki())) {
+                    unimportPagesFromWiki(pages, xcontext.getMainXWiki(), configuration);
                 }
 
                 for (String subwiki : wikis) {
                     unimportPagesFromWiki(pages, subwiki, configuration);
                 }
             } else {
-                unimportPagesFromWiki(pages, context.getMainXWiki(), configuration);
+                unimportPagesFromWiki(pages, xcontext.getMainXWiki(), configuration);
             }
         } else {
             unimportPagesFromWiki(pages, configuration.getWiki(), configuration);
@@ -237,23 +249,28 @@ public class DefaultPackager implements Packager, Initializable
     {
         WikiReference wikiReference = new WikiReference(wiki);
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
         for (XarEntry xarEntry : pages) {
             DocumentReference documentReference = this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
             try {
-                XWikiDocument document = getXWikiContext().getWiki().getDocument(documentReference, xcontext);
+                XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
                 if (!document.isNew()) {
                     String language = xarEntry.getLanguage();
                     if (language != null) {
                         document = document.getTranslatedDocument(language, xcontext);
-                        getXWikiContext().getWiki().deleteDocument(document, xcontext);
+                        xcontext.getWiki().deleteDocument(document, xcontext);
+
+                        this.logger.info("Successfully deleted document [{}] in language [{}]",
+                            document.getDocumentReference(), document.getRealLanguage());
                     } else {
-                        getXWikiContext().getWiki().deleteAllDocuments(document, xcontext);
+                        xcontext.getWiki().deleteAllDocuments(document, xcontext);
+
+                        this.logger.info("Successfully deleted document [{}]", document.getDocumentReference());
                     }
                 }
             } catch (XWikiException e) {
-                this.logger.error("Failed to delete document [" + documentReference + "]", e);
+                this.logger.error("Failed to delete document [{}]", documentReference, e);
             }
         }
     }
@@ -264,10 +281,10 @@ public class DefaultPackager implements Packager, Initializable
         List<XarEntry> documents = null;
 
         FileInputStream fis = new FileInputStream(xarFile);
-        ZipInputStream zis = new ZipInputStream(fis);
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
 
         try {
-            for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
+            for (ZipArchiveEntry zipEntry = zis.getNextZipEntry(); zipEntry != null; zipEntry = zis.getNextZipEntry()) {
                 if (!zipEntry.isDirectory()) {
                     try {
                         XarPageLimitedHandler documentHandler = new XarPageLimitedHandler(this.componentManager);
@@ -279,7 +296,7 @@ public class DefaultPackager implements Packager, Initializable
                         }
 
                         XarEntry xarEntry = documentHandler.getXarEntry();
-                        xarEntry.setZipEntry(zipEntry);
+                        xarEntry.setEntryName(zipEntry.getName());
 
                         documents.add(xarEntry);
                     } catch (NotADocumentException e) {
@@ -311,15 +328,5 @@ public class DefaultPackager implements Packager, Initializable
         } catch (UnknownRootElement e) {
             throw new NotADocumentException("Failed to parse stream", e);
         }
-    }
-
-    private ExecutionContext getExecutionContext()
-    {
-        return this.execution.getContext();
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) getExecutionContext().getProperty("xwikicontext");
     }
 }

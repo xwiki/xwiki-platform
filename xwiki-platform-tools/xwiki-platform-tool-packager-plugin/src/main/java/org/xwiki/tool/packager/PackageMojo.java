@@ -38,6 +38,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -56,6 +57,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -195,8 +197,7 @@ public class PackageMojo extends AbstractMojo
     {
         // Step 1: Expand Jetty resources into the package output directory.
         getLog().info("Expanding Jetty Resources ...");
-        Artifact jettyArtifact = resolveJettyArtifact();
-        unzip(jettyArtifact.getFile(), this.outputPackageDirectory);
+        expandJettyDistribution();
 
         // Step 2: Get the WAR dependencies and expand them in the package output directory.
         getLog().info("Expanding WAR dependencies ...");
@@ -254,6 +255,31 @@ public class PackageMojo extends AbstractMojo
         getLog().info(String.format("Import XAR dependencies %s...",
             this.importUser == null ? "as a backup pack" : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
+    }
+
+    private void expandJettyDistribution() throws MojoExecutionException
+    {
+        Artifact jettyArtifact = resolveJettyArtifact();
+        unzip(jettyArtifact.getFile(), this.outputPackageDirectory);
+
+        // Replace maven properties in start shell scripts
+        VelocityContext context = createVelocityContext();
+        Collection<File> startFiles = org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory,
+            new WildcardFileFilter("start_xwiki*.*"), null);
+        VelocityEngine velocityEngine = this.velocity.getEngine();
+        for (File startFile : startFiles) {
+            getLog().info(String.format("  Replacing variables in [%s]...", startFile));
+            try {
+                String content = org.apache.commons.io.FileUtils.readFileToString(startFile);
+                OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
+                velocityEngine.evaluate(context, writer, "", content);
+                writer.close();
+            } catch (Exception e) {
+                // Failed to read or write file...
+                throw new MojoExecutionException(
+                    String.format("Failed to process start shell script [%s]", startFile), e);
+            }
+        }
     }
 
     private Artifact resolveArtifactItem(ArtifactItem artifactItem) throws MojoExecutionException
@@ -347,7 +373,10 @@ public class PackageMojo extends AbstractMojo
                         String.format("Failed to import XAR [%s]", xarArtifact.toString()), e);
                 }
             }
-            copyDirectory(this.databaseDirectory, new File(this.outputPackageDirectory, "database"));
+
+            // Copy database files to XWiki's data directory.
+            File dataDir = new File(this.outputPackageDirectory, "data");
+            copyDirectory(this.databaseDirectory, new File(dataDir, "database"));
         }
     }
     
@@ -660,28 +689,28 @@ public class PackageMojo extends AbstractMojo
         properties.putAll(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
         for (Object key : projectProperties.keySet()) {
-            properties.put( key.toString(), projectProperties.get( key ).toString() );
+            properties.put(key.toString(), projectProperties.get(key).toString());
         }
 
-        VelocityContext context = new VelocityContext( properties );
+        VelocityContext context = new VelocityContext(properties);
 
         String inceptionYear = this.project.getInceptionYear();
-        String year = new SimpleDateFormat( "yyyy" ).format( new Date() );
+        String year = new SimpleDateFormat("yyyy").format( new Date());
 
-        if ( StringUtils.isEmpty(inceptionYear) )
+        if (StringUtils.isEmpty(inceptionYear))
         {
             inceptionYear = year;
         }
-        context.put( "project", this.project );
-        context.put( "presentYear", year );
+        context.put("project", this.project);
+        context.put("presentYear", year);
 
-        if ( inceptionYear.equals( year ) )
+        if (inceptionYear.equals(year))
         {
-            context.put( "projectTimespan", year );
+            context.put("projectTimespan", year);
         }
         else
         {
-            context.put( "projectTimespan", inceptionYear + "-" + year );
+            context.put("projectTimespan", inceptionYear + "-" + year);
         }
 
         return context;
@@ -692,7 +721,8 @@ public class PackageMojo extends AbstractMojo
         Properties props = new Properties();
 
         // Default configuration data for hibernate.cfg.xml
-        props.setProperty("xwikiDbConnectionUrl", "jdbc:hsqldb:file:database/xwiki_db;shutdown=true");
+        props.setProperty("xwikiDbConnectionUrl",
+            "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true");
         props.setProperty("xwikiDbConnectionUsername", "sa");
         props.setProperty("xwikiDbConnectionPassword", "");
         props.setProperty("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
@@ -712,6 +742,9 @@ public class PackageMojo extends AbstractMojo
         props.setProperty("xwikiCfgDefaultSkin", "colibri");
         props.setProperty("xwikiCfgDefaultBaseSkin", "colibri");
         props.setProperty("xwikiCfgEncoding", "UTF-8");
+
+        // Other default configuration properties
+        props.setProperty("xwikiDataDir", "data");
 
         return props;
     }

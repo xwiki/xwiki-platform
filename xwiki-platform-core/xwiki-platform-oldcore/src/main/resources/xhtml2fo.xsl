@@ -117,8 +117,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">1000</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -128,8 +128,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">900</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -139,8 +139,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -150,8 +150,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -161,8 +161,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -172,8 +172,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -265,8 +265,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:attribute-set>
 
     <xsl:attribute-set name="dt">
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">1000</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="dd">
@@ -1619,7 +1619,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:template>
 
     <xsl:template match="html:tr[parent::html:table and html:th and not(html:td)]" mode="transform">
-        <fo:table-row xsl:use-attribute-sets="tr" keep-with-next="always">
+        <fo:table-row xsl:use-attribute-sets="tr" keep-with-next="1000">
             <xsl:call-template name="process-table-row"/>
         </fo:table-row>
     </xsl:template>

@@ -40,6 +40,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class DBListClass extends ListClass
 {
+    private static final String XCLASSNAME = "dblist";
+
     /**
      * Logging helper object.
      */
@@ -56,7 +58,7 @@ public class DBListClass extends ListClass
 
     public DBListClass(PropertyMetaClass wclass)
     {
-        super("dblist", "DB List", wclass);
+        super(XCLASSNAME, "DB List", wclass);
     }
 
     public DBListClass()
@@ -360,6 +362,7 @@ public class DBListClass extends ListClass
     public void flushCache()
     {
         this.cachedDBList = null;
+        super.flushCache();
     }
 
     // return first or second column from user query
@@ -554,6 +557,12 @@ public class DBListClass extends ListClass
         String separator = getSeparator();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         Map<String, ListItem> map = getMap(context);
+
+        // Skip unset values.
+        if (prop == null) {
+            return;
+        }
+
         if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<String>();

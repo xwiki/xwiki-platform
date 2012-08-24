@@ -122,14 +122,14 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 ## The actual class editor
 #set($formname = 'propupdate')
 #set($saveaction = 'propupdate')
-#set($redirect = $xwiki.getRequestURL())
+#set($redirect = $xwiki.relativeRequestURL)
 ##
 ##
 <div id="document-title"><h1>$msg.get('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])</h1></div>
 #classSwitcher()
 ##
 ##
-<form id="$formname" method="post" action="$doc.getURL('preview')" onsubmit="cancelCancelEdit()">
+<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock">
 <div id="xwikieditcontent" class="clear">
 ##
 ##

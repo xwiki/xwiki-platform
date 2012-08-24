@@ -25,13 +25,11 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * 
  * @version $Id$
  * @since 4.0M1
  */
@@ -41,7 +39,7 @@ public class XarFile
 
     private Map<XarEntry, XarEntry> entries = new HashMap<XarEntry, XarEntry>();
 
-    public XarFile(File file, Collection<XarEntry> entries) throws ZipException, IOException
+    public XarFile(File file, Collection<XarEntry> entries) throws IOException
     {
         this.zipFile = new ZipFile(file);
 
@@ -62,7 +60,7 @@ public class XarFile
             throw new IOException("Failed to find entry [" + entry + "]");
         }
 
-        return this.zipFile.getInputStream(realEntry.getZipEntry());
+        return this.zipFile.getInputStream(this.zipFile.getEntry(realEntry.getEntryName()));
     }
 
     public Collection<XarEntry> getEntries()

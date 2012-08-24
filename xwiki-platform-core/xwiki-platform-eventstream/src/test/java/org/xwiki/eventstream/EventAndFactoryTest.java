@@ -48,21 +48,20 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
+@MockingRequirement(DefaultEventFactory.class)
 public class EventAndFactoryTest extends AbstractMockingComponentTestCase
 {
+    private EventFactory factory;
+
     Event defaultEvent;
 
     Event rawEvent;
 
-    @MockingRequirement
-    private DefaultEventFactory factory;
-
-    @Override
     @Before
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-        final DocumentAccessBridge mockDocumentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -72,7 +71,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
         });
 
         final ExecutionContext context = new ExecutionContext();
-        final Execution mockExecution = getComponentManager().lookup(Execution.class);
+        final Execution mockExecution = getComponentManager().getInstance(Execution.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -82,7 +81,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
         });
 
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookupComponent(EntityReferenceResolver.TYPE_STRING);
+            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING);
         getMockery().checking(new Expectations()
                     {
             {
@@ -90,6 +89,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
                 will(returnValue(new DocumentReference("xwiki", "XWiki", "Admin")));
             }
         });
+        this.factory = getComponentManager().getInstance(EventFactory.class);
         this.defaultEvent = this.factory.createEvent();
         this.rawEvent = this.factory.createRawEvent();
     }

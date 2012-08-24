@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ldap</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ldap-ui</artifactId>
   <name>XWiki Platform - LDAP - UI</name>
@@ -45,13 +45,15 @@
       <scope>runtime</scope>
     </dependency>
     <!-- The LDAP UI provides a new entry in the admin UI, and depends on it -->
+    <!-- TODO: put it back when the admin application is a real application and doesn't contain datas anymore
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration</artifactId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    -->
     <!-- The Velocity Macro is used in this application's wiki pages -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

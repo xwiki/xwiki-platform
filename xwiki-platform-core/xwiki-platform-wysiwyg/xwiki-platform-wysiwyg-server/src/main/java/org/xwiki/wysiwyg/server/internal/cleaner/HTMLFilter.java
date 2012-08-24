@@ -19,14 +19,14 @@
  */
 package org.xwiki.wysiwyg.server.internal.cleaner;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Interface used to tag WYSIWYG editor specific HTML cleaning filters.
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface HTMLFilter extends org.xwiki.xml.html.filter.HTMLFilter
 {
     /**

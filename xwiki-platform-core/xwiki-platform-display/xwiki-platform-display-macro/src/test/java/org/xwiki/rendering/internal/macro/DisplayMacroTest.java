@@ -74,8 +74,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         super.setUp();
 
         // Put a fake XWiki context on the execution context.
-        getComponentManager().lookup(Execution.class).getContext()
-            .setProperty("xwikicontext", new HashMap<Object, Object>());
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        execution.getContext().setProperty("xwikicontext", new HashMap<Object, Object>());
     }
 
     @Override
@@ -84,8 +84,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         super.registerComponents();
         
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-        this.displayMacro = (DisplayMacro) getComponentManager().lookup(Macro.class, "display");
-        this.rendererFactory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
+        this.displayMacro = (DisplayMacro) getComponentManager().getInstance(Macro.class, "display");
+        this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
@@ -294,13 +294,14 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
     private XDOM getXDOM(String content) throws Exception
     {
-        return getComponentManager().lookup(Parser.class, "xwiki/2.0").parse(new StringReader(content));
+        Parser xwiki20Parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        return xwiki20Parser.parse(new StringReader(content));
     }
 
     private List<Block> runDisplayMacroWithPreVelocity(String velocity, String displayedContent)
         throws Exception
     {
-        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer,
             "wiki:Space.DisplayingPage", velocity);
@@ -332,7 +333,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         // Create a Macro transformation context with the Macro transformation object defined so that the display
         // macro can transform displayed page which is using a new context.
         MacroTransformation macroTransformation =
-            (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
+            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext macroContext = createMacroTransformationContext(displayedDocStringRef, false);
         macroContext.setId("wiki:Space.DisplayingPage");
         macroContext.setTransformation(macroTransformation);

@@ -27,11 +27,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstallException;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
@@ -47,8 +50,13 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * @version $Id$
@@ -63,6 +71,20 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     private static final String PROPERTY_USERREFERENCE = "user.reference";
 
+    private static final String PROPERTY_CALLERREFERENCE = "caller.reference";
+
+    private static final String PROPERTY_CHECKRIGHTS = "checkrights";
+
+    /**
+     * The full name (space.page) of the XWikiPreference page.
+     */
+    private static final String XWIKIPREFERENCES_FULLNAME = "XWiki.XWikiPreferences";
+
+    /**
+     * The identifier of the programming right.
+     */
+    private static final String RIGHTS_ADMIN = "admin";
+
     @Inject
     private Packager packager;
 
@@ -73,6 +95,31 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private DocumentReferenceResolver<String> resolver;
+
+    private String getWikiFromNamespace(String namespace) throws UnsupportedNamespaceException
+    {
+        String wiki = namespace;
+
+        if (wiki != null) {
+            if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
+                wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
+            } else {
+                throw new UnsupportedNamespaceException("Unsupported namespace [" + namespace
+                    + "], only wiki:wikiid format is supported");
+            }
+        }
+
+        return wiki;
+    }
+
     // TODO: support question/answer with the UI to resolve conflicts
     @Override
     public void install(LocalExtension localExtension, String namespace, Request request) throws InstallException
@@ -80,15 +127,11 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
         // probably not be in an expected state)
         if (!request.isRemote()) {
-            String wiki = namespace;
-
-            if (wiki != null) {
-                if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
-                    wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
-                } else {
-                    throw new InstallException("Unsupported namespace [" + namespace + "], only "
-                        + WIKI_NAMESPACEPREFIX + "wikiid format is supported");
-                }
+            String wiki;
+            try {
+                wiki = getWikiFromNamespace(namespace);
+            } catch (UnsupportedNamespaceException e) {
+                throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
             install(null, localExtension, wiki, request);
@@ -103,20 +146,17 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
         // probably not be in an expected state)
         if (!request.isRemote()) {
-            String wiki = namespace;
-
-            if (wiki != null) {
-                if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
-                    wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
-                } else {
-                    throw new InstallException("Unsupported namespace [" + namespace + "], only "
-                        + WIKI_NAMESPACEPREFIX + "wikiid format is supported");
-                }
+            String wiki;
+            try {
+                wiki = getWikiFromNamespace(namespace);
+            } catch (UnsupportedNamespaceException e) {
+                throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
             XarInstalledExtension previousXarExtension;
             try {
-                previousXarExtension = (XarInstalledExtension) this.xarRepository.resolve(previousLocalExtension.getId());
+                previousXarExtension =
+                    (XarInstalledExtension) this.xarRepository.resolve(previousLocalExtension.getId());
             } catch (ResolveException e) {
                 // Not supposed to be possible
                 throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
@@ -174,15 +214,11 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // Only remove XAR when it's a local order (otherwise it will be deleted several times and the wiki will
         // probably not be in an expected state)
         if (!request.isRemote()) {
-            String wiki = namespace;
-
-            if (wiki != null) {
-                if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
-                    wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
-                } else {
-                    throw new UninstallException("Unsupported namespace [" + namespace + "], only "
-                        + WIKI_NAMESPACEPREFIX + "wikiid format is supported");
-                }
+            String wiki;
+            try {
+                wiki = getWikiFromNamespace(namespace);
+            } catch (UnsupportedNamespaceException e) {
+                throw new UninstallException("Failed to extract wiki id from namespace", e);
             }
 
             // TODO: delete pages from the wiki which belong only to this extension (several extension could have some
@@ -212,11 +248,12 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setMergeConfiguration(mergeConfiguration);
 
         configuration.setInteractive(request.isInteractive());
-        configuration.setUser((DocumentReference) request.getProperty(PROPERTY_USERREFERENCE));
+        configuration.setUser(getRequestUserReference(PROPERTY_USERREFERENCE, request));
         configuration.setWiki(wiki);
+        configuration.setLogEnabled(true);
 
         try {
-            Job currentJob = this.componentManager.<JobContext> lookupComponent(JobContext.class).getCurrentJob();
+            Job currentJob = this.componentManager.<JobContext> getInstance(JobContext.class).getCurrentJob();
             if (currentJob != null) {
                 configuration.setJobStatus(currentJob.getStatus());
             }
@@ -225,5 +262,124 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         return configuration;
+    }
+
+    private DocumentReference getRequestUserReference(String property, Request request)
+    {
+        Object obj = request.getProperty(property);
+
+        if (obj instanceof DocumentReference) {
+            return (DocumentReference) obj;
+        }
+
+        return null;
+    }
+
+    private String getRequestUserString(String property, Request request)
+    {
+        String str = null;
+
+        if (request.containsProperty(property)) {
+            DocumentReference reference = getRequestUserReference(property, request);
+
+            if (reference != null) {
+                str = this.serializer.serialize(reference);
+            } else {
+                str = XWikiRightService.GUEST_USER_FULLNAME;
+            }
+        }
+
+        return str;
+    }
+
+    // Check
+
+    private boolean hasAccessLevel(String wiki, String right, String document, Request request) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        boolean hasAccess = true;
+
+        String currentWiki = xcontext.getDatabase();
+        try {
+            xcontext.setDatabase(wiki != null ? wiki : xcontext.getMainXWiki());
+
+            String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
+            if (caller != null) {
+                hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, caller, document, xcontext);
+            }
+
+            if (hasAccess) {
+                String user = getRequestUserString(PROPERTY_USERREFERENCE, request);
+                if (user != null) {
+                    hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, user, document, xcontext);
+                }
+            }
+        } finally {
+            xcontext.setDatabase(currentWiki);
+        }
+
+        return hasAccess;
+    }
+
+    @Override
+    public void checkInstall(Extension extension, String namespace, Request request) throws InstallException
+    {
+        String wiki;
+        try {
+            wiki = getWikiFromNamespace(namespace);
+        } catch (UnsupportedNamespaceException e) {
+            throw new InstallException("Failed to extract wiki id from namespace", e);
+        }
+
+        // TODO: check for edit right on each page of the extension ?
+
+        if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
+            try {
+                if (!hasAccessLevel(wiki, RIGHTS_ADMIN, XWIKIPREFERENCES_FULLNAME, request)) {
+                    if (namespace == null) {
+                        throw new InstallException(String.format("Admin right is required to install extension [%s]",
+                            extension.getId()));
+                    } else {
+                        throw new InstallException(String.format(
+                            "Admin right is required to install extension [%s] on namespace [%s]", extension.getId(),
+                            namespace));
+                    }
+                }
+            } catch (XWikiException e) {
+                throw new InstallException("Failed to check rights", e);
+            }
+        }
+    }
+
+    @Override
+    public void checkUninstall(InstalledExtension extension, String namespace, Request request)
+        throws UninstallException
+    {
+        String wiki;
+        try {
+            wiki = getWikiFromNamespace(namespace);
+        } catch (UnsupportedNamespaceException e) {
+            throw new UninstallException("Failed to extract wiki id from namespace", e);
+        }
+
+        // TODO: check for delete right on each page of the extension ?
+
+        if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
+            try {
+                if (!hasAccessLevel(wiki, RIGHTS_ADMIN, XWIKIPREFERENCES_FULLNAME, request)) {
+                    if (namespace == null) {
+                        throw new UninstallException(String.format(
+                            "Admin right is required to uninstall extension [%s]", extension.getId()));
+                    } else {
+                        throw new UninstallException(String.format(
+                            "Admin right is required to uninstall extension [%s] from namespace [%s]",
+                            extension.getId(), namespace));
+                    }
+                }
+            } catch (XWikiException e) {
+                throw new UninstallException("Failed to check rights", e);
+            }
+        }
     }
 }

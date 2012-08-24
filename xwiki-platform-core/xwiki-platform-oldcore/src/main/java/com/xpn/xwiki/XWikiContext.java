@@ -355,11 +355,7 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
     }
 
-    /**
-     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
-     */
-    @Deprecated
-    public void setUser(String user, boolean main)
+    private void setUserInternal(String user, boolean main)
     {
         if (user == null) {
             setUserReference(null);
@@ -388,7 +384,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     @Deprecated
     public void setUser(String user)
     {
-        setUser(user, false);
+        setUserInternal(user, false);
     }
 
     /**
@@ -574,20 +570,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     public BaseClass getBaseClass(DocumentReference documentReference)
     {
         return this.classCache.get(documentReference);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #getBaseClass(DocumentReference)}
-     */
-    // Used to avoid recursive loading of documents if there are recursives usage of classes
-    @Deprecated
-    public BaseClass getBaseClass(String name)
-    {
-        BaseClass baseClass = null;
-        if (StringUtils.isNotEmpty(name)) {
-            baseClass = this.classCache.get(this.currentMixedDocumentReferenceResolver.resolve(name));
-        }
-        return baseClass;
     }
 
     /**

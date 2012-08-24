@@ -80,6 +80,11 @@ public class Annotation
     public static final String DATE_FIELD = "date";
 
     /**
+     * The name of the field of this annotation's reference to the target content.
+     */
+    public static final String TARGET_FIELD = "target";
+
+    /**
      * The unique identifier of this annotation, which should be unique among all the annotations on the same target.
      */
     protected final String id;

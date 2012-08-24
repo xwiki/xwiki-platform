@@ -54,7 +54,7 @@ public class DefaultPasswordCryptoServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.service = getComponentManager().lookup(PasswordCryptoService.class);
+        this.service = getComponentManager().getInstance(PasswordCryptoService.class);
     }
 
     @Test

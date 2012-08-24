@@ -46,8 +46,10 @@ public class HeadingNameNamingCriterionTest extends AbstractRefactoringTestCase
     public void testDocumentNamesGeneration() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Heading="));
-        NamingCriterion namingCriterion = new HeadingNameNamingCriterion("Test.Test", docBridge,
-            getComponentManager().lookup(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString()), false);
+        BlockRenderer plainSyntaxBlockRenderer =
+            getComponentManager().getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
+        NamingCriterion namingCriterion =
+            new HeadingNameNamingCriterion("Test.Test", docBridge, plainSyntaxBlockRenderer, false);
         Block sectionBlock = xdom.getChildren().get(0);
         // Test normal heading-name naming
         Assert.assertEquals("Test.Heading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));

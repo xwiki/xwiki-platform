@@ -93,7 +93,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         throws AccessDeniedException
     {
         try {
-            if (!hasSecurityAccess(right, userReference, entityReference)) {
+            if (!hasSecurityAccess(right, userReference, entityReference, true)) {
                 throw new AccessDeniedException(userReference, entityReference);
             }
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
     {
         try {
-            return hasSecurityAccess(right, userReference, entityReference);
+            return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
             this.logger.error("Failed to load rights for user {}.", userReference, e);
             return false;
@@ -121,10 +121,13 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      * @param right the right to check .
      * @param userReference the user to check the right for
      * @param entityReference the entity on which to check the right
+     * @param check if true logging of denied access are made through {@link #logDeny} (at info level), and all
+     *              access logging are marked as security checkpoint.
      * @return {@code true} if the user has the specified right on the entity.
      * @throws AuthorizationException if an error occurs.
      */
-    private boolean hasSecurityAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+    private boolean hasSecurityAccess(Right right, DocumentReference userReference, EntityReference entityReference,
+        boolean check)
         throws AuthorizationException
     {
         if (userReference == null) {
@@ -151,7 +154,12 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         );
 
         RuleState access = securityAccess.get(right);
-        logAccess(access, userReference, entityReference, right, "access checked");
+        String info = check ? "security checkpoint" : "access inquiry";
+        if (check && access != RuleState.ALLOW) {
+            logDeny(userReference, entityReference, right, info);
+        } else {
+            logAccess(access, userReference, entityReference, right, info, true);
+        }
         return access == RuleState.ALLOW;
     }
 
@@ -197,7 +205,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                 }
                 return access;
             }
-            if (!entry.isEmpty()) {
+            if (!entry.isEmpty() || ref.getParentSecurityReference() == null) {
                 SecurityAccessEntry accessEntry = securityCache.get(user, ref);
                 if (accessEntry == null) {
                     SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
@@ -223,38 +231,41 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             } 
         }
 
-        logger.debug("4. Returning default access level.");
+        logger.debug("4. Returning default access level.  (This should never be reached!)");
         return XWikiSecurityAccess.getDefaultAccess();
     }
 
     /**
-     * Log allow conclusion.
+     * Log access conclusion.
      * @param access The ALLOW or DENY state
      * @param user The user name that was checked.
      * @param entity The page that was checked.
      * @param right The action that was requested.
      * @param info Additional information.
+     * @param debugLevel If true, is made at debug level, else logging is made at info level.
      */
-    private void logAccess(RuleState access, DocumentReference user, EntityReference entity, Right right, String info)
+    private void logAccess(RuleState access, DocumentReference user, EntityReference entity, Right right, String info,
+        boolean debugLevel)
     {
-        if ((access == RuleState.ALLOW && logger.isDebugEnabled())
-            || (access != RuleState.ALLOW && logger.isInfoEnabled())) {
+        if ((debugLevel && logger.isDebugEnabled()) || (!debugLevel && logger.isInfoEnabled())) {
             String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "no user";
             String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : "no entity";
             String rightName = (right != null) ? right.getName() : "no right";
+            String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
+            String message = "Access has been %s for (%s,%s,%s): %s";
             Formatter f = new Formatter();
-            if (access == RuleState.ALLOW) {
-                logger.debug(f.format("Access has been granted for (%s,%s,%s): %s",
-                    userName, docName, rightName, info).toString());
+            if (debugLevel) {
+                logger.debug(f.format(message, accessName, userName, docName, rightName, info).toString());
             } else {
-                logger.info(f.format("Access has been denied for (%s,%s,%s): %s",
-                    userName, docName, rightName, info).toString());
+                logger.info(f.format(message, accessName, userName, docName, rightName, info).toString());
             }
         }
     }
 
     /**
-     * Log deny conclusion.
+     * Log denied access conclusion.
+     * All denied access conclusion made during a security checkpoint use this method.
+     *
      * @param user The user name that was checked.
      * @param entity The page that was checked.
      * @param right The action that was requested.
@@ -262,6 +273,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      */
     protected void logDeny(DocumentReference user, EntityReference entity,  Right right, String info)
     {
-        logAccess(RuleState.DENY, user, entity, right, info);
+        logAccess(RuleState.DENY, user, entity, right, info, false);
     }
 }

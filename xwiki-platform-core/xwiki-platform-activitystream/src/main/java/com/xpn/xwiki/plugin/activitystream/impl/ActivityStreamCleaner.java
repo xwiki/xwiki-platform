@@ -174,11 +174,10 @@ public final class ActivityStreamCleaner
             doc = context.getWiki().getDocument(CLEANER_JOB_DOCNAME, context);            
             needsUpdate = setCleanerCommonDocumentsFields(doc);       
             
-            job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
+            job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             if (job == null) {
                 needsUpdate = true;
-                int index = doc.createNewObject(SchedulerPlugin.XWIKI_JOB_CLASS, context);
-                job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, index);
+                job = doc.newXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, context);
                 job.setStringValue("jobName", CLEANER_JOB_NAME);
                 job.setStringValue("jobClass", ActivityStreamCleanerJob.class.getName());
                 job.setStringValue("cron", CLEANER_JOB_CRON);

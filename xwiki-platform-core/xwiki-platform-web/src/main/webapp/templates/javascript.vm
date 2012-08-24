@@ -13,14 +13,15 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
 $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
-$xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $context.language})
+$xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})
+$xwiki.jsfx.use('uicomponents/model/entityReference.js')
 $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)
 $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)
 $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
 $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
 $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
-$xwiki.jsfx.use('uicomponents/suggest/suggest.js')
+$xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
@@ -59,6 +60,7 @@ XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";
 XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
+XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
@@ -69,66 +71,18 @@ window.docsaveurl = "${doc.getURL('save')}";
 window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
-#if(($xcontext.action=="inline")||($xcontext.action=="edit") || ($xcontext.action=="admin"))
+#set($editActions = ['edit', 'inline', 'admin'])
+#if($editActions.contains($xcontext.action))
+$xwiki.get('jsfx').use('uicomponents/lock/lock.js')
 $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
-<script type="text/javascript">
-// <![CDATA[
-var cancelEditNextOnunload;
-var cancelCancelEditFlag = true;
-var lockEditFlag = false;
-
-function cancelEditResponse() {
-}
-
-function cancelEdit() {
-  if (cancelCancelEditFlag) {
-    var surl = "$doc.getExternalURL('cancel', 'ajax=1')";
-    var myAjax = new Ajax.Request(surl, {
-      method: 'get',
-      parameters: "",
-      asynchronous: true,
-      discardResponse: true
-    });
-    cancelCancelEditFlag = false;
-  }
-  if (cancelEditNextOnunload) {
-    cancelEditNextOnunload();
-  }
-}
-
-function lockEdit() {
-  if (!lockEditFlag) {
-#if ($xcontext.action == 'inline')
-    var surl = "$doc.getExternalURL('lock', "action=inline&ajax=1&${docvariant.replace('&amp;', '&')}")";
-#else
-    var surl = "$doc.getExternalURL('lock', "ajax=1&${docvariant.replace('&amp;', '&')}")";
-#end
-    var myAjax = new Ajax.Request(surl, {
-      method: 'get',
-      parameters: "",
-      asynchronous: true
-    });
-    lockEditFlag = false;
-  }
-}
-
-function prepareCancelEdit() {
-  lockEdit();
-}
-function cancelCancelEdit() {
-  cancelCancelEditFlag = false;
-}
-Event.observe(window, "unload", cancelEdit);
-Event.observe(window, "pagehide", cancelEdit);
-Event.observe(document, "dom:loaded", prepareCancelEdit);
-// ]]>
-</script>
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions
 ##
-## - Skin file extension hook. Placed first since skin extensions might need to have xwiki or external libraries included first to be able to work properly
+## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+<!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
+## - Skin file extension hook.
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
 ## - Skin extension hook
 <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
@@ -137,3 +91,5 @@ Event.observe(document, "dom:loaded", prepareCancelEdit);
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
 ##
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>

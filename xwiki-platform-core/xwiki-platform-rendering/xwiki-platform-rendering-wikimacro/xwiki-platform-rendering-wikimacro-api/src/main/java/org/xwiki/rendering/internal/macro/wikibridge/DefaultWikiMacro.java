@@ -109,6 +109,11 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     private DocumentReference macroDocumentReference;
 
     /**
+     * User to be used to check rights for the macro.
+     */
+    private DocumentReference macroAuthor;
+
+    /**
      * Whether this macro supports inline mode or not.
      */
     private boolean supportsInlineMode;
@@ -139,10 +144,12 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
      * @param componentManager {@link ComponentManager} component used to look up for other components.
      * @since 2.3M1
      */
-    public DefaultWikiMacro(DocumentReference macroDocumentReference, boolean supportsInlineMode,
-        MacroDescriptor descriptor, XDOM macroContent, Syntax syntax, ComponentManager componentManager)
+    public DefaultWikiMacro(DocumentReference macroDocumentReference, DocumentReference macroAuthor,
+        boolean supportsInlineMode, MacroDescriptor descriptor, XDOM macroContent, Syntax syntax,
+        ComponentManager componentManager)
     {
         this.macroDocumentReference = macroDocumentReference;
+        this.macroAuthor = macroAuthor;
         this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
         this.content = macroContent;
@@ -169,7 +176,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Extension point to add more wiki macro bindings
         try {
             List<WikiMacroBindingInitializer> bindingInitializers =
-                this.componentManager.lookupList(WikiMacroBindingInitializer.class);
+                this.componentManager.getInstanceList(WikiMacroBindingInitializer.class);
 
             for (WikiMacroBindingInitializer bindingInitializer : bindingInitializers) {
                 bindingInitializer.initialize(this.macroDocumentReference, parameters, macroContent, context,
@@ -182,16 +189,16 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Execute the macro
         ObservationManager observation = null;
         try {
-            observation = this.componentManager.lookup(ObservationManager.class);
+            observation = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             // TODO: maybe log something
         }
 
         try {
-            Transformation macroTransformation = this.componentManager.lookup(Transformation.class, MACRO_HINT);
+            Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, MACRO_HINT);
 
             // Place macro context inside xwiki context ($context.macro).
-            Execution execution = this.componentManager.lookup(Execution.class);
+            Execution execution = this.componentManager.getInstance(Execution.class);
             Map<String, Object> xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
             xwikiContext.put(MACRO_KEY, macroBinding);
 
@@ -353,6 +360,12 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     public DocumentReference getDocumentReference()
     {
         return this.macroDocumentReference;
+    }
+
+    @Override
+    public DocumentReference getAuthorReference()
+    {
+        return this.macroAuthor;
     }
 
     @Override

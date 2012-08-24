@@ -23,8 +23,10 @@ import java.util.Properties;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -34,18 +36,18 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.6RC1
  */
+@MockingRequirement(XWikiMacroTransformationConfiguration.class)
 public class XWikiMacroTransformationConfigurationTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private XWikiMacroTransformationConfiguration configuration;
+    private MacroTransformationConfiguration configuration;
 
     private ConfigurationSource source;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
-        this.source = getComponentManager().lookup(ConfigurationSource.class);
+        this.source = getComponentManager().getInstance(ConfigurationSource.class);
+        this.configuration = getComponentManager().getInstance(MacroTransformationConfiguration.class);
     }
 
     @Test

@@ -23,11 +23,16 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.io.output.ProxyOutputStream;
+import org.xwiki.environment.Environment;
+import org.xwiki.store.UnexpectedException;
 
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
@@ -75,29 +80,29 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent()
     {
-        this.newFileItem();
+        this.file = this.getNewFileItem();
     }
 
     /**
-     * Set a new FileItem for storage.
-     * 
-     * @since 2.6M1
+     * @since 4.1M3
+     * @return a new FileItem for temporarily storing attachment content.
      */
-    private void newFileItem()
+    private static FileItem getNewFileItem()
     {
-        String tempFileLocation = System.getProperty("java.io.tmpdir");
-        // TODO try to get a different temp file location.
+        final Environment env = Utils.getComponent(Environment.class);
+        final File dir = new File(env.getTemporaryDirectory(), "attachment-cache");
         try {
-            final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, new File(tempFileLocation));
+            if (!dir.mkdirs() && !dir.exists()) {
+                throw new UnexpectedException("Failed to create directory for attachments " + dir);
+            }
+            final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, dir);
             // This causes the temp file to be created.
             dfi.getOutputStream();
             // Make sure this file is marked for deletion on VM exit because DiskFileItem does not.
             dfi.getStoreLocation().deleteOnExit();
-            this.file = dfi;
+            return dfi;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create new attachment temporary file."
-                + " Are you sure you have permission to write to "
-                + tempFileLocation + "?", e);
+            throw new UnexpectedException("Failed to create new attachment temporary file.", e);
         }
     }
 
@@ -210,6 +215,39 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
+     * Set the content of the attachment by writing to a provided OutputStream.
+     * Content is *not* appended, this method clears the content and creates new content.
+     * If you want to append content, you can call {@link #getContentInputStream()} and copy
+     * the content of that into the provided OutputStream. Before closing this OutputStream
+     * the content will remain the old content prior to the change.
+     *
+     * @return an OutputStream into which the caller can set the content of the attachments.
+     * @since 4.2M3
+     */
+    public OutputStream getContentOutputStream()
+    {
+        final FileItem fi = getNewFileItem();
+        final XWikiAttachmentContent xac = this;
+        final OutputStream fios;
+        try {
+            fios = fi.getOutputStream();
+        } catch (IOException e) {
+            // DiskFileItem does not do anything which could cause an exception to be thrown.
+            // so unless it is modified, this should not happen.
+            throw new RuntimeException("Exception getting attachment OutputStream.", e);
+        }
+        return (new ProxyOutputStream(fios) {
+            @Override
+            public void close() throws IOException
+            {
+                super.close();
+                xac.file = fi;
+                xac.setContentDirty(true);
+            }
+        });
+    }
+
+    /**
      * Set the content of the attachment from a portion of an InputStream.
      * 
      * @param is the input stream that will be read
@@ -233,7 +271,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is) throws IOException
     {
-        this.newFileItem();
+        this.file = this.getNewFileItem();
         IOUtils.copy(is, this.file.getOutputStream());
         this.setContentDirty(true);
 

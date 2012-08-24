@@ -23,9 +23,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
-@ComponentRole
+@Role
 public interface ServletContainerInitializer
 {
     void initializeRequest(HttpServletRequest request, Object xwikiContext)

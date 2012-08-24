@@ -19,10 +19,8 @@
  */
 package org.xwiki.chart.internal.plot;
 
-import java.util.Map;
-
-import org.jfree.chart.renderer.xy.XYAreaRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.category.AreaRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 
 /**
  * A {@link PlotGenerator} for generating area charts.
@@ -30,11 +28,11 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
  * @version $Id$
  * @since 2.0M1
  */
-public class AreaPlotGenerator extends AbstractXYPlotGenerator
-{    
+public class AreaPlotGenerator extends AbstractCategoryPlotGenerator
+{
     @Override
-    protected XYItemRenderer getXYItemRenderer(Map<String, String> parameters)
+    protected CategoryItemRenderer getRenderer()
     {
-        return new XYAreaRenderer();
-    }   
+        return new AreaRenderer();
+    }
 }

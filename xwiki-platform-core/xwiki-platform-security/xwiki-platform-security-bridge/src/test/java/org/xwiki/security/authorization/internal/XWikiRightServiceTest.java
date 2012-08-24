@@ -19,181 +19,109 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.Collections;
-
-import org.jmock.Expectations;
-import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.observation.EventListener;
+import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
+import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.security.authorization.AuthorizationManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 import junit.framework.Assert;
-
-import static java.util.Arrays.asList;
-import static org.xwiki.security.authorization.Right.ADMIN;
-import static org.xwiki.security.authorization.Right.PROGRAM;
-import static org.xwiki.security.authorization.Right.VIEW;
-
-import org.xwiki.environment.Environment;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
  * 
  * @version $Id$
  */
-public class XWikiRightServiceTest extends AbstractTestCase
+public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 {
-    /**
-     * Prefix for generating full user names.
-     */
-    private static final String XWIKI_SPACE_PREFIX = "XWiki.";
 
-    /**
-     * The Superadmin full name.
-     */
-    private static final String SUPERADMIN_USER_FULLNAME = XWIKI_SPACE_PREFIX + AuthorizationManager.SUPERADMIN_USER;
-
-    /**
-     * The Guest username.
-     */
-    private static final String GUEST_USER = "XWikiGuest";
-
-    /**
-     * The Guest full name.
-     */
-    private static final String GUEST_USER_FULLNAME = XWIKI_SPACE_PREFIX + GUEST_USER;
-
-
-    /**
-     * String document reference resolver.
-     */
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    private XWikiContext getContext()
+    @Test
+    public void testUserFromAnotherWiki1() throws Exception
     {
-        return xwikiContext;
-    }
+        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki1.xml");
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        getComponentManager().unregisterComponent(Environment.class, "default");
-        documentReferenceResolver = getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING);
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+
+        // TODO: Here we have a mismatch.
+
+        assertAccessLevelFalseExpectedDifference("User from another wiki has right on a local wiki",
+                                                 "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+
     }
 
     @Test
-    public void testHasAccessLevelWhithUserFromAnotherWiki() throws XWikiException
+    public void testUserFromAnotherWiki2() throws Exception
     {
-        final MockDocument doc = new MockDocument(documentReferenceResolver.resolve("wiki2:Space.Page"), "xwiki:XWiki.Admin");
+        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml");
 
-        MockDocument preferences = new MockDocument(documentReferenceResolver.resolve("wiki2:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
-        final XWikiRightService rightService = new XWikiCachingRightService();
+        XWikiContext ctx = testWiki.getXWikiContext();
 
-        final XWikiDocument user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
-        final XWikiDocument group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
+        ctx.setDatabase("wiki");
 
-        wiki.add(doc).add(preferences);
+        assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
+                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockGroupService)
-                .getAllGroupsReferencesForMember(user.getDocumentReference(), 0, 0, xwikiContext);
-            will(Expectations.returnValue(asList(group.getDocumentReference())));
-        }});
+        ctx.setDatabase("wiki2");
 
-        getContext().setDatabase("wiki");
+        assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
+                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        Assert.assertFalse("User from another wiki has right on a local wiki", rightService.hasAccessLevel("view",
-            user.getPrefixedFullName(), doc.getPrefixedFullName(), getContext()));
+        assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
+                              "view", "wiki:XWiki.user", "Space.Page", ctx);
 
-        // direct user rights
+    }
 
-        preferences.allowGlobal(asList(VIEW), asList(user.getPrefixedFullName()), Collections.<String>emptyList());
+    @Test
+    public void testGroupFromAnotherWiki1() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("groupFromAnotherWiki1.xml");
 
-        ((EventListener) rulesInvalidator).onEvent(null, preferences, null);
+        XWikiContext ctx = testWiki.getXWikiContext();
 
-        getContext().setDatabase(user.getWikiName());
+        ctx.setDatabase("wiki");
 
-        Assert.assertTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getPrefixedFullName(),
-                getContext()));
-        Assert.assertTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
-            rightService.hasAccessLevel("view", user.getFullName(), doc.getPrefixedFullName(),
-                getContext()));
+        assertAccessLevelTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
+                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        getContext().setDatabase(doc.getWikiName());
+        assertAccessLevelTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
+                              "view", "XWiki.user", "wiki2:Space.Page", ctx);
 
-        Assert.assertTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getPrefixedFullName(),
-                getContext()));
-        Assert.assertTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getFullName(),
-                getContext()));
 
-        // user group rights
+        ctx.setDatabase("wiki2");
 
-        
+        assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
+                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        preferences = new MockDocument(documentReferenceResolver.resolve("wiki2:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
-        preferences.allowGlobal(asList(VIEW), Collections.<String>emptyList(), asList(group.getPrefixedFullName()));
-        wiki.add(preferences);
-        
-        ((EventListener) rulesInvalidator).onEvent(null, preferences, null);
+        assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
+                              "view", "wiki:XWiki.user", "Space.Page", ctx);
 
-        getContext().setDatabase(user.getWikiName());
+    }
 
-        Assert.assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getPrefixedFullName(),
-                getContext()));
-        Assert.assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
-            rightService.hasAccessLevel("view", user.getFullName(), doc.getPrefixedFullName(),
-                getContext()));
+    @Test
+    public void testWikiOwnerFromAnotherWiki() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml");
 
-        getContext().setDatabase(doc.getWikiName());
+        XWikiContext ctx = testWiki.getXWikiContext();
 
-        Assert
-            .assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
-                rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getPrefixedFullName(),
-                    getContext()));
-        Assert
-            .assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
-                rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getFullName(),
-                    getContext()));
+        ctx.setDatabase("wiki");
 
-        // user is wiki owner
+        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from user wiki",
+                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        preferences = new MockDocument(documentReferenceResolver.resolve("wiki2:XWiki.XWikiPreferences"), "xwiki:XWiki.Admin");
-        wiki.add(preferences);
+        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from user wiki",
+                          "view", "XWiki.user", "wiki2:Space.Page", ctx);
 
-        ((EventListener) rulesInvalidator).onEvent(null, preferences, null);
+        ctx.setDatabase("wiki2");
 
-        wiki.setWikiOwner(doc.getWikiName(), user.getPrefixedFullName());
+        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from local wiki",
+                          "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        getContext().setDatabase(user.getWikiName());
+        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from local wiki",
+                          "view", "wiki:XWiki.user", "Space.Page", ctx);
 
-        Assert.assertTrue("Wiki owner from another wiki does not have right on a local wiki when tested from user wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getPrefixedFullName(),
-                getContext()));
-        Assert.assertTrue(
-            "Wiki owner group from another wiki does not have right on a local wiki when tested from user wiki",
-            rightService.hasAccessLevel("view", user.getFullName(), doc.getPrefixedFullName(),
-                getContext()));
-
-        getContext().setDatabase(doc.getWikiName());
-
-        Assert.assertTrue(
-            "Wiki owner group from another wiki does not have right on a local wiki when tested from local wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getPrefixedFullName(),
-                getContext()));
-        Assert.assertTrue(
-            "Wiki owner group from another wiki does not have right on a local wiki when tested from local wiki",
-            rightService.hasAccessLevel("view", user.getPrefixedFullName(), doc.getFullName(),
-                getContext()));
     }
 
     /**
@@ -201,49 +129,58 @@ public class XWikiRightServiceTest extends AbstractTestCase
      * @throws com.xpn.xwiki.XWikiException on error
      */
     @Test
-    public void testProgrammingRightsWhenNoContextDocumentIsSet() throws XWikiException
+    public void testProgrammingRightsWhenNoContextDocumentIsSet() throws Exception
     {
-        final XWikiRightService rightService = new XWikiCachingRightService();
-        // Setup an XWikiPreferences document granting programming rights to XWiki.Programmer
-        MockDocument prefs = new MockDocument(documentReferenceResolver.resolve("XWiki.XWikiPreferences"), "XWiki.Admin");
-        prefs.allowGlobal(asList(PROGRAM, ADMIN), asList("XWiki.Programmer"), Collections.<String>emptyList());
-        wiki.add(prefs);
+        LegacyTestWiki testWiki = newTestWiki("programmingRights.xml");
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockGroupService)
-                .getAllGroupsReferencesForMember(
-                    new DocumentReference("xwiki", XWikiConstants.WIKI_SPACE, XWikiConstants.GUEST_USER),
-                    0, 0, xwikiContext);
-            will(Expectations.returnValue(Collections.emptyList()));
-            allowing(mockGroupService)
-                .getAllGroupsReferencesForMember(
-                    new DocumentReference("xwiki", XWikiConstants.WIKI_SPACE, "Programmer"),
-                    0, 0, xwikiContext);
-            will(Expectations.returnValue(Collections.emptyList()));
-            allowing(mockGroupService)
-                .getAllGroupsReferencesForMember(
-                    new DocumentReference("xwiki", XWikiConstants.WIKI_SPACE, "superadmin"),
-                    0, 0, xwikiContext);
-            will(Expectations.returnValue(Collections.emptyList()));
-        }});
+        XWikiContext ctx = testWiki.getXWikiContext();
 
-        // Setup the context (no context document)
-        getContext().setMainXWiki("xwiki");
-        
-        getContext().remove("doc");
-        getContext().remove("sdoc");
-        getContext().setDatabase("xwiki");
+        ctx.setDatabase("wiki");
+
+        setContext(ctx);
+
+        testWiki.setSdoc(null);
 
         // XWiki.Programmer should have PR, as per the global rights.
-        getContext().setUser("XWiki.Programmer");
-        Assert.assertTrue(rightService.hasProgrammingRights(getContext()));
+        testWiki.setUser("XWiki.programmer");
+        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
         // Guests should not have PR
-        getContext().setUser(XWikiConstants.GUEST_USER_FULLNAME);
-        Assert.assertFalse(rightService.hasProgrammingRights(getContext()));
+        testWiki.setUser(XWikiConstants.GUEST_USER_FULLNAME);
+        Assert.assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
+        Assert.assertFalse(getCachingImpl().hasProgrammingRights(ctx));
 
         // superadmin should always have PR
-        getContext().setUser(XWikiConstants.WIKI_SPACE + '.' + AuthorizationManager.SUPERADMIN_USER);
-        Assert.assertTrue(rightService.hasProgrammingRights(getContext()));
+        testWiki.setUser(XWikiConstants.WIKI_SPACE + '.' + AuthorizationManager.SUPERADMIN_USER);
+        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+
+    }
+
+    @Test
+    public void testGuestRightsOnEmptyWiki() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("empty.xml");
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+
+        ctx.setDatabase("xwiki");
+
+        assertAccessLevelTrue("Guest does not have view right on empty wiki.",
+                              "view", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrue("Guest does not have edit right on empty wiki.",
+                              "edit", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrue("Guest does not have delete right on empty wiki.",
+                              "delete", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrue("Guest does not have admin right on empty wiki.",
+                              "admin", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
+        assertAccessLevelTrueExpectedDifference("Guest does not have programming right on empty wiki.",
+                              "programming", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+        
     }
 }

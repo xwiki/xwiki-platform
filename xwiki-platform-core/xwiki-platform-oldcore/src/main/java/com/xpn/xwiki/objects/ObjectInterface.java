@@ -26,9 +26,10 @@ import org.dom4j.Element;
 
 public interface ObjectInterface extends ElementInterface
 {
-    public BaseClass getxWikiClass(XWikiContext context) throws XWikiException;
-
-    // public void setxWikiClass(BaseClass xWikiClass);
+    /**
+     * @since 4.0M1
+     */
+    public BaseClass getXClass(XWikiContext context) throws XWikiException;
 
     public PropertyInterface get(String name) throws XWikiException;
 

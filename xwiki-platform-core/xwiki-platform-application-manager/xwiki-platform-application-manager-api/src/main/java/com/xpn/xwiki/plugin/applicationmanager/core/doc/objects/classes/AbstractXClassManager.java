@@ -367,7 +367,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 needsUpdate = true;
             }
 
-            this.baseClass = doc.getxWikiClass();
+            this.baseClass = doc.getXClass();
 
             needsUpdate |= updateBaseClass(this.baseClass);
 

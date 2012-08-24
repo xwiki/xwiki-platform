@@ -51,7 +51,7 @@ public class DefaultDocumentAccessBridgeTest extends AbstractBridgedXWikiCompone
         getContext().setURLFactory((XWikiURLFactory) mockURLFactory.proxy());
         getContext().setWiki((XWiki) mockXWiki.proxy());
 
-        this.documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        this.documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
     }
 
     public void testGetUrlEmptyDocument()

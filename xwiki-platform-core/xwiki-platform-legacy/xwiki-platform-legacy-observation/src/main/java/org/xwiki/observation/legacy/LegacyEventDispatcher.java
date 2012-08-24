@@ -122,7 +122,7 @@ public class LegacyEventDispatcher implements EventListener
             return this.observationManager;
         }
         try {
-            this.observationManager = this.componentManager.lookup(ObservationManager.class);
+            this.observationManager = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to lookup observation manager", e);
         }

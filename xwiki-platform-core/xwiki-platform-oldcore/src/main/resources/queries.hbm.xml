@@ -25,7 +25,7 @@
   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
   <query name="getSpaceDocsName">
-    select distinct doc.name from XWikiDocument doc where doc.space=:space and (doc.hidden &lt;&gt; true or doc.hidden is null) order by doc.name asc
+    select distinct doc.name from XWikiDocument doc where doc.space=:space order by doc.name asc
   </query>
   <query name="getAllSpaceDocuments">
     select distinct doc.name from XWikiDocument doc where doc.space=:space
@@ -37,7 +37,7 @@
     select distinct doc.fullName from XWikiDocument as doc
   </query>
   <query name="getAllPublicDocuments">
-    select distinct doc.fullName from XWikiDocument as doc where (doc.hidden &lt;&gt; true or doc.hidden is null)
+    select distinct doc.fullName from XWikiDocument as doc
   </query>
   <query name="listGroupsForUser">
     select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj, StringProperty as prop

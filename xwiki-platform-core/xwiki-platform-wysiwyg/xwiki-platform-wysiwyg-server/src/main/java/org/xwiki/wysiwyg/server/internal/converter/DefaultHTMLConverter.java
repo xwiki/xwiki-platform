@@ -122,7 +122,8 @@ public class DefaultHTMLConverter implements HTMLConverter
             // Parse & Render
             // Note that transformations are not executed when converting XHTML to source syntax.
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRendererFactory printRendererFactory = componentManager.lookup(PrintRendererFactory.class, syntaxId);
+            PrintRendererFactory printRendererFactory =
+                componentManager.getInstance(PrintRendererFactory.class, syntaxId);
             xhtmlStreamParser.parse(new StringReader(html), printRendererFactory.createRenderer(printer));
 
             return printer.toString();
@@ -137,7 +138,7 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Parse
-            Parser parser = componentManager.lookup(Parser.class, syntaxId);
+            Parser parser = componentManager.getInstance(Parser.class, syntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
             // Execute macro transformations

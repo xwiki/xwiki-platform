@@ -71,7 +71,7 @@ public class LDAPProfileXClass
 
         XWikiDocument ldapClassDoc = context.getWiki().getDocument(LDAP_XCLASS, context);
 
-        this.ldapClass = ldapClassDoc.getxWikiClass();
+        this.ldapClass = ldapClassDoc.getXClass();
 
         boolean needsUpdate = this.ldapClass.addTextField(LDAP_XFIELD_DN, LDAP_XFIELDPN_DN, 80);
         needsUpdate |= this.ldapClass.addTextField(LDAP_XFIELD_UID, LDAP_XFIELDPN_UID, 80);

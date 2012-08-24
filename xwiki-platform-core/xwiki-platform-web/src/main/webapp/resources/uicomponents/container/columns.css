@@ -1,6 +1,9 @@
 ## get the number of columns from the parameter
-#set($columns = "$request.columns")
-#set($columnsNumber = $util.parseInt("$!columns"))
+#set ($columns = "$!request.columns")
+#set ($columnsNumber = $mathtool.toInteger($columns))
+#if (!$columnsNumber || $columnsNumber <= 0)
+  #set ($columnsNumber = 1)
+#end
 ## don't fill 100% because IE doesn't fit things properly in
 #set($columnsTotalWidth = 99)
 ## 1.5% padding right to all the columns except last one
@@ -29,10 +32,6 @@
    they will collapse as if they didn't exist, which breaks the layout */
 .container-columns .column {
   min-height: 10px;
-  /* Must reset the text alignment, since otherwise it will be inherited as "justify" from the container */
-  /* The i10n value is "start", but also specify "left" for older browsers */
-  text-align: left;
-  text-align: start;
 }
 /* And for IE6, which doesn't understand the min-height */
 * html .container-columns .column {

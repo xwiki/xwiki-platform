@@ -27,6 +27,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -49,25 +51,31 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.0M1
  */
+@MockingRequirement(XWikiWikiModel.class)
 public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private XWikiWikiModel wikiModel;
+    private WikiModel wikiModel;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.wikiModel = getComponentManager().getInstance(WikiModel.class);
+    }
 
     @Test
     public void testGetDocumentEditURLWhenNoQueryStringSpecified() throws Exception
     {
         final EntityReferenceSerializer< ? > compactEntityReferenceSerializer =
-            getComponentManager().lookupComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         final DocumentAccessBridge documentAccessBridge =
-            getComponentManager().lookupComponent((Type) DocumentAccessBridge.class);
+            getComponentManager().getInstance((Type) DocumentAccessBridge.class);
 
         // Note: we use a character that needs to be encoded in the current document's page name to make sure the
         // generate query string is encoded.
         final DocumentReference currentDocumentReference = new DocumentReference("Wiki", "Space", "Page\u20AC");
 
         final DocumentReferenceResolver<String> documentResolver =
-            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentReference documentReference = new DocumentReference("TargetWiki", "TargetSpace", "TargetPage");
 
         getMockery().checking(new Expectations()
@@ -187,7 +195,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     {
         setUpCommonExpectations("attachmentURL", true);
         final XWikiRenderingConfiguration configuration =
-            getComponentManager().lookupComponent((Type) XWikiRenderingConfiguration.class);
+            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -215,7 +223,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     {
         setUpCommonExpectations("attachmentURL", true);
         final XWikiRenderingConfiguration configuration =
-            getComponentManager().lookupComponent((Type) XWikiRenderingConfiguration.class);
+            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -244,7 +252,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     {
         setUpCommonExpectations("attachmentURL", true);
         final XWikiRenderingConfiguration configuration =
-            getComponentManager().lookupComponent((Type) XWikiRenderingConfiguration.class);
+            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -318,7 +326,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenIcon() throws Exception
     {
         ResourceReference reference = new ResourceReference("iconname", ResourceType.ICON);
-        final SkinAccessBridge skinAccessBridge = getComponentManager().lookupComponent((Type) SkinAccessBridge.class);
+        final SkinAccessBridge skinAccessBridge = getComponentManager().getInstance((Type) SkinAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -335,10 +343,10 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetDocumentViewURLWhenNoBaseReference() throws Exception
     {
         final DocumentReferenceResolver<String> documentResolver =
-            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         final DocumentAccessBridge documentAccessBridge =
-            getComponentManager().lookupComponent((Type) DocumentAccessBridge.class);
+            getComponentManager().getInstance((Type) DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -357,11 +365,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetDocumentViewURLWhenBaseReferenceSpecified() throws Exception
     {
         final DocumentReferenceResolver<String> documentResolver =
-            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         final DocumentReference baseDocumentReference = new DocumentReference("wiki", "space", "base");
         final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         final DocumentAccessBridge documentAccessBridge =
-            getComponentManager().lookupComponent((Type) DocumentAccessBridge.class);
+            getComponentManager().getInstance((Type) DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -383,13 +391,13 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
         final boolean expectedIsImageDimensionsIncludedInImageURL) throws Exception
     {
         final DocumentAccessBridge documentAccessBridge =
-            getComponentManager().lookupComponent((Type) DocumentAccessBridge.class);
+            getComponentManager().getInstance((Type) DocumentAccessBridge.class);
         final AttachmentReferenceResolver<String> attachmentResolver =
-            getComponentManager().lookupComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
         final AttachmentReference attachmentReference =
             new AttachmentReference("filename", new DocumentReference("wiki", "space", "page"));
         final XWikiRenderingConfiguration configuration =
-            getComponentManager().lookupComponent((Type) XWikiRenderingConfiguration.class);
+            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {

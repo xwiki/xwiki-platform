@@ -21,7 +21,7 @@ package org.xwiki.observation.remote.converter;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 
@@ -31,7 +31,7 @@ import org.xwiki.observation.remote.RemoteEventData;
  * @version $Id$
  * @since 2.0M3
  */
-@ComponentRole
+@Role
 public interface EventConverterManager
 {
     /**

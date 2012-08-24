@@ -24,14 +24,15 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotListener;
-import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
+import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -43,6 +44,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
@@ -51,10 +53,11 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
+@MockingRequirement(value = DefaultWikiIRCBotListenerManager.class, exceptions = {EntityReferenceSerializer.class})
 public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
-    DefaultWikiIRCBotListenerManager manager;
+    private WikiIRCBotListenerManager manager;
 
     private DocumentReference wikiBotListenerReference1;
     private DocumentReference wikiBotListenerReference2;
@@ -66,20 +69,20 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
 
     private ComponentManager componentManager;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
-        final WikiIRCModel ircModel = getComponentManager().lookupComponent(WikiIRCModel.class);
+        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
 
         // Assume we have two Wiki Bot Listeners in the wiki
         final WikiBotListenerData listenerData1 = new WikiBotListenerData(
-            new DocumentReference("wik1", "space1", "page1"),
+            new DocumentReference("wiki1", "space1", "page1"),
             "space1.page1", "wikiname1", "wikidescription1");
         final WikiBotListenerData listenerData2 = new WikiBotListenerData(
-            new DocumentReference("wik2", "space2", "page2"),
+            new DocumentReference("wiki2", "space2", "page2"),
             "space2.page2", "wikiname2", "wikidescription2");
         final DocumentReferenceResolver<String> resolver =
-            getComponentManager().lookupComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
 
         this.wikiBotListenerReference1 = new DocumentReference("wiki1", "space1", "page1");
         this.wikiBotListenerReference2 = new DocumentReference("wiki2", "space2", "page2");
@@ -94,10 +97,10 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
             Collections.singletonMap("onSomeEvent2", new XDOM(Arrays.asList((Block) new WordBlock("whatever2")))),
                 Syntax.XWIKI_2_1, macroTransformation, plainTextRenderer, ircModel,
                     new DocumentReference("userwiki2", "userspace2", "userpage2"));
-        final IRCBot bot = getComponentManager().lookupComponent(IRCBot.class);
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
         this.listenerManager = getMockery().mock(ListenerManager.class);
 
-        this.componentManager = getComponentManager().lookupComponent(ComponentManager.class, "wiki");
+        this.componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -112,13 +115,15 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
             allowing(bot).getListenerManager();
             will(returnValue(listenerManager));
         }});
+
+        this.manager = getComponentManager().getInstance(WikiIRCBotListenerManager.class);
     }
 
     @Test
     public void registerWikiBotListeners() throws Exception
     {
         final WikiIRCBotListenerFactory factory =
-            getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);
+            getComponentManager().getInstance(WikiIRCBotListenerFactory.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -150,7 +155,7 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
     public void registerWikiBotListenersWhenTheyDontContainValidXObjects() throws Exception
     {
         final WikiIRCBotListenerFactory factory =
-            getComponentManager().lookupComponent(WikiIRCBotListenerFactory.class);
+            getComponentManager().getInstance(WikiIRCBotListenerFactory.class);
 
         getMockery().checking(new Expectations()
         {{
@@ -175,7 +180,7 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
                 will(returnValue(true));
                 oneOf(componentManager).hasComponent((Type) IRCBotListener.class, "wiki2:space2.page2");
                 will(returnValue(false));
-                oneOf(componentManager).lookupComponent(IRCBotListener.class, "wiki1:space1.page1");
+                oneOf(componentManager).getInstance(IRCBotListener.class, "wiki1:space1.page1");
                 will(returnValue(wikiIRCBotListener1));
 
                 // Real tests are here:

@@ -28,10 +28,12 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Container for the results of a search.
@@ -58,8 +60,7 @@ public class SearchResults extends Api
      * @param results Lucene search results
      * @param xwiki xwiki instance for access rights checking
      */
-    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, Searcher searcher, XWiki xwiki,
-        XWikiContext context)
+    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, Searcher searcher, XWiki xwiki, XWikiContext context)
     {
         super(context);
 
@@ -79,12 +80,13 @@ public class SearchResults extends Api
                     SearchResult result =
                         new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score, this.xwiki);
 
-                    String pageName = null;
                     if (result.isWikiContent()) {
-                        pageName = result.getWiki() + ":" + result.getSpace() + "." + result.getName();
-
-                        if (this.xwiki.exists(pageName)
-                            && this.xwiki.hasAccessLevel("view", this.context.getUser(), pageName)) {
+                        String prefixedFullName =
+                            ((EntityReferenceSerializer<String>)
+                                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING))
+                                .serialize(result.getDocumentReference());
+                        if (this.xwiki.exists(result.getDocumentReference())
+                            && this.xwiki.hasAccessLevel("view", this.context.getUser(), prefixedFullName)) {
                             this.relevantResults.add(result);
                         }
                     }
@@ -186,8 +188,9 @@ public class SearchResults extends Api
                 for (int i = 0; i < docs.scoreDocs.length; i++) {
                     SearchResult result = null;
                     try {
-                        result = new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score,
-                            this.xwiki);
+                        result =
+                            new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score,
+                                this.xwiki);
 
                         this.context.setDatabase(result.getWiki());
 

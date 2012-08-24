@@ -20,9 +20,9 @@
 package org.xwiki.rendering.macro.ruby;
 
 import org.junit.runner.RunWith;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.test.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -35,7 +35,7 @@ import org.xwiki.rendering.test.integration.RenderingTestSuite;
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager componentManager) throws Exception
     {
         new ScriptMockSetup(componentManager);
     }

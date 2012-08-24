@@ -48,7 +48,7 @@ public class SafeIterableResult<E extends Extension> extends AbstractSafeObject<
     @Override
     public Iterator<E> iterator()
     {
-        return new SafeExtensionIterator<E>(getWrapped().iterator(), this.safeProvider);
+        return new SafeIterator<E, Iterator<E>>(getWrapped().iterator(), this.safeProvider, null);
     }
 
     @Override

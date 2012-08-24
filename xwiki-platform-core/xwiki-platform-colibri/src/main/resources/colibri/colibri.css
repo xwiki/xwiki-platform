@@ -705,46 +705,6 @@ div.buttonwrapper {
   padding: 1.5em 0 1em;
 }
 
-#changescontent table {
-  margin-bottom: 0;
-  width: 100%;
-}
-
-#changescontent th, #changescontent td {
-  border: 1px solid $theme.borderColor;
-  padding: 3px 4px;
-}
-
-#changescontent th {
-  font-size: .85em;
-}
-
-#changescontent  .changes-table-title th {
-  font-size: .9em;
-  text-transform: uppercase;
-}
-
-#changescontent table tr.changes-table-title + tr.changes-table-title th {
-  border-bottom-width: 4px;
-  font-size: .8em;
-}
-
-.diff {
-  overflow: auto;
-  white-space: pre-wrap;
-}
-
-.diffaddword {
-  color: $theme.notificationSuccessColor;
-  background-color: rgba(0, 255, 0, 0.15);
-}
-
-.diffremoveword {
-  color: $theme.notificationErrorColor;
-  text-decoration: line-through;
-  background-color: rgba(255, 0, 0, 0.15);
-}
-
 /* --------------Information--------------*/
 #informationcontent dd {
   padding: 0 1em 1em;
@@ -1158,6 +1118,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .actionmenu .tmCreate {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
+  ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
+  #foreach ($prefix in ['-moz-', '-webkit-', '-o-', '-ms-', ''])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
 }
 
 .actionmenu .tmWiki {
@@ -1455,6 +1419,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
+  background-image: none;
   #css3_backgroundLinearGradient({
      'angle': 'top',
      'colors': [
@@ -1766,6 +1731,10 @@ h1.xwikipaneltitle {
   border-top: 1px dotted $theme.borderColor;
 }
 
+.DocumentInformation input.xhidden {
+  width: auto;
+}
+
 /* @group CONTAINERS GENERAL STYLING */
 /* --------------------------------------------------------------
   * General rules that applied to different types of containers
@@ -1901,16 +1870,6 @@ h1.xwikipaneltitle {
 
 .actionmenu .tmCreate:hover {
   border-radius: 4px 4px 0px 0px;
-}
-
-.actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
-  #css3_backgroundLinearGradient({
-     'angle': 'top',
-     'colors': [
-      {'color': 'rgba(236,236,236,0.3)', 'position': '0%'},
-      {'color': 'rgba(236,236,236,0)', 'position': '30%'}
-    ]
-  })
 }
 
 .tmCreate  .tme-extensible {

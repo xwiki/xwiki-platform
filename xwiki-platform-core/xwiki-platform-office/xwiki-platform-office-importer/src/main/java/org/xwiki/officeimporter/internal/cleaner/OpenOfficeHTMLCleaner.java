@@ -45,81 +45,81 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 @Named("openoffice")
 @Singleton
 public class OpenOfficeHTMLCleaner implements HTMLCleaner
-{  
+{
     /**
-     * Default html cleaner component used internally. 
+     * Default html cleaner component used internally.
      */
     @Inject
     private HTMLCleaner defaultHtmlCleaner;
-    
+
     /**
      * {@link HTMLFilter} for stripping various tags.
      */
     @Inject
     @Named("officeimporter/stripper")
     private HTMLFilter stripperFilter;
-    
+
     /**
      * {@link HTMLFilter} filtering styles.
      */
     @Inject
     @Named("officeimporter/style")
     private HTMLFilter styleFilter;
-    
+
     /**
      * {@link HTMLFilter} for stripping redundant tags.
      */
     @Inject
     @Named("officeimporter/redundancy")
     private HTMLFilter redundancyFilter;
-    
+
     /**
      * {@link HTMLFilter} for cleaning empty paragraphs.
      */
     @Inject
     @Named("officeimporter/paragraph")
     private HTMLFilter paragraphFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering image tags.
      */
     @Inject
     @Named("officeimporter/image")
     private HTMLFilter imageFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering HTML anchors.
      */
     @Inject
     @Named("officeimporter/anchor")
     private HTMLFilter anchorFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering lists.
      */
     @Inject
     @Named("officeimporter/list")
     private HTMLFilter listFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering tables.
      */
     @Inject
     @Named("officeimporter/table")
     private HTMLFilter tableFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering line breaks.
      */
     @Inject
     @Named("officeimporter/linebreak")
     private HTMLFilter lineBreakFilter;
-    
+
     @Override
     public Document clean(Reader originalHtmlContent)
     {
         // Add special parameters used in filters
-        HTMLCleanerConfiguration configuration = getDefaultConfiguration(); 
+        HTMLCleanerConfiguration configuration = getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("filterStyles", "strict"));
 
         return clean(originalHtmlContent, configuration);
@@ -139,8 +139,8 @@ public class OpenOfficeHTMLCleaner implements HTMLCleaner
         // Add OO cleaning filters after the default filters
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>(configuration.getFilters());
         filters.addAll(Arrays.asList(
-            this.stripperFilter, 
-            this.styleFilter, 
+            this.stripperFilter,
+            this.styleFilter,
             this.redundancyFilter,
             this.paragraphFilter,
             this.imageFilter,
@@ -149,7 +149,7 @@ public class OpenOfficeHTMLCleaner implements HTMLCleaner
             this.tableFilter,
             this.lineBreakFilter));
         configuration.setFilters(filters);
-        
+
         return configuration;
     }
 }

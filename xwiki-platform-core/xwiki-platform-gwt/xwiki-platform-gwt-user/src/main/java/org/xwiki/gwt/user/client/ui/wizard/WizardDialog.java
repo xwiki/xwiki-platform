@@ -124,6 +124,7 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      * 
      * @see ComplexDialogBox#showError(Throwable)
      */
+    @Override
     public void showError(Throwable caught)
     {
         // Show only the error message.
@@ -206,6 +207,7 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      * 
      * @see ComplexDialogBox#setCanceled(boolean)
      */
+    @Override
     public void setCanceled(boolean canceled)
     {
         super.setCanceled(canceled);

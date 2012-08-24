@@ -192,23 +192,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         EntityReference ref = xClassReference;
 
         if (ref != null) {
-            WikiReference wiki = (WikiReference) xClassReference.extractReference(EntityType.WIKI);
+            EntityReference wiki = xClassReference.extractReference(EntityType.WIKI);
             if (wiki != null) {
                 ref = xClassReference.removeParent(wiki);
-
-                // >>> TO BE REMOVED before 4.0 >>> and enable unit test
-                // XWikiDocumentTest#testCloneWithAbsoluteClassReference()
-                DocumentReference docRef = getDocumentReference();
-                WikiReference docWiki = (docRef != null) ? docRef.getWikiReference() : null;
-                if (docWiki != null && !wiki.equals(docWiki)) {
-                    LOGGER.error("Unsupported external ({}) XClass reference used for an XObject class reference."
-                        + " The reference has been changed to relative, and will used the document wiki ({}).",
-                        new Object[] {wiki.getName(), docWiki.getName(), new Throwable()});
-                } else {
-                    LOGGER.warn("Absolute XClass reference including a wiki reference ({}) used for an XObject class "
-                        + "reference. The reference has been changed to relative.", wiki.getName(), new Throwable());
-                }
-                // <<< TO BE REMOVED before 4.0 <<<
             }
         }
 
@@ -286,19 +272,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
 
         return baseClass;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
-     * @deprecated since 2.2M1 use {@link #getXClass(com.xpn.xwiki.XWikiContext)}
-     */
-    @Override
-    @Deprecated
-    public BaseClass getxWikiClass(XWikiContext context)
-    {
-        return getXClass(context);
     }
 
     public String getStringValue(String name)

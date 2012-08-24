@@ -20,6 +20,18 @@ div.suggestItems {
   z-index: 100013;
   text-align:left;
 }
+div.suggestItems .hide-button-wrapper {
+  line-height: 1em;
+  text-align: right;
+}
+div.suggestItems .hide-button {
+  cursor: pointer;
+  font-size: 0.8em;
+  font-style: italic;
+  margin: 0 4px;
+  opacity: .4;
+  padding: 0 0.5em;
+}
 
 div.suggestItems ul {
   margin: 0px;

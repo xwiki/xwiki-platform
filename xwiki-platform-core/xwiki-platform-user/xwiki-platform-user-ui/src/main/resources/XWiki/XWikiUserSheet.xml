@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,36 +19,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <xwikidoc>
-<web>XWiki</web>
-<name>XWikiUserSheet</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Main.XWikiUsers</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1106308018000</creationDate>
-<date>1305818123000</date>
-<contentUpdateDate>1305818123000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<attachment>
-<filename>noavatar.png</filename>
-<filesize>3076</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1263400909000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAIAAAAErfB6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA
+  <web>XWiki</web>
+  <name>XWikiUserSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.XWikiUsers</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1106308018000</creationDate>
+  <date>1305818123000</date>
+  <contentUpdateDate>1305818123000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>noavatar.png</filename>
+    <filesize>3076</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1263400909000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAIAAAAErfB6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA
 IGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAuKSURBVHja7F3ZduK6
 ErXl2RgPhNgE6ED//wf1a3fSi0xAQ0KYweeh7tJVbCAJGFsytR9YQCDYtVWjpJL869cvCVFeEBQB
 EoxAghFIMAIJRiDBCCQYgQQjwQgkGIEEI5BgBBKMQIIRSDASjECCEUgwAglGIMEIJBiBBCOQYCQY
@@ -101,88 +104,89 @@ SpMvZWgLsyEYrIoQrf2EgKqqWXGcDcE4tZA5aM+e4gmO4zirq0FQZFXSIqezSwjJp/HrpVnpTCoe
 pxIMDXJUVUVKMkcmbjgDE40O+HwEn74Sj2R4HYhsYZomLEBOdDrNm2DTNDE1Ogc0TVMUhW2FcIQi
 nUqwYRjFdnIuN2zbPtE6ktNHGdJwPrCb9oohmF2Vj8gcp886nEQwbB6UsDx5Npx+MBQp/AoQB6Cq
 aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
-</content></attachment>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>XWiki.XWikiUserSheet</name>
-<number>0</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>4a317e5c-a75e-4dec-aad0-1f80ffde5124</guid>
-<property>
-<cache>long</cache>
-</property>
-<property>
-<code>Object.extend(XWiki, {
+</content>
+  </attachment>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.XWikiUserSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>4a317e5c-a75e-4dec-aad0-1f80ffde5124</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>Object.extend(XWiki, {
   userprofile : {
 
     init : function() {
@@ -273,98 +277,98 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
 
 Event.observe(window, 'load', function() { XWiki.userprofile.init() });
 document.observe('lightbox:userprofile:loaded', function() { XWiki.userprofile.init() });</code>
-</property>
-<property>
-<name>userprofile</name>
-</property>
-<property>
-<parse>0</parse>
-</property>
-<property>
-<use>onDemand</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.StyleSheetExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>XWiki.XWikiUserSheet</name>
-<number>0</number>
-<className>XWiki.StyleSheetExtension</className>
-<guid>30c9f7e7-0b53-468b-a254-645d035d9416</guid>
-<property>
-<cache>long</cache>
-</property>
-<property>
-<code>#template("colorThemeInit.vm")
+    </property>
+    <property>
+      <name>userprofile</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.XWikiUserSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>30c9f7e7-0b53-468b-a254-645d035d9416</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template("colorThemeInit.vm")
 #set($tabswidth = "130px")
 
 td.recentChangesLeft, .recentChangesMoreActions {
@@ -590,18 +594,18 @@ span#avatarUpload {
 .dashboard .clearfloats {
   clear: right;
 }</code>
-</property>
-<property>
-<name>userprofile</name>
-</property>
-<property>
-<parse>1</parse>
-</property>
-<property>
-<use>onDemand</use>
-</property>
-</object>
-<content>{{velocity}}
+    </property>
+    <property>
+      <name>userprofile</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity}}
 ##
 ## Extensions and vars
 ##

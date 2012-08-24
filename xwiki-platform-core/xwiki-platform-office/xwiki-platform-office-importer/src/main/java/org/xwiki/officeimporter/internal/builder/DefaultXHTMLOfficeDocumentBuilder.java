@@ -20,9 +20,11 @@
 package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +32,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.parser.html.HtmlEncodingDetector;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -73,6 +75,11 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
     @Named("openoffice")
     private HTMLCleaner ooHtmlCleaner;
 
+    /**
+     * Used to determine the encoding of the HTML byte array produced by the office server.
+     */
+    private HtmlEncodingDetector htmlEncodingDetector = new HtmlEncodingDetector();
+
     @Override
     public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
@@ -84,7 +91,7 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
         String outputFileName = StringUtils.substringBeforeLast(officeFileName, ".") + ".html";
         try {
-            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, outputFileName);
+            artifacts = this.officeManager.getConverter().convert(inputStreams, officeFileName, outputFileName);
         } catch (OpenOfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);
@@ -92,28 +99,39 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
 
         // Prepare the parameters for HTML cleaning.
         Map<String, String> params = new HashMap<String, String>();
-        params.put("targetDocument", entityReferenceSerializer.serialize(reference));
+        params.put("targetDocument", this.entityReferenceSerializer.serialize(reference));
         if (filterStyles) {
             params.put("filterStyles", "strict");
         }
 
         // Parse and clean the HTML output.
-        InputStream htmlStream = new ByteArrayInputStream(artifacts.remove(outputFileName));
-        InputStreamReader htmlReader = null;
-        Document xhtmlDoc = null;
-        try {
-            htmlReader = new InputStreamReader(htmlStream, "UTF-8");
-            HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
-            configuration.setParameters(params);
-            xhtmlDoc = this.ooHtmlCleaner.clean(htmlReader, configuration);
-        } catch (UnsupportedEncodingException ex) {
-            throw new OfficeImporterException("Error: Could not encode html office content.", ex);
-        } finally {
-            IOUtils.closeQuietly(htmlReader);
-            IOUtils.closeQuietly(htmlStream);
-        }
+        HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
+        configuration.setParameters(params);
+        Reader html = getReader(artifacts.remove(outputFileName));
+        Document xhtmlDoc = this.ooHtmlCleaner.clean(html, configuration);
 
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);
+    }
+
+    /**
+     * Detects the proper encoding of the given byte array and returns a reader.
+     * 
+     * @param html HTML text as a byte array
+     * @return a reader for the given HTML byte array, that has the proper encoding
+     */
+    private Reader getReader(byte[] html)
+    {
+        InputStream htmlInputStream = new ByteArrayInputStream(html);
+        Charset charset = null;
+        try {
+            charset = htmlEncodingDetector.detect(htmlInputStream, null);
+        } catch (IOException e) {
+            // Shouldn't happen.
+        }
+        if (charset == null) {
+            charset = Charset.forName("UTF-8");
+        }
+        return new InputStreamReader(htmlInputStream, charset);
     }
 }

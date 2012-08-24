@@ -25,12 +25,15 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.util.Random;
+import java.security.SecureRandom;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -48,6 +51,7 @@ import static org.hamcrest.Matchers.*;
  * @version $Id$
  * @since 2.5M2
  */
+@MockingRequirement(DefaultCSRFTokenTest.InsecureCSRFToken.class)
 public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 {
     /** URL of the current document. */
@@ -57,16 +61,38 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     private static final String resubmitUrl = mockDocumentUrl;
 
     /** Tested CSRF token component. */
-    @MockingRequirement
-    private DefaultCSRFToken csrf;
+    private CSRFToken csrf;
 
-    @Override
+    /**
+     * This class is here because it doesn't require a SecureRandom generator
+     * seed on each startup. Seeding a SecureRandom generator can take a very long time,
+     * especially many time over which depleats the random pool on the server.
+     */
+    public static class InsecureCSRFToken extends DefaultCSRFToken
+    {
+        @Override
+        public void initialize()
+        {
+            final Random random = new Random(System.nanoTime());
+            this.setRandom(new SecureRandom() {
+                private static final long serialVersionUID = 3;
+                @Override
+                public void nextBytes(byte[] out)
+                {
+                    random.nextBytes(out);
+                }
+            });
+        }
+    }
+
+    @Before
     public void configure() throws Exception
     {
         // set up mocked dependencies
 
         // document access bridge
-        final DocumentAccessBridge mockDocumentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            getComponentManager().getInstance(DocumentAccessBridge.class);
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
         getMockery().checking(new Expectations()
         {
@@ -84,7 +110,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // configuration
-        final CSRFTokenConfiguration mockConfiguration = getComponentManager().lookup(CSRFTokenConfiguration.class);
+        final CSRFTokenConfiguration mockConfiguration =
+            getComponentManager().getInstance(CSRFTokenConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -118,7 +145,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // container
-        final Container mockContainer = getComponentManager().lookup(Container.class);
+        final Container mockContainer = getComponentManager().getInstance(Container.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -131,6 +158,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             // Ignore all calls to debug()
             ignoring(any(Logger.class)).method("debug");
         }});
+
+        this.csrf = getComponentManager().getInstance(CSRFToken.class);
     }
 
     /**

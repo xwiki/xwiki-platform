@@ -37,10 +37,12 @@ import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -151,7 +153,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * @param doc document which fired the event
      * @param context the XWiki context
      */
-    private void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
+    protected void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
     {
         if (event.getUser() == null) {
             event.setUser(context.getUser());
@@ -187,7 +189,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * @param context the XWiki context
      * @return the generated ID
      */
-    private String generateEventId(ActivityEvent event, XWikiContext context)
+    protected String generateEventId(ActivityEvent event, XWikiContext context)
     {
         String keySeparator = EVENT_ID_ELEMENTS_SEPARATOR;
         String wikiSpaceSeparator = ":";
@@ -211,7 +213,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * @return a new instance of {@link ActivityEventImpl}.
      */
-    private ActivityEvent newActivityEvent()
+    protected ActivityEvent newActivityEvent()
     {
         return new ActivityEventImpl();
     }
@@ -380,7 +382,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title,
         List<String> params, XWikiContext context) throws ActivityStreamException
     {
-        ActivityEvent event = newActivityEvent();
+        ActivityEventImpl event = new ActivityEventImpl();
         event.setStream(streamName);
         event.setPage(doc.getFullName());
         if (doc.getDatabase() != null) {
@@ -395,6 +397,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         event.setParams(params);
         // This might be wrong once non-altering events will be logged.
         event.setUser(doc.getAuthor());
+        event.setHidden(doc.isHidden());
         addActivityEvent(event, doc, context);
     }
 
@@ -606,6 +609,16 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         return searchEvents(fromHql, hql, filter, false, nb, start, parameterValues, context);
     }
 
+    /**
+     * @return True if the search methods must exclude hidden events, false otherwise.
+     */
+    private boolean filterHiddenEvents()
+    {
+        ConfigurationSource source = Utils.getComponent(ConfigurationSource.class, "user");
+        Integer preference = source.getProperty("displayHiddenDocuments", Integer.class);
+        return preference == null || preference != 1;
+    }
+
     @Override
     public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb,
         int start, List<Object> parameterValues, XWikiContext context) throws ActivityStreamException
@@ -613,16 +626,21 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         StringBuffer searchHql = new StringBuffer();
         List<ActivityEvent> results;
 
+        String hiddenFilter = "";
+        if (filterHiddenEvents()) {
+            hiddenFilter = "(act.hidden <> true or act.hidden is null) and ";
+        }
+
         if (filter) {
             searchHql.append("select act from ActivityEventImpl as act, ActivityEventImpl as act2 ");
             searchHql.append(fromHql);
-            searchHql.append(" where act.eventId=act2.eventId and ");
+            searchHql.append(" where act.eventId=act2.eventId and " + hiddenFilter);
             searchHql.append(hql);
             searchHql.append(" group by act.requestId having (act.priority)=max(act2.priority) order by act.date desc");
         } else {
             searchHql.append("select act from ActivityEventImpl as act ");
             searchHql.append(fromHql);
-            searchHql.append(" where ");
+            searchHql.append(" where " + hiddenFilter);
             searchHql.append(hql);
             searchHql.append(" order by act.date desc");
         }
@@ -831,48 +849,48 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
             if (event instanceof DocumentCreatedEvent) {
                 eventType = ActivityEventType.CREATE;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
             } else if (event instanceof DocumentUpdatedEvent) {
                 eventType = ActivityEventType.UPDATE;
-                displayTitle = originalDoc.getDisplayTitle(context);
+                displayTitle = originalDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
             } else if (event instanceof DocumentDeletedEvent) {
                 eventType = ActivityEventType.DELETE;
-                displayTitle = originalDoc.getDisplayTitle(context);
+                displayTitle = originalDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
             } else if (event instanceof CommentAddedEvent) {
                 eventType = ActivityEventType.ADD_COMMENT;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((CommentAddedEvent) event).getIdentifier();
             } else if (event instanceof CommentDeletedEvent) {
                 eventType = ActivityEventType.DELETE_COMMENT;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((CommentDeletedEvent) event).getIdentifier();
             } else if (event instanceof CommentUpdatedEvent) {
                 eventType = ActivityEventType.UPDATE_COMMENT;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((CommentUpdatedEvent) event).getIdentifier();
             } else if (event instanceof AttachmentAddedEvent) {
                 eventType = ActivityEventType.ADD_ATTACHMENT;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((AttachmentAddedEvent) event).getName();
             } else if (event instanceof AttachmentDeletedEvent) {
                 eventType = ActivityEventType.DELETE_ATTACHMENT;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((AttachmentDeletedEvent) event).getName();
             } else if (event instanceof AttachmentUpdatedEvent) {
                 eventType = ActivityEventType.UPDATE_ATTACHMENT;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((AttachmentUpdatedEvent) event).getName();
             } else if (event instanceof AnnotationAddedEvent) {
                 eventType = ActivityEventType.ADD_ANNOTATION;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((AnnotationAddedEvent) event).getIdentifier();
             } else if (event instanceof AnnotationDeletedEvent) {
                 eventType = ActivityEventType.DELETE_ANNOTATION;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((AnnotationDeletedEvent) event).getIdentifier();
             } else { // update annotation
                 eventType = ActivityEventType.UPDATE_ANNOTATION;
-                displayTitle = currentDoc.getDisplayTitle(context);
+                displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
                 additionalIdentifier = ((AnnotationUpdatedEvent) event).getIdentifier();
             }
 
@@ -886,7 +904,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
                 LOGGER.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
-                    + currentDoc.getFullName() + "]");
+                    + currentDoc + "]");
             }
         }
     }

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot</artifactId>
   <name>XWiki Platform - IRC Bot - Parent POM</name>
@@ -39,14 +39,7 @@
   </modules>
   <profiles>
     <profile>
-      <id>ci</id>
-      <activation>
-        <!-- This property is automatically defined by the Maven release plugin when executing
-             a release. Thus this profile will be automatically enabled when releasing -->
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
+      <id>integration-tests</id>
       <modules>
         <module>xwiki-platform-ircbot-test</module>
       </modules>

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
@@ -278,7 +279,7 @@ public class XWikiDavContext
     public byte[] getFileContentAsBytes(InputStream in) throws DavException
     {
         try {
-            return Util.getFileContentAsBytes(in);
+            return IOUtils.toByteArray(in);
         } catch (IOException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }

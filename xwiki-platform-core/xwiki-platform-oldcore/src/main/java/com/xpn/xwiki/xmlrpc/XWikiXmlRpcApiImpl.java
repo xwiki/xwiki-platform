@@ -1436,7 +1436,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         List<Parser> parsers;
         ComponentManager componentManager = Utils.getComponentManager();
         try {
-            parsers = componentManager.lookupList(Parser.class);
+            parsers = componentManager.getInstanceList(Parser.class);
             for (Parser parser : parsers) {
                 syntaxes.add(parser.getSyntax().toIdString());
             }
@@ -1462,7 +1462,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         ComponentManager componentManager = Utils.getComponentManager();
         try {
             // TODO: use BlockRenderer
-            renderers = componentManager.lookupList(PrintRendererFactory.class);
+            renderers = componentManager.getInstanceList(PrintRendererFactory.class);
             for (PrintRendererFactory renderer : renderers) {
                 syntaxes.add(renderer.getSyntax().toIdString());
             }

@@ -134,11 +134,6 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         final XWiki xwiki = new XWiki(new XWikiConfig(), context)
         {
             @Override
-            protected void registerWikiMacros()
-            {
-            }
-
-            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
@@ -177,6 +172,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
                 }
             });
         mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
+        mockXWikiStore.stubs().method("exists").will(returnValue(false));
 
         final Mock mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
@@ -209,7 +205,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         XWikiDocument doc = getContext().getWiki().getDocument(ARTICLE_CLASS_NAME, getContext());
         boolean needsUpdate = doc.isNew();
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(ARTICLE_CLASS_NAME);
 
         needsUpdate |= bclass.addTextField("title", "Title", 64);

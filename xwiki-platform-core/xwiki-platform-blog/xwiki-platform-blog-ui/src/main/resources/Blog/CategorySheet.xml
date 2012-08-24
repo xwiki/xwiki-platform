@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Blog</web>
+  <name>CategorySheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Blog.CategoryClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1220437371000</creationDate>
+  <date>1226817939000</date>
+  <contentUpdateDate>1226817939000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sheet for displaying blog categories</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.SheetDescriptorClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <action>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>action</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Action</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </action>
+    </class>
+    <name>Blog.CategorySheet</name>
+    <number>0</number>
+    <className>XWiki.SheetDescriptorClass</className>
+    <guid>e04cbd1d-a504-4e3e-9ddd-4d2bdcdac1b0</guid>
+    <property>
+      <action>view</action>
+    </property>
+  </object>
+  <content>{{include document="Blog.CategoriesCode"/}}
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+$xwiki.ssx.use("Blog.ManageCategories")##
+$xwiki.jsx.use("Blog.ManageCategories")##
+##
+##
+##
+#if($doc.getObject($blogCategoryClassname))
+  #getEntriesForCategory($doc.fullName $discard $totalEntries)
+
+&lt;h1&gt;Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=${escapetool.url($doc.fullName)}")" title="RSS"&gt;#toolImage('feed' '[RSS]')&lt;/a&gt;&lt;/h1&gt;
+  ## Keep testing the inline action for backward compatibility with older categories.
+  #if($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
+    {{include document="Blog.CreatePost"/}}
+    #getCategoriesHierarchy($doc.space $tree)
+    #if("$!{tree.get(${doc.fullName})}" != '')
+      &lt;div class="blog-categories-list subcategories"&gt;
+        &lt;div&gt;
+          **Subcategories**
+        &lt;/div&gt;
+        &lt;div&gt;
+          #displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'simple')
+        &lt;/div&gt;
+      &lt;/div&gt;
+    #end
+    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+
+    #getEntriesForCategory($doc.fullName $entries $totalEntries)
+    #if($totalEntries == 0)
+      #info('No entries in this category')
+    #else
+      #displayBlog($entries 'category' true true)
+      ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
+      ## document, as the macro fallbacks to 'paginated' in case the right setting cannot be determined.
+      #displayNavigationLinks($doc)
+    #end
+  #end
+#elseif($doc.fullName == $blogCategorySheet)
+= $msg.get('xe.blog.categories.sheet') =
+  $msg.get('xe.blog.categories.sheetmessage')
+#else
+  #warning($msg.get('xe.blog.categories.notcategory'))
+#end
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

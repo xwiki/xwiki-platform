@@ -1117,13 +1117,13 @@ $html
       #if ($defaultValue.class == 'class java.lang.Boolean')
         #set ($result = $util.parseBoolean($result))
       #elseif ($defaultValue.class == 'class java.lang.Integer')
-        #set ($result = $util.parseInt($result))
+        #set ($result = $mathtool.toInteger($result))
       #elseif ($defaultValue.class == 'class java.lang.Float')
-        #set ($result = $util.parseFloat($result))
+        #set ($result = $mathtool.toNumber($result).floatValue())
       #elseif ($defaultValue.class == 'class java.lang.Long')
-        #set ($result = $util.parseLong($result))
+        #set ($result = $mathtool.toNumber($result).longValue())
       #elseif ($defaultValue.class == 'class java.lang.Double')
-        #set ($result = $util.parseDouble($result))
+        #set ($result = $mathtool.toDouble($result))
       #end
     #end
     #if ("$!result" == '')
@@ -1502,8 +1502,8 @@ function (row, i, table) {
   var tr = new Element("tr");
   if (row["doc_viewable"]) {
   #foreach($colname in $collist)
-    // $colname
     #set($colprop = $colprops.get($colname))
+    // $colname
     #if("$!colprop.type"!="hidden")
       #if($colname.indexOf("doc.")==0)
         #set($jscolname = $colname.replaceAll("doc.", "doc_"))
@@ -1533,7 +1533,7 @@ function (row, i, table) {
             var tag = event.element().down("span");
             if (!tag)
              tag = event.element();
-            editProperty(row["doc_fullname"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+            editProperty(row["doc_fullName"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
           });
         ## Author
         #elseif($colprop.link == "author")
@@ -1598,12 +1598,14 @@ function (row, i, table) {
   #end
   }
   else {
-    var page = row["doc_fullname"];
+    var page = row["doc_fullName"];
     var dp = page.indexOf(':');
     var p = page.indexOf('.');
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
     var name = page.substring(p + 1);
     #foreach($colname in $collist)
+      // $colname
+      #set($colprop = $colprops.get($colname))
       #if("$!colprop.type"!="hidden")
         #if($colname.indexOf("doc.")==0)
          #set($jscolname = $colname.replaceAll("doc.", "doc_"))
@@ -1700,17 +1702,19 @@ function (row, i, table) {
     #set($parameters.hash = "${escapetool.H}${parameters.hash}")
   #end
   ## Get starting item number from request
-  #set($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
-  ## If the value is missing or invalid, parseInt returns 0, which is the default first item.
-  #set($parameters.firstItem = $util.parseInt($parameters.firstItem))
-  ## Get number of items per page from request
-  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
-    #set($parameters.defaultItemsPerPage = 20)
+  #set ($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
+  #set ($parameters.firstItem = $mathtool.toInteger($parameters.firstItem))
+  #if (!$parameters.firstItem)
+    #set ($parameters.firstItem = 0)
   #end
-  #set($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
-  #set($parameters.itemsPerPage = $util.parseInt($parameters.itemsPerPage))
-  #if($parameters.itemsPerPage <= 0)
-    #set($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
+  ## Get number of items per page from request
+  #if (!$parameters.defaultItemsPerPage || $mathtool.toInteger($parameters.defaultItemsPerPage) <= 0)
+    #set ($parameters.defaultItemsPerPage = 20)
+  #end
+  #set ($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
+  #set ($parameters.itemsPerPage = $mathtool.toInteger($parameters.itemsPerPage))
+  #if (!$parameters.itemsPerPage || $parameters.itemsPerPage <= 0)
+    #set ($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
   #end
 #end
 #**

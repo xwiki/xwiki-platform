@@ -55,9 +55,6 @@ public class DocumentHandler extends AbstractHandler
         this.skippedElements.add("version");
         this.skippedElements.add("minorEdit");
         this.skippedElements.add("comment");
-        this.skippedElements.add("creator");
-        this.skippedElements.add("author");
-        this.skippedElements.add("contentAuthor");
         this.skippedElements.add("creationDate");
         this.skippedElements.add("date");
         this.skippedElements.add("contentUpdateDate");
@@ -110,7 +107,7 @@ public class DocumentHandler extends AbstractHandler
     }
 
     @Override
-    public void endElementInternal(String uri, String localName, String qName) throws SAXException
+    protected void endElementInternal(String uri, String localName, String qName) throws SAXException
     {
         if (qName.equals("attachment")) {
             endAttachment(uri, localName, qName);

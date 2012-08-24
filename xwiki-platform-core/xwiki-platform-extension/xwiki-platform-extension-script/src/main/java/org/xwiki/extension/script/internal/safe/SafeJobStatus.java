@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import java.util.Date;
 import java.util.List;
 
 import org.xwiki.extension.internal.safe.AbstractSafeObject;
@@ -67,6 +68,7 @@ public class SafeJobStatus<J extends JobStatus> extends AbstractSafeObject<J> im
     }
 
     @Override
+    @Deprecated
     public List<LogEvent> getLog(LogLevel level)
     {
         return getWrapped().getLog(level);
@@ -94,5 +96,17 @@ public class SafeJobStatus<J extends JobStatus> extends AbstractSafeObject<J> im
     public void answered()
     {
         getWrapped().answered();
+    }
+
+    @Override
+    public Date getStartDate()
+    {
+        return getWrapped().getStartDate();
+    }
+
+    @Override
+    public Date getEndDate()
+    {
+        return getWrapped().getEndDate();
     }
 }

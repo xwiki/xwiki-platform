@@ -74,7 +74,7 @@ class ColumnGadget extends Gadget
      */
     public Integer getColumn()
     {
-        return column;
+        return this.column;
     }
 
     /**
@@ -82,7 +82,7 @@ class ColumnGadget extends Gadget
      */
     public Integer getIndex()
     {
-        return index;
+        return this.index;
     }
 
     @Override
@@ -185,9 +185,8 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
         // render them as columns using the container macro and appropriate parameters
         ContainerMacroParameters containerParams = new ContainerMacroParameters();
         containerParams.setLayoutStyle("columns");
-        containerParams.setJustify(true);
         BlocksContainerMacro containerMacro = new BlocksContainerMacro();
-        containerMacro.setComponentManager(componentManager);
+        containerMacro.setComponentManager(this.componentManager);
         containerMacro.setContent(gadgetContainers);
         List<Block> layoutedResult = containerMacro.execute(containerParams, null, context);
 

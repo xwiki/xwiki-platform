@@ -641,7 +641,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         doc = context.getWiki().getDocument("XWiki.AggregatorURLClass", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -679,6 +679,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
+
         if (needsUpdate) {
             context.getWiki().saveDocument(doc, context);
         }
@@ -693,7 +698,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         doc = context.getWiki().getDocument("XWiki.FeedEntryClass", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -742,6 +747,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
+        }
+
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         if (needsUpdate) {

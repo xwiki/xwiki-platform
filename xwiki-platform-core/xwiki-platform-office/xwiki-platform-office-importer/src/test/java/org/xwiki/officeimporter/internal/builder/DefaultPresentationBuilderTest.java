@@ -82,7 +82,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     {
         super.setUp();
 
-        presentationBuilder = (DefaultPresentationBuilder) getComponentManager().lookup(PresentationBuilder.class);
+        presentationBuilder = (DefaultPresentationBuilder) getComponentManager().getInstance(PresentationBuilder.class);
     }
 
     @Override

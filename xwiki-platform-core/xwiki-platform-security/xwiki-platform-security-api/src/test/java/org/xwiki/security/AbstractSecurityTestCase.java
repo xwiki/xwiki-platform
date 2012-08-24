@@ -55,6 +55,8 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     protected SecurityReference anotherDocRef;
     protected SecurityReference anotherSpaceDocRef;
     protected SecurityReference anotherWikiDocRef;
+    protected SecurityReference xwikiPreferencesDocRef;
+    protected SecurityReference webPreferencesDocRef;
 
     protected List<SecurityReference> entityRefs;
 
@@ -71,6 +73,7 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     protected UserSecurityReference anotherXuserRef;
     protected UserSecurityReference anotherUserRef;
     protected UserSecurityReference anotherWikiUserRef;
+    protected UserSecurityReference defaultUserRef;
 
     protected GroupSecurityReference groupRef;
     protected GroupSecurityReference anotherGroupRef;
@@ -118,7 +121,7 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     {
         super.setUp();
 
-        final XWikiBridge xwikiBridge = getComponentManager().lookup(XWikiBridge.class);
+        final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
         getMockery().checking(new Expectations() {{
             allowing (xwikiBridge).getMainWikiReference(); will(returnValue(new WikiReference("xwiki")));
@@ -153,6 +156,9 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
         anotherWikiXWikiSpace = newEntityReference(new SpaceReference("XWiki",
             anotherWikiRef.getOriginalWikiReference()));
 
+        xwikiPreferencesDocRef = newEntityReference(new DocumentReference("XWikiPreferences", xwikiSpace.getOriginalSpaceReference()));
+        webPreferencesDocRef = newEntityReference(new DocumentReference("WebPreferences", spaceRef.getOriginalSpaceReference()));
+
         xuserRef = newUserReference(new DocumentReference("user", xXWikiSpace.getOriginalSpaceReference()));
         ownerRef = newUserReference(new DocumentReference("owner", xXWikiSpace.getOriginalSpaceReference()));
         userRef = newUserReference(new DocumentReference("user", xwikiSpace.getOriginalSpaceReference()));
@@ -163,6 +169,7 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
             xwikiSpace.getOriginalSpaceReference()));
         anotherWikiUserRef = newUserReference(new DocumentReference("user",
             anotherWikiXWikiSpace.getOriginalSpaceReference()));
+        defaultUserRef = newUserReference(new DocumentReference("default", xwikiSpace.getOriginalSpaceReference()));
 
         groupRef = newGroupReference(new DocumentReference("group", xwikiSpace.getOriginalSpaceReference()));
         anotherGroupRef = newGroupReference(

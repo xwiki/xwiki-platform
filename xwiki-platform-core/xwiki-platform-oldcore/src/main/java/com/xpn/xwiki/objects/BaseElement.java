@@ -28,7 +28,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
@@ -274,7 +274,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(MergeUtils.mergeString(((BaseElement) previousElement).getPrettyName(),
+        setPrettyName(MergeUtils.mergeCharacters(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
     }
 }

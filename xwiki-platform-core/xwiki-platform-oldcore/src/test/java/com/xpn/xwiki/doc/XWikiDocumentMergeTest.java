@@ -26,9 +26,12 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeException;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -93,9 +96,9 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         MergeResult result =
             this.document.merge(this.previousDocument, this.newDocument, this.configuration, getContext());
 
-        List<Exception> exception = result.getErrors();
+        List<LogEvent> exception = result.getLog().getLogs(LogLevel.ERROR);
         if (!exception.isEmpty()) {
-            throw exception.get(0);
+            throw new MergeException(exception.get(0).getFormattedMessage(), exception.get(0).getThrowable());
         }
     }
 
@@ -115,12 +118,20 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     public void testContentModified() throws Exception
     {
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some new content");
-        this.document.setContent("some content\nwith additionnal line");
+        this.newDocument.setContent("some content\nafter");
+        this.document.setContent("before\nsome content");
 
         merge();
 
-        Assert.assertEquals("some new content\nwith additionnal line", this.document.getContent());
+        Assert.assertEquals("before\nsome content\nafter", this.document.getContent());
+
+        this.previousDocument.setContent("some content");
+        this.newDocument.setContent("some content\nafter");
+        this.document.setContent("some content");
+
+        merge();
+
+        Assert.assertEquals("some content\nafter", this.document.getContent());
     }
 
     @Test

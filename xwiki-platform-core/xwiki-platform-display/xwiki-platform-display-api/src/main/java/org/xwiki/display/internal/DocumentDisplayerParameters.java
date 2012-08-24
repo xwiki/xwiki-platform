@@ -52,6 +52,12 @@ public class DocumentDisplayerParameters implements Cloneable
     private boolean transformationContextIsolated = true;
 
     /**
+     * Flag indicating if the transformation context should be restricted so that potentially harmful transformations
+     * are not executed.
+     */
+    private boolean transformationContextRestricted;
+
+    /**
      * Flag indicating if the content should be transformed or not. When this flag is set the rendering transformations
      * are performed on the content XDOM.
      */
@@ -137,6 +143,25 @@ public class DocumentDisplayerParameters implements Cloneable
     public void setTransformationContextIsolated(boolean transformationContextIsolated)
     {
         this.transformationContextIsolated = transformationContextIsolated;
+    }
+
+    /**
+     * @return {@code true} if the transformation context should be restricted, {@code false} otherwise.
+     */
+    public boolean isTransformationContextRestricted()
+    {
+        return transformationContextRestricted;
+    }
+
+    /**
+     * Set the flag indicating whether the transformation context should be restricted or not.
+     *
+     * @param transformationContextRestricted {@code true} to indicate that potentially harmful transformations should
+     * not be executed.
+     */
+    public void setTransformationContextRestricted(boolean transformationContextRestricted)
+    {
+        this.transformationContextRestricted = transformationContextRestricted;
     }
 
     /**

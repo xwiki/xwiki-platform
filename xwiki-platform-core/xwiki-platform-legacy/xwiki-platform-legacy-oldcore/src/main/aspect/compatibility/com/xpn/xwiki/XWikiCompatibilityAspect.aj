@@ -16,11 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki;
 
 import java.io.UnsupportedEncodingException;
+import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.cache.api.XWikiCache;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
@@ -249,33 +251,6 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
-     */
-    @Deprecated
-    public String XWiki.parseMessage(String id, XWikiContext context)
-    {
-        XWikiMessageTool msg = context.getMessageTool();
-
-        return parseContent(msg.get(id), context);
-    }
-
-    /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
-     */
-    @Deprecated
-    public String XWiki.parseMessage(XWikiContext context)
-    {
-        String message = (String) context.get("message");
-        if (message == null) {
-            return null;
-        }
-
-        return parseMessage(message, context);
-    }
-
-    /**
      * @deprecated Removed since it isn't used; since 3.1M2.
      */
     @Deprecated
@@ -444,5 +419,202 @@ public privileged aspect XWikiCompatibilityAspect
         result += "{table}\r\n";
 
         return result;
+    }
+
+    @Deprecated
+    public String XWiki.getDocLanguagePreference(XWikiContext context)
+    {
+        return getLanguagePreference(context);
+    }
+
+    @Deprecated
+    public void XWiki.flushCache()
+    {
+        flushCache(getXWikiContext());
+    }
+
+    /**
+     * @deprecated use WikiManager plugin instead
+     */
+    @Deprecated
+    public int XWiki.createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
+        String description, String wikilanguage, boolean failOnExist, XWikiContext context) throws XWikiException
+    {
+        String database = context.getDatabase();
+        wikiName = wikiName.toLowerCase();
+
+        try {
+            XWikiDocument userdoc = getDocument(wikiAdmin, context);
+
+            // User does not exist
+            if (userdoc.isNew()) {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                        + "user does not exist");
+                }
+                return -2;
+            }
+
+            // User is not active
+            if (!(userdoc.getIntValue("XWiki.XWikiUsers", "active") == 1)) {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                        + "user is not active");
+                }
+                return -3;
+            }
+
+            String wikiForbiddenList = Param("xwiki.virtual.reserved_wikis");
+            if (Util.contains(wikiName, wikiForbiddenList, ", ")) {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                        + "wiki name is forbidden");
+                }
+                return -4;
+            }
+
+            String wikiServerPage = "XWikiServer" + wikiName.substring(0, 1).toUpperCase() + wikiName.substring(1);
+            // Verify is server page already exist
+            XWikiDocument serverdoc = getDocument(SYSTEM_SPACE, wikiServerPage, context);
+            if (serverdoc.isNew()) {
+                // clear entry in virtual wiki cache
+                this.virtualWikiMap.remove(wikiUrl);
+
+                // Create Wiki Server page
+                serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "server", wikiUrl);
+                serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner", wikiAdmin);
+                if (description != null) {
+                    serverdoc.setLargeStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "description", description);
+                }
+                if (wikilanguage != null) {
+                    serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "language", wikilanguage);
+                }
+                if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
+                    serverdoc.setContent("{{include document=\"XWiki.XWikiServerForm\"/}}\n");
+                    serverdoc.setSyntax(Syntax.XWIKI_2_0);
+                } else {
+                    serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");
+                    serverdoc.setSyntax(Syntax.XWIKI_1_0);
+                }
+                serverdoc.setParentReference(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
+                saveDocument(serverdoc, context);
+            } else {
+                // If we are not allowed to continue if server page already exists
+                if (failOnExist) {
+                    if (LOGGER.isErrorEnabled()) {
+                        LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                            + "wiki server page already exists");
+                    }
+                    return -5;
+                } else if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                        + "wiki server page already exists");
+                }
+            }
+
+            // Create wiki database
+            try {
+                context.setDatabase(getDatabase());
+                getStore().createWiki(wikiName, context);
+            } catch (XWikiException e) {
+                if (LOGGER.isErrorEnabled()) {
+                    if (e.getCode() == 10010) {
+                        LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                            + "wiki database already exists");
+                    } else if (e.getCode() == 10011) {
+                        LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                            + "wiki database creation failed");
+                    } else {
+                        LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                            + "wiki database creation threw exception", e);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                    + "wiki database creation threw exception", e);
+            }
+
+            try {
+                updateDatabase(wikiName, true, false, context);
+            } catch (Exception e) {
+                LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                    + "wiki database shema update threw exception", e);
+                return -6;
+            }
+
+            // Copy base wiki
+            int nb = copyWiki(baseWikiName, wikiName, wikilanguage, context);
+            // Save the number of docs copied in the context
+            context.put("nbdocs", Integer.valueOf(nb));
+
+            // Create user page in his wiki
+            // Let's not create it anymore.. this makes the creator loose
+            // super admin rights on his wiki
+            // copyDocument(wikiAdmin, getDatabase(), wikiName, wikilanguage, context);
+
+            // Modify rights in user wiki
+            context.setDatabase(wikiName);
+            /*
+             * XWikiDocument wikiprefdoc = getDocument("XWiki.XWikiPreferences", context);
+             * wikiprefdoc.setStringValue("XWiki.XWikiGlobalRights", "users", wikiAdmin);
+             * wikiprefdoc.setStringValue("XWiki.XWikiGlobalRights", "levels", "admin, edit");
+             * wikiprefdoc.setIntValue("XWiki.XWikiGlobalRights", "allow", 1); saveDocument(wikiprefdoc, context);
+             */
+            return 1;
+        } catch (Exception e) {
+            LOGGER.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: "
+                + "wiki creation threw exception", e);
+            return -10;
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    /**
+     * Get the XWiki temporary filesystem directory (cleaned up automatically by XWiki).
+     *
+     * @param context
+     * @return temporary directory
+     * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use {@link org.xwiki.environment.Environment#getTemporaryDirectory()}
+     */
+    @Deprecated
+    public File XWiki.getTempDirectory(XWikiContext context)
+    {
+        return this.environment.getTemporaryDirectory();
+    }
+
+    /**
+     * Get a new directory in the xwiki work directory
+     *
+     * @param subdir desired directory name
+     * @param context
+     * @return work subdirectory
+     * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use {@link org.xwiki.environment.Environment#getPermanentDirectory()}
+     */
+    @Deprecated
+    public File XWiki.getWorkSubdirectory(String subdir, XWikiContext context)
+    {
+        File fdir = new File(this.environment.getPermanentDirectory().getAbsolutePath(), subdir);
+        if (!fdir.exists()) {
+            fdir.mkdir();
+        }
+
+        return fdir;
+    }
+
+    /**
+     * Get the XWiki work directory
+     *
+     * @param context
+     * @return work directory
+     * @since 1.1 Milestone 4
+     * @deprecated starting with 4.2M1 use {@link org.xwiki.environment.Environment#getPermanentDirectory()}
+     */
+    @Deprecated
+    public File XWiki.getWorkDirectory(XWikiContext context)
+    {
+        return this.environment.getPermanentDirectory();
     }
 }

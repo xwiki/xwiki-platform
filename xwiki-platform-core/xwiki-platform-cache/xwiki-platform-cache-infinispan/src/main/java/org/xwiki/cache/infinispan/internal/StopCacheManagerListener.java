@@ -79,7 +79,7 @@ public class StopCacheManagerListener implements EventListener
     {
         try {
             InfinispanCacheFactory cacheFactory =
-                this.componentManager.lookupComponent(CacheFactory.class, "infinispan");
+                this.componentManager.getInstance(CacheFactory.class, "infinispan");
 
             cacheFactory.getCacheManager().stop();
         } catch (ComponentLookupException e) {

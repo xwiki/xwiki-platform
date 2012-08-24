@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.internal;
 
-import groovy.lang.Singleton;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;

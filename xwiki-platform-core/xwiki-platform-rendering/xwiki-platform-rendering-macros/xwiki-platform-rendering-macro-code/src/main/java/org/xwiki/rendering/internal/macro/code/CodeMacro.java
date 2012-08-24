@@ -134,7 +134,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 
         if (parameters.getLanguage() != null) {
             try {
-                parser = this.componentManager.lookup(HighlightParser.class, parameters.getLanguage());
+                parser = this.componentManager.getInstance(HighlightParser.class, parameters.getLanguage());
                 return parser.highlight(parameters.getLanguage(), new StringReader(content));
             } catch (ComponentLookupException e) {
                 this.logger.debug(
@@ -144,7 +144,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 
         this.logger.debug("Trying the default highlighting parser");
 
-        parser = this.componentManager.lookup(HighlightParser.class, "default");
+        parser = this.componentManager.getInstance(HighlightParser.class, "default");
 
         return parser.highlight(parameters.getLanguage(), new StringReader(content));
     }

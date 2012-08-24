@@ -26,14 +26,13 @@ import java.net.URL;
 import org.junit.*;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Tests for {@link AbstractDocumentMojo}.
  * 
  * @version $Id$
  */
-public class DocumentUpdateMojoTest extends AbstractBridgedComponentTestCase
+public class DocumentUpdateMojoTest
 {
     /**
      * Test that a document loaded in memory from XML by the mojo then written back to XML does not lose any

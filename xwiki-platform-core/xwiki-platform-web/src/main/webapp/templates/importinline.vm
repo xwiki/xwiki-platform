@@ -14,7 +14,7 @@
 #if($request.xredirect)
   #set($redirect = $request.xredirect)
 #else
-  #set($redirect = $xwiki.getRequestURL())
+  #set($redirect = $xwiki.relativeRequestURL)
 #end
 #if(!$redirect)
   #set($redirect = $importDoc.getURL('import', 'section=Import'))
@@ -31,9 +31,10 @@
 ##---------------------------------------------------------------------------
 #else
   #set($baseQueryString = "editor=$!{request.editor}&amp;section=$!{request.section}")
-  #set($ok = $xwiki.jsfx.use('js/xwiki/importer/import.js', true))
-  #set($ok = $xwiki.ssfx.use('js/xwiki/importer/import.css', true))
-  #set($attachments = $sorttool.sort($doc.attachmentList, ['date:desc']))
+  $xwiki.jsfx.use('js/xwiki/importer/import.js', true)##
+  $xwiki.ssfx.use('js/xwiki/importer/import.css', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
+  $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
   <div id="import">
     <div id="packagelist">
       <div class="legend">$msg.get('core.importer.uploadPackage')</div>
@@ -59,40 +60,7 @@
       </form>
     <div class="legend">$msg.get('core.importer.availablePackages')</div>
     <div id="packagelistcontainer">
-      #if($attachments.size() > 0)
-      <ul class="xlist">
-        #foreach ($attach in $attachments)
-          #set($url = $doc.getURL('import', "${baseQueryString}&amp;file=${escapetool.url($attach.filename).replace('+', '%20')}"))
-          #if("$!request.file" == "$!attach.filename") #set($extra = 'active') #else #set($extra = '') #end
-          <li class="xitem xhighlight">
-            <div class="xitemcontainer package $!extra">
-              <div class="name">
-                <a href="$!url" class="package" title="$msg.get('core.importer.selectThisPackage')">
-                  #set($maxnamelength = 40)
-                  #packName($attach.filename)
-                </a>
-                <span class="version">$attach.version</span>
-                <span class="xwikibuttonlinks">
-                  #set($redirect = $doc.getURL('import', 'section=Import'))
-                  #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
-                  <a class="deletelink" href="${attachurl}"
-                     onclick="return confirm('$msg.get('core.viewers.attachments.delete.confirm')');"
-                     title="$msg.get('core.viewers.attachments.delete.title')"></a>
-                </span>
-              </div>
-              <div class="infos">
-                  $msg.get('core.importer.packageInformationExtract', [
-                      $xwiki.getUserName($attach.author, true),
-                      $!xwiki.formatDate($attach.date)
-                  ]) - <span class="size">(#dynamicsize($attach.filesize))</span>
-              </div>
-            </div>
-          </li>
-        #end
-        </ul>
-    #else
-      #warning($msg.get('core.importer.noPackageAvailable'))
-    #end
+      #template('packagelist.vm')
     </div> ## packagelistcontainer
     </div> ## packagelist
     <div id="packagecontainer">

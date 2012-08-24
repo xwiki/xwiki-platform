@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -28,7 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 2.0M2
  */
-@ComponentRole
+@Role
 public interface WikiMacroManager
 {
     /**

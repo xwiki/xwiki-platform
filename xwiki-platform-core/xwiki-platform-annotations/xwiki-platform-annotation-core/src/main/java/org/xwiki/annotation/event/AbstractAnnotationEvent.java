@@ -29,7 +29,7 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
  * @version $Id$
  * @since 2.6RC2
  */
-public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent
+public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent implements AnnotationEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -76,11 +76,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent
         super(eventFilter);
     }
 
-    /**
-     * Retrieves the identifier of the annotation added/updated/deleted in the event.
-     * 
-     * @return identifier of the annotation
-     */
+    @Override
     public String getIdentifier()
     {
         return identifier;

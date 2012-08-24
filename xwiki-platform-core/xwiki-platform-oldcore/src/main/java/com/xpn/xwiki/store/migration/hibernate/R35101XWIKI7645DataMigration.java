@@ -34,6 +34,8 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.xwiki.component.annotation.Component;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
@@ -76,7 +78,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
         try {
             getStore().beginTransaction(getXWikiContext());
             // Run this migration if the database isn't new
-            shouldExecute = getStore().getDatabaseProductName(getXWikiContext()) == DatabaseProduct.ORACLE;
+            shouldExecute = getStore().getDatabaseProductName() == DatabaseProduct.ORACLE;
             getStore().endTransaction(getXWikiContext(), false);
         } catch (XWikiException ex) {
             // Shouldn't happen, ignore
@@ -89,7 +91,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
@@ -118,8 +120,19 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
                 "SELECT index_name FROM all_indexes WHERE table_owner=? AND table_name=? AND index_type='NORMAL'");
 
             for (String[] table : tablesToFix) {
-                stmt.execute("ALTER TABLE " + table[0] + " MODIFY (" + table[1] + " blob)");
-                getIndexesQuery.setString(1, Utils.getContext().getDatabase().toUpperCase());
+                try {
+                    stmt.execute("ALTER TABLE " + table[0] + " MODIFY (" + table[1] + " blob)");
+                } catch (SQLException ex) {
+                    // This exception is thrown when this migrator isn't really needed. This happens when migrating from
+                    // a version between 3.2 and 3.5, which do use the proper table structure, but we can't easily
+                    // distinguish between a pre-3.2 database and a post-3.2 database.
+                    if (ex.getMessage().contains("ORA-22859")) {
+                        return;
+                    } else {
+                        throw ex;
+                    }
+                }
+                getIndexesQuery.setString(1, getSchemaFromWikiName(Utils.getContext().getDatabase()));
                 getIndexesQuery.setString(2, table[0]);
                 ResultSet indexes = getIndexesQuery.executeQuery();
                 while (indexes.next()) {
@@ -128,5 +141,45 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
                 }
             }
         }
+
+        /**
+         * The actual schema name isn't always the same as the virtual wiki name. Two settings in xwiki.cfg can change
+         * this. For the main wiki, by default "xwiki" is used as the schema name, but the {@code xwiki.db} setting can
+         * override this. Also, the {@code xwiki.db.prefix} can define a prefix that should be appended to all schema
+         * names, so that all the wikis in a farm can have a common prefix. And on Oracle, the schema name is always
+         * uppercased.
+         *
+         * @param wikiName the name of the virtual wiki for which to compute the schema name
+         * @return the schema name corresponding to the virtual wiki, in UPPERCASE
+         */
+        private String getSchemaFromWikiName(String wikiName)
+        {
+            if (wikiName == null) {
+                return null;
+            }
+
+            XWikiContext context = Utils.getContext();
+            XWiki wiki = context.getWiki();
+
+            String schema;
+            if (context.isMainWiki(wikiName)) {
+                // Main wiki database, by default is "xwiki", but can be changed in xwiki.cfg
+                schema = wiki.Param("xwiki.db");
+                if (schema == null) {
+                    schema = wikiName;
+                }
+            } else {
+                // Virtual wiki database name is the name of the wiki
+                schema = wikiName.replace('-', '_');
+            }
+
+            // Apply an optional prefix defined in xwiki.cfg
+            String prefix = wiki.Param("xwiki.db.prefix", "");
+            schema = prefix + schema;
+
+            // Oracle schema names are UPPERCASE
+            return schema.toUpperCase();
+        }
+
     }
 }

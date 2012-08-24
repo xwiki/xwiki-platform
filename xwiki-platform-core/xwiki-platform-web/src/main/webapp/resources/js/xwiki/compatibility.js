@@ -188,4 +188,158 @@ window.togglePanelVisibility = XWiki.togglePanelVisibility.wrap(
   }
 );
 
+/**
+ * Deprecated since 4.1M1
+ */
+window.cancelEdit = function(){
+  warn("window.cancelEdit is deprecated since XWiki 4.1M1. Use XWiki.EditLock.unlock instead.");
+  XWiki.EditLock.unlock();
+}
+
+/**
+ * Deprecated since 4.1M1
+ */
+window.lockEdit = function(){
+  warn("window.lockEdit is deprecated since XWiki 4.1M1. Use XWiki.EditLock.lock instead.");
+  XWiki.EditLock.lock();
+}
+
+/**
+ * Deprecated since 4.1M1
+ */
+window.cancelCancelEdit = function(){
+  warn("window.cancelCancelEdit is deprecated since XWiki 4.1M1. Use XWiki.EditLock.setLocked(false) instead.");
+  XWiki.EditLock.setLocked(false);
+}
+
+XWiki.resource = XWiki.resource || {};
+Object.extend(XWiki.resource, {
+  /**
+   * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome",
+   * returns null with "Main.WebHome".
+   *
+   * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).wiki} instead
+   */
+  getWikiFromResourceName: function(name) {
+    if (name.include(XWiki.constants.wikiSpaceSeparator)) {
+      return name.substring(0, name.indexOf(XWiki.constants.wikiSpaceSeparator));
+    }
+    return null;
+  },
+
+  /**
+   * Extract the name of the space from a resource name. Examples: returns "Main" with "xwiki:Main.WebHome",
+   * returns "Main" with "Main.WebHome", returns null with "WebHome".
+   *
+   * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).space} instead
+   */
+  getSpaceFromResourceName: function(name) {
+    var originalName = name;
+    // Remove wiki if any.
+    if (name.include(XWiki.constants.wikiSpaceSeparator)) {
+      name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
+    }
+    // If the resource contains an attachment, make sure the dot is not part of the attachment name.
+    if (name.include(XWiki.constants.spacePageSeparator)) {
+      if (name.include(XWiki.constants.pageAttachmentSeparator) && name.indexOf(XWiki.constants.spacePageSeparator)
+          > name.indexOf(XWiki.constants.pageAttachmentSeparator)) {
+        return null;
+      }
+      return name.substring(0, name.indexOf(XWiki.constants.spacePageSeparator));
+    }
+    // If the resource name looks like "xwiki:Main" we return "Main".
+    if (originalName.include(XWiki.constants.wikiSpaceSeparator)
+        && !originalName.include(XWiki.constants.pageAttachmentSeparator)
+        && !originalName.include(XWiki.constants.anchorSeparator)) {
+      return name;
+    }
+    return null;
+  },
+
+  /**
+   * Extract the name of the page from a resource name. Examples: returns "WebHome" with "xwiki:Main.WebHome",
+   * returns "WebHome" with "Main.WebHome", returns null with "xwiki:Main".
+   *
+   * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).name} instead
+   */
+  getNameFromResourceName: function(name) {
+    var originalName = name;
+    // Remove wiki if any.
+    if (name.include(XWiki.constants.wikiSpaceSeparator)) {
+      name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
+    }
+    // remove attachment if any.
+    if (name.include(XWiki.constants.pageAttachmentSeparator)) {
+      name = name.substring(0, name.indexOf(XWiki.constants.pageAttachmentSeparator));
+    }
+    // remove anchor if any.
+    if (name.include(XWiki.constants.anchorSeparator)) {
+      name = name.substring(0, name.indexOf(XWiki.constants.anchorSeparator));
+    }
+    if (name.include(XWiki.constants.spacePageSeparator)) {
+      return name.substring(name.indexOf(XWiki.constants.spacePageSeparator) + 1, name.length);
+    } else {
+      if (originalName.include(XWiki.constants.wikiSpaceSeparator)) {
+        // If the resource name looks like "xwiki:Main" it does not contain page info.
+        return null;
+      } else {
+        return name;
+      }
+    }
+  },
+
+  /**
+   * Extract the name of the attachment from a resource name. Examples: returns "test.zip" with
+   * "Main.WebHome@test.zip", returns null with "Main.WebHome".
+   *
+   * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).attachment} instead
+   */
+  getAttachmentFromResourceName: function(name) {
+    if (name.include(XWiki.constants.pageAttachmentSeparator)) {
+      return name.substring(name.indexOf(XWiki.constants.pageAttachmentSeparator) + 1, name.length);
+    }
+    return null;
+  },
+
+  /**
+   * Extract the name of the anchor from a resource name. Examples: returns "Comments" with
+   * "Main.WebHome#Comments", returns null with "Main.WebHome".
+   *
+   * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).anchor} instead
+   */
+  getAnchorFromResourceName: function(name) {
+    if (name.include(XWiki.constants.anchorSeparator)) {
+      return name.substring(name.indexOf(XWiki.constants.anchorSeparator) + 1, name.length);
+    }
+    return null;
+  }
+});
+
+XWiki.constants = XWiki.constants || {};
+Object.extend(XWiki.constants, {
+  /**
+   * Character that separates wiki from space in a page fullName (example: the colon in xwiki:Main.WebHome).
+   *
+   * @deprecated since 4.2M1, your code shouldn't be aware of this separator, use {@code XWiki.Model}
+   *             to resolve/serialize entity references
+   */
+  wikiSpaceSeparator: ":",
+
+  /**
+   * Character that separates space from page in a page fullName (example: the dot in xwiki:Main.WebHome).
+   *
+   * @deprecated since 4.2M1, your code shouldn't be aware of this separator, use {@code XWiki.Model}
+   *             to resolve/serialize entity references
+   */
+  spacePageSeparator: ".",
+
+  /**
+   * Character that separates page from attachment in an attachment fullName (example: the @ in xwiki:Main.WebHome@Archive.tgz).
+   *
+   * @deprecated since 4.2M1, your code shouldn't be aware of this separator, use {@code XWiki.Model}
+   *             to resolve/serialize entity references
+   */
+  pageAttachmentSeparator: "@"
+});
+
 })();

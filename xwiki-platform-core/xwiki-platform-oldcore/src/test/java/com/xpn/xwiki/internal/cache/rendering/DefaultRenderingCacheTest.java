@@ -70,7 +70,7 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         this.mockRequest = getMockery().mock(XWikiServletRequestStub.class);
         getContext().setRequest(this.mockRequest);
 
-        this.renderingCache = getComponentManager().lookup(RenderingCache.class);
+        this.renderingCache = getComponentManager().getInstance(RenderingCache.class);
 
         // @formatter:off
         getMockery().checking(new Expectations() {{
@@ -112,8 +112,9 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("renderedContent",
             this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
-        
-        getComponentManager().lookup(ObservationManager.class).notify(
+
+        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        observationManager.notify(
             new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
         Assert.assertNull(this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source",

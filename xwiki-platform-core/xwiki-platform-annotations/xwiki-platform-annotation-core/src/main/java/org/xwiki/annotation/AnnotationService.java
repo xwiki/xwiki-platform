@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.annotation;
 
 import java.util.Collection;
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Component responsible for providing annotations related services: the management of annotations (retrieving, adding,
@@ -37,7 +36,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @see org.xwiki.annotation.io.IOTargetService
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface AnnotationService
 {
     /**

@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import java.util.Collection;
+
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
@@ -31,7 +33,7 @@ import org.xwiki.extension.internal.safe.ScriptSafeProvider;
  * @since 4.0M2
  */
 public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLocalExtension<T> implements
-    LocalExtension
+    InstalledExtension
 {
     /**
      * @param localExtension the wrapped local extension
@@ -40,5 +42,43 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     public SafeInstalledExtension(T localExtension, ScriptSafeProvider<Object> safeProvider)
     {
         super(localExtension, safeProvider);
+    }
+
+    // InstalledExtension
+
+    @Override
+    public LocalExtension getLocalExtension()
+    {
+        return safe(getWrapped().getLocalExtension());
+    }
+
+    @Override
+    public boolean isInstalled()
+    {
+        return getWrapped().isInstalled();
+    }
+
+    @Override
+    public boolean isInstalled(String namespace)
+    {
+        return getWrapped().isInstalled(namespace);
+    }
+
+    @Override
+    public boolean isValid(String namespace)
+    {
+        return getWrapped().isValid(namespace);
+    }
+
+    @Override
+    public Collection<String> getNamespaces()
+    {
+        return safe(getWrapped().getNamespaces());
+    }
+
+    @Override
+    public boolean isDependency()
+    {
+        return getWrapped().isDependency();
     }
 }

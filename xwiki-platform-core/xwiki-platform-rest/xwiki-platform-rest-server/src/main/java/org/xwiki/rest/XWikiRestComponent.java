@@ -19,7 +19,7 @@
  */
 package org.xwiki.rest;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * <p>
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface XWikiRestComponent
 {
 }

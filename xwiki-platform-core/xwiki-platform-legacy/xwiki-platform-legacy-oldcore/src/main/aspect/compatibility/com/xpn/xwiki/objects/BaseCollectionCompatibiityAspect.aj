@@ -21,6 +21,9 @@ package com.xpn.xwiki.objects;
 
 import java.util.List;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.classes.BaseClass;
+
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.BaseCollection} class.
  * 
@@ -39,5 +42,11 @@ public aspect BaseCollectionCompatibiityAspect
             property = new StringListProperty();
         property.setValue(value);
         safeput(name, property);
+    }
+
+    @Deprecated
+    public BaseClass BaseCollection.getxWikiClass(XWikiContext context)
+    {
+        return getXClass(context);
     }
 }

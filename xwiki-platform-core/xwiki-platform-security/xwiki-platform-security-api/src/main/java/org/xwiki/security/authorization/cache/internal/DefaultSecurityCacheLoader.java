@@ -102,16 +102,12 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                 return loadRequiredEntries(user, entity);
             } catch (ParentEntryEvictedException e) {
                 if (retries < MAX_RETRIES) {
-                    this.logger.debug("The parent entry was evicted. Have tried " 
-                                      + retries
-                                      + " times.  Trying again...");
+                    this.logger.debug("The parent entry was evicted. Have tried {} times.  Trying again...", retries);
                     continue;
                 }
             } catch (ConflictingInsertionException e) {
                 if (retries < MAX_RETRIES) {
-                    this.logger.debug("There were conflicting insertions. Have tried "
-                                      + retries
-                                      + " times.  Retrying...");
+                    this.logger.debug("There were conflicting insertions. Have tried {} times.  Retrying...", retries);
                     continue;
                 }
             } finally {

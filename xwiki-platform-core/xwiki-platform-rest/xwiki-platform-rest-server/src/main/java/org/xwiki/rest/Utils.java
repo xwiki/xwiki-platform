@@ -161,10 +161,10 @@ public class Utils
      */
     public static XWikiContext getXWikiContext(ComponentManager componentManager)
     {
-        Execution execution = null;
-        XWikiContext xwikiContext = null;
+        Execution execution;
+        XWikiContext xwikiContext;
         try {
-            execution = componentManager.lookup(Execution.class);
+            execution = componentManager.getInstance(Execution.class);
             xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
             return xwikiContext;
         } catch (Exception e) {

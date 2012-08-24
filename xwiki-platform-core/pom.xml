@@ -27,15 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.4.0</gwt.version>
-    <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
+    <gwt.version>2.5.0-rc1</gwt.version>
+    <gwt.maven.plugin.version>2.5.0-rc1</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
   </properties>
   <dependencies>
@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
+      <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -86,19 +86,37 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2</version>
+        <version>2.5.3</version>
       </dependency>
       <!-- JFreeChart -->
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
         <version>1.0.14</version>
+        <exclusions>
+          <!-- Not actually needed -->
+          <exclusion>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>2.12.2.Final</version>
+        <version>3.1.0.Final</version>
+      </dependency>
+      <!-- Apache Tika used by Lucene and Office modules -->
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parsers</artifactId>
+        <version>1.2</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
@@ -217,6 +235,34 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/internal/**</exclude>
+            <exclude>**/test/**</exclude>
+            <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Add a method to the oldcore/wikimacro bridge -->
+            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroFactory</exclude>
+            <!-- Added method to get the author of the macro -->
+            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacro</exclude>
+            <!-- Chart plugin has been moved from oldcore to its own module. There's no API breakage for the user -->
+            <exclude>com/xpn/xwiki/plugin/charts/**</exclude>
+            <!-- TODO Andreas: Explain why we have to break backward compatibility for the Chart module -->
+            <exclude>org/xwiki/chart/model/ChartModel</exclude>
+            <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
+            <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
+            <!-- Removed protected method (registerWikiMacros) that was not supposed to be used from outside
+                (was protected for unit tests hacks. -->
+            <exclude>com/xpn/xwiki/XWiki</exclude>
+            <!-- These classes below have never been used. It was supposed to be the start of the removal of Struts but
+                 since it hasn't progressed so far we're removing stray code from master. Experiments should be done
+                 on feature branches -->
+            <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
     <extensions>
       <!-- Needed to add support for the "xar" packaging -->
@@ -229,12 +275,12 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application-manager</module>
     <module>xwiki-platform-appwithinminutes</module>
+    <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-cache</module>
@@ -253,6 +299,8 @@
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-formula</module>
+    <module>xwiki-platform-git</module>
+    <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-invitation</module>
@@ -262,6 +310,7 @@
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
@@ -272,6 +321,7 @@
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-rendering</module>
+    <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
@@ -298,75 +348,16 @@
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>
-    <!-- We only build legacy modules in the "ci" or "release" profiles since they're not needed when developing
-         day to day and it speeds up the build -->
+    <!-- Profile to build Legacy modules -->
     <profile>
-      <id>ci</id>
-      <activation>
-        <!-- This property is automatically defined by the Maven release plugin when executing
-             a release. Thus this profile will be automatically enabled when releasing -->
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
+      <id>legacy</id>
       <modules>
         <module>xwiki-platform-legacy</module>
       </modules>
     </profile>
     <profile>
-      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
-           Cobertura instrumentation in a special profile (when the Cobertura profile is
-           executed, the Clirr one isn't). -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <!-- Remove the following excludes after we release 4.0 -->
-                <exclude>com/xpn/xwiki/objects/BaseCollection</exclude>
-                <exclude>com/xpn/xwiki/objects/BaseObject</exclude>
-                <exclude>com/xpn/xwiki/objects/BaseProperty</exclude>
-                <exclude>com/xpn/xwiki/objects/PropertyInterface</exclude>
-                <exclude>com/xpn/xwiki/objects/classes/PropertyClass</exclude>
-                <exclude>com/xpn/xwiki/store/XWikiHibernateBaseStore</exclude>
-                <exclude>com/xpn/xwiki/stats/impl/XWikiStats</exclude>
-                <exclude>com/xpn/xwiki/store/migration/AbstractDataMigrationManager*</exclude>
-                <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration*</exclude>
-                <exclude>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigrationManager*</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable</exclude>
-                <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/exec/InsertExecutable$1</exclude>
-                <exclude>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</exclude>
-                <exclude>org/xwiki/test/ui/po/CommentsTab</exclude>
-                <exclude>org/xwiki/test/ui/po/DeleteConfirmationPage</exclude>
-                <exclude>org/xwiki/test/ui/po/DeletePage</exclude>
-                <exclude>org/xwiki/test/ui/po/ViewPage</exclude>
-                <exclude>org/xwiki/test/ui/browser/IgnoreBrowser</exclude>
-                <!-- START: Removed Deprecations -->
-                <exclude>org/xwiki/bridge/AttachmentName</exclude>
-                <exclude>org/xwiki/bridge/DocumentName</exclude>
-                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
-                <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
-                <exclude>com/xpn/xwiki/doc/DefaultDocumentAccessBridge</exclude>
-                <exclude>com/xpn/xwiki/doc/XWikiDocument</exclude>
-                <!-- STOP: Removed Deprecations -->
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <xwiki.clirr.skip>false</xwiki.clirr.skip>
-      </properties>
-    </profile>
-    <profile>
-      <id>gwtTestManual</id>
+      <!-- Allows running GWT tests manually -->
+      <id>gwt-test-manual</id>
       <build>
         <plugins>
           <plugin>

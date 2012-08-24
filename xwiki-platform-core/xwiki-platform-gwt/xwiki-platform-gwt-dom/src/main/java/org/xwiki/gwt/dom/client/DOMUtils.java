@@ -146,7 +146,7 @@ public class DOMUtils
      * case style ({@code fontWeight}) and it is used like this {@code object.style.propertyJSName = value}. The CSS
      * name has dash style ({@code font-weight}) and it is used like this {@code propertyCSSName: value;}.
      * 
-     * @param el the element for which we retrieve the property value.
+     * @param element the element for which we retrieve the property value.
      * @param propertyName the script name of the CSS property whose value is returned.
      * @return the computed value of the specified CSS property for the given element.
      */

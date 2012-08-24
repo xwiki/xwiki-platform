@@ -74,6 +74,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("loginerror", Right.LOGIN)
             .putAction("loginsubmit", Right.LOGIN)
             .putAction("viewrev", Right.VIEW)
+            .putAction("viewattachrev", Right.VIEW)
             .putAction("get", Right.VIEW)
             .putAction("downloadrev", Right.VIEW)
             .putAction("plain", Right.VIEW)

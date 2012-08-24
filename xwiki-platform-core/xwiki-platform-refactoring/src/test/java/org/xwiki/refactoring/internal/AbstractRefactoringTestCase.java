@@ -63,7 +63,7 @@ public class AbstractRefactoringTestCase extends AbstractComponentTestCase
             allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(false));
         }});
 
-        this.docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
-        this.xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
+        this.docBridge = getComponentManager().getInstance(DocumentAccessBridge.class, "default");
+        this.xwikiParser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
     }
 }

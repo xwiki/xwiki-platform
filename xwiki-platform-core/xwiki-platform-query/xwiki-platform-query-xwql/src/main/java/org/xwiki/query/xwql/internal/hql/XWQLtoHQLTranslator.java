@@ -46,7 +46,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         input = input.trim();
         String lcInput = input.toLowerCase();
         String addition = "select doc.fullName from Document as doc ";
-        if (lcInput.startsWith("where") | lcInput.startsWith("order") || lcInput.length() == 0) {
+        if (lcInput.startsWith("where") || lcInput.startsWith("order") || lcInput.length() == 0) {
             input = addition + input;
         } else if (lcInput.startsWith("from")) {
             input = addition + "," + input.substring(4);

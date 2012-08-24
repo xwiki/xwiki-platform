@@ -88,11 +88,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
-            @Override
-            protected void registerWikiMacros()
-            {
-            }
-
             // Avoid all the error at XWiki initialization
             @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
@@ -321,7 +316,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         mockListener.expects(once()).method("getEvents")
             .will(returnValue(Arrays.asList(new DocumentCreatedEvent(ref), new DocumentCreatingEvent(ref))));
 
-        ObservationManager om = getComponentManager().lookup(ObservationManager.class);
+        ObservationManager om = getComponentManager().getInstance(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwikitest", "Some", "Document"));
@@ -347,7 +342,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         mockListener.expects(once()).method("getEvents")
             .will(returnValue(Arrays.asList(new DocumentDeletedEvent(ref), new DocumentDeletingEvent(ref))));
 
-        ObservationManager om = getComponentManager().lookup(ObservationManager.class);
+        ObservationManager om = getComponentManager().getInstance(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwikitest", "Another", "Document"));

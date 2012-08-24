@@ -35,6 +35,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.radeox.filter.CacheFilter;
 import org.radeox.filter.ListFilter;
 import org.radeox.filter.context.FilterContext;
@@ -163,9 +164,8 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
         char[] lastBullet = new char[0];
         String line = null;
         while ((line = reader.readLine()) != null) {
-            // No nested list handling, trim lines:
             line = line.trim();
-            int bulletEnd = line.indexOf(' ');
+            int bulletEnd = StringUtils.indexOfAny(line, ' ', '\t');
             if (line.length() == 0 || bulletEnd < 1) {
                 continue;
             }
@@ -178,7 +178,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
             interpolateLists(buffer, lastBullet, bullet);
             openItem(buffer, bullet[bullet.length - 1]);
-            buffer.append(line.substring(line.indexOf(' ') + 1));
+            buffer.append(line.substring(StringUtils.indexOfAny(line, ' ', '\t') + 1).trim());
             lastBullet = bullet;
         }
 

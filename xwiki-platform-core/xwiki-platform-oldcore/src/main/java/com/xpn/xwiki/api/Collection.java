@@ -38,7 +38,7 @@ public abstract class Collection extends Element
 
     public Class getxWikiClass()
     {
-        return new Class(getCollection().getxWikiClass(getXWikiContext()), getXWikiContext());
+        return new Class(getCollection().getXClass(getXWikiContext()), getXWikiContext());
     }
 
     @Override

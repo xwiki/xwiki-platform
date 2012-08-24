@@ -1,145 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Panels</web>
-<name>TagCloud</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Panels.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1244046169000</creationDate>
-<date>1244046169000</date>
-<contentUpdateDate>1244046169000</contentUpdateDate>
-<version>1.1</version>
-<title>Tag Cloud Panel</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>Panels.PanelClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>Information|Navigation|Tools|Administration|Other</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</category>
-<content>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>Text</editor>
-<name>content</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>Content</prettyName>
-<rows>25</rows>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<description>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<editor>PureText</editor>
-<name>description</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Name</prettyName>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<type>
-<cache>0</cache>
-<customDisplay></customDisplay>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>type</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Panel type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>view|edit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-</class>
-<name>Panels.TagCloud</name>
-<number>0</number>
-<className>Panels.PanelClass</className>
-<guid>d9b9383e-275c-4b18-a9c1-2334426076fa</guid>
-<property>
-<category>Information</category>
-</property>
-<property>
-<content>{{velocity}}
+  <web>Panels</web>
+  <name>TagCloud</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1244046169000</creationDate>
+  <date>1244046169000</date>
+  <contentUpdateDate>1244046169000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Tag Cloud Panel</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>Panels.PanelClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>Information|Navigation|Tools|Administration|Other</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </category>
+      <content>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Content</prettyName>
+        <rows>25</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <description>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>description</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Panel type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>view|edit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <name>Panels.TagCloud</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>d9b9383e-275c-4b18-a9c1-2334426076fa</guid>
+    <property>
+      <category>Information</category>
+    </property>
+    <property>
+      <content>{{velocity}}
 #panelheader($msg.get('xe.panels.tagcloud.title'))
 {{include document="XWiki.TagCloud"/}}
 #panelfooter()
 {{/velocity}}</content>
-</property>
-<property>
-<description></description>
-</property>
-<property>
-<name>Tag Cloud</name>
-</property>
-<property>
-<type>view</type>
-</property>
-</object>
-<content>{{include document="Panels.PanelSheet"/}}</content></xwikidoc>
+    </property>
+    <property>
+      <description/>
+    </property>
+    <property>
+      <name>Tag Cloud</name>
+    </property>
+    <property>
+      <type>view</type>
+    </property>
+  </object>
+  <content>{{include document="Panels.PanelSheet"/}}</content>
+</xwikidoc>

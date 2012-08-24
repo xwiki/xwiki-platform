@@ -211,17 +211,17 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
     @Test
     public void getAnnotatedHTML() throws Exception
     {
-        Parser parser = getComponentManager().lookup(Parser.class, docFactory.getDocument(docName).getSyntax());
+        Parser parser = getComponentManager().getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
         XDOM xdom = parser.parse(new StringReader(docFactory.getDocument(docName).getSource()));
-        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = getComponentManager().getInstance(SyntaxFactory.class);
 
         // run transformations
-        TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
+        TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, new TransformationContext(xdom,
             syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
 
         AnnotationPrintRenderer renderer =
-            getComponentManager().lookup(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
+            getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
         WikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
         // set the annotations for this renderer
@@ -241,17 +241,17 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
     @Test
     public void getAnnotatedHTMLWithoutAnnotations() throws Exception
     {
-        Parser parser = getComponentManager().lookup(Parser.class, docFactory.getDocument(docName).getSyntax());
+        Parser parser = getComponentManager().getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
         XDOM xdom = parser.parse(new StringReader(docFactory.getDocument(docName).getSource()));
-        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = getComponentManager().getInstance(SyntaxFactory.class);
 
         // run transformations
-        TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
+        TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, new TransformationContext(xdom,
             syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
 
         AnnotationPrintRenderer renderer =
-            getComponentManager().lookup(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
+            getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
         WikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
 

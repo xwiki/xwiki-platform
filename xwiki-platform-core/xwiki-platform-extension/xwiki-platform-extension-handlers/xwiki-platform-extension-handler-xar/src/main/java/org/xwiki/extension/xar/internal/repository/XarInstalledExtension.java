@@ -49,7 +49,7 @@ public class XarInstalledExtension extends WrappingInstalledExtension<InstalledE
 
     public List<XarEntry> getPages()
     {
-        return pages;
+        return this.pages;
     }
 
     private void enumeratePages(Packager packager) throws IOException

@@ -13,10 +13,10 @@
 ##
 #if (!$xcontext.action.startsWith('login'))
   #if ($isGuest)
-    #set ($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+    #set ($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
     #xwikitopmenuentry($!loginurl $!msg.get('login') 'tmLogin')
   #else
-    #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
+    #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
     #xwikitopmenuentry($!logouturl $!msg.get('logout') 'tmLogout')
   #end
 #end

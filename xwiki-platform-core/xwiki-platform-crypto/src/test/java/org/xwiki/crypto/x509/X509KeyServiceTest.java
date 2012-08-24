@@ -80,7 +80,7 @@ public class X509KeyServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.passwordService = getComponentManager().lookup(PasswordCryptoService.class);
+        this.passwordService = getComponentManager().getInstance(PasswordCryptoService.class);
     }
 
     @Test

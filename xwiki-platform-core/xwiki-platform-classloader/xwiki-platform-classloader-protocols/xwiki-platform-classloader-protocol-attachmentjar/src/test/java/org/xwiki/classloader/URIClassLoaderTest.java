@@ -63,9 +63,11 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
     @Test
     public void testFindResource() throws Exception
     {
+        URLStreamHandlerFactory urlStreamHandlerFactory =
+            getComponentManager().getInstance(URLStreamHandlerFactory.class);
         URIClassLoader cl =
             new URIClassLoader(new URI[] {new URI("attachmentjar://page%40filename1"), new URI("http://some/url"),
-            new URI("attachmentjar://filename2")}, getComponentManager().lookup(URLStreamHandlerFactory.class));
+            new URI("attachmentjar://filename2")}, urlStreamHandlerFactory);
 
         Assert.assertEquals(3, cl.getURLs().length);
         Assert.assertEquals("attachmentjar://page%40filename1", cl.getURLs()[0].toString());

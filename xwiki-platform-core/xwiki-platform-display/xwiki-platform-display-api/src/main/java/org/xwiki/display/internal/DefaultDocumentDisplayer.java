@@ -66,13 +66,13 @@ public class DefaultDocumentDisplayer implements DocumentDisplayer
         DocumentDisplayer displayer;
         if (parameters.isTitleDisplayed()) {
             try {
-                displayer = componentManager.lookup(DocumentDisplayer.class, "title/" + syntaxId);
+                displayer = componentManager.getInstance(DocumentDisplayer.class, "title/" + syntaxId);
             } catch (ComponentLookupException e) {
                 displayer = titleDisplayer;
             }
         } else {
             try {
-                displayer = componentManager.lookup(DocumentDisplayer.class, "content/" + syntaxId);
+                displayer = componentManager.getInstance(DocumentDisplayer.class, "content/" + syntaxId);
             } catch (ComponentLookupException e) {
                 displayer = contentDisplayer;
             }

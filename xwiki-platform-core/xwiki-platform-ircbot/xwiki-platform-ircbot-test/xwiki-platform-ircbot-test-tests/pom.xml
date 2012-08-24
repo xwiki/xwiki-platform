@@ -27,11 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ircbot-test</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot-test-tests</artifactId>
   <name>XWiki Platform - IRC Bot - Tests - Functional Tests</name>
-  <packaging>functional-test</packaging>
+  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
+       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+  <packaging>jar</packaging>
   <description>XWiki Platform - IRC Bot - Functional Tests</description>
   <properties>
     <!-- TODO: Remove once http://jira.xwiki.org/jira/browse/XWIKI-7581 is fixed -->
@@ -85,9 +87,7 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Even though the functional-test packaging ensures that the packager plugin will execute we still need to
-           redefine it here in order to make sure the right version is used as otherwise Maven will use the last
-           released version which may be the wrong one. -->
+      <!-- TODO: Remove when the following issue is fixed: http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
@@ -97,15 +97,46 @@
         <configuration>
           <importUser>superadmin</importUser>
         </configuration>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
-    <extensions>
-      <!-- Needed to add support for the "functional-test" packaging -->
-      <extension>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-functional-test-lifecycle</artifactId>
-        <version>${project.version}</version>
-      </extension>
-    </extensions>
   </build>
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.
+           It's needed because instrumented jars in the WAR will call Clover APIs at runtime when they execute. -->
+      <dependencies>
+        <dependency>
+          <groupId>com.cenqua.clover</groupId>
+          <artifactId>clover</artifactId>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
+               that have been instrumented with Clover (XWiki oldcore for example) -->
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+            <version>${project.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>com.cenqua.clover</groupId>
+                <artifactId>clover</artifactId>
+                <version>3.1.6</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

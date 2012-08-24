@@ -728,7 +728,7 @@ public class HibernateQuery extends DefaultQuery
             } catch (XWikiException e) {
                 throw new TranslateException("Couldn't load BaseClass document", e);
             }
-            BaseClass bc = doc.getxWikiClass();
+            BaseClass bc = doc.getXClass();
             if (bc == null)
                 throw new TranslateException("Couldn't load BaseClass");
 

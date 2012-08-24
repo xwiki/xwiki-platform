@@ -116,7 +116,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         // Create the XDOM.
         XDOM xdom = buildPresentationXDOM(html, documentReference);
 
-        return new XDOMOfficeDocument(xdom, artifacts, componentManager);
+        return new XDOMOfficeDocument(xdom, artifacts, this.componentManager);
     }
 
     /**
@@ -139,7 +139,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
             // artifact displays a screen shot of the first presentation slide.
-            return officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
+            return this.officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
         } catch (OpenOfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), e);
@@ -153,7 +153,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * with the given {@code nameSpace} to avoid name conflicts.
      * 
      * @param presentationArtifacts the map of presentation artifacts; this method removes some of the presentation
-     *            artifacts and renames others so be aware of the side effects
+     *        artifacts and renames others so be aware of the side effects
      * @param nameSpace the prefix to add in front of all slide image names to prevent name conflicts
      * @return the presentation HTML
      */
@@ -203,10 +203,10 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     protected String cleanPresentationHTML(String dirtyHTML, DocumentReference targetDocumentReference)
     {
-        HTMLCleanerConfiguration configuration = ooHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", entityReferenceSerializer
+        HTMLCleanerConfiguration configuration = this.ooHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", this.entityReferenceSerializer
             .serialize(targetDocumentReference)));
-        Document xhtmlDocument = ooHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
+        Document xhtmlDocument = this.ooHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
         HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
         return HTMLUtils.toString(xhtmlDocument);
     }
@@ -216,7 +216,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * 
      * @param html the HTML text to parse
      * @param targetDocumentReference specifies the document where the presentation will be imported; we use the target
-     *            document reference to get the syntax of the target document;
+     *        document reference to get the syntax of the target document;
      * @return a XDOM tree
      * @throws OfficeImporterException if parsing the given HTML fails
      */
@@ -224,12 +224,12 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         throws OfficeImporterException
     {
         try {
-            String syntaxId = documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
-            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
+            String syntaxId = this.documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, syntaxId);
 
             Map<String, String> galleryParameters = Collections.emptyMap();
             ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);
-            gallery.addChild(xhtmlParser.parse(new StringReader(html)));
+            gallery.addChild(this.xhtmlParser.parse(new StringReader(html)));
 
             return new XDOM(Collections.singletonList((Block) gallery));
         } catch (Exception e) {

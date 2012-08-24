@@ -60,7 +60,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
-import org.xwiki.test.AbstractMockingComponentTestCase;
 
 /**
  * Tests for FilesystemAttachmentStore.
@@ -69,7 +68,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
  * @since 3.0M2
  */
 @RunWith(JMock.class)
-public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestCase
+public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentStoreTest
 {
     private static final String HELLO = "Hello World";
 

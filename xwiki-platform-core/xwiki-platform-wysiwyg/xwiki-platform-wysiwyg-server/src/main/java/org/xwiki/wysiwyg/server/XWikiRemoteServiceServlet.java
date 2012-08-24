@@ -19,6 +19,8 @@
  */
 package org.xwiki.wysiwyg.server;
 
+import java.lang.reflect.Type;
+
 import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.SerializationException;
@@ -46,7 +48,7 @@ public class XWikiRemoteServiceServlet extends RemoteServiceServlet
     {
         try {
             RPCRequest req = RPC.decodeRequest(payload, null, this);
-            RemoteService service = (RemoteService) Utils.getComponent(req.getMethod().getDeclaringClass());
+            RemoteService service = (RemoteService) Utils.getComponent((Type) req.getMethod().getDeclaringClass());
             return RPC.invokeAndEncodeResponse(service, req.getMethod(), req.getParameters(),
                 req.getSerializationPolicy());
         } catch (IncompatibleRemoteServiceException ex) {

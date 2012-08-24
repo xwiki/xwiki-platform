@@ -60,8 +60,8 @@ public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTes
     public void setUp() throws Exception
     {
         super.setUp();
-        this.openOfficeHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "openoffice");
-        this.wysiwygHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
+        this.openOfficeHTMLCleaner = getComponentManager().getInstance(HTMLCleaner.class, "openoffice");
+        this.wysiwygHTMLCleaner = getComponentManager().getInstance(HTMLCleaner.class, "wysiwyg");
     }
 
     /**

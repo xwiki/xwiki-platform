@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Scheduler</web>
-<name>WebHome</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebHome</parent>
-<creator>xwiki:XWiki.Admin</creator>
-<author>xwiki:XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1288213047000</date>
-<contentUpdateDate>1288213047000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.scheduler")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>Scheduler</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1288213047000</date>
+  <contentUpdateDate>1288213047000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("xe.scheduler")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 ## First, set a shortcut to our Scheduler plugin
 ##
 #set ($scheduler = $xwiki.scheduler)
@@ -189,4 +190,5 @@ $msg.get('xe.scheduler.welcome')
   {{warning}}$msg.get('xe.scheduler.jobs.warning')){{/warning}}
 
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

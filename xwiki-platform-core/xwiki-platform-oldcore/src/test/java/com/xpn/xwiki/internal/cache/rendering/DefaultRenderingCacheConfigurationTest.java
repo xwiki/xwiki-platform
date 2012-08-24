@@ -51,12 +51,13 @@ public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedCompo
 
     private MockConfigurationSource getWikiConfigurationSource() throws Exception
     {
-        return (MockConfigurationSource) getComponentManager().lookup(ConfigurationSource.class, "wiki");
+        return (MockConfigurationSource) getComponentManager().getInstance(ConfigurationSource.class, "wiki");
     }
 
     private MockConfigurationSource getXWikiPropertiesConfigurationSource() throws Exception
     {
-        return (MockConfigurationSource) getComponentManager().lookup(ConfigurationSource.class, "xwikiproperties");
+        return (MockConfigurationSource) getComponentManager().getInstance(
+            ConfigurationSource.class, "xwikiproperties");
     }
 
     @Override
@@ -64,7 +65,7 @@ public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedCompo
     {
         super.setUp();
 
-        this.configuration = getComponentManager().lookup(RenderingCacheConfiguration.class);
+        this.configuration = getComponentManager().getInstance(RenderingCacheConfiguration.class);
         this.documentReference = new DocumentReference("wiki", "space", "page");
 
         getContext().setDatabase("wiki");

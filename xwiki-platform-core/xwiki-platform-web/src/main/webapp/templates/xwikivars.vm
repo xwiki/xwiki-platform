@@ -102,9 +102,10 @@
   #set ($headertitle = "<a href='$viewUrl'>$escapetool.xml(${doc.displayTitle})</a>")
 #end
 #set ($skin = $xwiki.getSkin())
-#set ($copyright = $xwiki.getSpaceCopyright())
+## Compute the copyright and evaluate its content with Velocity to allow users to put some scripts inside
+#set ($copyright = $xwiki.parseContent($xwiki.getSpaceCopyright()))
 #set ($xwikimode = $xcontext.getMode())
-#set ($logredir = $escapetool.xml($xwiki.getRequestURL()))
+#set ($logredir = $escapetool.xml($xwiki.relativeRequestURL))
 ##
 #if ($xwiki.exists('XWiki.MaintenanceInfo'))
   #set ($maintenanceinfo = 'XWiki.MaintenanceInfo')

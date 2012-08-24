@@ -22,6 +22,7 @@ package com.xpn.xwiki.export.html;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +38,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -104,6 +106,11 @@ public class HtmlPackager
      * The pages to export. A {@link Set} of page name.
      */
     private Set<String> pages = new HashSet<String>();
+
+    /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Modify the name of the package for which packager append ".zip".
@@ -286,7 +293,7 @@ public class HtmlPackager
 
         ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         tempdir.mkdirs();
         File attachmentDir = new File(tempdir, "attachment");

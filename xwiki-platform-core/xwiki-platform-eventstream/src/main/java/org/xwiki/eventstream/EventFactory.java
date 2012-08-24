@@ -19,7 +19,7 @@
  */
 package org.xwiki.eventstream;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A factory which creates {@link Event} objects ready to be used. Besides instantiating an Event object, the factory
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole
+@Role
 public interface EventFactory
 {
     /**

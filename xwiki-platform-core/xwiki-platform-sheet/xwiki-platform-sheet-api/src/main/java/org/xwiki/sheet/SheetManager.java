@@ -22,7 +22,7 @@ package org.xwiki.sheet;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 3.2M3
  */
-@ComponentRole
+@Role
 public interface SheetManager
 {
     /**

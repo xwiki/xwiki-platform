@@ -31,41 +31,52 @@ import org.xwiki.rendering.parser.Parser;
 
 /**
  * Test case for {@link XDOMOfficeDocument}.
- *
+ * 
  * @version $Id$
  * @since 2.2.5
  */
 public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
 {
+    /**
+     * Tests how document title is extracted from the content of the imported document.
+     * 
+     * @throws Exception if it fails to extract the title
+     */
     @Test
     public void testTitleExtraction() throws Exception
     {
-        String content = "content before title\n" +
-        		"%s Title %s\n" +
-        		"content after title.";
+        String content = "content before title\n" + "%s Title %s\n" + "content after title.";
         XDOMOfficeDocument doc = createOfficeDocument(String.format(content, "=", "="), "xwiki/2.0");
         Assert.assertEquals("Title", doc.getTitle());
-        
+
         doc = createOfficeDocument(String.format(content, "==", "=="), "xwiki/2.0");
         Assert.assertEquals("Title", doc.getTitle());
-        
+
         doc = createOfficeDocument(String.format(content, "===", "==="), "xwiki/2.0");
         Assert.assertEquals("Title", doc.getTitle());
-        
+
         doc = createOfficeDocument(String.format(content, "====", "===="), "xwiki/2.0");
         Assert.assertEquals("Title", doc.getTitle());
-        
+
         doc = createOfficeDocument(String.format(content, "=====", "====="), "xwiki/2.0");
         Assert.assertEquals("Title", doc.getTitle());
-        
+
         doc = createOfficeDocument(String.format(content, "======", "======"), "xwiki/2.0");
         Assert.assertEquals("Title", doc.getTitle());
     }
-    
+
+    /**
+     * Creates an {@link XDOMOfficeDocument} by parsing the given content.
+     * 
+     * @param content the content to be parsed
+     * @param syntax the syntax of the given content
+     * @return the created {@link XDOMOfficeDocument}
+     * @throws Exception if it fails to parse the given content
+     */
     private XDOMOfficeDocument createOfficeDocument(String content, String syntax) throws Exception
     {
-        Parser parser = getComponentManager().lookup(Parser.class, syntax);
-        XDOM xdom = parser.parse(new StringReader(content));        
+        Parser parser = getComponentManager().getInstance(Parser.class, syntax);
+        XDOM xdom = parser.parse(new StringReader(content));
         return new XDOMOfficeDocument(xdom, new HashMap<String, byte[]>(), getComponentManager());
     }
 }

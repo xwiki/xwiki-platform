@@ -52,21 +52,13 @@ public class MockPluginFactory implements PluginFactory
         this.plugin = plugin;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactory#newInstance()
-     */
+    @Override
     public Plugin newInstance()
     {
         return plugin;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactory#getPluginName()
-     */
+    @Override
     public String getPluginName()
     {
         return pluginName;

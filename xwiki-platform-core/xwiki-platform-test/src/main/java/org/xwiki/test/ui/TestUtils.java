@@ -80,8 +80,12 @@ public class TestUtils
     private static final String SCREENSHOT_DIR = System.getProperty("screenshotDirectory");
 
     private static PersistentTestContext context;
+    
+    private static final String URL = System.getProperty("xe.url", "http://localhost");
+    
+    public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
-    private static final String BASE_URL = "http://localhost:8080/xwiki/";
+    private static final String BASE_URL = URL + ":" + DEFAULT_PORT + "/xwiki/";
 
     private static final String BASE_BIN_URL = BASE_URL + "bin/";
 
@@ -768,6 +772,7 @@ public class TestUtils
             if (value instanceof Iterable) {
                 for (Object element : (Iterable< ? >) value) {
                     addQueryStringEntry(builder, key, element.toString());
+                    builder.append('&');
                 }
             } else {
                 addQueryStringEntry(builder, key, value.toString());
@@ -952,6 +957,17 @@ public class TestUtils
 
     public void attachFile(String space, String page, String name, File file, boolean failIfExists) throws Exception
     {
+        InputStream is = new FileInputStream(file);
+        try {
+            attachFile(space, page, name, is, failIfExists);
+        } finally {
+            is.close();
+        }
+    }
+
+    public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists)
+        throws Exception
+    {
         // make sure xwiki.Import exists
         if (!pageExists(space, page)) {
             createPage(space, page, null, null);
@@ -964,18 +980,13 @@ public class TestUtils
         url.append("/pages/");
         url.append(escapeURL(page));
         url.append("/attachments/");
-        url.append(escapeURL(file.getName()));
+        url.append(escapeURL(name));
 
-        InputStream is = new FileInputStream(file);
-        try {
-            if (failIfExists) {
-                executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode());
-            } else {
-                executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode(),
-                    Status.ACCEPTED.getStatusCode());
-            }
-        } finally {
-            is.close();
+        if (failIfExists) {
+            executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode());
+        } else {
+            executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode(),
+                Status.ACCEPTED.getStatusCode());
         }
     }
 

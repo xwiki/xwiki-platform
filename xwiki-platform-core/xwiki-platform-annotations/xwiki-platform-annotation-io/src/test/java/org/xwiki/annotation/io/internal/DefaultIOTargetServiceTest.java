@@ -61,7 +61,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         super.setUp();
 
         // get the default io target service
-        ioTargetService = getComponentManager().lookup(IOTargetService.class);
+        ioTargetService = getComponentManager().getInstance(IOTargetService.class);
     }
 
     @Test

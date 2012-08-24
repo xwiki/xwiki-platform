@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.formula;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Configuration properties for the {@link org.xwiki.rendering.internal.macro.formula.FormulaMacro formula macro}.
@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M3
  */
-@ComponentRole
+@Role
 public interface FormulaMacroConfiguration
 {
     /**

@@ -16,11 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package compatibility.com.xpn.xwiki.api;
 
 import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Add a backward compatibility layer to the {@link Context} class.
@@ -37,5 +37,18 @@ public privileged aspect ContextCompatibilityAspect
     public boolean Context.isVirtual()
     {
         return !this.isMainWiki();
+    }
+
+    /**
+     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
+     * 
+     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
+     * @see Util
+     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
+     */
+    @Deprecated
+    public Util Context.getUtil()
+    {
+        return this.context.getUtil();
     }
 }

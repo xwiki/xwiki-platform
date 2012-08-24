@@ -21,7 +21,7 @@ package org.xwiki.rendering.macro.dashboard;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.rendering.block.Block;
  * @version $Id$
  * @since 3.0rc1
  */
-@ComponentRole
+@Role
 public interface GadgetRenderer
 {
     /**

@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.server.filter;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,10 +35,15 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletContext;
@@ -136,7 +142,12 @@ public class XWikiContextInitializationFilter implements Filter
             // Initialize the current user.
             XWikiUser user = context.getWiki().checkAuth(context);
             if (user != null) {
-                context.setUser(user.getUser());
+                DocumentReferenceResolver<String> documentReferenceResolver =
+                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
+                SpaceReference defaultUserSpace = new SpaceReference("XWiki", new WikiReference("xwiki"));
+                DocumentReference userReference = documentReferenceResolver.resolve(user.getUser(), defaultUserSpace);
+                context.setUserReference(XWikiRightService.GUEST_USER.equals(userReference.getName()) ? null
+                    : userReference);
             }
         } catch (XWikiException e) {
             throw new ServletException("Failed to initialize the XWiki context.", e);
@@ -152,7 +163,7 @@ public class XWikiContextInitializationFilter implements Filter
         // Initialize the Container fields (request, response, session). Note that this is a bridge between the old core
         // and the component architecture. In the new component architecture we use ThreadLocal to transport the
         // request, response and session to components which require them.
-        ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
+        ServletContainerInitializer containerInitializer = Utils.getComponent((Type) ServletContainerInitializer.class);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
@@ -169,12 +180,12 @@ public class XWikiContextInitializationFilter implements Filter
      */
     protected void cleanupComponents()
     {
-        Container container = Utils.getComponent(Container.class);
+        Container container = Utils.getComponent((Type) Container.class);
         container.removeRequest();
         container.removeResponse();
         container.removeSession();
 
-        Execution execution = Utils.getComponent(Execution.class);
+        Execution execution = Utils.getComponent((Type) Execution.class);
         execution.removeContext();
     }
 }

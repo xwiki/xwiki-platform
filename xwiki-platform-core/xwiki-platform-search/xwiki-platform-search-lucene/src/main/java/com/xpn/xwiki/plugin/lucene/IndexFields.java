@@ -73,7 +73,7 @@ public abstract class IndexFields
      * Version of the document
      */
     public static final String DOCUMENT_VERSION = "version";
-    
+
     /**
      * Language of the document
      */
@@ -89,6 +89,8 @@ public abstract class IndexFields
      * Filename, only used for attachments
      */
     public static final String FILENAME = "filename";
+
+    public static final String MIMETYPE = "mimetype";
 
     /**
      * XWiki object type, only used for objects
@@ -114,6 +116,11 @@ public abstract class IndexFields
      * Date of creation
      */
     public static final String DOCUMENT_CREATIONDATE = "creationdate";
+
+    /**
+     * Document hidden flag.
+     */
+    public static final String DOCUMENT_HIDDEN = "hidden";
 
     /**
      * Fulltext content, not stored (and can therefore not be restored from the index).
@@ -147,6 +154,11 @@ public abstract class IndexFields
         }
 
         return null;
+    }
+
+    public static final boolean stringToBoolean(String booleanValue)
+    {
+        return Boolean.parseBoolean(booleanValue);
     }
 
     private IndexFields()

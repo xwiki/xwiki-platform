@@ -20,16 +20,32 @@
 package com.xpn.xwiki.doc;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.doc.XWikiDocument} class.
@@ -132,5 +148,169 @@ public aspect XWikiDocumentCompatibilityAspect
     public String XWikiDocument.displaySearch(PropertyClass pclass, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria, context);
+    }
+
+    /**
+     * @param context the XWiki context used to get access to the com.xpn.xwiki.render.XWikiRenderingEngine object
+     * @return the document title. If a title has not been provided, look for a section title in the document's content
+     *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
+     *         use Velocity, Groovy, etc syntax within a title.
+     * @deprecated use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWikiDocument.getDisplayTitle(XWikiContext context)
+    {
+        return getRenderedTitle(Syntax.XHTML_1_0, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1, use {@link #getXClass()} instead
+     */
+    @Deprecated
+    public BaseClass XWikiDocument.getxWikiClass()
+    {
+        return getXClass();
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject XWikiDocument.addObjectFromRequest(XWikiContext context) throws XWikiException
+    {
+        return addXObjectFromRequest(context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #setXObjectsToRemove(List)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
+    {
+        setXObjectsToRemove(objectsToRemove);
+    }
+
+    /**
+     * @deprecated since 2.2M1, use {@link #setXClass(BaseClass)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setxWikiClass(BaseClass xwikiClass)
+    {
+        setXClass(xwikiClass);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #getXObjects()} instead. Warning: if you used to modify the returned Map note
+     *             that since 2.2M1 this will no longer work and you'll need to call the setXObject methods instead (or
+     *             setxWikiObjects()). Obviously the best is to move to the new API.
+     */
+    @Deprecated
+    public Map<String, Vector<BaseObject>> XWikiDocument.getxWikiObjects()
+    {
+        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
+        Map<String, Vector<BaseObject>> objects = new LinkedHashMap<String, Vector<BaseObject>>();
+
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : getXObjects().entrySet()) {
+            objects.put(this.compactWikiEntityReferenceSerializer.serialize(entry.getKey()), new Vector<BaseObject>(
+                entry.getValue()));
+        }
+
+        return objects;
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setXObjects(Map)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setxWikiObjects(Map<String, Vector<BaseObject>> objects)
+    {
+        // Use a liked hash map to ensure we keep the order stored from the internal objects map.
+        Map<DocumentReference, List<BaseObject>> newObjects = new LinkedHashMap<DocumentReference, List<BaseObject>>();
+
+        for (Map.Entry<String, Vector<BaseObject>> entry : objects.entrySet()) {
+            newObjects.put(resolveClassReference(entry.getKey()), new ArrayList<BaseObject>(entry.getValue()));
+        }
+
+        setXObjects(newObjects);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #getXClasses(XWikiContext)} instead
+     */
+    @Deprecated
+    public List<BaseClass> XWikiDocument.getxWikiClasses(XWikiContext context)
+    {
+        return getXClasses(context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setXObjects(DocumentReference, List)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setObjects(String className, Vector<BaseObject> objects)
+    {
+        setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
+    }
+
+    /**
+     * @deprecated since 3.2M3, use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWikiDocument.extractTitle()
+    {
+        String title = "";
+
+        try {
+            if (is10Syntax()) {
+                title = extractTitle10();
+            } else {
+                List<HeaderBlock> blocks =
+                    getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
+                if (!blocks.isEmpty()) {
+                    HeaderBlock header = blocks.get(0);
+                    if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
+                        XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
+
+                        // transform
+                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
+                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
+
+                        // render
+                        Block headerBlock = headerXDOM.getChildren().get(0);
+                        if (headerBlock instanceof HeaderBlock) {
+                            title = renderXDOM(new XDOM(headerBlock.getChildren()), Syntax.XHTML_1_0);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Don't stop when there's a problem rendering the title.
+        }
+
+        return title;
+    }
+
+    /**
+     * Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title.
+     * 
+     * @deprecated since 3.2M3
+     **/
+    @Deprecated
+    private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
+
+    /**
+     * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
+     * @deprecated since 3.2M3
+     */
+    @Deprecated
+    private String XWikiDocument.extractTitle10()
+    {
+        String content = getContent();
+        Matcher m = HEADING_PATTERN_10.matcher(content);
+        if (m.find()) {
+            return m.group(1).trim();
+        }
+
+        return "";
     }
 }

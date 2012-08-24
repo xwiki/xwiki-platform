@@ -127,7 +127,7 @@ public class DisplayScriptService implements ScriptService
             displayerHint = "configured";
         }
         try {
-            DocumentDisplayer displayer = componentManager.lookup(DocumentDisplayer.class, displayerHint);
+            DocumentDisplayer displayer = componentManager.getInstance(DocumentDisplayer.class, displayerHint);
             return renderXDOM(displayer.display(getDocument(document), displayerParameters), outputSyntax);
         } catch (Exception e) {
             logger.error("Failed to display document [{}].", document.getPrefixedFullName(), e);
@@ -264,7 +264,7 @@ public class DisplayScriptService implements ScriptService
     private String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
         try {
-            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, targetSyntax.toIdString());
+            BlockRenderer renderer = componentManager.getInstance(BlockRenderer.class, targetSyntax.toIdString());
             WikiPrinter printer = new DefaultWikiPrinter();
             renderer.render(content, printer);
             return printer.toString();

@@ -56,7 +56,7 @@ public class PropAddAction extends XWikiAction
         }
 
         String propType = ((PropAddForm) form).getPropType();
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(doc.getFullName());
         if (bclass.get(propName) != null) {
             // TODO: handle the error of the property already existing when we want to add a class property

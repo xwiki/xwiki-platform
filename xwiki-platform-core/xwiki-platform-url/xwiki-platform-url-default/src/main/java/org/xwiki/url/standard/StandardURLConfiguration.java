@@ -19,13 +19,13 @@
  */
 package org.xwiki.url.standard;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface StandardURLConfiguration
 {
     boolean isPathBasedMultiWiki();

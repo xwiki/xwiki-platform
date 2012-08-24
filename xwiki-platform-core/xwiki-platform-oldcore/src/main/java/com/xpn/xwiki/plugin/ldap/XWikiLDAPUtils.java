@@ -234,8 +234,25 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return the cache.
      * @throws CacheException error when creating the cache.
+     * @deprecated use {@link #getGroupCache(CacheConfiguration, XWikiContext)} instead since 4.1M1
      */
+    @Deprecated
     public Cache<Map<String, String>> getCache(CacheConfiguration configuration, XWikiContext context)
+        throws CacheException
+    {
+        return getGroupCache(configuration, context);
+    }
+
+    /**
+     * Get the cache with the provided name for a particular LDAP server.
+     * 
+     * @param configuration the configuration to use to create the cache and to find it if it's already created.
+     * @param context the XWiki context.
+     * @return the cache.
+     * @throws CacheException error when creating the cache.
+     * @since 4.1M1
+     */
+    public Cache<Map<String, String>> getGroupCache(CacheConfiguration configuration, XWikiContext context)
         throws CacheException
     {
         Cache<Map<String, String>> cache;
@@ -244,23 +261,43 @@ public class XWikiLDAPUtils
             getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
                 + this.connection.getConnection().getPort();
 
-        Map<String, Cache<Map<String, String>>> cacheMap;
+        synchronized (cachePool) {
+            Map<String, Cache<Map<String, String>>> cacheMap;
 
-        if (cachePool.containsKey(cacheKey)) {
-            cacheMap = cachePool.get(cacheKey);
-        } else {
-            cacheMap = new HashMap<String, Cache<Map<String, String>>>();
-            cachePool.put(cacheKey, cacheMap);
-        }
+            if (cachePool.containsKey(cacheKey)) {
+                cacheMap = cachePool.get(cacheKey);
+            } else {
+                cacheMap = new HashMap<String, Cache<Map<String, String>>>();
+                cachePool.put(cacheKey, cacheMap);
+            }
 
-        cache = cacheMap.get(configuration.getConfigurationId());
+            cache = cacheMap.get(configuration.getConfigurationId());
 
-        if (cache == null) {
-            cache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
-            cacheMap.put(configuration.getConfigurationId(), cache);
+            if (cache == null) {
+                cache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
+                cacheMap.put(configuration.getConfigurationId(), cache);
+            }
         }
 
         return cache;
+    }
+
+    /**
+     * Force to empty the group cache.
+     * 
+     * @since 4.1M1
+     */
+    public static void resetGroupCache()
+    {
+        synchronized (cachePool) {
+            for (Map<String, Cache<Map<String, String>>> caches : cachePool.values()) {
+                for (Cache<Map<String, String>> cache : caches.values()) {
+                    cache.dispose();
+                }
+            }
+        }
+
+        cachePool.clear();
     }
 
     /**
@@ -664,7 +701,7 @@ public class XWikiLDAPUtils
 
         Cache<Map<String, String>> cache;
         try {
-            cache = getCache(getGroupCacheConfiguration(context), context);
+            cache = getGroupCache(getGroupCacheConfiguration(context), context);
 
             synchronized (cache) {
                 groupMembers = cache.get(groupDN);
@@ -1197,8 +1234,8 @@ public class XWikiLDAPUtils
         // Check if the default profile document is available
         for (int i = 0; true; ++i) {
             if (i > 0) {
-                userReference = new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE,
-                    validXWikiUserName + "_" + i);
+                userReference =
+                    new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName + "_" + i);
             }
 
             XWikiDocument doc = context.getWiki().getDocument(userReference, context);

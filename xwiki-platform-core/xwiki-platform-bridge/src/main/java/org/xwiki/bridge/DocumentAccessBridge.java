@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -36,7 +36,7 @@ import org.xwiki.model.reference.ObjectReference;
  * @version $Id$
  * @since 1.6M1
  */
-@ComponentRole
+@Role
 public interface DocumentAccessBridge
 {
     /**
@@ -589,8 +589,18 @@ public interface DocumentAccessBridge
      * Utility method to retrieve the current user.
      * 
      * @return the current user full reference.
+     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()} since 4.0RC1
      */
+    @Deprecated
     String getCurrentUser();
+
+    /**
+     * Utility method to retrieve the current user document reference.
+     *
+     * @return the current user document reference.
+     * @since 4.0RC1
+     */
+    DocumentReference getCurrentUserReference();
 
     /**
      * Utility method to set the current user.

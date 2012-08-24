@@ -128,12 +128,6 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
             {
                 return defaultValue;
             }
-
-            @Override
-            protected void registerWikiMacros()
-            {
-
-            }
         };
         xwiki.setConfig((this.config = new XWikiConfig()));
         xwiki.setDatabase(getContext().getDatabase());

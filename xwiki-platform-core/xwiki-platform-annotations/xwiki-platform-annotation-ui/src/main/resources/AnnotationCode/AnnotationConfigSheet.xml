@@ -21,56 +21,56 @@
 -->
 
 <xwikidoc>
-<web>AnnotationCode</web>
-<name>AnnotationConfigSheet</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>AnnotationCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1269603238000</creationDate>
-<date>1269604020000</date>
-<contentUpdateDate>1269604020000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.EditModeClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultEditMode>
-<name>defaultEditMode</name>
-<number>1</number>
-<prettyName>Default Edit Mode</prettyName>
-<size>15</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultEditMode>
-</class>
-<name>AnnotationCode.AnnotationConfigSheet</name>
-<number>0</number>
-<className>XWiki.EditModeClass</className>
-<guid>7d030ed4-622c-4843-981e-5b82a077fd53</guid>
-<property>
-<defaultEditMode>inline</defaultEditMode>
-</property>
-</object>
-<content>{{velocity}}
+  <web>AnnotationCode</web>
+  <name>AnnotationConfigSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1269603238000</creationDate>
+  <date>1269604020000</date>
+  <contentUpdateDate>1269604020000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.EditModeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultEditMode>
+        <name>defaultEditMode</name>
+        <number>1</number>
+        <prettyName>Default Edit Mode</prettyName>
+        <size>15</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultEditMode>
+    </class>
+    <name>AnnotationCode.AnnotationConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>7d030ed4-622c-4843-981e-5b82a077fd53</guid>
+    <property>
+      <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <content>{{velocity}}
 #set($annotationsConfigClass = $xwiki.getDocument("AnnotationCode.AnnotationConfig").xWikiClass)
 #set($configObj = $doc.getObject($doc.fullName))
 = $msg.get('annotations.config.activate.title') =

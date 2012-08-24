@@ -54,7 +54,7 @@ public class DefaultDocumentSplitterTest extends AbstractRefactoringTestCase
     {
         super.registerComponents();
 
-        splitter = getComponentManager().lookup(DocumentSplitter.class, "default");
+        splitter = getComponentManager().getInstance(DocumentSplitter.class, "default");
     }
 
     /**

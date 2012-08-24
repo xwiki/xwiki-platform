@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>Main</web>
-<name>LuceneSearch</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.Search</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252450800000</creationDate>
-<date>1298680350000</date>
-<contentUpdateDate>1298680350000</contentUpdateDate>
-<version>1.1</version>
-<title>#if("$!{request.text}"=="")$msg.get("search.page.lucene.title.noquery")#else$msg.get("search.page.lucene.title.query", [$request.text])#end</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>Main</web>
+  <name>LuceneSearch</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.Search</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252450800000</creationDate>
+  <date>1298680350000</date>
+  <contentUpdateDate>1298680350000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if("$!{request.text}"=="")$msg.get("search.page.lucene.title.noquery")#else$msg.get("search.page.lucene.title.query", [$request.text])#end</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Disable the document extra data: comments, attachments, history...
 #set($docextras = [])
@@ -41,6 +42,17 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Uncomment this line to overload the languages to search
 ## #set($languages = "default,en,de")
 #set ($rssmode = ("$!request.xpage" == 'plain'))
+#if ($rssmode)
+  $response.setContentType('application/rss+xml')
+#end
+## --------------------------
+## Hidden documents filtering
+## --------------------------
+#set($hiddenClause = ' AND hidden:false')
+## TODO: rewrite this when we'll have a user configuration script service
+#if($xwiki.getDocument($xcontext.user).getValue('displayHiddenDocuments') == 1)
+  #set($hiddenClause = '')
+#end
 ## ---------------
 ## Space filtering
 ## ---------------
@@ -180,7 +192,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     ## ---------------
     ## Lucene search
     ## ---------------
-    #set($searchresults = $lucene.getSearchResults("${query}${extraClause}", '', $wikinames, $!languages))
+    #set($searchresults = $lucene.getSearchResults("(${query}${extraClause})${hiddenClause}", '', $wikinames, $!languages))
     #if($searchresults &amp;&amp; $searchresults.getHitcount() &gt; 0)
       ## -----------------
       ## Pagination (top)
@@ -241,7 +253,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         ## RSS link
         ## ---------------
         #if($selectedSpace == '')
-          #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;text=${utext}" ))
+          #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;text=${utext}" ))
         #else
           #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;space=${selectedSpace}&amp;text=${utext}"))
         #end
@@ -272,4 +284,5 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #end
   #end## lucene exists
 #end## !$rssmode
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

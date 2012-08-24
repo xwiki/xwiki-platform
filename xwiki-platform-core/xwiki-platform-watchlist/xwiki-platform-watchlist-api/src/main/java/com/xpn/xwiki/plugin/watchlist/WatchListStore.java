@@ -187,7 +187,7 @@ public class WatchListStore implements EventListener
         throws XWikiException
     {
         boolean needsUpdate = false;
-        BaseClass bclass = watchListClass.getxWikiClass();
+        BaseClass bclass = watchListClass.getXClass();
         bclass.setName(WATCHLIST_CLASS);
 
         needsUpdate |= bclass.addStaticListField(WATCHLIST_CLASS_INTERVAL_PROP, "Email notifications interval", "");
@@ -217,27 +217,14 @@ public class WatchListStore implements EventListener
     }
 
     /**
-     * Creates the WatchList xwiki class.
-     * 
-     * @param context Context of the request
-     * @throws XWikiException if class fields cannot be created
+     * Create or update the watchlist class documents fields (content, title, etc).
+     *
+     * @param doc the watchlist class document.
+     * @return true if the class properties have been created or modified.
      */
-    private void initWatchListClass(XWikiContext context) throws XWikiException
+    public boolean initWatchListClassDocumentFields(XWikiDocument doc)
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        try {
-            doc = context.getWiki().getDocument(WATCHLIST_CLASS, context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            String[] spaceAndName = StringUtils.split(WATCHLIST_CLASS, SPACE_PAGE_SEP);
-            doc.setSpace(spaceAndName[0]);
-            doc.setName(spaceAndName[1]);
-            needsUpdate = true;
-        }
-
-        needsUpdate |= initWatchListClassProperties(doc, context);
+        boolean needsUpdate = true;
 
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
@@ -260,6 +247,37 @@ public class WatchListStore implements EventListener
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * Creates the WatchList xwiki class.
+     * 
+     * @param context Context of the request
+     * @throws XWikiException if class fields cannot be created
+     */
+    private void initWatchListClass(XWikiContext context) throws XWikiException
+    {
+        XWikiDocument doc;
+        boolean needsUpdate = false;
+
+        try {
+            doc = context.getWiki().getDocument(WATCHLIST_CLASS, context);
+        } catch (Exception e) {
+            doc = new XWikiDocument();
+            String[] spaceAndName = StringUtils.split(WATCHLIST_CLASS, SPACE_PAGE_SEP);
+            doc.setSpace(spaceAndName[0]);
+            doc.setName(spaceAndName[1]);
+            needsUpdate = true;
+        }
+
+        needsUpdate |= initWatchListClassProperties(doc, context);
+        needsUpdate |= initWatchListClassDocumentFields(doc);
 
         if (needsUpdate) {
             context.getWiki().saveDocument(doc, "", true, context);

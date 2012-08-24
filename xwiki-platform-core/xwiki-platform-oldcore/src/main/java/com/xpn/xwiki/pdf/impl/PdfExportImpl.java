@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +145,11 @@ public class PdfExportImpl implements PdfExport
     /** The JTidy instance used for cleaning up HTML documents. */
     private Tidy tidy;
 
+    /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
+
     // Fields initialization
     static {
         // ----------------------------------------------------------------------
@@ -246,7 +252,7 @@ public class PdfExportImpl implements PdfExport
         // This could be improved by setting a specific context using the passed document but we
         // would also need to get the translations and set them too.
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         this.tidy.setOutputEncoding(context.getWiki().getEncoding());
         this.tidy.setInputEncoding(context.getWiki().getEncoding());
@@ -672,7 +678,7 @@ public class PdfExportImpl implements PdfExport
      * Create an XWikiException object with the given source, export type and error type.
      * 
      * @param source the source exception that is forwarded
-     * @param exportType the type of the export performed while the exception occurred, {@link #PDF} or {@link #RTF}
+     * @param exportType the type of the export performed while the exception occurred, PDF or RTF
      * @param errorType the type of error that occurred, one of the constants in {@link XWikiException}
      * @return a new XWikiException object
      */

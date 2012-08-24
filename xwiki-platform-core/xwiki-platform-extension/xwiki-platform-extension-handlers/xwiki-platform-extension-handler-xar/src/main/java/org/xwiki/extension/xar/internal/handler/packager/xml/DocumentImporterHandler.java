@@ -24,19 +24,24 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
+import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,6 +55,9 @@ import com.xpn.xwiki.doc.merge.MergeResult;
  */
 public class DocumentImporterHandler extends DocumentHandler
 {
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentImporterHandler.class);
+
     private XarFile previousXarFile;
 
     private DefaultPackager packager;
@@ -58,9 +66,21 @@ public class DocumentImporterHandler extends DocumentHandler
 
     private PackageConfiguration configuration;
 
+    private EntityReferenceSerializer<String> compactWikiSerializer;
+
+    /**
+     * Attachment are imported before trying to merge a document for memory handling reasons so we need to know if there
+     * was really an existing document before starting to import attachments.
+     */
+    private Boolean hasCurrentDocument;
+
     public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki)
+        throws ComponentLookupException
     {
         super(componentManager, wiki);
+
+        this.compactWikiSerializer =
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
         this.packager = packager;
     }
@@ -91,6 +111,11 @@ public class DocumentImporterHandler extends DocumentHandler
         return userReference;
     }
 
+    private String getUserString(XWikiContext context)
+    {
+        return this.compactWikiSerializer.serialize(getUserReference(context), getDocument().getDocumentReference());
+    }
+
     private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws Exception
     {
         XWikiDocument currentDocument = getDatabaseDocument();
@@ -106,11 +131,15 @@ public class DocumentImporterHandler extends DocumentHandler
             }
         } else {
             currentDocument = document;
-            currentDocument.setCreatorReference(userReference);
+            if (userReference != null) {
+                currentDocument.setCreatorReference(userReference);
+            }
         }
 
-        currentDocument.setAuthorReference(userReference);
-        currentDocument.setContentAuthorReference(userReference);
+        if (userReference != null) {
+            currentDocument.setAuthorReference(userReference);
+            currentDocument.setContentAuthorReference(userReference);
+        }
 
         context.getWiki().saveDocument(currentDocument, comment, context);
     }
@@ -121,6 +150,10 @@ public class DocumentImporterHandler extends DocumentHandler
         // Ask what to do
         ConflictQuestion question =
             new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument);
+
+        if (mergedDocument == null) {
+            question.setGlobalAction(GlobalAction.NEXT);
+        }
 
         if (this.configuration != null && this.configuration.getJobStatus() != null) {
             try {
@@ -161,11 +194,17 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument currentDocument = getDatabaseDocument();
             XWikiDocument nextDocument = getDocument();
 
+            if (this.configuration.isLogEnabled()) {
+                LOGGER.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
+                    nextDocument.getRealLanguage());
+            }
+
             // Merge and save
-            if (currentDocument != null && !currentDocument.isNew()) {
+            if (currentDocument != null && this.hasCurrentDocument == Boolean.TRUE) {
                 XWikiDocument previousDocument = getPreviousDocument();
 
                 if (previousDocument != null) {
+                    // 3 ways merge
                     XWikiDocument mergedDocument = currentDocument.clone();
 
                     MergeResult documentMergeResult =
@@ -173,7 +212,19 @@ public class DocumentImporterHandler extends DocumentHandler
                             this.configuration.getMergeConfiguration(), context);
 
                     if (documentMergeResult.isModified()) {
-                        if (this.configuration.isInteractive() && !documentMergeResult.getErrors().isEmpty()) {
+                        if (this.configuration.isInteractive()
+                            && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+                            // Indicate future author to whoever is going to answer the question
+                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            DocumentReference userReference = getUserReference(context);
+                            if (userReference != null) {
+                                nextDocument.setAuthorReference(userReference);
+                                nextDocument.setContentAuthorReference(userReference);
+                                mergedDocument.setAuthorReference(userReference);
+                                mergedDocument.setContentAuthorReference(userReference);
+                            }
+
                             XWikiDocument documentToSave =
                                 askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument);
 
@@ -189,7 +240,25 @@ public class DocumentImporterHandler extends DocumentHandler
                         new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(),
                             mergedDocument.getLanguage()), documentMergeResult);
                 } else {
-                    saveDocument(nextDocument, comment, context);
+                    // already existing document in database but without previous version
+                    if (!currentDocument.equalsData(nextDocument)) {
+                        XWikiDocument documentToSave;
+                        if (this.configuration.isInteractive()) {
+                            // Indicate future author to whoever is going to answer the question
+                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+                            DocumentReference userReference = getUserReference(context);
+                            nextDocument.setAuthorReference(userReference);
+                            nextDocument.setContentAuthorReference(userReference);
+
+                            documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, null);
+                        } else {
+                            documentToSave = nextDocument;
+                        }
+
+                        if (documentToSave != currentDocument) {
+                            saveDocument(documentToSave, comment, context);
+                        }
+                    }
                 }
             } else {
                 saveDocument(nextDocument, comment, context);
@@ -218,6 +287,10 @@ public class DocumentImporterHandler extends DocumentHandler
             }
 
             existingDocument = translatedDocument;
+        }
+
+        if (this.hasCurrentDocument == null) {
+            this.hasCurrentDocument = !existingDocument.isNew();
         }
 
         return existingDocument;
@@ -251,17 +324,21 @@ public class DocumentImporterHandler extends DocumentHandler
         try {
             XWikiContext context = getXWikiContext();
 
-            // Set proper author
-            // TODO: add a setAuthorReference in XWikiAttachment
             XWikiDocument document = getDocument();
-            document.setAuthorReference(context.getUserReference());
-            attachment.setAuthor(document.getAuthor());
+
+            // Set proper author
+            DocumentReference userReference = getUserReference(context);
+            if (userReference != null) {
+                document.setAuthorReference(userReference);
+                attachment.setAuthor(getUserString(context));
+            }
 
             XWikiDocument dbDocument = getDatabaseDocument();
 
             XWikiAttachment dbAttachment = dbDocument.getAttachment(attachment.getFilename());
 
             if (dbAttachment == null) {
+                attachment.setDoc(dbDocument);
                 dbDocument.getAttachmentList().add(attachment);
             } else {
                 dbAttachment.setContent(attachment.getContentInputStream(context));

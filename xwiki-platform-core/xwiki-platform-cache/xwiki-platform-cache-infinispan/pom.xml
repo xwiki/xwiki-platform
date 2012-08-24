@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-infinispan</artifactId>
   <name>XWiki Platform - Cache - Infinispan</name>
@@ -50,16 +50,7 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
-      <version>5.1.1.FINAL</version>
-      <exclusions>
-        <!-- Exclude JGroups for now since we use Infinispan for local caches and thus don't need but also because
-             we use JGroups in our dependencies and Infinispan draws a more recent version than the one we use.
-             TODO: We should be able to remove this once we move to JGroups 3.x -->
-        <exclusion>
-          <artifactId>jgroups</artifactId>
-          <groupId>org.jgroups</groupId>
-        </exclusion>
-      </exclusions>
+      <version>5.1.5.FINAL</version>
     </dependency>
 
     <!-- Test Dependencies -->
@@ -82,35 +73,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>normal</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <excludes>
-                  <exclude>**/JBossCacheLocalCacheEvictionsTest.java</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>ci</id>
-      <activation>
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
-    </profile>
-  </profiles>
 </project>

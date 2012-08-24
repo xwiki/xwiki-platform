@@ -19,13 +19,10 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.zip.ZipEntry;
-
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * 
  * @version $Id$
  * @since 4.0M1
  */
@@ -35,7 +32,7 @@ public class XarEntry
 
     private String language;
 
-    private ZipEntry zipEntry;
+    private String entryName;
 
     public XarEntry()
     {
@@ -74,14 +71,14 @@ public class XarEntry
         this.language = language;
     }
 
-    public ZipEntry getZipEntry()
+    public String getEntryName()
     {
-        return this.zipEntry;
+        return this.entryName;
     }
 
-    public void setZipEntry(ZipEntry zipEntry)
+    public void setEntryName(String entryName)
     {
-        this.zipEntry = zipEntry;
+        this.entryName = entryName;
     }
 
     // Object

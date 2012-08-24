@@ -21,7 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.wiki;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -33,7 +33,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 @RemoteServiceRelativePath("WikiService.gwtrpc")
 public interface WikiService extends RemoteService
 {

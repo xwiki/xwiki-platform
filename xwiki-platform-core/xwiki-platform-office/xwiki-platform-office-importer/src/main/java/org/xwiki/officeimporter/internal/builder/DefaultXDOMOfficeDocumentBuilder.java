@@ -73,7 +73,7 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        return build(xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
+        return build(this.xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
     }
 
     @Override
@@ -83,10 +83,10 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
         HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
         XDOM xdom = null;
         try {
-            xdom = xHtmlParser.parse(new StringReader(HTMLUtils.toString(xhtmlDoc)));
+            xdom = this.xHtmlParser.parse(new StringReader(HTMLUtils.toString(xhtmlDoc)));
         } catch (ParseException ex) {
             throw new OfficeImporterException("Error: Could not parse xhtml office content.", ex);
         }
-        return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifacts(), componentManager);
+        return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifacts(), this.componentManager);
     }
 }

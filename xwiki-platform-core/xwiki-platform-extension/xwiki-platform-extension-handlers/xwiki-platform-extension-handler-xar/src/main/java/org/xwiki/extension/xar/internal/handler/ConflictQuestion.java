@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class ConflictQuestion
 {
-    public static enum GlobalActions
+    public static enum GlobalAction
     {
         CURRENT,
         PREVIOUS,
@@ -39,7 +39,7 @@ public class ConflictQuestion
 
     // Answer datas
 
-    private GlobalActions globalAction = GlobalActions.MERGED;
+    private GlobalAction globalAction = GlobalAction.MERGED;
 
     private XWikiDocument customDocument;
 
@@ -84,23 +84,30 @@ public class ConflictQuestion
 
     // Answer
 
-    public GlobalActions getGlobalAction()
+    public GlobalAction getGlobalAction()
     {
         return this.globalAction;
     }
 
-    public void setGlobalAction(GlobalActions globalAction)
+    public void setGlobalAction(GlobalAction globalAction)
     {
         this.globalAction = globalAction;
     }
 
+    /**
+     * @since 4.1
+     */
     public XWikiDocument getCustomDocument()
     {
         return this.customDocument;
     }
 
-    public void setCurrentDocument(XWikiDocument currentDocument)
+    /**
+     * @since 4.1
+     */
+    public void setCustomDocument(XWikiDocument customDocument)
     {
-        this.currentDocument = currentDocument;
+        this.customDocument = customDocument;
+        this.globalAction = GlobalAction.CUSTOM;
     }
 }

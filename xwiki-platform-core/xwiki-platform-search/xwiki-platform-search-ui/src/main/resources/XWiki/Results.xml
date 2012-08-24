@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>Results</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebSearch</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1272990081000</date>
-<contentUpdateDate>1272990081000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("search.page.results")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>Results</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1272990081000</date>
+  <contentUpdateDate>1272990081000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("search.page.results")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 {{html}}
 #set($showdata = 0)
 &lt;div id="searchResults"&gt;
@@ -34,7 +35,7 @@
       #set($isLuceneResult = false)
     #end
     #if($isLuceneResult)
-      #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
+      #set($itemfullname = $services.model.serialize($item.getDocumentReference()))
     #else
       #set($itemfullname = "${xcontext.database}:${item}")
     #end
@@ -57,7 +58,7 @@
         &lt;h2 class="itemTitle"&gt;
           #if($isLuceneResult)
             #if($item.type == 'attachment')
-              &lt;a href="$xwiki.getDocument($itemfullname).getAttachmentURL($item.filename)"&gt;$escapetool.xml($item.filename)&lt;/a&gt;
+              &lt;a href="$xwiki.getDocument($item.getDocumentReference()).getAttachmentURL($item.filename)"&gt;$escapetool.xml($item.filename)&lt;/a&gt;
             #else
               &lt;a href="$xwiki.getURL($itemfullname)"&gt;$escapetool.xml($xwiki.getDocument($itemfullname).plainTitle)&lt;/a&gt;
             #end
@@ -131,4 +132,5 @@
   #end ## foreach item
 &lt;/div&gt; ## searchResults
 {{/html}}
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

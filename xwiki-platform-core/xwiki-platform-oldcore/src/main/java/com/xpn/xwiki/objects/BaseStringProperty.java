@@ -20,7 +20,7 @@
 package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.merge.MergeUtils;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$
@@ -84,6 +84,6 @@ public class BaseStringProperty extends BaseProperty
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        setValue(MergeUtils.mergeString((String) previousValue, (String) newValue, getValue(), mergeResult));
+        setValue(MergeUtils.mergeCharacters((String) previousValue, (String) newValue, getValue(), mergeResult));
     }
 }

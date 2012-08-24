@@ -64,34 +64,33 @@ public class R4340XWIKI883DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query q =
-                    session
-                        .createQuery(
-                            "select s from BaseObject o, StringProperty s where o.className like 'XWiki.XWiki%Rights'"
-                            + " and o.id=s.id and (s.name='users' or s.name='groups')");
-                List lst = q.list();
+                Query q = session.createQuery(
+                    "select s from BaseObject o, StringProperty s where o.className like 'XWiki.XWiki%Rights'"
+                    + " and o.id=s.id and (s.name='users' or s.name='groups')");
+                @SuppressWarnings("unchecked")
+                List<StringProperty> lst = q.list();
                 if (lst.size() == 0) {
                     return null;
                 }
-                List lst2 = new ArrayList(lst.size());
-                for (Iterator it = lst.iterator(); it.hasNext();) {
-                    StringProperty sp = (StringProperty) it.next();
+                List<LargeStringProperty> lst2 = new ArrayList<LargeStringProperty>(lst.size());
+                for (Iterator<StringProperty> it = lst.iterator(); it.hasNext();) {
+                    StringProperty sp = it.next();
                     LargeStringProperty lsp = new LargeStringProperty();
                     lsp.setId(sp.getId());
                     lsp.setName(sp.getName());
                     lsp.setValue(sp.getValue());
                     lst2.add(lsp);
                 }
-                for (Iterator it = lst.iterator(); it.hasNext();) {
-                    session.delete(it.next());
+                for (StringProperty property : lst) {
+                    session.delete(property);
                 }
-                for (Iterator it = lst2.iterator(); it.hasNext();) {
-                    session.save(it.next());
+                for (LargeStringProperty property : lst2) {
+                    session.save(property);
                 }
                 return null;
             }

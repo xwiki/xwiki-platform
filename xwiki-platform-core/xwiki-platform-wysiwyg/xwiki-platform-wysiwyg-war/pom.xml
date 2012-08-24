@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-war</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - WAR Distribution</name>
@@ -59,6 +59,18 @@
       <artifactId>xwiki-platform-wysiwyg-client</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+      <classifier>shared</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -101,33 +113,6 @@
             <goals>
               <goal>compile</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <!--
-                We need to copy the jar with the classes shared by the client and server side of the WYSIWYG editor to
-                the library directory of the generated war. We do it like this because we can't exclude all transitive
-                dependencies of the shared jar at once.
-              -->
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>shared</classifier>
-                  <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -196,6 +181,8 @@
   </build>
   <profiles>
     <profile>
+      <!-- Only build the WYSIWYG editor in English and for Firefox. If not specified it'll be built for all supported
+           languages and browsers which takes longer. -->
       <id>dev</id>
       <properties>
         <gwt.style>DETAILED</gwt.style>

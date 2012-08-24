@@ -42,7 +42,6 @@ public class AttachmentsPane extends BaseElement
 
     /**
      * Fills the URL with the specified file path.
-     * This fills in the last field. To add more attachments, call addAnotherFile then setFileToUpload.
      * 
      * @param filePath the path to the file to upload in URL form (the file *must* exist in the target directory).
      */
@@ -52,12 +51,22 @@ public class AttachmentsPane extends BaseElement
         inputs.get(inputs.size() - 1).sendKeys(filePath);
     }
 
+    public void waitForUploadToFinish()
+    {
+        waitUntilElementIsVisible(By.xpath("//a[text()='Hide upload status']"));
+    }
+
+    public void clickHideProgress()
+    {
+        this.pane.findElement(By.xpath("//a[text()='Hide upload status']")).click();
+    }
+
     /**
      * Adds another input field for attaching a file.
      */
     public void addAnotherFile()
     {
-        addAnotherFile.click();
+        this.addAnotherFile.click();
     }
 
     public void clickAttachFiles()

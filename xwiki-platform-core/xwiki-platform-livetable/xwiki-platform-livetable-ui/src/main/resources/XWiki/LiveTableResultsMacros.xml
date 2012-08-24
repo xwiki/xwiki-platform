@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>LiveTableResultsMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1267453085000</date>
+  <contentUpdateDate>1267453085000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$msg.get("platform.livetable.resultsMacros")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#**
+ * Macro to get the results of a livetable data call.
+ * This page is called from live grids via Ajax with the argument xpage=plain. It returns a
+ * set of results serialized in JSON.
+ *#
+#macro(gridresult $className $collist)
+  #gridresultwithfilter($className $collist '' '' [])
+#end
+
+
+#**
+ * Computes the query used to retrieve the results of a live table data call.
+ * NOTE: This macro is not fully encapsulated because it defines a few Velocity variables that are used in subsequent macros.
+ *#
+#macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
+  ## Additional columns, should *not* contain parameters, all added column names must be filtered
+  #set($fromSql = '')
+  ## parametrized filter part of the query
+  #set($whereSql = '')
+  ## list of parameters to use with $whereSql
+  #set($whereParams = [])
+  #set($class = $xwiki.getDocument($className).getxWikiClass())
+  ##
+  ## Add the columns needed for the actual data
+  ##
+  #set($tablelist = [])
+  #foreach($colname in $collist)
+    #livetable_addColumnToQuery($colname)
+  #end
+  ##
+  ## Tag filtering
+  ##
+  #if($request.tag)
+    #set($fromSql = "${fromSql} , BaseObject as tobject, DBStringListProperty as tagprop")
+    #set($whereSql = "${whereSql} and tobject.className='XWiki.TagClass' and tobject.name=doc.fullName and tobject.id=tagprop.id.id and tagprop.id.name='tags' and (")
+    #foreach($tag in $request.getParameterValues('tag'))
+      #if($velocityCount &gt; 1) #set($whereSql = "${whereSql} and ") #end
+      #set($whereSql = "${whereSql} ? in elements(tagprop.list)")
+      #set($discard = $whereParams.add("${tag}"))
+    #end
+    #set($whereSql = "${whereSql})")
+  #end
+  ##
+  ##
+  ## Order
+  ##
+  #set($order = "$!request.sort")
+  #if($order != '')
+    #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
+      #set($orderDirection = 'desc')
+    #end
+    #if($order == 'description')
+      #set($tableAlias = 'dtable')
+    #else
+      #set($tableAlias = $order)
+    #end
+    ## only safe version should be used in SQL queries
+    #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+    ##
+    #if($order.startsWith('doc.'))
+      #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
+    #elseif($tablelist.contains($tableAlias))
+      #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
+      #if ($multiselect != '1')
+        #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #end
+    #elseif($order == 'averagevote')
+      #livetable_getTableName($order)
+      #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+      #set($discard = $whereParams.add("${order}"))
+      #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+    #else
+      #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
+      #if("$multiselect" != '1')
+        #livetable_getTableName($order)
+        #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+        #set($discard = $whereParams.add("${order}"))
+        #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #end
+    #end
+  #end
+  ##
+  ##
+  ## Compute the final queries
+  ##
+  #set($sqlParams = [])
+  #set($tagsMatchingParams = [])
+  #set($allMatchingParams = [])
+  #if("$!className" != '')
+    ## Class query
+    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+    #set($discard = $sqlParams.addAll($whereParams))
+    ##
+    #set($tagsMatchingFiltersFrom = ", BaseObject as obj $!fromSql $!filterfrom")
+    #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    ##
+    #set($allMatchingTagsFrom = ", BaseObject as obj $!filterfrom")
+    #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!filterwhere")
+    #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+    ##
+    #if($filterParams)
+      #set($discard = $sqlParams.addAll($filterParams))
+      #set($discard = $tagsMatchingParams.addAll($filterParams))
+      #set($discard = $allMatchingParams.addAll($filterParams))
+    #end
+  #else
+    ## Document query
+    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.addAll($whereParams))
+    ##
+    #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
+    #set($tagsMatchingFiltersWhere = "1=1 $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    ##
+    #set($allMatchingTagsFrom = "$!filterfrom")
+    #set($allMatchingTagsWhere = "1=1 $!filterwhere")
+    ##
+    #if($filterParams)
+      #set($discard = $sqlParams.addAll($filterParams))
+      #set($discard = $tagsMatchingParams.addAll($filterParams))
+      #set($discard = $allMatchingParams.addAll($filterParams))
+    #end
+  #end
+  #set($sql = "$countSql $!{orderSql}")
+#end
+
+
+#**
+ * Adds TagCloud information to the JSON returned by a live table data call.
+ * NOTE: This macro uses Velocity variables defined by gridresultwithfilter_buildQuery.
+ *
+ * @param $map stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresult_buildTagCloudJSON $map)
+  ##
+  ## TagCloud matching the current filters
+  ##
+  #set($tagsMatchingFilters = $xwiki.tag.getTagCountForQuery($tagsMatchingFiltersFrom, $tagsMatchingFiltersWhere, $tagsMatchingParams))
+  ## FIXME: We use a map just because the client expects an object, but all we really need is a list..
+  #set($matchingTags = {})
+  #foreach($tag in $tagsMatchingFilters.keySet())
+    ## NOTE: The value doesn't have a special meaning. I've used 1 just because it takes less space when serialized.
+    #set($discard = $matchingTags.put($tag, 1))
+  #end
+  #set($discard = $map.put('matchingtags', $matchingTags))
+  ##
+  ## TagCloud matching all the documents used by the live table
+  ##
+  #set($allMatchingTags = $xwiki.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
+  ## FIXME: We use a list of maps just because the client expects an array, but we should simply return $allMatchingTags..
+  #set($tags = [])
+  #foreach($tag in $allMatchingTags.keySet())
+    #set($discard = $tags.add({'tag': $tag, 'count': $allMatchingTags.get($tag)}))
+  #end
+  #set($discard = $map.put('tags', $tags))
+#end
+
+
+#**
+ * Adds information about each live table row to the JSON returned by a live table data call.
+ * NOTE: This macro uses Velocity variables defined by gridresultwithfilter_buildQuery.
+ *
+ * @param $map stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresult_buildRowsJSON $map)
+  #set($offset = $mathtool.toInteger($request.get('offset')))
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
+  #if (!$offset || $offset &lt; 0)
+    #set($offset = 0)
+  #end
+  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
+  #set($query = $services.query.hql($sql).addFilter('hidden').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($items = $query.execute())
+  #set($discard = $map.put('totalrows', $query.count()))
+  #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
+  #set($rows = [])
+  #foreach($item in $items)
+    #gridresult_buildRowJSON($item $rows)
+  #end
+  #set($discard = $map.put('rows', $rows))
+#end
+
+
+#**
+ * Adds information about the specified live table row to the JSON returned by a live table data call.
+ * NOTE: This macro uses Velocity variables available in gridresult_buildRowsJSON.
+ *
+ * @param $item the name of the document that feeds this live table row
+ * @param $rows stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresult_buildRowJSON $item $rows)
+  #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
+  #set($row = {'doc_viewable': $viewable})
+  #if(!$viewable)
+    #set($discard = $row.put('doc_fullName', "${context.database}:${item}"))
+  #else
+    #set($itemDoc = $xwiki.getDocument($item))
+    #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
+    #set($discard = $itemDoc.use($className))
+    #set($discard = $row.put('doc_name', $itemDoc.name))
+    #set($discard = $row.put('doc_fullName', $fullname))
+    #set($discard = $row.put('doc_space', $itemDoc.space))
+    #set($discard = $row.put('doc_url', $xwiki.getURL($item)))
+    #set($discard = $row.put('doc_space_url', $xwiki.getURL("${itemDoc.wiki}:${itemDoc.space}.WebHome")))
+    #if($xwiki.isVirtualMode())
+      #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
+      #set($discard = $row.put('doc_wiki_url', $xwiki.getURL("${itemDoc.wiki}:Main.WebHome")))
+    #end
+    #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
+    #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))
+    #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $context.user, $fullname)))
+    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
+    #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
+    #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
+    #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
+    #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
+    #set($discard = $row.put('doc_author_url', $xwiki.getURL($itemDoc.author)))
+    #set($discard = $row.put('doc_date', $xwiki.formatDate($itemDoc.date)))
+    #set($discard = $row.put('doc_title', $escapetool.xml($itemDoc.plainTitle)))
+    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($itemDoc.author, false)))
+    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($itemDoc.creationDate)))
+    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($itemDoc.creator, false)))
+    #foreach($colname in $collist)
+      #gridresult_buildColumnJSON($colname $row)
+    #end
+  #end
+  #set($discard = $rows.add($row))
+#end
+
+
+#**
+ * Adds information about the given column to the JSON returned by a live table data call.
+ * NOTE: This macro uses Velocity variables available in gridresult_buildRowJSON.
+ *
+ * @param $colname the name of the live table column for which to retrieve information
+ * @param $row stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresult_buildColumnJSON $colname $row)
+  #if($colname.startsWith('doc.'))
+  #elseif($colname == '_action')
+    #set($discard = $row.put($colname, $msg.get("${request.transprefix}actiontext")))
+  #elseif($colname == '_attachments')
+    #livetable_getAttachmentsList($itemDoc)
+    #set($discard = $row.put($colname, $attachlist))
+  #elseif($colname == '_avatar')
+    #livetable_getAvatar($itemDoc)
+    #set($discard = $row.put($colname, $avatar))
+  #elseif($colname == '_images')
+    #livetable_getImagesList($itemDoc)
+    #set($discard = $row.put($colname, $imagesList))
+  #else
+    #set($propClassName = "$!request.get($colname.concat('_class'))")
+    #if($propClassName != '')
+      #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+      #set($discard = $itemDoc.use($propClassName))
+    #else
+      #set($propClass = $class)
+    #end
+    ## Retrieve the property type as it might be usefull
+    #set($propType = '')
+    #if($listtool.contains($propClass.getPropertyNames(), $colname))
+      #set($propType = "$!propClass.get($colname).type")
+    #end
+    #set($fieldValue = "$!itemDoc.getValue($colname)")
+    #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
+    #if($fieldDisplayValue == '')
+      #set($fieldDisplayValue = $msg.get("${request.transprefix}emptyvalue"))
+    #end
+    #set($fieldUrl = '')
+    ## only retrieve an URL for a DBListClass item
+    #if($propType == 'DBListClass')
+      #set($fieldUrl = $xwiki.getDocument($fieldValue).getURL())
+      #if($fieldUrl == $xwiki.getURL('Main.WebHome'))
+        #set($fieldUrl = '')
+      #end
+    #end
+    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+    #set($discard = $row.put("${colname}_value", $fieldValue))
+    #set($discard = $row.put("${colname}_url", $fieldUrl))
+    ## reset to the default class
+    #set($discard = $itemDoc.use($className))
+  #end
+#end
+
+
+#**
+ * Builds the JSON response to a live table data call.
+ *
+ * @param $map stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresultwithfilter_buildJSON $className $collist $filterfrom $filterwhere $filterParams $map)
+  #gridresultwithfilter_buildQuery($className $collist $filterfrom $filterwhere $filterParams)
+  #if("$!request.sql" == '1')
+    #set($discard = $map.put('sql', $sql))
+    #set($discard = $map.put('countsql', $countSql))
+    #set($discard = $map.put('params', $sqlParams))
+  #end
+  #set($discard = $map.put('reqNo', $mathtool.toInteger($request.reqNo)))
+  #gridresult_buildTagCloudJSON($map)
+  #gridresult_buildRowsJSON($map)
+#end
+
+
+#**
+ * Builds the JSON response to a live table data call.
+ *
+ * @param $map stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresult_buildJSON $className $collist $map)
+  #gridresultwithfilter_buildJSON($className $collist '' '' [] $map)
+#end
+
+
+#**
+ * Macro to get the results of a livetable data call.
+ * This page is called from live grids via Ajax with the argument xpage=plain. It returns a
+ * set of results serialized in JSON.
+ *#
+#macro(gridresultwithfilter $className $collist $filterfrom $filterwhere $filterParams)
+  #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
+    $response.setContentType('application/json')
+    ## Build the JSON in memory (using basic Java data types) so that it can be adjusted before serialization.
+    #set($map = {})
+    #gridresultwithfilter_buildJSON($className $collist $filterfrom $filterwhere $filterParams $map)
+    $jsontool.serialize($map)
+  #end
+#end
+
+
+#**
+ * Get the name of the Property that should be used for a given livetable column.
+ * NOTE the resulting $tableName is safe to use inside SQL queries
+ *#
+#macro(livetable_getTableName $colname)
+  #set($propClassName = "$!request.get(${colname.concat('_class')})")
+  #if($propClassName != '')
+    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+  #else
+    #set($propClass = $class)
+  #end
+  #set($propType = '')
+  #if($listtool.contains($propClass.getPropertyNames(), $colname))
+    #set($propType = "$!{propClass.get($colname).type}")
+  #end
+  #if($propType == 'NumberClass')
+    #set($numberType = $propClass.get($colname).getProperty('numberType').getValue())
+    #if($numberType == 'integer')
+      #set($tableName = 'IntegerProperty')
+    #elseif($numberType == 'float')
+      #set($tableName = 'FloatProperty')
+    #elseif($numberType == 'double')
+      #set($tableName = 'DoubleProperty')
+    #else
+      #set($tableName = 'LongProperty')
+    #end
+  #elseif($propType == 'BooleanClass')
+    #set($tableName = 'IntegerProperty')
+  #elseif($propType == 'DateClass')
+    #set($tableName = 'DateProperty')
+  #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
+    #set($tableName = 'LargeStringProperty')
+  #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
+    #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
+    #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
+    #if($multiSelect == 1)
+      #if($relationalStorage == 1)
+        #set($tableName = 'DBStringListProperty')
+      #else
+        #set($tableName = 'StringListProperty')
+      #end
+    #else
+      #set($tableName = 'StringProperty')
+    #end
+  #else
+    #set($tableName = 'StringProperty')
+  #end
+#end
+
+#**
+ * Old alias of the #livetable_getTableName macro.
+ * @deprecated since 2.2.3, use {@link #livetable_getTableName}
+ *#
+#macro(grid_gettablename $colname)
+  #livetable_getTableName($colname)
+#end
+
+
+
+#**
+ * List attachments for a document, putting the result as HTML markup in the $attachlist variable.
+ *#
+#macro(livetable_getAttachmentsList $itemDoc)
+  #set($attachlist = '')
+  #foreach($attachment in $itemDoc.attachmentList)
+    #set($attachmentUrl = $itemDoc.getAttachmentURL($attachment.filename))
+    #set($attachlist = "${attachlist}&lt;a href='${attachmentUrl}'&gt;$attachment.filename&lt;/a&gt;&lt;br/&gt;")
+  #end
+#end
+
+#**
+ * Old alias of the #livetable_getAttachmentsList macro.
+ * @deprecated since 2.2.3, use {@link #livetable_getAttachmentsList}
+ *#
+#macro(grid_attachlist $itemDoc)
+  #livetable_getAttachmentsList($itemDoc)
+#end
+
+
+
+#**
+ * List image attachments for a document, putting the result as HTML markup in the $imagesList variable.
+ *#
+#macro(livetable_getImagesList $itemDoc)
+  #set($imagesList = '')
+  #foreach ($attachment in $itemDoc.attachmentList)
+    #if($attachment.isImage())
+      ## Create a thumbnail by resizing the image on the server side, if needed, to fit inside a 50x50 pixel square.
+      #set($thumbnailURL = $itemDoc.getAttachmentURL($attachment.filename, 'download', "width=50&amp;height=50&amp;keepAspectRatio=true"))
+      #set($imageURL = $itemDoc.getAttachmentURL($attachment.filename))
+      #set($imagesList = "${imagesList}&lt;a href=""$imageURL""&gt;&lt;img src=""$thumbnailURL"" alt=""$attachment.filename"" title=""$attachment.filename"" /&gt;&lt;/a&gt;")
+    #end
+  #end
+#end
+
+#**
+ * Old alias of the #livetable_getImagesList macro.
+ * @deprecated since 2.2.3, use {@link #livetable_getImagesList}
+ *#
+#macro(grid_photolist $itemDoc)
+  #livetable_getImagesList($itemDoc)
+#end
+
+
+#**
+ * Generate the HTML code for a user avatar, with a fixed 50px width.
+ *#
+#macro(livetable_getAvatar $itemDoc)
+  #set ($avatar = "#mediumUserAvatar($itemDoc.fullName)")
+  #set ($avatar = $avatar.trim())
+#end
+
+#**
+ * Old alias of the #livetable_getAvatar macro.
+ * @deprecated since 2.2.3, use {@link #livetable_getAvatar}
+ *#
+#macro(grid_avatar $itemDoc)
+  #livetable_getAvatar($itemDoc)
+#end
+
+
+
+#**
+ * Macro to extend the query to select the properties for the livetable columns.
+ * NOTE $colname is filtered (all characters but [a-zA-Z0-9_.] are removed) before use
+ *#
+#macro(livetable_addColumnToQuery $colname)
+ ## Safe because / is not allowed in property names
+ #set ($joinModeMarker = "/join_mode")
+ #if (!$colname.endsWith($joinModeMarker))
+  #set ($filterValue = "$!{request.get($colname)}")
+  #if($colname == 'description')
+    #set($tableAlias = 'dtable')
+  #else
+    #set($tableAlias = $colname)
+  #end
+  ## only safe versions should be used in SQL queries
+  #set($safe_colname = "$!{colname.replaceAll('[^a-zA-Z0-9_.]','')}")
+  #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+  ##
+  #set($propType = '')
+  #set($propClassName = "$!request.get(${colname.concat('_class')})")
+  #if($propClassName != '')
+    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+  #else
+    #set($propClass = $class)
+  #end
+  #if($propClass &amp;&amp; $listtool.contains($propClass.getPropertyNames(), $colname))
+    #set($propType = "$!{propClass.get($colname).type}")
+  #end
+  ##
+  ## Filter values
+  #if("$!filterValue" != '')
+    #set($discard = $tablelist.add($tableAlias))
+    #if($colname.startsWith('doc.'))
+      #set($whereSql = "${whereSql} and upper(str(${safe_colname.replace('_','.')})) like upper(?)")
+      #set($discard = $whereParams.add("%${filterValue}%"))
+    #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
+      #livetable_getTableName($colname)
+      #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+      #set($discard = $whereParams.addAll(["${colname}", $mathtool.toInteger(${filterValue})]))
+    #elseif($propType == 'DateClass')
+      #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
+      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+    #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
+      #set($fromSql = "${fromSql}, LargeStringProperty ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
+      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+    #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
+      #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
+      #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
+      #if($multiSelect == 1)
+        #if($relationalStorage == 1)
+          #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+          #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+            #set ($joinOperator = 'AND')
+          #end
+          #foreach ($filterValue in $request.getParameterValues($colname))
+            #if ($foreach.isFirst())
+              #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
+              #set ($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
+              #set ($discard = $whereParams.add("${colname}"))
+            #else
+              #set ($whereSql = "${whereSql} ${joinOperator}")
+            #end
+            #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
+            #set ($discard = $whereParams.add("${filterValue}"))
+            #if ($foreach.isLast())
+              #set ($whereSql = "${whereSql})")
+            #end
+          #end
+        #else
+          #set($fromSql = "${fromSql}, StringListProperty ${safe_tableAlias}")
+          #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
+          #set($discard = $whereParams.addAll(["${colname}", "%|${filterValue}|%"]))
+        #end
+      #else
+        #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
+        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+        #set($discard = $whereParams.addAll(["${colname}", "${filterValue}"]))
+      #end
+    #else
+      #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
+      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+    #end
+  #end
+ #end
+#end
+
+
+#**
+ * Old alias of the #livetable_addColumnToQuery macro.
+ * @deprecated since 2.2.3, use {@link #livetable_addColumnToQuery}
+ *#
+#macro(grid_addcolumn $colname)
+  #livetable_addColumnToQuery($colname)
+#end
+
+{{/velocity}}</content>
+</xwikidoc>

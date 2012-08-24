@@ -1,4 +1,5 @@
 var XWiki = (function(XWiki) {
+XWiki.widgets = XWiki.widgets || {};
 /**
  * XWiki namespace.
  * TODO: move everything in it.
@@ -9,15 +10,6 @@ var XWiki = (function(XWiki) {
 Object.extend(XWiki, {
 
   constants: {
-    /** Character that separates wiki from space in a page fullName (example: the colon in xwiki:Main.WebHome). */
-    wikiSpaceSeparator: ":",
-
-    /** Character that separates space from page in a page fullName (example: the dot in xwiki:Main.WebHome). */
-    spacePageSeparator: ".",
-
-    /** Character that separates page from attachment in an attachment fullName (example: the @ in xwiki:Main.WebHome@Archive.tgz). */
-    pageAttachmentSeparator: "@",
-
     /** URL Anchor separator. */
     anchorSeparator: "#",
 
@@ -36,96 +28,6 @@ Object.extend(XWiki, {
 
   resource: {
     /**
-     * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome",
-     * returns null with "Main.WebHome".
-     */
-    getWikiFromResourceName: function(name) {
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        return name.substring(0, name.indexOf(XWiki.constants.wikiSpaceSeparator));
-      }
-      return null;
-    },
-
-    /**
-     * Extract the name of the space from a resource name. Examples: returns "Main" with "xwiki:Main.WebHome",
-     * returns "Main" with "Main.WebHome", returns null with "WebHome".
-     */
-    getSpaceFromResourceName: function(name) {
-      var originalName = name;
-      // Remove wiki if any.
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
-      }
-      // If the resource contains an attachment, make sure the dot is not part of the attachment name.
-      if (name.include(XWiki.constants.spacePageSeparator)) {
-        if (name.include(XWiki.constants.pageAttachmentSeparator) && name.indexOf(XWiki.constants.spacePageSeparator)
-              > name.indexOf(XWiki.constants.pageAttachmentSeparator)) {
-          return null;
-        }
-        return name.substring(0, name.indexOf(XWiki.constants.spacePageSeparator));
-      }
-      // If the resource name looks like "xwiki:Main" we return "Main".
-      if (originalName.include(XWiki.constants.wikiSpaceSeparator)
-            && !originalName.include(XWiki.constants.pageAttachmentSeparator)
-            && !originalName.include(XWiki.constants.anchorSeparator)) {
-        return name;
-      }
-      return null;
-    },
-
-    /**
-     * Extract the name of the page from a resource name. Examples: returns "WebHome" with "xwiki:Main.WebHome",
-     * returns "WebHome" with "Main.WebHome", returns null with "xwiki:Main".
-     */
-    getNameFromResourceName: function(name) {
-      var originalName = name;
-      // Remove wiki if any.
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
-      }
-      // remove attachment if any.
-      if (name.include(XWiki.constants.pageAttachmentSeparator)) {
-        name = name.substring(0, name.indexOf(XWiki.constants.pageAttachmentSeparator));
-      }
-      // remove anchor if any.
-      if (name.include(XWiki.constants.anchorSeparator)) {
-        name = name.substring(0, name.indexOf(XWiki.constants.anchorSeparator));
-      }
-      if (name.include(XWiki.constants.spacePageSeparator)) {
-        return name.substring(name.indexOf(XWiki.constants.spacePageSeparator) + 1, name.length);
-      } else {
-        if (originalName.include(XWiki.constants.wikiSpaceSeparator)) {
-          // If the resource name looks like "xwiki:Main" it does not contain page info.
-          return null;
-        } else {
-          return name;
-        }
-      }
-    },
-
-    /**
-     * Extract the name of the attachment from a resource name. Examples: returns "test.zip" with
-     * "Main.WebHome@test.zip", returns null with "Main.WebHome".
-     */
-    getAttachmentFromResourceName: function(name) {
-      if (name.include(XWiki.constants.pageAttachmentSeparator)) {
-        return name.substring(name.indexOf(XWiki.constants.pageAttachmentSeparator) + 1, name.length);
-      }
-      return null;
-    },
-
-    /**
-     * Extract the name of the anchor from a resource name. Examples: returns "Comments" with
-     * "Main.WebHome#Comments", returns null with "Main.WebHome".
-     */
-    getAnchorFromResourceName: function(name) {
-      if (name.include(XWiki.constants.anchorSeparator)) {
-        return name.substring(name.indexOf(XWiki.constants.anchorSeparator) + 1, name.length);
-      }
-      return null;
-    },
-
-    /**
      * Build a resource object from a wiki resource name (aka fullName). Example with "Main.WebHome":
      * {
      *   wiki: "xwiki",
@@ -138,35 +40,94 @@ Object.extend(XWiki, {
      *  }
      *
      * @param name name of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
+     * @param entityType the type of entity specified by the given name; this parameter is optional but very useful when
+     *                   the passed string is a relative entity reference; e.g. XWiki.EntityType.SPACE for 'xwiki:Main'
+     *                   and XWiki.EntityType.ATTACHMENT for 'Page@file.txt'
      * @return the newly created resource object.
      */
-    get: function(name) {
-      var wiki = this.getWikiFromResourceName(name);
-      var space = this.getSpaceFromResourceName(name);
-      var pageName = this.getNameFromResourceName(name);
-      var attachment = this.getAttachmentFromResourceName(name);
-      var anchor = this.getAnchorFromResourceName(name);
+    get: function(name, entityType) {
+        // First, extract the anchor if it is specified, because entity references don't support anchors. We use a list
+        // of known anchors to reduce the possibility of a conflict with an entity whose name contains the anchor
+        // separator. Of couse this meas we don't support entity names that end with known anchors.
+        var anchor = '', knownAnchors = ['Attachments'];
+        // In case the entity type is not specified determine it from the known anchor.
+        var entityTypeForAnchor = [XWiki.EntityType.DOCUMENT];
+        for (var i = 0; i < knownAnchors.length; i++) {
+            if (name.endsWith(XWiki.constants.anchorSeparator + knownAnchors[i])) {
+                anchor = knownAnchors[i];
+                name = name.substr(0, name.length - (anchor.length + 1));
+                entityType = entityType || entityTypeForAnchor[i];
+                break;
+            }
+        }
 
-      if (!wiki) { wiki = XWiki.currentWiki; }
-      if (!space) { space = XWiki.currentSpace; }
-      if (!pageName) { pageName = XWiki.currentPage; }
-      if (!attachment) { attachment = ""; }
-      if (!anchor) { anchor = ""; }
+        var reference;
+        if (entityType) {
+            reference = XWiki.Model.resolve(name, entityType);
+        } else {
+            // NOTE: The given name can be an attachment reference, a document reference, a space reference or a wiki
+            // reference. Since we don't know the entity type we try to deduce it. This can fail if the given name is a
+            // relative reference.
+            reference = XWiki.Model.resolve(name, XWiki.EntityType.ATTACHMENT);
+            if (!reference.parent) {
+                // Attachment references must be prefixed with at least the document name.
+                reference = XWiki.Model.resolve(name, XWiki.EntityType.DOCUMENT);
+                if (!reference.parent) {
+                    // Check if it's not a space reference.
+                    var spaceReference = XWiki.Model.resolve(name, XWiki.EntityType.SPACE);
+                    if (spaceReference.parent) {
+                        // The wiki is specified so we assume it is a space reference.
+                        reference = spaceReference;
+                    } else {
+                        // The given name is either a wiki name, a space name or a document name. We can't really
+                        // distinguish between them so we assume it's the name of a document from the current space.
+                    }
+                }
+            }
+        }
 
-      var fullName = space + XWiki.constants.spacePageSeparator + pageName;
-      var prefixedSpace = wiki + XWiki.constants.wikiSpaceSeparator + space;
-      var prefixedFullName = wiki + XWiki.constants.wikiSpaceSeparator + fullName;
+        return this.fromEntityReference(reference, anchor);
+    },
 
-      return {
-          wiki: wiki,
-          space: space,
-          prefixedSpace: prefixedSpace,
-          fullName: fullName,
-          prefixedFullName: prefixedFullName,
-          name: pageName,
-          attachment: attachment,
-          anchor: anchor
-       };
+    fromEntityReference : function(reference, anchor) {
+        var wiki = reference.extractReference(XWiki.EntityType.WIKI);
+        wiki = (wiki && wiki.name) || XWiki.currentWiki;
+
+        var space = reference.extractReference(XWiki.EntityType.SPACE);
+        space = (space && space.name) || XWiki.currentSpace;
+
+        var page = reference.extractReference(XWiki.EntityType.DOCUMENT);
+        page = (page && page.name) || XWiki.currentPage;
+
+        var attachment = reference.extractReference(XWiki.EntityType.ATTACHMENT);
+        attachment = (attachment && attachment.name) || '';
+
+        var documentReference = new XWiki.DocumentReference(wiki, space, page);
+        var fullName = XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(wiki)));
+        var prefixedSpace = XWiki.Model.serialize(documentReference.parent);
+        var prefixedFullName = XWiki.Model.serialize(documentReference);
+
+        return {
+            wiki: wiki,
+            space: space,
+            prefixedSpace: prefixedSpace,
+            fullName: fullName,
+            prefixedFullName: prefixedFullName,
+            name: page,
+            attachment: attachment,
+            anchor: anchor
+        };
+    },
+
+    asEntityReference : function(resource) {
+        var reference;
+        var components = [resource.wiki, resource.space, resource.name, resource.attachment];
+        for (var i = 0; i < components.length; i++) {
+            if (components[i]) {
+                reference = new XWiki.EntityReference(components[i], i, reference);
+            }
+        }
+        return reference;
     },
 
     /**
@@ -176,28 +137,7 @@ Object.extend(XWiki, {
      * @return a string that can be passed to the #get(String) method to reconstruct the resource
      */
     serialize: function(resource) {
-        var name = '';
-        if (resource.wiki) {
-            name = resource.wiki;
-        }
-        if (resource.space) {
-            if (name.length > 0) {
-                name += XWiki.constants.wikiSpaceSeparator;
-            }
-            name += resource.space;
-        }
-        if (resource.name) {
-            if (name.length > 0) {
-                name += XWiki.constants.spacePageSeparator;
-            }
-            name += resource.name;
-        }
-        if (resource.attachment) {
-            if (name.length > 0) {
-                name += XWiki.constants.pageAttachmentSeparator;
-            }
-            name += resource.attachment;
-        }
+        var name = XWiki.Model.serialize(this.asEntityReference(resource));
         if (resource.anchor) {
             if (name.length > 0) {
                 name += XWiki.constants.anchorSeparator;
@@ -393,7 +333,7 @@ Object.extend(XWiki, {
    */
   insertCreatePageFromTemplateModalBoxes: function() {
       // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
           XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
               initialize : function($super, interactionParameters) {
                   var content =  new Element('div', {'class': 'modal-popup'});
@@ -591,10 +531,19 @@ Object.extend(XWiki, {
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
-  initialize: function(){
+  initialize: function() {
     // Extra security to make sure we do not get initalized twice.
-    // It would fire the custom dom:loaded event twice, which could make their observers misbehave.
+    // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
+      // This variable is set when the marker script is executed, which should always be the last script to execute.
+      // In case the dom:loaded event was fired prematurely, delay the execution and ask instead the marker script to
+      // re-invoke the initialization process.
+      if (typeof XWiki.lastScriptLoaded == "undefined") {
+        XWiki.failedInit = true;
+        return;
+      }
+
+      // All ready, continue with the initialization.
       this.isInitialized = true;
       document.fire("xwiki:dom:loading");
 
@@ -1312,7 +1261,7 @@ document.observe('xwiki:dom:loading', function() {
       this.value=this.defaultValue;
     }
   }
-  document.observe('xwiki:addBehavior:withTip', function(event){
+  document.observe('xwiki:addBehavior:withTip', function(event) {
     var item = event.memo.element;
     if (item) {
       item.observe('focus', onFocus.bindAsEventListener(item));
@@ -1322,6 +1271,13 @@ document.observe('xwiki:dom:loading', function() {
   document.observe('xwiki:dom:loaded', function() {
     $$("input.withTip", "textarea.withTip").each(function(item) {
       document.fire("xwiki:addBehavior:withTip", {'element' : item});
+    });
+  });
+  document.observe('xwiki:dom:updated', function(event) {
+    event.memo.elements.each(function(element) {
+      element.select("input.withTip", "textarea.withTip").each(function(item) {
+        document.fire("xwiki:addBehavior:withTip", {'element' : item});
+      });
     });
   });
 })();
@@ -1373,24 +1329,30 @@ document.observe('xwiki:dom:loaded', function() {
             noresults: "Group not found"
         }
     };
-    if (typeof(XWiki.widgets.Suggest) != "undefined") {
-      var keys = Object.keys(suggestionsMapping);
-      for (var i=0;i<keys.length;i++) {
-        var selector = 'input.suggest' + keys[i].capitalize();
-        $$(selector).each(function(item) {
-          if (!item.hasClassName('initialized')) {
-            var options = {
-              timeout : 30000,
-              parentContainer : item.up()
-            };
-            Object.extend(options, suggestionsMapping[keys[i]]);
-            // Create the Suggest.
-            var suggest = new XWiki.widgets.Suggest(item, options);
-            item.addClassName('initialized');
-          }
-        });
+    var addSuggests = function(elements) {
+      if (typeof(XWiki.widgets.Suggest) != "undefined") {
+        var keys = Object.keys(suggestionsMapping);
+        for (var i=0;i<keys.length;i++) {
+          var selector = 'input.suggest' + keys[i].capitalize();
+          elements.each(function(element) {$(element).select(selector).each(function(item) {
+            if (!item.hasClassName('initialized')) {
+              var options = {
+                timeout : 30000,
+                parentContainer : item.up()
+              };
+              Object.extend(options, suggestionsMapping[keys[i]]);
+              // Create the Suggest.
+              var suggest = new XWiki.widgets.Suggest(item, options);
+              item.addClassName('initialized');
+            }
+          })});
+        }
       }
-    }
+    };
+    addSuggests([$(document.documentElement)]);
+    document.observe('xwiki:dom:updated', function(event) {
+      addSuggests(event.memo.elements);
+    });
 });
 
 /**
@@ -1399,16 +1361,21 @@ document.observe('xwiki:dom:loaded', function() {
  *
  * To activate this behavior on an input elements, add the "suggested" classname to it.
  */
-document.observe('xwiki:dom:loaded', function() {
-  if (typeof(XWiki.widgets.Suggest) != "undefined") {
-    $$(".suggested").each(function(item) {
-      item.setAttribute("autocomplete", "off");
-      if (typeof item.onfocus === "function") {
-        item.onfocus();
-        item.removeAttribute("onfocus");
-      }
-    });
-  }
+['xwiki:dom:loaded', 'xwiki:dom:updated'].each(function(eventName) {
+  document.observe(eventName, function(event) {
+    if (typeof(XWiki.widgets.Suggest) != "undefined") {
+      var elements = event.memo && event.memo.elements || [document.documentElement];
+      elements.each(function(element) {
+        element.select(".suggested").each(function(item) {
+          item.setAttribute("autocomplete", "off");
+          if (typeof item.onfocus === "function") {
+            item.onfocus();
+            item.removeAttribute("onfocus");
+          }
+        });
+      });
+    }
+  });
 });
 
 /*

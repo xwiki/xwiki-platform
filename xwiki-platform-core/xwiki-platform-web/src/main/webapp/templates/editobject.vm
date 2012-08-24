@@ -241,10 +241,10 @@
       <a href='$fullEditorURL' class='edit-all' title="$msg.get('core.editors.object.editAllObjects')">$msg.get('core.editors.object.editAllObjects')</a>
     </div>
   #end
-  #set ($redirect = $xwiki.getRequestURL())
-  <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+  #set ($redirect = $xwiki.relativeRequestURL)
+  <form id="update" method="post" action="$doc.getURL("save")" class="withLock">
   <div id="xwikieditcontent" class="clear">
-  <div id="document-title"><h1>$msg.get('core.editors.object.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
+  <div id="document-title"><h1>$msg.get('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
 
   #checkPropertyDeprecation()
 

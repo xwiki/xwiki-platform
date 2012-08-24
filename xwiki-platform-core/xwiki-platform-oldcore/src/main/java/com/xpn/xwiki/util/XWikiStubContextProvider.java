@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.util;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -32,7 +32,7 @@ import com.xpn.xwiki.XWikiContext;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface XWikiStubContextProvider
 {
     /**

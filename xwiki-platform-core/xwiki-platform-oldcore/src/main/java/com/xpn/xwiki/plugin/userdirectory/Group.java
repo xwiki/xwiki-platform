@@ -331,7 +331,7 @@ public class Group
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName("XWiki.XWikiGroups");
         needsUpdate |= bclass.addTextField("member", "Member", 30);
         needsUpdate |= bclass.addTextField("role", "Role", 30);
@@ -364,7 +364,7 @@ public class Group
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName("XWiki.DirectoryGroupClass");
         needsUpdate |= bclass.addTextField("name", "Name", 30);
         needsUpdate |= bclass.addTextAreaField("description", "Description", 40, 5);
@@ -396,7 +396,7 @@ public class Group
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName("XWiki.GroupRelationClass");
         needsUpdate |= bclass.addTextField("name", "Name", 30);
         needsUpdate |= bclass.addTextField("parentpage", "Parent", 30);

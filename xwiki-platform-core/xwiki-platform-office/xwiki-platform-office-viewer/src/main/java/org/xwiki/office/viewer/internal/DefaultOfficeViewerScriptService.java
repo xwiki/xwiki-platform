@@ -166,7 +166,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
         this.transformationManager.performTransformations(xdom, context);
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, toSyntax.toIdString());
+        BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, toSyntax.toIdString());
         renderer.render(xdom, printer);
         return printer.toString();
     }

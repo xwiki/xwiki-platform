@@ -42,9 +42,11 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class UsersClass extends ListClass
 {
+    private static final String XCLASSNAME = "userslist";
+
     public UsersClass(PropertyMetaClass wclass)
     {
-        super("userslist", "Users List", wclass);
+        super(XCLASSNAME, "Users List", wclass);
         setSize(6);
         setUsesList(true);
     }

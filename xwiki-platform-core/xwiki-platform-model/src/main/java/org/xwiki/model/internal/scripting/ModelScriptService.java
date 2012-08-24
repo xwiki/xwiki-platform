@@ -109,14 +109,15 @@ public class ModelScriptService implements ScriptService
         DocumentReference documentReference;
         try {
             DocumentReferenceResolver<EntityReference> resolver =
-                this.componentManager.lookupComponent(DocumentReferenceResolver.TYPE_REFERENCE, hint);
+                this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, hint);
             documentReference = resolver.resolve(reference);
         } catch (ComponentLookupException e) {
             try {
                 // Ensure backward compatibility with older scripts that use hints like "default/reference" because at
                 // the time they were written we didn't have support for generic types in component role.
-                documentReference =
-                    this.componentManager.lookup(DocumentReferenceResolver.class, hint).resolve(reference);
+                DocumentReferenceResolver drr =
+                    this.componentManager.getInstance(DocumentReferenceResolver.class, hint);
+                documentReference = drr.resolve(reference);
                 logger.warn("Deprecated usage of DocumentReferenceResolver with hint [{}]. "
                     + "Please consider using a DocumentReferenceResolver that takes into account generic types.", hint);
             } catch (ComponentLookupException ex) {
@@ -142,12 +143,14 @@ public class ModelScriptService implements ScriptService
     /**
      * @param stringRepresentation the document reference specified as a String (using the "wiki:space.page" format and
      *            with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a document
+     *            reference relative to another entity reference
      * @return the typed Document Reference object (resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 2.3M2
      */
-    public DocumentReference resolveDocument(String stringRepresentation)
+    public DocumentReference resolveDocument(String stringRepresentation, Object... parameters)
     {
-        return resolveDocument(stringRepresentation, DEFAULT_RESOLVER_HINT);
+        return resolveDocument(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
     }
 
     /**
@@ -163,7 +166,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new DocumentReference(resolver.resolve(stringRepresentation, EntityType.DOCUMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -173,13 +176,15 @@ public class ModelScriptService implements ScriptService
     /**
      * @param stringRepresentation an attachment reference specified as {@link String} (using the "wiki:space.page@file"
      *            format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an attachment
+     *            reference relative to another entity reference
      * @return the corresponding typed {@link AttachmentReference} object (resolved using the
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 2.5M2
      */
-    public AttachmentReference resolveAttachment(String stringRepresentation)
+    public AttachmentReference resolveAttachment(String stringRepresentation, Object... parameters)
     {
-        return resolveAttachment(stringRepresentation, DEFAULT_RESOLVER_HINT);
+        return resolveAttachment(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
     }
 
     /**
@@ -196,7 +201,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new AttachmentReference(resolver.resolve(stringRepresentation, EntityType.ATTACHMENT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -206,13 +211,15 @@ public class ModelScriptService implements ScriptService
     /**
      * @param stringRepresentation an object reference specified as {@link String} (using the "wiki:space.page^object"
      *            format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
+     *            reference relative to another entity reference
      * @return the corresponding typed {@link ObjectReference} object (resolved using the
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 3.2M3
      */
-    public ObjectReference resolveObject(String stringRepresentation)
+    public ObjectReference resolveObject(String stringRepresentation, Object... parameters)
     {
-        return resolveObject(stringRepresentation, DEFAULT_RESOLVER_HINT);
+        return resolveObject(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
     }
     
     /**
@@ -229,7 +236,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectReference(resolver.resolve(stringRepresentation, EntityType.OBJECT, parameters));
         } catch (ComponentLookupException e) {
             return null;
@@ -239,13 +246,15 @@ public class ModelScriptService implements ScriptService
     /**
      * @param stringRepresentation an object property reference specified as {@link String} (using the 
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
+     *            property reference relative to another entity reference
      * @return the corresponding typed {@link ObjectReference} object (resolved using the
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 3.2M3
      */
-    public ObjectPropertyReference resolveObjectProperty(String stringRepresentation)
+    public ObjectPropertyReference resolveObjectProperty(String stringRepresentation, Object... parameters)
     {
-        return resolveObjectProperty(stringRepresentation, DEFAULT_RESOLVER_HINT);
+        return resolveObjectProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
     }
     
     /**
@@ -262,7 +271,7 @@ public class ModelScriptService implements ScriptService
     {
         try {
             EntityReferenceResolver<String> resolver =
-                this.componentManager.lookupComponent(EntityReferenceResolver.TYPE_STRING, hint);
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY,
                 parameters));
         } catch (ComponentLookupException e) {
@@ -273,25 +282,29 @@ public class ModelScriptService implements ScriptService
     /**
      * @param reference the entity reference to transform into a String representation
      * @return the string representation of the passed entity reference (using the "compact" serializer)
+     * @param parameters the optional extra parameters to pass to the Serializer; they are passed directly to
+     *        {@link EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)}
      * @since 2.3M2
      */
-    public String serialize(EntityReference reference)
+    public String serialize(EntityReference reference, Object... parameters)
     {
-        return serialize(reference, "compact");
+        return serialize(reference, "compact", parameters);
     }
 
     /**
      * @param reference the entity reference to transform into a String representation
      * @param hint the hint of the Serializer to use (valid hints are for example "default", "compact", "local")
+     * @param parameters the optional extra parameters to pass to the Serializer; they are passed directly to
+     *        {@link EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)}
      * @return the string representation of the passed entity reference
      */
-    public String serialize(EntityReference reference, String hint)
+    public String serialize(EntityReference reference, String hint, Object... parameters)
     {
         String result;
         try {
             EntityReferenceSerializer<String> serializer =
-                this.componentManager.lookupComponent(EntityReferenceSerializer.TYPE_STRING, hint);
-            result = serializer.serialize(reference);
+                this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, hint);
+            result = serializer.serialize(reference, parameters);
         } catch (ComponentLookupException e) {
             result = null;
         }

@@ -29,10 +29,14 @@ import org.jfree.chart.plot.Plot;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.chart.internal.plot.AreaPlotGenerator;
+import org.xwiki.chart.internal.plot.Bar3DPlotGenerator;
 import org.xwiki.chart.internal.plot.BarPlotGenerator;
+import org.xwiki.chart.internal.plot.Line3DPlotGenerator;
 import org.xwiki.chart.internal.plot.LinePlotGenerator;
 import org.xwiki.chart.internal.plot.PiePlotGenerator;
 import org.xwiki.chart.internal.plot.PlotGenerator;
+import org.xwiki.chart.internal.plot.XYAreaPlotGenerator;
+import org.xwiki.chart.internal.plot.XYLineAndShapePlotGenerator;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -47,12 +51,17 @@ import org.xwiki.component.phase.InitializationException;
  */
 @Component
 public class DefaultChartGenerator implements ChartGenerator, Initializable
-{    
+{
     /**
      * Map of available plot generators.
      */
     private Map<String, PlotGenerator> plotGenerators;
-    
+
+    /**
+     * Allows providing custom colors.
+     */
+    private DrawingSupplierFactory drawingSupplierFactory = new DrawingSupplierFactory();
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -61,10 +70,15 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
         plotGenerators.put("bar", new BarPlotGenerator());    
         plotGenerators.put("area", new AreaPlotGenerator());
         plotGenerators.put("pie", new PiePlotGenerator());
+        plotGenerators.put("line3D", new Line3DPlotGenerator());
+        plotGenerators.put("bar3D", new Bar3DPlotGenerator());
+        plotGenerators.put("xy_area", new XYAreaPlotGenerator());
+        plotGenerators.put("xy_line_and_shape", new XYLineAndShapePlotGenerator());
     }
 
     @Override
-    public byte[] generate(ChartModel model, Map<String, String> parameters) throws ChartGeneratorException
+    public byte[] generate(ChartModel model, Map<String, String> parameters)
+        throws ChartGeneratorException
     {
         setDefaultParams(parameters);
         String type = parameters.get(TYPE_PARAM);
@@ -74,6 +88,10 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
             throw new ChartGeneratorException(String.format("No such chart type : [%s].", type));
         }
         Plot plot = generator.generate(model, parameters);
+
+        // Set the default colors to use if the user has specified some colors.
+        plot.setDrawingSupplier(this.drawingSupplierFactory.createDrawingSupplier(parameters));
+
         JFreeChart jfchart = new JFreeChart(title, plot);
         int width = Integer.parseInt(parameters.get(WIDTH_PARAM));
         int height = Integer.parseInt(parameters.get(HEIGHT_PARAM));

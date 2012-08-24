@@ -41,8 +41,140 @@ import org.slf4j.LoggerFactory;
 public class SaveAndContinueAction extends XWikiAction
 {
 
+    /** Key for storing the wrapped action in the context. */
+    private static final String WRAPPED_ACTION_CONTEXT_KEY = "SaveAndContinueAction.wrappedAction";
+
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
+
+    /**
+     * Write an error response to an ajax request.
+     *
+     * @param httpStatusCode The status code to set on the response.
+     * @param message The message that should be displayed.
+     * @param context the context.
+     */
+    private void writeAjaxErrorResponse(int httpStatusCode, String message, XWikiContext context)
+    {
+        try {
+            context.getResponse().setContentType("text/plain");
+            context.getResponse().setStatus(httpStatusCode);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(message);
+        } catch (IOException e) {
+            LOGGER.error("Failed to send error response to AJAX save and continue request.", e);
+        }
+    }
+
+    /**
+     * Perform the internal action implied by the save and continue request.
+     *
+     * If the request is an ajax request, writeAjaxErrorResponse will be called.
+     *
+     * The return value will be that of the wrapped action.
+     *
+     * @param isAjaxRequest Indicate if this is an ajax request.
+     * @param back The back URL.
+     * @param context The xwiki context.
+     * @return {\code false} if the request is an ajax request, otherwise the return value of the wrapped action.
+     * @throws XWikiException 
+     */
+    private boolean doWrappedAction(boolean isAjaxRequest, String back, XWikiContext context) throws XWikiException {
+
+        boolean failure = false;
+
+        // This will never be true if "back" comes from request.getHeader("referer")
+        if (back != null && back.contains("editor=class")) {
+            PropUpdateAction pua = new PropUpdateAction();
+
+            if (pua.propUpdate(context)) {
+                if (isAjaxRequest) {
+                    String errorMessage = context.getMessageTool()
+                        .get((String) context.get("message"));
+                    writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
+                } else {
+                    context.put(WRAPPED_ACTION_CONTEXT_KEY, pua);
+                }
+
+                failure = true;
+            }
+        } else {
+            SaveAction sa = new SaveAction();
+            if (sa.save(context)) {
+                if (isAjaxRequest) {
+                    String errorMessage = context.getMessageTool()
+                        .get("core.editors.saveandcontinue.theDocumentWasNotSaved");
+                    // This should not happen.  SaveAction.save(context) should normally throw an
+                    // exception when failing during save and continue.
+                    LOGGER.error("SaveAction.save(context) returned true while using save & continue");
+                    writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
+                } else {
+                    context.put(WRAPPED_ACTION_CONTEXT_KEY, sa);
+                }
+
+                failure = true;
+            } else {
+                // Lock back the document
+                context.getDoc().getTranslatedDocument(context).setLock(context.getUser(), context);
+            }
+        }
+
+        return failure;
+    }
+
+    /**
+     * @param isAjaxRequest Indicate if this is an ajax request.
+     * @param context The XWiki context.
+     * @throws XWikiException unless it is an ajax request.
+     */
+    private void handleCSRFValidationFailure(boolean isAjaxRequest, XWikiContext context)
+        throws XWikiException
+    {
+        final String csrfCheckFailedMessage =
+            context.getMessageTool().get("core.editors.saveandcontinue.csrfCheckFailed");
+        if (isAjaxRequest) {
+            writeAjaxErrorResponse(HttpServletResponse.SC_FORBIDDEN,
+                                   csrfCheckFailedMessage,
+                                   context);
+        } else {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                                     XWikiException.ERROR_XWIKI_ACCESS_TOKEN_INVALID,
+                                     csrfCheckFailedMessage);
+        }
+    }
+
+    /**
+     * @param isAjaxRequest Indicate if this is an ajax request.
+     * @param exception The exception to handle.
+     * @param context The XWiki context.
+     * @throws XWikiException unless it is an ajax request.
+     */
+    private void handleException(boolean isAjaxRequest, Exception exception, XWikiContext context)
+        throws XWikiException
+    {
+        if (isAjaxRequest) {
+
+            String errorMessage = context.getMessageTool()
+                .get("core.editors.saveandcontinue.exceptionWhileSaving",
+                     exception.getMessage());
+
+            writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
+
+            String logMessage = "Caught exception during save and continue";
+            if (exception instanceof XWikiException) {
+                LOGGER.info(logMessage, exception);
+            } else {
+                LOGGER.error(logMessage, exception);
+            }
+        } else {
+            if (exception instanceof XWikiException) {
+                throw (XWikiException) exception;
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                                         "Uncaught exception", exception);
+            }
+        }
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -50,42 +182,34 @@ public class SaveAndContinueAction extends XWikiAction
         CSRFToken csrf = Utils.getComponent(CSRFToken.class);
         String token = context.getRequest().getParameter("form_token");
 
-        if (!csrf.isTokenValid(token)) {
-            try {
-                context.getResponse().setContentType("text/plain");
-                context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
-                context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
-                context.getResponse().getWriter().print(context.getMessageTool()
-                                                        .get("core.editors.saveandcontinue.csrfCheckFailed"));
-            } catch (IOException e) {
-                LOGGER.error("Failed to send error in response to save & continue action with mismatching CSRF token.",
-                             e);
-            }
+        // If the request is an ajax request, we will:
+        //
+        // 1) _not_ send a redirect response
+        // 
+        // 2) if for any reason the document is not saved, call the method writeAjaxErrorResponse and return false
+        // (which normally indicates success).
 
+        final boolean isAjaxRequest = Utils.isAjaxRequest(context);
+
+        if (!csrf.isTokenValid(token)) {
+            handleCSRFValidationFailure(isAjaxRequest, context);
             return false;
         }
 
         // Try to find the URL of the edit page which we came from
         String back = findBackURL(context);
 
-        // This will never be true if "back" comes from request.getHeader("referer")
-        if (back != null && back.contains("editor=class")) {
-            PropUpdateAction pua = new PropUpdateAction();
-            if (pua.propUpdate(context)) {
-                pua.render(context);
+        try {
+            if (doWrappedAction(isAjaxRequest, back, context)) {
+                return !isAjaxRequest;
             }
-        } else {
-            SaveAction sa = new SaveAction();
-            if (sa.save(context)) {
-                sa.render(context);
-            } else {
-                // Lock back the document
-                context.getDoc().getTranslatedDocument(context).setLock(context.getUser(), context);
-            }
+        } catch (Exception e) {
+            handleException(isAjaxRequest, e, context);
+            return !isAjaxRequest;
         }
 
         // If this is an ajax request, no need to redirect.
-        if (Utils.isAjaxRequest(context)) {
+        if (isAjaxRequest) {
             context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
             return false;
         }
@@ -103,6 +227,12 @@ public class SaveAndContinueAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
+        XWikiAction wrappedAction = (XWikiAction) context.get(WRAPPED_ACTION_CONTEXT_KEY);
+
+        if (wrappedAction != null) {
+            return wrappedAction.render(context);
+        }
+
         return "exception";
     }
 

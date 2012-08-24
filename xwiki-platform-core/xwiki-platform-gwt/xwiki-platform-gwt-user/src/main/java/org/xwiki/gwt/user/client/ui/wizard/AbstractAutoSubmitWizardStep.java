@@ -49,6 +49,7 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
      * 
      * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public final void init(Object data, AsyncCallback< ? > cb)
     {
@@ -100,6 +101,7 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
      * 
      * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
      */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         // Leave the input data unchanged by default.

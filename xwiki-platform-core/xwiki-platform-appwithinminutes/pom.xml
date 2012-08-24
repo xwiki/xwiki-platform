@@ -27,17 +27,24 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-appwithinminutes</artifactId>
   <name>XWiki Platform - App Within Minutes</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>An XWiki application that allows end users to use XWiki's powerful structured data management to make
     collaborative web applications with as little steps as possible. The focus is on solving most common use cases when
     creating applications. We are not trying to include all types of features (like notifications, complex fields or
     workflows). These can be added by programmers.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-appwithinminutes-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-appwithinminutes-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

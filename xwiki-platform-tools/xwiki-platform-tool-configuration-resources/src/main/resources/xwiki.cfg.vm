@@ -235,6 +235,14 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #-# Hide the /WebHome part of the URL when the document is the default one. Use 0 to hide, 1 to show.
 # xwiki.usedefaultaction=0
 
+#-# [Since 4.0RC1]
+#-# Indicate if the URL used in HTTPSevlet#sendRedirect should be made absolute by XWiki or left to application server.
+#-# Sending absolute URLs is a bad practice and generally not needed. This option is mostly here as retro-compatibility
+#-# switch and you should always make sure to properly configure your application server or any proxy behind it before
+#-# using this.
+#-# 0: send relative URLs (the default)
+#-# 1: send absolute URLs
+# xwiki.redirect.absoluteurl=0
 
 #---------------------------------------
 # Users
@@ -381,7 +389,7 @@ xwiki.editcomment.mandatory=$xwikiCfgEditCommentMandatory
 #-# Turn LDAP authentication on - otherwise only XWiki authentication
 #-# - 0: disable
 #-# - 1: enable
-#-# The default is 1
+#-# The default is 0
 # xwiki.authentication.ldap=1
 
 #-# LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
@@ -430,8 +438,8 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 #-# account is created.
 #-# - 0: only when creating user
 #-# - 1: at each authentication
-#-# The default is 1
-# xwiki.authentication.ldap.update_user=1
+#-# The default is 0
+xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# Maps XWiki groups to LDAP groups, separator is "|". The following kind of groups are supported:
@@ -457,8 +465,10 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 # xwiki.authentication.ldap.mode_group_sync=always
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
-#-# The default is 1
+#-# If ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 0
 xwiki.authentication.ldap.trylocal=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
@@ -591,8 +601,8 @@ xwiki.plugin.image.cache.capacity=30
 # xwiki.calendar.bound.next=12
 
 #-# Lucene search engine
-#-# Location where to place the lucene index files. The default is the "lucene" subdirectory in the container's "work"
-#-# diectory. Change it if you want to store indexes in another place.
+#-# Location where to place the lucene index files. The default is the "lucene" subdirectory in XWiki's permanent data
+#-# directory. Change it if you want to store indexes in another place.
 # xwiki.plugins.lucene.indexdir=/usr/local/xwiki/lucene
 #-# The text analyzer to use for indexing.
 # xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
@@ -632,14 +642,5 @@ xwiki.plugin.image.cache.capacity=30
 #-# * major: add to watchlist only document which are not edited as minor edit. That's the default mode.
 #-# * new: add to watchlist only newly created documents
 # xwiki.plugin.watchlist.automaticwatch=major
-
-#---------------------------------------
-# Misc
-#
-
-#-# Temporary directory where XWiki can put files (during export and upload, for example).
-# xwiki.temp.dir=/tmp/xwiki
-#-# XWiki work directory. If not set temporary directory is used.
-# xwiki.work.dir=/usr/local/xwiki
 
 $!xwikiCfgAdditionalProperties

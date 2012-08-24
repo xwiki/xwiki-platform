@@ -23,7 +23,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.xwiki.extension.internal.safe.AbstractSafeObject;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
-import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalActions;
+import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -69,12 +69,12 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
 
     // Answer
 
-    public GlobalActions getGlobalAction()
+    public GlobalAction getGlobalAction()
     {
         return this.question.getGlobalAction();
     }
 
-    public void setGlobalAction(GlobalActions globalAction)
+    public void setGlobalAction(GlobalAction globalAction)
     {
         this.question.setGlobalAction(globalAction);
     }
@@ -84,12 +84,15 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
         return safe(this.question.getCustomDocument());
     }
 
-    public void setCurrentDocument(Document currentDocument)
+    /**
+     * @since 4.1
+     */
+    public void setCustomDocument(Document customDocument)
     {
         try {
-            XWikiDocument document = (XWikiDocument) FieldUtils.readField(currentDocument, "doc", true);
+            XWikiDocument document = (XWikiDocument) FieldUtils.readField(customDocument, "doc", true);
 
-            this.question.setCurrentDocument(document);
+            this.question.setCustomDocument(document);
         } catch (IllegalAccessException e) {
             // TODO: log something ?
         }

@@ -61,7 +61,7 @@ public class DefaultApplicationContextListenerManager implements ApplicationCont
     {
         try {
             List<ApplicationContextListener> initializers =
-                this.componentManager.lookupList(ApplicationContextListener.class);
+                this.componentManager.getInstanceList(ApplicationContextListener.class);
             for (ApplicationContextListener initializer : initializers) {
                 initializer.initializeApplicationContext(applicationContext);
             }
@@ -75,7 +75,7 @@ public class DefaultApplicationContextListenerManager implements ApplicationCont
     {
         try {
             List<ApplicationContextListener> initializers =
-                this.componentManager.lookupList(ApplicationContextListener.class);
+                this.componentManager.getInstanceList(ApplicationContextListener.class);
             for (ApplicationContextListener initializer : initializers) {
                 initializer.destroyApplicationContext(applicationContext);
             }

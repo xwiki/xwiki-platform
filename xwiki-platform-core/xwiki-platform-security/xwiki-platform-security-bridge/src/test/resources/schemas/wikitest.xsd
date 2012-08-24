@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="wikis">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="wiki"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="wiki">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="user"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="group"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="right.element"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="space"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:Name"/>
+      <xs:attribute name="owner" use="required" type="xs:Name"/>
+      <xs:attribute name="mainWiki" type="xs:boolean"/>
+      <xs:attribute name="readOnly" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="user">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:Name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="group">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="user"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:Name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="space">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="right.element"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="document"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:Name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="document">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="creator"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="right.element"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:Name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="creator" type="xs:Name"/>
+  <xs:element name="right.element" abstract="true">
+    <xs:complexType>
+      <xs:attributeGroup ref="right.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="allowUser" substitutionGroup="right.element"/>
+  <xs:element name="denyUser" substitutionGroup="right.element"/>
+  <xs:element name="allowGroup" substitutionGroup="right.element"/>
+  <xs:element name="denyGroup" substitutionGroup="right.element"/>
+  <xs:attributeGroup name="right.attributes">
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="login"/>
+          <xs:enumeration value="register"/>
+          <xs:enumeration value="view"/>
+          <xs:enumeration value="edit"/>
+          <xs:enumeration value="delete"/>
+          <xs:enumeration value="admin"/>
+          <xs:enumeration value="programming"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="name" use="required" type="xs:Name"/>
+  </xs:attributeGroup>
+</xs:schema>

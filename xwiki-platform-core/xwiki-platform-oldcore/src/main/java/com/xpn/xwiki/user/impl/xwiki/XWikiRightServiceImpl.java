@@ -320,6 +320,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
     public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel, boolean user,
         boolean allow, boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException
     {
+        if (!global && ("admin".equals(accessLevel))) {
+            // Admin rights do not exist at document level.
+            throw new XWikiRightNotFoundException();
+        }
+
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
         String fieldName = user ? "users" : "groups";
         boolean found = false;
@@ -778,10 +783,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // and that all users that were not denied
             // should be allowed.
             if (!allow_found) {
-                // Should these rights be denied only if no deny rights were found?
-                if (accessLevel.equals("register") || accessLevel.equals("delete")) {
-                    logDeny(userOrGroupName, entityReference, accessLevel, "global level (" + accessLevel
-                        + " right must be explicit)");
+                // Delete must be denied by default.
+                if ("delete".equals(accessLevel)) {
+                    if (hasAccessLevel("admin", userOrGroupName, entityReference, user, context)) {
+                        logAllow(userOrGroupName, entityReference, accessLevel, "admin rights imply delete on empty wiki");
+                        return true;
+                    }
+                    logDeny(userOrGroupName, entityReference, accessLevel, "global level (delete right must be explicit)");
 
                     return false;
                 } else {

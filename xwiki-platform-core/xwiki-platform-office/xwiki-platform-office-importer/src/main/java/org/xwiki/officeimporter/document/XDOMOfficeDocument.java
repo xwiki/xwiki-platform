@@ -91,7 +91,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     {
         try {
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, syntaxId);
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, syntaxId);
             renderer.render(this.xdom, printer);
             return printer.toString();
         } catch (ComponentLookupException ex) {
@@ -157,7 +157,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     {
         try {
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, "plain/1.0");
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, "plain/1.0");
             renderer.render(header, printer);
             return printer.toString();
         } catch (ComponentLookupException ex) {

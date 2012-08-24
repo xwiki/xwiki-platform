@@ -19,9 +19,7 @@
     #submenuseparator()
     #submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.edit.rights') 'tmEditRights', '')
     #submenuitem($doc.getURL('edit', 'editor=object') $msg.get('core.menu.edit.object') 'tmEditObject', '')
-    #if($hasAdmin)
-      #submenuitem($doc.getURL('edit', 'editor=class') $msg.get('core.menu.edit.class') 'tmEditClass', '')
-    #end
+    #submenuitem($doc.getURL('edit', 'editor=class') $msg.get('core.menu.edit.class') 'tmEditClass', '')
     #xwikitopmenuentryend()
   #else ## !isAdvanced
     #xwikitopmenuentry('' $currentEditorTitle 'tmCurrentEditor' "$currentEditorId hasIcon")

@@ -63,6 +63,7 @@ public abstract class AbstractInteractiveWizardStep extends AbstractNavigationAw
      * 
      * @see AbstractNavigationAwareWizardStep#display()
      */
+    @Override
     public FlowPanel display()
     {
         return panel;

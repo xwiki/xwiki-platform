@@ -52,8 +52,8 @@ public abstract class AbstractROMTestCase
         getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
         getConfigurationSource2().setProperty("observation.remote.enabled", Boolean.TRUE);
 
-        this.observationManager1 = getComponentManager1().lookup(ObservationManager.class);
-        this.observationManager2 = getComponentManager2().lookup(ObservationManager.class);
+        this.observationManager1 = getComponentManager1().getInstance(ObservationManager.class);
+        this.observationManager2 = getComponentManager2().getInstance(ObservationManager.class);
     }
 
     public EmbeddableComponentManager getComponentManager1() throws Exception

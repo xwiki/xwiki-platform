@@ -55,7 +55,7 @@ public class XWikiWebappResourceLoader extends WebappLoader
     private Environment getEnvironment()
     {
         try {
-            return getComponentManager().lookup(Environment.class);
+            return getComponentManager().getInstance(Environment.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException(
                 "Cannot initialize Velocity subsystem: missing Environment component implementation");

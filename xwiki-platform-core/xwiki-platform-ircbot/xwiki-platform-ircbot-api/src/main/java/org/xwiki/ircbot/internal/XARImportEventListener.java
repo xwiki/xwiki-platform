@@ -27,13 +27,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
-import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -77,10 +79,16 @@ public class XARImportEventListener implements EventListener
     private EntityReferenceSerializer<String> serializer;
 
     /**
-     * Used to get access to the XWiki Context.
+     * Used to get access to the current user.
      */
     @Inject
-    private WikiIRCModel ircModel;
+    private DocumentAccessBridge dab;
+
+    /**
+     * Used to get access to the current wiki.
+     */
+    @Inject
+    private ModelContext modelContext;
 
     /**
      * Used to save temporary information about the fact that a XAR import is in progress so that we don't send
@@ -134,22 +142,24 @@ public class XARImportEventListener implements EventListener
      * Get the current author name that we want to print in the notification message we send to the IRC channel.
      *
      * @return the author name
-     * @throws IRCBotException if we cannot access the XWikiContext
+     * @throws IRCBotException if current user cannot be retrieved
      */
     private String getNotificationAuthor() throws IRCBotException
     {
-        DocumentReference authorReference = this.ircModel.getXWikiContext().getUserReference();
-        return this.serializer.serialize(authorReference);
+        return this.serializer.serialize(this.dab.getCurrentUserReference());
     }
 
     /**
-     * Get the current wiki name that we want to print in the notification message we send to the IRC channel.
-     *
-     * @return the current wiki name
-     * @throws IRCBotException if we cannot access the XWikiContext
+     * @return the current wiki
+     * @throws IRCBotException if the current wiki couldn't be found
      */
     private String getNotificationWiki() throws IRCBotException
     {
-        return this.ircModel.getXWikiContext().getDatabase();
+        EntityReference reference = this.modelContext.getCurrentEntityReference();
+        if (reference == null) {
+            // This shouldn't happen since there's always supposed to be a current wiki
+            throw new IRCBotException("The current wiki couldn't be computed");
+        }
+        return reference.extractReference(EntityType.WIKI).getName();
     }
 }

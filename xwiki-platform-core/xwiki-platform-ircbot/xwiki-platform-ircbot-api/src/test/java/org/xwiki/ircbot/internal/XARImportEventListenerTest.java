@@ -24,16 +24,15 @@ import java.util.Collections;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -41,14 +40,8 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
-import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
-import com.xpn.xwiki.web.Utils;
 
 import junit.framework.Assert;
 
@@ -61,15 +54,6 @@ import junit.framework.Assert;
 @ComponentList({
     // Used to test our Event Listener in integration with the Observation Manager (see below)
     DefaultObservationManager.class,
-    // Components drawn by new XWikiContext()
-    DefaultEntityReferenceValueProvider.class,
-    CurrentMixedEntityReferenceValueProvider.class,
-    CurrentMixedStringDocumentReferenceResolver.class,
-    DefaultModelConfiguration.class,
-    DefaultModelContext.class,
-    LocalStringEntityReferenceSerializer.class,
-    CompactWikiStringEntityReferenceSerializer.class,
-    CurrentEntityReferenceValueProvider.class
 })
 @MockingRequirement(XARImportEventListener.class)
 public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
@@ -111,19 +95,15 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
     public void onEventWhenXARImportStarted() throws Exception
     {
         final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
-        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
 
         // We simulate an EC without any XAR started information
         final Execution execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext ec = new ExecutionContext();
-
-        Utils.setComponentManager(getComponentManager());
-        final XWikiContext xwikiContext = new XWikiContext();
-        xwikiContext.setUserReference(userReference);
-        xwikiContext.setDatabase("somewiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -133,10 +113,12 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.singleton("channel")));
             oneOf(execution).getContext();
                 will(returnValue(ec));
-            exactly(2).of(ircModel).getXWikiContext();
-                will(returnValue(xwikiContext));
             oneOf(serializer).serialize(userReference);
                 will(returnValue("userwiki:userspace.userpage"));
+            oneOf(dab).getCurrentUserReference();
+                will(returnValue(userReference));
+            oneOf(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("somewiki")));
 
             // The test is here!
             oneOf(bot).sendMessage("channel",
@@ -153,20 +135,16 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
     public void onEventWhenXARImportFinished() throws Exception
     {
         final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
-        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
 
         // We simulate an EC with some XAR started information (100 documents imported)
         final Execution execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext ec = new ExecutionContext();
         ec.setProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY, 100L);
-
-        Utils.setComponentManager(getComponentManager());
-        final XWikiContext xwikiContext = new XWikiContext();
-        xwikiContext.setUserReference(userReference);
-        xwikiContext.setDatabase("somewiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -176,10 +154,12 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.singleton("channel")));
             oneOf(execution).getContext();
                 will(returnValue(ec));
-            exactly(2).of(ircModel).getXWikiContext();
-                will(returnValue(xwikiContext));
             oneOf(serializer).serialize(userReference);
                 will(returnValue("userwiki:userspace.userpage"));
+            oneOf(dab).getCurrentUserReference();
+                will(returnValue(userReference));
+            oneOf(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("somewiki")));
 
             // The test is here!
             oneOf(bot).sendMessage("channel", "The XAR import started by userwiki:userspace.userpage "

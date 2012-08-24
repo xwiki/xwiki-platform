@@ -56,11 +56,6 @@ public final class XWikiLDAPConfig
     public static final String CFG_LDAP_PORT = CFG_LDAP_SUFFIX + "port";
 
     /**
-     * LDAP time limit property name in xwiki.cfg.
-     */
-    public static final String CFG_LDAP_TIMELIMIT = CFG_LDAP_SUFFIX + "timelimit";
-
-    /**
      * LDAP properties names suffix in XWikiPreferences.
      */
     public static final String PREF_LDAP_SUFFIX = "ldap_";
@@ -69,11 +64,6 @@ public final class XWikiLDAPConfig
      * LDAP port property name in XWikiPreferences.
      */
     public static final String PREF_LDAP_PORT = "ldap_port";
-
-    /**
-     * LDAP time limit property name in XWikiPreferences.
-     */
-    public static final String PREF_LDAP_TIMELIMIT = "ldap_timelimit";
 
     /**
      * LDAP port property name in XWikiPreferences.
@@ -308,25 +298,6 @@ public final class XWikiLDAPConfig
         }
 
         return port;
-    }
-
-    /**
-     * Get LDAP time limit from configuration. Default value is 1000.
-     * 
-     * @param context the XWiki context.
-     * @return the LDAP time limit.
-     */
-    public int getLDAPTimeLimit(XWikiContext context)
-    {
-        int timeLimit;
-
-        try {
-            timeLimit = context.getWiki().getXWikiPreferenceAsInt(PREF_LDAP_TIMELIMIT, context);
-        } catch (Exception e) {
-            timeLimit = (int) context.getWiki().ParamAsLong(CFG_LDAP_TIMELIMIT, 1000);
-        }
-
-        return timeLimit;
     }
 
     /**

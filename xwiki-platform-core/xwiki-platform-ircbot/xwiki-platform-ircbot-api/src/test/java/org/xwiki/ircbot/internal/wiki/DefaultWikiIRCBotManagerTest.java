@@ -61,6 +61,7 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
     {
         this.manager = getComponentManager().getInstance(WikiIRCBotManager.class);
     }
+
     private void prepareStartBotTests(boolean isBotActive) throws Exception
     {
         final IRCBot bot = getComponentManager().getInstance(IRCBot.class);

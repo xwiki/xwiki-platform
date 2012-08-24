@@ -97,6 +97,7 @@
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-clover2-plugin</artifactId>
             <configuration>
+              <!-- Note that the overall TPC when including functional tests for this module is around 78% -->
               <targetPercentage>49%</targetPercentage>
             </configuration>
             <executions>

@@ -53,7 +53,7 @@ import junit.framework.Assert;
  */
 @ComponentList({
     // Used to test our Event Listener in integration with the Observation Manager (see below)
-    DefaultObservationManager.class,
+    DefaultObservationManager.class
 })
 @MockingRequirement(XARImportEventListener.class)
 public class XARImportEventListenerTest extends AbstractMockingComponentTestCase

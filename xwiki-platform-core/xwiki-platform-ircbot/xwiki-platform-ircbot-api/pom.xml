@@ -97,7 +97,7 @@
             <groupId>com.atlassian.maven.plugins</groupId>
             <artifactId>maven-clover2-plugin</artifactId>
             <configuration>
-              <targetPercentage>48.2%</targetPercentage>
+              <targetPercentage>49%</targetPercentage>
             </configuration>
             <executions>
               <execution>

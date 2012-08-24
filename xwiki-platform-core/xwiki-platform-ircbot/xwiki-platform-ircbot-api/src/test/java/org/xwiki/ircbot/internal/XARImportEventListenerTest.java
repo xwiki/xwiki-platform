@@ -28,16 +28,26 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.DefaultModelContext;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
+import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.web.Utils;
 
 import junit.framework.Assert;
@@ -48,16 +58,35 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.2M3
  */
-@AllComponents
+@ComponentList({
+    // Used to test our Event Listener in integration with the Observation Manager (see below)
+    DefaultObservationManager.class,
+    // Components drawn by new XWikiContext()
+    DefaultEntityReferenceValueProvider.class,
+    CurrentMixedEntityReferenceValueProvider.class,
+    CurrentMixedStringDocumentReferenceResolver.class,
+    DefaultModelConfiguration.class,
+    DefaultModelContext.class,
+    LocalStringEntityReferenceSerializer.class,
+    CompactWikiStringEntityReferenceSerializer.class,
+    CurrentEntityReferenceValueProvider.class
+})
 @MockingRequirement(XARImportEventListener.class)
 public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
 {
     private EventListener listener;
 
+    private ObservationManager observationManager;
+
     @Before
     public void configure() throws Exception
     {
         this.listener = getComponentManager().getInstance(EventListener.class, "ircxarimport");
+
+        // In order for the test to be more complete we send the XAR events through the Observation Manager which
+        // dispatches them to our Event Listener under test. This proves that our Listener is correctly registered as
+        // an Event Listener.
+        this.observationManager = getComponentManager().getInstance(ObservationManager.class);
     }
 
     @Test
@@ -75,7 +104,7 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
             never(bot).sendMessage(with(any(String.class)), with(any(String.class)));
         }});
 
-        this.listener.onEvent(null, null, null);
+        this.observationManager.notify(new XARImportingEvent(), null, null);
     }
 
     @Test
@@ -114,7 +143,7 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
                 "A XAR import has been started by userwiki:userspace.userpage in wiki somewiki");
         }});
 
-        this.listener.onEvent(new XARImportingEvent(), null, null);
+        this.observationManager.notify(new XARImportingEvent(), null, null);
 
         // Also verify that the XAR import counter has been set to 0 in the EC
         Assert.assertEquals(0L, ec.getProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY));
@@ -157,7 +186,7 @@ public class XARImportEventListenerTest extends AbstractMockingComponentTestCase
                 + "in wiki somewiki is now finished, 100 documents have been imported");
         }});
 
-        this.listener.onEvent(new XARImportedEvent(), null, null);
+        this.observationManager.notify(new XARImportedEvent(), null, null);
 
         // Also verify that the XAR import counter has been removed
         Assert.assertNull(ec.getProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY));

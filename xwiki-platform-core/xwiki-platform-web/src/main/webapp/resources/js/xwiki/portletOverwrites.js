@@ -15,10 +15,11 @@ XWiki.displayDocExtra = XWiki.displayDocExtra.wrap(
   }
 );
 
-/**
- * Make sure AJAX requests go through the portlet.
- */
-Event.observe(document, 'xwiki:dom:loaded', function() {
+
+Event.observe(document, 'xwiki:dom:loading', function() {
+  /**
+   * Make sure AJAX requests go through the portlet.
+   */
   var resourceURL = $('resourceURL').value;
   var fRequest = Ajax.Request.prototype.request;
   Ajax.Request.prototype.request = function(servletURL) {
@@ -31,5 +32,14 @@ Event.observe(document, 'xwiki:dom:loaded', function() {
       servletURL = resourceURL;
     }
     fRequest.call(this, servletURL);
+  }
+
+  // Namespace the ID parameter passed to the live table constructor.
+  if (XWiki.widgets && XWiki.widgets.LiveTable) {
+    XWiki.widgets.LiveTable.prototype.initialize = XWiki.widgets.LiveTable.prototype.initialize.wrap(
+      function(initialize, url, domNodeName, handler, options) {
+        initialize(url, ID(domNodeName), handler, options);
+      }
+    );
   }
 });

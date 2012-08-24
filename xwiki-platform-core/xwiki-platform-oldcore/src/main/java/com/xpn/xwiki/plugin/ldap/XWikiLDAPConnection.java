@@ -82,23 +82,15 @@ public class XWikiLDAPConnection
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
-        // open LDAP
-        int ldapPort = config.getLDAPPort(context);
-        String ldapHost = config.getLDAPParam("ldap_server", "localhost", context);
-
-        // allow to use the given user and password also as the LDAP bind user and password
-        String bindDN = config.getLDAPBindDN(ldapUserName, password, context);
-        String bindPassword = config.getLDAPBindPassword(ldapUserName, password, context);
-
         boolean bind;
         if ("1".equals(config.getLDAPParam("ldap_ssl", "0", context))) {
             String keyStore = config.getLDAPParam("ldap_ssl.keystore", "", context);
 
             LOGGER.debug("Connecting to LDAP using SSL");
 
-            bind = open(ldapHost, ldapPort, bindDN, bindPassword, keyStore, true, context);
+            bind = open(ldapUserName, password, config, keyStore, true, context);
         } else {
-            bind = open(ldapHost, ldapPort, bindDN, bindPassword, null, false, context);
+            bind = open(ldapUserName, password, config, null, false, context);
         }
 
         return bind;
@@ -107,29 +99,34 @@ public class XWikiLDAPConnection
     /**
      * Open LDAP connection.
      * 
-     * @param ldapHost the host of the server to connect to.
-     * @param ldapPort the port of the server to connect to.
-     * @param loginDN the user DN to connect to LDAP server.
+     * @param ldapUserName the user name to connect to LDAP server.
      * @param password the password to connect to LDAP server.
+     * @param config the configuration for the LDAP server
      * @param pathToKeys the path to SSL keystore to use.
      * @param ssl if true connect using SSL.
      * @param context the XWiki context.
      * @return true if the connection succeed, false otherwise.
      * @throws XWikiLDAPException error when trying to open connection.
      */
-    public boolean open(String ldapHost, int ldapPort, String loginDN, String password, String pathToKeys, boolean ssl,
+   public boolean open(String ldapUserName, String password, XWikiLDAPConfig config, String pathToKeys, boolean ssl,
         XWikiContext context) throws XWikiLDAPException
     {
-        int port = ldapPort;
+        // open LDAP
+        int ldapPort = config.getLDAPPort(context);
+        String ldapHost = config.getLDAPParam("ldap_server", "localhost", context);
 
-        if (port <= 0) {
-            port = ssl ? LDAPConnection.DEFAULT_SSL_PORT : LDAPConnection.DEFAULT_PORT;
+        // allow to use the given user and password also as the LDAP bind user and password
+        String bindDN = config.getLDAPBindDN(ldapUserName, password, context);
+        String bindPassword = config.getLDAPBindPassword(ldapUserName, password, context);
+
+        int timeLimit = config.getLDAPTimeLimit(context);
+
+        if (ldapPort <= 0) {
+            ldapPort = ssl ? LDAPConnection.DEFAULT_SSL_PORT : LDAPConnection.DEFAULT_PORT;
         }
 
         try {
             if (ssl) {
-                XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
                 // Dynamically set JSSE as a security provider
                 Security.addProvider(config.getSecureProvider(context));
 
@@ -155,17 +152,17 @@ public class XWikiLDAPConnection
             }
 
             // connect
-            connect(ldapHost, port);
+            connect(ldapHost, ldapPort);
 
             // set referral following
             LDAPConstraints constraints = this.connection.getConstraints();
-            constraints.setTimeLimit(1000);
+            constraints.setTimeLimit(timeLimit);
             constraints.setReferralFollowing(true);
-            constraints.setReferralHandler(new LDAPPluginReferralHandler(loginDN, password, context));
+            constraints.setReferralHandler(new LDAPPluginReferralHandler(bindDN, bindPassword, context));
             this.connection.setConstraints(constraints);
 
             // bind
-            bind(loginDN, password);
+            bind(bindDN, bindPassword);
         } catch (UnsupportedEncodingException e) {
             throw new XWikiLDAPException("LDAP bind failed with UnsupportedEncodingException.", e);
         } catch (LDAPException e) {

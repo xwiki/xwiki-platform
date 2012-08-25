@@ -297,7 +297,7 @@ viewers.Comments = Class.create({
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
                 document.fire("xwiki:docextra:loaded", {
-                  "id" : "Comments",
+                  "id" : ID('Comments'),
                   "element": this.container
                 });
                 this.updateCount();

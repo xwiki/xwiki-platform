@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,24 +16,28 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.component.wiki;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-component</artifactId>
-  <name>XWiki Platform - Component - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Component - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-component-multi</module>
-    <module>xwiki-platform-component-script</module>
-    <module>xwiki-platform-component-wiki</module>
-  </modules>
-</project>
+/**
+ * Utility for wiki methods to return a value. An implementation of this interface is binded in the context of a
+ * wiki method execution, so that such method scripts can return a value using {@link #returnValue(Object)}.
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
+public interface MethodOutputHandler
+{
+    /**
+     * Stores a value in the method invocation context for further return.
+     * Note that if this method is called multiple times during the invocation, the last one wins.
+     * 
+     * @param value the value to return
+     */
+    void returnValue(Object value);
+ 
+    /**
+     * @return the current stored return value (null if not set yet).
+     */
+    Object getReturnValue();   
+}

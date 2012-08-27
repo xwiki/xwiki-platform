@@ -28,13 +28,14 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
+import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
 /**
- * 
  * @version $Id$
  * @since 4.2M3
  */
@@ -75,7 +76,20 @@ public class DistributionInitializerListener implements EventListener
 
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
-            this.logger.info("Distribution up to date");
+            DistributionJobStatus status = this.distributionManager.getPreviousJobStatus();
+
+            for (DistributionStepStatus step : status.getSteps()) {
+                if (step.getUpdateState() == null) {
+                    this.distributionManager.startJob();
+                    break;
+                }
+            }
+
+            if (this.distributionManager.getJob() != null) {
+                this.logger.info("Distribution up to date");
+            } else {
+                this.logger.info("Distribution partially up to date");
+            }
         } else {
             this.logger.info("Distribution state: {}", distributionState);
             this.distributionManager.startJob();

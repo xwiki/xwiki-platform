@@ -23,33 +23,19 @@ package org.xwiki.extension.distribution.internal.job;
  * @version $Id$
  * @since 4.2M3
  */
-public class DistributionQuestion
+public class DistributionStepStatus
 {
-    public enum Action
+    public enum UpdateState
     {
-        /**
-         * Validate current step and go to next one.
-         */
-        COMPLETE_STEP,
-
-        /**
-         * Skip the current step.
-         */
-        SKIP_STEP,
-
-        /**
-         * Cancel the current step until next distribution modification.
-         */
-        CANCEL_STEP
+        CANCELED,
+        COMPLETED
     }
 
     private String stepId;
 
-    private Action action;
+    private UpdateState updateState;
 
-    private boolean save = true;
-
-    public DistributionQuestion(String stepId)
+    public DistributionStepStatus(String stepId)
     {
         this.stepId = stepId;
     }
@@ -59,23 +45,13 @@ public class DistributionQuestion
         return this.stepId;
     }
 
-    public Action getAction()
+    public UpdateState getUpdateState()
     {
-        return this.action;
+        return this.updateState;
     }
 
-    public void setUpdateState(Action action)
+    public void setUpdateState(UpdateState updateState)
     {
-        this.action = action;
-    }
-
-    public boolean isSave()
-    {
-        return this.save;
-    }
-
-    public void setSave(boolean save)
-    {
-        this.save = save;
+        this.updateState = updateState;
     }
 }

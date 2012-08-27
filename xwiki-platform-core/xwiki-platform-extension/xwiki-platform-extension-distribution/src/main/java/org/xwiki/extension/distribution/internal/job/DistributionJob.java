@@ -19,17 +19,20 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager;
-import org.xwiki.extension.distribution.internal.job.DistributionJobStatus.UpdateState;
+import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.internal.AbstractJobStatus;
 
 /**
- * 
  * @version $Id$
  * @since 4.2M3
  */
@@ -49,12 +52,29 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     @Override
     protected AbstractJobStatus<DistributionRequest> createNewStatus(DistributionRequest request)
     {
-        DistributionJobStatus status = new DistributionJobStatus(request, observationManager, loggerManager);
+        // TODO: make steps components automatically discovered so that any module can add custom steps
+
+        List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(2);
+        steps.add(new DistributionStepStatus("extension.mainui"));
+        steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+
+        DistributionJobStatus status =
+            new DistributionJobStatus(request, this.observationManager, this.loggerManager, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
+            DistributionJobStatus previousStatus = this.distributionManager.getPreviousJobStatus();
+
+            if (previousStatus != null
+                && previousStatus.getDistributionExtension() != null
+                && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
+                    this.distributionManager.getDistributionExtension())) {
+                status.setDistributionExtension(previousStatus.getDistributionExtension());
+                status.setDistributionExtensionUi(previousStatus.getDistributionExtensionUi());
+            }
+
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
+            status.setDistributionExtensionUi(this.distributionManager.getUIExtensionId());
         }
-        status.setDistributionExtensionUi(this.distributionManager.getUIExtensionId());
 
         return status;
     }
@@ -67,22 +87,36 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     @Override
     protected void start() throws Exception
     {
-        DistributionQuestion question = new DistributionQuestion();
+        List<DistributionStepStatus> steps = getDistributionJobStatus().getSteps();
 
-        // Waiting to start
-        getStatus().ask(question);
+        notifyPushLevelProgress(steps.size());
 
-        if (question.isSave()) {
-            switch (question.getAction()) {
-                case CANCEL:
-                    getDistributionJobStatus().setUpdateState(UpdateState.CANCELED);
-                    break;
-                case CONTINUE:
-                    getDistributionJobStatus().setUpdateState(UpdateState.COMPLETED);
-                    break;
-                default:
-                    break;
+        try {
+            for (int index = 0; index < steps.size(); ++index) {
+                DistributionStepStatus step = steps.get(index);
+
+                DistributionQuestion question = new DistributionQuestion(step.getStepId());
+
+                // Waiting to start
+                getStatus().ask(question);
+
+                if (question.isSave()) {
+                    switch (question.getAction()) {
+                        case CANCEL_STEP:
+                            getDistributionJobStatus().getCurrentStateStatus().setUpdateState(UpdateState.CANCELED);
+                            break;
+                        case COMPLETE_STEP:
+                            getDistributionJobStatus().getCurrentStateStatus().setUpdateState(UpdateState.COMPLETED);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                notifyStepPropress();
             }
+        } finally {
+            notifyPopLevelProgress();
         }
     }
 }

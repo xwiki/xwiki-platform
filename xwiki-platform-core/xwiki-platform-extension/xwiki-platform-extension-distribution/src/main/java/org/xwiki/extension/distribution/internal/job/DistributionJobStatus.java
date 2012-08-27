@@ -19,13 +19,14 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.List;
+
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
 /**
- * 
  * @version $Id$
  * @since 4.2M3
  */
@@ -36,33 +37,66 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
      */
     private static final long serialVersionUID = 1L;
 
-    public enum UpdateState
-    {
-        PARTIAL,
-        CANCELED,
-        COMPLETED
-    }
+    private ExtensionId previousDistributionExtension;
 
-    private UpdateState updateState;
+    private ExtensionId previousDistributionExtensionUi;
 
     private ExtensionId distributionExtension;
 
     private ExtensionId distributionExtensionUi;
 
+    private List<DistributionStepStatus> steps;
+
+    private int currentStateIndex;
+
     public DistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
-        LoggerManager loggerManager)
+        LoggerManager loggerManager, List<DistributionStepStatus> steps)
     {
         super(request, observationManager, loggerManager);
+
+        this.steps = steps;
     }
 
-    public UpdateState getUpdateState()
+    public List<DistributionStepStatus> getSteps()
     {
-        return this.updateState;
+        return this.steps;
     }
 
-    public void setUpdateState(UpdateState updateState)
+    public int getCurrentStateIndex()
     {
-        this.updateState = updateState;
+        return this.currentStateIndex;
+    }
+
+    public DistributionStepStatus getCurrentStateStatus()
+    {
+        return getSteps().get(getCurrentStateIndex());
+    }
+
+    public void setCurrentStateIndex(int currentStateIndex)
+    {
+        this.currentStateIndex = currentStateIndex;
+    }
+
+    // Distribution informations
+
+    public ExtensionId getPreviousDistributionExtension()
+    {
+        return this.previousDistributionExtension;
+    }
+
+    public void setPreviousDistributionExtension(ExtensionId previousDistributionExtension)
+    {
+        this.previousDistributionExtension = previousDistributionExtension;
+    }
+
+    public ExtensionId getPreviousDistributionExtensionUi()
+    {
+        return this.previousDistributionExtensionUi;
+    }
+
+    public void setPreviousDistributionExtensionUi(ExtensionId previousDistributionExtensionUi)
+    {
+        this.previousDistributionExtensionUi = previousDistributionExtensionUi;
     }
 
     public ExtensionId getDistributionExtension()

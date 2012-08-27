@@ -180,7 +180,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     }
 
     @Test(expected = InstallException.class)
-    public void testInstallOnRootWithoutPgrammingRigths() throws Throwable
+    public void testInstallOnRootWithoutProgrammingRigths() throws Throwable
     {
         getMockery().checking(new Expectations()
         {
@@ -197,7 +197,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     }
 
     @Test(expected = InstallException.class)
-    public void testInstallOnNamespaceWithoutPgrammingRigths() throws Throwable
+    public void testInstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
         getMockery().checking(new Expectations()
         {
@@ -249,7 +249,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     }
 
     @Test(expected = UninstallException.class)
-    public void testUninstallOnRootWithoutPgrammingRigths() throws Throwable
+    public void testUninstallOnRootWithoutProgrammingRigths() throws Throwable
     {
         getMockery().checking(new Expectations()
         {
@@ -266,7 +266,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     }
 
     @Test(expected = UninstallException.class)
-    public void testUninstallOnNamespaceWithoutPgrammingRigths() throws Throwable
+    public void testUninstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
         getMockery().checking(new Expectations()
         {

@@ -472,7 +472,8 @@ public class ExtensionManagerScriptService implements ScriptService
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (installRequest.getProperty(PROPERTY_CHECKRIGHTS) != Boolean.TRUE
+            && !this.documentAccessBridge.hasProgrammingRights()) {
             installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
         }
 
@@ -695,7 +696,7 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, !this.documentAccessBridge.hasProgrammingRights());
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
 
         ExtensionPlan status;
         try {

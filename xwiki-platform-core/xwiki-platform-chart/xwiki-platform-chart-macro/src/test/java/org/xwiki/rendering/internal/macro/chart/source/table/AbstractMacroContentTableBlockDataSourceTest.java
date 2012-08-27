@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.macro.chart.source.DataSource;
 import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
@@ -58,10 +60,17 @@ import org.xwiki.test.annotation.MockingRequirement;
     PlainTextRenderer.class,
     DefaultLinkLabelGenerator.class
 })
+@MockingRequirement(value = MacroContentTableBlockDataSource.class,
+    exceptions={ComponentManager.class, BlockRenderer.class})
 public abstract class AbstractMacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions={ComponentManager.class, BlockRenderer.class})
     private MacroContentTableBlockDataSource source;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.source = getComponentManager().getInstance(DataSource.class, "inline");
+    }
 
     protected MacroContentTableBlockDataSource getDataSource()
     {

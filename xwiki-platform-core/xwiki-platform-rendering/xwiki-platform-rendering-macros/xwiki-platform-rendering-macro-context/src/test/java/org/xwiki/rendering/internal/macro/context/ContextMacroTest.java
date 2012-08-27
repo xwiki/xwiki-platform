@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -38,6 +39,7 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
@@ -55,10 +57,16 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @since 3.0M1
  */
 @AllComponents
+@MockingRequirement(value = ContextMacro.class, exceptions = { BeanManager.class, MacroContentParser.class })
 public class ContextMacroTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = { BeanManager.class, MacroContentParser.class })
-    private ContextMacro macro;
+    private Macro macro;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.macro = getComponentManager().getInstance(Macro.class, "context");
+    }
 
     @Test
     public void testExecuteWhenNoDocumentSpecified() throws Exception

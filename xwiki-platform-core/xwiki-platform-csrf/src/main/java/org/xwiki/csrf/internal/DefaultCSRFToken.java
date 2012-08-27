@@ -123,9 +123,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         this.random = random;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getToken()
     {
@@ -150,9 +147,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clearToken()
     {
@@ -160,9 +154,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         this.tokens.remove(getTokenKey());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isTokenValid(String token)
     {
@@ -178,9 +169,6 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getResubmissionURL()
     {

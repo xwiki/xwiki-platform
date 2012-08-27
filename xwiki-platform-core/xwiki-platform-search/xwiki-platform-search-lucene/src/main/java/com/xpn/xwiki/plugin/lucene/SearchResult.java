@@ -107,8 +107,8 @@ public class SearchResult
                     this.url = document.getAttachmentURL(this.filename, "download");
                 }
             } catch (XWikiException e) {
-                LOGGER.error("error retrieving url for attachment [{}] of document [{}]",
-                    new Object[] {this.filename, fullDocName, e});
+                LOGGER.error("error retrieving url for attachment [{}] of document [{}]", new Object[] {this.filename,
+                fullDocName, e});
             }
         } else {
             this.objects = doc.getValues("object");

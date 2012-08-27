@@ -27,7 +27,9 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.block.Block;
@@ -40,7 +42,6 @@ import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
@@ -49,15 +50,12 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.4M2
  */
+@MockingRequirement(NestedScriptMacroValidatorListener.class)
 public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private NestedScriptMacroValidatorListener validator;
+    private EventListener validator;
 
-    /**
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#configure()
-     */
-    @Override
+    @Before
     public void configure() throws Exception
     {
         // Mock macro manager returns a script macro for "script" and null otherwise.
@@ -72,6 +70,8 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
             allowing(macroManager).getMacro(with(any(MacroId.class)));
                 will(returnValue(null));
         }});
+
+        this.validator = getComponentManager().getInstance(EventListener.class, "nestedscriptmacrovalidator");
     }
 
     @Test

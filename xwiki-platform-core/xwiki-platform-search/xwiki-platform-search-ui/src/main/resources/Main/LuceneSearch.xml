@@ -42,6 +42,9 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Uncomment this line to overload the languages to search
 ## #set($languages = "default,en,de")
 #set ($rssmode = ("$!request.xpage" == 'plain'))
+#if ($rssmode)
+  $response.setContentType('application/rss+xml')
+#end
 ## --------------------------
 ## Hidden documents filtering
 ## --------------------------
@@ -250,7 +253,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         ## RSS link
         ## ---------------
         #if($selectedSpace == '')
-          #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;text=${utext}" ))
+          #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;text=${utext}" ))
         #else
           #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;space=${selectedSpace}&amp;text=${utext}"))
         #end

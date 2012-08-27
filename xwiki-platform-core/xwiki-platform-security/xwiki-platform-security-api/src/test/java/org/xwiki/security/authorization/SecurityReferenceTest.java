@@ -29,6 +29,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.SecurityReference;
+import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -43,10 +44,10 @@ import static org.junit.Assert.assertThat;
  * @version $Id$
  * @since 4.0M2
  */
+@MockingRequirement(DefaultSecurityReferenceFactory.class)
 public class SecurityReferenceTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private DefaultSecurityReferenceFactory factory;
+    private SecurityReferenceFactory factory;
 
     private EntityReference xwiki = new EntityReference("xwiki", EntityType.WIKI);
     private EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
@@ -58,18 +59,17 @@ public class SecurityReferenceTest extends AbstractMockingComponentTestCase
     private EntityReference mainEntity = new EntityReference("page", EntityType.DOCUMENT, xspace);
     
     @Before
-    @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         final XWikiBridge wikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
         getMockery().checking(new Expectations()
         {{
                 allowing(wikiBridge).getMainWikiReference();
                 will(returnValue(new WikiReference("xwiki")));
-            }});
+        }});
+
+        this.factory = getComponentManager().getInstance(SecurityReferenceFactory.class);
     }
 
     @Test

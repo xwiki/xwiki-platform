@@ -21,8 +21,10 @@ package org.xwiki.configuration.internal;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -35,10 +37,16 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.0RC1
  */
+@MockingRequirement(UserPreferencesConfigurationSource.class)
 public class UserPreferencesConfigurationSourceTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private UserPreferencesConfigurationSource source;
+    private ConfigurationSource source;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.source = getComponentManager().getInstance(ConfigurationSource.class, "user");
+    }
 
     @Test
     public void getPropertyForStringWhenExists() throws Exception

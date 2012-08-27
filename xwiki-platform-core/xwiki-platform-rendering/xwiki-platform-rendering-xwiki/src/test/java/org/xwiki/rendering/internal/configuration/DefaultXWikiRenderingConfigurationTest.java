@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -37,18 +38,18 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @since 2.0M1
  */
 @AllComponents
+@MockingRequirement(value = DefaultXWikiRenderingConfiguration.class, role = XWikiRenderingConfiguration.class)
 public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(XWikiRenderingConfiguration.class)
-    private DefaultXWikiRenderingConfiguration configuration;
+    private XWikiRenderingConfiguration configuration;
 
     private ConfigurationSource source;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
         this.source = getComponentManager().getInstance(ConfigurationSource.class);
+        this.configuration = getComponentManager().getInstance(XWikiRenderingConfiguration.class);
     }
 
     @Test

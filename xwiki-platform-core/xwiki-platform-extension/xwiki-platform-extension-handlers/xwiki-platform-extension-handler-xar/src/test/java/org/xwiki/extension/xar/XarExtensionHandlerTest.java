@@ -34,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstallException;
+import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
@@ -55,7 +57,6 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -85,7 +86,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private RepositoryUtil repositoryUtil;
 
-    private JobManager taskManager;
+    private JobManager jobManager;
 
     private InstalledExtensionRepository xarExtensionRepository;
 
@@ -267,7 +268,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // lookup
 
-        this.taskManager = getComponentManager().getInstance(JobManager.class);
+        this.jobManager = getComponentManager().getInstance(JobManager.class);
         this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
         this.defaultPackager = getComponentManager().getInstance(Packager.class);
 
@@ -278,14 +279,19 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private XarInstalledExtension install(ExtensionId extensionId, String wiki) throws Throwable
     {
+        return installOnNamespace(extensionId, wiki != null ? "wiki:" + wiki : null);
+    }
+
+    private XarInstalledExtension installOnNamespace(ExtensionId extensionId, String namespace) throws Throwable
+    {
         InstallRequest installRequest = new InstallRequest();
         installRequest.setProperty("user.reference", getContext().getUserReference());
         installRequest.setProperty("checkrights", true);
         installRequest.addExtension(extensionId);
-        if (wiki != null) {
-            installRequest.addNamespace("wiki:" + wiki);
+        if (namespace != null) {
+            installRequest.addNamespace(namespace);
         }
-        Job installJob = this.taskManager.executeJob(InstallJob.JOBTYPE, installRequest);
+        Job installJob = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
 
         List<LogEvent> errors = installJob.getStatus().getLog().getLogs(LogLevel.ERROR);
         if (!errors.isEmpty()) {
@@ -304,7 +310,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         if (wiki != null) {
             uninstallRequest.addNamespace("wiki:" + wiki);
         }
-        Job uninstallJob = this.taskManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
+        Job uninstallJob = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogs(LogLevel.ERROR);
         if (!errors.isEmpty()) {
@@ -455,6 +461,15 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // uninstall
 
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
         uninstall(this.localXarExtensiontId1, "wiki");
 
         // validate
@@ -501,6 +516,15 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertFalse(pageWiki2.isNew());
 
         // uninstall
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
 
         uninstall(this.localXarExtensiontId1, null);
 
@@ -564,30 +588,102 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
     }
 
-    @Test
-    public void testInstallwithoutAdminRights() throws XWikiException
+    // rights check
+
+    // install
+
+    @Test(expected = InstallException.class)
+    public void testInstallOnRootWithoutAdminRights() throws Throwable
     {
         getMockery().checking(new Expectations()
         {
             {
-                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(false));
             }
         });
 
-        // install
+        install(this.localXarExtensiontId1, null);
+    }
 
-        try {
-            install(this.localXarExtensiontId1, "wiki");
-        } catch (Throwable e) {
-            // expected
-        }
+    // uninstall
 
-        try {
-            install(this.localXarExtensiontId1, null);
-        } catch (Throwable e) {
-            // expected
-        }
+    @Test(expected = InstallException.class)
+    public void testInstallOnWikiWithoutAdminRights() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(false));
+            }
+        });
+
+        install(this.localXarExtensiontId1, "wiki");
+    }
+
+    @Test(expected = InstallException.class)
+    public void testInstallOnUnsupportedNamespace() throws Throwable
+    {
+        installOnNamespace(this.localXarExtensiontId1, "unsupportednamespace");
+    }
+
+    // uninstall
+
+    @Test(expected = UninstallException.class)
+    public void testUninstallOnRootWithoutAdminRights() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
+                will(returnValue(Arrays.asList("wiki1", "wiki2")));
+
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
+        install(this.localXarExtensiontId1, null);
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(false));
+            }
+        });
+
+        uninstall(this.localXarExtensiontId1, null);
+    }
+
+    @Test(expected = UninstallException.class)
+    public void testUninstallOnWikiWithoutAdminRights() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
+        install(this.localXarExtensiontId1, "wiki");
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                will(returnValue(false));
+            }
+        });
+
+        uninstall(this.localXarExtensiontId1, "wiki");
     }
 }

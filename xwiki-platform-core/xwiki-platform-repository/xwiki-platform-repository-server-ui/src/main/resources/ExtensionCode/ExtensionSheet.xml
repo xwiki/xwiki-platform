@@ -228,7 +228,8 @@
       ##------- Features --------
       #set($features = $doc.getValue("features"))
       #if ($features &amp;&amp; $features.size() &gt; 0)
-        |(% class="label" %)Features(%%)|#foreach($feature in $features)#if($velocityCount &gt; 1), #end${feature}#end 
+        |(% class="label" %)Features(%%)|#foreach($feature in $features)#if($velocityCount &gt; 1), #end${feature}#end
+
       #end
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)

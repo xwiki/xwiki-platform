@@ -71,7 +71,7 @@
     ## Use ajax and hope the user runs javascript.
     {{html}}
       &lt;script type="text/javascript"&gt;
-        document.observe("dom:loaded", function() {
+        document.observe("xwiki:dom:loaded", function() {
           #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)
             new Ajax.Request("$xwiki.getURL($nameOflockedDocument, 'cancel', 'ajax=1')");
           #end

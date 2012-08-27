@@ -20,10 +20,12 @@
 package org.xwiki.query.internal;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -34,20 +36,22 @@ import static org.junit.Assert.assertEquals;
  *
  * @version $Id$
  */
+@MockingRequirement(HiddenDocumentFilter.class)
 public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private HiddenDocumentFilter filter;
+    private QueryFilter filter;
 
     private ConfigurationSource userConfiguration;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
-        userConfiguration = getComponentManager().getInstance(ConfigurationSource.class, "user");
+        this.userConfiguration = getComponentManager().getInstance(ConfigurationSource.class, "user");
         getMockery().checking(new Expectations() {{
             ignoring(any(Logger.class)).method("debug");
         }});
+
+        this.filter = getComponentManager().getInstance(QueryFilter.class, "hidden");
     }
 
     @Test

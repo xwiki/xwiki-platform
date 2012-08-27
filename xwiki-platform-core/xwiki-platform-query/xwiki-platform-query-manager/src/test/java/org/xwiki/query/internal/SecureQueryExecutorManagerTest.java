@@ -22,6 +22,7 @@ package org.xwiki.query.internal;
 import static org.junit.Assert.fail;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.Query;
@@ -35,14 +36,14 @@ import org.xwiki.test.annotation.MockingRequirement;
  *
  * @version $Id$
  */
+@MockingRequirement(SecureQueryExecutorManager.class)
 public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private SecureQueryExecutorManager qem;
+    private QueryExecutorManager qem;
 
     private DocumentAccessBridge dab;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         final QueryExecutorManager nestedQueryExecutorManager =
@@ -52,6 +53,7 @@ public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
         }});
 
         this.dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        this.qem = getComponentManager().getInstance(QueryExecutorManager.class, "secure");
     }
 
     private void setProgrammingRights(final boolean hasProgrammingRights)

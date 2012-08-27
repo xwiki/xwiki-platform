@@ -20,9 +20,11 @@
 package org.xwiki.query.internal;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -33,25 +35,27 @@ import static org.junit.Assert.assertEquals;
  *
  * @version $Id$
  */
+@MockingRequirement(UniqueDocumentFilter.class)
 public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private UniqueDocumentFilter filter;
+    private QueryFilter filter;
 
-    @Test
-    public void filterSelectStatement() throws Exception
-    {
-        assertEquals("select distinct doc.fullName from XWikiDocument doc",
-            filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
-    }
-
-    @Override
+    @Before
     public void configure() throws Exception
     {
         getMockery().checking(new Expectations() {{
             ignoring(any(Logger.class)).method("debug");
             ignoring(any(Logger.class)).method("warn");
         }});
+
+        this.filter = getComponentManager().getInstance(QueryFilter.class, "unique");
+    }
+
+    @Test
+    public void filterSelectStatement() throws Exception
+    {
+        assertEquals("select distinct doc.fullName from XWikiDocument doc",
+            filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test

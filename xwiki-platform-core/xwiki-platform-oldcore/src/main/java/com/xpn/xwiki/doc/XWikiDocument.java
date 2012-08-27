@@ -115,7 +115,6 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -3356,17 +3355,20 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setValidationScript(getValidationScript());
             doc.setLanguage(getLanguage());
             doc.setTranslation(getTranslation());
-            doc.setXClass(getXClass().clone());
-            doc.setXClassXML(getXClassXML());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
 
+            BaseClass bClass = getXClass().clone();
+            doc.setXClass(bClass);
+
             if (keepsIdentity) {
+                doc.setXClassXML(getXClassXML());
                 doc.cloneXObjects(this);
                 doc.cloneAttachments(this);
             } else {
+                bClass.setCustomMapping(null);
                 doc.duplicateXObjects(this);
                 doc.copyAttachments(this);
             }
@@ -7326,9 +7328,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         // Restore the current document on the XWiki Context.
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
-        }
+        context.setDoc((XWikiDocument) backup.get("doc"));
 
         // Restore the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
@@ -7336,12 +7336,20 @@ public class XWikiDocument implements DocumentModelBridge
         if (gcontext != null) {
             if (backup.get("gdoc") != null) {
                 gcontext.put("doc", backup.get("gdoc"));
+            } else {
+                gcontext.remove("doc");
             }
+
             if (backup.get("gcdoc") != null) {
                 gcontext.put("cdoc", backup.get("gcdoc"));
+            } else {
+                gcontext.remove("cdoc");
             }
+
             if (backup.get("gtdoc") != null) {
                 gcontext.put("tdoc", backup.get("gtdoc"));
+            } else {
+                gcontext.remove("tdoc");
             }
         }
     }

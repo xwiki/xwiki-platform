@@ -27,6 +27,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -49,10 +51,16 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.0M1
  */
+@MockingRequirement(XWikiWikiModel.class)
 public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private XWikiWikiModel wikiModel;
+    private WikiModel wikiModel;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.wikiModel = getComponentManager().getInstance(WikiModel.class);
+    }
 
     @Test
     public void testGetDocumentEditURLWhenNoQueryStringSpecified() throws Exception

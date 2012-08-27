@@ -141,6 +141,7 @@
               <exclude>**/gallery.css</exclude>
               <exclude>**/modalPopup.css</exclude>
               <exclude>**/searchSuggest.js</exclude>
+              <exclude>**/upload.js</exclude>
             </excludes>
           </configuration>
         </plugin>

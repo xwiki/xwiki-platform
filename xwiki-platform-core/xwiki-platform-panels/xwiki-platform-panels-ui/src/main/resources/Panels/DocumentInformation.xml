@@ -293,7 +293,7 @@ XWiki.SyntaxConverter = Class.create({
 });
 
 // Create the component when the HTML tree is fully loaded.
-document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</code>
+document.observe("xwiki:dom:loaded", function() { new XWiki.SyntaxConverter(); });</code>
     </property>
     <property>
       <name>SyntaxConverter</name>

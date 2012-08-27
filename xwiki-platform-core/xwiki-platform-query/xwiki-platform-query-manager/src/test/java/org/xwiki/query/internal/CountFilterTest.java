@@ -24,9 +24,11 @@ import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -37,17 +39,19 @@ import static org.junit.Assert.assertEquals;
  *
  * @version $Id$
  */
+@MockingRequirement(CountFilter.class)
 public class CountFilterTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
     private CountFilter filter;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         getMockery().checking(new Expectations() {{
             ignoring(any(Logger.class)).method("debug");
         }});
+
+        this.filter = getComponentManager().getInstance(QueryFilter.class, "count");
     }
 
     @Test

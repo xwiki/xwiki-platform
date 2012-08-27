@@ -70,6 +70,11 @@ public final class DatabaseProduct
     public static final DatabaseProduct POSTGRESQL = new DatabaseProduct("PostgreSQL");
 
     /**
+     * The product name for Microsoft SQL Server databases.
+     */
+    public static final DatabaseProduct MSSQL = new DatabaseProduct("Microsoft SQL Server");
+
+    /**
      * Represents an unknown database for which we were not able to find the product name.
      */
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
@@ -135,6 +140,8 @@ public final class DatabaseProduct
             product = MYSQL;
         } else if (productNameAsString.equalsIgnoreCase(POSTGRESQL.getProductName())) {
             product = POSTGRESQL;
+        } else if (productNameAsString.equalsIgnoreCase(MSSQL.getProductName())) {
+            product = MSSQL;
         } else {
             product = UNKNOWN;
         }

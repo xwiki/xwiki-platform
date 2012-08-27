@@ -85,6 +85,10 @@ public class UploadAction extends XWikiAction
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
+        if (fileupload == null) {
+            ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure.noFiles");
+            return true;
+        }
         Map<String, String> fileNames = new LinkedHashMap<String, String>();
         List<String> wrongFileNames = new ArrayList<String>();
         Map<String, String> failedFiles = new LinkedHashMap<String, String>();

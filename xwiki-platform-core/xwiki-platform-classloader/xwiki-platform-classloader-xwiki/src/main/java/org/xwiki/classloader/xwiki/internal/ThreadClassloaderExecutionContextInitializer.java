@@ -64,6 +64,9 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
             this.classLoaderManager.getURLClassLoader(currentWikiId != null ? "wiki:" + currentWikiId : null, false);
 
         if (extensionClassLoader != null) {
+            // TODO: This overwrite the current context classloader. We should instead save the current classloader in
+            // a stack and add a restore() method to put it back (and ensure that at the end of a request the stack is
+            // always empty!).
             Thread.currentThread().setContextClassLoader(extensionClassLoader);
         }
     }

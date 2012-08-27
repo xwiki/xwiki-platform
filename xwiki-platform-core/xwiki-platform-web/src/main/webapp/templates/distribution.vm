@@ -47,6 +47,10 @@
   #if ($distributionUIId)
     <form method='get' action="">
       <div>
+        #if ($request.xredirect)
+          <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)" />
+        #end
+
         <p>The default distribution UI id is <strong>${distributionUIId.id}.</strong>
 
         #if ($distributionState == 'SAME')

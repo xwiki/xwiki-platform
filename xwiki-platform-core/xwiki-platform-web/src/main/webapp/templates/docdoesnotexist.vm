@@ -2,8 +2,8 @@
 ### Document does not exist message
 ###
 ###
-#if ($services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED')
-  #template("distribution.vm")
+#if ($xcontext.isMainWiki() && $xwiki.hasWikiAdminRights() && $services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED')
+  $response.sendRedirect('XWiki.Distribution', 'distribution', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")
 #else
   $response.setStatus(404)
   #template("startpage.vm")

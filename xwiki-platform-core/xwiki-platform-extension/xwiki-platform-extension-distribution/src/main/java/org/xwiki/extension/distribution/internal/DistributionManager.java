@@ -25,6 +25,11 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 @Role
 public interface DistributionManager
 {

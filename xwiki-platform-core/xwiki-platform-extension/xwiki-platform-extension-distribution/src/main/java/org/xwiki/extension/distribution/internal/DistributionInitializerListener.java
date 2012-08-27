@@ -33,6 +33,11 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 @Component
 @Named("DistributionInitializerListener")
 public class DistributionInitializerListener implements EventListener

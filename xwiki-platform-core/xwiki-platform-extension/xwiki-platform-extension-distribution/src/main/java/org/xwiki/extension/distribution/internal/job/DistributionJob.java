@@ -28,6 +28,11 @@ import org.xwiki.extension.distribution.internal.job.DistributionJobStatus.Updat
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.internal.AbstractJobStatus;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 @Component
 @Named("distribution")
 public class DistributionJob extends AbstractJob<DistributionRequest>

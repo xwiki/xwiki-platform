@@ -24,6 +24,11 @@ import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 {
     /**

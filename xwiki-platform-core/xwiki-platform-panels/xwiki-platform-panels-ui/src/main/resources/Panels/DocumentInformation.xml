@@ -420,13 +420,11 @@ $xwiki.jsx.use($paneldoc.fullName)##
 &lt;/select&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
-#if($isAdvancedUser)
 
 {{html}}
 &lt;input id="xhidden" type="checkbox" name="xhidden" #if($doc.isHidden()) checked="checked"#end value="1"/&gt;&lt;label for="xhidden"&gt;$msg.get('panels.documentInformation.hiddenDocument')&lt;/label&gt;
 &lt;input name="xhidden" type="hidden" value="0" /&gt;
 {{/html}}
-#end
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)
   ; $msg.get('panels.documentInformation.includesCount', [$pages.size()])

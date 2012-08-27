@@ -111,7 +111,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     {
         XWikiContext xwikiContext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
         if (xwikiContext == null) {
-            throw new IRCBotException("The XWiki Context is not available in the Execution Contexte");
+            throw new IRCBotException("The XWiki Context is not available in the Execution Context");
         }
         return xwikiContext;
     }

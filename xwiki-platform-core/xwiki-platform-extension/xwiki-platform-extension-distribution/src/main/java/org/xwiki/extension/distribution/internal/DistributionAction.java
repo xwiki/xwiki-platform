@@ -53,7 +53,8 @@ public class DistributionAction extends XWikiAction
 
         // Make sure to have programming rights
         // TODO: find something nicer
-        XWikiDocument document = new XWikiDocument(new DocumentReference(context.getDatabase(), "", ""));
+        XWikiDocument document =
+            new XWikiDocument(new DocumentReference(context.getDatabase(), "XWiki", "Distribution"));
         document.setContentAuthorReference(SUPERADMIN_REFERENCE);
         document.setAuthorReference(SUPERADMIN_REFERENCE);
         document.setCreatorReference(SUPERADMIN_REFERENCE);

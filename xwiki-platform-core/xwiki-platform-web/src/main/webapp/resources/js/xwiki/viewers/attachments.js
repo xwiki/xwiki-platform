@@ -173,7 +173,7 @@ viewers.Attachments = Class.create({
    */
   addTabLoadListener : function(event) {
     var listener = function(event) {
-      if (event.memo.id == 'Attachments') {
+      if (event.memo.id == ID('Attachments')) {
         this.addDeleteListener();
         this.prepareForm();
         document.stopObserving("xwiki:docextra:loaded", listener);

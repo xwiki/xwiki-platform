@@ -21,6 +21,11 @@ package org.xwiki.extension.distribution.internal.job;
 
 import org.xwiki.job.DefaultRequest;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 public class DistributionRequest extends DefaultRequest
 {
 

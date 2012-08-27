@@ -19,7 +19,11 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
-
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 public class DistributionQuestion
 {
     public enum Action

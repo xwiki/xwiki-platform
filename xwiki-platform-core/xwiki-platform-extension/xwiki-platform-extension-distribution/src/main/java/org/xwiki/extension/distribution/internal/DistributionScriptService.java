@@ -38,6 +38,7 @@ import org.xwiki.script.service.ScriptService;
  * Note: this script service is strictly internal and intended to be used only from templates for now.
  * 
  * @version $Id$
+ * @since 4.2M3
  */
 @Component
 @Named("distribution")

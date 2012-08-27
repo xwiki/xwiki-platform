@@ -19,8 +19,11 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiAction;
 
 /**
@@ -28,6 +31,7 @@ import com.xpn.xwiki.web.XWikiAction;
  * template with the current user rights.
  * 
  * @version $Id$
+ * @since 4.2M3
  */
 public class DistributionAction extends XWikiAction
 {
@@ -38,17 +42,22 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTON_ACTION = "distribution";
 
+    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki", "superadmin");
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        boolean shouldRender = true;
-
         context.put("action", DISTRIBUTON_ACTION);
 
-        // Make sure to check right only on current user and don't take into account any current document
-        context.setDoc(null);
+        // Make sure to have programming rights
+        // TODO: find something nicer
+        XWikiDocument document = new XWikiDocument(new DocumentReference(context.getDatabase(), "", ""));
+        document.setContentAuthorReference(SUPERADMIN_REFERENCE);
+        document.setAuthorReference(SUPERADMIN_REFERENCE);
+        document.setCreatorReference(SUPERADMIN_REFERENCE);
+        context.setDoc(document);
 
-        return shouldRender;
+        return true;
     }
 
     @Override

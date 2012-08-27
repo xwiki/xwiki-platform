@@ -42,6 +42,11 @@ import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.2M3
+ */
 @Component
 public class DefaultDistributionManager implements DistributionManager, Initializable
 {

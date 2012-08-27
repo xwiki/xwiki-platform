@@ -24,6 +24,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiAction;
 
 /**
@@ -42,7 +43,8 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTON_ACTION = "distribution";
 
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki", "superadmin");
+    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki",
+        XWikiRightService.SUPERADMIN_USER);
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

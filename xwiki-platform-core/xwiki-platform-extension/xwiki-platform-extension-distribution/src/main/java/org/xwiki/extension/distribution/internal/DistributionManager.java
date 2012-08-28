@@ -35,10 +35,10 @@ public interface DistributionManager
 {
     enum DistributionState
     {
-        // Nothing to do
+        // The distribution did not changed
         SAME,
 
-        // No idea what do to
+        // No distribution information can be found
         NONE,
 
         // Probably something to do

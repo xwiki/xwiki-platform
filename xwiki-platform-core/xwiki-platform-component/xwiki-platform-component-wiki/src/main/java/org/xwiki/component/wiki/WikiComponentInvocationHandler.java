@@ -149,7 +149,7 @@ public class WikiComponentInvocationHandler implements InvocationHandler
             if (method.getDeclaringClass() == Object.class) {
                 return this.proxyObjectMethod(proxy, method, args);
             } else {
-                throw new NoSuchMethodException();
+                throw new NoSuchMethodException(method.getName());
             }
         } else {
             return this.executeWikiContent(proxy, method, args);

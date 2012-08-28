@@ -136,8 +136,8 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
      */
     private void registerComponents()
     {
-        // Retreive all components definitions and register them.
-        for (WikiComponentBuilder provider : wikiComponentProviders) {
+        // Retrieve all components definitions and register them.
+        for (WikiComponentBuilder provider : this.wikiComponentProviders) {
             for (DocumentReference reference : provider.getDocumentReferences()) {
                 try {
                     List<WikiComponent> components = provider.buildComponents(reference);
@@ -145,8 +145,8 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                         this.wikiComponentManager.registerWikiComponent(component);
                     }
                 } catch (WikiComponentException e) {
-                    this.logger.warn("Failed to register wiki component(s) for document [{}]: {}",
-                        compactWikiSerializer.serialize(reference), e.getMessage());
+                    this.logger.warn("Failed to register the wiki component located in the document [{}]. "
+                        + "Root cause: {}", this.compactWikiSerializer.serialize(reference), e.getMessage());
                 }
             }
         }

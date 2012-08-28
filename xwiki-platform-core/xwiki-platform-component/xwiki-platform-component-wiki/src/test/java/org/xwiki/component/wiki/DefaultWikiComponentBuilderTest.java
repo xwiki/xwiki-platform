@@ -201,7 +201,7 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
             this.provider.buildComponents(DOC_REFERENCE);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
-            Assert.assertEquals("No role were precised in the component", expected.getMessage());
+            Assert.assertEquals("No role was specified in the component", expected.getMessage());
         }
     }
 
@@ -229,7 +229,8 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
             this.provider.buildComponents(DOC_REFERENCE);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
-            Assert.assertEquals("The role class could not be found", expected.getMessage());
+            Assert.assertEquals("The role class [a.class.that.does.not.Exist] could not be found",
+                expected.getMessage());
         }
     }
 

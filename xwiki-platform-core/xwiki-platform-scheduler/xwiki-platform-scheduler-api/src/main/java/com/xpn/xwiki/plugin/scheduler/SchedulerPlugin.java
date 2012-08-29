@@ -180,11 +180,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * 
      * @param job the job for which the context will be prepared
      * @param context the XWikiContext at preparation time. This is a real context associated with a servlet request
-     * @return the stub context prepared with job datas.
+     * @return the stub context prepared with job data
      */
     private XWikiContext prepareJobStubContext(BaseObject job, XWikiContext context) throws SchedulerPluginException
     {
-        boolean jobNeedsUpdate = true;
+        boolean jobNeedsUpdate = false;
         String cUser = job.getStringValue("contextUser");
         if (cUser.equals("")) {
             // The context user has not been filled yet.

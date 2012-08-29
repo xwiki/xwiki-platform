@@ -182,15 +182,21 @@ kWrCyQnxm2ZJfeIlY0GPBCzxmrX6lfPaT2RHZ1x6nICBGK7dgnDibwklpKMxXKkqnYRnJ/7T3y1p
 TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 </content>
   </attachment>
-  <content>{{include document="ExtensionManagerMacros" /}}
+  <content>{{velocity output="false"}}
+## TODO: Find a better way to include the Extension Manager Velocity macros.
+$xwiki.parseContent($xwiki.xWiki.getResourceContent('/templates/extension.vm'))
+{{/velocity}}
 
 {{velocity}}
+## HTML cleaner messes up the content of the legend tag.
+{{html clean="false"}}
 ## AJAX call for a single extension.
 #if ($xcontext.action == 'get' &amp;&amp; $request.extensionId &amp;&amp; $request.extensionVersion)
   #handleExtensionRequest()
 #else
-  (% class="full column" %)(((
+  &lt;div class="full column"&gt;
   #displayExtensionSearchBar()
+
   #if ($request.extensionId &amp;&amp; $request.extensionVersion)
     ## Advanced search.
     #handleExtensionRequest()
@@ -234,24 +240,25 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
       #set ($totalHits = $extensions.totalHits)
     #end
     #if (!$extensions.iterator().hasNext())
-      {{info}}$msg.get($noResultsMessageKey, ["//$!{request.search}//"]){{/info}}
+      &lt;pre class="box infomessage"&gt;$msg.get($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/pre&gt;
     #else
       #if ($totalHits &amp;&amp; $totalHits &gt; $paginationParams.itemsPerPage)
         #set ($hasPagination = true)
         #set ($paginationParams.totalItems = $totalHits)
         #set ($paginationParams.url = $doc.getURL($xcontext.action, $request.getQueryString().replaceAll('(^|&amp;)firstIndex=[^&amp;]++&amp;?', '$1')))
-        {{html}}#pagination($paginationParams){{/html}}
+        #pagination($paginationParams)
       #end
       #foreach($extension in $extensions)
         #displayExtension($extension)
       #end
       #if ($hasPagination)
         #set ($discard = $paginationParams.put('position', 'bottom'))
-        {{html}}#pagination($paginationParams){{/html}}
+        #pagination($paginationParams)
       #end
     #end
   #end
-  )))
+  &lt;/div&gt;
 #end
+{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

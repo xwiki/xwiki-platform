@@ -123,6 +123,9 @@ ul.extension-metadata li {
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
+.dependency-item > p, .extension-log-item > p {
+  margin: 0;
+}
 .extension-item-core .extension-name, .extension-item-remote-core .extension-name,
 .dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");

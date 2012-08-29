@@ -240,7 +240,7 @@ $xwiki.parseContent($xwiki.xWiki.getResourceContent('/templates/extension.vm'))
       #set ($totalHits = $extensions.totalHits)
     #end
     #if (!$extensions.iterator().hasNext())
-      &lt;pre class="box infomessage"&gt;$msg.get($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/pre&gt;
+      &lt;div class="box infomessage"&gt;$msg.get($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/div&gt;
     #else
       #if ($totalHits &amp;&amp; $totalHits &gt; $paginationParams.itemsPerPage)
         #set ($hasPagination = true)

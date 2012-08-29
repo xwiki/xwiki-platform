@@ -72,8 +72,8 @@ public class SearchResultsPane extends BaseElement
     {
         String nameAndVersion = name + " " + version;
         By xpath =
-            By.xpath("//div[contains(@class, 'extension-item') and "
-                + "descendant::h2[contains(@class, 'extension-name') and . = '" + nameAndVersion + "']]");
+            By.xpath("//div[contains(@class, 'extension-item') and descendant::h2[contains(@class, "
+                + "'extension-name') and normalize-space(.) = '" + nameAndVersion + "']]");
         List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), xpath);
         return found.size() == 1 ? new ExtensionPane(found.get(0)) : null;
     }

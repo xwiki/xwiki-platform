@@ -269,7 +269,9 @@
     #if ($xwiki.isVirtualMode() && $namespace.startsWith('wiki:'))
       <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', [$namespace.substring(5)])</span>
     #end
-    <span class="extension-status">$!dependencyStatusMessage</span>
+    #if ("$!dependencyStatusMessage" != '')
+      <span class="extension-status">$dependencyStatusMessage</span>
+    #end
   </div>
 #end
 
@@ -285,7 +287,7 @@
 #end
 
 #macro (displayExtensionDetails_dependencies_downstream $backwardDependencies)
-  #if (!$backwardDependencies.size() > 0)
+  #if ($backwardDependencies.size() > 0)
     <p>$msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</p>
     <ul>
       #foreach ($namespace in $backwardDependencies.entrySet())
@@ -438,7 +440,7 @@
         #displayExtensionAuthors($extension)
       #end
       #if ("$!extension.summary" != '')
-        <pre class="extension-description">$extension.summary.replaceAll('\s+', ' ')</pre>
+        <div class="extension-description">$escapetool.xml($extension.summary)</div>
       #end
       #displayProgressBar($extension)
       <div class="clearfloats"></div>
@@ -720,26 +722,24 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #if ($extension)
       #displayExtension($extension)
     #else
-      <div class="box infomessage">$msg.get('extensions.advancedSearch.noResults', ["<strong><pre>$!escapetool.xml($request.extensionId)</pre></strong>", "<strong><pre>$!escapetool.xml($request.extensionVersion)</pre></strong>"])</div>
+      <div class="box infomessage">$msg.get('extensions.advancedSearch.noResults', ["<strong>$!escapetool.xml($request.extensionId)</strong>", "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
     #end
   #end
 #end
 
 #macro (printThrowable $throwable $isCause)
-  #if (!$isCause)
-    <div class="stacktrace">##
-  #end
-  $throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
+#if (!$isCause)
+  <div class="stacktrace">##
+#end
+$throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
 
-  #foreach($stackTraceElement in $throwable.stackTrace)
-#**#    at $stackTraceElement
-  #end
-  #if ($throwable.cause)
-    Caused by: #printThrowable($throwable.cause true)
-  #end
-  #if (!$isCause)
-    </div>
-  #end
+#foreach($stackTraceElement in $throwable.stackTrace)
+    at $stackTraceElement
+#end
+#if ($throwable.cause)
+Caused by: #printThrowable($throwable.cause true)
+#end
+#if (!$isCause)</div>#end
 #end
 
 #macro (getThrowableRootCauseMessage $throwable)
@@ -761,15 +761,14 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     <li class="extension-log-item extension-log-item-$logLevel">
       #if ($log.throwable)
         #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
-        #if ("$!message" != '')
-          ## We use the HTML macro because currently there's no easy way to escape wiki syntax.
-          $escapetool.xml($message)
+        #if ("$!message.trim()" != '')
+          <p>$escapetool.xml($message)</p>
         #else
-          #printLogMessage($log)
+          <p>#printLogMessage($log)</p>
         #end
         #printThrowable($log.throwable)
       #else
-        #printLogMessage($log)
+        <p>#printLogMessage($log)</p>
       #end
     </li>
   #end

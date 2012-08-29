@@ -265,7 +265,7 @@ public class WatchListJobManager
     {
         XWikiDocument doc;
         boolean needsUpdate = false;
-        BaseObject job = null;
+        BaseObject job;
 
         try {
             doc = context.getWiki().getDocument(docName, context);

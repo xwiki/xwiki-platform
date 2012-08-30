@@ -21,6 +21,7 @@ package org.xwiki.configuration.internal;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.ModelContext;
@@ -40,23 +41,45 @@ public class UserPreferencesConfigurationSourceTest extends AbstractMockingCompo
     @MockingRequirement
     private UserPreferencesConfigurationSource source;
 
-    @Test
-    public void getPropertyForStringWhenExists() throws Exception
+    @Before
+    @Override
+    public void setUp() throws Exception
     {
-        final DocumentReference userPreferencesReference = new DocumentReference("wiki", "XWiki", "XWikiUsers");
-        final DocumentReference currentUserReference = new DocumentReference("wiki", "XWiki", "User");
+        super.setUp();
 
+        final DocumentReference userPreferencesReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+        final DocumentReference currentUserReference = new DocumentReference("xwiki", "XWiki", "User");
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
+
         getMockery().checking(new Expectations() {{
             allowing(dab).getCurrentUserReference();
                 will(returnValue(currentUserReference));
-            allowing(modelContext).getCurrentEntityReference();
-                will(returnValue(new WikiReference("wiki")));
             oneOf(dab).getProperty(currentUserReference, userPreferencesReference, "key");
                 will(returnValue("value"));
         }});
+    }
 
+    @Test
+    public void getStringPropertyWhenUserInTheSameWiki() throws Exception
+    {
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
+        getMockery().checking(new Expectations() {{
+            allowing(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("xwiki")));
+        }});
+        String result = this.source.getProperty("key", String.class);
+
+        Assert.assertEquals("value", result);
+    }
+
+    @Test
+    public void getStringPropertyWhenUserInADifferentWiki() throws Exception
+    {
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
+        getMockery().checking(new Expectations() {{
+            allowing(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("subwiki")));
+        }});
         String result = this.source.getProperty("key", String.class);
 
         Assert.assertEquals("value", result);

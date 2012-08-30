@@ -121,7 +121,7 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
-    private static final Logger log = LoggerFactory.getLogger(XWikiHibernateStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateStore.class);
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
@@ -652,8 +652,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 }
                             }
                             if (newProperty == null) {
-                                log.warn("Incompatible data migration when changing field {} of class {}",
-                                    prop.getName(), prop.getClassName());
+                                LOGGER.warn("Incompatible data migration when changing field {} of class {}",
+                                        prop.getName(), prop.getClassName());
                                 continue;
                             }
                             newProperty.setId(brokenProperty.getId());
@@ -870,7 +870,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         }
 
-        log.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
+        LOGGER.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
 
         return doc;
     }
@@ -1346,10 +1346,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             } catch (ObjectNotFoundException e) {
-                // Let's accept that there is no data in property tables
-                // but log it
-                if (log.isErrorEnabled()) {
-                    log.error("No data for property " + property.getName() + " of object id " + property.getId());
+                // Let's accept that there is no data in property tables but log it
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("No data for property " + property.getName() + " of object id " + property.getId());
                 }
             }
 
@@ -2708,13 +2707,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String propname = hibprop.getName();
             PropertyClass propclass = (PropertyClass) bclass.getField(propname);
             if (propclass == null) {
-                log.warn("Mapping contains invalid field name " + propname);
+                LOGGER.warn("Mapping contains invalid field name " + propname);
                 return false;
             }
 
             boolean result = isValidColumnType(hibprop.getValue().getType().getName(), propclass.getClassName());
             if (result == false) {
-                log.warn("Mapping contains invalid type in field " + propname);
+                LOGGER.warn("Mapping contains invalid type in field " + propname);
                 return false;
             }
         }

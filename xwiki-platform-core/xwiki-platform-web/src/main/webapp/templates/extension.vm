@@ -4,6 +4,7 @@
 
 #set ($extensionManager = $services.extension)
 #set ($extensionNamespace = "wiki:$xcontext.database")
+#set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 
 #macro (displayExtensionSearchBar)
   <div class="extension-search-bar">
@@ -74,7 +75,7 @@
       #computeXBack()
       ## Check if the current request targets the given extension.
       #if ($request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
-        #if ($xcontext.action == 'get')
+        #if ($isAjaxRequest)
           ## AJAX request to show extension details.
           #em_submitButton('extensions.actions.showDetails' 'showDetails' true 'visibilityAction')
           #em_submitButton('extensions.actions.hideDetails' 'hideDetails' true 'visibilityAction')
@@ -456,8 +457,8 @@
   #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
     #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
-    #if ($xcontext.action == 'get')
-      ## AJAX request. Send error back.
+    #if ($isAjaxRequest)
+      ## Send error back.
       $response.sendError(400, $errorMessage)
     #else
       <div class="box errormessage">$errorMessage #printThrowable($lastError)</div>
@@ -538,8 +539,8 @@
   #set($lastError = $extensionManager.lastError)
   #if ($lastError)
     #set ($errorMessage = $msg.get('extensions.uninstall.error.uninstallFailure', [$extensionId, $extensionVersion]))
-    #if ($xcontext.action == 'get')
-      ## AJAX request. Send error back.
+    #if ($isAjaxRequest)
+      ## Send error back.
       $response.sendError(400, $errorMessage)
     #else
       <div class="box errormessage">$errorMessage #printThrowable($lastError)</div>
@@ -710,8 +711,8 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       #else
         $response.sendRedirect("#getExtensionURL()")
       #end
-    #elseif ($xcontext.action == 'get')
-      # AJAX request. The CSRF token expired. We only redisplay the extension because the resubmission confirmation doesn't fit nicely in-line.
+    #elseif ($isAjaxRequest)
+      ## The CSRF token expired. We only redisplay the extension because the resubmission confirmation doesn't fit nicely in-line.
       $response.sendRedirect("#getExtensionURL()")
     #else
       $response.sendRedirect($services.csrf.getResubmissionURL())

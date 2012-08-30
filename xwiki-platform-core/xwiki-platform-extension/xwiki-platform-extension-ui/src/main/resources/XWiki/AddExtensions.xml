@@ -183,15 +183,16 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
 </content>
   </attachment>
   <content>{{velocity output="false"}}
-## TODO: Find a better way to include the Extension Manager Velocity macros.
-$xwiki.parseContent($xwiki.xWiki.getResourceContent('/templates/extension.vm'))
+## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
+## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template when
+## this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
+#parse('extension.vm')
 {{/velocity}}
 
 {{velocity}}
 ## HTML cleaner messes up the content of the legend tag.
 {{html clean="false"}}
-## AJAX call for a single extension.
-#if ($xcontext.action == 'get' &amp;&amp; $request.extensionId &amp;&amp; $request.extensionVersion)
+#if ($isAjaxRequest)
   #handleExtensionRequest()
 #else
   &lt;div class="full column"&gt;

@@ -50,7 +50,8 @@ XWiki.ExtensionBehaviour = Class.create({
     } else {
       serviceDocument = XWiki.currentDocument;
     }
-    return serviceDocument.getURL('get');
+    var action = XWiki.contextaction == 'view' || XWiki.contextaction == 'admin' ? 'get' : XWiki.contextaction;
+    return serviceDocument.getURL(action);
   },
 
   /**
@@ -350,6 +351,7 @@ XWiki.ExtensionBehaviour = Class.create({
    * 'admin' action (depending whether the extension is displayed alone or in the administration section).
    */
   _fixExtensionLinks : function() {
+    if (XWiki.contextaction != 'get') return;
     this.container.select("a.extension-link").each(function (link) {
       var action = XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view';
       var queryString = link.getAttribute('href').replace(/.*\?/, '');

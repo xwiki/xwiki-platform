@@ -1,101 +1,93 @@
-#template("xwikivars.vm")
-
-#if ($request.distributioncancel)
-  #set($distributionJobStatus = $services.distribution.jobStatus)
-  #set($distributionQuestion = $distributionJobStatus.question)
+#macro(handleStepAction $action)
+  #set ($distributionJobStatus = $services.distribution.jobStatus)
+  #set ($distributionQuestion = $distributionJobStatus.question)
   #if ($distributionQuestion)
-    $distributionQuestion.setUpdateState('CANCEL')
+    $distributionQuestion.setUpdateState($action)
     $distributionJobStatus.answered()
   #end
-#elseif ($request.distributioncontinue)
-  #set($distributionJobStatus = $services.distribution.jobStatus)
-  #set($distributionQuestion = $distributionJobStatus.question)
-  #if ($distributionQuestion)
-    $distributionQuestion.setUpdateState('CONTINUE')
-    $distributionJobStatus.answered()
-  #end
-## TODO: add SKIP action when there will be several step
+  $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution', "xredirect=$!escapetool.url($request.xredirect)"))
 #end
 
-#set($distributionState = $services.distribution.state.name())
-#if ($distributionState == 'NONE')
-  Can't get any information about the distribution.
-#else
-  #set($distributionExtension = $services.distribution.distributionExtension)
-  #set($distributionUIId = $services.distribution.getUIExtensionId())
-
-  #if ($request.installui)
-    <p>Installing $distributionUIId...<p>
-
-    #set($installRequest = $services.extension.createInstallRequest($distributionUIId.id, $distributionUIId.version.value, 'wiki:xwiki'))
-    $installRequest.setInteractive(false)
-    $installRequest.setProperty($null)
-    #set($installJob = $services.extension.install($installRequest))
-    $installJob.join()
-    <ul>
-    #foreach ($logevent in $installJob.status.log)
-      <li>
-        $logevent
-        $logevent.throwable.printStackTrace()
-      </li>
-    #end
-    </ul>
-  #end
-
-  <p>The distribution is <strong>$distributionExtension.name ($distributionExtension.id.id)</strong> in version <strong>$distributionExtension.id.version</strong>.</p>
-
-  #if ($distributionUIId)
-    <form method='get' action="">
-      <div>
-        #if ($request.xredirect)
-          <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)" />
-        #end
-
-        <p>The default distribution UI id is <strong>${distributionUIId.id}.</strong>
-
-        #if ($distributionState == 'SAME')
-          <p>Already up to date. Nothing to do.</p>
-        #elseif ($distributionState == 'NEW')
-          #set($installedExtension = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
-          #if ($installedExtension.isValid('wiki:xwiki'))
-            <p>No previous status could be found but the right UI already seems to be installed.</p>
-
-            <span class="buttonwrapper"><input class="button" type="submit" name="distributioncontinue" value="Continue"/></span>
-          #else
-            <p>No previous status could be found, either:</p>
-            <ul>
-              <li>it's a new install</li>
-              <li>the previous version was not including distribution module</li>
-            </ul>
-
-            ##TODO: propose to indicate what's already installed but not known as such by Extension Manager (when upgrading old distributions)
-
-            <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Install UI"/></span>
-          #end
-        #elseif ($distributionState == 'UPGRADE')
-          <p>Upgrading.</p>
-
-          ## Install job will take care of upgrade
-          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Upgrade UI"/></span>
-        #elseif ($distributionState == 'DOWNGRADE')
-          <p>Downgrading.</p>
-
-          ## Install job will take care of downgrade
-          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Downgrade UI"/></span>
-        #elseif ($distributionState == 'DIFFERENT')
-          <p>Installing a different distribution.</p>
-
-          ## TODO: Might need to indicate what was the previous distribution UI to uinstall it while installing the new one
-
-          <span class="buttonwrapper"><input class="button" type="submit" name="installui" value="Install UI"/></span>
-        #else
-          <p>Unkown status.</p>
-        #end
-
-        <span class="buttonwrapper"><input class="button" type="submit" name="distributioncancel" value="Cancel"/></span>
+#macro(displayStep)
+  #template('xwikivars.vm')
+  #template('htmlheader.vm')
+  $xwiki.ssfx.use('uicomponents/extension/distribution.css')
+  <div class="xdialog-modal-container">
+    <div class="xdialog-screen"></div>
+    <div class="xdialog-box">
+      <div class="xdialog-title">Distribution Wizard</div>
+      <div class="xdialog-content">
+        #displayStepContent()
+        #displayStepButtons()
       </div>
-    </form>
+    </div>
+  </div>
+  #template('htmlfooter.vm')
+#end
+
+#macro(displayStepContent)
+  #set ($stepId = $services.distribution.jobStatus.question.stepId)
+  #if ($stepId == 'extension.mainui')
+    #displayMainUIStep()
+  #elseif ($stepId == 'extension.outdatedextensions')
+    #displayOutdatedExtensionsStep()
   #else
-    <p>No default UI is indicated for this distribution.</p>
+    <div class="box errormessage">Unknown step</div>
+  #end
+#end
+
+#macro(displayMainUIStep)
+  #set ($distributionState = $services.distribution.state)
+  #if ($distributionState == 'NONE')
+    <div class="box errormessage">Can't get any information about the distribution.</div>
+  #else
+    <p>The following distribution has been detected:</p>
+    #set ($distributionExtension = $services.distribution.distributionExtension)
+    #displayExtension($distributionExtension)
+    #set ($distributionUIId = $services.distribution.getUIExtensionId())
+    #if ($distributionUIId)
+      <p>The following user interface is recommended for your distribution:</p>
+      #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
+      #displayExtension($distributionUIExtension)
+    #else
+      <div class="box warningmessage">The detected distribution doesn't specify a default UI.</div>
+    #end
+  #end
+#end
+
+#macro(displayOutdatedExtensionsStep)
+  <p>TODO: Display outdated extensions</p>
+#end
+
+#macro(displayStepButtons)
+  <form action="" class="xform">
+    <div class="buttons">
+      #if ($request.xredirect)
+        <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)" />
+      #end
+      <span class="buttonwrapper"><button class="button" type="submit" name="action" value="COMPLETE_STEP">Continue</button></span>
+      <span class="buttonwrapper"><button class="button secondary" type="submit" name="action" value="SKIP_STEP">Skip</button></span>
+      <span class="buttonwrapper"><button class="button secondary" type="submit" name="action" value="CANCEL_STEP">Cancel</button></span>
+    </div>
+  </form>
+#end
+
+#if ($services.distribution.jobStatus.state == 'FINISHED')
+  #set ($redirectURL = $request.xredirect)
+  #if ("$!redirectURL" == '')
+    #set ($redirectURL = $xwiki.getURL('Main.WebHome'))
+  #end
+  $response.sendRedirect($redirectURL)
+#elseif ("$!request.action" != '')
+  #handleStepAction($request.action)
+#else
+  ## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
+  ## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template when
+  ## this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
+  #parse('extension.vm')
+  #if ($isAjaxRequest)
+    #handleExtensionRequest()
+  #else
+    #displayStep()
   #end
 #end

@@ -344,7 +344,7 @@
 #if("$!request.space" != "") #set($space=$request.space) #else #set($space = $doc.space) #end
 $msg.get('platform.index.spaceIndexDescription', [$space])
 
-{{documents space="$space" id="spaceindex"/}}
+{{documents space="$space.replaceAll('"', '~"')" id="spaceindex"/}}
 {{/velocity}}
 </content>
 </xwikidoc>

@@ -35,7 +35,10 @@
   <description>xwiki-platform-oldcore repackaging including legacy aspects</description>
   <properties>
     <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-oldcore,com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+    <xwiki.extension.features>
+      org.xwiki.platform:xwiki-platform-oldcore,
+      com.xpn.xwiki.platform:xwiki-core
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <!-- We need this dependency so that the wrapped module is built before this one -->

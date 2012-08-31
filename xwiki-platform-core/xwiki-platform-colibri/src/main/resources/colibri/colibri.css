@@ -1417,7 +1417,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .buttonwrapper .button {
   vertical-align: middle;
 }
-input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
+input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;
   #css3_backgroundLinearGradient({
@@ -1439,7 +1439,7 @@ input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:
   text-transform: uppercase;
 }
 
-input.button:hover, .buttonwrapper a:hover{
+input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
   background-color: $theme.buttonPrimaryBackgroundColor;
   #css3_backgroundLinearGradient({
      'angle': 'top',
@@ -1453,7 +1453,7 @@ input.button:hover, .buttonwrapper a:hover{
   text-decoration: none;
 }
 
-.buttonwrapper input.secondary, .buttonwrapper a.secondary, 
+.buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary,
 .buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
   background-color: $theme.buttonSecondaryBackgroundColor;
@@ -1470,7 +1470,7 @@ input.button:hover, .buttonwrapper a:hover{
   text-shadow: 0px 1px 0px $theme.buttonSecondaryGradientColor;
 }
 
-input.secondary:hover, .buttonwrapper a.secondary:hover {
+input.secondary:hover, button.secondary:hover, .buttonwrapper a.secondary:hover {
   box-shadow: 0px 2px 2px $theme.borderColor;
 }
 
@@ -1498,7 +1498,7 @@ input.icon-button {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/search.png')");
 }
 
-*:disabled, input.disabled, .buttonwrapper a.disabled {
+*:disabled, input.disabled, button.disabled, .buttonwrapper a.disabled {
   opacity: .5;
   cursor: default;
 }

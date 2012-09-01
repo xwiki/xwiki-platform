@@ -33,6 +33,9 @@
   <name>XWiki Platform - IRC Bot - API</name>
   <packaging>jar</packaging>
   <description>Java API for the IRC Bot Application</description>
+  <properties>
+    <xwiki.clover.targetPercentage>49%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.pircbotx</groupId>
@@ -86,33 +89,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <!-- Fail the build if the test coverage is below a given value.
-       Note: Since this takes a bit of time to execute we only run this when the integration-tests profile is active -->
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.atlassian.maven.plugins</groupId>
-            <artifactId>maven-clover2-plugin</artifactId>
-            <configuration>
-              <!-- Note that the overall TPC when including functional tests for this module is around 78% -->
-              <targetPercentage>49%</targetPercentage>
-            </configuration>
-            <executions>
-              <execution>
-                <id>clover-check</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>instrument-test</goal>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

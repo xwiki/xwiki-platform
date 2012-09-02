@@ -48,7 +48,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  */
 @AllComponents
 @MockingRequirement(value = DefaultSheetManager.class, exceptions = { DocumentReferenceResolver.class })
-public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
+public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase<SheetManager>
 {
     /**
      * The name of the execution context sheet property.
@@ -56,7 +56,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
     private static final String SHEET_PROPERTY = "sheet";
 
     /**
-     * The action property of the sheet descriptor class. See {@value #SHEET_CLASS_REFERENCE}.
+     * The action property of the sheet descriptor class. See {@link #SHEET_CLASS_REFERENCE}.
      */
     private static final String ACTION_PROPERTY = "action";
 
@@ -70,11 +70,6 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
      */
     private static final DocumentReference SHEET_CLASS_REFERENCE = new DocumentReference(WIKI_NAME, "XWiki",
         "SheetDescriptorClass");
-
-    /**
-     * The component being tested.
-     */
-    private SheetManager sheetManager;
 
     /**
      * The execution context.
@@ -125,8 +120,6 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
                 will(returnValue(new DocumentReference(WIKI_NAME, "Space", "Page")));
             }
         });
-
-        this.sheetManager = getComponentManager().getInstance(SheetManager.class);
     }
 
     /**
@@ -156,7 +149,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        Assert.assertEquals(Arrays.asList(sheetReference), sheetManager.getSheets(document, "view"));
+        Assert.assertEquals(Arrays.asList(sheetReference), getMockedComponent().getSheets(document, "view"));
 
         // (2) The sheet is specified on the execution context but the target document is not the current document.
         getMockery().checking(new Expectations()
@@ -172,7 +165,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.emptySet()));
             }
         });
-        Assert.assertTrue(sheetManager.getSheets(document, "edit").isEmpty());
+        Assert.assertTrue(getMockedComponent().getSheets(document, "edit").isEmpty());
 
         // (3) The sheet is not specified on the execution context.
         context.removeProperty(SHEET_PROPERTY);
@@ -188,7 +181,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        Assert.assertTrue(sheetManager.getSheets(document, "get").isEmpty());
+        Assert.assertTrue(getMockedComponent().getSheets(document, "get").isEmpty());
     }
 
     /**
@@ -259,6 +252,6 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        sheetManager.getSheets(document, currentAction);
+        getMockedComponent().getSheets(document, currentAction);
     }
 }

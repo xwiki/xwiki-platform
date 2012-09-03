@@ -5,9 +5,6 @@
   top: 1em;
   width: 800px;
 }
-.xdialog-box .buttons {
-  text-align: right;
-}
 
 .extension-item:first-of-type {
   border-bottom-color: #E8E8E8;

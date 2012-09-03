@@ -19,8 +19,13 @@
     <div class="xdialog-box">
       <div class="xdialog-title">Distribution Wizard</div>
       <div class="xdialog-content">
-        #displayStepContent($stepId)
-        #displayStepButtons()
+        #if ($request.extensionId && $request.extensionVersion)
+          ## The user can get here by clicking on an extension link.
+          #handleExtensionRequest()
+        #else
+          #displayStepContent($stepId)
+          #displayStepButtons()
+        #end
       </div>
     </div>
   </div>

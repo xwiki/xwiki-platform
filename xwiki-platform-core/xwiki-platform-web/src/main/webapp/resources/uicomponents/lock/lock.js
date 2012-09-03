@@ -40,7 +40,7 @@ function init() {
 
   // Unlock before logging out because afterwards we don't have rights.
   // Note that the logout action doesn't target the current document so it can't remove its lock.
-  $('tmLogout').down('a').observe('click', unlock);
+  $('tmLogout') && $('tmLogout').down('a') && $('tmLogout').down('a').observe('click', unlock);
 
   // The page is automatically unlocked when the form is submitted.
   var markUnlocked = XWiki.EditLock.setLocked.bind(XWiki.EditLock, false);

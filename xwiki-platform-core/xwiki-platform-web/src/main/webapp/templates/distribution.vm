@@ -12,12 +12,14 @@
   #template('xwikivars.vm')
   #template('htmlheader.vm')
   $xwiki.ssfx.use('uicomponents/extension/distribution.css')
-  <div class="xdialog-modal-container">
+  $xwiki.jsfx.use('uicomponents/extension/distribution.js', true)
+  #set ($stepId = $services.distribution.jobStatus.question.stepId)
+  <div id="$!stepId" class="xdialog-modal-container">
     <div class="xdialog-screen"></div>
     <div class="xdialog-box">
       <div class="xdialog-title">Distribution Wizard</div>
       <div class="xdialog-content">
-        #displayStepContent()
+        #displayStepContent($stepId)
         #displayStepButtons()
       </div>
     </div>
@@ -25,8 +27,7 @@
   #template('htmlfooter.vm')
 #end
 
-#macro(displayStepContent)
-  #set ($stepId = $services.distribution.jobStatus.question.stepId)
+#macro(displayStepContent $stepId)
   #if ($stepId == 'extension.mainui')
     #displayMainUIStep()
   #elseif ($stepId == 'extension.outdatedextensions')
@@ -44,13 +45,28 @@
     <p>The following distribution has been detected:</p>
     #set ($distributionExtension = $services.distribution.distributionExtension)
     #displayExtension($distributionExtension)
+
     #set ($distributionUIId = $services.distribution.getUIExtensionId())
     #if ($distributionUIId)
+      #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
+      #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
+
+      ## Allow the user to install, upgrade or downgrade the UI.
       <p>The following user interface is recommended for your distribution:</p>
       #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
       #displayExtension($distributionUIExtension)
+
+      #if ($distributionState == 'NEW' && !$showCompleteStepButton)
+        ## Either a new install or an upgrade from a version that doesn't have the distribution module.
+        ## TODO: Ask the user if a previous version of the UI was installed without the Extension Manager. Retrieve the
+        ## list of versions available for the recommended UI and let the user choose the version he's currently using.
+        ## Do a fake install of the selected version.
+      #elseif ($distributionState == 'DIFFERENT')
+        ## TODO: Display the previous distribution UI extension to let the user uninstall it.
+      #end
     #else
       <div class="box warningmessage">The detected distribution doesn't specify a default UI.</div>
+      ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
     #end
   #end
 #end
@@ -61,13 +77,21 @@
 
 #macro(displayStepButtons)
   <form action="" class="xform">
-    <div class="buttons">
+    <div id="stepButtons" class="buttons">
       #if ($request.xredirect)
         <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)" />
       #end
-      <span class="buttonwrapper"><button class="button" type="submit" name="action" value="COMPLETE_STEP">Continue</button></span>
-      <span class="buttonwrapper"><button class="button secondary" type="submit" name="action" value="SKIP_STEP">Skip</button></span>
-      <span class="buttonwrapper"><button class="button secondary" type="submit" name="action" value="CANCEL_STEP">Cancel</button></span>
+      ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
+      ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
+      <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
+        <button type="submit" name="action" value="COMPLETE_STEP">Continue</button>
+      </span>
+      <span class="buttonwrapper#if ($showCompleteStepButton) hidden#end">
+        <button class="secondary" type="submit" name="action" value="SKIP_STEP" title="Ask me again after a server restart">Skip</button>
+      </span>
+      <span class="buttonwrapper#if ($showCompleteStepButton) hidden#end">
+        <button class="secondary" type="submit" name="action" value="CANCEL_STEP" title="Ask me again when I change my distribution">Cancel</button>
+      </span>
     </div>
   </form>
 #end

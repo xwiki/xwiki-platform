@@ -41,6 +41,27 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
+   * Returns the extension identifier.
+   */
+  getId : function() {
+    var idHiddenInput = this.container.down('input[name="extensionId"]');
+    return idHiddenInput ? idHiddenInput.value : null;
+  },
+
+  /**
+   * Returns the status of the extension (loading, core, remote, installed, etc.).
+   */
+  getStatus : function() {
+    var classNames = $w(this.container.className);
+    for (var i = 0; i < classNames.length; i++) {
+      if (classNames[i].startsWith('extension-item-')) {
+        return classNames[i].substr(15);
+      }
+    }
+    return null;
+  },
+
+  /**
    * Returns the URL of the service used to retrieve extension details and to install/uninstall extensions.
    */
   _getServiceURL : function(serviceDocument) {
@@ -100,6 +121,7 @@ XWiki.ExtensionBehaviour = Class.create({
     var extensionBodyHidden = !extensionBody || extensionBody.hasClassName('hidden');
     var currentMenuItem = this.container.down('.innerMenu li a.current');
     currentMenuItem && (this._previouslySelectedMenuItem = currentMenuItem.getAttribute('href'));
+    var oldStatus = this.getStatus();
     // Replace the current extension container element with the one that was just fetched.
     this.container.addClassName('hidden');
     this.container.insert({after : html});
@@ -110,6 +132,10 @@ XWiki.ExtensionBehaviour = Class.create({
       stop : function() {},
       element : function() {return this.container.down('input[name="hideDetails"]')}.bind(this)
     });
+    // Fire an event when the extension status changes.
+    if (oldStatus != this.getStatus()) {
+      document.fire('xwiki:extension:statusChanged', {extension: this});
+    }
   },
 
   /**

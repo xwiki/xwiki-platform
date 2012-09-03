@@ -247,7 +247,9 @@ public class WikiComponentInvocationHandler implements InvocationHandler
                 }
             }
         } finally {
-            xwikiContext.put(XWIKI_CONTEXT_DOC_KEY, contextDoc);
+            if (contextDoc != null) {
+                xwikiContext.put(XWIKI_CONTEXT_DOC_KEY, contextDoc);
+            }
         }
     }
 

@@ -20,8 +20,8 @@
 package org.xwiki.component.wiki;
 
 /**
- * Utility for wiki methods to return a value. An implementation of this interface is binded in the context of a
- * wiki method execution, so that such method scripts can return a value using {@link #returnValue(Object)}.
+ * Utility for wiki methods to return a value. An implementation of this interface is bound in the context of a
+ * wiki method execution, so that such method scripts can return a value using {@link #setValue(Object)}.
  * 
  * @version $Id$
  * @since 4.2M3
@@ -34,10 +34,10 @@ public interface MethodOutputHandler
      * 
      * @param value the value to return
      */
-    void returnValue(Object value);
+    void setValue(Object value);
  
     /**
      * @return the current stored return value (null if not set yet).
      */
-    Object getReturnValue();   
+    Object getValue();
 }

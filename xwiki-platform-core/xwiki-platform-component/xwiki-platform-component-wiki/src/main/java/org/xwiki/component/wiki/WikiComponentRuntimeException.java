@@ -17,32 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.wiki.internal;
-
-import org.xwiki.component.wiki.MethodOutputHandler;
+package org.xwiki.component.wiki;
 
 /**
- * Default method output handler.
- * 
+ * A generic runtime exception thrown by this module, usually a wrapper around lower level exceptions.
+ *
  * @version $Id$
  * @since 4.2M3
  */
-public class DefaultMethodOutputHandler implements MethodOutputHandler
+public class WikiComponentRuntimeException extends RuntimeException
 {
     /**
-     * The stored return value.
+     * Constructor of this exception.
+     *
+     * @param message the message associated with the exception
      */
-    private Object returnValue;
-
-    @Override
-    public void setValue(Object value)
+    public WikiComponentRuntimeException(String message)
     {
-        this.returnValue = value;
+        super(message);
     }
 
-    @Override
-    public Object getValue()
+    /**
+     * Constructor of this exception.
+     *
+     * @param message the message associated with the exception
+     * @param t the root cause
+     */
+    public WikiComponentRuntimeException(String message, Throwable t)
     {
-        return this.returnValue;
+        super(message, t);
     }
 }

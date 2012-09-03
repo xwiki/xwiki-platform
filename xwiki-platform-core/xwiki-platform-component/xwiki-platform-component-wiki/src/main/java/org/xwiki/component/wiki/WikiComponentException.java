@@ -47,5 +47,4 @@ public class WikiComponentException extends Exception
     {
         super(message, t);
     }
-    
 }

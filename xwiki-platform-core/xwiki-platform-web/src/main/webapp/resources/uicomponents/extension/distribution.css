@@ -5,7 +5,9 @@
   top: 1em;
   width: 800px;
 }
-
-.extension-item:first-of-type {
-  border-bottom-color: #E8E8E8;
+.xdialog-content > .ui-progress {
+  margin-bottom: .5em;
+}
+#upgradePlanLog {
+  display: block;
 }

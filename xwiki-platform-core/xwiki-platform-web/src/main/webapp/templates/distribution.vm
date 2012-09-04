@@ -1,11 +1,22 @@
 #macro(handleStepAction $action)
-  #set ($distributionJobStatus = $services.distribution.jobStatus)
-  #set ($distributionQuestion = $distributionJobStatus.question)
-  #if ($distributionQuestion)
-    $distributionQuestion.setUpdateState($action)
-    $distributionJobStatus.answered()
+  #if ($action == 'prepareUpgrade')
+    #prepareUpgrade()
+  #else
+    #set ($distributionJobStatus = $services.distribution.jobStatus)
+    #set ($distributionQuestion = $distributionJobStatus.question)
+    #if ($distributionQuestion)
+      $distributionQuestion.setUpdateState($action)
+      $distributionJobStatus.answered()
+    #end
   #end
   $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution', "xredirect=$!escapetool.url($request.xredirect)"))
+#end
+
+#macro(handleStepAjaxRequest)
+  #set ($stepId = $services.distribution.jobStatus.question.stepId)
+  #if ($stepId == 'extension.outdatedextensions')
+    #displayOutdatedExtensionsStep()
+  #end
 #end
 
 #macro(displayStep)
@@ -49,7 +60,8 @@
   #else
     <p>The following distribution has been detected:</p>
     #set ($distributionExtension = $services.distribution.distributionExtension)
-    #displayExtension($distributionExtension)
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    <div>#displayExtension($distributionExtension)</div>
 
     #set ($distributionUIId = $services.distribution.getUIExtensionId())
     #if ($distributionUIId)
@@ -77,7 +89,92 @@
 #end
 
 #macro(displayOutdatedExtensionsStep)
-  <p>TODO: Display outdated extensions</p>
+  #set ($distributionId = "$services.distribution.distributionExtension.id")
+  #set ($upgradePlan = $services.extension.getExtensionPlanJobStatus($null, 'wiki:xwiki'))
+  #if (!$upgradePlan || $upgradePlan.request.getProperty('distribution.id') != $distributionId)
+    ## Schedule the upgrade plan creation job.
+    #prepareUpgrade($upgradePlan)
+  #end
+  #if ($upgradePlan.state != 'FINISHED')
+    #displayJobProgressBar($upgradePlan)
+    #displayUpgradePlanStatus($upgradePlan)
+  #else
+    #displayUpgradePlan($upgradePlan)
+  #end
+#end
+
+#macro(displayUpgradePlanStatus $status)
+  <div id="upgradePlanLog" class="extension-body-progress#if($status.log.isEmpty() && $status.state != 'FINISHED') loading#end">
+    #printStatusLog($status)
+  </div>
+#end
+
+#macro (displayUpgradePlan $plan)
+  #set($hasError = false)
+  #foreach($log in $plan.log)
+    #if ($log.level.name() == 'ERROR')
+      #set($hasError = true)
+      #break
+    #end
+  #end
+  ##
+  #if ($hasError)
+    #displayUpgradePlanStatus($plan)
+  #else
+    #set ($invalid = [])
+    #set ($outdated = [])
+    ## Iterate the first level nodes from the upgrade plan tree.
+    #foreach ($firstLevelNode in $plan.tree)
+      #set ($planAction = $firstLevelNode.action)
+      #set ($installedVersion = $services.extension.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
+      #if (!$installedVersion.isValid($planAction.namespace))
+        #set ($discard = $invalid.add($planAction))
+      ## Check if the latest version has been installed after the upgrade plan was created.
+      #elseif ($installedVersion.id.version.value != $planAction.extension.id.version.value)
+        #set ($discard = $outdated.add($planAction))
+      #end
+    #end
+    #set ($showCompleteStepButton = $invalid.isEmpty())
+    ##
+    #if ($outdated.isEmpty() && $invalid.isEmpty())
+      <div class="box infomessage">All extensions are up-to-date.</div>
+    #else
+      #displayPlanActionList($invalid 'invalid')
+      #displayPlanActionList($outdated 'outdated')
+    #end
+  #end
+  <form action="" class="xform">
+    <p class="buttons">
+      <span class="buttonwrapper">
+        <button id="prepareUpgradeButton" type="submit" name="action" value="prepareUpgrade" class="secondary">Reload</button>
+      </span>
+    </p>
+  </form>
+#end
+
+#macro(displayPlanActionList $list $key)
+  #if ($list.size() > 0)
+    <p>$msg.get("extensions.upgrade.list.$key")</p>
+    <div id="${key}Extensions">
+    #foreach ($planAction in $list)
+      #set ($extensionNamespace = $planAction.namespace)
+      #displayExtension($planAction.extension)
+    #end
+    </div>
+  #end
+#end
+
+#macro(prepareUpgrade $upgradePlan)
+  #set ($upgradePlanJob = $services.extension.createUpgradePlan('wiki:xwiki'))
+  #set ($lastError = $services.extension.lastError)
+  #if ($lastError)
+    <div class="box errormessage">Failed to create upgrade plan. #printThrowable($lastError)</div>
+  #else
+    #set ($distributionId = "$services.distribution.distributionExtension.id")
+    #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
+    #set ($upgradePlan = $NULL)
+    #setVariable ("$upgradePlan" $upgradePlanJob.status)
+  #end
 #end
 
 #macro(displayStepButtons)
@@ -115,7 +212,11 @@
   ## this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
   #parse('extension.vm')
   #if ($isAjaxRequest)
-    #handleExtensionRequest()
+    #if ($request.extensionId)
+      #handleExtensionRequest()
+    #else
+      #handleStepAjaxRequest()
+    #end
   #else
     #displayStep()
   #end

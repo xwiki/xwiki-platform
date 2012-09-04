@@ -773,7 +773,9 @@ public class XWikiHibernateBaseStore implements Initializable
         // XWiki doesn't support having several Database queries for different "databases" when inside a transaction.
         // If this happen it means we'll return wrong results which could lead to inconsistencies (for example
         // document cache corruption - it would put an empty doc in the cache for example).
-        if ((session != null) && !StringUtils.equals(context.getDatabase(), getCurrentDatabase(context))) {
+        if ((session != null) && getCurrentDatabase(context) != null &&
+            !getCurrentDatabase(context).equals(context.getDatabase()))
+        {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
                 String.format("A database transaction is already started (the current database is [%s]) and some code "
                 + "is trying to load/save data from another database [%s]. Nested queries targeting different "

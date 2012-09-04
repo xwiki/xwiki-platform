@@ -673,14 +673,14 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous upgrade plan creation process.
+     * Schedule the upgrade plan creation job.
      * 
      * @param namespace the (optional) namespace where to upgrade the extensions; if {@code null} or empty, the
-     *            extension will be installed globally
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *            extensions will be upgraded globally
+     * @return the {@link Job} object which can be used to monitor the progress of the upgrade plan creation process, or
      *         {@code null} in case of failure
      */
-    public ExtensionPlan createUpgradePlan(String namespace)
+    public Job createUpgradePlan(String namespace)
     {
         setError(null);
 
@@ -698,17 +698,14 @@ public class ExtensionManagerScriptService implements ScriptService
 
         installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
 
-        ExtensionPlan status;
+        Job job = null;
         try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(UpgradePlanJob.JOBTYPE, installRequest).getStatus());
+            job = this.jobManager.addJob(UpgradePlanJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
-
-            status = null;
         }
 
-        return status;
+        return job;
     }
 
     // Jobs

@@ -93,7 +93,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             if (query.getWiki() != null) {
                 getContext().setDatabase(query.getWiki());
             }
-            return getStore().executeRead(getContext(), true, new HibernateCallback<List<T>>()
+            return getStore().executeRead(getContext(), new HibernateCallback<List<T>>()
             {
                 @SuppressWarnings("unchecked")
                 @Override

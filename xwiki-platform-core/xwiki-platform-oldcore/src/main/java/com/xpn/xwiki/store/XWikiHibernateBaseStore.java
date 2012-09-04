@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -325,7 +326,6 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public synchronized void updateSchema(XWikiContext context, boolean force) throws HibernateException
     {
-
         // We don't update the schema if the XWiki hibernate config parameter says not to update
         if ((!force) && (context.getWiki() != null)
             && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
@@ -757,16 +757,28 @@ public class XWikiHibernateBaseStore implements Initializable
     public boolean beginTransaction(SessionFactory sfactory, XWikiContext context)
         throws XWikiException
     {
-
         Transaction transaction = getTransaction(context);
         Session session = getSession(context);
 
+        // XWiki uses a new Session for a new Transaction so we need to keep both in sync and thus we check if that's
+        // the case. If it isn't it means some code is faulty somewhere.
         if (((session == null) && (transaction != null)) || ((transaction == null) && (session != null))) {
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Incompatible session (" + session + ") and transaction (" + transaction + ") status");
             }
             // TODO: Fix this problem, don't ignore it!
             return false;
+        }
+
+        // XWiki doesn't support having several Database queries for different "databases" when inside a transaction.
+        // If this happen it means we'll return wrong results which could lead to inconsistencies (for example
+        // document cache corruption - it would put an empty doc in the cache for example).
+        if ((session != null) && !StringUtils.equals(context.getDatabase(), getCurrentDatabase(context))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                String.format("A database transaction is already started (the current database is [%s]) and some code "
+                + "is trying to load/save data from another database [%s]. Nested queries targeting different "
+                + "databases are not supported. This is a fatal error which needs to be reported and fixed.",
+                getCurrentDatabase(context), context.getDatabase()));
         }
 
         if (session != null) {
@@ -1197,14 +1209,8 @@ public class XWikiHibernateBaseStore implements Initializable
             if (monitor != null) {
                 monitor.startTimer("hibernate");
             }
-
             checkHibernate(context);
             bTransaction = beginTransaction(context);
-
-            if (context.getDatabase() != null && !context.getDatabase().equals(getCurrentDatabase(context))) {
-                setDatabase(getSession(context), context);
-            }
-
             return cb.doInHibernate(getSession(context));
         } catch (Exception e) {
             doCommit = false;

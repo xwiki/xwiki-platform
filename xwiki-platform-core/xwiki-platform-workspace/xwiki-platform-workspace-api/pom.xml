@@ -65,7 +65,8 @@
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>**</exclude>
+            <!-- API Changes. -->
+            <exclude>**/WorkspaceManager</exclude>
           </excludes>
         </configuration>
       </plugin>

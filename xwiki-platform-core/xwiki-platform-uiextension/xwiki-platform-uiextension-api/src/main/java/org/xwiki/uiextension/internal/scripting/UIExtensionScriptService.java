@@ -65,14 +65,14 @@ public class UIExtensionScriptService implements ScriptService
      */
     @Inject
     @Named("context")
-    private Provider<ComponentManager> componentManager;
+    private Provider<ComponentManager> contextComponentManagerProvider;
 
     /**
      * Used to render the content of the extension to XHTML.
      */
     @Inject
     @Named("xhtml/1.0")
-    private BlockRenderer renderer;
+    private BlockRenderer xhtmlRenderer;
 
     /**
      * The execution context, used to access to the {@link com.xpn.xwiki.XWikiContext}.
@@ -92,7 +92,7 @@ public class UIExtensionScriptService implements ScriptService
         Map<String, UIExtension> extensions = null;
 
         try {
-            extensions = this.componentManager.get().getInstanceMap(UIExtension.class);
+            extensions = this.contextComponentManagerProvider.get().getInstanceMap(UIExtension.class);
         } catch (ComponentLookupException e) {
             logger.error("Failed to lookup for UIExtension instances, error: [{}]", e.getMessage());
         }
@@ -109,7 +109,7 @@ public class UIExtensionScriptService implements ScriptService
     }
 
     /**
-     * Render in HTML all the extensions provided for a given extension point.
+     * Render in XHTML all the extensions provided for a given extension point.
      *
      * @param extensionPointId the ID of the extension point to render the extensions for
      * @return the HTML resulting of the rendering of the extensions registered for the given extension point
@@ -124,7 +124,7 @@ public class UIExtensionScriptService implements ScriptService
         }
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(xdom, printer);
+        this.xhtmlRenderer.render(xdom, printer);
         return printer.toString();
     }
 }

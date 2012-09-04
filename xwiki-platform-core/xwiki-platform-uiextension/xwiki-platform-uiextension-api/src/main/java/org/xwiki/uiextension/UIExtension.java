@@ -34,22 +34,23 @@ import org.xwiki.rendering.block.XDOM;
 public interface UIExtension
 {
     /**
-     * @return The unique ID of this extension.
+     * @return the unique ID of this extension
      */
     String getId();
 
     /**
-     * @return The ID of the hook this UI extension is designed for.
+     * @return the ID of the hook this UI extension is providing an extension for (aka an Extension Point)
      */
     String getExtensionPointId();
 
     /**
-      * @return A map of data provided by the extension.
+      * @return a map of data provided by the extension. It's up to the Extension Point to specify what data it
+     *          supports
      */
     Map<String, String> getData();
 
     /**
-     * @return The XDOM that must be rendered when this extension is displayed.
+     * @return the XDOM that must be rendered when this extension is displayed
      */
     XDOM getXDOM();
 }

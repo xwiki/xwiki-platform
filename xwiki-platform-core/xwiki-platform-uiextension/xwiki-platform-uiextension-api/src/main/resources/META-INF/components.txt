@@ -1,0 +1,3 @@
+org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder
+org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilderEventListener
+org.xwiki.uiextension.internal.scripting.UIExtensionScriptService

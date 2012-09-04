@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * Same as ExplicitReferenceEntityReferenceResolver but with the extended type in both the role hint and the role type.
  * 
  * @version $Id$
- * @since 2.23
+ * @since 2.2.3
  * @deprecated use {@link ExplicitReferenceEntityReferenceResolver} instead.
  */
 @Component
@@ -48,6 +48,6 @@ public class DeprecatedExplicitReferenceEntityReferenceResolver2 implements Enti
     @Override
     public EntityReference resolve(EntityReference entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        return this.resolver.resolve((EntityReference) entityReferenceRepresentation, type, parameters);
+        return this.resolver.resolve(entityReferenceRepresentation, type, parameters);
     }
 }

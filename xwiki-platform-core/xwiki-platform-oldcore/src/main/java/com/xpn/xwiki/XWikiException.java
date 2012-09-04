@@ -85,6 +85,7 @@ public class XWikiException extends Exception
     public static final int ERROR_XWIKI_STORE_ARCHIVEFORMAT = 3003;
     public static final int ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT = 3004;
     public static final int ERROR_XWIKI_STORE_MIGRATION = 3005;
+    public static final int ERROR_XWIKI_STORE_MISC = 3006;
 
     public static final int ERROR_XWIKI_STORE_RCS_SAVING_FILE = 3101;
     public static final int ERROR_XWIKI_STORE_RCS_READING_FILE = 3102;
@@ -120,7 +121,7 @@ public class XWikiException extends Exception
     public static final int ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE = 3401;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETE_DATABASE = 3402;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DATABASE = 3403;
-    
+
     public static final int ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION = 4001;
     public static final int ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION = 4002;
 

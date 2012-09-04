@@ -21,16 +21,18 @@ package org.xwiki.component.wiki;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.DefaultMethodOutputHandler;
+import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.ConverterManager;
+import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -51,11 +53,6 @@ import com.xpn.xwiki.XWikiContext;
  */
 public class WikiComponentInvocationHandler implements InvocationHandler
 {
-    /**
-     * The logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(WikiComponentInvocationHandler.class);
-
     /**
      * The key under which the component reference (a virtual "this") is kept in the method invocation context. 
      */
@@ -139,7 +136,7 @@ public class WikiComponentInvocationHandler implements InvocationHandler
         {
             for (Method componentMethod : componentMethods) {
                 if (method.getName().equals(componentMethod.getName())) {
-                    return method.invoke(this.wikiComponent, args);
+                        return method.invoke(this.wikiComponent, args);
                 }
             }
         }
@@ -149,7 +146,15 @@ public class WikiComponentInvocationHandler implements InvocationHandler
             if (method.getDeclaringClass() == Object.class) {
                 return this.proxyObjectMethod(proxy, method, args);
             } else {
-                throw new NoSuchMethodException();
+                // Note: We throw a runtime exception so that our exception doesn't get wrapped by a generic
+                // UndeclaredThrowableException which would not make much sense for the user.
+                // See http://docs.oracle.com/javase/6/docs/api/java/lang/reflect/UndeclaredThrowableException.html
+                throw new WikiComponentRuntimeException(
+                    String.format("You need to add an Object of type [%s] in document [%s] to implement method [%s.%s]",
+                        WikiComponentConstants.METHOD_CLASS,
+                        getSerializedWikiComponentDocumentReference(),
+                        method.getDeclaringClass().getName(),
+                        method.getName()));
             }
         } else {
             return this.executeWikiContent(proxy, method, args);
@@ -177,10 +182,9 @@ public class WikiComponentInvocationHandler implements InvocationHandler
         methodContext.put(METHOD_CONTEXT_COMPONENT_KEY, proxy);
 
         Map<Integer, Object> inputs = new HashMap<Integer, Object>();
-        
         if (args != null && args.length > 0) {
-            for (int i=0;i<args.length;i++) {
-                // Start with "0" as first input key.
+            // Start with "0" as first input key.
+            for (int i = 0; i < args.length; i++) {
                 inputs.put(i, args[i]);
             }
         }
@@ -197,6 +201,7 @@ public class WikiComponentInvocationHandler implements InvocationHandler
 
         try {
             // Perform internal macro transformations.
+            XDOM transformedXDOM;
             try {
                 Syntax syntax =
                     xwikiContext.getWiki().getDocument(this.wikiComponent.getDocumentReference(),
@@ -205,31 +210,60 @@ public class WikiComponentInvocationHandler implements InvocationHandler
                 transformationContext.setId(method.getClass().getName() + "#" + method.getName());
                 // We need to clone the xdom to avoid transforming the original and make it useless after the first
                 // transformation
-                XDOM transformedXDOM = xdom.clone();
+                transformedXDOM = xdom.clone();
                 macroTransformation.transform(transformedXDOM, transformationContext);
             } catch (TransformationException e) {
-                LOGGER.error("Error while executing wiki component macro transformation for method [{}]",
-                    method.getName(), e);
+                throw new WikiComponentRuntimeException(String.format(
+                    "Error while executing wiki component macro transformation for method [%s]", method.getName()), e);
             }
 
             if (methodContext.get(METHOD_CONTEXT_OUTPUT_KEY) != null
-                && ((MethodOutputHandler) methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getReturnValue() != null) {
+                && ((MethodOutputHandler) methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getValue() != null) {
                 return method.getReturnType().cast(((MethodOutputHandler)
-                    methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getReturnValue());
-            } else if (method.getReturnType().equals(String.class)) {
-                // If return type is String and no specific return value has been provided during the macro
-                // expansion, then we return the content rendered as is
-                WikiPrinter printer = new DefaultWikiPrinter();
-                BlockRenderer renderer = componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
-                renderer.render(xdom, printer);
-                return printer.toString();
+                    methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getValue());
             } else {
-                // surrender
-                return null;
+                // Since no return value has been explicitly provided, we try to convert the result of the rendering
+                // into the expected return type using a Converter.
+                WikiPrinter printer = new DefaultWikiPrinter();
+                BlockRenderer renderer =
+                    componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
+                renderer.render(transformedXDOM, printer);
+                String contentResult = printer.toString();
+
+                // Do the conversion!
+                ConverterManager converterManager = componentManager.getInstance(ConverterManager.class);
+                try {
+                    return converterManager.convert(method.getGenericReturnType(), contentResult);
+                } catch (ConversionException e) {
+                    // Surrender!
+                    throw new WikiComponentRuntimeException(String.format("Failed to convert result [%s] to type [%s] "
+                        + "for method [%s.%s] found in Object [%s] of document [%s]",
+                        contentResult,
+                        method.getGenericReturnType(),
+                        method.getDeclaringClass().getName(),
+                        method.getName(),
+                        WikiComponentConstants.METHOD_CLASS,
+                        getSerializedWikiComponentDocumentReference()), e);
+                }
             }
         } finally {
-            xwikiContext.put(XWIKI_CONTEXT_DOC_KEY, contextDoc);
+            if (contextDoc != null) {
+                xwikiContext.put(XWIKI_CONTEXT_DOC_KEY, contextDoc);
+            }
         }
+    }
+
+    /**
+     * Helper code to get a serialized document reference for the document containing the wiki component.
+     *
+     * @return the String representation of the document reference
+     * @throws ComponentLookupException if the reference serializer component couldn't be found
+     */
+    private String getSerializedWikiComponentDocumentReference() throws ComponentLookupException
+    {
+        EntityReferenceSerializer<String> serializer =
+            this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        return serializer.serialize(this.wikiComponent.getDocumentReference());
     }
 
     /**

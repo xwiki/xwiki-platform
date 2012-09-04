@@ -103,10 +103,40 @@ public class BrokenLinkEventListener implements EventListener
             LinkState linkState = (LinkState) brokenLinkData.get("state");
             int responseCode = linkState.getResponseCode();
 
-            String message = String.format("Invalid link found %s on page %s (code = %s)",
-                linkURL, linkSource, responseCode);
+            // Get Link extra data and serialize them
+            String dataString = getSerializedLinkData((Map<String, Object>) brokenLinkData.get("contextData"));
+
+            String message;
+            if (dataString.length() > 0) {
+                message = String.format("Invalid link %s on page %s (code = %s, %s)", linkURL, linkSource,
+                    responseCode, dataString);
+            } else {
+                message = String.format("Invalid link %s on page %s (code = %s)", linkURL, linkSource, responseCode);
+            }
+
             this.bot.sendMessage(this.bot.getChannelsNames().iterator().next(), message);
         }
+    }
+
+    /**
+     * @param contextData the extra context data to serialize
+     * @return the serialized version of context data, ready to be printed to the user, separated by commas
+     *         (eg "param1 = value1, param2 = value2")
+     */
+    private String getSerializedLinkData(Map<String, Object> contextData)
+    {
+        StringBuffer dataString = new StringBuffer();
+        if (contextData != null) {
+            Iterator<Map.Entry<String, Object>> it = contextData.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Object> entry = it.next();
+                dataString.append(entry.getKey()).append(" = ").append(entry.getValue());
+                if (it.hasNext()) {
+                    dataString.append(", ");
+                }
+            }
+        }
+        return dataString.toString();
     }
 
     /**
@@ -132,6 +162,7 @@ public class BrokenLinkEventListener implements EventListener
     /**
      * @return the latest broken links found in the wiki
      */
+    // TODO: Expose this through a user-public interface since this is currently in the internal package only!
     public Buffer getLastBrokenLinks()
     {
         return BufferUtils.unmodifiableBuffer(this.lastBrokenLinks);

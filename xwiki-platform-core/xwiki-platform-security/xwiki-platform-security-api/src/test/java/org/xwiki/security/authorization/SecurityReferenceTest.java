@@ -45,10 +45,8 @@ import static org.junit.Assert.assertThat;
  * @since 4.0M2
  */
 @MockingRequirement(DefaultSecurityReferenceFactory.class)
-public class SecurityReferenceTest extends AbstractMockingComponentTestCase
+public class SecurityReferenceTest extends AbstractMockingComponentTestCase<SecurityReferenceFactory>
 {
-    private SecurityReferenceFactory factory;
-
     private EntityReference xwiki = new EntityReference("xwiki", EntityType.WIKI);
     private EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
     private EntityReference xspace = new EntityReference("space", EntityType.SPACE,
@@ -68,24 +66,26 @@ public class SecurityReferenceTest extends AbstractMockingComponentTestCase
                 allowing(wikiBridge).getMainWikiReference();
                 will(returnValue(new WikiReference("xwiki")));
         }});
-
-        this.factory = getComponentManager().getInstance(SecurityReferenceFactory.class);
     }
 
     @Test
     public void testEquality() throws Exception
     {
-        assertThat(factory.newEntityReference(mainEntity), equalTo(factory.newEntityReference(mainEntity)));
-        assertThat(factory.newEntityReference(subEntity), equalTo(factory.newEntityReference(subEntity)));
-        assertThat(factory.newEntityReference(mainEntity), not(equalTo(factory.newEntityReference(subEntity))));
-        assertThat(factory.newEntityReference(subEntity), not(equalTo(factory.newEntityReference(mainEntity))));
+        assertThat(getMockedComponent().newEntityReference(mainEntity),
+            equalTo(getMockedComponent().newEntityReference(mainEntity)));
+        assertThat(getMockedComponent().newEntityReference(subEntity),
+            equalTo(getMockedComponent().newEntityReference(subEntity)));
+        assertThat(getMockedComponent().newEntityReference(mainEntity),
+            not(equalTo(getMockedComponent().newEntityReference(subEntity))));
+        assertThat(getMockedComponent().newEntityReference(subEntity),
+            not(equalTo(getMockedComponent().newEntityReference(mainEntity))));
     }
 
     @Test
     public void testGetReversedSecurityReferenceChain() throws Exception
     {
-
-        List<SecurityReference> subList = (List<SecurityReference>) factory.newEntityReference(subEntity).getReversedSecurityReferenceChain();
+        List<SecurityReference> subList = (List<SecurityReference>) getMockedComponent().newEntityReference(subEntity)
+            .getReversedSecurityReferenceChain();
         assertThat(subList.get(0), equalTo(xwiki));
         assertThat(subList.get(0).getOriginalReference(), equalTo(xwiki));
         assertThat(subList.get(1), equalTo(wiki));
@@ -95,7 +95,8 @@ public class SecurityReferenceTest extends AbstractMockingComponentTestCase
         assertThat(subList.get(3), equalTo(subEntity));
         assertThat(subList.get(3).getOriginalReference(), equalTo(subEntity));
 
-        List<SecurityReference> mainList = (List<SecurityReference>) factory.newEntityReference(mainEntity).getReversedSecurityReferenceChain();
+        List<SecurityReference> mainList = (List<SecurityReference>) getMockedComponent().newEntityReference(mainEntity)
+            .getReversedSecurityReferenceChain();
         assertThat(mainList.get(0), equalTo(xwiki));
         assertThat(mainList.get(0).getOriginalReference(), equalTo(xwiki));
         assertThat(mainList.get(1), equalTo(xspace));

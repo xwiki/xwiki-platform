@@ -52,7 +52,7 @@ public interface WikiComponentConstants
     /**
      * The XClass defining a component interface implementation.
      */
-    String INTERFACE_CLASS = "Component.ComponentInterfaceClass";
+    String INTERFACE_CLASS = "XWiki.ComponentInterfaceClass";
 
     /**
      * The name property of the {@link #INTERFACE_CLASS} XClass.

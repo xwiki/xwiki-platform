@@ -114,14 +114,14 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             String role = componentObject.getStringValue(COMPONENT_ROLE_TYPE_FIELD);
 
             if (StringUtils.isBlank(role)) {
-                throw new WikiComponentException("No role were precised in the component");
+                throw new WikiComponentException("No role was specified in the component");
             }
 
             Class< ? > roleAsClass;
             try {
                 roleAsClass = Class.forName(role);
             } catch (ClassNotFoundException e) {
-                throw new WikiComponentException("The role class could not be found", e);
+                throw new WikiComponentException(String.format("The role class [%s] could not be found", role), e);
             }
 
             String roleHint = StringUtils.defaultIfEmpty(componentObject.getStringValue("roleHint"), "default");
@@ -132,7 +132,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
 
             components.add(component);
         } catch (XWikiException e) {
-            throw new WikiComponentException("Failed to build wiki component for document " + reference.toString());
+            throw new WikiComponentException(
+                String.format("Failed to build wiki component for document [%s]", reference.toString()), e);
         }
 
         return components;

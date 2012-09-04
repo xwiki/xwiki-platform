@@ -45,7 +45,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  */
 @MockingRequirement(SheetDocumentDisplayer.class)
-public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
+public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase<DocumentDisplayer>
 {
     /**
      * The reference to the displayed document.
@@ -66,11 +66,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
      * A user reference.
      */
     private static final DocumentReference BOB = new DocumentReference("wiki4", "Users2", "Bob");
-
-    /**
-     * The component being tested.
-     */
-    private DocumentDisplayer sheetDocumentDisplayer;
 
     /**
      * The component used to access the documents.
@@ -99,8 +94,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 will(returnValue(true));
             }
         });
-
-        this.sheetDocumentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class, "sheet");
     }
 
     /**
@@ -200,7 +193,7 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        sheetDocumentDisplayer.display(document, new DocumentDisplayerParameters());
+        getMockedComponent().display(document, new DocumentDisplayerParameters());
     }
 
     /**
@@ -257,6 +250,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        sheetDocumentDisplayer.display(document, new DocumentDisplayerParameters());
+        getMockedComponent().display(document, new DocumentDisplayerParameters());
     }
 }

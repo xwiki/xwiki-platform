@@ -35,13 +35,13 @@ public class DefaultMethodOutputHandler implements MethodOutputHandler
     private Object returnValue;
 
     @Override
-    public void returnValue(Object value)
+    public void setValue(Object value)
     {
         this.returnValue = value;
     }
 
     @Override
-    public Object getReturnValue()
+    public Object getValue()
     {
         return this.returnValue;
     }

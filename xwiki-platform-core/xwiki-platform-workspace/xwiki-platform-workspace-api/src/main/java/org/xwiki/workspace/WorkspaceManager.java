@@ -19,6 +19,7 @@
  */
 package org.xwiki.workspace;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
@@ -110,6 +111,23 @@ public interface WorkspaceManager
      * @throws WorkspaceException if problems occur
      */
     List<Workspace> getWorkspaces() throws WorkspaceException;
+
+    /**
+     * @return all the template workspace. Workspace with "visibility" field equals to "template".
+     * @throws XWikiException critical error in xwiki engine.
+     */
+    public List<Workspace> getWikiTemplateList() throws XWikiException
+    {
+        List<Workspace> listDocument = Collections.emptyList();
+
+        try {
+            listDocument = this.wikiManager.getWikiTemplateAliasList(this.context);
+        } catch (WikiManagerException e) {
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
+        }
+
+        return listDocument;
+    }
 
     /**
      * @param workspaceName name of the workspace to check

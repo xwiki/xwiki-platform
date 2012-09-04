@@ -102,7 +102,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
             }
         });
 
-        wikiUIExtension.getXDOM();
+        wikiUIExtension.execute();
     }
 
     @Test
@@ -122,7 +122,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
         Assert.assertEquals(DOC_REFERENCE, wikiUIExtension.getDocumentReference());
         Assert.assertEquals(UIExtension.class, wikiUIExtension.getRole());
         Assert.assertEquals("id", wikiUIExtension.getRoleHint());
-        wikiUIExtension.getXDOM();
+        wikiUIExtension.execute();
     }
 
     @Test

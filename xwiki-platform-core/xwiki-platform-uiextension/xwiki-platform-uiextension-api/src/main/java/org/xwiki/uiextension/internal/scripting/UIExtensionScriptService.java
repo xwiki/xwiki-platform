@@ -120,7 +120,7 @@ public class UIExtensionScriptService implements ScriptService
         XDOM xdom = new XDOM(new ArrayList<Block>());
 
         for (UIExtension uiExtension : uiExtensions) {
-            xdom.addChild(uiExtension.getXDOM());
+            xdom.addChildren(uiExtension.execute());
         }
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();

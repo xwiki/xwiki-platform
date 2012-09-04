@@ -26,23 +26,35 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-uiextension</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-uiextension</artifactId>
-  <name>XWiki Platform - User Interface Extension - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>User Interface extension mechanism for XWiki</description>
-  <modules>
-    <module>xwiki-platform-uiextension-api</module>
-    <module>xwiki-platform-uiextension-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-uiextension-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-uiextension-ui</artifactId>
+  <name>XWiki Platform - User Interface Extension - UI</name>
+  <packaging>xar</packaging>
+  <description>UI for the User Interface Extensions</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

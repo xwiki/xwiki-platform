@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
@@ -173,7 +174,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
-    public XDOM getXDOM()
+    public List<Block> execute()
     {
         // We need to clone the xdom to avoid transforming the original and make it useless after the first
         // transformation
@@ -189,7 +190,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
                 documentReference.toString());
         }
 
-        return transformedXDOM;
+        return transformedXDOM.getChildren();
     }
 
     @Override

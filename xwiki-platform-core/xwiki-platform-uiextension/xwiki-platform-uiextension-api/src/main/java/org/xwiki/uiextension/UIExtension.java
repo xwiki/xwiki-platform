@@ -19,10 +19,11 @@
  */
 package org.xwiki.uiextension;
 
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 
 /**
  * Represents a User Interface Extension.
@@ -39,7 +40,7 @@ public interface UIExtension
     String getId();
 
     /**
-     * @return the ID of the hook this UI extension is providing an extension for (aka an Extension Point)
+     * @return the ID of the extension point this UI extension is providing an extension for
      */
     String getExtensionPointId();
 
@@ -52,5 +53,5 @@ public interface UIExtension
     /**
      * @return the XDOM that must be rendered when this extension is displayed
      */
-    XDOM getXDOM();
+    List<Block> execute();
 }

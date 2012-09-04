@@ -88,7 +88,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
-        String olddatabase = getContext().getDatabase();
+        String oldDatabase = getContext().getDatabase();
         try {
             if (query.getWiki() != null) {
                 getContext().setDatabase(query.getWiki());
@@ -102,22 +102,19 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                     org.hibernate.Query hquery = createHibernateQuery(session, query);
                     populateParameters(hquery, query);
 
+                    List results = hquery.list();
                     if (query.getFilters() != null && !query.getFilters().isEmpty()) {
-                        List results = hquery.list();
                         for (QueryFilter filter : query.getFilters()) {
                             results = filter.filterResults(results);
                         }
-
-                        return (List<T>) results;
-                    } else {
-                        return hquery.list();
                     }
+                    return (List<T>) results;
                 }
             });
         } catch (XWikiException e) {
             throw new QueryException("Exception while execute query", query, e);
         } finally {
-            getContext().setDatabase(olddatabase);
+            getContext().setDatabase(oldDatabase);
         }
     }
 

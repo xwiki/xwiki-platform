@@ -813,7 +813,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         if (pClass == null) {
             throw new DataMigrationException(
-                String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", className));
+                String.format("Could not migrate IDs for class [%s] : no hibernate mapping found. "
+                    + "For example, this error commonly happens if you have copied a document defining an internally "
+                    + "mapped class (like XWiki.XWikiPreferences) and never used the newly created class OR if you "
+                    + "have forgotten to customize the hibernate mapping while using your own internally custom mapped "
+                    + "class. In the first and most common case, to fix this issue and migrate your wiki, you should "
+                    + "delete the offending and useless class definition or the whole document defining that class "
+                    + "from your original wiki before the migration.",
+                    className));
         }
 
         return pClass;
@@ -1187,11 +1194,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     String className = propertyClass.getName();
                     PersistentClass klass = getClassMapping(className);
 
-                    if (klass == null) {
-                        throw new DataMigrationException(
-                            String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", className));
-                    }
-
                     // Add collection table that will not be updated by cascaded updates
                     objsColl.addAll(getCollectionProperties(klass));
 
@@ -1202,11 +1204,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 }
                 for (String customClass : customMappedClasses) {
                     PersistentClass klass = getClassMapping(customClass);
-
-                    if (klass == null) {
-                        throw new DataMigrationException(
-                            String.format("Could not migrate IDs for class [%s] : no hibernate mapping.", customClass));
-                    }
 
                     // Add collection table that will not be updated by cascaded updates
                     objsColl.addAll(getCollectionProperties(klass));

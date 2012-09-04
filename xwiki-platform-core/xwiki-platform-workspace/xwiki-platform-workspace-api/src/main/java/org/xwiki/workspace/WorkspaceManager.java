@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 
-import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;    
 
 /**
  * Component in charge of creating and managing workspaces.

@@ -50,10 +50,16 @@ public class DistributionScriptService implements ScriptService
      */
     public static final String EXTENSIONERROR_KEY = "scriptservice.distribution.error";
 
+    /**
+     * Provides safe objects for scripts.
+     */
     @Inject
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider scriptProvider;
 
+    /**
+     * The component used to get information about the current distribution.
+     */
     @Inject
     private DistributionManager distributionManager;
 
@@ -70,26 +76,41 @@ public class DistributionScriptService implements ScriptService
 
     // Distribution
 
+    /**
+     * @return the current distribution state
+     */
     public DistributionState getState()
     {
         return this.distributionManager.getDistributionState();
     }
 
+    /**
+     * @return the extension that defines the current distribution
+     */
     public CoreExtension getDistributionExtension()
     {
         return this.distributionManager.getDistributionExtension();
     }
 
+    /**
+     * @return the recommended user interface for {@link #getDistributionExtension()}
+     */
     public ExtensionId getUIExtensionId()
     {
         return this.distributionManager.getUIExtensionId();
     }
 
+    /**
+     * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     */
     public DistributionJobStatus getPreviousJobStatus()
     {
         return this.distributionManager.getPreviousJobStatus();
     }
 
+    /**
+     * @return the status of the current distribution job
+     */
     public DistributionJobStatus getJobStatus()
     {
         DistributionJob job = this.distributionManager.getJob();

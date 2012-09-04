@@ -68,11 +68,11 @@
         <configuration>
           <excludes>
             <!-- Need time -->
-            **/DefaultDistributionManager.java,
-            **/DistributionAction.java,
-            **/DistributionInitializerListener.java,
-            **/DistributionManager.java,
-            **/DistributionScriptService.java
+            **/DistributionJob.java,
+            **/DistributionJobStatus.java,
+            **/DistributionQuestion.java,
+            **/DistributionStepStatus.java,
+            **/DefaultDistributionManager.java
           </excludes>
         </configuration>
       </plugin>

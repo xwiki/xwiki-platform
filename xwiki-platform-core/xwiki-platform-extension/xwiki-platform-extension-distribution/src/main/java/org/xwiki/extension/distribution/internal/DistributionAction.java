@@ -43,6 +43,9 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTON_ACTION = "distribution";
 
+    /**
+     * The reference of the superadmin user document.
+     */
     private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki",
         XWikiRightService.SUPERADMIN_USER);
 
@@ -54,7 +57,8 @@ public class DistributionAction extends XWikiAction
         // Make sure to have programming rights
         // TODO: find something nicer
         XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getDatabase(), "XWiki", "Distribution"));
+            new XWikiDocument(new DocumentReference(context.getDatabase(), SUPERADMIN_REFERENCE.getLastSpaceReference()
+                .getName(), "Distribution"));
         document.setContentAuthorReference(SUPERADMIN_REFERENCE);
         document.setAuthorReference(SUPERADMIN_REFERENCE);
         document.setCreatorReference(SUPERADMIN_REFERENCE);

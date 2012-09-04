@@ -40,6 +40,9 @@ import org.xwiki.job.internal.AbstractJobStatus;
 @Named("distribution")
 public class DistributionJob extends AbstractJob<DistributionRequest>
 {
+    /**
+     * The component used to get information about the current distribution.
+     */
     @Inject
     private DistributionManager distributionManager;
 
@@ -79,6 +82,9 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         return status;
     }
 
+    /**
+     * @return the distribution job status
+     */
     protected DistributionJobStatus getDistributionJobStatus()
     {
         return (DistributionJobStatus) getStatus();

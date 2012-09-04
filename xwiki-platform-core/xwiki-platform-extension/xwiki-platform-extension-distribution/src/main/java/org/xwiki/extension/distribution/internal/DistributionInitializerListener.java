@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
@@ -43,17 +42,20 @@ import org.xwiki.observation.event.Event;
 @Named("DistributionInitializerListener")
 public class DistributionInitializerListener implements EventListener
 {
-    private static List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent());
+    /**
+     * The list of events to listen to.
+     */
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent());
 
     /**
-     * The repository with core modules provided by the platform.
+     * The component used to get information about the current distribution.
      */
-    @Inject
-    private InstalledExtensionRepository installedExtensionRepository;
-
     @Inject
     private DistributionManager distributionManager;
 
+    /**
+     * The object used to log messages.
+     */
     @Inject
     private Logger logger;
 

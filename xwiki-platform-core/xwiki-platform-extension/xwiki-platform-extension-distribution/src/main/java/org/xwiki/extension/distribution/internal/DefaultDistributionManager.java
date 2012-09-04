@@ -43,6 +43,7 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
 
 /**
+ * Default {@link DistributionManager} implementation.
  * 
  * @version $Id$
  * @since 4.2M3
@@ -61,6 +62,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Inject
     private JobManager jobManager;
 
+    /**
+     * Used to lookup components dynamically.
+     */
     @Inject
     private ComponentManager componentManager;
 

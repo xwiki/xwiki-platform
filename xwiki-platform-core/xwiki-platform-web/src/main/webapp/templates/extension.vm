@@ -133,22 +133,26 @@
 #macro (displayProgressBar $extension)
   #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #if ($jobStatus && $jobStatus.state != 'FINISHED')
-    <div class="ui-progress">
-      <div class="ui-progress-background">
-        #set ($percent = $jobStatus.progress.offset)
-        #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
-        <div class="ui-progress-bar green" style="width:${percent}%"></div>
-      </div>
-      #if (!$jobStatus.log.isEmpty())
-        ## We need the tail of the log queue.
-        #set ($logList = [])
-        #set ($discard = $logList.addAll($jobStatus.log))
-        <p class="ui-progress-message">
-          #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
-        </p>
-      #end
-    </div>
+    #displayJobProgressBar($jobStatus)
   #end
+#end
+
+#macro (displayJobProgressBar $jobStatus)
+  <div class="ui-progress">
+    <div class="ui-progress-background">
+      #set ($percent = $jobStatus.progress.offset)
+      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+      <div class="ui-progress-bar green" style="width:${percent}%"></div>
+    </div>
+    #if (!$jobStatus.log.isEmpty())
+      ## We need the tail of the log queue.
+      #set ($logList = [])
+      #set ($discard = $logList.addAll($jobStatus.log))
+      <p class="ui-progress-message">
+        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
+      </p>
+    #end
+  </div>
 #end
 
 #macro (displayExtensionDetails_menuLink $detail $selected)
@@ -478,6 +482,7 @@
     #foreach($log in $installPlan.log)
       #if ($log.level.name() == 'ERROR')
         #set($hasError = true)
+        #break
       #end
     #end
     ##
@@ -571,6 +576,7 @@
     #foreach($log in $uninstallPlan.log)
       #if ($log.level.name() == 'ERROR')
         #set($hasError = true)
+        #break
       #end
     #end
     ##
@@ -752,6 +758,7 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (printStatusLog $status)
+  #if ($status.log.size() > 0)
   <ul>
   #foreach ($log in $status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
@@ -774,6 +781,7 @@ Caused by: #printThrowable($throwable.cause true)
     </li>
   #end
   </ul>
+  #end
 #end
 
 #macro (printLogMessage $log)

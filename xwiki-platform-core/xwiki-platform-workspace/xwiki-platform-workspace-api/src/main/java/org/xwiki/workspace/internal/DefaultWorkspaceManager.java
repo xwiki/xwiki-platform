@@ -189,7 +189,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
                 logger.error("Failed to check if user [{}] can edit workspace [{}]. Assuming false.", new Object[] {
-                userName, workspaceName, e});
+                    userName, workspaceName, e});
             }
 
             return false;
@@ -220,7 +220,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
                 logger.error("Failed to check if user [{}] can delete workspace [{}]. Assuming false.", new Object[] {
-                userName, workspaceName, e});
+                    userName, workspaceName, e});
             }
 
             return false;
@@ -239,6 +239,13 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
         throws WorkspaceException
     {
+        return this.createWorkspace(workspaceName, newWikiXObjectDocument, "workspacetemplate");
+    }
+
+    @Override
+    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument,
+        String templateWikiName) throws WorkspaceException
+    {
         XWikiContext deprecatedContext = getXWikiContext();
 
         String comment = String.format("Created new workspace '%s'", workspaceName);
@@ -249,7 +256,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             newWikiXObjectDocument.setWikiName(workspaceName);
 
             result =
-                this.wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, "workspacetemplate", true,
+                this.wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, templateWikiName, true,
                     comment, deprecatedContext);
         } catch (Exception e) {
             logAndThrowException(String.format("Failed to create workspace [%s]", workspaceName), e);

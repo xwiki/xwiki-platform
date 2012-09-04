@@ -350,6 +350,8 @@ function prettyNameChanged()
 ##
 #if ($action &amp;&amp; $action == 'create')
   #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument))
+  #set ($templateName = "$!request.template")
+  #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument, $templateName))
   ##
   #if ("$!WorkspaceManager.lastException" == '')
     ## Add members.
@@ -401,6 +403,26 @@ function prettyNameChanged()
       &lt;span id='wikiprettynamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;&lt;input size='60' id='XWiki.XWikiServerClass_0_wikiprettyname' name='XWiki.XWikiServerClass_0_wikiprettyname' type='text' onchange='prettyNameChanged();' onkeyup='prettyNameChanged();' #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;&lt;/dd&gt;
+  &lt;/dl&gt;
+
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label for='template'&gt;Template&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.template')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;select name='template'&gt;
+        #set($wikiList = $WikiManager.getAllWikis())
+        #foreach($wiki in $wikiList)
+          #set($wikiAliasList = $wiki.wikiAliasList)
+          #set($firstalias = $wikiAliasList.get(0))
+          #if($firstalias.isWikiTemplate())
+            #set($name = "#if($firstalias.wikiPrettyName &amp;&amp; $firstalias.wikiPrettyName.trim().length() &gt; 0) $firstalias.wikiPrettyName ($wiki.wikiName) #else $wiki.wikiName #end")
+            &lt;option value="$wiki.getWikiName()" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected="selected" #end &gt;$name&lt;/option&gt;
+          #end
+        #end
+      &lt;/select&gt;
+    &lt;/dd&gt;
   &lt;/dl&gt;
 
   &lt;dl&gt;

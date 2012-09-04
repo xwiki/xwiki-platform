@@ -95,6 +95,7 @@ workspacemanager.prop.workspace.membershipType.label=Membership Type
 # DOCUMENTATION
 workspacemanager.doc.createwiki.wikiname=The unique identifier of the new workspace.
 workspacemanager.doc.createwiki.desc.wikiprettyname=The display name of the workspace.
+workspacemanager.doc.createwiki.desc.template=Template to use for this new workspace (all documents will be cloned).
 workspacemanager.doc.createwiki.desc.description=A brief description of the workspace and its purpose.
 workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the workspace.
 workspacemanager.doc.createwiki.members=The users that can participate in the workspace.\n\

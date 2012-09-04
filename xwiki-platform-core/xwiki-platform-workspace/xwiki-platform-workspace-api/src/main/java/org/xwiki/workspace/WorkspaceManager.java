@@ -56,6 +56,19 @@ public interface WorkspaceManager
 
     /**
      * Creates a new workspace from a wiki descriptor.
+     *
+     * @param workspaceName name of the new workspace
+     * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
+     *            document will be created. This method will take care of saving the document.
+     * @param templateWikiName the name of the wiki from where to copy document to the new wiki.
+     * @return {@link XWikiServer} descriptor for the newly created workspace
+     * @throws WorkspaceException if problems occur
+     */
+    XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument, String templateWikiName)
+        throws WorkspaceException;
+
+    /**
+     * Creates a new workspace from a wiki descriptor.
      * 
      * @param workspaceName name of the new workspace
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor

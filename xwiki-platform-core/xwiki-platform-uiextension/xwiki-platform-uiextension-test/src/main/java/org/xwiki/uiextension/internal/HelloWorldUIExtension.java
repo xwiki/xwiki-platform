@@ -30,12 +30,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.uiextension.UIExtension;
 
 /**
  * UI Extension
- *
+ * 
  * @version $Id$
  * @since 4.2M3
  */
@@ -65,10 +64,10 @@ public class HelloWorldUIExtension implements UIExtension
     }
 
     @Override
-    public XDOM getXDOM()
+    public List<Block> execute()
     {
         List<Block> blocks = new ArrayList<Block>();
         blocks.add(new WordBlock("HelloWorld"));
-        return new XDOM(blocks);
+        return blocks;
     }
 }

@@ -28,7 +28,7 @@
   <div id="$!stepId" class="xdialog-modal-container">
     <div class="xdialog-screen"></div>
     <div class="xdialog-box">
-      <div class="xdialog-title">Distribution Wizard</div>
+      <div class="xdialog-title">$msg.get('extensions.distribution.wizardTitle')</div>
       <div class="xdialog-content">
         #if ($request.extensionId && $request.extensionVersion)
           ## The user can get here by clicking on an extension link.
@@ -56,9 +56,9 @@
 #macro(displayMainUIStep)
   #set ($distributionState = $services.distribution.state)
   #if ($distributionState == 'NONE')
-    <div class="box errormessage">Can't get any information about the distribution.</div>
+    <div class="box errormessage">$msg.get('extensions.distribution.error.noState')</div>
   #else
-    <p>The following distribution has been detected:</p>
+    <p>$msg.get('extensions.distribution.hint')</p>
     #set ($distributionExtension = $services.distribution.distributionExtension)
     ## Wrap the extension in a DIV so that its bottom border is displayed.
     <div>#displayExtension($distributionExtension)</div>
@@ -69,7 +69,7 @@
       #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
 
       ## Allow the user to install, upgrade or downgrade the UI.
-      <p>The following user interface is recommended for your distribution:</p>
+      <p>$msg.get('extensions.distribution.uiHint')</p>
       #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
       #displayExtension($distributionUIExtension)
 
@@ -82,7 +82,7 @@
         ## TODO: Display the previous distribution UI extension to let the user uninstall it.
       #end
     #else
-      <div class="box warningmessage">The detected distribution doesn't specify a default UI.</div>
+      <div class="box warningmessage">$msg.get('extensions.distribution.error.noUI')</div>
       ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
     #end
   #end
@@ -137,7 +137,7 @@
     #set ($showCompleteStepButton = $invalid.isEmpty())
     ##
     #if ($outdated.isEmpty() && $invalid.isEmpty())
-      <div class="box infomessage">All extensions are up-to-date.</div>
+      <div class="box infomessage">$msg.get('extensions.distribution.upToDate')</div>
     #else
       #displayPlanActionList($invalid 'invalid')
       #displayPlanActionList($outdated 'outdated')
@@ -146,7 +146,7 @@
   <form action="" class="xform">
     <p class="buttons">
       <span class="buttonwrapper">
-        <button id="prepareUpgradeButton" type="submit" name="action" value="prepareUpgrade" class="secondary">Reload</button>
+        <button id="prepareUpgradeButton" type="submit" name="action" value="prepareUpgrade" class="secondary">$msg.get('extensions.distribution.stepAction.prepareUpgrade')</button>
       </span>
     </p>
   </form>
@@ -154,7 +154,7 @@
 
 #macro(displayPlanActionList $list $key)
   #if ($list.size() > 0)
-    <p>$msg.get("extensions.upgrade.list.$key")</p>
+    <p>$msg.get("extensions.distribution.list.$key")</p>
     <div id="${key}Extensions">
     #foreach ($planAction in $list)
       #set ($extensionNamespace = $planAction.namespace)
@@ -168,7 +168,7 @@
   #set ($upgradePlanJob = $services.extension.createUpgradePlan('wiki:xwiki'))
   #set ($lastError = $services.extension.lastError)
   #if ($lastError)
-    <div class="box errormessage">Failed to create upgrade plan. #printThrowable($lastError)</div>
+    <div class="box errormessage">$msg.get('extensions.distribution.error.prepareUpgradeFailure') #printThrowable($lastError)</div>
   #else
     #set ($distributionId = "$services.distribution.distributionExtension.id")
     #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
@@ -186,13 +186,15 @@
       ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
       ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
       <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-        <button type="submit" name="action" value="COMPLETE_STEP">Continue</button>
+        <button type="submit" name="action" value="COMPLETE_STEP">$msg.get('extensions.distribution.stepAction.complete')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton) hidden#end">
-        <button class="secondary" type="submit" name="action" value="SKIP_STEP" title="Ask me again after a server restart">Skip</button>
+        <button class="secondary" type="submit" name="action" value="SKIP_STEP"
+          title="$escapetool.xml($msg.get('extensions.distribution.stepAction.skip.hint'))">$msg.get('extensions.distribution.stepAction.skip')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton) hidden#end">
-        <button class="secondary" type="submit" name="action" value="CANCEL_STEP" title="Ask me again when I change my distribution">Cancel</button>
+        <button class="secondary" type="submit" name="action" value="CANCEL_STEP"
+          title="$escapetool.xml($msg.get('extensions.distribution.stepAction.cancel.hint'))">$msg.get('extensions.distribution.stepAction.cancel')</button>
       </span>
     </div>
   </form>

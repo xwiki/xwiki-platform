@@ -64,7 +64,7 @@ public class UIExtensionTest extends AbstractTest
             + "{{/html}}\n"
             + "\n"
             + "#foreach($uix in $services.uix.getExtensions('hello'))\n"
-            + "$uix.data\n"
+            + "$uix.parameters\n"
             + "#end\n"
             + "{{/velocity}}\n", "Hello World");
         Assert.assertEquals("HelloWorld\n"
@@ -76,12 +76,12 @@ public class UIExtensionTest extends AbstractTest
             "id", "helloWikiWorld2",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld2",
-            "data", "HelloWikiWorldKey=$xcontext.user");
+            "parameters", "HelloWikiWorldKey=$xcontext.user");
         getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
             "id", "helloWikiWorld1",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld1",
-            "data", "HelloWikiWorldKey=$xcontext.user");
+            "parameters", "HelloWikiWorldKey=$xcontext.user");
         getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
         Assert.assertEquals("HelloWikiWorld1\n"
             + "HelloWikiWorld2\n"

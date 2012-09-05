@@ -83,10 +83,10 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
         });
 
         xdom = new XDOM(new ArrayList<Block>());
-        Map<String, String> data = new HashMap();
-        data.put("key", "value=foo");
+        Map<String, String> parameters = new HashMap();
+        parameters.put("key", "value=foo");
 
-        wikiUIExtension = new WikiUIExtension(DOC_REFERENCE, "id", "epId", xdom, Syntax.XWIKI_2_1, data,
+        wikiUIExtension = new WikiUIExtension(DOC_REFERENCE, "id", "epId", xdom, Syntax.XWIKI_2_1, parameters,
             componentManager);
     }
 
@@ -126,7 +126,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
     }
 
     @Test
-    public void getDataWithAnEqualSignInAValue() throws Exception
+    public void getParametersWithAnEqualSignInAValue() throws Exception
     {
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
         final VelocityContext velocityContext = getMockery().mock(VelocityContext.class);
@@ -144,11 +144,11 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
             }
         });
 
-        Assert.assertEquals("", wikiUIExtension.getData().get("key"));
+        Assert.assertEquals("", wikiUIExtension.getParameters().get("key"));
     }
 
     @Test
-    public void getDataWhenVelocityFails() throws Exception
+    public void getParametersWhenVelocityFails() throws Exception
     {
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
         final VelocityContext velocityContext = getMockery().mock(VelocityContext.class);
@@ -167,7 +167,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
             }
         });
 
-        Assert.assertEquals(0, wikiUIExtension.getData().size());
+        Assert.assertEquals(0, wikiUIExtension.getParameters().size());
     }
 
     @Override

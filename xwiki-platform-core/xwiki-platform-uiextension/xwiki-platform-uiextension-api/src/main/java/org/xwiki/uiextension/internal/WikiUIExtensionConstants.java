@@ -53,7 +53,7 @@ public interface WikiUIExtensionConstants
     String CONTENT_PROPERTY = "content";
 
     /**
-     * Data property.
+     * Extension parameters property.
      */
-    String DATA_PROPERTY = "data";
+    String PARAMETERS_PROPERTY = "parameters";
 }

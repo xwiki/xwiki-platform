@@ -87,24 +87,24 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private ComponentManager componentManager;
 
     /**
-     * Parse the data provided by the extension.
-     * The data is provided in a LargeString property of the extension object. In the future it would be better
+     * Parse the parameters provided by the extension.
+     * The parameters are provided in a LargeString property of the extension object. In the future it would be better
      * to have a Map<String, String> XClass property.
      *
-     * @param rawData the string to parse
-     * @return a map of data
+     * @param rawParameters the string to parse
+     * @return a map of parameters
      */
-    private Map<String, String> parseData(String rawData)
+    private Map<String, String> parseParameters(String rawParameters)
     {
-        Map<String, String> data = new HashMap<String, String>();
-        for (String line : rawData.split("[\\r\\n]+")) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        for (String line : rawParameters.split("[\\r\\n]+")) {
             String[] pair = line.split("=", 2);
             if (pair.length == 2 && !"".equals(pair[0]) && !"".equals(pair[1])) {
-                data.put(pair[0], pair[1]);
+                parameters.put(pair[0], pair[1]);
             }
         }
 
-        return data;
+        return parameters;
     }
 
     @Override
@@ -137,7 +137,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
             String id = extensionDefinition.getStringValue(ID_PROPERTY);
             String extensionPointId = extensionDefinition.getStringValue(EXTENSION_POINT_ID_PROPERTY);
             String content = extensionDefinition.getStringValue(CONTENT_PROPERTY);
-            Map<String, String> data = parseData(extensionDefinition.getStringValue(DATA_PROPERTY));
+            Map<String, String> parameters = parseParameters(extensionDefinition.getStringValue(PARAMETERS_PROPERTY));
 
             try {
                 Parser parser = componentManager.getInstance(Parser.class, doc.getSyntax().toIdString());
@@ -145,7 +145,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
                 try {
                     XDOM xdom = parser.parse(new StringReader(content));
                     WikiUIExtension extension =
-                        new WikiUIExtension(reference, id, extensionPointId, xdom, doc.getSyntax(), data,
+                        new WikiUIExtension(reference, id, extensionPointId, xdom, doc.getSyntax(), parameters,
                             componentManager);
                     extensions.add(extension);
                 } catch (ParseException e) {

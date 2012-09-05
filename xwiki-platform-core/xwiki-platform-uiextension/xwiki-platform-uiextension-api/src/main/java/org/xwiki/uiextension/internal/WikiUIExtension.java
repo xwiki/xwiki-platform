@@ -58,11 +58,6 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiUIExtension.class);
 
     /**
-     * Name of the key associated to the extension data map in the context.
-     */
-    private static final String DATA_MAP_CONTEXT_KEY = "uixdata";
-
-    /**
      * @see #WikiUIExtension
      */
     private final DocumentReference documentReference;
@@ -95,7 +90,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * @see #WikiUIExtension
      */
-    private final Map<String, String> data;
+    private final Map<String, String> parameters;
 
     /**
      * @see #WikiUIExtension
@@ -120,19 +115,20 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      * @param extensionPointId ID of the extension point this extension is designed for
      * @param xdom the XDOM to be rendered when this extension is displayed
      * @param syntax the Syntax of the extension XDOM
-     * @param data the data map
+     * @param parameters the extension parameters map
      * @param componentManager the XWiki component manager
      * @throws ComponentLookupException when components allowing to render the extension content are missing
      */
     public WikiUIExtension(DocumentReference documentReference, String id, String extensionPointId, XDOM xdom,
-        Syntax syntax, Map<String, String> data, ComponentManager componentManager) throws ComponentLookupException
+        Syntax syntax, Map<String, String> parameters, ComponentManager componentManager)
+        throws ComponentLookupException
     {
         this.documentReference = documentReference;
         this.id = id;
         this.extensionPointId = extensionPointId;
         this.xdom = xdom;
         this.syntax = syntax;
-        this.data = data;
+        this.parameters = parameters;
         this.roleHint = id;
         this.macroTransformation = componentManager.<Transformation>getInstance(Transformation.class, "macro");
         this.execution = componentManager.getInstance(Execution.class);
@@ -152,11 +148,11 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
-    public Map<String, String> getData()
+    public Map<String, String> getParameters()
     {
         Map<String, String> result = new HashMap<String, String>();
 
-        for (Map.Entry<String, String> entry : this.data.entrySet()) {
+        for (Map.Entry<String, String> entry : this.parameters.entrySet()) {
             StringWriter writer = new StringWriter();
             try {
                 this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,

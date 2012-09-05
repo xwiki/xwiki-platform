@@ -45,10 +45,12 @@ public interface UIExtension
     String getExtensionPointId();
 
     /**
-      * @return a map of data provided by the extension. It's up to the Extension Point to specify what data it
-     *          supports
+     * A map of parameters provided by the extension. When providing a new Extension Point the developer must document
+     * the list of parameters he requires.
+     *
+      * @return a map of parameters provided by the extension
      */
-    Map<String, String> getData();
+    Map<String, String> getParameters();
 
     /**
      * @return the XDOM that must be rendered when this extension is displayed

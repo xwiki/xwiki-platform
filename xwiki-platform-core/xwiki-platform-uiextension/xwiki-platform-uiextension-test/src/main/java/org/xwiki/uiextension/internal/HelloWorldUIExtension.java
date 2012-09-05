@@ -56,11 +56,11 @@ public class HelloWorldUIExtension implements UIExtension
     }
 
     @Override
-    public Map<String, String> getData()
+    public Map<String, String> getParameters()
     {
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("HelloWorldKey", "HelloWorldValue");
-        return data;
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("HelloWorldKey", "HelloWorldValue");
+        return parameters;
     }
 
     @Override

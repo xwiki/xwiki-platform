@@ -257,7 +257,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("extensionPointId"));
                 oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
                 will(returnValue("content"));
-                oneOf(extensionObject).getStringValue(DATA_PROPERTY);
+                oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
                 will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
                 oneOf(parser).parse(with(any(Reader.class)));
                 will(returnValue(xdom));
@@ -285,7 +285,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         Assert.assertEquals(1, components.size());
 
         UIExtension uiExtension = (WikiUIExtension) components.get(0);
-        Map<String, String> data = uiExtension.getData();
-        Assert.assertEquals(2, data.size());
+        Map<String, String> parameters = uiExtension.getParameters();
+        Assert.assertEquals(2, parameters.size());
     }
 }

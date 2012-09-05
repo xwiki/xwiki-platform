@@ -42,7 +42,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.EditModeClass</name>
@@ -391,6 +391,74 @@
     </property>
     <property>
       <title>$msg.get('platform.dashboard.wiki.messageSender')</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>2</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Extension ID (must be unique)</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>6c560735-3e80-4a42-85e2-2dbe77ae9de6</guid>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <parameters>label=$msg.get('xe.panels.quicklinks.dashboard')
+target=Dashboard.WebHome
+icon=application_view_tile</parameters>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
+    </property>
+    <property>
+      <id>org.xwiki.platform.panels.Applications.Dashboard</id>
     </property>
   </object>
   <content>{{velocity}}

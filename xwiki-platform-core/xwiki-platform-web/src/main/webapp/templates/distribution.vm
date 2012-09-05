@@ -25,7 +25,7 @@
   $xwiki.ssfx.use('uicomponents/extension/distribution.css')
   $xwiki.jsfx.use('uicomponents/extension/distribution.js', true)
   #set ($stepId = $services.distribution.jobStatus.question.stepId)
-  <div id="$!stepId" class="xdialog-modal-container">
+  <div id="$!stepId">
     <div class="xdialog-screen"></div>
     <div class="xdialog-box">
       <div class="xdialog-title">$msg.get('extensions.distribution.wizardTitle')</div>

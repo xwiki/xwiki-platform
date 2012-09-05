@@ -1,8 +1,9 @@
 .xdialog-screen {
   opacity: 0.5;
+  position: fixed;
 }
 .xdialog-box {
-  top: 1em;
+  margin: 1em auto;
   width: 800px;
 }
 .xdialog-content > .ui-progress {

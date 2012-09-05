@@ -55,13 +55,19 @@
 
 #macro(displayMainUIStep)
   #set ($distributionState = $services.distribution.state)
-  #if ($distributionState == 'NONE')
+  #if (!$distributionState || $distributionState == 'NONE')
     <div class="box errormessage">$msg.get('extensions.distribution.error.noState')</div>
   #else
     <p>$msg.get('extensions.distribution.hint')</p>
     #set ($distributionExtension = $services.distribution.distributionExtension)
-    ## Wrap the extension in a DIV so that its bottom border is displayed.
-    <div>#displayExtension($distributionExtension)</div>
+    #if ($distributionExtension)
+      ## Wrap the extension in a DIV so that its bottom border is displayed.
+      <div>#displayExtension($distributionExtension)</div>
+    #else
+      <div class="box infomessage">$msg.get('extensions.advancedSearch.noResults',
+        ["<strong>$!escapetool.xml($distributionExtension.id.id)</strong>",
+        "<strong>$!escapetool.xml($distributionExtension.id.version)</strong>"])</div>
+    #end
 
     #set ($distributionUIId = $services.distribution.getUIExtensionId())
     #if ($distributionUIId)
@@ -71,7 +77,13 @@
       ## Allow the user to install, upgrade or downgrade the UI.
       <p>$msg.get('extensions.distribution.uiHint')</p>
       #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
-      #displayExtension($distributionUIExtension)
+      #if ($distributionUIExtension)
+        #displayExtension($distributionUIExtension)
+      #else
+        <div class="box infomessage">$msg.get('extensions.advancedSearch.noResults',
+          ["<strong>$!escapetool.xml($distributionUIId.id)</strong>",
+          "<strong>$!escapetool.xml($distributionUIId.version)</strong>"])</div>
+      #end
 
       #if ($distributionState == 'NEW' && !$showCompleteStepButton)
         ## Either a new install or an upgrade from a version that doesn't have the distribution module.

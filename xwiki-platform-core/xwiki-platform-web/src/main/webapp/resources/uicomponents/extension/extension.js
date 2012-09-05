@@ -251,7 +251,9 @@ XWiki.ExtensionBehaviour = Class.create({
       var progressSectionAnchor = 'extension-body-progress' + lastSection.previous().id.substr($w(lastSection.className)[0].length);
       lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
       // Add the progress menu.
-      this.container.down('.innerMenu').insert('<li><span class="wikilink"><a href="#' + progressSectionAnchor + '">$msg.get('extensions.info.category.progress')</a></span></li>');
+      var progressMenuLabel = "$msg.get('extensions.info.category.progress')";
+      this.container.down('.innerMenu').insert('<li><span class="wikilink"><a href="#' + progressSectionAnchor + '">'
+        + progressMenuLabel + '</a></span></li>');
     } else if (progressSection.down('.extension-log-item-loading')) {
       // Just hide the question that has been answered if there is any progress item loading.
       progressSection.down('form').hide();

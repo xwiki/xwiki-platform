@@ -107,8 +107,6 @@
     <property>
       <content>{{velocity}}
 #panelheader($msg.get('xe.panels.quicklinks'))
-* [[$msg.get('xe.panels.quicklinks.index')&gt;&gt;Main.AllDocs]]
-* [[$msg.get('xe.panels.quicklinks.userdirectory')&gt;&gt;Main.UserDirectory]]
 * [[$msg.get('xe.panels.quicklinks.sandbox')&gt;&gt;Sandbox.WebHome]]
 #if ($xwiki.hasAdminRights())
 

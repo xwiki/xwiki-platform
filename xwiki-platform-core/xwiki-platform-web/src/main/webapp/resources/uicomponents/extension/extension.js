@@ -76,6 +76,24 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
+   * Handles an AJAX request failure.
+   */
+  _onAjaxRequestFailure : function(response) {
+    if (response.status == 401) {
+      // Unauthorized request. This can happen for instance if the session expires or if the user looses rights while
+      // installing or uninstalling an extension. By reloading the page we hope the user will be redirected to the
+      // login page and then, after he authenticates, back to the current page.
+      window.location.reload(true);
+    } else {
+      var failureReason = response.statusText;
+      if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+        failureReason = 'Server not responding';
+      }
+      new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
+    }
+  },
+
+  /**
    * Submit a form asynchronously.
    */
   _submit : function(event, ajaxRequestParameters) {
@@ -91,20 +109,7 @@ XWiki.ExtensionBehaviour = Class.create({
     // Default AJAX request parameters.
     var defaultAJAXRequestParameters = {
       parameters : formData,
-      onFailure : function (response) {
-        if (response.status == 401) {
-          // Unauthorized request. This can happen for instance if the session expires or if the user looses rights while
-          // installing or uninstalling an extension. By reloading the page we hope the user will be redirected to the
-          // login page and then, after he authenticates, back to the current page.
-          window.location.reload(true);
-        } else {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
-          new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
-        }
-      },
+      onFailure : this._onAjaxRequestFailure.bind(this),
       on0 : function (response) {
         response.request.options.onFailure(response);
       },
@@ -328,15 +333,20 @@ XWiki.ExtensionBehaviour = Class.create({
       onSuccess : function(response) {
         this._update(response.responseText);
       }.bind(this),
-      onFailure : this._maybeScheduleRefresh.bind(this)
+      onFailure : function(response) {
+        this._onAjaxRequestFailure(response);
+        // Use a longer refresh timeout after an AJAX request failure.
+        this._maybeScheduleRefresh(10);
+      }.bind(this)
     });
   },
 
   /**
    * Schedule a new refresh if the extension has a job running.
    */
-  _maybeScheduleRefresh : function() {
-    this.container.hasClassName('extension-item-loading') && !this.container.down('input[name="confirm"]') && this._refresh.bind(this).delay(1);
+  _maybeScheduleRefresh : function(timeout) {
+    timeout = timeout || 1;
+    this.container.hasClassName('extension-item-loading') && !this.container.down('input[name="confirm"]') && this._refresh.bind(this).delay(timeout);
   },
 
   /**

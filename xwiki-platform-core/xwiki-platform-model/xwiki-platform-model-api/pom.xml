@@ -33,6 +33,11 @@
   <name>XWiki Platform - Model - API</name>
   <packaging>jar</packaging>
   <description>XWiki Model API</description>
+  <properties>
+    <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions through
+         the Extension Manager -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-model</xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

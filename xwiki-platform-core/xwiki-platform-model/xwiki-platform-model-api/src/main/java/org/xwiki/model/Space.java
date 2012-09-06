@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,23 +16,41 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.model;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-model</artifactId>
-  <name>XWiki Platform - Model - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Model (Wiki, Space, Document, etc)</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-model-api</module>
-    <module>xwiki-platform-model-bridge</module>
-  </modules>
-</project>
+public interface Space extends Object, Extensible
+{
+    /**
+     * @return the list of top level Space objects in this Space (excluding nested spaces)
+     */
+    EntityIterator<Space> getSpaces();
+
+    /**
+     * @param spaceName the name of the nested space to look for
+     * @return the nested space whose name is passed as parameter
+     */
+    Space getSpace(String spaceName);
+
+    /**
+     * Add a nested space.
+     */
+    Space addSpace(String spaceName);
+
+    /**
+     * Remove a nested space.
+     */
+    void removeSpace(String spaceName);
+
+    boolean hasSpace(String spaceName);
+
+    EntityIterator<Document> getDocuments();
+
+    boolean hasDocument(String documentName);
+
+    Document getDocument(String documentName);
+
+    Document addDocument(String documentName);
+
+    void removeDocument(String documentName);
+}

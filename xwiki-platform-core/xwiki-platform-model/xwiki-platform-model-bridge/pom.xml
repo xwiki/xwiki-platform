@@ -29,41 +29,60 @@
     <artifactId>xwiki-platform-model</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-model-api</artifactId>
-  <name>XWiki Platform - Model - API</name>
+  <artifactId>xwiki-platform-model-bridge</artifactId>
+  <name>XWiki Platform - Model - OldCore Bridge</name>
   <packaging>jar</packaging>
-  <description>XWiki Model API</description>
+  <description>Implementation of new Model API based on the old Model (oldcore)</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- We need to have the Servlet API JAR available since Component Initialization will initialize
+         com.xpn.xwiki.internal.DefaultXWikiStubContextProvider which requires the Servlet API to be present -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to mock XWiki class -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  <properties>
+    <!-- Skip Clirr execution since this is the first release of this module. Remove once it's been relased once. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <build>
     <plugins>
       <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
@@ -74,23 +93,12 @@
           <includeTestSourceDirectory>false</includeTestSourceDirectory>
           <excludes>
             <!-- New Model is not yet stabilized, exclude from Checkstyle for now -->
-            org/xwiki/model/Content.java,
-            org/xwiki/model/Document.java,
-            org/xwiki/model/Entity.java,
-            org/xwiki/model/EntityManager.java,
-            org/xwiki/model/Extensible.java,
-            org/xwiki/model/Linkable.java,
-            org/xwiki/model/Wiki.java,
-            org/xwiki/model/UniqueReference.java,
-            org/xwiki/model/Space.java,
-            org/xwiki/model/Server.java,
-            org/xwiki/model/Referenceable.java,
-            org/xwiki/model/Persistable.java,
-            org/xwiki/model/Object.java,
-            org/xwiki/model/ObjectDefinition.java,
-            org/xwiki/model/ObjectDefinitionProperty.java,
-            org/xwiki/model/EntityIterator.java,
-            org/xwiki/model/Version.java
+            org/xwiki/model/internal/BridgedDocument.java,
+            org/xwiki/model/internal/BridgedEntityManager.java,
+            org/xwiki/model/internal/BridgedObject.java,
+            org/xwiki/model/internal/BridgedServer.java,
+            org/xwiki/model/internal/BridgedSpace.java,
+            org/xwiki/model/internal/BridgedWiki.java
           </excludes>
         </configuration>
       </plugin>

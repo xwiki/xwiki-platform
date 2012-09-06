@@ -109,7 +109,7 @@
 #panelheader($msg.get('panels.applications.title'))
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
 #set($params = $uix.getParameters())
-* [[image:icon:$params.icon $params.label&gt;&gt;$params.target]]
+* [[image:$params.icon $params.label&gt;&gt;$params.target]]
 #end
 #panelfooter()
 {{/velocity}}</content>

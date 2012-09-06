@@ -82,7 +82,7 @@
     <property>
       <parameters>label=$msg.get('xe.panels.quicklinks.blog')
 target=Blog.WebHome
-icon=transmit</parameters>
+icon=icon:transmit</parameters>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>

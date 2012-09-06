@@ -25,8 +25,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 
 /**
  * Validate {@link RegexEntityReference} class.

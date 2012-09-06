@@ -74,11 +74,11 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "default");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(
-                    new DocumentReference("wiki", "space", "page"));
+                        new DocumentReference("wiki", "space", "page"));
             }
         });
 
@@ -92,11 +92,11 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "currentmixed");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "currentmixed");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(
-                    new DocumentReference("wiki", "space", "page"));
+                        new DocumentReference("wiki", "space", "page"));
             }
         });
 
@@ -110,7 +110,7 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "default");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(null);
@@ -127,12 +127,12 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "default");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(
-                    new EntityReference("page", EntityType.DOCUMENT,
-                        new EntityReference("space", EntityType.SPACE)));
+                        new EntityReference("page", EntityType.DOCUMENT,
+                                new EntityReference("space", EntityType.SPACE)));
             }
         });
 
@@ -146,12 +146,12 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "default");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(
-                    new EntityReference("page", EntityType.DOCUMENT,
-                        new EntityReference("wiki", EntityType.WIKI)));
+                        new EntityReference("page", EntityType.DOCUMENT,
+                                new EntityReference("wiki", EntityType.WIKI)));
             }
         });
 
@@ -165,12 +165,12 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "default");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(
-                    new EntityReference("space", EntityType.SPACE,
-                        new EntityReference("wiki", EntityType.WIKI)));
+                        new EntityReference("space", EntityType.SPACE,
+                                new EntityReference("wiki", EntityType.WIKI)));
             }
         });
 
@@ -184,11 +184,11 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "default");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver)
-                    .resolve(new EntityReference("wiki", EntityType.WIKI));
+                        .resolve(new EntityReference("wiki", EntityType.WIKI));
             }
         });
 
@@ -202,11 +202,11 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "invalid");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "invalid");
                 will(throwException(new ComponentLookupException("error")));
                 // Make sure backward compatibility is preserved.
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(DocumentReferenceResolver.class,
-                    "invalid");
+                        "invalid");
                 will(throwException(new ComponentLookupException("error")));
             }
         });
@@ -222,15 +222,15 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "current/reference");
+                        DocumentReferenceResolver.TYPE_REFERENCE, "current/reference");
                 will(throwException(new ComponentLookupException("error")));
                 // Make sure backward compatibility is preserved.
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(DocumentReferenceResolver.class,
-                    "current/reference");
+                        "current/reference");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(
-                    new DocumentReference("wiki", "space", "page"));
+                        new DocumentReference("wiki", "space", "page"));
                 will(returnValue(ref));
                 allowing(ModelScriptServiceTest.this.mockLogger).warn(with(any(String.class)), with(any(String.class)));
             }
@@ -246,7 +246,7 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    EntityReferenceValueProvider.class, "current");
+                        EntityReferenceValueProvider.class, "current");
                 will(returnValue(ModelScriptServiceTest.this.mockValueProvider));
                 allowing(ModelScriptServiceTest.this.mockValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("somewiki"));
@@ -262,7 +262,7 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    EntityReferenceValueProvider.class, "invalid");
+                        EntityReferenceValueProvider.class, "invalid");
                 will(throwException(new ComponentLookupException("error")));
             }
         });

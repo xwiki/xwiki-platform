@@ -73,12 +73,12 @@ public class UIExtensionTest extends AbstractTest
         // Test Wiki UI extension
 
         getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
-            "id", "helloWikiWorld2",
+            "name", "helloWikiWorld2",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld2",
             "parameters", "HelloWikiWorldKey=$xcontext.user");
         getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
-            "id", "helloWikiWorld1",
+            "name", "helloWikiWorld1",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld1",
             "parameters", "HelloWikiWorldKey=$xcontext.user");

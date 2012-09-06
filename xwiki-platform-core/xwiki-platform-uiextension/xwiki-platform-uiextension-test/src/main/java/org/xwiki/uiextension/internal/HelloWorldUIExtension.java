@@ -44,9 +44,9 @@ import org.xwiki.uiextension.UIExtension;
 public class HelloWorldUIExtension implements UIExtension
 {
     @Override
-    public String getId()
+    public String getName()
     {
-        return getClass().getAnnotation(Named.class).value();
+        return "my extension";
     }
 
     @Override

@@ -35,9 +35,9 @@ import org.xwiki.rendering.block.Block;
 public interface UIExtension
 {
     /**
-     * @return the unique ID of this extension
+     * @return the name of this extension
      */
-    String getId();
+    String getName();
 
     /**
      * @return the ID of the extension point this UI extension is providing an extension for

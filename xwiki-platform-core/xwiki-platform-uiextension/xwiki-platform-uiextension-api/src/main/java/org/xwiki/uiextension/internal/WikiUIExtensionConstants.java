@@ -38,14 +38,14 @@ public interface WikiUIExtensionConstants
         EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE)));
 
     /**
-     * Extension ID property.
-     */
-    String ID_PROPERTY = "id";
-
-    /**
      * Extension Point ID property.
      */
     String EXTENSION_POINT_ID_PROPERTY = "extensionPointId";
+
+    /**
+     * Extension name property.
+     */
+    String NAME_PROPERTY = "name";
 
     /**
      * Extension content property.

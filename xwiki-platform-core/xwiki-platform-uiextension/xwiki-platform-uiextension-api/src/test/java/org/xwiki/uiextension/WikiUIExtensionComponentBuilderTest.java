@@ -40,10 +40,14 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -69,6 +73,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenc
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -85,14 +90,18 @@ import junit.framework.Assert;
     CurrentMixedStringDocumentReferenceResolver.class,
     CurrentMixedEntityReferenceValueProvider.class,
     DefaultEntityReferenceValueProvider.class,
-    CompactWikiStringEntityReferenceSerializer.class
+    CompactWikiStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class
 })
 @MockingRequirement(value = WikiUIExtensionComponentBuilder.class,
     exceptions = {EntityReferenceSerializer.class, Parser.class})
 public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponentTestCase
     implements WikiUIExtensionConstants
 {
-    private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
 
     private XWiki xwiki;
 
@@ -130,7 +139,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 allowing(execution).getContext();
                 will(returnValue(context));
 
-                allowing(xwiki).getDocument(DOC_REFERENCE, xwikiContext);
+                allowing(xwiki).getDocument(DOC_REF, xwikiContext);
                 will(returnValue(componentDoc));
                 allowing(componentDoc).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
@@ -162,7 +171,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         });
 
         try {
-            this.builder.buildComponents(DOC_REFERENCE);
+            this.builder.buildComponents(DOC_REF);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
             Assert.assertEquals("No UI extension object could be found in document [xwiki:XWiki.MyUIExtension]",
@@ -188,7 +197,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         });
 
         try {
-            this.builder.buildComponents(DOC_REFERENCE);
+            this.builder.buildComponents(DOC_REF);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
             Assert.assertEquals("Registering UI extensions requires admin rights at the wiki level",
@@ -214,7 +223,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         });
 
         try {
-            this.builder.buildComponents(DOC_REFERENCE);
+            this.builder.buildComponents(DOC_REF);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
             Assert.assertEquals("Failed to create UI Extension(s)", expected.getMessage());
@@ -234,6 +243,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         final VelocityContext velocityContext = getMockery().mock(VelocityContext.class);
         final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
         final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
+        final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);
         final StringWriter writer = new StringWriter();
         writer.append("value=foo");
         final XDOM xdom = new XDOM(new ArrayList<Block>());
@@ -251,8 +261,10 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("XWiki.Admin"));
                 oneOf(rightService).hasAccessLevel("admin", "XWiki.Admin", "XWiki.XWikiPreferences", xwikiContext);
                 will(returnValue(true));
-                oneOf(extensionObject).getStringValue(ID_PROPERTY);
-                will(returnValue("id"));
+                oneOf(extensionObject).getReference();
+                will(returnValue(extensionReference));
+                oneOf(extensionObject).getStringValue(NAME_PROPERTY);
+                will(returnValue("name"));
                 oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
                 will(returnValue("extensionPointId"));
                 oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
@@ -281,7 +293,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
             }
         });
 
-        List<WikiComponent> components = this.builder.buildComponents(DOC_REFERENCE);
+        List<WikiComponent> components = this.builder.buildComponents(DOC_REF);
         Assert.assertEquals(1, components.size());
 
         UIExtension uiExtension = (WikiUIExtension) components.get(0);

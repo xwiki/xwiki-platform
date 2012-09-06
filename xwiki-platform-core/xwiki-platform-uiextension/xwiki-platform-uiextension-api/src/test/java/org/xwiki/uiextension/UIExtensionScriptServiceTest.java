@@ -39,6 +39,9 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -66,6 +69,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValuePr
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.web.Utils;
 
 import junit.framework.Assert;
@@ -81,13 +85,27 @@ import junit.framework.Assert;
     CurrentMixedStringDocumentReferenceResolver.class,
     CurrentMixedEntityReferenceValueProvider.class,
     DefaultEntityReferenceValueProvider.class,
-    CompactWikiStringEntityReferenceSerializer.class
+    CompactWikiStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class
 })
 @MockingRequirement(value = UIExtensionScriptService.class, exceptions = {EntityReferenceSerializer.class})
 public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCase
     implements WikiUIExtensionConstants
 {
-    private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+    private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");
+
+    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+
+    private BaseObjectReference OBJ1_REF;
+
+    private BaseObjectReference OBJ2_REF;
+
+    private BaseObjectReference OBJ3_REF;
+
+    private BaseObjectReference OBJ4_REF;
 
     private ComponentManager contextComponentManager;
 
@@ -114,6 +132,13 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
         Utils.setComponentManager(getComponentManager());
 
+        // We need to this here and not directly when we declare the variables because otherwise the component manager
+        // would not be initialized before the lookups performed in the BaseObjectReference constructor
+        OBJ1_REF = new BaseObjectReference(CLASS_REF, 1, DOC_REF);
+        OBJ2_REF = new BaseObjectReference(CLASS_REF, 2, DOC_REF);
+        OBJ3_REF = new BaseObjectReference(CLASS_REF, 3, DOC_REF);
+        OBJ4_REF = new BaseObjectReference(CLASS_REF, 4, DOC_REF);
+
         execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext context = new ExecutionContext();
 
@@ -131,13 +156,13 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         velocityManager = getComponentManager().registerMockComponent(getMockery(), VelocityManager.class);
         transformation = getComponentManager().registerMockComponent(getMockery(), Transformation.class, "macro");
         this.service = getComponentManager().getInstance(ScriptService.class, "uix");
-        uiExtensions.put("1id3", new WikiUIExtension(DOC_REFERENCE, "1id3", "epId1", xdom, Syntax.XWIKI_2_0,
+        uiExtensions.put("1id3", new WikiUIExtension(OBJ1_REF, "1id3", "epId1", xdom, Syntax.XWIKI_2_0,
             new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.put("1id1", new WikiUIExtension(DOC_REFERENCE, "1id1", "epId1", xdom, Syntax.XWIKI_2_0,
+        uiExtensions.put("1id1", new WikiUIExtension(OBJ2_REF, "1id1", "epId1", xdom, Syntax.XWIKI_2_0,
             new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.put("1id2", new WikiUIExtension(DOC_REFERENCE, "1id2", "epId1", xdom, Syntax.XWIKI_2_0,
+        uiExtensions.put("1id2", new WikiUIExtension(OBJ3_REF, "1id2", "epId1", xdom, Syntax.XWIKI_2_0,
             new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.put("2id1", new WikiUIExtension(DOC_REFERENCE, "2id1", "epId2", xdom, Syntax.XWIKI_2_0,
+        uiExtensions.put("2id1", new WikiUIExtension(OBJ4_REF, "2id1", "epId2", xdom, Syntax.XWIKI_2_0,
             new HashMap<String, String>(), getComponentManager()));
 
         getMockery().checking(new Expectations()
@@ -195,9 +220,9 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         List<UIExtension> extensions = new ArrayList<UIExtension>();
         extensions.addAll(this.service.getExtensions("epId1"));
 
-        Assert.assertEquals("1id1", extensions.get(0).getId());
-        Assert.assertEquals("1id2", extensions.get(1).getId());
-        Assert.assertEquals("1id3", extensions.get(2).getId());
+        Assert.assertEquals("1id1", extensions.get(0).getName());
+        Assert.assertEquals("1id2", extensions.get(1).getName());
+        Assert.assertEquals("1id3", extensions.get(2).getName());
     }
 
     @Test

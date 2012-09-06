@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -65,7 +66,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * @see #WikiUIExtension
      */
-    private final String id;
+    private final String name;
 
     /**
      * @see #WikiUIExtension
@@ -110,8 +111,8 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * Default constructor.
      *
-     * @param documentReference the reference of the document holding this extension
-     * @param id the ID of the extension
+     * @param objectReference the reference of the object holding this extension
+     * @param name the name of the extension
      * @param extensionPointId ID of the extension point this extension is designed for
      * @param xdom the XDOM to be rendered when this extension is displayed
      * @param syntax the Syntax of the extension XDOM
@@ -119,26 +120,26 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      * @param componentManager the XWiki component manager
      * @throws ComponentLookupException when components allowing to render the extension content are missing
      */
-    public WikiUIExtension(DocumentReference documentReference, String id, String extensionPointId, XDOM xdom,
-        Syntax syntax, Map<String, String> parameters, ComponentManager componentManager)
+    public WikiUIExtension(ObjectReference objectReference, String name, String extensionPointId,
+        XDOM xdom, Syntax syntax, Map<String, String> parameters, ComponentManager componentManager)
         throws ComponentLookupException
     {
-        this.documentReference = documentReference;
-        this.id = id;
+        this.documentReference = (DocumentReference) objectReference.getParent();
+        this.roleHint = objectReference.toString();
+        this.name = name;
         this.extensionPointId = extensionPointId;
         this.xdom = xdom;
         this.syntax = syntax;
         this.parameters = parameters;
-        this.roleHint = id;
         this.macroTransformation = componentManager.<Transformation>getInstance(Transformation.class, "macro");
         this.execution = componentManager.getInstance(Execution.class);
         this.velocityManager = componentManager.getInstance(VelocityManager.class);
     }
 
     @Override
-    public String getId()
+    public String getName()
     {
-        return this.id;
+        return this.name;
     }
 
     @Override
@@ -179,7 +180,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         // Perform macro transformations.
         try {
             TransformationContext transformationContext = new TransformationContext(xdom, syntax);
-            transformationContext.setId(this.getId());
+            transformationContext.setId(this.getRoleHint());
             macroTransformation.transform(transformedXDOM, transformationContext);
         } catch (TransformationException e) {
             LOGGER.error("Error while executing wiki component macro transformation for extension [{}]",

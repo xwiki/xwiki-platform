@@ -81,7 +81,7 @@ public class UIExtensionScriptService implements ScriptService
     private Execution execution;
 
     /**
-     * Get the extensions for a given extension point. By default extensions are ordered alphabetically by their id.
+     * Get the extensions for a given extension point. By default extensions are ordered  by name alphabetically.
      *
      * @param extensionPointId the ID of the extension point to retrieve the extensions for
      * @return the list of extensions registered for the given extension point
@@ -100,7 +100,7 @@ public class UIExtensionScriptService implements ScriptService
         if (extensions != null) {
             for (UIExtension extension : extensions.values()) {
                 if (extension.getExtensionPointId().equals(extensionPointId)) {
-                    results.put(extension.getId(), extension);
+                    results.put(extension.getName(), extension);
                 }
             }
         }

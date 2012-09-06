@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.Entity;
+import javax.xml.stream.events.EntityReference;
+
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.velocity.VelocityContext;
@@ -35,6 +38,7 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -48,9 +52,15 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
+import com.xpn.xwiki.objects.BaseObjectReference;
+
 public class WikiUIExtensionTest extends AbstractMockingTestCase
 {
-    private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+    private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");
+
+    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+
+    private ObjectReference objectReference;
 
     private WikiUIExtension wikiUIExtension;
 
@@ -70,6 +80,10 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
         final Execution execution = getMockery().mock(Execution.class);
         velocityManager = getMockery().mock(VelocityManager.class);
 
+        // We need to this here and not directly when we declare the variables because otherwise the component manager
+        // would not be initialized before the lookups performed in the BaseObjectReference constructor
+        objectReference = new BaseObjectReference(CLASS_REF, 1, DOC_REF);
+
         getMockery().checking(new Expectations()
         {
             {
@@ -86,7 +100,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
         Map<String, String> parameters = new HashMap();
         parameters.put("key", "value=foo");
 
-        wikiUIExtension = new WikiUIExtension(DOC_REFERENCE, "id", "epId", xdom, Syntax.XWIKI_2_1, parameters,
+        wikiUIExtension = new WikiUIExtension(objectReference, "name", "epId", xdom, Syntax.XWIKI_2_1, parameters,
             componentManager);
     }
 
@@ -115,13 +129,15 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
             }
         });
 
-        Assert.assertEquals("id", wikiUIExtension.getId());
+        Assert.assertEquals("name", wikiUIExtension.getName());
         Assert.assertEquals("epId", wikiUIExtension.getExtensionPointId());
         Assert.assertEquals(MapUtils.EMPTY_MAP, wikiUIExtension.getHandledMethods());
         Assert.assertEquals(ListUtils.EMPTY_LIST, wikiUIExtension.getImplementedInterfaces());
-        Assert.assertEquals(DOC_REFERENCE, wikiUIExtension.getDocumentReference());
+        Assert.assertEquals(DOC_REF, wikiUIExtension.getDocumentReference());
         Assert.assertEquals(UIExtension.class, wikiUIExtension.getRole());
-        Assert.assertEquals("id", wikiUIExtension.getRoleHint());
+        Assert.assertEquals("name = [xwiki:XWiki.UIExtensionClass[1]], type = [OBJECT], parent = [name = " +
+            "[MyUIExtension], type = [DOCUMENT], parent = [name = [XWiki], type = [SPACE], parent = [name = [xwiki], " +
+            "type = [WIKI], parent = [null]]]]", wikiUIExtension.getRoleHint());
         wikiUIExtension.execute();
     }
 

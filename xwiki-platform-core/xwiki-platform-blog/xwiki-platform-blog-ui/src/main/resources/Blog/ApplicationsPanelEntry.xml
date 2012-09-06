@@ -56,21 +56,21 @@
       <extensionPointId>
         <disabled>0</disabled>
         <name>extensionPointId</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Extension Point ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </extensionPointId>
-      <id>
+      <name>
         <disabled>0</disabled>
-        <name>id</name>
-        <number>1</number>
-        <prettyName>Extension ID (must be unique)</prettyName>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </id>
+      </name>
     </class>
     <name>Blog.ApplicationsPanelEntry</name>
     <number>0</number>
@@ -88,7 +88,7 @@ icon=transmit</parameters>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
     </property>
     <property>
-      <id>org.xwiki.platform.panels.Applications.Blog</id>
+      <name>org.xwiki.platform.panels.Applications.Blog</name>
     </property>
   </object>
   <content>{{include document="XWiki.UIExtensionSheet" /}}</content>

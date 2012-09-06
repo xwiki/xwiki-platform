@@ -134,7 +134,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
         for (BaseObject extensionDefinition : extensionDefinitions) {
             // Extract extension definition.
-            String id = extensionDefinition.getStringValue(ID_PROPERTY);
+            String id = extensionDefinition.getStringValue(NAME_PROPERTY);
             String extensionPointId = extensionDefinition.getStringValue(EXTENSION_POINT_ID_PROPERTY);
             String content = extensionDefinition.getStringValue(CONTENT_PROPERTY);
             Map<String, String> parameters = parseParameters(extensionDefinition.getStringValue(PARAMETERS_PROPERTY));
@@ -145,8 +145,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
                 try {
                     XDOM xdom = parser.parse(new StringReader(content));
                     WikiUIExtension extension =
-                        new WikiUIExtension(reference, id, extensionPointId, xdom, doc.getSyntax(), parameters,
-                            componentManager);
+                        new WikiUIExtension(extensionDefinition.getReference(), id, extensionPointId, xdom,
+                            doc.getSyntax(), parameters, componentManager);
                     extensions.add(extension);
                 } catch (ParseException e) {
                     throw new WikiComponentException(

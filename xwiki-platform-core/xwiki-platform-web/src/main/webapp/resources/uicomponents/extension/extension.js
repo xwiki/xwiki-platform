@@ -92,11 +92,18 @@ XWiki.ExtensionBehaviour = Class.create({
     var defaultAJAXRequestParameters = {
       parameters : formData,
       onFailure : function (response) {
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
+        if (response.status == 401) {
+          // Unauthorized request. This can happen for instance if the session expires or if the user looses rights while
+          // installing or uninstalling an extension. By reloading the page we hope the user will be redirected to the
+          // login page and then, after he authenticates, back to the current page.
+          window.location.reload(true);
+        } else {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
         }
-        new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
       },
       on0 : function (response) {
         response.request.options.onFailure(response);

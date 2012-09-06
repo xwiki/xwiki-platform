@@ -31,6 +31,9 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
+/**
+ * @since 4.3M1
+ */
 public class BridgedServerTest extends AbstractBridgedComponentTestCase
 {
     private Server server;

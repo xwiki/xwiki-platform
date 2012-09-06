@@ -28,6 +28,8 @@ import org.xwiki.model.reference.EntityReference;
  *   <li>renaming an entity</li>
  *   <li>aliases an entity</li>
  * </ul>
+ *
+ * @since 4.3M1
  */
 public interface Linkable
 {

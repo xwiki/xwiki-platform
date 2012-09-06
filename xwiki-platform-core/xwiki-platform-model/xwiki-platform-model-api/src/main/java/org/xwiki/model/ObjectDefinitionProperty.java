@@ -19,6 +19,9 @@
  */
 package org.xwiki.model;
 
+/**
+ * @since 4.3M1
+ */
 public interface ObjectDefinitionProperty extends Entity
 {
 

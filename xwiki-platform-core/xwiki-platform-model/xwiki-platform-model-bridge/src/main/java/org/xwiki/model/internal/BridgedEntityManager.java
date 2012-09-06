@@ -43,6 +43,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @since 4.3M1
+ */
 public class BridgedEntityManager implements EntityManager
 {
     private XWikiContext xcontext;

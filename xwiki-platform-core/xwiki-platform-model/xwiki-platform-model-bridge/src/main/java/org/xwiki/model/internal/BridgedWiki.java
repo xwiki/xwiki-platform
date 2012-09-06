@@ -29,7 +29,10 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-public class BridgedWiki implements Wiki
+public class /**
+ * @since 4.3M1
+ */
+        BridgedWiki implements Wiki
 {
     private XWikiContext xcontext;
 

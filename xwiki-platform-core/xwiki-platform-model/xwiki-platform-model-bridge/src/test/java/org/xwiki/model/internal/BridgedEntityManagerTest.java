@@ -39,6 +39,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
+/**
+ * @since 4.3M1
+ */
 public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
 {
     private BridgedEntityManager manager;

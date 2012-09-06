@@ -26,6 +26,9 @@ import org.xwiki.model.*;
 import org.xwiki.model.Object;
 import org.xwiki.model.reference.EntityReference;
 
+/**
+ * @since 4.3M1
+ */
 public class BridgedSpace implements Space
 {
     @Override public Document addDocument(String documentName)

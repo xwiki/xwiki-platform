@@ -27,6 +27,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Unit tests for {@link Content}.
  *
  * @version $Id$
+ * @since 4.3M1
  */
 public class ContentTest
 {

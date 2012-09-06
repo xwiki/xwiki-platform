@@ -22,6 +22,8 @@ package org.xwiki.model;
 /**
  * An XWiki Server is made of one or several {@link org.xwiki.model.Wiki}s. This is the top most
  * concept of the XWiki Model.
+ *
+ * @since 4.3M1
  */
 public interface Server extends Persistable
 {

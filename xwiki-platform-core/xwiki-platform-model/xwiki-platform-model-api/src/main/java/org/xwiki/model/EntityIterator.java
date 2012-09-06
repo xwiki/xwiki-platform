@@ -23,6 +23,9 @@ import java.lang.*;
 import java.lang.Object;
 import java.util.Iterator;
 
+/**
+ * @since 4.3M1
+ */
 public class EntityIterator<T> implements Iterator
 {
     @Override

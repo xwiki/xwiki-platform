@@ -21,6 +21,9 @@ package org.xwiki.model;
 
 import org.xwiki.model.reference.EntityReference;
 
+/**
+ * @since 4.3M1
+ */
 public interface Referenceable
 {
     EntityReference getReference();

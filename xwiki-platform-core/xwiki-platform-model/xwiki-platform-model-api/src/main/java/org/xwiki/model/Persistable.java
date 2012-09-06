@@ -21,6 +21,9 @@ package org.xwiki.model;
 
 import java.util.Map;
 
+/**
+ * @since 4.3M1
+ */
 public interface Persistable
 {
     // Note: All the other methods don't save. Need to call save() to save. For ex this allows to add several docs

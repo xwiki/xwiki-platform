@@ -28,6 +28,9 @@ import java.util.Map;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * @since 4.3M1
+ */
 public class BridgedDocument implements Document
 {
     private XWikiDocument document;

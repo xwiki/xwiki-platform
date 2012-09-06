@@ -32,6 +32,9 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @since 4.3M1
+ */
 public class BridgedObject implements Object
 {
     private BaseObject baseObject;

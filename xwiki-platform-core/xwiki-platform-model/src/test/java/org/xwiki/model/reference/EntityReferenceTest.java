@@ -431,28 +431,24 @@ public class EntityReferenceTest
         EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)));
-        Assert.assertEquals("name = [page], type = [DOCUMENT], parent = [name = [space], type = [SPACE], "
-            + "parent = [name = [wiki], type = [WIKI], parent = [null]]]", reference1.toString());
+        Assert.assertEquals("Document wiki:space.page", reference1.toString());
 
         EntityReference reference2 = new EntityReference("page", EntityType.DOCUMENT, null);
-        Assert.assertEquals("name = [page], type = [DOCUMENT], parent = [null]", reference2.toString());
+        Assert.assertEquals("Document page", reference2.toString());
 
         EntityReference reference3 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE));
-        Assert.assertEquals("name = [page], type = [DOCUMENT], parent = [name = [space], type = [SPACE], "
-            + "parent = [null]]", reference3.toString());
+        Assert.assertEquals("Document space.page", reference3.toString());
 
+        // We don't handle parameters in Entity Reference because they're internal and not exposed and at the moment
+        // they can only be used in a restricted manner (only LOCALE) by a DocumentReference.
         Map<String, Serializable> map  = new HashMap<String, Serializable>();
         map.put("key1", "value1");
         EntityReference reference4 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE), map);
-        Assert.assertEquals("name = [page], type = [DOCUMENT], parent = [name = [space], type = [SPACE], "
-            + "parent = [null]] parameters = {key1 = [value1]}", reference4.toString());
+        Assert.assertEquals("Document space.page", reference4.toString());
 
-        map.put("key2", "value2");
-        EntityReference reference5 = new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE), map);
-        Assert.assertEquals("name = [page], type = [DOCUMENT], parent = [name = [space], type = [SPACE], "
-            + "parent = [null]] parameters = {key1 = [value1], key2 = [value2]}", reference5.toString());
+        EntityReference reference5 = new EntityReference("attachment", EntityType.ATTACHMENT, reference1);
+        Assert.assertEquals("Attachment wiki:space.page@attachment", reference5.toString());
     }
 }

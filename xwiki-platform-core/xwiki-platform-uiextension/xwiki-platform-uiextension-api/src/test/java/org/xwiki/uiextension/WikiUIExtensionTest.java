@@ -135,9 +135,8 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
         Assert.assertEquals(ListUtils.EMPTY_LIST, wikiUIExtension.getImplementedInterfaces());
         Assert.assertEquals(DOC_REF, wikiUIExtension.getDocumentReference());
         Assert.assertEquals(UIExtension.class, wikiUIExtension.getRole());
-        Assert.assertEquals("name = [xwiki:XWiki.UIExtensionClass[1]], type = [OBJECT], parent = [name = " +
-            "[MyUIExtension], type = [DOCUMENT], parent = [name = [XWiki], type = [SPACE], parent = [name = [xwiki], " +
-            "type = [WIKI], parent = [null]]]]", wikiUIExtension.getRoleHint());
+        Assert.assertEquals("Object xwiki:XWiki.MyUIExtension^xwiki:XWiki.UIExtensionClass[1]",
+            wikiUIExtension.getRoleHint());
         wikiUIExtension.execute();
     }
 

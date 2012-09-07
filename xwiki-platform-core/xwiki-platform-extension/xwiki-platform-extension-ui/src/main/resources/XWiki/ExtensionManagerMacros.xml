@@ -1375,7 +1375,7 @@ $xwiki.jsx.use('ExtensionManagerMacros')
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}$msg.get('extensions.install.error.missingIdOrVersion'){{/error}}
   #elseif ($request.confirm)
-    #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
+    #set($installJob = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionnamespace))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       #if($extensionwiki)

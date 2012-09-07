@@ -31,10 +31,10 @@ import org.xwiki.model.reference.WikiReference;
 
 import java.util.Map;
 
-public class /**
+/**
  * @since 4.3M1
  */
-        BridgedServer implements Server
+public class BridgedServer implements Server
 {
     private XWikiContext xcontext;
 

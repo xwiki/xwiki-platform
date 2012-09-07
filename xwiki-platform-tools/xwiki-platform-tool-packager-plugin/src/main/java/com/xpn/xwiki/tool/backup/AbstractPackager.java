@@ -53,7 +53,7 @@ public abstract class AbstractPackager
      * @throws Exception failed to initialize context.
      * @todo Replace the Hibernate config file with a list of parameters required for the packaging operation
      */
-    protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
+    public XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
     {
         // Initialize the Component Manager and Environment
         ComponentManager cm = org.xwiki.environment.System.initialize();

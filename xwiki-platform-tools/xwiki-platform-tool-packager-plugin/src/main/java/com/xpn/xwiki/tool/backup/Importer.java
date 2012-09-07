@@ -19,25 +19,27 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.plugin.packaging.Package;
-import com.xpn.xwiki.plugin.packaging.PackageException;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.packaging.Package;
+import com.xpn.xwiki.plugin.packaging.PackageException;
+import com.xpn.xwiki.store.XWikiCacheStore;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+
 /**
  * Import a set of XWiki documents into an existing database.
- *
+ * 
  * @version $Id$
  */
 public class Importer extends AbstractPackager
@@ -70,14 +72,14 @@ public class Importer extends AbstractPackager
      * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
      * allowed for method names though.
      * </p>
-     *
+     * 
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param databaseName some database name (TODO: find out what this name is really)
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
      *            password, etc)
-     * @param importUser optionally the user under which to perform the import (useful for example when importing
-     *        pages that need to have Programming Rights and the page author is not the same as the importing user)
+     * @param importUser optionally the user under which to perform the import (useful for example when importing pages
+     *            that need to have Programming Rights and the page author is not the same as the importing user)
      * @throws Exception if the import failed for any reason
      * @todo Replace the Hibernate config file with a list of parameters required for the importation
      */
@@ -108,8 +110,33 @@ public class Importer extends AbstractPackager
     }
 
     /**
+     * @param file the XAR file to import
+     * @param importUser optionally the user under which to perform the import (useful for example when importing pages
+     *            that need to have Programming Rights and the page author is not the same as the importing user)
+     * @param context the XWiki context
+     * @throws XWikiException failed to import the XAR file
+     * @throws IOException failed to parse the XAR file
+     */
+    public void importXAR(File file, String importUser, XWikiContext context) throws XWikiException, IOException
+    {
+        Package pack = new Package();
+        pack.setWithVersions(false);
+
+        // Parse XAR
+        FileInputStream fis = new FileInputStream(file);
+        try {
+            pack.Import(fis, context);
+        } finally {
+            IOUtils.closeQuietly(fis);
+        }
+
+        // Import into the database
+        installWithUser(importUser, pack, context);
+    }
+
+    /**
      * Install a Package as a backup pack or with the passed user (if any).
-     *
+     * 
      * @param importUser the user to import with or null if it should be imported as a backup pack
      * @param pack the Package instance performing the import
      * @param context the XWiki Context
@@ -139,7 +166,7 @@ public class Importer extends AbstractPackager
      * @param context the XWiki Context object from which we can retrieve the Store implementation
      * @throws XWikiException in case of shutdown error
      */
-    private void shutdownHSQLDB(XWikiContext context) throws XWikiException
+    void shutdownHSQLDB(XWikiContext context) throws XWikiException
     {
         XWikiStoreInterface store = context.getWiki().getStore();
         if (XWikiCacheStore.class.isAssignableFrom(store.getClass())) {

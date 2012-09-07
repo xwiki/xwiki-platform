@@ -552,7 +552,7 @@ public class PackageMojo extends AbstractMojo
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",
-            "xwiki-commons-logging-logback", this.project.getVersion(), null, "jar"));
+            "xwiki-commons-logging-logback", this.getXWikiCommonsVersion(), null, "jar"));
         // Get the logging artifact versions from the top level XWiki Commons POM
         MavenProject pomProject = getTopLevelPOMProject();
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.slf4j", "jcl-over-slf4j",
@@ -594,14 +594,23 @@ public class PackageMojo extends AbstractMojo
     private MavenProject getTopLevelPOMProject() throws MojoExecutionException
     {
         MavenProject pomProject;
-        Artifact pomArtifact = this.factory.createArtifact("org.xwiki.commons", "xwiki-commons",
-            this.project.getVersion(), "", "pom");
+        Artifact pomArtifact =
+            this.factory.createArtifact("org.xwiki.commons", "xwiki-commons", this.getXWikiCommonsVersion(), "", "pom");
         try {
             pomProject = this.mavenProjectBuilder.buildFromRepository(pomArtifact, this.remoteRepos, this.local);
         } catch (ProjectBuildingException e) {
             throw new MojoExecutionException(String.format("Failed to build project for [%s]", pomArtifact), e);
         }
         return pomProject;
+    }
+
+    /**
+     * @return the version of the XWiki Commons project, taken from the {@code commons.version} property, defaulting to
+     *         the current project version of this property is not defined
+     */
+    private String getXWikiCommonsVersion()
+    {
+        return this.project.getProperties().getProperty("commons.version", this.project.getVersion());
     }
 
     private String getDependencyManagementVersion(MavenProject project, String groupId, String artifactId)

@@ -54,6 +54,12 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.objects.BaseObjectReference;
 
+/**
+ * Unit tests for {@link WikiUIExtension}.
+ *
+ * @version $Id$
+ * @since 4.2M3
+ */
 public class WikiUIExtensionTest extends AbstractMockingTestCase
 {
     private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");

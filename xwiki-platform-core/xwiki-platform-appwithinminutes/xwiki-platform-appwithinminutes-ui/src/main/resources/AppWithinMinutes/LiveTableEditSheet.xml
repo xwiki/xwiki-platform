@@ -602,7 +602,7 @@ return XWiki;
 
 #macro(displayIcon)
   #if($services.uix)
-    #set($icon = 'icon:wrench')
+    #set($icon = 'icon:application')
     #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
       #if($uix.getName() == "org.xwiki.platform.panels.Applications.${doc.space}")
         #if("$!uix.getParameters().get('icon')" != '')

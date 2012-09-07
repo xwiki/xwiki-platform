@@ -109,7 +109,7 @@ public class DefaultWikiIRCBotListenerManager implements WikiIRCBotListenerManag
                     this.componentManager.registerComponent(componentDescriptor, wikiListener);
                 } catch (ComponentRepositoryException e) {
                     throw new IRCBotException(String.format("Unable to register Wiki IRC Bot Listener in document [%s]",
-                        this.compactWikiSerializer.serialize(reference)), e);
+                        reference), e);
                 }
                 // Step 4: Add the listener to the Bot
                 this.bot.getListenerManager().addListener(wikiListener);

@@ -131,8 +131,7 @@ public class DocumentModifiedEventListener implements EventListener
                 }
             } catch (IRCBotException e) {
                 // Failed to handle the event, log an error
-                this.logger.error("Failed to send IRC notification for document [{}]",
-                    this.serializer.serialize(reference), e);
+                this.logger.error("Failed to send IRC notification for document [{}]", reference, e);
             }
         }
     }

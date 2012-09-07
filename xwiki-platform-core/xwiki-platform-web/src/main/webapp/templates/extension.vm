@@ -86,7 +86,7 @@
       #else
         ## The given extension is displayed in a list of extensions.
         #em_submitButton('extensions.actions.showDetails' 'actionShowDetails' true)
-        <input type="hidden" name="xback" value="${xback}" />
+        <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
       #end
       ##
       ## Specific actions.

@@ -66,7 +66,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         this.repositoryUtil.setup();
 
         // mock
-
+        
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
@@ -84,7 +84,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
-
                 allowing(mockXWiki).isVirtualMode();
                 will(returnValue(true));
 
@@ -155,7 +154,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(true));
-
             }
         });
 
@@ -172,7 +170,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(true));
-
             }
         });
 
@@ -189,7 +186,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(false));
-
             }
         });
 
@@ -206,7 +202,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(false));
-
             }
         });
 
@@ -241,7 +236,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(true));
-
             }
         });
 
@@ -258,7 +252,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(false));
-
             }
         });
 
@@ -275,7 +268,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(false));
-
             }
         });
 

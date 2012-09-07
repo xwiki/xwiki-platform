@@ -24,14 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Entity;
-import javax.xml.stream.events.EntityReference;
-
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.velocity.VelocityContext;
 import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,14 +43,10 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.test.AbstractMockingTestCase;
-import org.xwiki.test.MockingComponentManager;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
-
-import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Unit tests for {@link WikiUIExtension}.
@@ -60,7 +54,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @version $Id$
  * @since 4.2M3
  */
-public class WikiUIExtensionTest extends AbstractMockingTestCase
+public class WikiUIExtensionTest
 {
     private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");
 
@@ -76,19 +70,21 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
 
     private XDOM xdom;
 
+    private Mockery mockery = new JUnit4Mockery();
+
+    private Mockery getMockery()
+    {
+        return mockery;
+    }
+
     @Before
     public void configure() throws Exception
     {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-
         final ComponentManager componentManager = getMockery().mock(ComponentManager.class);
         transformation = getMockery().mock(Transformation.class, "macro");
         final Execution execution = getMockery().mock(Execution.class);
         velocityManager = getMockery().mock(VelocityManager.class);
-
-        // We need to this here and not directly when we declare the variables because otherwise the component manager
-        // would not be initialized before the lookups performed in the BaseObjectReference constructor
-        objectReference = new BaseObjectReference(CLASS_REF, 1, DOC_REF);
+        objectReference = new ObjectReference(CLASS_REF.toString() + "[1]", DOC_REF);
 
         getMockery().checking(new Expectations()
         {
@@ -150,7 +146,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
     public void getParametersWithAnEqualSignInAValue() throws Exception
     {
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
-        final VelocityContext velocityContext = getMockery().mock(VelocityContext.class);
+        final VelocityContext velocityContext = new VelocityContext();
 
         getMockery().checking(new Expectations()
         {
@@ -172,7 +168,7 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
     public void getParametersWhenVelocityFails() throws Exception
     {
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
-        final VelocityContext velocityContext = getMockery().mock(VelocityContext.class);
+        final VelocityContext velocityContext = new VelocityContext();
 
         getMockery().checking(new Expectations()
         {
@@ -189,11 +185,5 @@ public class WikiUIExtensionTest extends AbstractMockingTestCase
         });
 
         Assert.assertEquals(0, wikiUIExtension.getParameters().size());
-    }
-
-    @Override
-    public MockingComponentManager getComponentManager() throws Exception
-    {
-        return null;
     }
 }

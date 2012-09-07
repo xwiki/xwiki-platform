@@ -94,7 +94,7 @@ public class UIExtensionScriptService implements ScriptService
         try {
             extensions = this.contextComponentManagerProvider.get().getInstanceMap(UIExtension.class);
         } catch (ComponentLookupException e) {
-            logger.error("Failed to lookup for UIExtension instances, error: [{}]", e.getMessage());
+            logger.error("Failed to lookup UIExtension instances, error: [{}]", e);
         }
 
         if (extensions != null) {

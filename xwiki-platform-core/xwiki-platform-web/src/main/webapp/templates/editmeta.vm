@@ -2,13 +2,17 @@
 #if("$!docTitle" == '')
   #set($docTitle = $!tdoc.title)
 #end
+#set($docParent = $request.getParameter('parent'))
+#if("$!docParent" == '')
+  #set($docParent = $!tdoc.parent)
+#end
 ##--------------------------------------------------------------------------
 ## Title and parent
 ##
   <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$msg.get('core.editors.content.parentField.edit.title')">[$msg.get('core.editors.content.parentField.edit')]</a></div>
   <div id="parentinput">
     <label for="xwikidocparentinput">$msg.get('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$msg.get('core.editors.content.parentField.edit.hide')</a>
-    <input type="text" id="xwikidocparentinput" name="parent" value="$!{escapetool.xml($tdoc.parent)}" size="30" class="suggestDocuments"/></label>
+    <input type="text" id="xwikidocparentinput" name="parent" value="$!{escapetool.xml("$!docParent")}" size="30" class="suggestDocuments"/></label>
   </div>
   #if ($editor != 'inline')
   <div id="titleinput">

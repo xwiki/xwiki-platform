@@ -30,14 +30,14 @@ import org.xwiki.component.annotation.Role;
 public interface DistributionConfiguration
 {
     /**
-     * When this property is {@code true} any page view should be redirected to the distribution wizard if the
-     * distribution job is running. If {@code false} the distribution wizard is accessible only by using the
-     * distribution action.
+     * When this property is {@code false} any page view should be redirected to the distribution wizard if the
+     * distribution job is running. If {@code true} the distribution wizard is accessible only by using the distribution
+     * action.
      * <p>
      * This property is needed mostly by functional tests that don't want to handle the distribution wizard.
      * 
-     * @return {@code true} if the view action should be redirected to the distribution action while the distribution
-     *         job is running, {@code false} otherwise
+     * @return {@code false} if the distribution wizard is displayed whenever the distribution job is running and an
+     *         administrator views a wiki page, {@code true} otherwise
      */
-    boolean isViewActionRedirected();
+    boolean isWizardSkipped();
 }

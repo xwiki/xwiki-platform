@@ -70,7 +70,7 @@ public class XWikiTestSetup extends TestSetup
             // connection for the tests.
             properties.setProperty("extension.repositories", "");
             // Skip the distribution wizard.
-            properties.setProperty("extension.distribution.redirectViewAction", false);
+            properties.setProperty("extension.distribution.skipWizard", true);
             executor.saveXWikiProperties(properties);
 
             this.executors.add(executor);

@@ -46,8 +46,8 @@ public class DefaultDistributionConfiguration implements DistributionConfigurati
     private ConfigurationSource configuration;
 
     @Override
-    public boolean isViewActionRedirected()
+    public boolean isWizardSkipped()
     {
-        return configuration.getProperty(PREFIX + "redirectViewAction", true);
+        return configuration.getProperty(PREFIX + "skipWizard", false);
     }
 }

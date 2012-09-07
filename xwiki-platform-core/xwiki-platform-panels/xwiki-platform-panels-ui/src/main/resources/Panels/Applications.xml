@@ -106,10 +106,34 @@
     </property>
     <property>
       <content>{{velocity}}
+#set($discard = $xwiki.ssx.use('Panels.Applications'))
+#set($discard = $xwiki.jsx.use('Panels.Applications'))
 #panelheader($msg.get('panels.applications.title'))
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
-#set($params = $uix.getParameters())
+  #set($params = $uix.getParameters())
+  #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $context.user, $params.target))
+(% class="applicationsPanel" %)
 * [[image:$params.icon $params.label&gt;&gt;$params.target]]
+  #end
+#end
+#if($xwiki.hasWikiAdminRights())
+## We need the 3 newlines below to have a separation between the lists
+
+
+
+(% class="applicationsPanel" %)
+* [[image:icon:add $msg.get('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||id="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]] 
+
+(% id="applicationPanelMoreContainer" class="hidden" %)(((
+(% class="applicationsPanel" %)
+#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more'))
+  #set($params = $uix.getParameters())
+  #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
+(% class="applicationsPanel" %)
+* [[image:$params.icon $params.label&gt;&gt;$params.target]]
+  #end
+#end
+)))
 #end
 #panelfooter()
 {{/velocity}}</content>
@@ -122,6 +146,209 @@
     </property>
     <property>
       <type>view</type>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>document.observe('xwiki:dom:loaded', function(e) {
+  $('applicationPanelMoreButton').observe('click', function(e) {
+    $('applicationPanelMoreContainer').style.display = "none";
+    $('applicationPanelMoreContainer').removeClassName('hidden');
+    Effect.BlindDown('applicationPanelMoreContainer');
+    e.stop();
+  });
+});</code>
+    </property>
+    <property>
+      <name>Applications Panel</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>ul.applicationsPanel li img {
+  float:left;
+}
+
+#applicationPanelMoreContainer li a {
+  font-size: 90%;
+  line-height: 16px;
+  font-weight: bold;
+}
+
+
+
+</code>
+    </property>
+    <property>
+      <name>Applications Panel</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
   <content>{{include document="Panels.PanelSheet"/}}</content>

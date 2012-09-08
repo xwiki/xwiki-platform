@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).

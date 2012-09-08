@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference;
+package org.xwiki.model.reference;
 
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 
 /**
  * Extends {@link DefaultStringEntityReferenceSerializer} to add the serialization of the Locale for Document

@@ -42,125 +42,138 @@ public class BridgedDocument implements Document
 
     public Version getVersion()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public EntityIterator<Entity> getChildren(EntityType type)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public org.xwiki.model.Object addObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public ObjectDefinition addObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public Content getContent()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public Locale getLocale()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public Object getObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public ObjectDefinition getObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public EntityIterator<ObjectDefinition> getObjectDefinitions()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public EntityIterator<Object> getObjects()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public boolean hasObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public boolean hasObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public void removeObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public void removeObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public void setContent(Content content)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public String getIdentifier()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public Entity getParent()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public EntityReference getReference()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public EntityReference getLinkReference()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public void setLinkReference(EntityReference linkedReference)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public EntityType getType()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public void discard()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public boolean isModified()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public boolean isNew()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public boolean isRemoved()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 }

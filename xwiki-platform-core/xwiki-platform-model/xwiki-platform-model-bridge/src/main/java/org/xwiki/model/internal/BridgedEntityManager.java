@@ -29,7 +29,7 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.Entity;
 import org.xwiki.model.EntityManager;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelException;
+import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.UniqueReference;
 import org.xwiki.model.Version;
 import org.xwiki.model.reference.DocumentReference;
@@ -67,7 +67,7 @@ public class BridgedEntityManager implements EntityManager
         try {
             this.modifiedEntityCache = cacheManager.getCacheFactory().newCache(cacheConfiguration);
         } catch (Exception e) {
-            throw new ModelException("Failed to create Entity Cache", e);
+            throw new ModelRuntimeException("Failed to create Entity Cache", e);
         }
     }
 
@@ -100,7 +100,7 @@ public class BridgedEntityManager implements EntityManager
                         result = (T) new BridgedSpace();
                     }
                 } catch (XWikiException e) {
-                    throw new ModelException("Error verifying existence of space [" + reference + "]", e);
+                    throw new ModelRuntimeException("Error verifying existence of space [" + reference + "]", e);
                 }
                 break;
             case WIKI:
@@ -128,7 +128,7 @@ public class BridgedEntityManager implements EntityManager
                 }
                 break;
             default:
-                throw new ModelException("Not supported");
+                throw new ModelRuntimeException("Not supported");
         }
 
         return result;
@@ -164,7 +164,7 @@ public class BridgedEntityManager implements EntityManager
                 result = xdoc;
             }
         } catch (XWikiException e) {
-            throw new ModelException("Error loading document [" + reference + "]", e);
+            throw new ModelRuntimeException("Error loading document [" + reference + "]", e);
         }
 
         return result;
@@ -190,7 +190,7 @@ public class BridgedEntityManager implements EntityManager
                 }
                 break;
             default:
-                throw new ModelException("Not supported");
+                throw new ModelRuntimeException("Not supported");
         }
         return result;
     }
@@ -204,7 +204,7 @@ public class BridgedEntityManager implements EntityManager
         if (reference.getType().equals(EntityType.WIKI)) {
             result = (T) new BridgedWiki(getXWikiContext());
         } else {
-            throw new ModelException("Not supported");
+            throw new ModelRuntimeException("Not supported");
         }
 
         // Save the Entity in the cache
@@ -217,13 +217,7 @@ public class BridgedEntityManager implements EntityManager
     @Override
     public void removeEntity(UniqueReference uniqueReference)
     {
-        throw new ModelException("Not supported");
-    }
-
-    @Override
-    public void rollback(Version versionToRollbackTo)
-    {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public XWiki getXWiki()

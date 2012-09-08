@@ -26,7 +26,6 @@ import org.jmock.Expectations;
 import org.junit.*;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.*;
-import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;

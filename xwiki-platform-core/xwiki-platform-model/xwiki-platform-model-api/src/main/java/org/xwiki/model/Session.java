@@ -19,31 +19,14 @@
  */
 package org.xwiki.model;
 
-import java.util.Locale;
-
 /**
  * @since 4.3M1
  */
-public interface Entity extends Persistable, Linkable, Referenceable
+public interface Session extends Persistable
 {
-    /**
-     * UUID
-     */
-    String getIdentifier();
-    
-    EntityType getType();
+    void start();
 
-    Locale getLocale();
+    void stop();
 
-    Version getVersion();
-
-    Entity getParent();
-
-    EntityIterator<Entity> getChildren(EntityType type) throws ModelException;
-
-    boolean isModified();
-
-    boolean isNew();
-
-    boolean isRemoved();
+    void rollback(Version versionToRollbackTo);
 }

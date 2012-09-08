@@ -27,23 +27,23 @@ public interface Extensible
     /**
      * @return the list of object definitions defined inside this entity
      */
-    EntityIterator<ObjectDefinition> getObjectDefinitions();
+    EntityIterator<ObjectDefinition> getObjectDefinitions() throws ModelException;
 
-    ObjectDefinition getObjectDefinition(String objectDefinitionName);
+    ObjectDefinition getObjectDefinition(String objectDefinitionName) throws ModelException;
 
     ObjectDefinition addObjectDefinition(String objectDefinitionName);
 
     void removeObjectDefinition(String objectDefinitionName);
 
-    boolean hasObjectDefinition(String objectDefinitionName);
+    boolean hasObjectDefinition(String objectDefinitionName) throws ModelException;
 
-    EntityIterator<Object> getObjects();
+    EntityIterator<Object> getObjects() throws ModelException;
 
-    Object getObject(String objectName);
+    Object getObject(String objectName) throws ModelException;
 
     Object addObject(String objectName);
 
     void removeObject(String objectName);
 
-    boolean hasObject(String objectName);
+    boolean hasObject(String objectName) throws ModelException;
 }

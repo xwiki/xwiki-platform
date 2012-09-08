@@ -19,35 +19,18 @@
  */
 package org.xwiki.model;
 
-import java.lang.*;
-import java.lang.Object;
-import java.util.Iterator;
-
 /**
  * @since 4.3M1
  */
-public class EntityIterator<T> implements Iterator
+public class EntityIterator<T extends Entity>
 {
-    @Override
-    public boolean hasNext()
+    public boolean hasNext() throws ModelException
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
-    @Override
-    public Object next()
+    public T next() throws ModelException
     {
-        throw new ModelException("Not supported");
-    }
-
-    @Override
-    public void remove()
-    {
-        throw new ModelException("Not supported");
-    }
-
-    public T nextEntity()
-    {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 }

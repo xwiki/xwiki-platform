@@ -30,13 +30,13 @@ public interface Server extends Persistable
     /**
      * @return the list of all Wiki objects inside this Server
      */
-    EntityIterator<Wiki> getWikis();
+    EntityIterator<Wiki> getWikis() throws ModelException;
 
-    Wiki getWiki(String wikiName);
+    Wiki getWiki(String wikiName) throws ModelException;
 
     Wiki addWiki(String wikiName);
 
     void removeWiki(String wikiName);
 
-    boolean hasWiki(String wikiName);
+    boolean hasWiki(String wikiName) throws ModelException;
 }

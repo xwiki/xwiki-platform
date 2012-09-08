@@ -22,11 +22,19 @@ package org.xwiki.model;
 import java.util.Map;
 
 /**
+ *
  * @since 4.3M1
  */
 public interface Persistable
 {
-    // Note: All the other methods don't save. Need to call save() to save. For ex this allows to add several docs
-    // at once before saving them all at once. This allows for optimizations.
-    void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters);
+    /**
+     * None of the other Model API save. This allows to add/modify/delete several Entities before saving them all at
+     * once, which allows for both optimizations and supporting Store working in this manner (for example SCM tools).
+     */
+    void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters) throws ModelException;
+
+    /**
+     * Discard all uncomitted changes.
+     */
+    void discard();
 }

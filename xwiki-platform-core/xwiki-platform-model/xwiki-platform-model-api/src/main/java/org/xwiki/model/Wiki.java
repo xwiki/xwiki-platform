@@ -27,17 +27,17 @@ public interface Wiki extends Object, Extensible
     /**
      * @return the list of top level Space objects in this wiki (excluding nested spaces)
      */
-    EntityIterator<Space> getSpaces();
+    EntityIterator<Space> getSpaces() throws ModelException;
 
     /**
      * @param spaceName the name of the space
      * @return the object representing the space whose  name is passed in parameter
      */
-    Space getSpace(String spaceName);
+    Space getSpace(String spaceName) throws ModelException;
 
     Space addSpace(String spaceName);
 
     void removeSpace(String spaceName);
 
-    boolean hasSpace(String spaceName);
+    boolean hasSpace(String spaceName) throws ModelException;
 }

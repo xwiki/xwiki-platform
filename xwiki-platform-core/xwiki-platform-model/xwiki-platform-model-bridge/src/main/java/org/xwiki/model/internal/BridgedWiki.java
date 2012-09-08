@@ -41,29 +41,34 @@ public class BridgedWiki implements Wiki
         this.xcontext = xcontext;
     }
 
+    @Override
     public Space addSpace(String spaceName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public Space getSpace(String spaceName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public EntityIterator<Space> getSpaces()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public boolean hasSpace(String spaceName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public void removeSpace(String spaceName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     public XWiki getXWiki()
@@ -71,44 +76,52 @@ public class BridgedWiki implements Wiki
         return this.xcontext.getWiki();
     }
 
+    @Override
     public org.xwiki.model.Object addObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public ObjectDefinition addObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public EntityIterator<Entity> getChildren(EntityType type)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public String getIdentifier()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public Object getObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public ObjectDefinition getObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public EntityIterator<ObjectDefinition> getObjectDefinitions()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public EntityIterator<Object> getObjects()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     /**
@@ -124,51 +137,64 @@ public class BridgedWiki implements Wiki
         return null;
     }
 
+    @Override
     public EntityReference getReference()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public EntityReference getLinkReference()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public void setLinkReference(EntityReference linkedReference)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public EntityType getType()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public boolean hasObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public boolean hasObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public void removeObject(String objectName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public void removeObjectDefinition(String objectDefinitionName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
+    @Override
     public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public void discard()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 
     public XWikiContext getXWikiContext()
@@ -179,24 +205,30 @@ public class BridgedWiki implements Wiki
     @Override
     public boolean isModified()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public boolean isNew()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public boolean isRemoved()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public Locale getLocale()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public Version getVersion()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 }

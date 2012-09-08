@@ -27,13 +27,13 @@ public interface Space extends Object, Extensible
     /**
      * @return the list of top level Space objects in this Space (excluding nested spaces)
      */
-    EntityIterator<Space> getSpaces();
+    EntityIterator<Space> getSpaces() throws ModelException;
 
     /**
      * @param spaceName the name of the nested space to look for
      * @return the nested space whose name is passed as parameter
      */
-    Space getSpace(String spaceName);
+    Space getSpace(String spaceName) throws ModelException;
 
     /**
      * Add a nested space.
@@ -45,13 +45,13 @@ public interface Space extends Object, Extensible
      */
     void removeSpace(String spaceName);
 
-    boolean hasSpace(String spaceName);
+    boolean hasSpace(String spaceName) throws ModelException;
 
-    EntityIterator<Document> getDocuments();
+    EntityIterator<Document> getDocuments() throws ModelException;
 
-    boolean hasDocument(String documentName);
+    boolean hasDocument(String documentName) throws ModelException;
 
-    Document getDocument(String documentName);
+    Document getDocument(String documentName) throws ModelException;
 
     Document addDocument(String documentName);
 

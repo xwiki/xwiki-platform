@@ -24,6 +24,8 @@ import java.util.Locale;
 import org.xwiki.model.reference.EntityReference;
 
 /**
+ * TODO: Decide if this should be part of the current EntityReference implementation.
+ *
  * @since 4.3M1
  */
 public class UniqueReference

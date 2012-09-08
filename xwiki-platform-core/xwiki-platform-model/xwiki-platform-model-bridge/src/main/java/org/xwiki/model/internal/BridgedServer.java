@@ -24,6 +24,7 @@ import com.xpn.xwiki.XWikiContext;
 import org.xwiki.model.EntityIterator;
 import org.xwiki.model.EntityManager;
 import org.xwiki.model.ModelException;
+import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.Server;
 import org.xwiki.model.UniqueReference;
 import org.xwiki.model.Wiki;
@@ -54,7 +55,7 @@ public class BridgedServer implements Server
     }
 
     @Override
-    public Wiki getWiki(String wikiName)
+    public Wiki getWiki(String wikiName) throws ModelException
     {
         UniqueReference uniqueReference = new UniqueReference(new WikiReference(wikiName));
         return this.entityManager.getEntity(uniqueReference);
@@ -63,11 +64,11 @@ public class BridgedServer implements Server
     @Override
     public EntityIterator<Wiki> getWikis()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public boolean hasWiki(String wikiName)
+    public boolean hasWiki(String wikiName) throws ModelException
     {
         UniqueReference uniqueReference = new UniqueReference(new WikiReference(wikiName));
         return this.entityManager.hasEntity(uniqueReference);
@@ -76,13 +77,19 @@ public class BridgedServer implements Server
     @Override
     public void removeWiki(String wikiName)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override
     public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public void discard()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 
     public XWikiContext getXWikiContext()

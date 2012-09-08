@@ -20,14 +20,15 @@
 package org.xwiki.model;
 
 /**
+ * Provides direct access to any Entity through an{@link org.xwiki.model.reference.EntityReference} without having
+ * to navigate through the Entity hierarchy.
+ *
  * @since 4.3M1
  */
 public interface EntityManager
 {
-    <T extends Entity> T getEntity(UniqueReference reference);
-    boolean hasEntity(UniqueReference reference);
+    <T extends Entity> T getEntity(UniqueReference reference) throws ModelException;
+    boolean hasEntity(UniqueReference reference) throws ModelException;
     void removeEntity(UniqueReference reference);
     <T extends Entity> T addEntity(UniqueReference reference);
-
-    void rollback(Version versionToRollbackTo);
 }

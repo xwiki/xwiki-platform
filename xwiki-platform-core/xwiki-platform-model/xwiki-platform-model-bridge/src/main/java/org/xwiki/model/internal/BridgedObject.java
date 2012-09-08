@@ -25,7 +25,7 @@ import java.util.Map;
 import org.xwiki.model.Entity;
 import org.xwiki.model.EntityIterator;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelException;
+import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.Object;
 import org.xwiki.model.Version;
 import org.xwiki.model.reference.EntityReference;
@@ -46,61 +46,73 @@ public class BridgedObject implements Object
 
     @Override public EntityIterator<Entity> getChildren(EntityType type)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public String getIdentifier()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public Locale getLocale()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public Entity getParent()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public EntityType getType()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public Version getVersion()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public boolean isModified()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public boolean isNew()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public boolean isRemoved()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public EntityReference getLinkReference()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public void setLinkReference(EntityReference linkedReference)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public void discard()
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 
     @Override public EntityReference getReference()
     {
-        throw new ModelException("Not supported");
+        throw new ModelRuntimeException("Not supported");
     }
 }

@@ -168,7 +168,7 @@ public class BridgedDocument implements Document
     @Override
     public boolean isNew()
     {
-        throw new ModelRuntimeException("Not supported");
+        return this.document.isNew();
     }
 
     @Override

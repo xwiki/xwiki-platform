@@ -29,9 +29,9 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.Entity;
 import org.xwiki.model.EntityManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelException;
 import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.UniqueReference;
-import org.xwiki.model.Version;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -72,7 +72,7 @@ public class BridgedEntityManager implements EntityManager
     }
 
     @Override
-    public <T extends Entity> T getEntity(UniqueReference uniqueReference)
+    public <T extends Entity> T getEntity(UniqueReference uniqueReference) throws ModelException
     {
         T result = null;
 
@@ -87,10 +87,7 @@ public class BridgedEntityManager implements EntityManager
         EntityReference reference = uniqueReference.getReference();
         switch (reference.getType()) {
             case DOCUMENT:
-                XWikiDocument xdoc = getXWikiDocument(reference);
-                if (xdoc != null) {
-                    result = (T) new BridgedDocument(xdoc);
-                }
+                result = (T) new BridgedDocument(getXWikiDocument(reference));
                 break;
             case SPACE:
                 // A space exists if there's at least one document in it.
@@ -134,37 +131,27 @@ public class BridgedEntityManager implements EntityManager
         return result;
     }
 
-    private BaseObject getXWikiObject(EntityReference reference)
+    private BaseObject getXWikiObject(EntityReference reference) throws ModelException
     {
-        BaseObject result = null;
-
         // Find the reference to the document containing the object (it's the parent of the passed
         // reference) and Load the parent document since objects are loaded at the same time in the old model.
         XWikiDocument xdoc = getXWikiDocument(reference.getParent());
-        // Get the requested object if the document isn't new...
-        if (xdoc != null) {
-            BaseObject object = xdoc.getXObject(new ObjectReference(reference));
-            if (object != null) {
-                result = object;
-            }
-        }
-
-        return result;
+        // Get the requested object if the document isn't new. If the document is new or the document exists but
+        // doesn't have that XObject then we return null. Note that we cannot create an empty XObject since we don't
+        // have a reference to the XClass at this moment.
+        return xdoc.getXObject(new ObjectReference(reference));
     }
 
-    private XWikiDocument getXWikiDocument(EntityReference reference)
+    private XWikiDocument getXWikiDocument(EntityReference reference) throws ModelException
     {
-        XWikiDocument result = null;
+        XWikiDocument result;
 
         try {
             // Since the old model API always return a XWikiDocument even if it doesn't exist, we need to check
             // if the document is new or not.
-            XWikiDocument xdoc = getXWiki().getDocument(new DocumentReference(reference), getXWikiContext());
-            if (!xdoc.isNew()) {
-                result = xdoc;
-            }
+            result = getXWiki().getDocument(new DocumentReference(reference), getXWikiContext());
         } catch (XWikiException e) {
-            throw new ModelRuntimeException("Error loading document [" + reference + "]", e);
+            throw new ModelException("Error loading document [%s]", e, reference);
         }
 
         return result;

@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.Document;
+import org.xwiki.model.ModelException;
 import org.xwiki.model.UniqueReference;
 import org.xwiki.model.Wiki;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,6 +36,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -84,7 +86,28 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         }});
 
         Document doc = this.manager.getEntity(new UniqueReference(documentReference));
-        Assert.assertNull(doc);
+        Assert.assertNotNull(doc);
+        Assert.assertTrue(doc.isNew());
+    }
+
+    @Test
+    public void getEntityForDocumentWhenStoreException() throws Exception
+    {
+        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        final XWikiDocument xdoc = new XWikiDocument(documentReference);
+        // This means the doc doesn't exist in the old model
+        xdoc.setNew(true);
+        getMockery().checking(new Expectations() {{
+            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            will(throwException(new XWikiException()));
+        }});
+
+        try {
+            this.manager.getEntity(new UniqueReference(documentReference));
+            Assert.fail("Should have thrown an exception");
+        } catch (ModelException expected) {
+            Assert.assertEquals("Error loading document [wiki:space.page]", expected.getMessage());
+        }
     }
 
     @Test
@@ -159,8 +182,6 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations() {{
             oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
                 will(returnValue(xdoc));
-            oneOf(xdoc).isNew();
-                will(returnValue(false));
             oneOf(xdoc).getXObject(objectReference);
                 will(returnValue(baseObject));
         }});
@@ -178,8 +199,6 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations() {{
             oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
                 will(returnValue(xdoc));
-            oneOf(xdoc).isNew();
-                will(returnValue(false));
             oneOf(xdoc).getXObject(objectReference);
                 will(returnValue(null));
         }});
@@ -193,12 +212,12 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
     {
         final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         final ObjectReference objectReference = new ObjectReference("object", documentReference);
-        final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
+        final XWikiDocument xdoc = new XWikiDocument(documentReference);
+        // This means the doc doesn't exist in the old model
+        xdoc.setNew(true);
         getMockery().checking(new Expectations() {{
             oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
                 will(returnValue(xdoc));
-            oneOf(xdoc).isNew();
-                will(returnValue(true));
         }});
 
         org.xwiki.model.Object object = this.manager.getEntity(new UniqueReference(objectReference));

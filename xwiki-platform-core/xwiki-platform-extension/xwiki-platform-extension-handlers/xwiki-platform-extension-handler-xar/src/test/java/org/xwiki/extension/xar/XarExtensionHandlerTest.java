@@ -355,6 +355,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong content", "content", page.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
+        Assert.assertFalse("Document is hidden", page.isHidden());
 
         BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -385,12 +386,23 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         DocumentReference translatedReference = new DocumentReference("wiki", "translated", "translated");
         XWikiDocument translated = this.documents.get(translatedReference).get("tr");
 
-        Assert.assertNotNull("Document wiki:space.page has not been saved in the database", translated);
-        Assert.assertFalse("Document wiki:space.page has not been saved in the database", translated.isNew());
+        Assert.assertNotNull("Document wiki:translated.translated has not been saved in the database", translated);
+        Assert
+            .assertFalse("Document wiki:translated.translated has not been saved in the database", translated.isNew());
 
         Assert.assertEquals("Wrong content", "translated content", translated.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
+
+        // space.hiddenpage
+
+        XWikiDocument hiddenpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "hiddenpage"), getContext());
+
+        Assert.assertNotNull("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage);
+        Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
+
+        Assert.assertTrue("Document is not hidden", hiddenpage.isHidden());
     }
 
     @Test

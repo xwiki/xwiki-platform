@@ -91,7 +91,7 @@ widgets.ModalPopup = Class.create({
       break;
     }
     // Append to the end of the document body.
-    document.body.appendChild(this.dialog);
+    $('body').appendChild(this.dialog);
     this.dialog.hide();
   },
   /** Set a class name to the dialog box */
@@ -122,7 +122,7 @@ widgets.ModalPopup = Class.create({
       // Start listening to keyboard events
       this.attachKeyListeners();
       // In IE, position: fixed does not work.
-      if (window.browser.isIE6x) {
+      if (browser.isIE6x) {
         this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
         this.dialog._x_scrollListener = this.onScroll.bindAsEventListener(this);
         Event.observe(window, "scroll", this.dialog._x_scrollListener);
@@ -143,7 +143,7 @@ widgets.ModalPopup = Class.create({
     if (event) {
       Event.stop(event);
     }
-    if (window.browser.isIE6x) {
+    if (browser.isIE6x) {
       Event.stopObserving(window, "scroll", this.dialog._x_scrollListener);
       $$("select").each(function(item) {
         item.style.visibility = item._x_initiallyVisible;

@@ -266,8 +266,10 @@ viewers.Comments = Class.create({
           // Allows CommentAddAction to parse a template which will return a message telling if the captcha was wrong.
           formData.set('xpage', 'xpart');
           formData.set('vm', this.generatorTemplate);
-          // Strip whatever query string is supplied by the form so it doesn't override the formData.
-          var url = form.action.replace(/\?.*/, '');
+          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          var queryStringParams = $H(form.action.toQueryParams());
+          formData.keys().each(queryStringParams.unset.bind(queryStringParams));
+          var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
           formData.unset('action_cancel');
           // Create a notification message to display to the user when the submit is being sent
           form._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.inProgress')", "inprogress");
@@ -326,7 +328,7 @@ viewers.Comments = Class.create({
     if (!form || !XWiki.hasEdit) {
       return;
     }
-    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent($$("meta[name=space]")[0].content)).replace("__page__", encodeURIComponent($$("meta[name=page]")[0].content));
+    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent(XWiki.currentSpace)).replace("__page__", encodeURIComponent(XWiki.currentPage));
     form.commentElt = form.down('textarea');
     var buttons = form.down('input[type=submit]').up('div');
     form.previewButton = new Element('span', {'class' : 'buttonwrapper'}).update(new Element('input', {'type' : 'button', 'class' : 'button', 'value' : "$msg.get('core.viewers.comments.preview.button.preview')"}));

@@ -68,7 +68,7 @@ public abstract class AbstractXYPlotGenerator implements PlotGenerator
     }
 
     /**
-     * @return an {@link CategoryItemRenderer} to be used for plotting the chart.
+     * @return an {@link XYItemRenderer} to be used for plotting the chart.
      */
     protected abstract XYItemRenderer getRenderer();
 

@@ -22,7 +22,6 @@ package org.xwiki.chart.internal.plot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
-
 /**
  * Generate Plots for XY data sets using a line and shape renderer.
  *
@@ -31,7 +30,6 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
  */
 public class XYLineAndShapePlotGenerator extends AbstractXYPlotGenerator
 {
-
     @Override
     public XYItemRenderer getRenderer()
     {

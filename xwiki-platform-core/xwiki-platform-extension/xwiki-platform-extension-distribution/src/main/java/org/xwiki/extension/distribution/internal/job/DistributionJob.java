@@ -28,6 +28,7 @@ import javax.inject.Named;
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.internal.AbstractJobStatus;
@@ -59,7 +60,13 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
 
         List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(2);
         steps.add(new DistributionStepStatus("extension.mainui"));
-        steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+        
+        DistributionState state = distributionManager.getDistributionState();
+
+        // Upgrade outdated extension only when the distribution changed
+        if (state != DistributionState.NEW) {
+            steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+        }
 
         DistributionJobStatus status =
             new DistributionJobStatus(request, this.observationManager, this.loggerManager, steps);

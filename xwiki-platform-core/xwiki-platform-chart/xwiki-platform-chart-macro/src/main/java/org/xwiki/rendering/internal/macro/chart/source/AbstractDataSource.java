@@ -63,7 +63,7 @@ public abstract class AbstractDataSource implements DataSource
     private SimpleChartModel chartModel;
 
     /**
-     * A configuartion object for time zone and locale.
+     * A configuration object for time zone and locale.
      */
     private LocaleConfiguration localeConfiguration = new LocaleConfiguration();
 

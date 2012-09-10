@@ -20,12 +20,15 @@
 package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -36,15 +39,15 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Computes a temporary storage location for generated chart image and the URL to access it.
+ * Save generated Chart images to a temporary storage location.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M3
  */
 @Component
 @Named("tmp")
 @Singleton
-public class TemporaryImageLocator implements ImageLocator
+public class TemporaryChartImageWriter implements ChartImageWriter
 {
     /**
      * Default encoding used for encoding wiki, space, page and image file names when generating the Image in the
@@ -87,7 +90,30 @@ public class TemporaryImageLocator implements ImageLocator
     private DocumentAccessBridge documentAccessBridge;
 
     @Override
-    public File getStorageLocation(ImageId imageId) throws MacroExecutionException
+    public void writeImage(ImageId imageId, byte[] imageData) throws MacroExecutionException
+    {
+        File imageFile = getStorageLocation(imageId);
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(imageFile);
+            fos.write(imageData);
+            fos.close();
+        } catch (IOException e) {
+            throw new MacroExecutionException("Failed to write the generated chart image", e);
+        } finally {
+            IOUtils.closeQuietly(fos);
+        }
+    }
+
+    /**
+     * Compute the location where to store the generated chart image.
+     *
+     * @param imageId the image id that we use to generate a unique storage location
+     * @return the location where to store the generated chart image
+     * @throws MacroExecutionException if an error happened when computing the location
+     */
+    protected File getStorageLocation(ImageId imageId) throws MacroExecutionException
     {
         File directory;
         try {

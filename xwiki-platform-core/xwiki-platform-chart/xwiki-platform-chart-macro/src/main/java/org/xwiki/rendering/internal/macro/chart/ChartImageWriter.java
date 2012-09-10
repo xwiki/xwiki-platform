@@ -19,28 +19,27 @@
  */
 package org.xwiki.rendering.internal.macro.chart;
 
-import java.io.File;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Returns location for the generated chart image, both for where it's stored in the store and the URL to retrieve it.
+ * Writes an Image represented as an array of Bytes to storage. Also provides a helper method to get an XWiki URL to
+ * access the written data.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M3
  */
 @Role
-public interface ImageLocator
+public interface ChartImageWriter
 {
     /**
-     * Compute the location where to store the generated chart image.
+     * Writes the image to storage.
      *
      * @param imageId the image id that we use to generate a unique storage location
-     * @return the location where to store the generated chart image
-     * @throws MacroExecutionException if an error happened when computing the location
+     * @param imageData the image to store
+     * @throws MacroExecutionException if an error happened when computing the location or saving the image
      */
-    File getStorageLocation(ImageId imageId) throws MacroExecutionException;
+    void writeImage(ImageId imageId, byte[] imageData) throws MacroExecutionException;
 
     /**
      * Compute the URL to use to access the stored generate chart image.

@@ -30,17 +30,19 @@ import org.xwiki.model.Object;
 import org.xwiki.model.Version;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * @since 4.3M1
  */
-public class BridgedObject implements Object
+public class BridgedObject extends AbstractBridgedEntity implements Object
 {
     private BaseObject baseObject;
 
-    public BridgedObject(BaseObject baseObject)
+    public BridgedObject(BaseObject baseObject, XWikiContext xcontext)
     {
+        super(xcontext);
         this.baseObject = baseObject;
     }
 
@@ -75,11 +77,6 @@ public class BridgedObject implements Object
     }
 
     @Override public boolean isModified()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public boolean isNew()
     {
         throw new ModelRuntimeException("Not supported");
     }

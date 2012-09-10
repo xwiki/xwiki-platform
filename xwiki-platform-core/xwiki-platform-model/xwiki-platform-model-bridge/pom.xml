@@ -93,6 +93,7 @@
           <includeTestSourceDirectory>false</includeTestSourceDirectory>
           <excludes>
             <!-- New Model is not yet stabilized, exclude from Checkstyle for now -->
+            org/xwiki/model/internal/AbstractBridgedEntity.java,
             org/xwiki/model/internal/BridgedDocument.java,
             org/xwiki/model/internal/BridgedEntityManager.java,
             org/xwiki/model/internal/BridgedObject.java,

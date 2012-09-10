@@ -32,13 +32,11 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * @since 4.3M1
  */
-public class BridgedWiki implements Wiki
+public class BridgedWiki extends AbstractBridgedEntity implements Wiki
 {
-    private XWikiContext xcontext;
-
     public BridgedWiki(XWikiContext xcontext)
     {
-        this.xcontext = xcontext;
+        super(xcontext);
     }
 
     @Override
@@ -73,7 +71,7 @@ public class BridgedWiki implements Wiki
 
     public XWiki getXWiki()
     {
-        return this.xcontext.getWiki();
+        return getXWikiContext().getWiki();
     }
 
     @Override
@@ -197,19 +195,8 @@ public class BridgedWiki implements Wiki
         throw new ModelRuntimeException("Not supported");
     }
 
-    public XWikiContext getXWikiContext()
-    {
-        return this.xcontext;
-    }
-
     @Override
     public boolean isModified()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override
-    public boolean isNew()
     {
         throw new ModelRuntimeException("Not supported");
     }

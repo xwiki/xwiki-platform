@@ -26,11 +26,18 @@ import org.xwiki.model.*;
 import org.xwiki.model.Object;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * @since 4.3M1
  */
-public class BridgedSpace implements Space
+public class BridgedSpace extends AbstractBridgedEntity implements Space
 {
+    public BridgedSpace(XWikiContext xcontext)
+    {
+        super(xcontext);
+    }
+
     @Override public Document addDocument(String documentName)
     {
         throw new ModelRuntimeException("Not supported");
@@ -182,12 +189,6 @@ public class BridgedSpace implements Space
 
     @Override
     public boolean isModified()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override
-    public boolean isNew()
     {
         throw new ModelRuntimeException("Not supported");
     }

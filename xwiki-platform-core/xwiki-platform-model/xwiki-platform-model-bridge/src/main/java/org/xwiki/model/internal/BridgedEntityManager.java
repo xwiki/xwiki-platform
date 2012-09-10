@@ -87,29 +87,38 @@ public class BridgedEntityManager implements EntityManager
         EntityReference reference = uniqueReference.getReference();
         switch (reference.getType()) {
             case DOCUMENT:
-                result = (T) new BridgedDocument(getXWikiDocument(reference));
+                result = (T) new BridgedDocument(getXWikiDocument(reference), getXWikiContext());
+                // Note: We don't need to set isNew since this is supported by the old model directly.
                 break;
             case SPACE:
                 // A space exists if there's at least one document in it.
                 try {
+                    // TODO: Improve performance by issuing a query that only looks for documents in the specified
+                    // space instead of all docs in all spaces...
                     List<String> spaces = getXWiki().getSpaces(getXWikiContext());
                     if (spaces.contains(reference.getName())) {
-                        result = (T) new BridgedSpace();
+                        BridgedSpace bs = new BridgedSpace(getXWikiContext());
+                        bs.setNew(false);
+                        result = (T) bs;
                     }
                 } catch (XWikiException e) {
-                    throw new ModelRuntimeException("Error verifying existence of space [" + reference + "]", e);
+                    throw new ModelException("Error verifying existence of space [%s]", e, reference);
                 }
                 break;
             case WIKI:
                 // TODO: Need to load the wiki details. FTM only checking if it exists
                 if (hasEntity(uniqueReference)) {
-                    result = (T) new BridgedWiki(getXWikiContext());
+                    BridgedWiki bw = new BridgedWiki(getXWikiContext());
+                    bw.setNew(false);
+                    result = (T) bw;
                 }
                 break;
             case OBJECT:
                 BaseObject xObject = getXWikiObject(reference);
                 if (xObject != null) {
-                    result = (T) new BridgedObject(xObject);
+                    BridgedObject bo = new BridgedObject(xObject, getXWikiContext());
+                    bo.setNew(false);
+                    result = (T) bo;
                 }
                 break;
             case OBJECT_PROPERTY:

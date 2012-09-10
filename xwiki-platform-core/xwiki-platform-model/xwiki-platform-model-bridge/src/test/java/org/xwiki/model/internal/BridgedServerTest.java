@@ -54,6 +54,7 @@ public class BridgedServerTest extends AbstractBridgedComponentTestCase
 
         // Verify we get the exact same instance since we haven't saved yet.
         Assert.assertSame(wiki, this.server.getWiki("wiki"));
+        Assert.assertTrue(wiki.isNew());
     }
 
     @Test
@@ -65,5 +66,18 @@ public class BridgedServerTest extends AbstractBridgedComponentTestCase
         }});
 
         Assert.assertTrue(this.server.hasWiki("wiki"));
+    }
+
+    @Test
+    public void getWikiWhenWikiExists() throws Exception
+    {
+        getMockery().checking(new Expectations() {{
+            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
+            will(returnValue(new URL("http://whatever/not/null")));
+        }});
+
+        Wiki wiki = this.server.getWiki("wiki");
+        Assert.assertNotNull(wiki);
+        Assert.assertFalse(wiki.isNew());
     }
 }

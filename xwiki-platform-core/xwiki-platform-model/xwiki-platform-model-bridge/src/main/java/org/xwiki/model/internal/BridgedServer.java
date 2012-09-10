@@ -47,6 +47,9 @@ public class BridgedServer implements Server
         this.entityManager = entityManager;
     }
 
+    /**
+     * Note: We'll create a wiki descriptor document when we save the Wiki Entity.
+     */
     @Override
     public Wiki addWiki(String wikiName)
     {

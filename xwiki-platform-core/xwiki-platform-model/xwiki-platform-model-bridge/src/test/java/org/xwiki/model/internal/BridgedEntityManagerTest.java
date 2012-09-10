@@ -21,6 +21,7 @@ package org.xwiki.model.internal;
 
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -29,10 +30,12 @@ import org.junit.Test;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.Document;
 import org.xwiki.model.ModelException;
+import org.xwiki.model.Space;
 import org.xwiki.model.UniqueReference;
 import org.xwiki.model.Wiki;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
@@ -71,6 +74,7 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
 
         Document doc = this.manager.getEntity(new UniqueReference(documentReference));
         Assert.assertNotNull(doc);
+        Assert.assertFalse(doc.isNew());
     }
 
     @Test
@@ -121,6 +125,7 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
 
         Wiki wiki = this.manager.getEntity(new UniqueReference(wikiReference));
         Assert.assertNotNull(wiki);
+        Assert.assertFalse(wiki.isNew());
     }
 
     @Test
@@ -188,6 +193,7 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
 
         org.xwiki.model.Object object = this.manager.getEntity(new UniqueReference(objectReference));
         Assert.assertNotNull(object);
+        Assert.assertFalse(object.isNew());
     }
 
     @Test
@@ -222,5 +228,20 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
 
         org.xwiki.model.Object object = this.manager.getEntity(new UniqueReference(objectReference));
         Assert.assertNull(object);
+    }
+
+    @Test
+    public void getEntityForSpaceThatExists() throws Exception
+    {
+        final SpaceReference spaceReference = new SpaceReference("space", new WikiReference("wiki"));
+
+        getMockery().checking(new Expectations() {{
+            oneOf(getContext().getWiki()).getSpaces(getContext());
+            will(returnValue(Arrays.asList("space", "otherspace")));
+        }});
+
+        Space space = this.manager.getEntity(new UniqueReference(spaceReference));
+        Assert.assertNotNull(space);
+        Assert.assertFalse(space.isNew());
     }
 }

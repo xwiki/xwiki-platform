@@ -26,17 +26,19 @@ import org.xwiki.model.reference.EntityReference;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @since 4.3M1
  */
-public class BridgedDocument implements Document
+public class BridgedDocument extends AbstractBridgedEntity implements Document
 {
     private XWikiDocument document;
 
-    public BridgedDocument(XWikiDocument document)
+    public BridgedDocument(XWikiDocument document, XWikiContext xcontext)
     {
+        super(xcontext);
         this.document = document;
     }
 
@@ -169,6 +171,12 @@ public class BridgedDocument implements Document
     public boolean isNew()
     {
         return this.document.isNew();
+    }
+
+    @Override
+    public void setNew(boolean isNew)
+    {
+        this.document.setNew(isNew);
     }
 
     @Override

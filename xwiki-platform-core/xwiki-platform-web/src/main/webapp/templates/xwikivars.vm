@@ -123,7 +123,7 @@
   #set ($docvariant = "${languageparams}${revparams}")
 #end
 #set ($keyboardShortcutsEnabled = $isAdvancedUser)
-#set ($isInServletMode = $xwikimode == 0)
-#set ($isInPortletMode = $xwikimode == 1)
+#set ($isInPortletMode = $xwikimode == 1 || "$!request.getAttribute('javax.portlet.request')" != '')
+#set ($isInServletMode = $xwikimode == 0 && !$isInPortletMode)
 #template("deprecatedVars.vm")
 #end

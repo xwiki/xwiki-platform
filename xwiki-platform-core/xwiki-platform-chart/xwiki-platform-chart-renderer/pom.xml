@@ -41,7 +41,6 @@
       <groupId>org.jfree</groupId>
       <artifactId>jfreechart</artifactId>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

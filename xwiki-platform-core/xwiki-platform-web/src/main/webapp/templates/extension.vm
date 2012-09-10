@@ -140,11 +140,15 @@
 #macro (displayJobProgressBar $jobStatus)
   <div class="ui-progress">
     <div class="ui-progress-background">
-      #set ($percent = $jobStatus.progress.offset)
+      #set ($percent = 0)
+      ## The job status is null after the job is created, until the job is scheduled.
+      #if ($jobStatus)
+        #set ($percent = $jobStatus.progress.offset)
+      #end
       #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
       <div class="ui-progress-bar green" style="width:${percent}%"></div>
     </div>
-    #if (!$jobStatus.log.isEmpty())
+    #if ($jobStatus && !$jobStatus.log.isEmpty())
       ## We need the tail of the log queue.
       #set ($logList = [])
       #set ($discard = $logList.addAll($jobStatus.log))

@@ -220,8 +220,7 @@
           <excludes>
               **/ImportMojo.java,
               **/ExportMojo.java,
-              **/PackageMojo.java,
-              **/ArtifactItem.java
+              **/PackageMojo.java
           </excludes>
         </configuration>
       </plugin>

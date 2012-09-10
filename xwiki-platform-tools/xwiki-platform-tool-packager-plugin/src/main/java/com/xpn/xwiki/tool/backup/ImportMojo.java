@@ -27,11 +27,14 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
 
 import com.xpn.xwiki.XWikiContext;
@@ -65,7 +68,7 @@ public class ImportMojo extends AbstractMojo
     private File sourceDirectory;
 
     /**
-     * @parameter default-value = "${project.build.directory}/datas/"
+     * @parameter default-value = "${project.build.directory}/data/"
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
      */
     private File xwikiDataDir;
@@ -114,13 +117,6 @@ public class ImportMojo extends AbstractMojo
 
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
-            ComponentManager componentManager = (ComponentManager) xcontext.get(ComponentManager.class.getName());
-
-            LocalExtensionRepository localExtensionRepository =
-                componentManager.getInstance(LocalExtensionRepository.class);
-            InstalledExtensionRepository installedExtensionRepository =
-                componentManager.getInstance(InstalledExtensionRepository.class);
-
             for (Artifact artifact : artifacts) {
                 if (!artifact.isOptional()) {
                     if ("xar".equals(artifact.getType())) {
@@ -130,14 +126,7 @@ public class ImportMojo extends AbstractMojo
                         importer.importXAR(artifact.getFile(), null, xcontext);
 
                         // Install extension
-                        DefaultLocalExtension extension =
-                            new DefaultLocalExtension(null, new ExtensionId(artifact.getGroupId() + ':'
-                                + artifact.getArtifactId(), artifact.getVersion()), artifact.getType());
-
-                        LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
-                        installedExtensionRepository.installExtension(localExtension, "xwiki", true);
-
-                        // TODO: add other project informations and especially the features and dependencies
+                        installExtension(artifact, xcontext);
                     }
                 }
             }
@@ -149,5 +138,27 @@ public class ImportMojo extends AbstractMojo
         // TODO: Find a way to implement this generically for all databases and inside
         // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
         importer.shutdownHSQLDB(xcontext);
+    }
+
+    private void installExtension(Artifact artifact, XWikiContext xcontext) throws ComponentLookupException,
+        InstallException, LocalExtensionRepositoryException
+    {
+        ComponentManager componentManager = (ComponentManager) xcontext.get(ComponentManager.class.getName());
+
+        LocalExtensionRepository localExtensionRepository =
+            componentManager.getInstance(LocalExtensionRepository.class);
+        InstalledExtensionRepository installedExtensionRepository =
+            componentManager.getInstance(InstalledExtensionRepository.class);
+
+        DefaultLocalExtension extension =
+            new DefaultLocalExtension(null, new ExtensionId(artifact.getGroupId() + ':' + artifact.getArtifactId(),
+                artifact.getBaseVersion()), artifact.getType());
+
+        extension.setFile(artifact.getFile());
+
+        LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
+        installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", true);
+
+        // TODO: add other project informations and especially the features and dependencies
     }
 }

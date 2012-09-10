@@ -775,7 +775,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       #foreach($p in $request.getParameterNames())
         #if($p != 'page' &amp;&amp; $p != 'ipp')
           #foreach($v in $request.getParameterValues($p))
-            #set($queryString = "${queryString}&amp;amp;${p}=${v}")
+            #set($queryString = "${queryString}&amp;${p}=${v}")
           #end
         #end
       #end

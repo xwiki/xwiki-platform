@@ -79,7 +79,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         // Step 2: Upgrade outdated extensions
 
         // Upgrade outdated extension only when the distribution changed
-        if (state != DistributionState.NEW) {
+        if (!this.installedRepository.getInstalledExtensions().isEmpty()) {
             steps.add(new DistributionStepStatus("extension.outdatedextensions"));
         }
 

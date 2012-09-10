@@ -153,14 +153,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
-            XarInstalledExtension previousXarExtension;
-            try {
-                previousXarExtension =
-                    (XarInstalledExtension) this.xarRepository.resolve(previousLocalExtension.getId());
-            } catch (ResolveException e) {
+            XarInstalledExtension previousXarExtension =
+                (XarInstalledExtension) this.xarRepository.getInstalledExtension(previousLocalExtension.getId());
+
+            if (previousXarExtension == null) {
                 // Not supposed to be possible
                 throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
-                    + "] from xar repository", e);
+                    + "] from xar repository");
             }
 
             // Install new pages

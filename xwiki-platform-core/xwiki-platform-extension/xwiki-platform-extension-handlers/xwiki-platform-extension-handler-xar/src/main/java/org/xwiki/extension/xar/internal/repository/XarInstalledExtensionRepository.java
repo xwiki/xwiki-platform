@@ -244,12 +244,6 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     }
 
     @Override
-    public InstalledExtension getInstalledExtension(ExtensionId extensionId)
-    {
-        return this.extensions.get(extensionId);
-    }
-
-    @Override
     public InstalledExtension getInstalledExtension(String id, String namespace)
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);

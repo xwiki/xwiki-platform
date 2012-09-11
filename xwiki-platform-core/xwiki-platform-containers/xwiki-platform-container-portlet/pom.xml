@@ -45,10 +45,13 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>portlet-api</groupId>
+      <groupId>javax.portlet</groupId>
       <artifactId>portlet-api</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- Portlet API uses the Servlet API -->
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
     </dependency>
   </dependencies>
   <build>

@@ -34,6 +34,7 @@ import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
+import javax.portlet.RenderRequest;
 import javax.portlet.WindowState;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
@@ -241,6 +242,30 @@ public class XWikiPortletRequest implements XWikiRequest
     public boolean isRequestedSessionIdValid()
     {
         return request.isRequestedSessionIdValid();
+    }
+
+    @Override
+    public String getETag()
+    {
+        return request instanceof RenderRequest ? ((RenderRequest) request).getETag() : null;
+    }
+
+    @Override
+    public String getWindowID()
+    {
+        return request.getWindowID();
+    }
+
+    @Override
+    public Map<String, String[]> getPrivateParameterMap()
+    {
+        return request.getPrivateParameterMap();
+    }
+
+    @Override
+    public Map<String, String[]> getPublicParameterMap()
+    {
+        return request.getPublicParameterMap();
     }
 
     /*
@@ -525,5 +550,4 @@ public class XWikiPortletRequest implements XWikiRequest
             return getHttpServletRequest().getRemoteHost();
         return null;
     }
-
 }

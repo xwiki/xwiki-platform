@@ -138,11 +138,11 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     private String getRequestParameters(XWikiContext context)
     {
         if (context.getRequest() != null) {
-            Map<String, String> parameters = context.getRequest().getParameterMap();
+            Map<String, String[]> parameters = context.getRequest().getParameterMap();
 
             if (parameters != null) {
                 if (parameters.containsKey(PARAMETER_REFRESH)) {
-                    parameters = new HashMap<String, String>(parameters);
+                    parameters = new HashMap<String, String[]>(parameters);
 
                     parameters.remove(PARAMETER_REFRESH);
                 }

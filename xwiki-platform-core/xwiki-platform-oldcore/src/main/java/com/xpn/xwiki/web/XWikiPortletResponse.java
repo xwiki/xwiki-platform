@@ -19,15 +19,33 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.portlet.*;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.ActionResponse;
+import javax.portlet.CacheControl;
+import javax.portlet.MimeResponse;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletModeException;
+import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceURL;
+import javax.portlet.StateAwareResponse;
+import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
 
 public class XWikiPortletResponse implements XWikiResponse {
     private PortletResponse response;
@@ -160,9 +178,11 @@ public class XWikiPortletResponse implements XWikiResponse {
             ((ActionResponse)response).setPortletMode(portletMode);
     }
 
-    public void setRenderParameters(Map map) {
-        if (response instanceof ActionResponse)
-            ((ActionResponse)response).setRenderParameters(map);
+    public void setRenderParameters(Map<String, String[]> parameters)
+    {
+        if (response instanceof ActionResponse) {
+            ((ActionResponse) response).setRenderParameters(parameters);
+        }
     }
 
     public void setRenderParameter(String s, String s1) {
@@ -173,6 +193,94 @@ public class XWikiPortletResponse implements XWikiResponse {
     public void setRenderParameter(String s, String[] strings) {
         if (response instanceof ActionResponse)
             ((ActionResponse)response).setRenderParameter(s, strings);
+    }
+
+    @Override
+    public void setNextPossiblePortletModes(Collection<PortletMode> portletModes)
+    {
+        if (response instanceof RenderResponse) {
+            ((RenderResponse) response).setNextPossiblePortletModes(portletModes);
+        }
+    }
+
+    @Override
+    public ResourceURL createResourceURL()
+    {
+        return response instanceof MimeResponse ? ((MimeResponse) response).createResourceURL() : null;
+    }
+
+    @Override
+    public CacheControl getCacheControl()
+    {
+        return response instanceof MimeResponse ? ((MimeResponse) response).getCacheControl() : null;
+    }
+
+    @Override
+    public void addProperty(Cookie cookie)
+    {
+        response.addProperty(cookie);
+    }
+
+    @Override
+    public void addProperty(String key, Element element)
+    {
+        response.addProperty(key, element);
+    }
+
+    @Override
+    public Element createElement(String tagName) throws DOMException
+    {
+        return response.createElement(tagName);
+    }
+
+    @Override
+    public void sendRedirect(String location, String renderUrlParamName) throws IOException
+    {
+        if (response instanceof ActionResponse) {
+            ((ActionResponse) response).sendRedirect(location, renderUrlParamName);
+        }
+    }
+
+    @Override
+    public Map<String, String[]> getRenderParameterMap()
+    {
+        return response instanceof StateAwareResponse ? ((StateAwareResponse) response).getRenderParameterMap() : null;
+    }
+
+    @Override
+    public PortletMode getPortletMode()
+    {
+        return response instanceof StateAwareResponse ? ((StateAwareResponse) response).getPortletMode() : null;
+    }
+
+    @Override
+    public WindowState getWindowState()
+    {
+        return response instanceof StateAwareResponse ? ((StateAwareResponse) response).getWindowState() : null;
+    }
+
+    @Override
+    public void removePublicRenderParameter(String name)
+    {
+        if (response instanceof StateAwareResponse) {
+            ((StateAwareResponse) response).removePublicRenderParameter(name);
+        }
+    }
+
+    @Override
+    public void setEvent(QName qName, Serializable value)
+    {
+        if (response instanceof StateAwareResponse) {
+            ((StateAwareResponse) response).setEvent(qName, value);
+        }
+    }
+
+    @Override
+    public void setEvent(String name, Serializable value)
+    {
+        if (response instanceof StateAwareResponse) {
+            ((StateAwareResponse) response).setEvent(name, value);
+        }
     }
 
     /*
@@ -318,7 +426,4 @@ public class XWikiPortletResponse implements XWikiResponse {
             return getHttpServletResponse().containsHeader(name);
         return false;
     }
-
-
 }
-

@@ -537,4 +537,28 @@ public class XWikiServletRequest implements XWikiRequest
     {
         return null;
     }
+
+    @Override
+    public String getETag()
+    {
+        return null;
+    }
+
+    @Override
+    public String getWindowID()
+    {
+        return null;
+    }
+
+    @Override
+    public Map<String, String[]> getPrivateParameterMap()
+    {
+        return null;
+    }
+
+    @Override
+    public Map<String, String[]> getPublicParameterMap()
+    {
+        return null;
+    }
 }

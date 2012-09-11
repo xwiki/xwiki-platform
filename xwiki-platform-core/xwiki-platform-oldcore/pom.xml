@@ -186,12 +186,12 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>portlet-api</groupId>
+      <groupId>javax.portlet</groupId>
       <artifactId>portlet-api</artifactId>
-      <version>1.0</version>
       <!-- TODO: Ideally the scope should be "provided". However before we can do this we'll need
            to fully remove all references to the Portlet API in XWiki Core so that using it in
            a Servlet environment will not fail with a ClassNotFoundException -->
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>struts</groupId>

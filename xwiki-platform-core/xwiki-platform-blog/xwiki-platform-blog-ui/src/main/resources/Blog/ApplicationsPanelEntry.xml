@@ -88,7 +88,7 @@ icon=icon:transmit</parameters>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
     </property>
     <property>
-      <name>platform.panels.Applications.Blog</name>
+      <name>platform.panels.blogApplication</name>
     </property>
   </object>
   <content>{{include document="XWiki.UIExtensionSheet" /}}</content>

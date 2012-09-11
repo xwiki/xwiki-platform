@@ -242,7 +242,7 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
       <extensionPointId>org.xwiki.platform.panels.Applications.more</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.panels.Applications.addApplications</name>
+      <name>platform.panels.addApplications</name>
     </property>
     <property>
       <parameters>label=$msg.get('extensions.applicationsPanel.install')

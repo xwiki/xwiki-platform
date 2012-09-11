@@ -458,7 +458,7 @@ icon=icon:application_view_tile</parameters>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
     </property>
     <property>
-      <name>platform.panels.Applications.Dashboard</name>
+      <name>platform.panels.dashboardApplication</name>
     </property>
   </object>
   <content>{{velocity}}

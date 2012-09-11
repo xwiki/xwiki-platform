@@ -80,10 +80,10 @@
       <content/>
     </property>
     <property>
-      <extensionPointId>org.platform.panels.Applications.more</extensionPointId>
+      <extensionPointId>org.xwiki.platform.panels.Applications.more</extensionPointId>
     </property>
     <property>
-      <name>platform.panels.Applications.createApplication</name>
+      <name>platform.panels.createApplication</name>
     </property>
     <property>
       <parameters>label=$msg.get('platform.appwithinminutes.appPanelCreateEntry')

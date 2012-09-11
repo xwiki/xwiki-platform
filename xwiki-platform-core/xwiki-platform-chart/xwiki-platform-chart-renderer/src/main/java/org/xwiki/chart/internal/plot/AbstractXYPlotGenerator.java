@@ -37,7 +37,6 @@ import org.xwiki.chart.PlotGeneratorException;
  */
 public abstract class AbstractXYPlotGenerator implements PlotGenerator
 {
-
     @Override
     public Plot generate(ChartModel model, Map<String, String> parameters)
         throws PlotGeneratorException

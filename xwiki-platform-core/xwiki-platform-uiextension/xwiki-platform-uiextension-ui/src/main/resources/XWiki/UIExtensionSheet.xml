@@ -29,7 +29,7 @@
   #foreach($prop in $class.properties)
     ; $prop.prettyName
     #if($prop.getType() == 'TextAreaClass')
-      : {{code}}$uix.getProperty($prop.getName()).getValue(){{/code}}
+      : (% class="box" %)((( {{{ $uix.getProperty($prop.getName()).getValue() }}} )))
     #else
       : $doc.display($prop.getName(), $uix)
     #end

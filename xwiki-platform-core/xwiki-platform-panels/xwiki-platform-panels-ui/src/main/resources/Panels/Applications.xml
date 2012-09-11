@@ -122,9 +122,9 @@
 
 
 (% class="applicationsPanel" %)
-* [[image:icon:add $msg.get('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||id="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]] 
+* [[image:icon:add $msg.get('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||class="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]]
 
-(% id="applicationPanelMoreContainer" class="hidden" %)(((
+(% class="applicationPanelMoreContainer hidden" %)(((
 (% class="applicationsPanel" %)
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more'))
   #set($params = $uix.getParameters())
@@ -229,11 +229,30 @@
     </property>
     <property>
       <code>document.observe('xwiki:dom:loaded', function(e) {
-  $('applicationPanelMoreButton').observe('click', function(e) {
-    $('applicationPanelMoreContainer').style.display = "none";
-    $('applicationPanelMoreContainer').removeClassName('hidden');
-    Effect.BlindDown('applicationPanelMoreContainer');
-    e.stop();
+  $$('[class="applicationPanelMoreButton"]').each(function(button, index) {
+    button.observe('click', function(e) {
+      e.stop();
+      // If the submenu is already visible, hide it
+      el = e.currentTarget.up('div').down('[class="applicationPanelMoreContainer"]');
+      if (el) {
+        el.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
+        Effect.BlindUp(el.id, {
+          // We do this to be able to get our hidden element back, we don't rely on
+          // display:none since we don't allow nested style in HTML elements.
+          afterFinish: function(effect) {
+            effect.element.addClassName('hidden');
+          }
+        });
+      }
+      // If not, show it
+      el = e.currentTarget.up('div').down('[class="applicationPanelMoreContainer hidden"]');
+      if (el) {
+        el.style.display = "none";
+        el.removeClassName('hidden');
+        el.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
+        Effect.BlindDown(el.id);
+      }
+    });
   });
 });</code>
     </property>
@@ -331,7 +350,7 @@
   float:left;
 }
 
-#applicationPanelMoreContainer li a {
+div.applicationPanelMoreContainer li a {
   font-size: 90%;
   line-height: 16px;
   font-weight: bold;

@@ -45,7 +45,11 @@ public enum PlotType
     /** xy area plot type. */
     XYAREA("xy_area", DatasetType.XY, AxisType.NUMBER, AxisType.NUMBER),
     /** xy line and shape plot type. */
-    XYLINEANDSHAPE("xy_line_and_shape", DatasetType.XY, AxisType.NUMBER, AxisType.NUMBER);
+    XYLINEANDSHAPE("xy_line_and_shape", DatasetType.XY, AxisType.NUMBER, AxisType.NUMBER),
+    /** xy line3D plot type. */
+    XYLINE3D("xy_line3D", DatasetType.XY, AxisType.NUMBER, AxisType.NUMBER),
+    /** xy step plot type. */
+    XYSTEP("xy_step", DatasetType.XY, AxisType.NUMBER, AxisType.NUMBER);
 
     /** The name of the plot type. */
     private final String name;

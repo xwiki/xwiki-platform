@@ -672,40 +672,75 @@ public class ExtensionManagerScriptService implements ScriptService
         return status;
     }
 
+    private InstallRequest createUpgradePlanRequest(String namespace)
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));
+        installRequest.addNamespace(namespace);
+
+        return installRequest;
+    }
+
+    private InstallRequest createUpgradePlanRequest()
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, null));
+
+        return installRequest;
+    }
+
     /**
      * Schedule the upgrade plan creation job.
      * 
-     * @param namespace the (optional) namespace where to upgrade the extensions; if {@code null} or empty, the
-     *            extensions will be upgraded globally
+     * @param request the request to pass to pass to the upgrade plan job
      * @return the {@link Job} object which can be used to monitor the progress of the upgrade plan creation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createUpgradePlan(InstallRequest request)
+    {
+        request.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            request.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        request.setProperty(PROPERTY_CHECKRIGHTS, true);
+
+        Job job = null;
+        try {
+            job = safe(this.jobManager.addJob(UpgradePlanJob.JOBTYPE, request));
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    /**
+     * Start the asynchronous upgrade plan creation process for the provided namespace.
+     * 
+     * @param namespace the namespace where to upgrade the extensions
+     * @return the {@link Job} object which can be used to monitor the progress of the plan creation process, or
      *         {@code null} in case of failure
      */
     public Job createUpgradePlan(String namespace)
     {
         setError(null);
 
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
-        }
+        return createUpgradePlan(createUpgradePlanRequest(namespace));
+    }
 
-        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
+    /**
+     * Start the asynchronous upgrade plan creation process for all the namespaces.
+     * 
+     * @return the {@link Job} object which can be used to monitor the progress of the plan creation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createUpgradePlan()
+    {
+        setError(null);
 
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-
-        Job job = null;
-        try {
-            job = this.jobManager.addJob(UpgradePlanJob.JOBTYPE, installRequest);
-        } catch (JobException e) {
-            setError(e);
-        }
-
-        return job;
+        return createUpgradePlan(createUpgradePlanRequest());
     }
 
     // Jobs

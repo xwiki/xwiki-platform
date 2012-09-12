@@ -27,8 +27,11 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.internal.AbstractJobStatus;
 
@@ -46,6 +49,9 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     @Inject
     private DistributionManager distributionManager;
 
+    @Inject
+    private InstalledExtensionRepository installedRepository;
+
     @Override
     public String getType()
     {
@@ -58,8 +64,26 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         // TODO: make steps components automatically discovered so that any module can add custom steps
 
         List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(2);
-        steps.add(new DistributionStepStatus("extension.mainui"));
-        steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+
+        ExtensionId extensionUI = this.distributionManager.getUIExtensionId();
+
+        // Step 1: Install/upgrade main wiki UI
+
+        // Only if the UI is not already installed
+        if (this.installedRepository.getInstalledExtension(extensionUI) == null) {
+            steps.add(new DistributionStepStatus("extension.mainui"));
+        }
+
+        DistributionState state = this.distributionManager.getDistributionState();
+
+        // Step 2: Upgrade outdated extensions
+
+        // Upgrade outdated extension only when the distribution changed
+        if (!this.installedRepository.getInstalledExtensions().isEmpty()) {
+            steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+        }
+
+        // Create status
 
         DistributionJobStatus status =
             new DistributionJobStatus(request, this.observationManager, this.loggerManager, steps);
@@ -76,7 +100,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
             }
 
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
-            status.setDistributionExtensionUi(this.distributionManager.getUIExtensionId());
+            status.setDistributionExtensionUi(extensionUI);
         }
 
         return status;

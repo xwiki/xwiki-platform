@@ -63,6 +63,12 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     }
 
     @Override
+    public InstalledExtension getInstalledExtension(ExtensionId extensionId)
+    {
+        return safe(getWrapped().getInstalledExtension(extensionId));
+    }
+
+    @Override
     public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
         return safe(getWrapped().getInstalledExtension(feature, namespace));

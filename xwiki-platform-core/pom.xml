@@ -88,19 +88,6 @@
         <artifactId>jython-standalone</artifactId>
         <version>2.5.3</version>
       </dependency>
-      <!-- JFreeChart -->
-      <dependency>
-        <groupId>org.jfree</groupId>
-        <artifactId>jfreechart</artifactId>
-        <version>1.0.14</version>
-        <exclusions>
-          <!-- Not actually needed -->
-          <exclusion>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
@@ -117,6 +104,20 @@
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
         <version>1.2</version>
+        <exclusions>
+          <exclusion>
+            <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
+            <groupId>de.l3s.boilerpipe</groupId>
+            <artifactId>boilerpipe</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
+        <groupId>de.l3s.boilerpipe</groupId>
+        <artifactId>boilerpipe</artifactId>
+        <version>1.2.0-xwiki</version>
+        <scope>runtime</scope>
       </dependency>
       <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
       <dependency>
@@ -259,6 +260,9 @@
             <exclude>org/xwiki/chart/model/ChartModel</exclude>
             <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
             <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
+            <!-- The getParametersMap() should never have been a public API. I believe it was added there just as
+                 a way to reduce the Class Fan Out, which is the wrong solution. -->
+            <exclude>org/xwiki/rendering/macro/chart/ChartMacroParameters</exclude>
             <!-- Removed protected method (registerWikiMacros) that was not supposed to be used from outside
                 (was protected for unit tests hacks. -->
             <exclude>com/xpn/xwiki/XWiki</exclude>

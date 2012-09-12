@@ -240,7 +240,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         final Transformation transformation = getMockery().mock(Transformation.class, "macro");
         final VelocityManager velocityManager = getMockery().mock(VelocityManager.class);
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
-        final VelocityContext velocityContext = getMockery().mock(VelocityContext.class);
+        final VelocityContext velocityContext = new VelocityContext();
         final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
         final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
         final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);

@@ -148,7 +148,7 @@ public class AxisConfigurator extends AbstractConfigurator
     }
 
     /**
-     * Claime limit parapemeters.
+     * Claime limit parameters.
      *
      * @param key the parameter name.
      * @param value the parameter value.

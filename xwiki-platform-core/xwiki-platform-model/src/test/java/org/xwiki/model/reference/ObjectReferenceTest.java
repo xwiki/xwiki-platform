@@ -79,8 +79,7 @@ public class ObjectReferenceTest
                 EntityType.SPACE)));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] in an object "
-                + "reference", expected.getMessage());
+            assertEquals("Invalid parent reference [Space Space] in an object reference", expected.getMessage());
         }
     }
 }

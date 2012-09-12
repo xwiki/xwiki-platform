@@ -102,7 +102,8 @@
 
 #macro(displayOutdatedExtensionsStep)
   #set ($distributionId = "$services.distribution.distributionExtension.id")
-  #set ($upgradePlan = $services.extension.getExtensionPlanJobStatus($null, 'wiki:xwiki'))
+  ## Get the status of the upgrade plan job for the entire farm.
+  #set ($upgradePlan = $services.extension.getExtensionPlanJobStatus($null, $null))
   #if (!$upgradePlan || $upgradePlan.request.getProperty('distribution.id') != $distributionId)
     ## Schedule the upgrade plan creation job.
     #prepareUpgrade($upgradePlan)
@@ -116,8 +117,12 @@
 #end
 
 #macro(displayUpgradePlanStatus $status)
-  <div id="upgradePlanLog" class="extension-body-progress#if($status.log.isEmpty() && $status.state != 'FINISHED') loading#end">
-    #printStatusLog($status)
+  ## The status is null after the job is created, until the job is scheduled.
+  #set ($isLoading = !$status || ($status.log.isEmpty() && $status.state != 'FINISHED'))
+  <div id="upgradePlanLog" class="extension-body-progress#if($isLoading) loading#end">
+    #if ($status)
+      #printStatusLog($status)
+    #end
   </div>
 #end
 
@@ -177,14 +182,15 @@
 #end
 
 #macro(prepareUpgrade $upgradePlan)
-  #set ($upgradePlanJob = $services.extension.createUpgradePlan('wiki:xwiki'))
+  ## Create the upgrade plan for the entire farm.
+  #set ($upgradePlanJob = $services.extension.createUpgradePlan($null))
   #set ($lastError = $services.extension.lastError)
   #if ($lastError)
     <div class="box errormessage">$msg.get('extensions.distribution.error.prepareUpgradeFailure') #printThrowable($lastError)</div>
   #else
     #set ($distributionId = "$services.distribution.distributionExtension.id")
     #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
-    #set ($upgradePlan = $NULL)
+    #set ($upgradePlan = $null)
     #setVariable ("$upgradePlan" $upgradePlanJob.status)
   #end
 #end

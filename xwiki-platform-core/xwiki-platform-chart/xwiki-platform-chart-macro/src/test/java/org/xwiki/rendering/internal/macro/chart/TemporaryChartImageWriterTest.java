@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.macro.chart;
 import java.io.File;
 
 import org.jmock.Expectations;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
@@ -36,22 +35,14 @@ import org.xwiki.test.annotation.MockingRequirement;
 import junit.framework.Assert;
 
 /**
- * Unit tests for {@link TemporaryImageLocator}.
+ * Unit tests for {@link TemporaryChartImageWriter}.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M3
  */
-@MockingRequirement(TemporaryImageLocator.class)
-public class TemporaryImageLocatorTest extends AbstractMockingComponentTestCase
+@MockingRequirement(TemporaryChartImageWriter.class)
+public class TemporaryChartImageWriterTest extends AbstractMockingComponentTestCase<ChartImageWriter>
 {
-    private ImageLocator imageLocator;
-
-    @Before
-    public void configure() throws Exception
-    {
-        this.imageLocator = getComponentManager().getInstance(ImageLocator.class, "tmp");
-    }
-
     @Test
     public void getStorageLocation() throws Exception
     {
@@ -67,7 +58,8 @@ public class TemporaryImageLocatorTest extends AbstractMockingComponentTestCase
                 will(returnValue(new File("/tmpdir")));
         }});
 
-        File location = this.imageLocator.getStorageLocation(new ImageId(new ChartMacroParameters()));
+        File location = ((TemporaryChartImageWriter) getMockedComponent()).getStorageLocation(
+            new ImageId(new ChartMacroParameters()));
         Assert.assertTrue("Got: " + location.toString(),
             location.toString().matches("/tmpdir/temp/chart/wiki/space/page/.*\\.png"));
     }
@@ -81,7 +73,7 @@ public class TemporaryImageLocatorTest extends AbstractMockingComponentTestCase
                 will(returnValue("temp/Space/Page"));
         }});
 
-        String location = this.imageLocator.getURL(new ImageId(new ChartMacroParameters()));
+        String location = getMockedComponent().getURL(new ImageId(new ChartMacroParameters()));
         Assert.assertTrue("Got: " + location, location.toString().matches("temp/Space/Page/chart/.*\\.png"));
     }
 }

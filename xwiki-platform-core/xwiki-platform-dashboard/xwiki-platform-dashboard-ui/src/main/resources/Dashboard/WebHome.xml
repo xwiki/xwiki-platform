@@ -452,13 +452,13 @@
     <property>
       <parameters>label=$msg.get('xe.panels.quicklinks.dashboard')
 target=Dashboard.WebHome
-icon=application_view_tile</parameters>
+icon=icon:application_view_tile</parameters>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.panels.Applications.Dashboard</name>
+      <name>platform.panels.dashboardApplication</name>
     </property>
   </object>
   <content>{{velocity}}

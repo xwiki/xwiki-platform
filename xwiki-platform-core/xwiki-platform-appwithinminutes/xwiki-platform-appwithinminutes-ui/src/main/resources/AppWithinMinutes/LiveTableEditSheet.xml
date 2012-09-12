@@ -600,6 +600,25 @@ return XWiki;
   {{/html}}
 #end
 
+#macro(displayIcon)
+  #if($services.uix)
+    #set($icon = 'icon:application')
+    #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
+      #if($uix.getName() == "org.xwiki.platform.panels.Applications.${doc.space}")
+        #if("$!uix.getParameters().get('icon')" != '')
+          #set($icon = $uix.getParameters().get('icon'))
+        #end
+      #end
+    #end
+    {{html wiki="true"}}
+      ## The icon
+      ; &lt;label for="applicationIcon"&gt;$msg.get('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
+        (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorIconHint', $xwiki.getSkinFile('icons/silk/index_abc.png'))  
+      : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!icon" /&gt;
+      {{/html}}
+  #end
+#end
+
 #macro(doEdit)
   #set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
   #set($discard = $doc.use($liveTableObj))
@@ -614,6 +633,9 @@ return XWiki;
   (% class="form-body" %)
   (((
     #displayFormFields()
+
+    #displayIcon()
+
     #if("$!request.wizard" == 'true')
 
       #appWizardFooter(3)
@@ -653,9 +675,18 @@ return XWiki;
   #set($discard = $doc.save($comment, $minorEdit))
 #end
 
+#macro(updateAndSaveIcon)
+  #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
+  #set($discard = $uix.set('name', "platform.panels.${doc.space}Application"))
+  #set($discard = $uix.set('extensionPointId', "org.xwiki.platform.panels.Applications"))
+  #set($discard = $uix.set('parameters', "label=${doc.space}${util.newline}target=${doc.fullName}${util.newline}icon=${request.applicationIcon}"))
+  #set($discard = $doc.save('Updated application icon', true))
+#end
+
 #macro(doSave)
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
+  #updateAndSaveIcon()
   #if($action == 'save')
     #if($errorMessage)
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}

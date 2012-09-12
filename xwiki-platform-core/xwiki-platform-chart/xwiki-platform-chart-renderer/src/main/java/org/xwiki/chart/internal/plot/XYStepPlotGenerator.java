@@ -20,19 +20,19 @@
 package org.xwiki.chart.internal.plot;
 
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYStepRenderer;
 
 /**
- * Generate Plots for XY data sets using a line and shape renderer.
+ * See {@Link XYStepRenderer}.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M3
  */
-public class XYLineAndShapePlotGenerator extends AbstractXYPlotGenerator
+public class XYStepPlotGenerator extends AbstractXYPlotGenerator
 {
     @Override
     public XYItemRenderer getRenderer()
     {
-        return new XYLineAndShapeRenderer();
+        return new XYStepRenderer();
     }
 }

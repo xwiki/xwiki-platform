@@ -60,7 +60,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 #set($spaces = $xwiki.spaces)
 #set($selectedSpace = "$!request.space")
 #if($selectedSpace != '' &amp;&amp; !$blacklistedSpaces.contains($selectedSpace))
-  #set($extraClause = " AND space:${selectedSpace}")
+  #set($extraClause = " +space:""${selectedSpace}""")
 #end
 ## ----------------------------------------------------------------------
 ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)

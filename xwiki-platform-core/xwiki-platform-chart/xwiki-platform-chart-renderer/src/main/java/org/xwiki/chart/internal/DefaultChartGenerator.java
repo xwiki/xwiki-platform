@@ -36,7 +36,9 @@ import org.xwiki.chart.internal.plot.LinePlotGenerator;
 import org.xwiki.chart.internal.plot.PiePlotGenerator;
 import org.xwiki.chart.internal.plot.PlotGenerator;
 import org.xwiki.chart.internal.plot.XYAreaPlotGenerator;
+import org.xwiki.chart.internal.plot.XYLine3DPlotGenerator;
 import org.xwiki.chart.internal.plot.XYLineAndShapePlotGenerator;
+import org.xwiki.chart.internal.plot.XYStepPlotGenerator;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -74,6 +76,8 @@ public class DefaultChartGenerator implements ChartGenerator, Initializable
         plotGenerators.put("bar3D", new Bar3DPlotGenerator());
         plotGenerators.put("xy_area", new XYAreaPlotGenerator());
         plotGenerators.put("xy_line_and_shape", new XYLineAndShapePlotGenerator());
+        plotGenerators.put("xy_line3D", new XYLine3DPlotGenerator());
+        plotGenerators.put("xy_step", new XYStepPlotGenerator());
     }
 
     @Override

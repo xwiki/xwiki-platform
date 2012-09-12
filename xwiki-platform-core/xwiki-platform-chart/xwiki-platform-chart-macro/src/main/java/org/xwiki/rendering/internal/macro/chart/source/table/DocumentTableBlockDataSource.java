@@ -33,7 +33,6 @@ import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -69,7 +68,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     /**
      * The document name of the document holding the table.
      */
-    private DocumentReference documentRef;
+    private DocumentReference documentReference;
 
     /**
      * The id of the table holding the data.
@@ -95,12 +94,6 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     private DocumentAccessBridge docBridge;
 
     /**
-     * {@link EntityReferenceSerializer} component.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
      * A document reference resolver.
      */
     @Inject
@@ -119,20 +112,20 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         // Parse the document content into an XDOM.
         XDOM xdom;
         try {
-            DocumentModelBridge document = this.docBridge.getDocument(this.documentRef);
+            DocumentModelBridge document = this.docBridge.getDocument(this.documentReference);
             DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
             parameters.setContentTranslated(true);
             xdom = this.documentDisplayer.display(document, parameters);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
-                this.entityReferenceSerializer.serialize(this.documentRef)), ex);
+                this.documentReference, e));
         }
 
         // Find the correct table block.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
         this.logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-            new Object[]{this.tableId, tableBlocks.size(), this.documentRef});
+            new Object[]{this.tableId, tableBlocks.size(), this.documentReference });
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
@@ -156,7 +149,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     protected boolean setParameter(String key, String value) throws MacroExecutionException
     {
         if (DOCUMENT_PARAM.equals(key)) {
-            this.documentRef = this.documentReferenceResolver.resolve(value);
+            this.documentReference = this.documentReferenceResolver.resolve(value);
             return true;
         }
 
@@ -173,18 +166,17 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     {
         super.validateParameters();
 
-        if (null == this.documentRef) {
-            this.documentRef = this.docBridge.getCurrentDocumentReference();
+        if (null == this.documentReference) {
+            this.documentReference = this.docBridge.getCurrentDocumentReference();
         } else if (!authorizationManager.hasAccess(Right.VIEW,
             this.docBridge.getCurrentUserReference(),
-            this.documentRef))
+            this.documentReference))
         {
             throw new MacroExecutionException("You do not have permission to view the document.");
         }
 
-        if (!this.docBridge.exists(this.documentRef)) {
-            throw new MacroExecutionException(String.format("Document [%s] does not exist.",
-                this.entityReferenceSerializer.serialize(this.documentRef)));
+        if (!this.docBridge.exists(this.documentReference)) {
+            throw new MacroExecutionException(String.format("Document [%s] does not exist.", this.documentReference));
         }
     }
 }

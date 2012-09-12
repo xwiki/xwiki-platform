@@ -17,22 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.chart.internal.plot;
+package org.xwiki.extension.distribution.internal;
 
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Generate Plots for XY data sets using a line and shape renderer.
- *
+ * Default implementation of {@link DistributionConfiguration}.
+ * 
  * @version $Id$
- * @since 4.2M1
  */
-public class XYLineAndShapePlotGenerator extends AbstractXYPlotGenerator
+@Component
+@Singleton
+public class DefaultDistributionConfiguration implements DistributionConfiguration
 {
+    /**
+     * The prefix used for all configuration properties specific to the distribution module.
+     */
+    private static final String PREFIX = "extension.distribution.";
+
+    /**
+     * The configuration source.
+     */
+    @Inject
+    private ConfigurationSource configuration;
+
     @Override
-    public XYItemRenderer getRenderer()
+    public boolean isWizardSkipped()
     {
-        return new XYLineAndShapeRenderer();
+        return configuration.getProperty(PREFIX + "skipWizard", false);
     }
 }

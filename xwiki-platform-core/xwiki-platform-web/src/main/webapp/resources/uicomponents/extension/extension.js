@@ -396,11 +396,9 @@ XWiki.ExtensionBehaviour = Class.create({
    * 'admin' action (depending whether the extension is displayed alone or in the administration section).
    */
   _fixExtensionLinks : function() {
-    if (XWiki.contextaction != 'get') return;
     this.container.select("a.extension-link").each(function (link) {
-      var action = XWiki.currentDocument.page == 'XWikiPreferences' ? 'admin' : 'view';
       var queryString = link.getAttribute('href').replace(/.*\?/, '');
-      link.setAttribute('href', XWiki.currentDocument.getURL(action, queryString));
+      link.setAttribute('href', XWiki.currentDocument.getURL(XWiki.contextaction, queryString));
     });
   },
 

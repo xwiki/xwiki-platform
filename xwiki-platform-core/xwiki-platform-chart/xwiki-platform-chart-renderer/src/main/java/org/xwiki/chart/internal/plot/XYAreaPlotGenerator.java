@@ -30,7 +30,6 @@ import org.jfree.chart.renderer.xy.XYAreaRenderer;
  */
 public class XYAreaPlotGenerator extends AbstractXYPlotGenerator
 {
-
     @Override
     public XYItemRenderer getRenderer()
     {

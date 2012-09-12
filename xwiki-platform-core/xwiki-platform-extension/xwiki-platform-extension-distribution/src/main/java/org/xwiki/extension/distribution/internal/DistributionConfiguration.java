@@ -17,36 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.chart;
-
-import java.io.File;
+package org.xwiki.extension.distribution.internal;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Returns location for the generated chart image, both for where it's stored in the store and the URL to retrieve it.
- *
+ * Configuration properties for the distribution module.
+ * 
  * @version $Id$
- * @since 4.2M1
  */
 @Role
-public interface ImageLocator
+public interface DistributionConfiguration
 {
     /**
-     * Compute the location where to store the generated chart image.
-     *
-     * @param imageId the image id that we use to generate a unique storage location
-     * @return the location where to store the generated chart image
-     * @throws MacroExecutionException if an error happened when computing the location
+     * When this property is {@code false} any page view should be redirected to the distribution wizard if the
+     * distribution job is running. If {@code true} the distribution wizard is accessible only by using the distribution
+     * action.
+     * <p>
+     * This property is needed mostly by functional tests that don't want to handle the distribution wizard.
+     * 
+     * @return {@code false} if the distribution wizard is displayed whenever the distribution job is running and an
+     *         administrator views a wiki page, {@code true} otherwise
      */
-    File getStorageLocation(ImageId imageId) throws MacroExecutionException;
-
-    /**
-     * Compute the URL to use to access the stored generate chart image.
-     *
-     * @param imageId the image id for the image that we have stored
-     * @return the URL to use to access the stored generate chart image
-     */
-    String getURL(ImageId imageId);
+    boolean isWizardSkipped();
 }

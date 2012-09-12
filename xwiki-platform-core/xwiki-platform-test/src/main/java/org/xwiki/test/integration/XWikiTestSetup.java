@@ -19,12 +19,13 @@
  */
 package org.xwiki.test.integration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
@@ -64,10 +65,12 @@ public class XWikiTestSetup extends TestSetup
         for (int i = 0; i < nb; ++i) {
             XWikiExecutor executor = new XWikiExecutor(i);
 
+            PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
             // Don't set any extension repository since we don't need it and we don't want to require internet
             // connection for the tests.
-            Properties properties = executor.loadXWikiProperties();
             properties.setProperty("extension.repositories", "");
+            // Skip the distribution wizard.
+            properties.setProperty("extension.distribution.skipWizard", true);
             executor.saveXWikiProperties(properties);
 
             this.executors.add(executor);

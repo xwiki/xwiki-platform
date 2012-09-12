@@ -35,6 +35,10 @@
   <description>Macro for displaying charts</description>
   <dependencies>
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-chart-renderer</artifactId>
       <version>${project.version}</version>

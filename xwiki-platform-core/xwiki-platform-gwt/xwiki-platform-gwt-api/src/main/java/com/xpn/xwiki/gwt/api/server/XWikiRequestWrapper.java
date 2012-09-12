@@ -19,20 +19,31 @@
  */
 package com.xpn.xwiki.gwt.api.server;
 
-import com.xpn.xwiki.web.XWikiRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-import javax.servlet.ServletInputStream;
-import javax.servlet.RequestDispatcher;
-import javax.portlet.*;
-import java.util.*;
-import java.security.Principal;
-import java.io.UnsupportedEncodingException;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.portlet.PortalContext;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletSession;
+import javax.portlet.WindowState;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiRequestWrapper implements XWikiRequest {
     private final XWikiRequest request;
@@ -392,5 +403,29 @@ public class XWikiRequestWrapper implements XWikiRequest {
 
     public InputStream getPortletInputStream() throws IOException {
         return request.getPortletInputStream();
+    }
+
+    @Override
+    public String getETag()
+    {
+        return request.getETag();
+    }
+
+    @Override
+    public String getWindowID()
+    {
+        return request.getWindowID();
+    }
+
+    @Override
+    public Map<String, String[]> getPrivateParameterMap()
+    {
+        return request.getPrivateParameterMap();
+    }
+
+    @Override
+    public Map<String, String[]> getPublicParameterMap()
+    {
+        return request.getPublicParameterMap();
     }
 }

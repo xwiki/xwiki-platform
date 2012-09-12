@@ -124,13 +124,14 @@ public class BridgedEntityManager implements EntityManager
             case OBJECT_PROPERTY:
                 BaseObject xobject = getXWikiObject(reference.getParent());
                 if (xobject != null) {
-                    /*
                     try {
-                        result = (T) new BridgedObjectProperty(xobject.get(reference.getName()));
+                        BridgedObjectProperty bop =
+                            new BridgedObjectProperty(xobject.get(reference.getName()), getXWikiContext());
+                        bop.setNew(false);
+                        result = (T) bop;
                     } catch (XWikiException e) {
-                        // TODDO
+                        throw new ModelException("Failed to retrieve object property [%s]", e, reference);
                     }
-                    */
                 }
                 break;
             default:

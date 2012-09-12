@@ -20,10 +20,11 @@
 package org.xwiki.model;
 
 /**
+ * Represents an Object Property, i.e. a generic field in an Object which can contain any type of metadata.
+ *
+ * @version $Id$
  * @since 4.3M1
  */
-public interface Document extends Entity, Extensible
+public interface ObjectProperty extends Entity
 {
-    Content getContent();
-    void setContent(Content content);
 }

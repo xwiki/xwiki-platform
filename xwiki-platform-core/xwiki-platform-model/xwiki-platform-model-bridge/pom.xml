@@ -99,7 +99,8 @@
             org/xwiki/model/internal/BridgedObject.java,
             org/xwiki/model/internal/BridgedServer.java,
             org/xwiki/model/internal/BridgedSpace.java,
-            org/xwiki/model/internal/BridgedWiki.java
+            org/xwiki/model/internal/BridgedWiki.java,
+            org/xwiki/model/internal/BridgedObjectProperty.java
           </excludes>
         </configuration>
       </plugin>

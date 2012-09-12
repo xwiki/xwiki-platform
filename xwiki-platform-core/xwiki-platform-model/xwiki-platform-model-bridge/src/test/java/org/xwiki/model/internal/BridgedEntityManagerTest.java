@@ -30,10 +30,12 @@ import org.junit.Test;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.Document;
 import org.xwiki.model.ModelException;
+import org.xwiki.model.ObjectProperty;
 import org.xwiki.model.Space;
 import org.xwiki.model.UniqueReference;
 import org.xwiki.model.Wiki;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -42,6 +44,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
@@ -243,5 +246,29 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         Space space = this.manager.getEntity(new UniqueReference(spaceReference));
         Assert.assertNotNull(space);
         Assert.assertFalse(space.isNew());
+    }
+
+    @Test
+    public void getEntityForObjectPropertyThatExists() throws Exception
+    {
+        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        final ObjectReference objectReference = new ObjectReference("object", documentReference);
+        final ObjectPropertyReference propertyReference = new ObjectPropertyReference("property", objectReference);
+        final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
+        final BaseObject baseObject = getMockery().mock(BaseObject.class);
+        final PropertyInterface propertyInterface = getMockery().mock(PropertyInterface.class);
+
+        getMockery().checking(new Expectations() {{
+            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            will(returnValue(xdoc));
+            oneOf(xdoc).getXObject(objectReference);
+            will(returnValue(baseObject));
+            oneOf(baseObject).get("property");
+            will(returnValue(propertyInterface));
+        }});
+
+        ObjectProperty objectProperty = this.manager.getEntity(new UniqueReference(propertyReference));
+        Assert.assertNotNull(objectProperty);
+        Assert.assertFalse(objectProperty.isNew());
     }
 }

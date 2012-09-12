@@ -19,12 +19,10 @@
  */
 package org.xwiki.model.internal;
 
-import java.lang.reflect.Type;
 import java.net.URL;
 
 import org.jmock.Expectations;
 import org.junit.*;
-import org.xwiki.cache.CacheManager;
 import org.xwiki.model.*;
 
 import com.xpn.xwiki.XWiki;
@@ -46,8 +44,8 @@ public class BridgedServerTest extends AbstractBridgedComponentTestCase
         final XWiki xwiki = getMockery().mock(XWiki.class);
         getContext().setWiki(xwiki);
 
-        CacheManager cacheManager = getComponentManager().getInstance((Type) CacheManager.class);
-        this.server = new BridgedServer(new BridgedEntityManager(cacheManager, getContext()), getContext());
+        EntityManager entityManager = getComponentManager().getInstance(EntityManager.class, "bridge");
+        this.server = new BridgedServer(entityManager, getContext());
     }
 
     @Test
@@ -55,8 +53,7 @@ public class BridgedServerTest extends AbstractBridgedComponentTestCase
     {
         Wiki wiki = this.server.addWiki("wiki");
 
-        // Verify we get the exact same instance since we haven't saved yet.
-        Assert.assertSame(wiki, this.server.getWiki("wiki"));
+        Assert.assertNotNull(wiki);
         Assert.assertTrue(wiki.isNew());
     }
 

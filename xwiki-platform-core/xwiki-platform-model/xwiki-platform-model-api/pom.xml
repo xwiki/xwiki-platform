@@ -96,7 +96,8 @@
             org/xwiki/model/ObjectDefinitionProperty.java,
             org/xwiki/model/EntityIterator.java,
             org/xwiki/model/Version.java,
-            org/xwiki/model/Session.java
+            org/xwiki/model/Session.java,
+            org/xwiki/model/ObjectProperty.java
           </excludes>
         </configuration>
       </plugin>

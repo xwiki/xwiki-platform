@@ -19,15 +19,20 @@
  */
 package org.xwiki.model.internal;
 
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Arrays;
 
 import org.jmock.Expectations;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.Document;
 import org.xwiki.model.ModelException;
 import org.xwiki.model.ObjectProperty;
@@ -39,13 +44,17 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Unit tests for {@link BridgedEntityManager}.
@@ -53,18 +62,36 @@ import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
  * @version $Id$
  * @since 4.3M1
  */
-public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
+@AllComponents
+@MockingRequirement(BridgedEntityManager.class)
+public class BridgedEntityManagerTest extends AbstractMockingComponentTestCase<BridgedEntityManager>
 {
-    private BridgedEntityManager manager;
+    private XWikiContext context;
 
     @Before
     public void configure() throws Exception
     {
+        // Allow mocking Classes...
+        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
+        Utils.setComponentManager(getComponentManager());
+        this.context = new XWikiContext();
         final XWiki xwiki = getMockery().mock(XWiki.class);
-        getContext().setWiki(xwiki);
+        this.context.setWiki(xwiki);
 
-        CacheManager cacheManager = getComponentManager().getInstance((Type) CacheManager.class);
-        this.manager = new BridgedEntityManager(cacheManager, getContext());
+        final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
+        final CacheFactory cacheFactory = getMockery().mock(CacheFactory.class);
+        final Execution execution = getComponentManager().getInstance(Execution.class);
+        final ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty("xwikicontext", this.context);
+
+        getMockery().checking(new Expectations() {{
+            oneOf(cacheManager).getCacheFactory();
+            will(returnValue(cacheFactory));
+            oneOf(cacheFactory).newCache(with(any(CacheConfiguration.class)));
+            will(returnValue(getMockery().mock(Cache.class)));
+            allowing(execution).getContext();
+            will(returnValue(executionContext));
+        }});
     }
 
     @Test
@@ -74,11 +101,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         final XWikiDocument xdoc = new XWikiDocument(documentReference);
         xdoc.setNew(false);
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
                 will(returnValue(xdoc));
         }});
 
-        Document doc = this.manager.getEntity(new UniqueReference(documentReference));
+        Document doc = getMockedComponent().getEntity(new UniqueReference(documentReference));
         Assert.assertNotNull(doc);
         Assert.assertFalse(doc.isNew());
     }
@@ -91,11 +118,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         // This means the doc doesn't exist in the old model
         xdoc.setNew(true);
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
                 will(returnValue(xdoc));
         }});
 
-        Document doc = this.manager.getEntity(new UniqueReference(documentReference));
+        Document doc = getMockedComponent().getEntity(new UniqueReference(documentReference));
         Assert.assertNotNull(doc);
         Assert.assertTrue(doc.isNew());
     }
@@ -108,12 +135,12 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         // This means the doc doesn't exist in the old model
         xdoc.setNew(true);
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
             will(throwException(new XWikiException()));
         }});
 
         try {
-            this.manager.getEntity(new UniqueReference(documentReference));
+            getMockedComponent().getEntity(new UniqueReference(documentReference));
             Assert.fail("Should have thrown an exception");
         } catch (ModelException expected) {
             Assert.assertEquals("Error loading document [wiki:space.page]", expected.getMessage());
@@ -125,11 +152,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
     {
         final WikiReference wikiReference = new WikiReference("wiki");
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
+            oneOf(context.getWiki()).getServerURL("wiki", context);
                 will(returnValue(new URL("http://whatever/not/null")));
         }});
 
-        Wiki wiki = this.manager.getEntity(new UniqueReference(wikiReference));
+        Wiki wiki = getMockedComponent().getEntity(new UniqueReference(wikiReference));
         Assert.assertNotNull(wiki);
         Assert.assertFalse(wiki.isNew());
     }
@@ -139,11 +166,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
     {
         final WikiReference wikiReference = new WikiReference("wiki");
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
+            oneOf(context.getWiki()).getServerURL("wiki", context);
                 will(returnValue(null));
         }});
 
-        Wiki wiki = this.manager.getEntity(new UniqueReference(wikiReference));
+        Wiki wiki = getMockedComponent().getEntity(new UniqueReference(wikiReference));
         Assert.assertNull(wiki);
     }
 
@@ -152,11 +179,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
     {
         final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).exists(documentReference, getContext());
+            oneOf(context.getWiki()).exists(documentReference, context);
                 will(returnValue(true));
         }});
 
-        Assert.assertTrue(this.manager.hasEntity(new UniqueReference(documentReference)));
+        Assert.assertTrue(getMockedComponent().hasEntity(new UniqueReference(documentReference)));
     }
 
     @Test
@@ -164,11 +191,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
     {
         final WikiReference wikiReference = new WikiReference("wiki");
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
+            oneOf(context.getWiki()).getServerURL("wiki", context);
                 will(returnValue(new URL("http://whatever/not/null")));
         }});
 
-        Assert.assertTrue(this.manager.hasEntity(new UniqueReference(wikiReference)));
+        Assert.assertTrue(getMockedComponent().hasEntity(new UniqueReference(wikiReference)));
     }
 
     @Test
@@ -176,11 +203,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
     {
         final WikiReference wikiReference = new WikiReference("wiki");
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
+            oneOf(context.getWiki()).getServerURL("wiki", context);
                 will(returnValue(null));
         }});
 
-        Assert.assertFalse(this.manager.hasEntity(new UniqueReference(wikiReference)));
+        Assert.assertFalse(getMockedComponent().hasEntity(new UniqueReference(wikiReference)));
     }
 
     @Test
@@ -191,13 +218,13 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
         final BaseObject baseObject = getMockery().mock(BaseObject.class);
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
                 will(returnValue(xdoc));
             oneOf(xdoc).getXObject(objectReference);
                 will(returnValue(baseObject));
         }});
 
-        org.xwiki.model.Object object = this.manager.getEntity(new UniqueReference(objectReference));
+        org.xwiki.model.Object object = getMockedComponent().getEntity(new UniqueReference(objectReference));
         Assert.assertNotNull(object);
         Assert.assertFalse(object.isNew());
     }
@@ -209,13 +236,13 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         final ObjectReference objectReference = new ObjectReference("object", documentReference);
         final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
                 will(returnValue(xdoc));
             oneOf(xdoc).getXObject(objectReference);
                 will(returnValue(null));
         }});
 
-        org.xwiki.model.Object object = this.manager.getEntity(new UniqueReference(objectReference));
+        org.xwiki.model.Object object = getMockedComponent().getEntity(new UniqueReference(objectReference));
         Assert.assertNull(object);
     }
 
@@ -228,11 +255,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         // This means the doc doesn't exist in the old model
         xdoc.setNew(true);
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
                 will(returnValue(xdoc));
         }});
 
-        org.xwiki.model.Object object = this.manager.getEntity(new UniqueReference(objectReference));
+        org.xwiki.model.Object object = getMockedComponent().getEntity(new UniqueReference(objectReference));
         Assert.assertNull(object);
     }
 
@@ -242,11 +269,11 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         final SpaceReference spaceReference = new SpaceReference("space", new WikiReference("wiki"));
 
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getSpaces(getContext());
+            oneOf(context.getWiki()).getSpaces(context);
             will(returnValue(Arrays.asList("space", "otherspace")));
         }});
 
-        Space space = this.manager.getEntity(new UniqueReference(spaceReference));
+        Space space = getMockedComponent().getEntity(new UniqueReference(spaceReference));
         Assert.assertNotNull(space);
         Assert.assertFalse(space.isNew());
     }
@@ -259,18 +286,18 @@ public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase
         final ObjectPropertyReference propertyReference = new ObjectPropertyReference("property", objectReference);
         final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
         final BaseObject baseObject = getMockery().mock(BaseObject.class);
-        final PropertyInterface propertyInterface = getMockery().mock(PropertyInterface.class);
+        final BaseProperty baseProperty = getMockery().mock(BaseProperty.class);
 
         getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getDocument(documentReference, getContext());
+            oneOf(context.getWiki()).getDocument(documentReference, context);
             will(returnValue(xdoc));
             oneOf(xdoc).getXObject(objectReference);
             will(returnValue(baseObject));
             oneOf(baseObject).get("property");
-            will(returnValue(propertyInterface));
+            will(returnValue(baseProperty));
         }});
 
-        ObjectProperty objectProperty = this.manager.getEntity(new UniqueReference(propertyReference));
+        ObjectProperty objectProperty = getMockedComponent().getEntity(new UniqueReference(propertyReference));
         Assert.assertNotNull(objectProperty);
         Assert.assertFalse(objectProperty.isNew());
     }

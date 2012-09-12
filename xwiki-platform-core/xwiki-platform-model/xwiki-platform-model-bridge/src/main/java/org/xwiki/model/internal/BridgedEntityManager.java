@@ -22,10 +22,18 @@ package org.xwiki.model.internal;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
 import org.xwiki.model.Entity;
 import org.xwiki.model.EntityManager;
 import org.xwiki.model.EntityType;
@@ -47,26 +55,32 @@ import com.xpn.xwiki.objects.BaseProperty;
 /**
  * @since 4.3M1
  */
-public class BridgedEntityManager implements EntityManager
+@Component
+@Named("bridge")
+@Singleton
+public class BridgedEntityManager implements EntityManager, Initializable
 {
-    private XWikiContext xcontext;
+    @Inject
+    private Execution execution;
+
+    @Inject
+    private CacheManager cacheManager;
 
     /**
      * Cache holding modified entities not yet saved to persistent storage.
      */
     private Cache<Entity> modifiedEntityCache;
 
-    public BridgedEntityManager(CacheManager cacheManager, XWikiContext xcontext)
+    @Override
+    public void initialize() throws InitializationException
     {
-        this.xcontext = xcontext;
-
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setConfigurationId("model");
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
         try {
-            this.modifiedEntityCache = cacheManager.getCacheFactory().newCache(cacheConfiguration);
+            this.modifiedEntityCache = this.cacheManager.getCacheFactory().newCache(cacheConfiguration);
         } catch (Exception e) {
             throw new ModelRuntimeException("Failed to create Entity Cache", e);
         }
@@ -212,11 +226,11 @@ public class BridgedEntityManager implements EntityManager
 
     public XWiki getXWiki()
     {
-        return this.xcontext.getWiki();
+        return getXWikiContext().getWiki();
     }
 
     public XWikiContext getXWikiContext()
     {
-        return this.xcontext;
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

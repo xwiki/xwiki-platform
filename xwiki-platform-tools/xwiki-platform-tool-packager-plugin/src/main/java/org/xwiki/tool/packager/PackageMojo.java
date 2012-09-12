@@ -602,7 +602,7 @@ public class PackageMojo extends AbstractMojo
     {
         MavenProject pomProject;
         Artifact pomArtifact =
-            this.factory.createArtifact("org.xwiki.commons", "xwiki-commons", this.getXWikiCommonsVersion(), "", "pom");
+            this.factory.createProjectArtifact("org.xwiki.commons", "xwiki-commons", this.getXWikiCommonsVersion());
         try {
             pomProject = this.mavenProjectBuilder.buildFromRepository(pomArtifact, this.remoteRepos, this.local);
         } catch (ProjectBuildingException e) {

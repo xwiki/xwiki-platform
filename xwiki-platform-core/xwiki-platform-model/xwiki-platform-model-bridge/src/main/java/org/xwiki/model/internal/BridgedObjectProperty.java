@@ -32,19 +32,19 @@ import org.xwiki.model.Version;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * @since 4.3M1
  */
 public class BridgedObjectProperty extends AbstractBridgedEntity implements ObjectProperty
 {
-    private PropertyInterface propertyInterface;
+    private BaseProperty baseProperty;
 
-    public BridgedObjectProperty(PropertyInterface propertyInterface, XWikiContext xcontext)
+    public BridgedObjectProperty(BaseProperty baseProperty, XWikiContext xcontext)
     {
         super(xcontext);
-        this.propertyInterface = propertyInterface;
+        this.baseProperty = baseProperty;
     }
 
     @Override public String getIdentifier()
@@ -111,5 +111,11 @@ public class BridgedObjectProperty extends AbstractBridgedEntity implements Obje
     @Override public EntityReference getReference()
     {
         throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override
+    public Object getValue()
+    {
+        return this.baseProperty.getValue();
     }
 }

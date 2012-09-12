@@ -42,6 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * @since 4.3M1
@@ -75,14 +76,6 @@ public class BridgedEntityManager implements EntityManager
     public <T extends Entity> T getEntity(UniqueReference uniqueReference) throws ModelException
     {
         T result = null;
-
-        // Verify first if the entity requested is in the modified entity cache
-        // TODO: why doesn't the cache api support an Object as key? This makes it complex for us here...
-        // FTM doing something extra simple...
-        T modifiedEntity = (T) this.modifiedEntityCache.get(uniqueReference.toString());
-        if (modifiedEntity != null) {
-            return modifiedEntity;
-        }
 
         EntityReference reference = uniqueReference.getReference();
         switch (reference.getType()) {
@@ -125,8 +118,8 @@ public class BridgedEntityManager implements EntityManager
                 BaseObject xobject = getXWikiObject(reference.getParent());
                 if (xobject != null) {
                     try {
-                        BridgedObjectProperty bop =
-                            new BridgedObjectProperty(xobject.get(reference.getName()), getXWikiContext());
+                        BridgedObjectProperty bop = new BridgedObjectProperty(
+                            (BaseProperty) xobject.get(reference.getName()), getXWikiContext());
                         bop.setNew(false);
                         result = (T) bop;
                     } catch (XWikiException e) {

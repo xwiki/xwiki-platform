@@ -48,6 +48,9 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
+ * Unit tests for {@link BridgedEntityManager}.
+ *
+ * @version $Id$
  * @since 4.3M1
  */
 public class BridgedEntityManagerTest extends AbstractBridgedComponentTestCase

@@ -17,15 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model;
+package org.xwiki.model.internal;
+
+import org.junit.Test;
+
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+
+import junit.framework.Assert;
 
 /**
- * Represents an Object Property, i.e. a generic field in an Object which can contain any type of metadata.
+ * Unit tests for {@link BridgedObjectProperty}.
  *
  * @version $Id$
  * @since 4.3M1
  */
-public interface ObjectProperty<T> extends Entity
+public class BridgedObjectPropertyTest extends AbstractBridgedComponentTestCase
 {
-    T getValue();
+    @Test
+    public void getValueWhenDefined()
+    {
+        StringProperty property = new StringProperty();
+        property.setValue("test");
+
+        BridgedObjectProperty bop = new BridgedObjectProperty(property, getContext());
+        Assert.assertEquals("test", bop.getValue());
+    }
 }

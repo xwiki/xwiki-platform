@@ -35,6 +35,10 @@
   <description>Make it possible to implement a component in a wiki page, using wiki objects</description>
   <dependencies>
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
@@ -48,6 +52,11 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-api</artifactId>
       <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

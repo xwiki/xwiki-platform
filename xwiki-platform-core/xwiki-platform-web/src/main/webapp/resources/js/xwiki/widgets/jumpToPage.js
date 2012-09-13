@@ -19,7 +19,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     var content = new Element("div");
     this.input = new Element("input", {
       "type" : "text",
-      "id" : "jmp_target",
+      "id" : ID("jmp_target"),
       "title" : "$msg.get('core.viewers.jump.dialog.input.tooltip')"
     });
     content.appendChild(this.input);

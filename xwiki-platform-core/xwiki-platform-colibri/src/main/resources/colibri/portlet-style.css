@@ -1,0 +1,12 @@
+div#body {
+  min-width: 0;
+}
+div#body .main {
+  padding: 0;
+}
+div#body #xwikimaincontainerinner {
+  height: auto;
+}
+div#body .alleditcontent {
+  margin: 0;
+}

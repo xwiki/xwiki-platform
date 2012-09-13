@@ -407,15 +407,17 @@ function prettyNameChanged()
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;select name='template' id='template'&gt;
-        #set($wikiList = $WikiManager.getWikiTemplateList())
-        #foreach($wiki in $wikiList)
+        #set($WorkspaceManager = $services.workspace)
+        #set($templates = $WorkspaceManager.getWorkspaceTemplates())
+        #foreach($template in $templates)
+          #set($wiki = $template.getWikiDescriptor())
           #set($wikiAliasList = $wiki.wikiAliasList)
           #set($firstalias = $wikiAliasList.get(0))
           #set($name = $wiki.wikiName)
           #if($stringtool.isNotBlank("$!firstalias.wikiPrettyName"))
             #set($name = "${firstalias.wikiPrettyName} (${name})")
           #end          
-          &lt;option value="$wiki.getWikiName()" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected="selected" #end &gt;$name&lt;/option&gt;
+          &lt;option value="$template.getWikiName()" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected="selected" #end &gt;$name&lt;/option&gt;
         #end
       &lt;/select&gt;
     &lt;/dd&gt;

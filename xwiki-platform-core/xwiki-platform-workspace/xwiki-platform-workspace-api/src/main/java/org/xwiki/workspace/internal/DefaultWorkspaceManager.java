@@ -544,6 +544,22 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         return result;
     }
 
+    @Override
+    public List<Workspace> getWorkspaceTemplates() throws WorkspaceException
+    {
+        List<Workspace> result = new ArrayList<Workspace>();
+
+        List<Workspace> workspaces = getWorkspaces();
+        for (Workspace workspace : workspaces) {
+            XWikiServer server = workspace.getWikiDescriptor();
+            if(server.isWikiTemplate()){
+                result.add(workspace);
+            }
+        }
+
+        return result;
+    }
+
     /**
      * @param wikiDocument the wiki descriptor document
      * @return the WorkspaceClass object contained by the wiki document, if it is a workspace, <code>null</code>

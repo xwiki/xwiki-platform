@@ -114,6 +114,12 @@
       #if ("$!request.confirmTemplateInstall" == '1')
         #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
+          #set($wikiTemplateDocument = $WikiManager.getWikiDocument($TEMPLATE_NAME))
+          #set($workspaceObj = $wikiTemplateDocument.getObject('WorkspaceManager.WorkspaceClass'))
+          #if(!$workspaceObj)
+            #set($discard = $wikiTemplateDocument.createNewObject('WorkspaceManager.WorkspaceClass'))
+            #set($discard = $wikiTemplateDocument.save())
+          #end          
           ## Use a redirect so that the page can be refreshed after the form's POST.
           #set ($discard = $response.sendRedirect($doc.getURL()))
 

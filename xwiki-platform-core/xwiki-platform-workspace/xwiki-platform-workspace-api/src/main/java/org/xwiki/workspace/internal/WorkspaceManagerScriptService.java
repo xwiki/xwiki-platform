@@ -327,6 +327,26 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
+     * Get the list of all workspace templates. It basically gets all workspace returned by
+     * {@code WorkspaceManager.getWorkspaces} and which are considered as template (see
+     * {@code XWikiServer.isWikiTemplate}).
+     *
+     * @return list of available workspace templates
+     * @see #CONTEXT_LASTEXCEPTION to check for abnormal method termination
+     */
+    public List<Workspace> getWorkspaceTemplates()
+    {
+        List<Workspace> result = null;
+        try {
+            result = workspaceManager.getWorkspaceTemplates();
+        } catch (Exception e) {
+            error(e);
+        }
+
+        return result;
+    }
+
+    /**
      * @param workspaceName name of the workspace to check
      * @return true if a workspace with the given name exists, false otherwise
      */

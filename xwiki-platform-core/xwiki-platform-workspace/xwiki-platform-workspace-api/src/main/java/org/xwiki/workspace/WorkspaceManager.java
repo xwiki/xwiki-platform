@@ -109,7 +109,17 @@ public interface WorkspaceManager
      * @return list of available workspaces
      * @throws WorkspaceException if problems occur
      */
-    List<Workspace> getWorkspaces() throws WorkspaceException;    
+    List<Workspace> getWorkspaces() throws WorkspaceException;
+
+    /**
+     * Get the list of all workspace templates. It basically gets all workspace returned by
+     * {@link #WorkspaceManager.getWorkspaces} and which are considered as template (see
+     * {@link #XWikiServer.isWikiTemplate}).
+     *
+     * @return list of available workspace templates
+     * @throws WorkspaceException if problems occur
+     */
+    List<Workspace> getWorkspaceTemplates() throws WorkspaceException;
 
     /**
      * @param workspaceName name of the workspace to check

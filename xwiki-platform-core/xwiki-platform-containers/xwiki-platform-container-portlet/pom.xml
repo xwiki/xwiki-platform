@@ -47,6 +47,7 @@
     <dependency>
       <groupId>javax.portlet</groupId>
       <artifactId>portlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <!-- Portlet API uses the Servlet API -->

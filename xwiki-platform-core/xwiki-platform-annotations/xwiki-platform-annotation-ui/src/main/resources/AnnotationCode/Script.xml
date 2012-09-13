@@ -599,7 +599,7 @@ XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
-  annTabname : 'Annotations',
+  annTabname : ID('Annotations'),
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
   // whether the annotations are being displayed; synchronizes with displayAnnotationsCheckbox if that element exists
@@ -684,7 +684,7 @@ XWiki.Annotation = Class.create({
         }
       }
       // create the annotations button
-      var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
+      var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': ID('tmAnnotations')});
       var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
       annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
       annContainer.insert({top: annLink});
@@ -977,7 +977,7 @@ XWiki.Annotation = Class.create({
     $$(".annotation a.edit").each(function(item) {
       var container = item.up('.annotation');
       // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
-      var annotationId = container.id.substring(16);
+      var annotationId = container.id.substring(container.id.lastIndexOf('_') + 1);
       this.addEditListener(item, annotationId, container.up());
     }.bind(this));
   },
@@ -1181,7 +1181,7 @@ XWiki.Annotation = Class.create({
     // and a nice loading panel inside
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
     // and put it in the content
-    document.body.insert({bottom : bubble});
+    $('body').insert({bottom : bubble});
     // make it hidden for the moment
     bubble.toggleClassName('hidden');
     // position it

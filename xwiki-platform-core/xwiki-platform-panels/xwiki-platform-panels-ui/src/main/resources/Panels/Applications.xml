@@ -228,31 +228,56 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>document.observe('xwiki:dom:loaded', function(e) {
-  $$('[class="applicationPanelMoreButton"]').each(function(button, index) {
-    button.observe('click', function(e) {
+      <code>var XWiki = (function(XWiki) {
+
+var panels = XWiki.panels = XWiki.panels || {};
+
+panels.MoreApplicationsButtonListener = Class.create({
+  initialize: function(button) {
+    this.button = button;
+    this.container = button.up('div').down('.applicationPanelMoreContainer');
+    this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
+    this.isToggling = false;
+
+    this.button.observe('click', function(e) {
       e.stop();
-      // If the submenu is already visible, hide it
-      el = e.currentTarget.up('div').down('[class="applicationPanelMoreContainer"]');
-      if (el) {
-        el.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
-        Effect.BlindUp(el.id, {
-          // We do this to be able to get our hidden element back, we don't rely on
-          // display:none since we don't allow nested style in HTML elements.
-          afterFinish: function(effect) {
-            effect.element.addClassName('hidden');
-          }
-        });
+      if (!this.isToggling) {
+        this.toggle();
       }
-      // If not, show it
-      el = e.currentTarget.up('div').down('[class="applicationPanelMoreContainer hidden"]');
-      if (el) {
-        el.style.display = "none";
-        el.removeClassName('hidden');
-        el.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
-        Effect.BlindDown(el.id);
-      }
-    });
+    }.bindAsEventListener(this));
+
+    return this;
+  },
+
+  toggle: function() {
+    this.isToggling = true;
+    if (this.container.hasClassName('hidden')) {
+      this.container.style.display = "none";
+      this.container.removeClassName('hidden');
+      Effect.BlindDown(this.container.id, {
+        afterFinish: function() {
+          this.isToggling = false;
+        }.bind(this)
+      });
+    } else {
+      Effect.BlindUp(this.container.id, {
+        // We do this to be able to get our hidden element back, we don't rely on
+        // display:none since we don't allow nested style in HTML elements.
+        afterFinish: function() {
+          this.container.addClassName('hidden');
+          this.isToggling = false;
+        }.bind(this)
+      });
+    }
+  }
+});
+
+return XWiki;
+}(XWiki || {}));
+
+document.observe('xwiki:dom:loaded', function(e) {
+  $$('.applicationPanelMoreButton').each(function(button) {
+    new XWiki.panels.MoreApplicationsButtonListener(button);
   });
 });</code>
     </property>

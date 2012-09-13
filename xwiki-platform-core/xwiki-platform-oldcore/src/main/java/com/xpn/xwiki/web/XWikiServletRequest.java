@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -30,11 +29,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.portlet.PortalContext;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletSession;
-import javax.portlet.WindowState;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -462,103 +456,5 @@ public class XWikiServletRequest implements XWikiRequest
     public int getLocalPort()
     {
         return this.request.getLocalPort();
-    }
-
-    /*
-     * Portlet Functions. They do nothing in the servlet environement
-     */
-
-    public boolean isWindowStateAllowed(WindowState windowState)
-    {
-        return false;
-    }
-
-    public boolean isPortletModeAllowed(PortletMode portletMode)
-    {
-        return false;
-    }
-
-    public PortletMode getPortletMode()
-    {
-        return null;
-    }
-
-    public WindowState getWindowState()
-    {
-        return null;
-    }
-
-    public PortletPreferences getPreferences()
-    {
-        return null;
-    }
-
-    public PortletSession getPortletSession()
-    {
-        return null;
-    }
-
-    public PortletSession getPortletSession(boolean b)
-    {
-        return null;
-    }
-
-    public PortalContext getPortalContext()
-    {
-        return null;
-    }
-
-    public String getProperty(String s)
-    {
-        return null;
-    }
-
-    public Enumeration getProperties(String s)
-    {
-        return null;
-    }
-
-    public Enumeration getPropertyNames()
-    {
-        return null;
-    }
-
-    public String getResponseContentType()
-    {
-        return null;
-    }
-
-    public Enumeration getResponseContentTypes()
-    {
-        return null;
-    }
-
-    public InputStream getPortletInputStream() throws IOException
-    {
-        return null;
-    }
-
-    @Override
-    public String getETag()
-    {
-        return null;
-    }
-
-    @Override
-    public String getWindowID()
-    {
-        return null;
-    }
-
-    @Override
-    public Map<String, String[]> getPrivateParameterMap()
-    {
-        return null;
-    }
-
-    @Override
-    public Map<String, String[]> getPublicParameterMap()
-    {
-        return null;
     }
 }

@@ -21,18 +21,12 @@ package com.xpn.xwiki.plugin.scheduler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.portlet.PortalContext;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletSession;
-import javax.portlet.WindowState;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -54,9 +48,12 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private String host;
 
-    /** The context path used by the runtime instance. This can be useful if a URL factory is created from within a scheduler job. */
+    /**
+     * The context path used by the runtime instance. This can be useful if a URL factory is created from within a
+     * scheduler job.
+     */
     private String contextPath;
-    
+
     public XWikiServletRequestStub()
     {
         this.host = "";
@@ -66,7 +63,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     {
         this.contextPath = contextPath;
     }
-    
+
     public void setHost(String host)
     {
         this.host = host;
@@ -91,61 +88,6 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     public Cookie getCookie(String cookieName)
-    {
-        return null;
-    }
-
-    public boolean isWindowStateAllowed(WindowState windowState)
-    {
-        return false;
-    }
-
-    public boolean isPortletModeAllowed(PortletMode portletMode)
-    {
-        return false;
-    }
-
-    public PortletMode getPortletMode()
-    {
-        return null;
-    }
-
-    public WindowState getWindowState()
-    {
-        return null;
-    }
-
-    public PortletPreferences getPreferences()
-    {
-        return null;
-    }
-
-    public PortletSession getPortletSession()
-    {
-        return null;
-    }
-
-    public PortletSession getPortletSession(boolean b)
-    {
-        return null;
-    }
-
-    public String getProperty(String s)
-    {
-        return null;
-    }
-
-    public Enumeration getProperties(String s)
-    {
-        return null;
-    }
-
-    public Enumeration getPropertyNames()
-    {
-        return null;
-    }
-
-    public PortalContext getPortalContext()
     {
         return null;
     }
@@ -255,11 +197,6 @@ public class XWikiServletRequestStub implements XWikiRequest
         return false;
     }
 
-    public String getResponseContentType()
-    {
-        return null;
-    }
-
     public Enumeration getResponseContentTypes()
     {
         return null;
@@ -295,11 +232,6 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     public String getCharacterEncoding()
-    {
-        return null;
-    }
-
-    public InputStream getPortletInputStream() throws IOException
     {
         return null;
     }
@@ -441,29 +373,5 @@ public class XWikiServletRequestStub implements XWikiRequest
     public int getLocalPort()
     {
         return 0;
-    }
-
-    @Override
-    public String getETag()
-    {
-        return null;
-    }
-
-    @Override
-    public String getWindowID()
-    {
-        return null;
-    }
-
-    @Override
-    public Map<String, String[]> getPrivateParameterMap()
-    {
-        return null;
-    }
-
-    @Override
-    public Map<String, String[]> getPublicParameterMap()
-    {
-        return null;
     }
 }

@@ -186,14 +186,6 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.portlet</groupId>
-      <artifactId>portlet-api</artifactId>
-      <!-- TODO: Ideally the scope should be "provided". However before we can do this we'll need
-           to fully remove all references to the Portlet API in XWiki Core so that using it in
-           a Servlet environment will not fail with a ClassNotFoundException -->
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
       <version>1.2.9</version>
@@ -446,11 +438,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-configuration-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-portlet</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -1119,11 +1106,6 @@
               **/web/XWikiDefaultURLFactory.java,
               **/web/XWikiEngineContext.java,
               **/web/XWikiForm.java,
-              **/web/XWikiPortletContext.java,
-              **/web/XWikiPortlet.java,
-              **/web/XWikiPortletRequest.java,
-              **/web/XWikiPortletResponse.java,
-              **/web/XWikiPortletURLFactory.java,
               **/web/XWikiRequest.java,
               **/web/XWikiRequestProcessor.java,
               **/web/XWikiResourceManagerImpl.java,

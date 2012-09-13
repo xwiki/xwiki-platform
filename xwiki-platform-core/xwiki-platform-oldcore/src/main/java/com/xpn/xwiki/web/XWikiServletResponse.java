@@ -20,27 +20,12 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.portlet.CacheControl;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletModeException;
-import javax.portlet.PortletURL;
-import javax.portlet.ResourceURL;
-import javax.portlet.WindowState;
-import javax.portlet.WindowStateException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
 
 public class XWikiServletResponse implements XWikiResponse
 {
@@ -247,134 +232,8 @@ public class XWikiServletResponse implements XWikiResponse
         this.response.sendError(i);
     }
 
-    /*
-     * Portlet Functions
-     */
-    public void addProperty(String s, String s1)
-    {
-    }
-
-    public void setProperty(String s, String s1)
-    {
-    }
-
     public String getContentType()
     {
         return null;
-    }
-
-    public OutputStream getPortletOutputStream() throws IOException
-    {
-        return null;
-    }
-
-    public PortletURL createRenderURL()
-    {
-        return null;
-    }
-
-    public PortletURL createActionURL()
-    {
-        return null;
-    }
-
-    public String getNamespace()
-    {
-        return null;
-    }
-
-    public void setTitle(String s)
-    {
-    }
-
-    public void setWindowState(WindowState windowState) throws WindowStateException
-    {
-    }
-
-    public void setPortletMode(PortletMode portletMode) throws PortletModeException
-    {
-    }
-
-    public void setRenderParameters(Map<String, String[]> parameters)
-    {
-    }
-
-    public void setRenderParameter(String s, String s1)
-    {
-    }
-
-    public void setRenderParameter(String s, String[] strings)
-    {
-    }
-
-    @Override
-    public void setNextPossiblePortletModes(Collection<PortletMode> portletModes)
-    {
-    }
-
-    @Override
-    public ResourceURL createResourceURL()
-    {
-        return null;
-    }
-
-    @Override
-    public CacheControl getCacheControl()
-    {
-        return null;
-    }
-
-    @Override
-    public void addProperty(Cookie cookie)
-    {
-    }
-
-    @Override
-    public void addProperty(String key, Element element)
-    {
-    }
-
-    @Override
-    public Element createElement(String tagName) throws DOMException
-    {
-        return null;
-    }
-
-    @Override
-    public void sendRedirect(String location, String renderUrlParamName) throws IOException
-    {
-    }
-
-    @Override
-    public Map<String, String[]> getRenderParameterMap()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletMode getPortletMode()
-    {
-        return null;
-    }
-
-    @Override
-    public WindowState getWindowState()
-    {
-        return null;
-    }
-
-    @Override
-    public void removePublicRenderParameter(String name)
-    {
-    }
-
-    @Override
-    public void setEvent(QName arg0, Serializable arg1)
-    {
-    }
-
-    @Override
-    public void setEvent(String name, Serializable value)
-    {
     }
 }

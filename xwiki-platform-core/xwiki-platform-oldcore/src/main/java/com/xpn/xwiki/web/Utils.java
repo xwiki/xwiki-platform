@@ -105,11 +105,7 @@ public class Utils
         XWikiResponse response = context.getResponse();
 
         // Set content-type and encoding (this can be changed later by pages themselves)
-        if (context.getResponse() instanceof XWikiPortletResponse) {
-            response.setContentType("text/html");
-        } else {
-            response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
-        }
+        response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
 
         String action = context.getAction();
         if ((!"download".equals(action)) && (!"skin".equals(action))) {
@@ -377,8 +373,6 @@ public class Utils
         int mode = 0;
         if (request instanceof XWikiServletRequest) {
             mode = XWikiContext.MODE_SERVLET;
-        } else if (request instanceof XWikiPortletRequest) {
-            mode = XWikiContext.MODE_PORTLET;
         }
         context.setMode(mode);
 

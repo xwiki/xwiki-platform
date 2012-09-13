@@ -129,12 +129,6 @@
         <!-- Only needed at build time -->
         <scope>provided</scope>
       </dependency>
-      <!-- Dependencies required by portlet integration -->
-      <dependency>
-        <groupId>javax.portlet</groupId>
-        <artifactId>portlet-api</artifactId>
-        <version>2.0</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -341,6 +335,11 @@
                 <!-- Moved to another module -->
                 <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPlugin</exclude>
                 <exclude>com/xpn/xwiki/plugin/zipexplorer/ZipExplorerPluginAPI</exclude>
+                <!-- Removed dependency on Portlet API
+                  (these classes should have been internal anyway) -->
+                <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</exclude>
+                <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
+                <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
               </excludes>
             </configuration>
           </plugin>

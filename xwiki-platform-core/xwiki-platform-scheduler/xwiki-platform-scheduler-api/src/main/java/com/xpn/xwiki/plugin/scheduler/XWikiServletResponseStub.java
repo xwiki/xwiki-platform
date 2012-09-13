@@ -20,27 +20,12 @@
 package com.xpn.xwiki.plugin.scheduler;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.portlet.CacheControl;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletModeException;
-import javax.portlet.PortletURL;
-import javax.portlet.ResourceURL;
-import javax.portlet.WindowState;
-import javax.portlet.WindowStateException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
 
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -60,32 +45,32 @@ public class XWikiServletResponseStub implements XWikiResponse
 
     public void removeCookie(String arg0, XWikiRequest arg1)
     {
-        
+
     }
 
     public void setCharacterEncoding(String arg0)
     {
-        
+
     }
 
     public void addCookie(Cookie arg0)
     {
-        
+
     }
 
     public void addDateHeader(String arg0, long arg1)
     {
-        
+
     }
 
     public void addHeader(String arg0, String arg1)
     {
-        
+
     }
 
     public void addIntHeader(String arg0, int arg1)
     {
-        
+
     }
 
     public boolean containsHeader(String arg0)
@@ -116,47 +101,47 @@ public class XWikiServletResponseStub implements XWikiResponse
 
     public void sendError(int arg0) throws IOException
     {
-        
+
     }
 
     public void sendError(int arg0, String arg1) throws IOException
     {
-        
+
     }
 
     public void sendRedirect(String arg0) throws IOException
     {
-        
+
     }
 
     public void setDateHeader(String arg0, long arg1)
     {
-        
+
     }
 
     public void setHeader(String arg0, String arg1)
     {
-        
+
     }
 
     public void setIntHeader(String arg0, int arg1)
     {
-        
+
     }
 
     public void setStatus(int arg0)
     {
-        
+
     }
 
     public void setStatus(int arg0, String arg1)
     {
-        
+
     }
 
     public void flushBuffer() throws IOException
     {
-        
+
     }
 
     public int getBufferSize()
@@ -196,161 +181,31 @@ public class XWikiServletResponseStub implements XWikiResponse
 
     public void reset()
     {
-        
+
     }
 
     public void resetBuffer()
     {
-        
+
     }
 
     public void setBufferSize(int arg0)
     {
-        
+
     }
 
     public void setContentLength(int arg0)
     {
-        
+
     }
 
     public void setContentType(String arg0)
     {
-        
+
     }
 
     public void setLocale(Locale arg0)
     {
-        
-    }
 
-    public PortletURL createActionURL()
-    {
-        return null;
-    }
-
-    public PortletURL createRenderURL()
-    {
-        return null;
-    }
-
-    public String getNamespace()
-    {
-        return null;
-    }
-
-    public OutputStream getPortletOutputStream() throws IOException
-    {
-        return null;
-    }
-
-    public void setTitle(String arg0)
-    {
-        
-    }
-
-    public void addProperty(String arg0, String arg1)
-    {
-        
-    }
-
-    public void setProperty(String arg0, String arg1)
-    {
-        
-    }
-
-    public void setPortletMode(PortletMode arg0) throws PortletModeException
-    {
-        
-    }
-
-    public void setRenderParameter(String arg0, String arg1)
-    {
-        
-    }
-
-    public void setRenderParameter(String arg0, String[] arg1)
-    {
-        
-    }
-
-    public void setRenderParameters(Map<String, String[]> parameters)
-    {
-    }
-
-    public void setWindowState(WindowState arg0) throws WindowStateException
-    {
-        
-    }
-
-    @Override
-    public void setNextPossiblePortletModes(Collection<PortletMode> portletModes)
-    {
-    }
-
-    @Override
-    public ResourceURL createResourceURL()
-    {
-        return null;
-    }
-
-    @Override
-    public CacheControl getCacheControl()
-    {
-        return null;
-    }
-
-    @Override
-    public void addProperty(Cookie cookie)
-    {
-    }
-
-    @Override
-    public void addProperty(String key, Element element)
-    {
-    }
-
-    @Override
-    public Element createElement(String tagName) throws DOMException
-    {
-        return null;
-    }
-
-    @Override
-    public void sendRedirect(String location, String renderUrlParamName) throws IOException
-    {
-    }
-
-    @Override
-    public Map<String, String[]> getRenderParameterMap()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletMode getPortletMode()
-    {
-        return null;
-    }
-
-    @Override
-    public WindowState getWindowState()
-    {
-        return null;
-    }
-
-    @Override
-    public void removePublicRenderParameter(String name)
-    {
-    }
-
-    @Override
-    public void setEvent(QName arg0, Serializable arg1)
-    {
-    }
-
-    @Override
-    public void setEvent(String name, Serializable value)
-    {
     }
 }

@@ -340,6 +340,19 @@
                 <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</exclude>
                 <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
                 <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
+                <!-- Remove dependency on Portlet API from old core -->
+                <exclude>com/xpn/xwiki/web/XWikiForm</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiPortlet</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiPortletContext</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiPortletRequest</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiPortletResponse</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiPortletURLFactory</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiRequest</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiResponse</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiServletRequest</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiServletRequestStub</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiServletResponse</exclude>
+                <exclude>com/xpn/xwiki/web/XWikiServletResponseStub</exclude>
               </excludes>
             </configuration>
           </plugin>

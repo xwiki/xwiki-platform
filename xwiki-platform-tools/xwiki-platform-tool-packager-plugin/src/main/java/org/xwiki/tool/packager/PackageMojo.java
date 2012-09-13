@@ -528,8 +528,8 @@ public class PackageMojo extends AbstractMojo
         // Since xwiki-platform-portlet has portlet-api as provided dependency it's excluded from all dependencies
         // resolutions so we need to add it explicitly
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("javax.portlet",
-            "portlet-api", getDependencyManagementVersion(pomProject, "javax.portlet", "portlet-api"), null, "jar"));
-        
+            "portlet-api", "2.0", null, "jar"));
+
         return mandatoryTopLevelArtifacts;
     }
 

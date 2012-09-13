@@ -20,16 +20,9 @@
 package com.xpn.xwiki.plugin.scheduler;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.portlet.PortletMode;
-import javax.portlet.PortletModeException;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowState;
-import javax.portlet.WindowStateException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +37,8 @@ import com.xpn.xwiki.web.XWikiResponse;
  */
 public class XWikiServletResponseStub implements XWikiResponse
 {
+    // XWikiResponse
+
     @Override
     public HttpServletResponse getHttpServletResponse()
     {
@@ -220,103 +215,31 @@ public class XWikiServletResponseStub implements XWikiResponse
     }
 
     @Override
+    public void setContentLength(int len)
+    {
+
+    }
+
+    @Override
+    public void setContentType(String type)
+    {
+
+    }
+
+    @Override
+    public void setBufferSize(int size)
+    {
+
+    }
+
+    @Override
     public void resetBuffer()
     {
 
     }
 
     @Override
-    public void setBufferSize(int arg0)
-    {
-
-    }
-
-    @Override
-    public void setContentLength(int arg0)
-    {
-
-    }
-
-    @Override
-    public void setContentType(String arg0)
-    {
-
-    }
-
-    @Override
-    public void setLocale(Locale arg0)
-    {
-
-    }
-
-    @Override
-    public PortletURL createActionURL()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletURL createRenderURL()
-    {
-        return null;
-    }
-
-    @Override
-    public String getNamespace()
-    {
-        return null;
-    }
-
-    @Override
-    public OutputStream getPortletOutputStream() throws IOException
-    {
-        return null;
-    }
-
-    @Override
-    public void setTitle(String arg0)
-    {
-
-    }
-
-    @Override
-    public void addProperty(String arg0, String arg1)
-    {
-
-    }
-
-    @Override
-    public void setProperty(String arg0, String arg1)
-    {
-
-    }
-
-    @Override
-    public void setPortletMode(PortletMode arg0) throws PortletModeException
-    {
-
-    }
-
-    @Override
-    public void setRenderParameter(String arg0, String arg1)
-    {
-
-    }
-
-    @Override
-    public void setRenderParameter(String arg0, String[] arg1)
-    {
-
-    }
-
-    @Override
-    public void setRenderParameters(Map arg0)
-    {
-
-    }
-
-    @Override
-    public void setWindowState(WindowState arg0) throws WindowStateException
+    public void setLocale(Locale loc)
     {
 
     }

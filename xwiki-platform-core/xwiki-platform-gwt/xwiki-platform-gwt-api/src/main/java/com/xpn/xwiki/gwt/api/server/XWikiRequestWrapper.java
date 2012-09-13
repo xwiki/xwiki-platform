@@ -19,199 +19,289 @@
  */
 package com.xpn.xwiki.gwt.api.server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import com.xpn.xwiki.web.XWikiRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-import javax.servlet.ServletInputStream;
-import javax.servlet.RequestDispatcher;
-import javax.portlet.*;
-import java.util.*;
-import java.security.Principal;
-import java.io.UnsupportedEncodingException;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStream;
-
-public class XWikiRequestWrapper implements XWikiRequest {
+public class XWikiRequestWrapper implements XWikiRequest
+{
     private final XWikiRequest request;
+
     public Map paramMap;
 
-    public XWikiRequestWrapper(XWikiRequest request) {
+    public XWikiRequestWrapper(XWikiRequest request)
+    {
         this.request = request;
     }
 
-    public XWikiRequest getRequest() {
+    public XWikiRequest getRequest()
+    {
         return request;
     }
 
-    public HttpServletRequest getHttpServletRequest() {
+    public void setParameterMap(Map params)
+    {
+        paramMap = params;
+    }
+
+    // XWikiRequest
+
+    @Override
+    public HttpServletRequest getHttpServletRequest()
+    {
         return request.getHttpServletRequest();
     }
 
-    public Cookie getCookie(String cookieName) {
+    @Override
+    public Cookie getCookie(String cookieName)
+    {
         return request.getCookie(cookieName);
     }
 
-    public String getAuthType() {
+    @Override
+    public String getAuthType()
+    {
         return request.getAuthType();
     }
 
-    public Cookie[] getCookies() {
+    @Override
+    public Cookie[] getCookies()
+    {
         return request.getCookies();
     }
 
-    public long getDateHeader(String s) {
+    @Override
+    public long getDateHeader(String s)
+    {
         return request.getDateHeader(s);
     }
 
-    public String getHeader(String s) {
+    @Override
+    public String getHeader(String s)
+    {
         return request.getHeader(s);
     }
 
-    public Enumeration getHeaders(String s) {
+    @Override
+    public Enumeration getHeaders(String s)
+    {
         return request.getHeaders(s);
     }
 
-    public Enumeration getHeaderNames() {
+    @Override
+    public Enumeration getHeaderNames()
+    {
         return request.getHeaderNames();
     }
 
-    public int getIntHeader(String s) {
+    @Override
+    public int getIntHeader(String s)
+    {
         return request.getIntHeader(s);
     }
 
-    public String getMethod() {
+    @Override
+    public String getMethod()
+    {
         return request.getMethod();
     }
 
-    public String getPathInfo() {
+    @Override
+    public String getPathInfo()
+    {
         return request.getPathInfo();
     }
 
-    public String getPathTranslated() {
+    @Override
+    public String getPathTranslated()
+    {
         return request.getPathTranslated();
     }
 
-    public String getContextPath() {
+    @Override
+    public String getContextPath()
+    {
         return request.getContextPath();
     }
 
-    public String getQueryString() {
+    @Override
+    public String getQueryString()
+    {
         return request.getQueryString();
     }
 
-    public String getRemoteUser() {
+    @Override
+    public String getRemoteUser()
+    {
         return request.getRemoteUser();
     }
 
-    public boolean isUserInRole(String s) {
+    @Override
+    public boolean isUserInRole(String s)
+    {
         return request.isUserInRole(s);
     }
 
-    public Principal getUserPrincipal() {
+    @Override
+    public Principal getUserPrincipal()
+    {
         return request.getUserPrincipal();
     }
 
-    public String getRequestedSessionId() {
+    @Override
+    public String getRequestedSessionId()
+    {
         return request.getRequestedSessionId();
     }
 
-    public String getRequestURI() {
+    @Override
+    public String getRequestURI()
+    {
         return request.getRequestURI();
     }
 
-    public StringBuffer getRequestURL() {
+    @Override
+    public StringBuffer getRequestURL()
+    {
         return request.getRequestURL();
     }
 
-    public String getServletPath() {
+    @Override
+    public String getServletPath()
+    {
         return request.getServletPath();
     }
 
-    public HttpSession getSession(boolean b) {
+    @Override
+    public HttpSession getSession(boolean b)
+    {
         return request.getSession(b);
     }
 
-    public HttpSession getSession() {
+    @Override
+    public HttpSession getSession()
+    {
         return request.getSession();
     }
 
-    public boolean isRequestedSessionIdValid() {
+    @Override
+    public boolean isRequestedSessionIdValid()
+    {
         return request.isRequestedSessionIdValid();
     }
 
-    public boolean isRequestedSessionIdFromCookie() {
+    @Override
+    public boolean isRequestedSessionIdFromCookie()
+    {
         return request.isRequestedSessionIdFromCookie();
     }
 
-    public boolean isRequestedSessionIdFromURL() {
+    @Override
+    public boolean isRequestedSessionIdFromURL()
+    {
         return request.isRequestedSessionIdFromURL();
     }
 
-    public boolean isRequestedSessionIdFromUrl() {
+    @Override
+    public boolean isRequestedSessionIdFromUrl()
+    {
         return request.isRequestedSessionIdFromUrl();
     }
 
-    public Object getAttribute(String s) {
+    @Override
+    public Object getAttribute(String s)
+    {
         return request.getAttribute(s);
     }
 
-    public Enumeration getAttributeNames() {
+    @Override
+    public Enumeration getAttributeNames()
+    {
         return request.getAttributeNames();
     }
 
-    public String getCharacterEncoding() {
+    @Override
+    public String getCharacterEncoding()
+    {
         return request.getCharacterEncoding();
     }
 
-    public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
+    @Override
+    public void setCharacterEncoding(String s) throws UnsupportedEncodingException
+    {
         request.setCharacterEncoding(s);
     }
 
-    public int getContentLength() {
+    @Override
+    public int getContentLength()
+    {
         return request.getContentLength();
     }
 
-    public String getContentType() {
+    @Override
+    public String getContentType()
+    {
         return request.getContentType();
     }
 
-    public ServletInputStream getInputStream() throws IOException {
+    @Override
+    public ServletInputStream getInputStream() throws IOException
+    {
         return request.getInputStream();
     }
 
-    public String get(String name) {
+    @Override
+    public String get(String name)
+    {
         return getParameter(name);
     }
 
-    public String getParameter(String name) {
-        if (paramMap==null)
-         return request.getParameter(name);
+    @Override
+    public String getParameter(String name)
+    {
+        if (paramMap == null)
+            return request.getParameter(name);
         Object data = paramMap.get(name);
-        if (data==null) {
+        if (data == null) {
             return "";
         } else if (data instanceof String)
-         return (String) data;
+            return (String) data;
         else if (data instanceof String[]) {
-            if (((String[])data).length>0)
-             return (((String[])data))[0];
+            if (((String[]) data).length > 0)
+                return (((String[]) data))[0];
             else
-             return "";
+                return "";
         } else if (data instanceof Collection) {
-            if (((Collection)data).size()>0)
-             return ((Collection)data).toArray()[0].toString();
+            if (((Collection) data).size() > 0)
+                return ((Collection) data).toArray()[0].toString();
             else
-             return "";
+                return "";
         } else {
             return data.toString();
         }
     }
 
-    public Enumeration getParameterNames() {
-        if (paramMap==null)
-         return request.getParameterNames();
+    @Override
+    public Enumeration getParameterNames()
+    {
+        if (paramMap == null)
+            return request.getParameterNames();
         else {
             Set keys = paramMap.keySet();
             Vector v = new Vector();
@@ -223,12 +313,14 @@ public class XWikiRequestWrapper implements XWikiRequest {
         }
     }
 
-    public String[] getParameterValues(String name) {
-        if (paramMap==null)
-         return request.getParameterValues(name);
+    @Override
+    public String[] getParameterValues(String name)
+    {
+        if (paramMap == null)
+            return request.getParameterValues(name);
         else {
             Object data = paramMap.get(name);
-            if (data==null) {
+            if (data == null) {
                 return new String[0];
             } else if (data instanceof String) {
                 String[] result = new String[1];
@@ -237,8 +329,8 @@ public class XWikiRequestWrapper implements XWikiRequest {
             } else if (data instanceof String[]) {
                 return (String[]) data;
             } else if (data instanceof Collection) {
-                String[] result = new String[((Collection)data).size()];
-                Iterator it = ((Collection)data).iterator();
+                String[] result = new String[((Collection) data).size()];
+                Iterator it = ((Collection) data).iterator();
                 int i = 0;
                 while (it.hasNext()) {
                     result[i] = (String) it.next();
@@ -254,143 +346,120 @@ public class XWikiRequestWrapper implements XWikiRequest {
 
     }
 
-    public Map getParameterMap() {
-        if (paramMap==null)
-         return request.getParameterMap();
+    @Override
+    public Map getParameterMap()
+    {
+        if (paramMap == null)
+            return request.getParameterMap();
         else
-         return paramMap;
+            return paramMap;
     }
 
-
-    public void setParameterMap(Map params) {
-        paramMap = params;
-    }
-
-    public String getProtocol() {
+    @Override
+    public String getProtocol()
+    {
         return request.getProtocol();
     }
 
-    public String getScheme() {
+    @Override
+    public String getScheme()
+    {
         return request.getScheme();
     }
 
-    public String getServerName() {
+    @Override
+    public String getServerName()
+    {
         return request.getServerName();
     }
 
-    public int getServerPort() {
+    @Override
+    public int getServerPort()
+    {
         return request.getServerPort();
     }
 
-    public BufferedReader getReader() throws IOException {
+    @Override
+    public BufferedReader getReader() throws IOException
+    {
         return request.getReader();
     }
 
-    public String getRemoteAddr() {
+    @Override
+    public String getRemoteAddr()
+    {
         return request.getRemoteAddr();
     }
 
-    public String getRemoteHost() {
+    @Override
+    public String getRemoteHost()
+    {
         return request.getRemoteHost();
     }
 
-    public void setAttribute(String s, Object o) {
+    @Override
+    public void setAttribute(String s, Object o)
+    {
         request.setAttribute(s, o);
     }
 
-    public void removeAttribute(String s) {
+    @Override
+    public void removeAttribute(String s)
+    {
         request.removeAttribute(s);
     }
 
-    public Locale getLocale() {
+    @Override
+    public Locale getLocale()
+    {
         return request.getLocale();
     }
 
-    public Enumeration getLocales() {
+    @Override
+    public Enumeration getLocales()
+    {
         return request.getLocales();
     }
 
-    public boolean isSecure() {
+    @Override
+    public boolean isSecure()
+    {
         return request.isSecure();
     }
 
-    public RequestDispatcher getRequestDispatcher(String s) {
+    @Override
+    public RequestDispatcher getRequestDispatcher(String s)
+    {
         return request.getRequestDispatcher(s);
     }
 
-    public String getRealPath(String s) {
+    @Override
+    public String getRealPath(String s)
+    {
         return request.getRealPath(s);
     }
 
-    public int getRemotePort() {
+    @Override
+    public int getRemotePort()
+    {
         return request.getRemotePort();
     }
 
-    public String getLocalName() {
+    @Override
+    public String getLocalName()
+    {
         return request.getLocalName();
     }
 
-    public String getLocalAddr() {
+    @Override
+    public String getLocalAddr()
+    {
         return request.getLocalAddr();
     }
 
-    public int getLocalPort() {
+    @Override
+    public int getLocalPort()
+    {
         return request.getLocalPort();
-    }
-
-    public boolean isWindowStateAllowed(WindowState windowState) {
-        return request.isWindowStateAllowed(windowState);
-    }
-
-    public boolean isPortletModeAllowed(PortletMode portletMode) {
-        return request.isPortletModeAllowed(portletMode);
-    }
-
-    public PortletMode getPortletMode() {
-        return request.getPortletMode();
-    }
-
-    public WindowState getWindowState() {
-        return request.getWindowState();
-    }
-
-    public PortletPreferences getPreferences() {
-        return request.getPreferences();
-    }
-
-    public PortletSession getPortletSession() {
-        return request.getPortletSession();
-    }
-
-    public PortletSession getPortletSession(boolean b) {
-        return request.getPortletSession(b);
-    }
-
-    public PortalContext getPortalContext() {
-        return request.getPortalContext();
-    }
-
-    public String getProperty(String s) {
-        return request.getProperty(s);
-    }
-
-    public Enumeration getProperties(String s) {
-        return request.getProperties(s);
-    }
-
-    public Enumeration getPropertyNames() {
-        return request.getPropertyNames();
-    }
-
-    public String getResponseContentType() {
-        return request.getResponseContentType();
-    }
-
-    public Enumeration getResponseContentTypes() {
-        return request.getResponseContentTypes();
-    }
-
-    public InputStream getPortletInputStream() throws IOException {
-        return request.getPortletInputStream();
     }
 }

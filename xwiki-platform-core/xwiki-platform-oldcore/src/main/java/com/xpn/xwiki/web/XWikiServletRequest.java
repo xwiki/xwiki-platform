@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -30,11 +29,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.portlet.PortalContext;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletSession;
-import javax.portlet.WindowState;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -146,106 +140,129 @@ public class XWikiServletRequest implements XWikiRequest
         return text;
     }
 
+    // XWikiRequest
+
+    @Override
     public String get(String name)
     {
         return filterString(this.request.getParameter(name));
     }
 
+    @Override
     public HttpServletRequest getHttpServletRequest()
     {
         return this.request;
     }
 
+    @Override
     public String getAuthType()
     {
         return this.request.getAuthType();
     }
 
+    @Override
     public Cookie[] getCookies()
     {
         return this.request.getCookies();
     }
 
+    @Override
     public Cookie getCookie(String cookieName)
     {
         return Util.getCookie(cookieName, this);
     }
 
+    @Override
     public long getDateHeader(String s)
     {
         return this.request.getDateHeader(s);
     }
 
+    @Override
     public String getHeader(String s)
     {
         return this.request.getHeader(s);
     }
 
+    @Override
     public Enumeration getHeaders(String s)
     {
         return this.request.getHeaders(s);
     }
 
+    @Override
     public Enumeration getHeaderNames()
     {
         return this.request.getHeaderNames();
     }
 
+    @Override
     public int getIntHeader(String s)
     {
         return this.request.getIntHeader(s);
     }
 
+    @Override
     public String getMethod()
     {
         return this.request.getMethod();
     }
 
+    @Override
     public String getPathInfo()
     {
         return this.request.getPathInfo();
     }
 
+    @Override
     public String getPathTranslated()
     {
         return this.request.getPathTranslated();
     }
 
+    @Override
     public String getContextPath()
     {
         return this.request.getContextPath();
     }
 
+    @Override
     public String getQueryString()
     {
         return this.request.getQueryString();
     }
 
+    @Override
     public String getRemoteUser()
     {
         return this.request.getRemoteUser();
     }
 
+    @Override
     public boolean isUserInRole(String s)
     {
         return this.request.isUserInRole(s);
     }
 
+    @Override
     public Principal getUserPrincipal()
     {
         return this.request.getUserPrincipal();
     }
 
+    @Override
     public String getRequestedSessionId()
     {
         return this.request.getRequestedSessionId();
     }
 
+    @Override
     public String getRequestURI()
     {
         return this.request.getRequestURI();
     }
 
+    @Override
     public StringBuffer getRequestURL()
     {
         StringBuffer requestURL = this.request.getRequestURL();
@@ -255,31 +272,37 @@ public class XWikiServletRequest implements XWikiRequest
         return requestURL;
     }
 
+    @Override
     public String getServletPath()
     {
         return this.request.getServletPath();
     }
 
+    @Override
     public HttpSession getSession(boolean b)
     {
         return this.request.getSession(b);
     }
 
+    @Override
     public HttpSession getSession()
     {
         return this.request.getSession();
     }
 
+    @Override
     public boolean isRequestedSessionIdValid()
     {
         return this.request.isRequestedSessionIdValid();
     }
 
+    @Override
     public boolean isRequestedSessionIdFromCookie()
     {
         return this.request.isRequestedSessionIdFromCookie();
     }
 
+    @Override
     public boolean isRequestedSessionIdFromURL()
     {
         return this.request.isRequestedSessionIdFromURL();
@@ -289,62 +312,74 @@ public class XWikiServletRequest implements XWikiRequest
      * @deprecated
      */
     @Deprecated
+    @Override
     public boolean isRequestedSessionIdFromUrl()
     {
         return this.request.isRequestedSessionIdFromURL();
     }
 
+    @Override
     public Object getAttribute(String s)
     {
         return this.request.getAttribute(s);
     }
 
+    @Override
     public Enumeration getAttributeNames()
     {
         return this.request.getAttributeNames();
     }
 
+    @Override
     public String getCharacterEncoding()
     {
         return this.request.getCharacterEncoding();
     }
 
+    @Override
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException
     {
         this.request.setCharacterEncoding(s);
     }
 
+    @Override
     public int getContentLength()
     {
         return this.request.getContentLength();
     }
 
+    @Override
     public String getContentType()
     {
         return this.request.getContentType();
     }
 
+    @Override
     public ServletInputStream getInputStream() throws IOException
     {
         return this.request.getInputStream();
     }
 
+    @Override
     public String getParameter(String s)
     {
         return filterString(this.request.getParameter(s));
     }
 
+    @Override
     public Enumeration getParameterNames()
     {
         return this.request.getParameterNames();
     }
 
+    @Override
     public String[] getParameterValues(String s)
     {
         String[] origResult = this.request.getParameterValues(s);
         return filterStringArray(origResult);
     }
 
+    @Override
     public Map getParameterMap()
     {
         Map newMap = new HashMap();
@@ -364,31 +399,37 @@ public class XWikiServletRequest implements XWikiRequest
         return map;
     }
 
+    @Override
     public String getProtocol()
     {
         return this.request.getProtocol();
     }
 
+    @Override
     public String getScheme()
     {
         return this.request.getScheme();
     }
 
+    @Override
     public String getServerName()
     {
         return this.request.getServerName();
     }
 
+    @Override
     public int getServerPort()
     {
         return this.request.getServerPort();
     }
 
+    @Override
     public BufferedReader getReader() throws IOException
     {
         return this.request.getReader();
     }
 
+    @Override
     public String getRemoteAddr()
     {
         if (this.request.getHeader("x-forwarded-for") != null) {
@@ -397,6 +438,7 @@ public class XWikiServletRequest implements XWikiRequest
         return this.request.getRemoteAddr();
     }
 
+    @Override
     public String getRemoteHost()
     {
         if (this.request.getHeader("x-forwarded-for") != null) {
@@ -405,31 +447,37 @@ public class XWikiServletRequest implements XWikiRequest
         return this.request.getRemoteHost();
     }
 
+    @Override
     public void setAttribute(String s, Object o)
     {
         this.request.setAttribute(s, o);
     }
 
+    @Override
     public void removeAttribute(String s)
     {
         this.request.removeAttribute(s);
     }
 
+    @Override
     public Locale getLocale()
     {
         return this.request.getLocale();
     }
 
+    @Override
     public Enumeration getLocales()
     {
         return this.request.getLocales();
     }
 
+    @Override
     public boolean isSecure()
     {
         return this.request.isSecure();
     }
 
+    @Override
     public RequestDispatcher getRequestDispatcher(String s)
     {
         return this.request.getRequestDispatcher(s);
@@ -439,102 +487,33 @@ public class XWikiServletRequest implements XWikiRequest
      * @deprecated
      */
     @Deprecated
+    @Override
     public String getRealPath(String s)
     {
         return this.request.getRealPath(s);
     }
 
+    @Override
     public int getRemotePort()
     {
         return this.request.getRemotePort();
     }
 
+    @Override
     public String getLocalName()
     {
         return this.request.getLocalName();
     }
 
+    @Override
     public String getLocalAddr()
     {
         return this.request.getLocalAddr();
     }
 
+    @Override
     public int getLocalPort()
     {
         return this.request.getLocalPort();
-    }
-
-    /*
-     * Portlet Functions. They do nothing in the servlet environement
-     */
-
-    public boolean isWindowStateAllowed(WindowState windowState)
-    {
-        return false;
-    }
-
-    public boolean isPortletModeAllowed(PortletMode portletMode)
-    {
-        return false;
-    }
-
-    public PortletMode getPortletMode()
-    {
-        return null;
-    }
-
-    public WindowState getWindowState()
-    {
-        return null;
-    }
-
-    public PortletPreferences getPreferences()
-    {
-        return null;
-    }
-
-    public PortletSession getPortletSession()
-    {
-        return null;
-    }
-
-    public PortletSession getPortletSession(boolean b)
-    {
-        return null;
-    }
-
-    public PortalContext getPortalContext()
-    {
-        return null;
-    }
-
-    public String getProperty(String s)
-    {
-        return null;
-    }
-
-    public Enumeration getProperties(String s)
-    {
-        return null;
-    }
-
-    public Enumeration getPropertyNames()
-    {
-        return null;
-    }
-
-    public String getResponseContentType()
-    {
-        return null;
-    }
-
-    public Enumeration getResponseContentTypes()
-    {
-        return null;
-    }
-
-    public InputStream getPortletInputStream() throws IOException
-    {
-        return null;
     }
 }

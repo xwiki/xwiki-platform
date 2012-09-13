@@ -19,12 +19,10 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.RenderRequest;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @version $Id$
@@ -35,7 +33,7 @@ public abstract class XWikiForm extends ActionForm
 
     /**
      * Reset all properties to their default values.
-     *
+     * 
      * @param request The servlet request we are processing
      */
     public void setRequest(HttpServletRequest request)
@@ -43,14 +41,9 @@ public abstract class XWikiForm extends ActionForm
         this.request = new XWikiServletRequest(request);
     }
 
-    public void setRequest(PortletRequest request)
-    {
-        this.request = new XWikiPortletRequest(request);
-    }
-
     /**
      * Reset all properties to their default values.
-     *
+     * 
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      */
@@ -63,19 +56,7 @@ public abstract class XWikiForm extends ActionForm
 
     /**
      * Reset all properties to their default values.
-     *
-     * @param mapping The mapping used to select this instance
-     * @param request The servlet request we are processing
-     */
-    public void reset(ActionMapping mapping, RenderRequest request)
-    {
-        setRequest(request);
-        readRequest();
-    }
-
-    /**
-     * Reset all properties to their default values.
-     *
+     * 
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      */

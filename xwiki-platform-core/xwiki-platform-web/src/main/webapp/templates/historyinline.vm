@@ -20,7 +20,12 @@
 #if ($totalVersions == 0)
   #warning ($msg.get('thispagedoesnotexist'))
 #else
-  #set ($paginationParameters = {'url' : "?${viewer}&amp;showminor=${minorVersions}", 'totalItems' : $totalVersions, 'defaultItemsPerPage' : 20, 'position': 'top'})
+  #if ($xcontext.action == 'get')
+    #set ($action = 'view')
+  #else
+    #set ($action = $xcontext.action)
+  #end
+  #set ($paginationParameters = {'url' : $doc.getURL($action, "$viewer&showminor=$minorVersions"), 'totalItems' : $totalVersions, 'defaultItemsPerPage' : 20, 'position': 'top'})
   #pagination ($paginationParameters)
 ## Since we're displaying revisions starting from the last one, we need to mirror the range inside
 ## the total versions range.

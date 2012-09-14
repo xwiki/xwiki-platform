@@ -164,6 +164,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     /**
      * @return list of document references to documents containing a UI extension object.
      */
+    @Override
     public List<DocumentReference> getDocumentReferences()
     {
         List<DocumentReference> results = new ArrayList<DocumentReference>();

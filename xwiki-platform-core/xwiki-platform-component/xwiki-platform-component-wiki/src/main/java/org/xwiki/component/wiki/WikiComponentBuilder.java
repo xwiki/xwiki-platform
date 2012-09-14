@@ -43,7 +43,8 @@ public interface WikiComponentBuilder
 
     /**
      * Build the components defined in a document XObjects. Being able to define more than one component in a document
-     * depends on the implementation.
+     * depends on the implementation. It is up to the implementation to determine if the last author of the document
+     * has the required permissions to register a component.
      * 
      * @param reference the reference to the document that holds component definition objects
      * @return the constructed component definition

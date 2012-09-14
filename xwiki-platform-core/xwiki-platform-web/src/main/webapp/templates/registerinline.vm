@@ -48,7 +48,7 @@
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
 
           <dt><label for="register_username">$msg.get('core.register.username') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
-          <dd><input name="xwikiname" id="register_username" type="text" size="20" onfocus="prepareName(document.forms.register);" /></dd>
+          <dd><input name="xwikiname" id="register_username" type="text" size="20" onfocus="prepareName($('register'));" /></dd>
 
           #set($prop = $class.password)
           <dt><label for="register_${prop.name}">$msg.get('core.register.password') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>

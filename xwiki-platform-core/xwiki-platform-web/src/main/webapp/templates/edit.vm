@@ -95,6 +95,7 @@
   <script type="text/javascript">
     //<![CDATA[
     if ($('tmEditWysiwyg')) {
+      #set ($form = "$('$formname')")
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
       Event.observe($('tmEditWysiwyg'), "click", function(event) {
         #if($doc.syntax.toIdString() == "xwiki/1.0")
@@ -103,15 +104,15 @@
           return;
         }
         #end
-        document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")';
-        document.forms.${formname}.submit();
+        ${form}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")';
+        ${form}.submit();
         Event.stop(event);
       });
 
       // Manage switch from wysiwyg to wiki, content must be preserved between those editors.
       Event.observe($('tmEditWiki'), "click", function(event) {
-        document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
-        document.forms.${formname}.submit();
+        ${form}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
+        ${form}.submit();
         Event.stop(event);
       });
     }

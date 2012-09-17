@@ -771,7 +771,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #else
     ## Paginated
     #if(($totalPages &gt; 1))
-      #set($queryString = "")
+      #set($queryString = '')
       #foreach($p in $request.getParameterNames())
         #if($p != 'page' &amp;&amp; $p != 'ipp')
           #foreach($v in $request.getParameterValues($p))

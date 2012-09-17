@@ -42,8 +42,6 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
  * Method invocation handler for wiki component proxy instances. Has a reference on a map of name/body wiki code of
  * supported methods.
@@ -190,9 +188,11 @@ public class WikiComponentInvocationHandler implements InvocationHandler
         }
         
         methodContext.put(METHOD_CONTEXT_INPUT_KEY, inputs);
-        
+
+        // TODO: Fix this since the XWiki Context is the old way of doing things. We need a solution based on the
+        // Execution Context instead.
         // Place macro context inside xwiki context ($context.macro).
-        XWikiContext xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        Map<Object, Object> xwikiContext = (Map<Object, Object>) execution.getContext().getProperty("xwikicontext");
         xwikiContext.put("method", methodContext);
         // Save current context document, to put it back after the execution.
         Object contextDoc = xwikiContext.get(XWIKI_CONTEXT_DOC_KEY);
@@ -203,9 +203,7 @@ public class WikiComponentInvocationHandler implements InvocationHandler
             // Perform internal macro transformations.
             XDOM transformedXDOM;
             try {
-                Syntax syntax =
-                    xwikiContext.getWiki().getDocument(this.wikiComponent.getDocumentReference(),
-                        xwikiContext).getSyntax();
+                Syntax syntax = docBridge.getDocument(this.wikiComponent.getDocumentReference()).getSyntax();
                 TransformationContext transformationContext = new TransformationContext(xdom, syntax);
                 transformationContext.setId(method.getClass().getName() + "#" + method.getName());
                 // We need to clone the xdom to avoid transforming the original and make it useless after the first
@@ -217,34 +215,38 @@ public class WikiComponentInvocationHandler implements InvocationHandler
                     "Error while executing wiki component macro transformation for method [%s]", method.getName()), e);
             }
 
-            if (methodContext.get(METHOD_CONTEXT_OUTPUT_KEY) != null
-                && ((MethodOutputHandler) methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getValue() != null) {
-                return method.getReturnType().cast(((MethodOutputHandler)
-                    methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getValue());
-            } else {
-                // Since no return value has been explicitly provided, we try to convert the result of the rendering
-                // into the expected return type using a Converter.
-                WikiPrinter printer = new DefaultWikiPrinter();
-                BlockRenderer renderer =
-                    componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
-                renderer.render(transformedXDOM, printer);
-                String contentResult = printer.toString();
+            if (!method.getReturnType().getName().equals("void")) {
+                if (methodContext.get(METHOD_CONTEXT_OUTPUT_KEY) != null
+                    && ((MethodOutputHandler) methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getValue() != null) {
+                    return method.getReturnType().cast(((MethodOutputHandler)
+                        methodContext.get(METHOD_CONTEXT_OUTPUT_KEY)).getValue());
+                } else {
+                    // Since no return value has been explicitly provided, we try to convert the result of the rendering
+                    // into the expected return type using a Converter.
+                    WikiPrinter printer = new DefaultWikiPrinter();
+                    BlockRenderer renderer =
+                        componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
+                    renderer.render(transformedXDOM, printer);
+                    String contentResult = printer.toString();
 
-                // Do the conversion!
-                ConverterManager converterManager = componentManager.getInstance(ConverterManager.class);
-                try {
-                    return converterManager.convert(method.getGenericReturnType(), contentResult);
-                } catch (ConversionException e) {
-                    // Surrender!
-                    throw new WikiComponentRuntimeException(String.format("Failed to convert result [%s] to type [%s] "
-                        + "for method [%s.%s] found in Object [%s] of document [%s]",
-                        contentResult,
-                        method.getGenericReturnType(),
-                        method.getDeclaringClass().getName(),
-                        method.getName(),
-                        WikiComponentConstants.METHOD_CLASS,
-                        getSerializedWikiComponentDocumentReference()), e);
+                    // Do the conversion!
+                    ConverterManager converterManager = componentManager.getInstance(ConverterManager.class);
+                    try {
+                        return converterManager.convert(method.getGenericReturnType(), contentResult);
+                    } catch (ConversionException e) {
+                        // Surrender!
+                        throw new WikiComponentRuntimeException(String.format("Failed to convert result [%s] to type [%s] "
+                            + "for method [%s.%s] found in Object [%s] of document [%s]",
+                            contentResult,
+                            method.getGenericReturnType(),
+                            method.getDeclaringClass().getName(),
+                            method.getName(),
+                            WikiComponentConstants.METHOD_CLASS,
+                            getSerializedWikiComponentDocumentReference()), e);
+                    }
                 }
+            } else {
+                return null;
             }
         } finally {
             if (contextDoc != null) {

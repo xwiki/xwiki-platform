@@ -26,7 +26,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * Represents the definition of a wiki component implementation.
+ * Represents the definition of a wiki component implementation. A java component can extend this interface if it needs
+ * to be bound to a document, in order to be unregistered and registered again when the document is modified, and
+ * unregistered when the document is deleted.
  * 
  * @version $Id$
  * @since 4.2M3
@@ -34,6 +36,8 @@ import org.xwiki.rendering.block.XDOM;
 public interface WikiComponent
 {
     /**
+     * Get the reference of the document this component instance is bound to.
+     *
      * @return the reference to the document holding this wiki component definition.
      */
     DocumentReference getDocumentReference();
@@ -49,11 +53,23 @@ public interface WikiComponent
     String getRoleHint();
 
     /**
+     * Get the list of interfaces the wiki component implements, apart from its main Role. When the component is
+     * entirely written in a document, it allows the {@link WikiComponentManager} to add those Interfaces to the list of
+     * implemented interfaces of the {@link java.lang.reflect.Proxy} it will create.
+     * Classes extending this interface only need to return an empty list here since the list of interfaces they
+     * implement will be determined using Java reflection.
+     *
      * @return the extra list of interfaces this component implementation implements.
      */
     List<Class< ? >> getImplementedInterfaces();
 
     /**
+     * Get the implementations of all the methods the component handles. It allows to write method implementations in
+     * wiki documents, using script macros. When a method has multiple signatures (different sets of parameters) the
+     * same {@link XDOM} will be executed.
+     * Classes extending this interface only need to return an empty list here since the methods they handle are native
+     * Java methods.
+     *
      * @return the map of method name/wiki code this component implementation handles. 
      */
     Map<String, XDOM> getHandledMethods();

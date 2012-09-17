@@ -66,4 +66,27 @@ Event.observe(document, 'xwiki:dom:loading', function() {
       }
     );
   }
+
+  // The form action URL can be modified from JavaScript before the form is sumitted.
+  // Make sure the form is submitted with a portlet URL.
+  document.observe('submit', function(event) {
+    var form = event.element();
+    var servletURL = form.readAttribute('action') || '';
+    var actionURL = $('actionURL').value;
+    if (servletURL == '') {
+      form.action = actionURL;
+      // Don't submit an empty dispatch URL because the request will be made to the home page.
+      form.getInputs('hidden', dispatchURLParamName).invoke('disable');
+    } else if (servletURL.startsWith('$request.contextPath')) {
+      form.action = actionURL;
+      var dispatchURLs = form.getInputs('hidden', dispatchURLParamName);
+      if (dispatchURLs.length > 0) {
+        // Update the dispatch URL.
+        dispatchURLs[0].value = servletURL;
+      } else {
+        // Add the dispatch URL parameter.
+        form.insert({top: new Element('input', {type: 'hidden', name: dispatchURLParamName, value: servletURL})});
+      }
+    }
+  });
 });

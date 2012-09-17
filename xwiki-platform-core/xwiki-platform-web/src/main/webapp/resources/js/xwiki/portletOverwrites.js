@@ -20,7 +20,7 @@ Event.observe(document, 'xwiki:dom:loading', function() {
    * Make sure AJAX requests go through the portlet.
    */
   var resourceURL = $('resourceURL').value;
-  var dispatchURLParamName = 'org.xwiki.portlet.parameter.dispatchURL';
+  var dispatchURLParamName = 'org.xwiki.portlet.request.parameter.dispatchURL';
   var fRequest = Ajax.Request.prototype.request;
   Ajax.Request.prototype.request = function(servletURL) {
     if (Object.isString(this.options.parameters)) {

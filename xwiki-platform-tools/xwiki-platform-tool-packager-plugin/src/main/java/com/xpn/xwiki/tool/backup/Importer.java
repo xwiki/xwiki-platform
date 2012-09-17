@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageException;
 import com.xpn.xwiki.store.XWikiCacheStore;
@@ -153,7 +154,11 @@ public class Importer extends AbstractPackager
         }
 
         try {
-            pack.install(context);
+            int code = pack.install(context);
+            if (code != DocumentInfo.INSTALL_OK) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to import XAR with code [" + code + "]");
+            }
         } finally {
             // Restore context user as before
             context.setUserReference(currentUserReference);

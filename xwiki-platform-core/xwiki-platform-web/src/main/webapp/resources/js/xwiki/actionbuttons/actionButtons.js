@@ -151,7 +151,8 @@ actionButtons.AjaxSaveAndContinue = Class.create({
   createMessages : function() {
     this.savingBox = new XWiki.widgets.Notification("Saving...", "inprogress", {inactive: true});
     this.savedBox = new XWiki.widgets.Notification("Saved", "done", {inactive: true});
-    this.failedBox = new XWiki.widgets.Notification("Failed to save the document. Reason: <span id=\"ajaxRequestFailureReason\"></span>", "error", {inactive: true});
+    this.failedBox = new XWiki.widgets.Notification("Failed to save the document. Reason: <span id=\""
+      + ID('ajaxRequestFailureReason') + "\"></span>", "error", {inactive: true});
   },
   addListeners : function() {
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));

@@ -98,22 +98,23 @@
       #set ($form = "$('$formname')")
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
       Event.observe($('tmEditWysiwyg'), "click", function(event) {
+        Event.stop(event);
         #if($doc.syntax.toIdString() == "xwiki/1.0")
         if (checkAdvancedContent('$msg.get("checkadvancedcontent")') == false) {
-          Event.stop(event);
           return;
         }
         #end
         ${form}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")';
-        ${form}.submit();
-        Event.stop(event);
+        // Submit the form by clicking on a submit button so that the onsubmit event is fired.
+        ${form}.getInputs('submit')[0].writeAttribute('name', '').click();
       });
 
       // Manage switch from wysiwyg to wiki, content must be preserved between those editors.
       Event.observe($('tmEditWiki'), "click", function(event) {
-        ${form}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
-        ${form}.submit();
         Event.stop(event);
+        ${form}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
+        // Submit the form by clicking on a submit button so that the onsubmit event is fired.
+        ${form}.getInputs('submit')[0].writeAttribute('name', '').click();
       });
     }
     //]]>

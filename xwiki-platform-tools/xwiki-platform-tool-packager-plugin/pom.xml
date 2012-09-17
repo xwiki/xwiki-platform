@@ -67,16 +67,16 @@
       <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.7</version>
+    </dependency>
     <!-- Plexus -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
       <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-velocity</artifactId>
-      <version>1.1.8</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -57,13 +57,12 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.app.Velocity;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.velocity.VelocityComponent;
 import org.hibernate.cfg.Environment;
 
 import com.xpn.xwiki.XWikiContext;
@@ -171,18 +170,9 @@ public class PackageMojo extends AbstractMojo
     private ArtifactMetadataSource metadataSource;
 
     /**
-     * Velocity component.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private VelocityComponent velocity;
-
-    /**
-     * The user under which the import should be done. If not user is specified then we import with backup pack. For
-     * example {@code superadmin}.
-     * 
+     * The user under which the import should be done. If not user is specified then we import with backup pack.
+     * For example {@code superadmin}.
+     *
      * @parameter
      */
     private String importUser;
@@ -267,16 +257,17 @@ public class PackageMojo extends AbstractMojo
 
         // Replace maven properties in start shell scripts
         VelocityContext context = createVelocityContext();
-        Collection<File> startFiles =
-            org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory, new WildcardFileFilter(
-                "start_xwiki*.*"), null);
-        VelocityEngine velocityEngine = this.velocity.getEngine();
+        Collection<File> startFiles = org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory,
+            new WildcardFileFilter("start_xwiki*.*"), null);
+
+        // Note: Init is done once even if this method is called several times...
+        Velocity.init();
         for (File startFile : startFiles) {
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));
             try {
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile);
                 OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
-                velocityEngine.evaluate(context, writer, "", content);
+                Velocity.evaluate(context, writer, "", content);
                 writer.close();
             } catch (Exception e) {
                 // Failed to read or write file...
@@ -343,7 +334,9 @@ public class PackageMojo extends AbstractMojo
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
                     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
                     getLog().info("Writing config file: " + outputFile);
-                    this.velocity.getEngine().evaluate(context, writer, "", IOUtils.toString(jarInputStream));
+                    // Note: Init is done once even if this method is called several times...
+                    Velocity.init();
+                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
                     writer.close();
                     jarInputStream.closeEntry();
                 }

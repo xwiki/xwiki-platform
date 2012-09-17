@@ -171,7 +171,7 @@ public class Importer extends AbstractPackager
      * @param context the XWiki Context object from which we can retrieve the Store implementation
      * @throws XWikiException in case of shutdown error
      */
-    void shutdownHSQLDB(XWikiContext context) throws XWikiException
+    public void shutdownHSQLDB(XWikiContext context) throws XWikiException
     {
         XWikiStoreInterface store = context.getWiki().getStore();
         if (XWikiCacheStore.class.isAssignableFrom(store.getClass())) {

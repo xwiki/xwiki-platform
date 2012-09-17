@@ -67,6 +67,7 @@ import org.codehaus.plexus.velocity.VelocityComponent;
 import org.hibernate.cfg.Environment;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.tool.backup.Importer;
 
 /**
@@ -365,9 +366,9 @@ public class PackageMojo extends AbstractMojo
             System.setProperty(Environment.URL, "jdbc:hsqldb:file:" + this.databaseDirectory
                 + "/xwiki_db;shutdown=true");
 
-            XWikiContext context;
+            XWikiContext xcontext;
             try {
-                context = importer.createXWikiContext("xwiki", new File(webInfDirectory, "hibernate.cfg.xml"));
+                xcontext = importer.createXWikiContext("xwiki", new File(webInfDirectory, "hibernate.cfg.xml"));
             } catch (Exception e) {
                 throw new MojoExecutionException("Failed to create context to import XAR files", e);
             }
@@ -376,11 +377,22 @@ public class PackageMojo extends AbstractMojo
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {
-                    importer.importXAR(xarArtifact.getFile(), this.importUser, context);
+                    importer.importXAR(xarArtifact.getFile(), this.importUser, xcontext);
                 } catch (Exception e) {
                     throw new MojoExecutionException(
                         String.format("Failed to import XAR [%s]", xarArtifact.toString()), e);
                 }
+            }
+
+            // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
+            // to disk and will be lost. In practice this means the last Document imported has a
+            // very high chance of not making it...
+            // TODO: Find a way to implement this generically for all databases and inside
+            // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
+            try {
+                importer.shutdownHSQLDB(xcontext);
+            } catch (Exception e) {
+                throw new MojoExecutionException("Failed to shutdown hsqldb database", e);
             }
 
             // Copy database files to XWiki's data directory.

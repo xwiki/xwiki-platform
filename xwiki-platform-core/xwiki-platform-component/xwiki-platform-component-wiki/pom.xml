@@ -35,8 +35,8 @@
   <description>Make it possible to implement a component in a wiki page, using wiki objects</description>
   <dependencies>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

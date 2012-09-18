@@ -31,7 +31,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
-import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.job.AbstractJob;
@@ -75,8 +74,6 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         if (this.installedRepository.getInstalledExtension(extensionUI) == null) {
             steps.add(new DistributionStepStatus("extension.mainui"));
         }
-
-        DistributionState state = this.distributionManager.getDistributionState();
 
         // Step 2: Upgrade outdated extensions
 

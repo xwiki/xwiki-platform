@@ -165,7 +165,7 @@
     #if ($remaining &gt; 0)
     (% class="documentListMore" %) (((
     // $msg.get('xe.dashboard.space.remainingDocumentsInSpace', [$remaining, $spaceParam])
-       [[$msg.get('xe.dashboard.space.visitSpaceIndex')&gt;&gt;Main.SpaceIndex?space=$spaceParam]] //
+       [[$msg.get('xe.dashboard.space.visitSpaceIndex')&gt;&gt;Main.SpaceIndex?space=${escapetool.url($spaceParam)}]] //
     )))
     #end
   #end

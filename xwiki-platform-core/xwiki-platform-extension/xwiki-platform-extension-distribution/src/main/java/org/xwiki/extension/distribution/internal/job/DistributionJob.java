@@ -77,7 +77,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
 
         // Step 2: Upgrade outdated extensions
 
-        // Upgrade outdated extension only when the distribution changed
+        // Upgrade outdated extensions only when there is outdated extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
             Collection<String> namespaces = extension.getNamespaces();
             if (namespaces == null) {

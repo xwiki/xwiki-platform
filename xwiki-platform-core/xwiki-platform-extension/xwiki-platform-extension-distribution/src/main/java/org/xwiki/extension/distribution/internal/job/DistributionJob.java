@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal.job;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import javax.inject.Named;
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
@@ -79,8 +81,21 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         // Step 2: Upgrade outdated extensions
 
         // Upgrade outdated extension only when the distribution changed
-        if (!this.installedRepository.getInstalledExtensions().isEmpty()) {
-            steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+        for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
+            Collection<String> namespaces = extension.getNamespaces();
+            if (namespaces == null) {
+                if (!extension.isValid(null)) {
+                    steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+                    break;
+                }
+            } else {
+                for (String namespace : namespaces) {
+                    if (!extension.isValid(namespace)) {
+                        steps.add(new DistributionStepStatus("extension.outdatedextensions"));
+                        break;
+                    }
+                }
+            }
         }
 
         // Create status

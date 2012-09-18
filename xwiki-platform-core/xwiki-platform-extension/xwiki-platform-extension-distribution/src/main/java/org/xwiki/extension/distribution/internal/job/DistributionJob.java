@@ -64,7 +64,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     {
         // TODO: make steps components automatically discovered so that any module can add custom steps
 
-        List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(2);
+        List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(3);
 
         ExtensionId extensionUI = this.distributionManager.getUIExtensionId();
 
@@ -93,6 +93,11 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
                     }
                 }
             }
+        }
+
+        // Step 0: A welcome message. Only if there is actually something to do
+        if (!steps.isEmpty()) {
+            steps.add(0, new DistributionStepStatus("welcome"));
         }
 
         // Create status

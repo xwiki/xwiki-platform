@@ -10,3 +10,6 @@ div#body #xwikimaincontainerinner {
 div#body .alleditcontent {
   margin: 0;
 }
+div#body #hierarchy {
+  padding-top: 0;
+}

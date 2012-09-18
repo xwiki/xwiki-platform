@@ -19,14 +19,12 @@
     $result
   #end
 #end
-#if($isInServletMode) ## Visible only in a page
-  <div id="hierarchy">
-  #if ($doc.fullName != 'Main.WebHome')
-    #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-      #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a>" 0)
-    #else
-      #computeHierarchy($doc "<span class='current'>$escapetool.xml($tdoc.getPlainTitle())</span>" 0)
-    #end
+<div id="hierarchy">
+#if ($doc.fullName != 'Main.WebHome')
+  #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+    #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a>" 0)
+  #else
+    #computeHierarchy($doc "<span class='current'>$escapetool.xml($tdoc.getPlainTitle())</span>" 0)
   #end
-  </div>
 #end
+</div>

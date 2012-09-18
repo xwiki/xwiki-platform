@@ -275,7 +275,7 @@ public class ImportMojo extends AbstractMojo
         for (Dependency mavenDependency : (List<Dependency>) model.getDependencies()) {
             if (!mavenDependency.isOptional()
                 && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
-                extension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ' '
+                extension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
                     + mavenDependency.getArtifactId(), new DefaultVersionConstraint(mavenDependency.getVersion())));
             }
         }

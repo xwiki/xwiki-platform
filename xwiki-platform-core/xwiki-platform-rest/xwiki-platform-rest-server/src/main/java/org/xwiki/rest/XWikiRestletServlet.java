@@ -26,6 +26,7 @@ import javax.servlet.ServletException;
 
 import org.restlet.Application;
 import org.restlet.Context;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
 import org.restlet.ext.servlet.ServerServlet;
@@ -61,8 +62,7 @@ public class XWikiRestletServlet extends ServerServlet
         Context applicationContext = application.getContext();
 
         /* Retrieve the component manager and make it available in the restlet application context. */
-        ComponentManager componentManager =
-            (ComponentManager) getServletContext().getAttribute("org.xwiki.component.manager.ComponentManager");
+        ComponentManager componentManager = getComponentManager(context);
         applicationContext.getAttributes().put(Constants.XWIKI_COMPONENT_MANAGER, componentManager);
 
         /* Set the object factory for instantiating components. */
@@ -100,4 +100,23 @@ public class XWikiRestletServlet extends ServerServlet
         }
     }
 
+    /**
+     * Finds the correct Component Manager to use to find REST Resource components. This is important so that
+     * components registered in a children Component Manager are found (for example a REST Resource Component added
+     * in a subwiki).
+     *
+     * @param context the RESTlet context
+     * @return the Context Component Manager or if it doesn't exist the Root Component Manager
+     */
+    private ComponentManager getComponentManager(Context context)
+    {
+        ComponentManager result =
+            (ComponentManager) getServletContext().getAttribute("org.xwiki.component.manager.ComponentManager");
+        try {
+            result = result.getInstance(ComponentManager.class, "context");
+        } catch (ComponentLookupException e) {
+            // Return the root CM since there's no Context CM!
+        }
+        return result;
+    }
 }

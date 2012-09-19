@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class XWikiJaxRsApplication extends Application
 
         /* Look up all the component that are markes as XWikiRestComponent. */
         List<ComponentDescriptor<XWikiRestComponent>> cds =
-            componentManager.getComponentDescriptorList(XWikiRestComponent.class);
+            componentManager.getComponentDescriptorList((Type) XWikiRestComponent.class);
 
         for (ComponentDescriptor<XWikiRestComponent> cd : cds) {
             this.jaxRsClasses.add(cd.getImplementation());

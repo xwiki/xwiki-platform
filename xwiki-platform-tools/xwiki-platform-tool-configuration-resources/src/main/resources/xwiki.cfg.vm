@@ -122,11 +122,11 @@ xwiki.tags=1
 
 #-# [Since 1.6M1]
 #-# Force the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode.
-# xwiki.db=xwiki
+xwiki.db=xwiki
 
 #-# [Since 1.6M1]
 #-# Add a prefix to all databases names of the wikis in virtual mode and to the wiki name in non virtual mode.
-# xwiki.db.prefix=
+xwiki.db.prefix=wiki_
 
 
 #---------------------------------------

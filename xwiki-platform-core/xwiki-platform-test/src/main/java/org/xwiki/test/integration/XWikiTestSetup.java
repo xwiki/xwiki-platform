@@ -69,8 +69,6 @@ public class XWikiTestSetup extends TestSetup
             // Don't set any extension repository since we don't need it and we don't want to require internet
             // connection for the tests.
             properties.setProperty("extension.repositories", "");
-            // Skip the distribution wizard.
-            properties.setProperty("extension.distribution.skipWizard", true);
             executor.saveXWikiProperties(properties);
 
             this.executors.add(executor);

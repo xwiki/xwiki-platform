@@ -64,12 +64,6 @@ public class DistributionScriptService implements ScriptService
     private DistributionManager distributionManager;
 
     /**
-     * The component used to access the configuration of the distribution module.
-     */
-    @Inject
-    private DistributionConfiguration configuration;
-
-    /**
      * @param <T> the type of the object
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
@@ -122,13 +116,5 @@ public class DistributionScriptService implements ScriptService
         DistributionJob job = this.distributionManager.getJob();
 
         return job != null ? (DistributionJobStatus) job.getStatus() : null;
-    }
-
-    /**
-     * @return the component used to access the configuration properties of the distribution module
-     */
-    public DistributionConfiguration getConfiguration()
-    {
-        return this.configuration;
     }
 }

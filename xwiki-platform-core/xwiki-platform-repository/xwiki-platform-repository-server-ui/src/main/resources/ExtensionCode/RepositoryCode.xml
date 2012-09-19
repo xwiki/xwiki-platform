@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #set ($discard = $xwiki.ssx.use('ExtensionCode.SkinExtension'))
 #set ($discard = $xwiki.jsx.use('ExtensionCode.SkinExtension'))

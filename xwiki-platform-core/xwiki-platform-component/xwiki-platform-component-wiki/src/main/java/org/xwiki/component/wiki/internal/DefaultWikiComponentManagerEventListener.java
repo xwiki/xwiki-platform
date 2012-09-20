@@ -32,6 +32,7 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
@@ -87,7 +88,8 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             new DocumentCreatedEvent(),
             new DocumentUpdatedEvent(),
             new DocumentDeletedEvent(),
-            new ApplicationReadyEvent());
+            new ApplicationReadyEvent(),
+            new WikiReadyEvent());
     }
 
     @Override
@@ -104,29 +106,12 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             DocumentReference documentReference = document.getDocumentReference();
 
             if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
-                // Unregister any existing component registered under this document, if any
-                unregisterComponents(documentReference);
-
-                for (WikiComponentBuilder provider : wikiComponentProviders) {
-                    // Check whether the given document has a wiki component defined in it.
-                    if (provider.getDocumentReferences().contains(documentReference)) {
-                        try {
-                            List<WikiComponent> components = provider.buildComponents(documentReference);
-                            for (WikiComponent component : components) {
-                                // Register the component.
-                                registerComponent(component);
-                            }
-                        } catch (WikiComponentException e) {
-                            this.logger.warn("Failed to create wiki component(s) for document [{}]: {}",
-                                compactWikiSerializer.serialize(documentReference), e.getMessage());
-                        }
-                    }
-                }
+                registerComponents(document);
             } else if (event instanceof DocumentDeletedEvent) {
                 // Unregister components from the deleted document, if any
                 unregisterComponents(documentReference);
             }
-        } else if (event instanceof ApplicationReadyEvent) {
+        } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
             registerComponents();
         }
     }
@@ -154,17 +139,35 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
 
 
     /**
-     * Helper method to register a wiki component.
+     * Helper method to register wiki components from a given document.
      * 
-     * @param wikiComponent the wikiComponent to register.
+     * @param document the document to register the components for.
      */
-    private void registerComponent(WikiComponent wikiComponent)
+    private void registerComponents(DocumentModelBridge document)
     {
-        try {
-            this.wikiComponentManager.registerWikiComponent(wikiComponent);
-        } catch (WikiComponentException e) {
-            this.logger.warn("Unable to register component(s) from document [{}]: {}",
-                compactWikiSerializer.serialize(wikiComponent.getDocumentReference()), e.getMessage());
+        DocumentReference documentReference = document.getDocumentReference();
+        // Unregister any existing component registered under this document, if any
+        unregisterComponents(documentReference);
+
+        for (WikiComponentBuilder provider : wikiComponentProviders) {
+            // Check whether the given document has a wiki component defined in it.
+            if (provider.getDocumentReferences().contains(documentReference)) {
+                try {
+                    List<WikiComponent> components = provider.buildComponents(documentReference);
+                    for (WikiComponent component : components) {
+                        // Register the component.
+                        try {
+                            this.wikiComponentManager.registerWikiComponent(component);
+                        } catch (WikiComponentException e) {
+                            this.logger.warn("Unable to register component(s) from document [{}]: {}",
+                                compactWikiSerializer.serialize(component.getDocumentReference()), e.getMessage());
+                        }
+                    }
+                } catch (WikiComponentException e) {
+                    this.logger.warn("Failed to create wiki component(s) for document [{}]: {}",
+                        compactWikiSerializer.serialize(documentReference), e.getMessage());
+                }
+            }
         }
     }
 

@@ -52,7 +52,7 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
     @Test
     public void registerWikiComponent() throws Exception
     {
-        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class);
+        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -66,7 +66,7 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
     @Test
     public void registerAlreadyRegisteredWikiComponent() throws Exception
     {
-        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class);
+        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
 
         getMockery().checking(new Expectations()
         {{
@@ -86,7 +86,7 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
     @Test
     public void unregisterWikiComponent() throws Exception
     {
-        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class);
+        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
 
         getMockery().checking(new Expectations()
         {{

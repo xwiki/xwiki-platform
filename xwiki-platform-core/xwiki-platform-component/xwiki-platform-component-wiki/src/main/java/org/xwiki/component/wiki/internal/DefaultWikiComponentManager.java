@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -64,6 +65,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * Component manager against which wiki component will be registered.
      */
     @Inject
+    @Named("wiki")
     private ComponentManager componentManager;
 
     /**

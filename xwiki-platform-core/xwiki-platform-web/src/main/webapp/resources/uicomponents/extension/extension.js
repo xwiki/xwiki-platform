@@ -423,9 +423,13 @@ XWiki.ExtensionBehaviour = Class.create({
     // Execute Extension Manager jobs asynchronously.
     var confirmJobButton = this.container.down('input[name="confirm"]');
     confirmJobButton && confirmJobButton.observe('click', this._startJob.bindAsEventListener(this));
-    // Compute the changes asynchronously when there is a merge conflict.
     var diffButton = this.container.down('input[name="diff"]');
-    diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
+    if (diffButton) {
+      // Compute the changes asynchronously when there is a merge conflict.
+      diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
+      // Scroll to the page to the merge conflict resolution section.
+      diffButton.form.scrollTo();
+    }
   }
 });
 

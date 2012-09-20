@@ -454,7 +454,13 @@
       #displayProgressBar($extension)
       <div class="clearfloats"></div>
     </div>
-    #if ($request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
+    ## Show the extension details if this extension has been explicitely requested or if the extension has a job waiting.
+    #set ($showDetails = $request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
+    #if (!$showDetails)
+      #set ($discard = "#getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)")
+      #set ($showDetails = $jobStatus.state == 'WAITING')
+    #end
+    #if ($showDetails)
       #displayExtensionDetails($extension)
     #end
   </div>

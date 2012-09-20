@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
   #if(!$formatDate)
     #set($formatDate = $msg.get("wikimanager.defaultdatetimeformat"))

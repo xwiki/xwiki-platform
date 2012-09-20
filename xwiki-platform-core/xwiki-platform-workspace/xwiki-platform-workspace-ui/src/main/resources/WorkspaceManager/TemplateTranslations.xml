@@ -34,6 +34,40 @@ core.menu.admin.wiki=Administer Workspace
 # WORKSPACE INFORMATION PANEL
 workspacemanager.panel.title=Workspace information
 
+# MESSAGES
+platform.workspace.wikiNotWorkspace=The current wiki is not a workspace.
+platform.workspace.gadgetWelcomeToWorkspace=Welcome to the **{0}** workspace.
+platform.workspace.currentUserIsOwner=You are the owner of this workspace.
+platform.workspace.currentUserIsAdministrator=You are an administrator of this workspace.
+platform.workspace.joinNeedToLogIn=To join this workspace you need to be logged in.
+platform.workspace.currentUserNotMember=You are not a member of this workspace.
+platform.workspace.currentUserCanJoin=If you like, you can [[join this workspace&gt;&gt;path:{0}]].
+platform.workspace.currentUserIsMember=You are a member of this workspace.
+platform.workspace.currentUserCanLeave=If you like, you can [[leave this workspace&gt;&gt;path:{0}]].
+platform.workspace.gadgetTopActiveUsersAllMembers=To see the full list of workspace members, you can use the [[User Directory&gt;&gt;Main.UserDirectory]] page.
+platform.workspace.invitationPendingForCurrentWorkspace=You have been invited to join this workspace
+platform.workspace.joinRequestPendingForCurrentWorkspace=You have requested to join this workspace
+platform.workspace.joinRequestAcceptedNotification=Your request to join the workspace ''{0}'' has been accepted.
+platform.workspace.joinRequestRejectedNotification=Your request to join the workspace ''{0}'' has been rejected.
+platform.workspace.candidateHandledSaveComment=Handled candidate {0} ({1})
+platform.workspace.candidateHandledComment=Comment:
+platform.workspace.candidateAcceptedSuccess=Request accepted successfully.
+platform.workspace.candidateRejectedSuccess=Request rejected successfully.
+platform.workspace.inviteUserAlreadyMember=The user is already a member of the workspace.
+platform.workspace.inviteRequestAlreadyExists=The user already has a pending request. Please respond to the request instead.
+platform.workspace.inviteUserAlreadyInvited=The user already has a pending invitation.
+platform.workspace.inviteSaveComment=User ''{0}'' has been invited to join the workspace.
+platform.workspace.inviteNotification=You have been invited to join the workspace ''{0}''.
+platform.workspace.inviteSuccess=User invited successfully.
+platform.workspace.invitationCancelSaveComment=Cancelled invitation {0} ({1})
+platform.workspace.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
+platform.workspace.invitationCancelSuccess=Invitation cancelled successfully.
+
+# Duplicated from WorkspaceManager.Translations. To be removed when the 2 are merged.
+workspacemanager.error.workspacedoesnotexist=Workspace [{0}] does not exist
+platform.workspace.exceptionWithMessage=Exception: {0}
+
+
 # LABELS
 workspacemanager.prop.wikiprettyname.label=Pretty Name
 workspacemanager.prop.description.label=Description
@@ -41,6 +75,28 @@ workspacemanager.prop.owner.label=Owner
 workspacemanager.prop.membershipType.label=Membership Type
 workspacemanager.prop.secure.label=Secure (SSL)
 workspacemanager.member.add=Add or invite user to workspace
+platform.workspace.gadgetWorkspaceInformationLabel=Workspace Information
+platform.workspace.gadgetTopActiveUsersLabel=Top Active Members
+platform.workspace.panelInformationNameLabel=Name
+platform.workspace.panelInformationDescriptionLabel=Description
+platform.workspace.panelInformationMembersLabel=Members
+platform.workspace.invitationActionViewLabel=View Invitation
+platform.workspace.joinRequestActionCancelLabel=Cancel Request
+platform.workspace.joinRequestActionRequestLabel=Request Join
+platform.workspace.joinActionJoinLabel=Join
+platform.workspace.leaveWorkspace=Leave Workspace
+platform.workspace.inviteUserNameLabel=User name
+platform.workspace.inviteMessageLabel=Message
+platform.workspace.inviteInviteButtonLabel=Invite
+platform.workspace.candidatesLabel=Candidates
+platform.workspace.candidateStatusLabel=Status:
+platform.workspace.candidateTypeLabel=Type:
+platform.workspace.candidateReviewerLabel=Admin:
+platform.workspace.candidateReviewerMessageLabel=Admin's Message:
+platform.workspace.candidateReviewerPrivateComment=Private Comment:
+platform.workspace.candidateAcceptLabel=Accept
+platform.workspace.candidateRejectLabel=Reject
+platform.workspace.invitationCancelLabel=Cancel Invitation
 
 # HINTS
 workspacemanager.prop.wikiprettyname.hint=The display name of the workspace.
@@ -48,6 +104,9 @@ workspacemanager.prop.description.hint=A brief description of the workspace and 
 workspacemanager.prop.owner.hint=A user who will have all the rights on the workspace.
 workspacemanager.prop.membershipType.hint=The way users can join this workspace.
 workspacemanager.prop.secure.hint=If enabled, all this wiki's generated externals URLs will starting with //https:~/~///.
+platform.workspace.inviteUserNameHint=The name of the user to add to the workspace.
+platform.workspace.inviteMessageHint=The message to send to the user.
+platform.workspace.candidatesHint=Users which have requested or which have been invited to join the workspace.
 
 # DESCRIPTIONS
 admin.xwiki.workspaceusers.description=Manage workspace members: add, remove, invite, accept or reject workspace members.

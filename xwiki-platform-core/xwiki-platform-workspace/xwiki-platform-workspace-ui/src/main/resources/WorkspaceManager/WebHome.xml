@@ -151,7 +151,7 @@
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
 #end
-[[Create a new Workspace&gt;&gt;CreateNewWorkspace]]
+[[$msg.get('platform.workspace.createNewWorkspaceLabel')&gt;&gt;CreateNewWorkspace]]
 #livetable('workspaces', $columns, $columnsProperties, $options)
 {{/velocity}}</content>
 </xwikidoc>

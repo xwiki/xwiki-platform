@@ -29,7 +29,7 @@
 #set ($confirm = $request.confirm)
 ##
 #if ("$!workspaceId" == '' || "$!workspaceName" == '')
-  {{error}}[workspaceId] and [workspaceName] parameters are not specified.{{/error}}
+  {{error}}$msg.get('platform.workspace.twoParametersNotSpecified', ['workspaceId', 'workspaceName']){{/error}}
 #else
   ## FIXME: add plugin dependency checks.
   ##
@@ -39,7 +39,7 @@
   ##
   #if ("$!workspace" == '')
     #if ("$!{WorkspaceManager.lastException}" != '')
-      {{error}}Exception: $!{WorkspaceManager.lastException.message}{{/error}}
+      {{error}}$msg.get('platform.workspace.exceptionWithMessage', $WorkspaceManager.lastException.message){{/error}}
     #else
       {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', ["$workspaceId"]){{/error}}
     #end
@@ -55,24 +55,24 @@
     ##
     #set ($existingMemberObject = $workspaceGroupDocumentRestricted.getXObject($groupsClassReference, 'member', $currentUser))
     #if ("$!existingMemberObject" == '')
-      {{error}}The user [[$currentUser]] is not a member of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/error}}
+      {{error}}$msg.get('platform.workspace.userNotMemberOfWorkspace', [$currentUser, $workspaceName, $workspaceUrl]){{/error}}
     #elseif ($workspace.wikiDescriptor.owner == $currentUser)
-      {{error}}The user [[$currentUser]] is the owner of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]. The owner of a workspace may not leave it unless the workspace is deleted or the owner is changed.{{/error}}
+      {{error}}$msg.get('platform.workspace.leaveErrorUserIsOwner', [$currentUser, $workspaceName, $workspaceUrl]){{/error}}
     #else
       #if ("$!confirm" != 1)
         #set ($browseDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          Are you sure you want to leave workspace [[$workspaceName&gt;&gt;$workspaceUrl]]?
+          $msg.get('platform.workspace.leaveConfirmation', [$workspaceName, $workspaceUrl])
           ((({{html}}
-            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;Yes&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;No&lt;/a&gt;&lt;/span&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$msg.get('platform.workspace.leaveYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$msg.get('platform.workspace.leaveNo')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
         {{/box}}
       #else
         #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($existingMemberObject))
-        #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "User $currentUser left workspace.", true, $xcontext.context))
-        {{success}}The user [[$currentUser]] successfully left workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
+        #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $msg.get('platform.workspace.leaveSaveComment', $currentUser), true, $xcontext.context))
+        {{success}}$msg.get('platform.workspace.leaveSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
       #end
     #end
   #end

@@ -35,7 +35,7 @@
 #if (!$documentBundles.contains('WorkspaceManager.Translations'))
   #if ($hasGlobalAdmin)
     #set ($discard = $xwikiPreferencesObject.set('documentBundles', "$documentBundles, WorkspaceManager.Translations"))
-    #set ($discard = $xwikiPreferencesDocument.save('Automatically registered Workspace Manager translations.', true))
+    #set ($discard = $xwikiPreferencesDocument.save($msg.get('platform.workspace.translationsInstallSaveComment'), true))
     {{success}}$msg.get('workspacemanager.translations.install.success'){{/success}}
   #else
     #set ($needsAdminRights = true)
@@ -68,7 +68,7 @@
       #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.png' + $escapetool.singleQuote + ')')
       #set ($discard = $searchSuggestConfigObject.set('icon', $suggestIcon))
       ##
-      #set ($discard = $searchSuggestConfigDocument.save('Automatically registered workspace search suggestions.', true))
+      #set ($discard = $searchSuggestConfigDocument.save($msg.get('platform.workspace.searchSuggestionsInstallSaveComment'), true))
       #if (!$skipSuccessMessage)
 
         {{success}}$msg.get('workspacemanager.searchSuggestions.install.success'){{/success}}
@@ -112,7 +112,7 @@
   #if ($hasGlobalAdmin)
     #if ($doc.getAttachment($TEMPLATE_PACKAGE))
       #if ("$!request.confirmTemplateInstall" == '1')
-        #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, 'Workspace Template', $TEMPLATE_PACKAGE))
+        #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, $msg.get('platform.workspace.templateWikiTitle'), $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
           ## Use a redirect so that the page can be refreshed after the form's POST.
           #set ($discard = $response.sendRedirect($doc.getURL()))
@@ -127,7 +127,7 @@
       #else
 
         {{warning}}
-          Workspace template is not yet installed. Install the workspace template now?
+          $msg.get('platform.workspace.templateNotInstalledInstallNow')
 
           {{html}}
           &lt;form method='post' action="$doc.getURL()"&gt;
@@ -135,7 +135,7 @@
               &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
               &lt;input type='hidden' name='confirmTemplateInstall' value='1' /&gt;
               &lt;span class='buttonwrapper'&gt;
-                &lt;input type='submit' value='Install' class='button' /&gt;
+                &lt;input type='submit' value="$msg.get('platform.workspace.templateInstallConfirm')" class='button' /&gt;
               &lt;/span&gt;
             &lt;/div&gt;
           &lt;/form&gt;
@@ -144,7 +144,11 @@
       #end
     #else
 
-      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/public/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
+      #set ($repositoryLocation = 'public')
+      #if ($xwiki.version.endsWith('SNAPSHOT'))
+        #set ($repositoryLocation = 'public-snapshots')
+      #end
+      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/${repositoryLocation}/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
     #end
   #else
     #set ($needsAdminRights = true)
@@ -171,7 +175,7 @@
     #set ($needsAdminRights = true)
   #else
 
-    {{error}}Workspace template features can not be installed without the workspace base template being installed first.{{/error}}
+    {{error}}$msg.get('platform.workspace.templateFeaturesInstallErrorNeedTemplateFirst'){{/error}}
   #end
 #elseif (!$xwiki.exists($manageWorkspaceDocumentReference))
   #set ($templateFeaturesAttachment = $doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
@@ -224,7 +228,7 @@
       ##
       ## Save XWikiPreferences with the new changes.
       #if ($xwikiPreferencesNeedsSaving)
-        #set ($discard = $xwikiPreferencesDocument.save('Automatically registered workspace translations and panel', true))
+        #set ($discard = $xwikiPreferencesDocument.save($msg.get('platform.workspace.templateFeaturesInstallTranslationsAndPanelSaveComment'), true))
       #end
       ##
       ## 3. Extend XWiki.SearchSuggestConfig to show Workspaces as search suggestions.
@@ -245,13 +249,13 @@
         #set ($templateAdminMember = $groupDocumentToClean.getObject($serializedTemplateGroupClass, 'member', 'XWiki.Admin'))
         #if ($templateAdminMember)
           #if ($groupAllMembers.size() == 1)
-            ## Just one member, we must not delete the object or the group will be disolved.
+            ## Just one member, we must not delete the object or the group will be dissolved.
             #set ($discard = $templateAdminMember.set('member', ''))
           #else
-            ## More than 1 member, we can sefely delete this object and the group will not be affected.
+            ## More than 1 member, we can safely delete this object and the group will not be affected.
             #set ($discard = $groupDocumentToClean.removeObject($templateAdminMember))
           #end
-          #set ($discard = $groupDocumentToClean.save('Automatically removed local admin.', true))
+          #set ($discard = $groupDocumentToClean.save($msg.get('platform.workspace.templateFeaturesInstallRemoveAdminSaveComment'), true))
         #end
       #end
       ##
@@ -279,19 +283,19 @@
       ##
       ## 5. Set initial rights for the entire workspace to registered users.
       ##
-      #setRights($xwikiPreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, 'Automatically set default rights for global users to allow view.', true)
+      #setRights($xwikiPreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $msg.get('platform.workspace.templateFeaturesInstallSetViewRightsSaveComment'), true)
       ##
       ## 6. Set initial rights for displaying panels properly to guests/registered users.
       ##
       #set ($panelsSpacePreferencesDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'Panels', 'WebPreferences'))
-      #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, 'Automatically set default rights to panels for guests to allow view.')
-      #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, 'Automatically set default rights to panels for global users to allow view.', true)
+      #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, $msg.get('platform.workspace.templateFeaturesInstallSetPanelViewRightsGuestsSaveComment'))
+      #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $msg.get('platform.workspace.templateFeaturesInstallSetPanelViewRightsGlobalUsersSaveComment'), true)
       ##
       ## 7. Set initial rights for displaying color themes properly to guests/registered users.
       ##
       #set ($colorThemesSpacePreferencesDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'ColorThemes', 'WebPreferences'))
-      #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, 'Automatically set default rights to color themes for guests to allow view.')
-      #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, 'Automatically set default rights to color themes for global users to allow view.', true)
+      #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, $msg.get('platform.workspace.templateFeaturesInstallSetThemesViewRightsGuestsSaveComment'))
+      #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $msg.get('platform.workspace.templateFeaturesInstallSetThemesViewRightsGlobalUsersSaveComment'), true)
       ##
       ## 8. Set initial rights for displaying the skin properly to guests/registered users.
       ##
@@ -299,8 +303,8 @@
       #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
       #set ($skinDocumentReference = $services.model.resolveDocument($skinDocumentName))
       #set ($discard = $xcontext.setDatabase($currentDatabase))
-      #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $guestUser, 'Automatically set default rights to skin for guests to allow view.')
-      #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $allGlobalUsersGroup, 'Automatically set default rights to skin for global users to allow view.')
+      #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $guestUser, $msg.get('platform.workspace.templateFeaturesInstallSetSkinViewRightsGuestsSaveComment'))
+      #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $allGlobalUsersGroup, $msg.get('platform.workspace.templateFeaturesInstallSetSkinViewRightsGlobalUsersSaveComment'), true)
       ##
       ## 9. Disable local user registration
       ##
@@ -351,22 +355,22 @@
       ##
       ## 12. Fix the author of wiki macro documents (use the current admin user) so that they are correctly registered.
       ##
-      #fixDocumentAuthor('XWiki.WikiMacroClass', 'Fixed macro registration.', $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.WikiMacroClass', $msg.get('platform.workspace.templateFeaturesInstallFixMacrosSaveComment'), $documentNamesAlreadyFixed)
       ##
       ## 13. Fix the author of configuration pages for each application (use the current admin user) so that they are correctly registered and accessible in the workspace Administration section.
       ##
-      #fixDocumentAuthor('XWiki.ConfigurableClass', 'Fixed Configurable Class registration issues.', $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.ConfigurableClass', $msg.get('platform.workspace.templateFeaturesInstallFixConfigurableClassSaveComment'), $documentNamesAlreadyFixed)
       ##
       ## 14. Fix the author of SSX and JSX extensions.
       ##
-      #fixDocumentAuthor('XWiki.StyleSheetExtension', 'Fixed SSX registration issues.', $documentNamesAlreadyFixed)
-      #fixDocumentAuthor('XWiki.JavaScriptExtension', 'Fixed JSX registration issues.', $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.StyleSheetExtension', $msg.get('platform.workspace.templateFeaturesInstallFixSSXSaveComment'), $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.JavaScriptExtension', $msg.get('platform.workspace.templateFeaturesInstallFixJSXSaveComment'), $documentNamesAlreadyFixed)
       ##
       ## 15. Fix the author of documents with RequiredRightClass declarations.
       ##
-      #fixDocumentAuthor('XWiki.RequiredRightClass', 'Fixed RequiredRightClass requests.', $documentNamesAlreadyFixed)
+      #fixDocumentAuthor('XWiki.RequiredRightClass', $msg.get('platform.workspace.templateFeaturesInstallFixRequiredRightClassSaveComment'), $documentNamesAlreadyFixed)
 
-      {{success}}Workspace template features successfully installed.{{/success}}
+      {{success}}$msg.get('platform.workspace.templateFeaturesInstallSuccess'){{/success}}
     #end
   #else
 
@@ -378,12 +382,13 @@
   ##
   #if ($context.doc == $context.tdoc)
 
-    {{success}}Workspace template features successfully installed.{{/success}}
+    {{success}}$msg.get('platform.workspace.templateFeaturesInstallSuccess'){{/success}}
   #end
 #end
 ##
 #if ($needsAdminRights)
   ## It might be possible that admin rights are required to register the translations themselves. Use this as backup message.
+  ## It will not look nice if the current language is not english, but at least the user will know what to do.
   #if ($msg.get('workspacemanager.install.notallowed') == 'workspacemanager.install.notallowed')
 
     {{error}}Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.{{/error}}

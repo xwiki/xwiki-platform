@@ -262,6 +262,7 @@ function prettyNameChanged()
   #set ($documentBundlesValue = "${WORKSPACE_MANAGER_TRANSLATIONS_PAGE},${documentBundlesValue}")
   #set ($temp = $xwikiPreferencesDocument.set('documentBundles', $documentBundlesValue))
   ## Save the preferences page using programming rights of the current document.
+  ## The save comment can not be translated at this point, since the translations are not yet registered.
   #set ($temp = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
   {{info}}$msg.get('workspacemanager.install.translations'){{/info}}
 
@@ -366,7 +367,7 @@ function prettyNameChanged()
         #set($temp = $memberObject.set('member', $member))
       #end
       ## Save the group document to preserve the member additions.
-      #set($temp = $workspaceGroupDocument.save('Added initial workspace members', true))
+      #set($temp = $workspaceGroupDocument.save($msg.get('platform.workspace.createInitialMembersSaveComment'), true))
     #end
     ## Redirect to the new workspace's homepage.
     #set($temp = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
@@ -382,7 +383,7 @@ function prettyNameChanged()
 &lt;form method='post' action='' id='wikicreationform' class='xform third'&gt;
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='wikiname'&gt;$msg.get('workspacemanager.prop.wiki.wikiname') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;label for='wikiname'&gt;$msg.get('workspacemanager.prop.wiki.wikiname') &lt;span class='xRequired'&gt;($msg.get('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.wikiname')&lt;/span&gt;
       &lt;span id='wikinamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
@@ -396,7 +397,7 @@ function prettyNameChanged()
   ##
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wiki.wikiprettyname') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wiki.wikiprettyname') &lt;span class='xRequired'&gt;($msg.get('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.wikiprettyname')&lt;/span&gt;
       &lt;span id='wikiprettynamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
@@ -418,7 +419,7 @@ function prettyNameChanged()
   #if ($hasAdmin)
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.wiki.owner') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.wiki.owner') &lt;span class='xRequired'&gt;($msg.get('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;

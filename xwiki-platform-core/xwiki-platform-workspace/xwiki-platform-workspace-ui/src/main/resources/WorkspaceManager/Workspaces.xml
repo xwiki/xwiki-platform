@@ -278,10 +278,10 @@ ul.xlist li.xitem div.xshowonhover img {
 ##
 $xwiki.ssx.use('WorkspaceManager.Workspaces')
 ##
-#set($workspaceDocumentsList = $services.query.xwql('select wikiServerDescriptorDocument.fullName from Document wikiServerDescriptorDocument, wikiServerDescriptorDocument.object(WorkspaceManager.WorkspaceClass) as workspaceDescriptor, wikiServerDescriptorDocument.object(XWiki.XWikiServerClass) as wikiServerDescriptor').execute())
+#set ($workspaceDocumentsList = $services.query.xwql('select wikiServerDescriptorDocument.fullName from Document wikiServerDescriptorDocument, wikiServerDescriptorDocument.object(WorkspaceManager.WorkspaceClass) as workspaceDescriptor, wikiServerDescriptorDocument.object(XWiki.XWikiServerClass) as wikiServerDescriptor').execute())
 ##
 #if (!$workspaceDocumentsList || $workspaceDocumentsList.size() == 0 )
-There are currently no workspaces created.
+$msg.get('platform.workspace.macroNoWorkspaces')
 
 #end
 {{html wiki='true'}}

@@ -461,7 +461,12 @@
 #end
 
 #macro (installExtension $extensionId $extensionVersion $extensionNamespace)
-  #set ($discard = $extensionManager.install($extensionId, $extensionVersion, $extensionNamespace))
+  #set ($installRequest = $extensionManager.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
+  ## TODO: Add a way to preserve the extension author without preventing extensions from being installed with guest user as author.
+  #if (!$xcontext.userReference)
+    #set ($discard = $installRequest.removeProperty('user.reference'))
+  #end
+  #set ($discard = $extensionManager.install($installRequest))
   #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
     #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))

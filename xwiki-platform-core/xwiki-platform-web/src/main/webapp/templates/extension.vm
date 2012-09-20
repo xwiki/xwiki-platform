@@ -480,7 +480,7 @@
       ## Send error back.
       $response.sendError(400, $errorMessage)
     #else
-      <div class="box errormessage">$errorMessage #printThrowable($lastError)</div>
+      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
     #end
   #else
     ## Redirect to extension display.
@@ -491,7 +491,7 @@
 #macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
   #set($installPlan = $extensionManager.createInstallPlan($extensionId, $extensionVersion, $extensionNamespace))
   #if (!$installPlan)
-    <div class="box errormessage">$msg.get('extensions.install.error.prepareFailure', [$extensionId, $extensionVersion, $extensionManager.lastError.message])</div>
+    <div class="errormessage">$msg.get('extensions.install.error.prepareFailure', [$extensionId, $extensionVersion, $extensionManager.lastError.message])</div>
   #else
     #set($hasError = false)
     #foreach($log in $installPlan.log)
@@ -516,7 +516,7 @@
       #end
       ##
       #if ($noAction)
-        <div class="box infomessage">$msg.get('extensions.install.error.alreadyInstalled')</div>
+        <div class="infomessage">$msg.get('extensions.install.error.alreadyInstalled')</div>
       #else
         #foreach($entry in $extensionsByAction.entrySet())
           #if (!$entry.value.isEmpty())
@@ -563,7 +563,7 @@
       ## Send error back.
       $response.sendError(400, $errorMessage)
     #else
-      <div class="box errormessage">$errorMessage #printThrowable($lastError)</div>
+      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
     #end
   #else
     ## Redirect to extension display.
@@ -585,7 +585,7 @@
     #end
   #end
   #if (!$uninstallPlan)
-    <div class="box errormessage">$msg.get('extensions.uninstall.error.prepareFailure', [$extensionId, $extensionVersion, $lasterror.message])</div>
+    <div class="errormessage">$msg.get('extensions.uninstall.error.prepareFailure', [$extensionId, $extensionVersion, $lasterror.message])</div>
   #else
     #set($hasError = false)
     #foreach($log in $uninstallPlan.log)
@@ -607,7 +607,7 @@
       #end
       ##
       #if ($extensionsToUninstall.isEmpty())
-        <div class="box infomessage">$msg.get('extensions.uninstall.error.notInstalled')</div>
+        <div class="infomessage">$msg.get('extensions.uninstall.error.notInstalled')</div>
       #else
         <p>$msg.get('extensions.uninstall.list')</p>
         <ul>
@@ -744,7 +744,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #if ($extension)
       #displayExtension($extension)
     #else
-      <div class="box infomessage">$msg.get('extensions.advancedSearch.noResults', ["<strong>$!escapetool.xml($request.extensionId)</strong>", "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+      <div class="infomessage">$msg.get('extensions.advancedSearch.noResults', ["<strong>$!escapetool.xml($request.extensionId)</strong>", "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
     #end
   #end
 #end

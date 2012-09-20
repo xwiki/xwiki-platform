@@ -1,14 +1,49 @@
-.xdialog-screen {
+#template('colorThemeInit.vm')
+#distributionWizard .xdialog-screen {
   opacity: 0.5;
   position: fixed;
 }
-.xdialog-box {
+#distributionWizard .xdialog-box {
   margin: 1em auto;
   width: 800px;
 }
-.xdialog-content > .ui-progress {
+#distributionWizard .xdialog-header {
+  background-image: url("header.png");
+  border-radius: 4px 4px 0 0;
+  margin: -1px;
+}
+#distributionWizard .xdialog-header img {
+  margin-left: -10px;
+}
+#distributionWizard .xdialog-content > .ui-progress {
   margin-bottom: .5em;
 }
-#upgradePlanLog {
+#distributionWizard .xdialog-content > .extension-body-progress {
   display: block;
+}
+#distributionWizard .xLabel {
+  font-weight: 700;
+  margin: 1.2em 0 0.3em 0;
+  text-transform: uppercase;
+}
+#distributionWizard .xHint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin-bottom: 0.3em;
+}
+#distributionWizard .errormessage, #distributionWizard .warningmessage, #distributionWizard .infomessage {
+  background-color: transparent;
+  box-shadow: none;
+}
+#welcome .steps-hint {
+  margin-top: 1.5em;
+}
+#welcome .steps.vertical {
+  margin-bottom: 1.5em;
+}
+#welcome .steps.vertical .name {
+  font-weight: bolder;
+}
+#welcome .steps.vertical .description {
+  font-size: smaller;
 }

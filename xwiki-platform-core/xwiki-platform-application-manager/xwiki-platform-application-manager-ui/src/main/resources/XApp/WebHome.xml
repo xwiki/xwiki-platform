@@ -22,6 +22,6 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>#includeInContext("XAppManager.WebHome")</content>
 </xwikidoc>

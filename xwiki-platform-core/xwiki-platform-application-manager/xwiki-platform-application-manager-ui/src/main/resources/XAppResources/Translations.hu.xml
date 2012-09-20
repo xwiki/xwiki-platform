@@ -21,6 +21,6 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
+<hidden>true</hidden>
 <content>## XWiki Translation for language hu generated from http://www.l10n.xwiki.org
 </content></xwikidoc>

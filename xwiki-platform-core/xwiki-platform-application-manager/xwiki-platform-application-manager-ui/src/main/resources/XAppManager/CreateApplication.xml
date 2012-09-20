@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>#set($AppManager = $services.applicationmanager)
 #if(!$AppManager)
   #error($msg.get("xapp.pluginnotenabled"))

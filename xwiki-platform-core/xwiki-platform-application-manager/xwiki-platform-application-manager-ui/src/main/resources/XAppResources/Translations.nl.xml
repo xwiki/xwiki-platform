@@ -21,7 +21,7 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
+<hidden>true</hidden>
 <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
 xapp.action.exportnonrecurse=Eksportēt (nerekursīvi)
 xapp.action.exportrecurse=Eksportēt

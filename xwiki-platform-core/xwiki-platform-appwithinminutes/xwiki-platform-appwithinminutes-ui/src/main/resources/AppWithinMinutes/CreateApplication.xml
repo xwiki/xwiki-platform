@@ -299,22 +299,6 @@ return XWiki;
   color: $theme.textColor;
 }
 
-.wizard-help .steps {
-  list-style-position: inside;
-  list-style-type: none;
-  margin: 0;
-}
-
-.wizard-help .steps li {
-  margin-top: .5em;
-}
-
-.wizard-help .steps .description {
-  display: block;
-  line-height: normal;
-  margin-left: 23px;
-}
-
 .wizard-body {
   margin-right: 19em;
 }
@@ -357,7 +341,7 @@ return XWiki;
   (% class="wizard-help" %)
   (((
     **$msg.get('platform.appwithinminutes.wizardStepHelpTitle')** $msg.get('platform.appwithinminutes.wizardStepHelpDescription')
-    (% class="steps" %)
+    (% class="steps vertical" %)
     #foreach($index in [1, 2, 3])
       * (% class="number" %)$index(%%) (% class="name" %)$msg.get("platform.appwithinminutes.wizardStep${index}Name")(%%)
         (% class="description" %)$msg.get("platform.appwithinminutes.wizardStep${index}Description")

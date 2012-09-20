@@ -67,6 +67,8 @@
 .extension-item .extension-item-remote-core .extension-status, .extension-item .extension-item-remote-installed .extension-status {
   color: $theme.notificationWarningColor;
 }
+.extension-item-installed-invalid .extension-status, .extension-item-remote-installed-invalid .extension-status,
+.extension-item .extension-item-installed-invalid .extension-status, .extension-item .extension-item-remote-installed-invalid .extension-status,
 /* This applies only to dependencies. */
 .extension-item-remote-core-incompatible .extension-status, .extension-item-remote-installed-incompatible .extension-status {
   color: $theme.notificationErrorColor;
@@ -131,7 +133,10 @@ ul.extension-metadata li {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 .extension-item-installed .extension-name, .extension-item-remote-installed .extension-name,
-.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed, .dependency-item.extension-item-remote-installed-incompatible {
+.extension-item-installed-invalid .extension-name, .extension-item-remote-installed-invalid .extension-name,
+.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed,
+.dependency-item.extension-item-installed-invalid, .dependency-item.extension-item-remote-installed-invalid,
+.dependency-item.extension-item-remote-installed-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
 .extension-item-remote .extension-name, .dependency-item.extension-item-remote {
@@ -154,6 +159,7 @@ ul.extension-metadata li {
 .extension-item-remote-installed, .extension-item-remote-core {
   border-right-color: $theme.notificationWarningColor;
 }
+.extension-item-installed-invalid, .extension-item-remote-installed-invalid,
 .extension-item-remote-core-incompatible, .extension-item-remote-installed-incompatible {
   border-right-color: $theme.notificationErrorColor;
 }

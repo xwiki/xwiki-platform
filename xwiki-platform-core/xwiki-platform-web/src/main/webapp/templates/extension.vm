@@ -94,13 +94,13 @@
       #if(!$extensionStatus)
         #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
       #end
-      #if ($extensionStatus == 'installed')
+      #if ($extensionStatus.startsWith('installed'))
         ## This extension can be uninstalled.
         #extensionActionButton($extension 'uninstall' true)
       #elseif ($extensionStatus == 'remote')
         ## Installable extension.
         #extensionActionButton($NULL 'install')
-      #elseif ($extensionStatus == 'remote-installed')
+      #elseif ($extensionStatus.startsWith('remote-installed'))
         ## An extension that can be either upgraded or downgraded.
         ## Compare this version with the version that is currently installed to determine which button to display.
         #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
@@ -852,7 +852,12 @@ Caused by: #printThrowable($throwable.cause true)
     #set ($status = 'loading')
   #else
     #set ($status = $extension.repository.id.id)
-    #if ($status != 'core' && $status != 'installed')
+    #if ($status == 'installed')
+      ## Determine if the extension is still valid.
+      #if ("$!extension.isValid($extensionNamespace)" == 'false')
+        #set ($status = 'installed-invalid')
+      #end
+    #elseif ($status != 'core')
       ## An extension, either local or remote, that might be available to install.
       ## Check if a different version of this extension is installed or is a core dependency.
       #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
@@ -861,8 +866,8 @@ Caused by: #printThrowable($throwable.cause true)
       #end
       #if ($currentVersion)
         #set ($repoId = $currentVersion.repository.id.id)
-        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible"])
-        #set ($status = "#determineVersionCompatibility($extension.id $currentVersion.id $versionConstraint $options)")
+        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
+        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
       #else
         #set ($status = 'remote')
       #end
@@ -880,10 +885,12 @@ Caused by: #printThrowable($throwable.cause true)
 
 #macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
 #set ($status = $options.get(0))
-#if ($alice.equals($bob))
+#if ($alice.id.equals($bob.id))
 #set ($status = $options.get(1))
-#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.version))
+#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
 #set ($status = $options.get(2))
+#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
+#set ($status = $options.get(3))
 #end
 $status##
 #end

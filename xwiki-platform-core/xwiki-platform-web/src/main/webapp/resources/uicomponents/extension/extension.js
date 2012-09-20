@@ -77,19 +77,28 @@ XWiki.ExtensionBehaviour = Class.create({
 
   /**
    * Handles an AJAX request failure.
+   * @return {@code true} to retry the request, {@code false} otherwise
    */
   _onAjaxRequestFailure : function(response) {
     if (response.status == 401) {
       // Unauthorized request. This can happen for instance if the session expires or if the user looses rights while
       // installing or uninstalling an extension. By reloading the page we hope the user will be redirected to the
       // login page and then, after he authenticates, back to the current page.
-      window.location.reload(true);
+      new XWiki.widgets.ConfirmationBox({
+        onYes: function() {
+          window.location.reload(true);
+        }
+      }, {
+        confirmationText: "$escapetool.javascript($msg.get('extensions.info.fetch.unauthorized'))"
+      });
+      return false;
     } else {
       var failureReason = response.statusText;
       if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
         failureReason = 'Server not responding';
       }
-      new XWiki.widgets.Notification("$msg.get('extensions.info.fetch.failed')" + failureReason, "error");
+      new XWiki.widgets.Notification("$escapetool.javascript($msg.get('extensions.info.fetch.failed'))" + failureReason, "error");
+      return true;
     }
   },
 
@@ -263,7 +272,7 @@ XWiki.ExtensionBehaviour = Class.create({
       var progressSectionAnchor = 'extension-body-progress' + lastSection.previous().id.substr($w(lastSection.className)[0].length);
       lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
       // Add the progress menu.
-      var progressMenuLabel = "$msg.get('extensions.info.category.progress')";
+      var progressMenuLabel = "$escapetool.javascript($msg.get('extensions.info.category.progress'))";
       this.container.down('.innerMenu').insert('<li><span class="wikilink"><a href="#' + progressSectionAnchor + '">'
         + progressMenuLabel + '</a></span></li>');
     } else if (progressSection.down('.extension-log-item-loading')) {
@@ -334,9 +343,10 @@ XWiki.ExtensionBehaviour = Class.create({
         this._update(response.responseText);
       }.bind(this),
       onFailure : function(response) {
-        this._onAjaxRequestFailure(response);
-        // Use a longer refresh timeout after an AJAX request failure.
-        this._maybeScheduleRefresh(10);
+        if (this._onAjaxRequestFailure(response)) {
+          // Use a longer refresh timeout after an AJAX request failure.
+          this._maybeScheduleRefresh(10);
+        }
       }.bind(this)
     });
   },

@@ -59,7 +59,7 @@ public class XWikiJaxRsApplication extends Application
         ComponentManager componentManager =
             (ComponentManager) context.getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
 
-        /* Look up all the component that are markes as XWikiRestComponent. */
+        /* Look up all the component that are marked as XWikiRestComponent. */
         List<ComponentDescriptor<XWikiRestComponent>> cds =
             componentManager.getComponentDescriptorList((Type) XWikiRestComponent.class);
 

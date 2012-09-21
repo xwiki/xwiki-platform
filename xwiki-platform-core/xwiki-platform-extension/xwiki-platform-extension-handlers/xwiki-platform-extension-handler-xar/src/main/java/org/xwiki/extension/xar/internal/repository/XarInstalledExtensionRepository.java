@@ -55,7 +55,6 @@ import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -92,9 +91,6 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
 
     private Map<ExtensionId, XarInstalledExtension> extensions =
         new ConcurrentHashMap<ExtensionId, XarInstalledExtension>();
-
-    private Map<DocumentReference, List<XarInstalledExtension>> extensionsPages =
-        new ConcurrentHashMap<DocumentReference, List<XarInstalledExtension>>();
 
     @Override
     public void initialize() throws InitializationException

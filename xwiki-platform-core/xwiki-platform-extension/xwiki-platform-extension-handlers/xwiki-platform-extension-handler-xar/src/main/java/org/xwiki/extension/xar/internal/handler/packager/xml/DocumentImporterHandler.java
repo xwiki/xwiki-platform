@@ -143,7 +143,23 @@ public class DocumentImporterHandler extends DocumentHandler
             currentDocument.setContentAuthorReference(userReference);
         }
 
-        context.getWiki().saveDocument(currentDocument, comment, context);
+        saveDocumentSetContextUser(currentDocument, comment, context);
+    }
+
+    private void saveDocumentSetContextUser(XWikiDocument document, String comment, XWikiContext context)
+        throws Exception
+    {
+        DocumentReference userReference = context.getUserReference();
+
+        try {
+            // Make sure to have context user corresponding to document author for badly designed listeners expecting
+            // the document to actually be saved by context user
+            context.setUserReference(document.getAuthorReference());
+
+            context.getWiki().saveDocument(document, comment, context);
+        } catch (Exception e) {
+            context.setUserReference(userReference);
+        }
     }
 
     private XWikiDocument askDocumentToSave(XWikiDocument currentDocument, XWikiDocument previousDocument,
@@ -348,9 +364,9 @@ public class DocumentImporterHandler extends DocumentHandler
                 dbAttachment.setAuthor(attachment.getAuthor());
             }
 
-            context.getWiki().saveDocument(dbDocument, comment, context);
+            saveDocumentSetContextUser(dbDocument, comment, context);
 
-            // reset content to since it could consume lots of memory and it's not used in diff for now
+            // reset content since it could consume lots of memory and it's not used in diff for now
             attachment.setAttachment_content(null);
             getDocument().getAttachmentList().add(attachment);
         } catch (Exception e) {

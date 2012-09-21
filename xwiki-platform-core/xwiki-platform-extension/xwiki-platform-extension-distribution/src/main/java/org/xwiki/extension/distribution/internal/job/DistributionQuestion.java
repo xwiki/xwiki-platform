@@ -40,7 +40,17 @@ public class DistributionQuestion
         /**
          * Cancel the current step until next distribution modification.
          */
-        CANCEL_STEP
+        CANCEL_STEP,
+
+        /**
+         * Skip all the remaining steps.
+         */
+        SKIP,
+
+        /**
+         * Cancel all the remaining steps until next distribution modification.
+         */
+        CANCEL
     }
 
     private String stepId;

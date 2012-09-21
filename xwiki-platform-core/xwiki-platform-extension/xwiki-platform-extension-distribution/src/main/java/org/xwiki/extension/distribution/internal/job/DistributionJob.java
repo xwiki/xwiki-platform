@@ -151,16 +151,24 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
                     if (question.isSave()) {
                         switch (question.getAction()) {
                             case CANCEL_STEP:
-                                getDistributionJobStatus().getCurrentStateStatus().setUpdateState(UpdateState.CANCELED);
+                                step.setUpdateState(UpdateState.CANCELED);
                                 break;
                             case COMPLETE_STEP:
-                                getDistributionJobStatus().getCurrentStateStatus()
-                                    .setUpdateState(UpdateState.COMPLETED);
+                                step.setUpdateState(UpdateState.COMPLETED);
+                                break;
+                            case CANCEL:
+                                for (; index < steps.size(); ++index) {
+                                    steps.get(index).setUpdateState(UpdateState.CANCELED);
+                                }
+                            case SKIP:
+                                index = steps.size() - 1;
                                 break;
                             default:
                                 break;
                         }
                     }
+
+                    getDistributionJobStatus().setCurrentStateIndex(index);
                 }
 
                 notifyStepPropress();

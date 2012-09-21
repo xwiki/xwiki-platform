@@ -69,7 +69,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     public DistributionStepStatus getCurrentStateStatus()
     {
-        return getSteps().get(getCurrentStateIndex());
+        return getCurrentStateIndex() < getSteps().size() ? getSteps().get(getCurrentStateIndex()) : null;
     }
 
     public void setCurrentStateIndex(int currentStateIndex)

@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -768,19 +767,6 @@ public class XWikiHibernateBaseStore implements Initializable
             }
             // TODO: Fix this problem, don't ignore it!
             return false;
-        }
-
-        // XWiki doesn't support having several Database queries for different "databases" when inside a transaction.
-        // If this happen it means we'll return wrong results which could lead to inconsistencies (for example
-        // document cache corruption - it would put an empty doc in the cache for example).
-        if ((session != null) && getCurrentDatabase(context) != null &&
-            !getCurrentDatabase(context).equals(context.getDatabase()))
-        {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
-                String.format("A database transaction is already started (the current database is [%s]) and some code "
-                + "is trying to load/save data from another database [%s]. Nested queries targeting different "
-                + "databases are not supported. This is a fatal error which needs to be reported and fixed.",
-                getCurrentDatabase(context), context.getDatabase()));
         }
 
         if (session != null) {

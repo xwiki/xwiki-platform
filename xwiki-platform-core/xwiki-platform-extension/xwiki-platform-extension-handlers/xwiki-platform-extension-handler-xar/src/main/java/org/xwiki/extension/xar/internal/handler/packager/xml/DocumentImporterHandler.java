@@ -100,26 +100,16 @@ public class DocumentImporterHandler extends DocumentHandler
         return this.mergeResult;
     }
 
-    private DocumentReference getUserReference(XWikiContext context)
+    private String getUserString()
     {
-        DocumentReference userReference = this.configuration.getUserReference();
-
-        if (userReference == null) {
-            userReference = context.getUserReference();
-        }
-
-        return userReference;
-    }
-
-    private String getUserString(XWikiContext context)
-    {
-        return this.compactWikiSerializer.serialize(getUserReference(context), getDocument().getDocumentReference());
+        return this.compactWikiSerializer.serialize(this.configuration.getUserReference(), getDocument()
+            .getDocumentReference());
     }
 
     private void saveDocument(XWikiDocument document, String comment, XWikiContext context) throws Exception
     {
         XWikiDocument currentDocument = getDatabaseDocument();
-        DocumentReference userReference = getUserReference(context);
+        DocumentReference userReference = this.configuration.getUserReference();
 
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
@@ -235,7 +225,7 @@ public class DocumentImporterHandler extends DocumentHandler
                             // Indicate future author to whoever is going to answer the question
                             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
                             mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
-                            DocumentReference userReference = getUserReference(context);
+                            DocumentReference userReference = this.configuration.getUserReference();
                             if (userReference != null) {
                                 nextDocument.setAuthorReference(userReference);
                                 nextDocument.setContentAuthorReference(userReference);
@@ -264,7 +254,7 @@ public class DocumentImporterHandler extends DocumentHandler
                         if (this.configuration.isInteractive()) {
                             // Indicate future author to whoever is going to answer the question
                             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
-                            DocumentReference userReference = getUserReference(context);
+                            DocumentReference userReference = this.configuration.getUserReference();
                             nextDocument.setAuthorReference(userReference);
                             nextDocument.setContentAuthorReference(userReference);
 
@@ -345,10 +335,10 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument document = getDocument();
 
             // Set proper author
-            DocumentReference userReference = getUserReference(context);
+            DocumentReference userReference = this.configuration.getUserReference();
             if (userReference != null) {
                 document.setAuthorReference(userReference);
-                attachment.setAuthor(getUserString(context));
+                attachment.setAuthor(getUserString());
             }
 
             XWikiDocument dbDocument = getDatabaseDocument();

@@ -161,8 +161,7 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
         needsUpdate |= this.initializeXClassDocumentMetadata(doc, "Wiki Component Dependency XWiki Class");
         needsUpdate |= bclass.addTextField(COMPONENT_ROLE_TYPE_FIELD, "Dependency Role Type", 30);
         needsUpdate |= bclass.addTextField(COMPONENT_ROLE_HINT_FIELD, "Dependency Role Hint", 30);
-        needsUpdate |= bclass.addTextField("bindingName", "Binding name", 30);
-        needsUpdate |= bclass.addStaticListField("type", "Requirement type", "single=Single|list=List|map=Map");
+        needsUpdate |= bclass.addTextField(DEPENDENCY_BINDING_NAME_FIELD, "Binding name", 30);
 
         if (needsUpdate) {
             this.update(doc);

@@ -78,4 +78,9 @@ public interface WikiComponentConstants
      * The role type property of both {@link #COMPONENT_CLASS} and {@link #DEPENDENCY_CLASS}.
      */
     String COMPONENT_ROLE_TYPE_FIELD = "roleType";
+
+    /**
+     * The binding name property of {@link #DEPENDENCY_CLASS}.
+     */
+    String DEPENDENCY_BINDING_NAME_FIELD = "bindingName";
 }

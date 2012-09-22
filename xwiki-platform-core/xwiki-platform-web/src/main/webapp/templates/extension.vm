@@ -66,8 +66,8 @@
 #end
 
 #macro (displayExtensionActionButtons $extension)
-  <form action="">
-    <div class="extension-actions">
+  <form action="" class="extension-actions">
+    <fieldset>
       #extensionHiddenFormFields($extension.id.id $extension.id.version true)
       ##
       ## Generic actions.
@@ -110,7 +110,7 @@
           #extensionActionButton($installedExtension 'downgrade' true)
         #end
       #end
-    </div>
+    </fieldset>
   </form>
 #end
 
@@ -118,15 +118,15 @@
   #set ($authors = [])
   #foreach ($author in $extension.authors)
     #if ($author.name == 'devs')
-      #set ($discard = $authors.add("<a href=""http://www.xwiki.org/"">$msg.get('extensions.info.authors.xwikiorg')</a>"))
+      #set ($discard = $authors.add("<a class=""extension-author"" href=""http://www.xwiki.org/"">$msg.get('extensions.info.authors.xwikiorg')</a>"))
     #elseif ("$!author.url" != '' && "$!author.name" != '')
-      #set ($discard = $authors.add("<a href=""$author.url"">$escapetool.xml($author.name)</a>"))
+      #set ($discard = $authors.add("<a class=""extension-author"" href=""$author.url"">$escapetool.xml($author.name)</a>"))
     #else
-      #set ($discard = $authors.add($escapetool.xml($author.name)))
+      #set ($discard = $authors.add("<span class=""extension-author"">$escapetool.xml($author.name)</span>"))
     #end
   #end
   #if (!$authors.isEmpty())
-    <div class="extension-authors"><p>$msg.get('extensions.info.authors') $stringtool.join($authors, ', ')</p></div>
+    <p class="extension-authors">$msg.get('extensions.info.authors') $stringtool.join($authors, ', ')</p>
   #end
 #end
 
@@ -436,20 +436,19 @@
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   <div class="extension-item extension-item-${extensionStatus}">
     <div class="extension-header">
-      <h2 class="extension-name">
-        #displayExtensionName($extension) <span class="extension-version">$escapetool.xml($extension.id.version)</span>
+      <h2 class="extension-title">
+        <span class="extension-name">#displayExtensionName($extension)</span>
+        <span class="extension-version">$escapetool.xml($extension.id.version)</span>
       </h2>
-      <div class="extension-header-right">
-        #if ($extensionStatusMessage)
-          <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
-        #end
-        #displayExtensionActionButtons($extension)
-      </div>
+      #if ($extensionStatusMessage)
+        <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
+      #end
+      #displayExtensionActionButtons($extension)
       #if ($extension.authors.size() > 0)
         #displayExtensionAuthors($extension)
       #end
       #if ("$!extension.summary" != '')
-        <div class="extension-description">$escapetool.xml($extension.summary)</div>
+        <div class="extension-summary">$escapetool.xml($extension.summary)</div>
       #end
       #displayProgressBar($extension)
       <div class="clearfloats"></div>

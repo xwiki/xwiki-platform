@@ -333,7 +333,7 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _refresh : function() {
     // Prepare the data for the AJAX call.
-    var form = this.container.down('.extension-actions').up('form');
+    var form = this.container.down('.extension-actions');
     var formData = new Hash(form.serialize({submit: false}));
 
     // Launch the AJAX call.

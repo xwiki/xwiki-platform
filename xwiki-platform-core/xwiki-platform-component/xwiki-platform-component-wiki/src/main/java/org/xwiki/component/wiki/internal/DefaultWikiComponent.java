@@ -19,11 +19,13 @@
  */
 package org.xwiki.component.wiki.internal;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
@@ -47,9 +49,9 @@ public class DefaultWikiComponent implements WikiComponent
     private Map<String, XDOM> handledMethods = new HashMap<String, XDOM>();
 
     /**
-     * @see {@link #getRole()}
+     * @see {@link #getRoleType()}
      */
-    private Class< ? > role;
+    private Type roleType;
 
     /**
      * @see {@link #getRoleHint()}
@@ -62,16 +64,21 @@ public class DefaultWikiComponent implements WikiComponent
     private List<Class< ? >> implementedInterfaces = new ArrayList<Class< ? >>();
 
     /**
+     * @see {@link #getDependencies()}
+     */
+    private Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
+
+    /**
      * Constructor of this component.
      * 
      * @param reference the document holding the component definition
-     * @param role the role implemented
+     * @param roleType the role Type implemented
      * @param roleHint the role hint for this role implementation
      */
-    public DefaultWikiComponent(DocumentReference reference, Class< ? > role, String roleHint)
+    public DefaultWikiComponent(DocumentReference reference, Type roleType, String roleHint)
     {
         this.documentReference = reference;
-        this.role = role;
+        this.roleType = roleType;
         this.roleHint = roleHint;
     }
 
@@ -88,9 +95,9 @@ public class DefaultWikiComponent implements WikiComponent
     }
 
     @Override
-    public Class< ? > getRole()
+    public Type getRoleType()
     {
-        return this.role;
+        return this.roleType;
     }
 
     @Override
@@ -103,6 +110,12 @@ public class DefaultWikiComponent implements WikiComponent
     public List<Class< ? >> getImplementedInterfaces()
     {
         return this.implementedInterfaces;
+    }
+
+    @Override
+    public Map<String, ComponentDescriptor> getDependencies()
+    {
+        return this.dependencies;
     }
 
     /**
@@ -122,10 +135,20 @@ public class DefaultWikiComponent implements WikiComponent
      *
      * @see {@link #getImplementedInterfaces()}
      *
-     * @param interfaces the interfaces this component implements.
+     * @param interfaces the interfaces this component implements
      */
     public void setImplementedInterfaces(List<Class< ? >> interfaces)
     {
         this.implementedInterfaces = interfaces;
+    }
+
+    /**
+     * Sets the component dependencies.
+     *
+     * @param dependencies the dependencies of this component
+     */
+    public void setDependencies(Map<String, ComponentDescriptor> dependencies)
+    {
+        this.dependencies = dependencies;
     }
 }

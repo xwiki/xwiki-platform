@@ -72,8 +72,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private Execution execution;
 
     /**
-     * Used to transform the wiki page reference where the UI Extension is defined into a Component Role Hint.
-     * We use a compact serializer since UI Extensions are registered for a given wiki only.
+     * Used to transform the reference to the UI Extension XClass to a string usable in a query.
+     * {@see #searchDocumentReferences()}
      */
     @Inject
     @Named("compactwiki")

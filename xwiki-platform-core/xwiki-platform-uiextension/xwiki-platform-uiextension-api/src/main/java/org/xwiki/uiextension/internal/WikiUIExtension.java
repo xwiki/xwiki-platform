@@ -20,6 +20,7 @@
 package org.xwiki.uiextension.internal;
 
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +29,13 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -125,7 +128,6 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         throws ComponentLookupException
     {
         this.documentReference = (DocumentReference) objectReference.getParent();
-        this.roleHint = objectReference.toString();
         this.name = name;
         this.extensionPointId = extensionPointId;
         this.xdom = xdom;
@@ -134,6 +136,9 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         this.macroTransformation = componentManager.<Transformation>getInstance(Transformation.class, "macro");
         this.execution = componentManager.getInstance(Execution.class);
         this.velocityManager = componentManager.getInstance(VelocityManager.class);
+        EntityReferenceSerializer<String> serializer =
+            componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        this.roleHint = serializer.serialize(objectReference);
     }
 
     @Override
@@ -197,7 +202,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
-    public Class<?> getRole()
+    public Type getRoleType()
     {
         return UIExtension.class;
     }
@@ -210,6 +215,11 @@ public class WikiUIExtension implements UIExtension, WikiComponent
 
     @Override
     public Map<String, XDOM> getHandledMethods()
+    {
+        return MapUtils.EMPTY_MAP;
+    }
+
+    @Override public Map<String, ComponentDescriptor> getDependencies()
     {
         return MapUtils.EMPTY_MAP;
     }

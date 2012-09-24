@@ -21,6 +21,7 @@ package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentInvocationHandler;
@@ -83,7 +85,8 @@ public class DefaultWikiComponentManager implements WikiComponentManager
         
         try {
             // Get the component role interface
-            Class< ? > role = component.getRole();
+            Type roleType = component.getRoleType();
+            Class<?> roleTypeClass = ReflectionUtils.getTypeClass(roleType);
 
             // Create the method invocation handler of the proxy
             InvocationHandler handler = new WikiComponentInvocationHandler(component, componentManager);
@@ -104,14 +107,15 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
             // If the component is a pure XObject implementation, we need to add the role interface to the list, since
             // it's not been added by the previous loops.
-            if (!implementedInterfaces.contains(role)) {
-                implementedInterfaces.add(role);
+            if (!implementedInterfaces.contains(roleType)) {
+                implementedInterfaces.add(roleTypeClass);
             }
 
             // Create the component instance and its descriptor
-            Class< ? >[] implementedInterfacesArray = implementedInterfaces.toArray(new Class<?>[0]);
-            Object instance = Proxy.newProxyInstance(role.getClassLoader(), implementedInterfacesArray, handler);
-            ComponentDescriptor componentDescriptor = this.createComponentDescriptor(role, component.getRoleHint());
+            Class<?>[] implementedInterfacesArray = implementedInterfaces.toArray(new Class<?>[0]);
+            Object instance =
+                Proxy.newProxyInstance(roleTypeClass.getClassLoader(), implementedInterfacesArray, handler);
+            ComponentDescriptor componentDescriptor = this.createComponentDescriptor(roleType, component.getRoleHint());
 
             // Since we are responsible to create the component instance,
             // we also are responsible of its initialization (if needed)
@@ -124,7 +128,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             }
 
             // Finally, register the component against the CM
-            componentManager.registerComponent(componentDescriptor, role.cast(instance));
+            componentManager.registerComponent(componentDescriptor, roleTypeClass.cast(instance));
             
             // And hold a reference to it.
             this.registeredComponents.add(component);
@@ -143,7 +147,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             if (registered.getDocumentReference().equals(reference)) {
                 // Unregister component
                 unregisteredComponent = registered;
-                componentManager.unregisterComponent(registered.getRole(), registered.getRoleHint());
+                componentManager.unregisterComponent(registered.getRoleType(), registered.getRoleHint());
             }
         }
 
@@ -156,15 +160,15 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     /**
      * Helper method to create a component descriptor from role and hint.
      * 
-     * @param role the component role of the descriptor to create
+     * @param roleType the component role type of the descriptor to create
      * @param roleHint the hint of the implementation for the descriptor to create
      * @return the constructed {@link ComponentDescriptor}
      */
     @SuppressWarnings("unchecked")
-    private ComponentDescriptor createComponentDescriptor(Class role, String roleHint)
+    private ComponentDescriptor createComponentDescriptor(Type roleType, String roleHint)
     {
         DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
-        cd.setRole(role);
+        cd.setRoleType(roleType);
         cd.setRoleHint(roleHint);
         return cd;
     }

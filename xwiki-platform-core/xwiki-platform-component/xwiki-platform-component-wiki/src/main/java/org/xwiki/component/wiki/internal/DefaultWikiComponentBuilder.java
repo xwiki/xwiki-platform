@@ -31,7 +31,10 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
@@ -119,7 +122,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
 
             Class< ? > roleAsClass;
             try {
-                roleAsClass = Class.forName(role);
+                roleAsClass = ReflectionUtils.getTypeClass(ReflectionUtils.unserializeType(role));
             } catch (ClassNotFoundException e) {
                 throw new WikiComponentException(String.format("The role class [%s] could not be found", role), e);
             }
@@ -129,6 +132,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             DefaultWikiComponent component = new DefaultWikiComponent(reference, roleAsClass, roleHint);
             component.setHandledMethods(this.getHandledMethods(componentDocument));
             component.setImplementedInterfaces(this.getDeclaredInterfaces(componentDocument));
+            component.setDependencies(this.getDependencies(componentDocument));
 
             components.add(component);
         } catch (XWikiException e) {
@@ -156,7 +160,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
                         handledMethods.put(method.getStringValue(METHOD_NAME_FIELD), xdom);
                     } catch (Exception e) {
                         this.logger.error("Failed to execute code for component method [{}] in document [{}] ",
-                            method.getNumber(), componentDocument.getPrefixedFullName());
+                            method.getNumber(), componentDocument.getDocumentReference());
                     }
                 }
             }
@@ -165,8 +169,11 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     }
 
     /**
+     * The array of interfaces declared by the wiki component, if some interfaces can't be found by the
+     * {@link ClassLoader} they will be filtered out and a warning will be displayed in the log.
+     *
      * @param componentDocument the document holding the component description
-     * @return the array of interfaces declared (and actually existing) by the document
+     * @return the array of interfaces declared by the wiki component
      */
     private List<Class< ? >> getDeclaredInterfaces(XWikiDocument componentDocument)
     {
@@ -179,12 +186,42 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
                         interfaces.add(implemented);
                     } catch (ClassNotFoundException e) {
                         this.logger.warn("Interface [{}] not found, declared for wiki component [{}]",
-                            iface.getStringValue(INTERFACE_NAME_FIELD), componentDocument.getPrefixedFullName());
+                            iface.getStringValue(INTERFACE_NAME_FIELD),
+                            componentDocument.getDocumentReference());
                     }
                 }
             }
         }
         return interfaces;
+    }
+
+    /**
+     * Retrieve the Map of dependencies declared by the wiki component, if some dependencies can't be found by the
+     * {@link ClassLoader} they will be filtered out a warning will be displayed in the log.
+     *
+     * @param componentDocument the document holding the component description
+     * @return the Map of dependencies declared by the wiki component
+     */
+    private Map<String, ComponentDescriptor> getDependencies(XWikiDocument componentDocument)
+    {
+        Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
+        if (componentDocument.getObjectNumbers(DEPENDENCY_CLASS) > 0) {
+            for (BaseObject dependency : componentDocument.getObjects(DEPENDENCY_CLASS)) {
+                try {
+                    DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
+                    cd.setRoleType(
+                        ReflectionUtils.unserializeType(dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD)));
+                    cd.setRoleHint(dependency.getStringValue(COMPONENT_ROLE_HINT_FIELD));
+                    dependencies.put(dependency.getStringValue(DEPENDENCY_BINDING_NAME_FIELD), cd);
+                } catch (ClassNotFoundException e) {
+                    this.logger.warn("Interface [{}] not found, declared as dependency for wiki component [{}]",
+                        dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD),
+                        componentDocument.getDocumentReference());
+                }
+            }
+        }
+
+        return dependencies;
     }
 
     /**

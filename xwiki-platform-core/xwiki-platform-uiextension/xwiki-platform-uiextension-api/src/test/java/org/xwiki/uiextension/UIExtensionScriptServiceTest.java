@@ -36,6 +36,8 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -82,6 +84,8 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
     private Execution execution;
 
+    private EntityReferenceSerializer<String> serializer;
+
     XDOM xdom = new XDOM(new ArrayList<Block>());
 
     @Before
@@ -99,8 +103,22 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
             getComponentManager().registerMockComponent(getMockery(), BlockRenderer.class,
                 Syntax.XHTML_1_0.toIdString());
         getComponentManager().registerMockComponent(getMockery(), VelocityManager.class);
+        serializer = registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
         transformation = getComponentManager().registerMockComponent(getMockery(), Transformation.class, "macro");
         this.service = getComponentManager().getInstance(ScriptService.class, "uix");
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(execution).getContext();
+                will(returnValue(context));
+                allowing(serializer).serialize(with(any(EntityReference.class)), with(anything()));
+                will(returnValue("does not matter"));
+                allowing(componentManagerProvider).get();
+                will(returnValue(contextComponentManager));
+            }
+        });
+
         uiExtensions.put("1id3", new WikiUIExtension(OBJ1_REF, "1id3", "epId1", xdom, Syntax.XWIKI_2_0,
             new HashMap<String, String>(), getComponentManager()));
         uiExtensions.put("1id1", new WikiUIExtension(OBJ2_REF, "1id1", "epId1", xdom, Syntax.XWIKI_2_0,
@@ -109,16 +127,6 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
             new HashMap<String, String>(), getComponentManager()));
         uiExtensions.put("2id1", new WikiUIExtension(OBJ4_REF, "2id1", "epId2", xdom, Syntax.XWIKI_2_0,
             new HashMap<String, String>(), getComponentManager()));
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(execution).getContext();
-                will(returnValue(context));
-                allowing(componentManagerProvider).get();
-                will(returnValue(contextComponentManager));
-            }
-        });
     }
 
     @Test

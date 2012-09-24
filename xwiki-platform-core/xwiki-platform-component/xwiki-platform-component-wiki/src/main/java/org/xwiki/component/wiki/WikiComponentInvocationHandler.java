@@ -21,12 +21,18 @@ package org.xwiki.component.wiki;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.internal.DefaultMethodOutputHandler;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.context.Execution;
@@ -51,6 +57,8 @@ import org.xwiki.rendering.transformation.TransformationException;
  */
 public class WikiComponentInvocationHandler implements InvocationHandler
 {
+
+
     /**
      * The key under which the component reference (a virtual "this") is kept in the method invocation context. 
      */
@@ -91,6 +99,11 @@ public class WikiComponentInvocationHandler implements InvocationHandler
      * @see {@link Object#toString()}
      */
     private static Method toStringMethod;
+
+    /**
+     * The logger to log.
+     */
+    private final Logger logger = LoggerFactory.getLogger(WikiComponentInvocationHandler.class);
 
     static {
         try {
@@ -159,6 +172,46 @@ public class WikiComponentInvocationHandler implements InvocationHandler
         }
     }
 
+    private void injectComponentDependencies(Map<String, Object> methodContext)
+    {
+        for (Map.Entry<String, ComponentDescriptor> dependency : this.wikiComponent.getDependencies().entrySet()) {
+            ComponentDescriptor cd = dependency.getValue();
+            Class<?> roleTypeClass = ReflectionUtils.getTypeClass(cd.getRoleType());
+            Object componentDependency = null;
+            try {
+                if (roleTypeClass.isAssignableFrom(List.class)) {
+                    // If the ParameterizedType is a List, the raw Type is the List Class and the first Type argument
+                    // is the actual component (which can be a ParameterizedType itself).
+                    // Example: java.util.List<org.xwiki.model.reference.EntityReferenceSerializer<java.lang.String>>
+                    // raw Type: java.util.List
+                    // Type arguments [0]: org.xwiki.model.reference.EntityReferenceSerializer<java.lang.String>
+                    componentDependency =
+                        componentManager.getInstanceList(
+                            ((ParameterizedType) cd.getRoleType()).getActualTypeArguments()[0]);
+                } else if (roleTypeClass.isAssignableFrom(Map.class)) {
+                    // If the ParameterizedType is a Map, the raw Type is the Map, the first argument can only be a
+                    // String in our implementation and the second argument is the actual component.
+                    // Example: java.util.Map<java.lang.String,
+                    // org.xwiki.model.reference.EntityReferenceSerializer<java.lang.String>>
+                    // raw Type: java.util.Map
+                    // Type arguments [0]: java.lang.String
+                    // [1]: org.xwiki.model.reference.EntityReferenceSerializer<java.lang.String>
+                    componentDependency = componentManager.getInstanceMap(
+                        ((ParameterizedType) cd.getRoleType()).getActualTypeArguments()[1]);
+                } else {
+                    // Not a List or a Map, note that the role Type can be a ParameterizedType itself
+                    // Example: org.xwiki.model.reference.EntityReferenceSerializer<java.lang.String>
+                    componentDependency = componentManager.getInstance(cd.getRoleType(), cd.getRoleHint());
+                }
+            } catch (ComponentLookupException e) {
+                 this.logger.warn(String.format(
+                     "No component found for role [%s] with hint [%s], declared as dependency for wiki component [%s]",
+                     cd.getRoleType().toString(), cd.getRoleHint(), this.wikiComponent.getDocumentReference()));
+            }
+            methodContext.put(dependency.getKey(), componentDependency);
+        }
+    }
+
     /**
      * "Executes" the wiki content associated to the passed method.
      * 
@@ -186,8 +239,9 @@ public class WikiComponentInvocationHandler implements InvocationHandler
                 inputs.put(i, args[i]);
             }
         }
-        
         methodContext.put(METHOD_CONTEXT_INPUT_KEY, inputs);
+
+        this.injectComponentDependencies(methodContext);
 
         // TODO: Fix this since the XWiki Context is the old way of doing things. We need a solution based on the
         // Execution Context instead.

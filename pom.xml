@@ -33,7 +33,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>4.2-SNAPSHOT</version>
+  <version>4.2-rc-1</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for Platform extensions -->
@@ -45,7 +45,7 @@
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
     <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>stable-4.2.x</tag>
+    <tag>xwiki-platform-4.2-rc-1</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

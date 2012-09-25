@@ -32,7 +32,7 @@
          http://platform.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
          database. You'll need to do 2 things:
          1) Copy your database driver JAR in WEB-INF/lib or in some shared lib directory
-         2) Uncomment the properties below for your specific DB (and comment the default 
+         2) Uncomment the properties below for your specific DB (and comment the default
             database configuration if it doesn't match your DB)
     -->
 
@@ -50,6 +50,19 @@
     <property name="dbcp.ps.maxActive">20</property>
     <property name="dbcp.ps.maxWait">120000</property>
     <property name="dbcp.ps.maxIdle">20</property>
+
+    <!-- Uncomment to use BoneCP Connection Pooling -->
+    <!--
+    <property name="bonecp.idleMaxAgeInMinutes">240</property>
+    <property name="bonecp.idleConnectionTestPeriodInMinutes">60</property>
+    <property name="bonecp.partitionCount">3</property>
+    <property name="bonecp.acquireIncrement">10</property>
+    <property name="bonecp.maxConnectionsPerPartition">60</property>
+    <property name="bonecp.minConnectionsPerPartition">20</property>
+    <property name="bonecp.statementsCacheSize">50</property>
+    <property name="bonecp.releaseHelperThreads">3</property>
+    -->
+
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
     <property name="jdbc.use_scrollable_resultset">false</property>
 
@@ -58,13 +71,16 @@
          Note that the database tables will be created automatically if they don't already exist.
     -->
 ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
-## have preferred to use an empty value but I couldn't make that work with Maven. 
+## have preferred to use an empty value but I couldn't make that work with Maven.
 #if ($xwikiDbConnectionUrl != "none")
     <property name="connection.url">$xwikiDbConnectionUrl</property>
     <property name="connection.username">$!xwikiDbConnectionUsername</property>
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
+    <!-- Uncomment to use BoneCP Connection Pooling. You'll also need to comment out the DBCP property of the same name
+         below since there can be only one such property. -->
+    <!--property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property-->
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>

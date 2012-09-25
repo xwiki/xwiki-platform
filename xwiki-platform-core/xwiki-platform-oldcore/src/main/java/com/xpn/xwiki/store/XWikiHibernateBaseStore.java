@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -42,6 +43,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
+import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.slf4j.Logger;
@@ -380,6 +382,12 @@ public class XWikiHibernateBaseStore implements Initializable
         } else {
             // virtual
             schema = wikiName.replace('-', '_');
+
+            // For HSQLDB we only support uppercase schema names. This is because Hibernate doesn't properly generate
+            // quotes around schema names when it qualifies the table name when it generates the update script.
+            if (databaseProduct == DatabaseProduct.HSQLDB) {
+                schema = StringUtils.upperCase(schema);
+            }
         }
 
         // Apply prefix
@@ -454,7 +462,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
             String contextSchema = getSchemaFromWikiName(context);
 
-            DatabaseProduct databaseProduct = getDatabaseProductName(context);
+            DatabaseProduct databaseProduct = getDatabaseProductName();
             if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
                 || databaseProduct == DatabaseProduct.DERBY || databaseProduct == DatabaseProduct.DB2) {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
@@ -625,32 +633,11 @@ public class XWikiHibernateBaseStore implements Initializable
 
                     DatabaseProduct databaseProduct = getDatabaseProductName(context);
                     if (DatabaseProduct.ORACLE == databaseProduct) {
-                        Statement stmt = null;
-                        try {
-                            stmt = session.connection().createStatement();
-                            stmt.execute("alter session set current_schema = " + escapedSchemaName);
-                        } finally {
-                            try {
-                                if (stmt != null) {
-                                    stmt.close();
-                                }
-                            } catch (Exception e) {
-                            }
-                        }
+                        executeSQL("alter session set current_schema = " + escapedSchemaName, session);
                     } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
-                        || DatabaseProduct.DB2 == databaseProduct) {
-                        Statement stmt = null;
-                        try {
-                            stmt = session.connection().createStatement();
-                            stmt.execute("SET SCHEMA " + escapedSchemaName);
-                        } finally {
-                            try {
-                                if (stmt != null) {
-                                    stmt.close();
-                                }
-                            } catch (Exception e) {
-                            }
-                        }
+                        || DatabaseProduct.DB2 == databaseProduct)
+                    {
+                        executeSQL("SET SCHEMA " + schemaName, session);
                     } else {
                         String catalog = session.connection().getCatalog();
                         catalog = (catalog == null) ? null : catalog.replace('_', '-');
@@ -670,6 +657,33 @@ public class XWikiHibernateBaseStore implements Initializable
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
                 "Exception while switching to database {0}", e, args);
         }
+    }
+
+    /**
+     * Execute an SQL statement using Hibernate.
+     *
+     * @param sql the SQL statement to execute
+     * @param session the Hibernate Session in which to execute the statement
+     */
+    private void executeSQL(final String sql, Session session)
+    {
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException
+            {
+                Statement stmt = null;
+                try {
+                    stmt = connection.createStatement();
+                    stmt.execute(sql);
+                } finally {
+                    try {
+                        if (stmt != null) {
+                            stmt.close();
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        });
     }
 
     /**

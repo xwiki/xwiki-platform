@@ -80,7 +80,7 @@
     <property name="dialect">$xwikiDbDialect</property>
     <!-- Uncomment to use BoneCP Connection Pooling. You'll also need to comment out the DBCP property of the same name
          below since there can be only one such property. -->
-    <!--property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property-->
+    <!--property name="connection.provider_class">com.jolbox.bonecp.provider.BoneCPConnectionProvider</property-->
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>

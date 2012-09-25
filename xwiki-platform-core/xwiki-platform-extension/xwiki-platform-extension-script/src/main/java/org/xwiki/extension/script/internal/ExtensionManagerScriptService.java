@@ -34,6 +34,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
@@ -876,6 +877,26 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             return new DefaultVersionConstraint(versionConstraint);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates an extension dependency object.
+     * 
+     * @param id the dependency identifier
+     * @param versionConstraint the dependency version constraint
+     * @return the extension dependency object
+     */
+    public ExtensionDependency createExtensionDependency(String id, String versionConstraint)
+    {
+        setError(null);
+
+        try {
+            return new DefaultExtensionDependency(id, new DefaultVersionConstraint(versionConstraint));
         } catch (Exception e) {
             setError(e);
         }

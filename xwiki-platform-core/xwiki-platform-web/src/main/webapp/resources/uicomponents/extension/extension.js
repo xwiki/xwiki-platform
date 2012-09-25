@@ -25,6 +25,9 @@ XWiki.ExtensionBehaviour = Class.create({
     // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
     this._enhanceMenuBehaviour();
 
+    // Enhances the behaviour of the Dependencies section.
+    this._enhanceDependenciesBehaviour();
+
     // Enhances the behaviour of the Progress section.
     this._enhanceProgressBehaviour();
 
@@ -347,7 +350,10 @@ XWiki.ExtensionBehaviour = Class.create({
           // Use a longer refresh timeout after an AJAX request failure.
           this._maybeScheduleRefresh(10);
         }
-      }.bind(this)
+      }.bind(this),
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      }
     });
   },
 
@@ -443,6 +449,51 @@ XWiki.ExtensionBehaviour = Class.create({
     // Compute the changes asynchronously when there is a merge conflict.
     var diffButton = this.container.down('input[name="diff"]');
     diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
+  },
+
+  /**
+   * Enhances the behaviour of the Dependencies section within the extension details.
+   */
+  _enhanceDependenciesBehaviour : function() {
+    // Don't resolve unknown dependencies while the extension has a job running.
+    if (!this.container.hasClassName('extension-item-loading')) {
+      this._resolveUnknownDependency(this.container.select('.dependency-item.extension-item-unknown'), 0);
+    }
+  },
+
+  /**
+   * Makes an AJAX request to resolve the specified dependency.
+   */
+  _resolveUnknownDependency : function(dependencies, index) {
+    if (index >= dependencies.length) {
+      return;
+    }
+
+    var dependency = dependencies[index];
+    var section = this.container.down('input[name="section"]');
+    new Ajax.Request(this._getServiceURL(section && section.value), {
+      parameters : {
+        extensionId: dependency.down('.extension-name').innerHTML,
+        extensionVersionConstraint: dependency.down('.extension-version').innerHTML
+      },
+      onCreate : function() {
+        dependency.removeClassName('extension-item-unknown').addClassName('extension-item-loading');
+      },
+      onSuccess : function(response) {
+        // Update the dependency if it's still attached to the document.
+        if (dependency.up('html')) {
+          dependency.insert({before: response.responseText}).remove();
+          this._resolveUnknownDependency(dependencies, index + 1);
+        }
+      }.bind(this),
+      onFailure : function(response) {
+        dependency.removeClassName('extension-item-loading').addClassName('extension-item-unknown');
+        this._onAjaxRequestFailure(response);
+      }.bind(this),
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      }
+    });
   }
 });
 

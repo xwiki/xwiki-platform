@@ -253,12 +253,22 @@
   #end
 #end
 
-#macro (displayDependency $dependencyOrExtension $namespace)
+#macro (displayDependency $dependencyOrExtension $namespace $resolveRemotely)
   #if ($dependencyOrExtension.versionConstraint)
     ## Dependency object.
     #set ($dependencyId = $dependencyOrExtension.id)
     #set ($dependencyVersion = $dependencyOrExtension.versionConstraint)
-    #set ($dependencyExtension = $extensionManager.resolve($dependencyOrExtension))
+    #if ($resolveRemotely)
+      #set ($dependencyExtension = $extensionManager.resolve($dependencyOrExtension))
+    #else
+      ## Search for the dependency only in the core and local repositories.
+      ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
+      ## downloaded). We need a resolve method that doesn't perform any remote calls.
+      #set ($dependencyExtension = $extensionManager.getRepository('core').resolve($dependencyOrExtension))
+      #if (!$dependencyExtension)
+        #set ($dependencyExtension = $extensionManager.getRepository('local').resolve($dependencyOrExtension))
+      #end
+    #end
   #else
     ## Extension object.
     #set ($dependencyId = $dependencyOrExtension.id.id)
@@ -274,7 +284,7 @@
     #set ($dependencyName = "<a href=""$dependencyURL"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
   <div class="dependency-item extension-item-$dependencyStatus">
-    ${dependencyName}<span class="extension-version">$!dependencyVersion</span>
+    <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
     #if ($xwiki.isVirtualMode() && $namespace.startsWith('wiki:'))
       <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', [$namespace.substring(5)])</span>
     #end
@@ -737,9 +747,14 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #else
       $response.sendRedirect($services.csrf.getResubmissionURL())
     #end
+  #elseif ($request.extensionVersionConstraint)
+    #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
+    #displayDependency($dependency $extensionNamespace true)
   #else
     ## Display the extension.
-    #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
+    ## Create a dependency in order to support version constraints (e.g. a version range).
+    #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersion))
+    #set ($extension = $extensionManager.resolve($dependency))
     #if ($extension)
       #displayExtension($extension)
     #else

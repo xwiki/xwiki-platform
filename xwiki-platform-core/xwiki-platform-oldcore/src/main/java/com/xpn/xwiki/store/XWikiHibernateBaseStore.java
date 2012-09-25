@@ -637,7 +637,7 @@ public class XWikiHibernateBaseStore implements Initializable
                     } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
                         || DatabaseProduct.DB2 == databaseProduct)
                     {
-                        executeSQL("SET SCHEMA " + schemaName, session);
+                        executeSQL("SET SCHEMA " + escapedSchemaName, session);
                     } else {
                         String catalog = session.connection().getCatalog();
                         catalog = (catalog == null) ? null : catalog.replace('_', '-');

@@ -357,7 +357,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.DERBY == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema);
+                stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
             } else if (DatabaseProduct.DB2 == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + escapedSchema + " RESTRICT");
             } else if (DatabaseProduct.MYSQL == databaseProduct) {

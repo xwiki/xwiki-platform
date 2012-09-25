@@ -6,6 +6,7 @@ com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
 com.xpn.xwiki.internal.MessageToolVelocityContextInitializer
 com.xpn.xwiki.internal.XWikiContextProvider
 com.xpn.xwiki.internal.XWikiStubContextInitializer
+com.xpn.xwiki.internal.classes.XWikiPreferencesXClassProvider
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCacheConfiguration

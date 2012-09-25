@@ -153,6 +153,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
+import com.xpn.xwiki.objects.classes.XClassProvider;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -3120,119 +3121,17 @@ public class XWiki implements EventListener
             return bclass;
         }
 
-        if (!"internal".equals(bclass.getCustomMapping())) {
-            needsUpdate = true;
-            bclass.setCustomMapping("internal");
+        XClassProvider xclassProvider = Utils.getComponent(XClassProvider.class, "XWiki.XWikiPreferences");
+
+        BaseClass newClass = xclassProvider.getXClass();
+
+        if (doc.isNew()) {
+            doc.setXClass(newClass);
+        } else {
+            bclass.apply(newClass, false);
         }
 
-        needsUpdate |= bclass.addTextField("parent", "Parent Space", 30);
-        needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
-        needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
-        needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
-        needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
-        needsUpdate |= bclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
-
-        needsUpdate |= bclass.addTextField("skin", "Skin", 30);
-        needsUpdate |=
-            bclass.addDBListField("colorTheme", "Color theme",
-                "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
-        // This one should not be in the prefs
-        PropertyInterface baseskinProp = bclass.get("baseskin");
-        if (baseskinProp != null) {
-            bclass.removeField("baseskin");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
-        needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
-        needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
-
-        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-
-        needsUpdate |= bclass.addTextField("webcopyright", "Copyright", 30);
-        needsUpdate |= bclass.addTextField("title", "Title", 30);
-        needsUpdate |= bclass.addTextField("version", "Version", 30);
-        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
-        needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
-
-        // mail
-        needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
-        needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
-        needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
-        needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
-        needsUpdate |= bclass.addTextField("smtp_server_username", "Server username (optional)", 30);
-        needsUpdate |= bclass.addTextField("smtp_server_password", "Server password (optional)", 30);
-        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6);
-        needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
-        needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
-        needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
-
-        needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
-
-        needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
-
-        // Captcha for guest comments
-        needsUpdate |=
-            bclass.addBooleanField("guest_comment_requires_captcha",
-                "Enable CAPTCHA in Comments for Unregistered Users", "select");
-
-        // Document editing
-        needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
-        needsUpdate |= bclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");
-
-        // for tags
-        needsUpdate |= bclass.addBooleanField("tags", "Activate the tagging", "yesno");
-
-        // for backlinks
-        needsUpdate |= bclass.addBooleanField("backlinks", "Activate the backlinks", "yesno");
-
-        // New fields for the XWiki 1.0 skin
-        needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
-        needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
-        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
-        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
-        needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
-
-        // Only used by LDAP authentication service
-
-        needsUpdate |= bclass.addBooleanField("ldap", "Ldap", "yesno");
-        needsUpdate |= bclass.addTextField("ldap_server", "Ldap server adress", 60);
-        needsUpdate |= bclass.addTextField("ldap_port", "Ldap server port", 60);
-        needsUpdate |= bclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
-        needsUpdate |= bclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
-        needsUpdate |= bclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
-        needsUpdate |= bclass.addTextField("ldap_user_group", "Ldap group filter", 60);
-        needsUpdate |= bclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);
-        needsUpdate |= bclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
-        needsUpdate |= bclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
-        needsUpdate |= bclass.addTextField("ldap_fields_mapping", "Ldap user fiels mapping", 60);
-        needsUpdate |= bclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
-        needsUpdate |= bclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5);
-        needsUpdate |= bclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
-        needsUpdate |= bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "|always|create");
-        needsUpdate |= bclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
-
-        if (((BooleanClass) bclass.get("showLeftPanels")).getDisplayType().equals("checkbox")) {
-            ((BooleanClass) bclass.get("showLeftPanels")).setDisplayType("yesno");
-            ((BooleanClass) bclass.get("showRightPanels")).setDisplayType("yesno");
-            needsUpdate = true;
-        }
-
-        needsUpdate |= bclass.addBooleanField("showannotations", "Show document annotations", "yesno");
-        needsUpdate |= bclass.addBooleanField("showcomments", "Show document comments", "yesno");
-        needsUpdate |= bclass.addBooleanField("showattachments", "Show document attachments", "yesno");
-        needsUpdate |= bclass.addBooleanField("showhistory", "Show document history", "yesno");
-        needsUpdate |= bclass.addBooleanField("showinformation", "Show document information", "yesno");
-        needsUpdate |= bclass.addBooleanField("editcomment", "Enable version summary", "yesno");
-        needsUpdate |= bclass.addBooleanField("editcomment_mandatory", "Make version summary mandatory", "yesno");
-        needsUpdate |= bclass.addBooleanField("minoredit", "Enable minor edits", "yesno");
+        // Sheet
 
         SheetBinder documentSheetBinder = Utils.getComponent((Type) SheetBinder.class, "document");
         boolean withoutDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();

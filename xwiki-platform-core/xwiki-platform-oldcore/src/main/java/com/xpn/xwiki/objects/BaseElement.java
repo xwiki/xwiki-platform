@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -276,5 +277,21 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     {
         setPrettyName(MergeUtils.mergeCharacters(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
+    }
+
+    @Override
+    public boolean apply(ElementInterface newElement, boolean clean)
+    {
+        boolean modified = false;
+
+        BaseElement<R> newBaseElement = (BaseElement<R>) newElement;
+
+        // Pretty name
+        if (StringUtils.equals(newBaseElement.getPrettyName(), getPrettyName())) {
+            setPrettyName(newBaseElement.getPrettyName());
+            modified = true;
+        }
+
+        return modified;
     }
 }

@@ -73,7 +73,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /** LoggerManager to suspend logging during normal faulty SQL operation. */
     @Inject
-    private LoggerManager loggerManager;
+    protected LoggerManager loggerManager;
 
     @Inject
     private HibernateSessionFactory sessionFactory;

@@ -131,9 +131,14 @@ viewers.Comments = Class.create({
         } else {
           new Ajax.Request(
             /* Ajax request URL */
-            item.readAttribute('href').replace('viewer=comments', 'xpage=xpart&vm=commentsinline.vm'),
+            XWiki.currentDocument.getURL(),
             /* Ajax request parameters */
             {
+              parameters : {
+                number: item.up(this.xcommentSelector)._x_number,
+                xpage: 'xpart',
+                vm: 'commentsinline.vm'
+              },
               onCreate : function() {
                 // Disable the button, to avoid a cascade of clicks from impatient users
                 item.disabled = true;

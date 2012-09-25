@@ -295,6 +295,15 @@ Object.extend(XWiki, {
   },
 
   /**
+   * Loads the given URL in the specified window, or the current one if none is specified.
+   * NOTE: This method is overridden in Portlet mode to ensure that the given URL is loaded inside the portal page.
+   */
+  loadURL : function(url, targetWindow) {
+    targetWindow = targetWindow || window;
+    targetWindow.location = url;
+  },
+
+  /**
    * Add click listeners on all rendereing error messages to let the user read the detailed error description.
    * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
    * Otherwise make all the document's body errors expandable.

@@ -90,7 +90,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   openDocument : function(event, mode) {
     if (!$('as_jmp_target') && this.input.value != "") {
       Event.stop(event);
-      window.self.location = this.urlTemplate.replace("__space__/__document__", this.input.value.replace(".", "/")).replace("__action__", mode);
+      XWiki.loadURL(this.urlTemplate.replace("__space__/__document__", this.input.value.replace(".", "/")).replace("__action__", mode));
     }
   },
   addQuickLinksEntry : function() {

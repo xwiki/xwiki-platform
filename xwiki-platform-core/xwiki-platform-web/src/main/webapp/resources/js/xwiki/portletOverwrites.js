@@ -15,6 +15,27 @@ XWiki.displayDocExtra = XWiki.displayDocExtra.wrap(
   }
 );
 
+/**
+ * Wrap in order to load the given URL inside the portal page.
+ */
+XWiki.loadURL = XWiki.loadURL.wrap(
+  function(loadURL, url, targetWindow) {
+    if (url.startsWith('$request.contextPath')) {
+      var form = new Element('form', {action: $('actionURL').value});
+      form.insert(new Element('input', {
+        type: 'hidden',
+        name: 'org.xwiki.portlet.request.parameter.dispatchURL',
+        value: url
+      }));
+      targetWindow = targetWindow || window;
+      targetWindow.document.body.insert(form);
+      form.submit();
+    } else {
+      loadURL(url, targetWidow);
+    }
+  }
+);
+
 Event.observe(document, 'xwiki:dom:loading', function() {
   /**
    * Make sure AJAX requests go through the portlet.

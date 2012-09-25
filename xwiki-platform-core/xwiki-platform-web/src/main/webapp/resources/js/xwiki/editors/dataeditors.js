@@ -431,11 +431,11 @@ editors.XDataEditors = Class.create({
               onYes : function() {
                   document.fire('xwiki:actions:save', {'continue' : true, 'form' : $('propupdate')});
                   document.observe('xwiki:document:saved', function () {
-                    window.self.location = value;
+                    XWiki.loadURL(value);
                   });
               },
               onNo : function() {
-                  window.self.location = value;
+                  XWiki.loadURL(value);
               }
             },
             /* Interaction parameters */

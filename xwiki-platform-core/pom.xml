@@ -270,8 +270,6 @@
                  since it hasn't progressed so far we're removing stray code from master. Experiments should be done
                  on feature branches -->
             <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
-            <!-- Added a new sendMessageFromTemplate method signature that uses a map of parameters instead of a VelocityContext -->
-            <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
           </excludes>
         </configuration>
       </plugin>

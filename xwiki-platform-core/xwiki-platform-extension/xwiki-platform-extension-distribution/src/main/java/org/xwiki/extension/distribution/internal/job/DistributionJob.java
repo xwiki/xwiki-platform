@@ -140,6 +140,8 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
 
         try {
             for (int index = 0; index < steps.size(); ++index) {
+                getDistributionJobStatus().setCurrentStateIndex(index);
+
                 DistributionStepStatus step = steps.get(index);
 
                 if (step.getUpdateState() == null) {
@@ -167,8 +169,6 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
                                 break;
                         }
                     }
-
-                    getDistributionJobStatus().setCurrentStateIndex(index);
                 }
 
                 notifyStepPropress();

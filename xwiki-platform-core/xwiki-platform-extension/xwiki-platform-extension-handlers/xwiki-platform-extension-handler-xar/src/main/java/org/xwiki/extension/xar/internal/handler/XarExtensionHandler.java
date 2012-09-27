@@ -165,8 +165,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             // Install new pages
             install(previousXarExtension, newLocalExtension, wiki, request);
 
-            // Uninstall old version pages not anymore in the new version
-            Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
+            // TODO: Uninstall old version pages at the end of the job to better support upgrades
+            /*Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
 
             List<XarEntry> newPages;
             try {
@@ -190,7 +190,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 this.packager.unimportPages(previousPages, createPackageConfiguration(request, wiki));
             } catch (Exception e) {
                 this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
-            }
+            }*/
         }
     }
 

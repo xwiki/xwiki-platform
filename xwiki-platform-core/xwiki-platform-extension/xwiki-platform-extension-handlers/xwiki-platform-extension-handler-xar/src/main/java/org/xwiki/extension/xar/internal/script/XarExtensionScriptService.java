@@ -31,17 +31,14 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.script.internal.ExtensionManagerScriptService;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
-import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobManager;
-import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Various XAR oriented APIs for scripts.

@@ -255,12 +255,14 @@ panels.MoreApplicationsButtonListener = Class.create({
       this.container.style.display = "none";
       this.container.removeClassName('hidden');
       Effect.BlindDown(this.container.id, {
+        duration: 0.1,
         afterFinish: function() {
           this.isToggling = false;
         }.bind(this)
       });
     } else {
       Effect.BlindUp(this.container.id, {
+        duration: 0.1,
         // We do this to be able to get our hidden element back, we don't rely on
         // display:none since we don't allow nested style in HTML elements.
         afterFinish: function() {

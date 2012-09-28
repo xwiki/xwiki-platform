@@ -326,7 +326,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-
                 oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
@@ -450,11 +449,10 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", newPage.isNew());
 
-        // TODO: wait for http://jira.xwiki.org/browse/XWIKI-8257
-        /*XWikiDocument removedPage =
+        XWikiDocument removedPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
 
-        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", removedPage.isNew());*/
+        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", removedPage.isNew());
     }
 
     @Test

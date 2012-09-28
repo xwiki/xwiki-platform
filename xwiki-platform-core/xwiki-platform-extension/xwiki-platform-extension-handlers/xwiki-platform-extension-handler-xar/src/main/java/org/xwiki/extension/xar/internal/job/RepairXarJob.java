@@ -34,6 +34,7 @@ import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Request;
 
 /**
@@ -117,7 +118,7 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
      * @return the stored local extension
      * @throws InstallException failed to store extension
      */
-    private LocalExtension getLocalExtension(ExtensionId extensionId) throws InstallException
+    private LocalExtension getLocalXARExtension(ExtensionId extensionId) throws InstallException
     {
         LocalExtension localExtension = this.localRepository.getLocalExtension(extensionId);
 
@@ -125,12 +126,16 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
             try {
                 Extension extension = this.repositoryManager.resolve(extensionId);
 
-                localExtension = this.localExtensionRepository.storeExtension(extension);
+                if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+                    localExtension = this.localExtensionRepository.storeExtension(extension);
+                }
             } catch (ResolveException e) {
                 throw new InstallException("Failed to find extension", e);
             } catch (LocalExtensionRepositoryException e) {
                 throw new InstallException("Failed save extension in local reposiory", e);
             }
+        } else if (!localExtension.getType().equals(XarExtensionHandler.TYPE)) {
+            localExtension = null;
         }
 
         return localExtension;
@@ -152,7 +157,11 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
             return;
         }
 
-        repairExtension(getLocalExtension(extensionId), namespace, dependency);
+        LocalExtension localExtension = getLocalXARExtension(extensionId);
+
+        if (localExtension != null) {
+            repairExtension(localExtension, namespace, dependency);
+        }
     }
 
     /**

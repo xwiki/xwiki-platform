@@ -60,9 +60,11 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 @Component
 @Singleton
-@Named("xar")
+@Named(XarExtensionHandler.TYPE)
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
+    public static final String TYPE = "xar";
+
     protected static final String WIKI_NAMESPACEPREFIX = "wiki:";
 
     protected static final String PROPERTY_USERREFERENCE = "user.reference";
@@ -85,7 +87,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private Packager packager;
 
     @Inject
-    @Named("xar")
+    @Named(XarExtensionHandler.TYPE)
     private InstalledExtensionRepository xarRepository;
 
     @Inject

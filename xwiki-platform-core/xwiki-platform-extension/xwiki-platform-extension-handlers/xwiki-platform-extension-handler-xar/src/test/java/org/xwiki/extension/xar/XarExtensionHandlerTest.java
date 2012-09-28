@@ -42,6 +42,7 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
@@ -269,7 +270,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         // lookup
 
         this.jobManager = getComponentManager().getInstance(JobManager.class);
-        this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
+        this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
         this.defaultPackager = getComponentManager().getInstance(Packager.class);
 
         // Get rid of wiki macro listener

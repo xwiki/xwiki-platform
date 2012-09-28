@@ -114,7 +114,7 @@ public class XarExtensionJobFinishedListener implements EventListener
     private Execution execution;
 
     @Inject
-    @Named("xar")
+    @Named(XarExtensionHandler.TYPE)
     private Provider<InstalledExtensionRepository> xarRepositoryProvider;
 
     @Inject

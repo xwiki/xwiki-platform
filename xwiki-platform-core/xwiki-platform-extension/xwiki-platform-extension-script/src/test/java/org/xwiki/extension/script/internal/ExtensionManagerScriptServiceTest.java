@@ -66,8 +66,29 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         this.repositoryUtil.setup();
 
         // mock
-        
-        this.mockXWiki = getMockery().mock(XWiki.class);
+
+        // TODO: replace with a real mock when moving to JMock 2.6 (http://www.jmock.org/threading-synchroniser.html)
+        this.mockXWiki = new XWiki()
+        {
+            @Override
+            public boolean isVirtualMode()
+            {
+                return true;
+            }
+
+            @Override
+            public XWikiRightService getRightService()
+            {
+                return mockRightService;
+            }
+
+            @Override
+            public void prepareResources(XWikiContext context)
+            {
+                // Do nothing
+            }
+        };
+
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
         this.contextUser = new DocumentReference(getContext().getDatabase(), "XWiki", "ExtensionUser");
@@ -80,19 +101,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         this.classes.put("StyleSheetExtension", styleSheetClass);
 
         // checking
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
-
-                allowing(mockXWiki).getRightService();
-                will(returnValue(mockRightService));
-
-                allowing(mockXWiki).prepareResources(with(any(XWikiContext.class)));
-            }
-        });
 
         getContext().setUserReference(this.contextUser);
 

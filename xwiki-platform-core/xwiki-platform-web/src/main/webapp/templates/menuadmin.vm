@@ -1,3 +1,4 @@
+#if($isInServletMode)## Visible only in a page
 <div id="actionmenu" class="layoutsubsection">
 <div class="centered">
 <div class="editinfo">
@@ -5,3 +6,4 @@ $msg.get("administrating"): $xwiki.parseMessage("admining${editor}")
 </div>
 </div>
 </div>
+#end

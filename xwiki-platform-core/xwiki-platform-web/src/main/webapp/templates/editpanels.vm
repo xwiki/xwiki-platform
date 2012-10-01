@@ -1,3 +1,4 @@
+#if($isInServletMode)
 ## This template is necessary so that different skins can use different edit Panels.
 ## Thus each skin is allowed to override the editpanelsvars.vm file.
 #template('editpanelsvars.vm')
@@ -32,4 +33,5 @@
   }
 //]]>
 </script>
+#end
 #end

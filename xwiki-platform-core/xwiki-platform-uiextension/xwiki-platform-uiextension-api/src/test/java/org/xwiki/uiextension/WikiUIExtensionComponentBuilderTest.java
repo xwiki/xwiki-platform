@@ -268,7 +268,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue(true));
                 oneOf(extensionObject).getReference();
                 will(returnValue(extensionReference));
-                oneOf(extensionObject).getStringValue(NAME_PROPERTY);
+                oneOf(extensionObject).getStringValue(ID_PROPERTY);
                 will(returnValue("name"));
                 oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
                 will(returnValue("extensionPointId"));

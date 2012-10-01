@@ -137,7 +137,7 @@ public class WikiUIExtensionTest
             }
         });
 
-        Assert.assertEquals("name", wikiUIExtension.getName());
+        Assert.assertEquals("name", wikiUIExtension.getId());
         Assert.assertEquals("epId", wikiUIExtension.getExtensionPointId());
         Assert.assertEquals(MapUtils.EMPTY_MAP, wikiUIExtension.getHandledMethods());
         Assert.assertEquals(ListUtils.EMPTY_LIST, wikiUIExtension.getImplementedInterfaces());

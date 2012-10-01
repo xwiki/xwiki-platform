@@ -17,58 +17,55 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension.internal;
+package org.xwiki.uiextension.internal.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.UIExtensionFilter;
 
 /**
- * UI Extension
- * 
+ * Sort a list of {@link UIExtension} by their IDs.
+ *
  * @version $Id$
- * @since 4.2M3
+ * @since 4.3M1
  */
 @Component
-@Named("helloWorld")
 @Singleton
-public class HelloWorldUIExtension implements UIExtension
+@Named("sortById")
+public class SortByIdFilter implements UIExtensionFilter
 {
-    @Override
-    public String getId()
+    /**
+     * Comparator comparing the IDs of two {@link UIExtension}s.
+     */
+    public class UIExtensionIdComparator implements Comparator<UIExtension>
     {
-        return "my extension";
+        @Override
+        public int compare(UIExtension source, UIExtension target)
+        {
+            return source.getId().compareToIgnoreCase(target.getId());
+        }
     }
 
+    /**
+     * @param extensions The list of {@link UIExtension}s to filter
+     * @param ignored This filter doesn't require any parameter, passed arguments will be ignored
+     * @return The filter list
+     */
     @Override
-    public String getExtensionPointId()
+    public List<UIExtension> filter(List<UIExtension> extensions, String... ignored)
     {
-        return "hello";
-    }
+        List<UIExtension> results = new ArrayList<UIExtension>();
+        results.addAll(extensions);
+        Collections.sort(results, new UIExtensionIdComparator());
 
-    @Override
-    public Map<String, String> getParameters()
-    {
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("HelloWorldKey", "HelloWorldValue");
-        return parameters;
-    }
-
-    @Override
-    public Block execute()
-    {
-        List<Block> blocks = new ArrayList<Block>();
-        blocks.add(new WordBlock("HelloWorld"));
-        return new CompositeBlock(blocks);
+        return results;
     }
 }

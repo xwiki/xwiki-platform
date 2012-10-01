@@ -17,58 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension.internal;
+package org.xwiki.uiextension.internal.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.UIExtensionFilter;
 
 /**
- * UI Extension
- * 
+ * Select only some {@link UIExtension}s from a list, identified by their ID. This allows to choose precisely what
+ * will be displayed by an Extension Point, the list of displayed extensions will be defined manually.
+ *
  * @version $Id$
- * @since 4.2M3
+ * @since 4.3M1
  */
 @Component
-@Named("helloWorld")
 @Singleton
-public class HelloWorldUIExtension implements UIExtension
+@Named("select")
+public class SelectFilter implements UIExtensionFilter
 {
+    /**
+     * @param extensions The list of {@link UIExtension}s to filter
+     * @param ids The IDs of the {@link UIExtension}s to select
+     * @return The filtered list
+     */
     @Override
-    public String getId()
+    public List<UIExtension> filter(List<UIExtension> extensions, String... ids)
     {
-        return "my extension";
-    }
+        List<String> extensionIds = Arrays.asList(ids);
+        List<UIExtension> results = new ArrayList<UIExtension>();
 
-    @Override
-    public String getExtensionPointId()
-    {
-        return "hello";
-    }
+        for (UIExtension extension : extensions) {
+            if (extensionIds.contains(extension.getId())) {
+                results.add(extension);
+            }
+        }
 
-    @Override
-    public Map<String, String> getParameters()
-    {
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("HelloWorldKey", "HelloWorldValue");
-        return parameters;
-    }
-
-    @Override
-    public Block execute()
-    {
-        List<Block> blocks = new ArrayList<Block>();
-        blocks.add(new WordBlock("HelloWorld"));
-        return new CompositeBlock(blocks);
+        return results;
     }
 }

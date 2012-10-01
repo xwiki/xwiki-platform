@@ -30,7 +30,6 @@ import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.context.Execution;
@@ -38,14 +37,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Represents a dynamic component instance of a UI Extension (ie a UI Extension defined in a Wiki page) that we
@@ -79,7 +77,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * @see #WikiUIExtension
      */
-    private final String roleHint;
+    private String roleHint;
 
     /**
      * @see #WikiUIExtension
@@ -104,12 +102,12 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * Used to transform the macros within the extension content.
      */
-    private final Transformation macroTransformation;
+    private Transformation macroTransformation;
 
     /**
      * The execution context, used to access to the {@link com.xpn.xwiki.XWikiContext}.
      */
-    private final Execution execution;
+    private Execution execution;
 
     /**
      * Default constructor.
@@ -121,11 +119,9 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      * @param syntax the Syntax of the extension XDOM
      * @param parameters the extension parameters map
      * @param componentManager the XWiki component manager
-     * @throws ComponentLookupException when components allowing to render the extension content are missing
      */
     public WikiUIExtension(ObjectReference objectReference, String name, String extensionPointId,
         XDOM xdom, Syntax syntax, Map<String, String> parameters, ComponentManager componentManager)
-        throws ComponentLookupException
     {
         this.documentReference = (DocumentReference) objectReference.getParent();
         this.name = name;
@@ -133,16 +129,21 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         this.xdom = xdom;
         this.syntax = syntax;
         this.parameters = parameters;
-        this.macroTransformation = componentManager.<Transformation>getInstance(Transformation.class, "macro");
-        this.execution = componentManager.getInstance(Execution.class);
-        this.velocityManager = componentManager.getInstance(VelocityManager.class);
-        EntityReferenceSerializer<String> serializer =
-            componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.roleHint = serializer.serialize(objectReference);
+        try {
+            this.macroTransformation = componentManager.<Transformation>getInstance(Transformation.class, "macro");
+            this.execution = componentManager.getInstance(Execution.class);
+            this.velocityManager = componentManager.getInstance(VelocityManager.class);
+            EntityReferenceSerializer<String> serializer =
+                componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+            this.roleHint = serializer.serialize(objectReference);
+        } catch (Exception e) {
+            LOGGER.error(String.format("Failed to get an instance for a component role required by Wiki Components. "
+                + "Error: [%s]", e.getMessage()));
+        }
     }
 
     @Override
-    public String getName()
+    public String getId()
     {
         return this.name;
     }
@@ -164,7 +165,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
                 this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,
                     "", entry.getValue());
                 result.put(entry.getKey(), writer.toString());
-            } catch (XWikiVelocityException e) {
+            } catch (Exception e) {
                 LOGGER.warn(String.format(
                     "Failed to evaluate UI extension data value, key [%s], value [%s]. Reason: [%s]",
                     entry.getKey(), entry.getValue(), e.getMessage()));
@@ -176,7 +177,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
-    public List<Block> execute()
+    public Block execute()
     {
         // We need to clone the xdom to avoid transforming the original and make it useless after the first
         // transformation
@@ -187,12 +188,12 @@ public class WikiUIExtension implements UIExtension, WikiComponent
             TransformationContext transformationContext = new TransformationContext(xdom, syntax);
             transformationContext.setId(this.getRoleHint());
             macroTransformation.transform(transformedXDOM, transformationContext);
-        } catch (TransformationException e) {
+        } catch (Exception e) {
             LOGGER.error("Error while executing wiki component macro transformation for extension [{}]",
                 documentReference.toString());
         }
 
-        return transformedXDOM.getChildren();
+        return new CompositeBlock(transformedXDOM.getChildren());
     }
 
     @Override

@@ -60,10 +60,12 @@ public class UIExtensionTest extends AbstractTest
         final ViewPage testPage = getUtil().createPage(getTestClassName(), HELLOWORLD_UIX_PAGE, "{{velocity}}\n"
             + "\n"
             + "{{html}}\n"
-            + "$services.uix.render('hello')\n"
+            + "#foreach($uix in $services.uix.getExtensions('hello', {'sortByParameter' : 'HelloWorldKey'}))"
+            + "$services.rendering.render($uix.execute(), "
+            + "'xhtml/1.0')#end\n"
             + "{{/html}}\n"
             + "\n"
-            + "#foreach($uix in $services.uix.getExtensions('hello'))\n"
+            + "#foreach($uix in $services.uix.getExtensions('hello', {'sortByParameter' : 'HelloWorldKey'}))\n"
             + "$uix.parameters\n"
             + "#end\n"
             + "{{/velocity}}\n", "Hello World");
@@ -76,18 +78,18 @@ public class UIExtensionTest extends AbstractTest
             "name", "helloWikiWorld2",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld2",
-            "parameters", "HelloWikiWorldKey=$xcontext.user");
+            "parameters", "HelloWikiWorldKey=zz2_$xcontext.user");
         getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
             "name", "helloWikiWorld1",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld1",
-            "parameters", "HelloWikiWorldKey=$xcontext.user");
+            "parameters", "HelloWikiWorldKey=zz1_$xcontext.user");
         getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
-        Assert.assertEquals("HelloWikiWorld1\n"
+        Assert.assertEquals("HelloWorld\n"
+            + "HelloWikiWorld1\n"
             + "HelloWikiWorld2\n"
-            + "HelloWorld\n"
-            + "{HelloWikiWorldKey=XWiki.superadmin}\n"
-            + "{HelloWikiWorldKey=XWiki.superadmin}\n"
-            + "{HelloWorldKey=HelloWorldValue}", testPage.getContent());
+            + "{HelloWorldKey=HelloWorldValue}\n"
+            + "{HelloWikiWorldKey=zz1_XWiki.superadmin}\n"
+            + "{HelloWikiWorldKey=zz2_XWiki.superadmin}", testPage.getContent());
     }
 }

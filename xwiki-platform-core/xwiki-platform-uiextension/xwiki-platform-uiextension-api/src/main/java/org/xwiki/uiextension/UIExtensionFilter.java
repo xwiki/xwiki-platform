@@ -17,43 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension.internal;
+package org.xwiki.uiextension;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import java.util.List;
+
+import org.xwiki.component.annotation.Role;
 
 /**
- * Constants for XClasses and XProperties.
+ * A UIExtensionFilter provides a way to filter a list of {@link UIExtension}.
  *
  * @version $Id$
- * @since 4.2M3
+ * @since 4.3M1
  */
-
-public interface WikiUIExtensionConstants
+@Role
+public interface UIExtensionFilter
 {
     /**
-     * Extension XClass reference.
+     * Filter a list of {@link UIExtension}. Some filters require information provided by the user of the API, since we
+     * don't support Constructor or setter injection we need the "parameter" argument to pass information to the filter.
+     *
+     * @param extensions The list of {@link UIExtension}s to filter
+     * @param parameters A list of optional parameters
+     * @return The filtered list
      */
-    EntityReference UI_EXTENSION_CLASS = new EntityReference(new EntityReference("UIExtensionClass",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE)));
-
-    /**
-     * Extension Point ID property.
-     */
-    String EXTENSION_POINT_ID_PROPERTY = "extensionPointId";
-
-    /**
-     * Extension ID property.
-     */
-    String ID_PROPERTY = "name";
-
-    /**
-     * Extension content property.
-     */
-    String CONTENT_PROPERTY = "content";
-
-    /**
-     * Extension parameters property.
-     */
-    String PARAMETERS_PROPERTY = "parameters";
+    List<UIExtension> filter(List<UIExtension> extensions, String... parameters);
 }

@@ -19,7 +19,6 @@
  */
 package org.xwiki.uiextension;
 
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -35,9 +34,9 @@ import org.xwiki.rendering.block.Block;
 public interface UIExtension
 {
     /**
-     * @return the name of this extension
+     * @return the ID of this extension
      */
-    String getName();
+    String getId();
 
     /**
      * @return the ID of the extension point this UI extension is providing an extension for
@@ -53,7 +52,7 @@ public interface UIExtension
     Map<String, String> getParameters();
 
     /**
-     * @return the XDOM that must be rendered when this extension is displayed
+     * @return the {@link Block} that must be rendered when this extension is displayed
      */
-    List<Block> execute();
+    Block execute();
 }

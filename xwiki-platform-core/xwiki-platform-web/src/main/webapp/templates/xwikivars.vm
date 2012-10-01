@@ -125,5 +125,6 @@
 #set ($keyboardShortcutsEnabled = $isAdvancedUser)
 #set ($isInPortletMode = $xwikimode == 1 || "$!request.getAttribute('javax.portlet.request')" != '')
 #set ($isInServletMode = $xwikimode == 0 && !$isInPortletMode)
+#set ($showFullUI = $isInServletMode || $request.getAttribute('javax.portlet.request').getWindowState().toString().equalsIgnoreCase('maximized'))
 #template("deprecatedVars.vm")
 #end

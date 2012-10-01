@@ -9,7 +9,7 @@
 ## Stylesheet overrides for portlet mode.
 #if ($isInPortletMode)
   #set ($defaultPortletStyleURL = $xwiki.getSkinFile("portlet-$defaultstyle", true))
-  <link href="${defaultPortletStyleURL}#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" media="all" />
+  <link href="${defaultPortletStyleURL}?#if ($themeDoc)colorTheme=$!{themeDocFullName}#end#if ($showFullUI)&maximized=true#end" rel="stylesheet" type="text/css" media="all" />
 #end
 <link href="$xwiki.getSkinFile('print.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
 #set ($a11y = "$!{request.getCookie('a11y').getValue()}")

@@ -13,7 +13,7 @@
 $string
 #end
 #end
-#if($isInServletMode) ## Visible only in a page
+#if($showFullUI) ## Visible only in a page
 <div id="headerspace" class="layoutsection">
 <div class="minwidth"></div>
 <hr/>

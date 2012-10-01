@@ -1,11 +1,15 @@
 div#body {
+  font-size: 100%;
+}
+div#body #xwikimaincontainerinner {
+  height: auto;
+}
+#if ("$!request.maximized" != 'true')
+div#body {
   min-width: 0;
 }
 div#body .main {
   padding: 0;
-}
-div#body #xwikimaincontainerinner {
-  height: auto;
 }
 div#body .alleditcontent {
   margin: 0;
@@ -13,3 +17,4 @@ div#body .alleditcontent {
 div#body #hierarchy {
   padding-top: 0;
 }
+#end

@@ -40,6 +40,8 @@
     <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
+    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
+    <hsqldb.version>2.2.9</hsqldb.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

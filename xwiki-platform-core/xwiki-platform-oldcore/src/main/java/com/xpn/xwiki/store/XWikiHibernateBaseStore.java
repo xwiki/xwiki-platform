@@ -164,11 +164,11 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        ConnectionProvider connectionProvider = ((SessionFactoryImpl) getSessionFactory()).getConnectionProvider();
         Connection connection = null;
         DatabaseProduct product = this.databaseProduct;
 
         if (product == DatabaseProduct.UNKNOWN) {
+            ConnectionProvider connectionProvider = ((SessionFactoryImpl) getSessionFactory()).getConnectionProvider();
             try {
                 connection = connectionProvider.getConnection();
                 product = DatabaseProduct.toProduct(connection.getMetaData().getDatabaseProductName());

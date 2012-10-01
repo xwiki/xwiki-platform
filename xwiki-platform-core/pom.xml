@@ -249,6 +249,9 @@
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
+            <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
+                 from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
+            <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
           </excludes>
         </configuration>
       </plugin>

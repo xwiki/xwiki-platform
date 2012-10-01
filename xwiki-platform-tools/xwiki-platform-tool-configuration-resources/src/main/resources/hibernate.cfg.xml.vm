@@ -41,17 +41,27 @@
     <property name="show_sql">false</property>
     <property name="use_outer_join">true</property>
 
+    <!-- DBCP Connection Pooling configuration -->
     <property name="dbcp.defaultAutoCommit">false</property>
     <property name="dbcp.maxActive">50</property>
     <property name="dbcp.maxIdle">5</property>
     <property name="dbcp.maxWait">30000</property>
     <property name="dbcp.whenExhaustedAction">1</property>
     <property name="dbcp.ps.whenExhaustedAction">1</property>
-    <property name="dbcp.ps.maxActive">20</property>
     <property name="dbcp.ps.maxWait">120000</property>
     <property name="dbcp.ps.maxIdle">20</property>
 
-    <!-- Uncomment to use BoneCP Connection Pooling -->
+    <!-- This configuration tells DBCP whether to cache Prepared Statement or not. Note that when using HSQLDB for
+         example, it's important to NOT cache prepared statements because HSQLDB Prepared Statements (PS)
+         contain the schema on which they were initially created and thus when switching schema if the same
+         PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache prepared statement
+         there's no performance loss. see http://jira.xwiki.org/browse/XWIKI-1740.
+
+         Thus we recommend not turning on this configuration parameter unless you know what you're doing :)
+    -->
+    <!--property name="dbcp.ps.maxActive">20</property-->
+
+    <!-- BoneCP Connection Pooling configuration. -->
     <!--
     <property name="bonecp.idleMaxAgeInMinutes">240</property>
     <property name="bonecp.idleConnectionTestPeriodInMinutes">60</property>
@@ -78,8 +88,9 @@
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
-    <!-- Uncomment to use BoneCP Connection Pooling. You'll also need to comment out the DBCP property of the same name
-         below since there can be only one such property. -->
+    <!-- Uncomment to use BoneCP Connection Pooling. You'll also need to uncomment the BoneCP configuration properties
+         above and comment out the "connection.provider_class" configuration property for DBCP since there can only
+         be one such property. -->
     <!--property name="connection.provider_class">com.jolbox.bonecp.provider.BoneCPConnectionProvider</property-->
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>

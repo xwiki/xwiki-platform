@@ -23,7 +23,7 @@
 #if($showLeftPanels == "yes")
   #set($showLeftPanels = "1")
 #end
-#if($showLeftPanels == "no" || !$isInServletMode)
+#if($showLeftPanels == "no")
   #set($showLeftPanels = "0")
 #end
 
@@ -33,7 +33,7 @@
 #if($showRightPanels == "yes")
   #set($showRightPanels = "1")
 #end
-#if($showRightPanels == "no" || !$isInServletMode)
+#if($showRightPanels == "no")
   #set($showRightPanels = "0")
 #end
 

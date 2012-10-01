@@ -4,7 +4,6 @@
 ### The uppermost area of each page
 ### Contains the company logo, links to global actions and the search facility
 ###
-#if($isInServletMode) ## Visible only in a page
 <div id="headerglobal" class="layoutsection">
 #if($xcontext.action == "view")
 <div class="minwidthb"></div>
@@ -66,5 +65,4 @@
   </div> ## globallinks
   <div class="clearfloats"></div>
 </div> ## headerglobal
-#end
 ### TODO: Format the header for pdf output

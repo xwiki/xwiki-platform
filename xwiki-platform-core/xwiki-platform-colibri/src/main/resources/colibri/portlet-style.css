@@ -1,15 +1,6 @@
 div#body {
-  min-width: 0;
-}
-div#body .main {
-  padding: 0;
+  font-size: 100%;
 }
 div#body #xwikimaincontainerinner {
   height: auto;
-}
-div#body .alleditcontent {
-  margin: 0;
-}
-div#body #hierarchy {
-  padding-top: 0;
 }

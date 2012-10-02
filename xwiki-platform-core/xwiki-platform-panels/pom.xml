@@ -34,6 +34,7 @@
   <packaging>pom</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
   <modules>
+    <module>xwiki-platform-panels-api</module>
     <module>xwiki-platform-panels-ui</module>
   </modules>
   <profiles>

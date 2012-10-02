@@ -23,10 +23,6 @@ var XWiki = (function(XWiki){
                               "none" : "$msg.get('core.importer.selectNone')"
     };
 
-    // FIXME: we should have those images outside SmartClient library to lessen the dependency towards the library
-    var expandFolderImagePath = "$xwiki.getSkinFile('js/smartclient/skins/Enterprise/images/TreeGrid/opener_closed.png')";
-    var collapseFolderImagePath = "$xwiki.getSkinFile('js/smartclient/skins/Enterprise/images/TreeGrid/opener_opened.png')";
-
     /**
      * Initialization hook for the rich UI.
      * We hijack clicks on package names links, to display the rich importer UI since javascript is available.
@@ -409,7 +405,7 @@ var XWiki = (function(XWiki){
             var docNb = this.countDocumentsInSpace(space);
             var selection =  docNb + " / " + docNb + " " + translations["documentSelected"];
 
-            var spaceItem = new Element("li", {'class':'xitem xunderline'});
+            var spaceItem = new Element("li", {'class':'xitem xunderline collapsed'});
 
             var spaceItemContainer = new Element("div", {'class':'xitemcontainer'});
             var spaceBox = new Element("input", {'type':'checkbox','checked':'checked', 'class':'space'});
@@ -424,27 +420,19 @@ var XWiki = (function(XWiki){
 
             spaceItemContainer.insert(spaceBox);
 
-            var expandImage = new Element("img", {'src': expandFolderImagePath });
-            spaceItemContainer.insert(expandImage);
-
             var spaceName = new Element("div", {'class':'spacename'}).update(space)
             spaceItemContainer.insert(spaceName);
 
             var onToggle = function(event){
-                event.element().up("li").down("div.pages").toggleClassName("hidden");
-                event.element().up("li").down("img").src =
-                    event.element().up("li").down("div.pages").hasClassName("hidden") ?
-                    expandFolderImagePath :
-                    collapseFolderImagePath
+                event.element().up("li").toggleClassName("collapsed");
             };
 
-            expandImage.observe("click", onToggle);
             spaceName.observe("click", onToggle);
 
             spaceItemContainer.insert(new Element("div", {'class':'selection'}).update(selection));
             spaceItemContainer.insert(new Element("div", {'class':'clearfloats'}));
 
-            var pagesContainer = new Element("div", {'class':'pages hidden'});
+            var pagesContainer = new Element("div", {'class':'pages'});
             var list = new Element("ul", {'class':'xlist pages'});
 
             var self = this;

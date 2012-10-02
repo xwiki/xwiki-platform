@@ -252,6 +252,12 @@
             <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
                  from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
             <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
+            <!-- Introduced by XWIKI-8232, "Handle wiki components dependencies injection" -->
+            <!-- To be removed once 4.3 final is released -->
+            <exclude>org/xwiki/component/wiki/WikiComponent</exclude>
+            <!-- Introduced by XWIKI-8236, "Provide a configuration mechanism for UI extension points" -->
+            <!-- To be removed once 4.3 final is released -->
+            <exclude>org/xwiki/uiextension/UIExtension</exclude>
           </excludes>
         </configuration>
       </plugin>

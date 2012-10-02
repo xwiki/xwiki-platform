@@ -168,7 +168,7 @@ public class XWikiHibernateBaseStore implements Initializable
         DatabaseProduct product = this.databaseProduct;
 
         if (product == DatabaseProduct.UNKNOWN) {
-            // Note that we need to the cast because this is how Hibernate suggests to get the Connection Provider.
+            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
             // See http://bit.ly/QAJXlr
             ConnectionProvider connectionProvider =
                 ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
@@ -308,7 +308,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
         // Close all connections
         if (getSessionFactory() != null) {
-            // Note that we need to the cast because this is how Hibernate suggests to get the Connection Provider.
+            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
             // See http://bit.ly/QAJXlr
             ConnectionProvider connectionProvider =
                 ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();

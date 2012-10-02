@@ -74,7 +74,7 @@ public class HibernateShutdownEventListener implements EventListener
         SessionFactory sessionFactory = this.sessionFactoryFactory.getSessionFactory();
         if (sessionFactory != null) {
             // Close all connections in the Connection Pool.
-            // Note that we need to the cast because this is how Hibernate suggests to get the Connection Provider.
+            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
             // See http://bit.ly/QAJXlr
             ConnectionProvider provider = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider();
             // If the user has specified a Data Source we shouldn't close it. Fortunately the way Hibernate works is

@@ -122,7 +122,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
 
             Class< ? > roleAsClass;
             try {
-                roleAsClass = ReflectionUtils.getTypeClass(ReflectionUtils.unserializeType(role));
+                roleAsClass = ReflectionUtils.getTypeClass(ReflectionUtils.unserializeType(role,
+                    Thread.currentThread().getContextClassLoader()));
             } catch (ClassNotFoundException e) {
                 throw new WikiComponentException(String.format("The role class [%s] could not be found", role), e);
             }
@@ -210,7 +211,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
                 try {
                     DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
                     cd.setRoleType(
-                        ReflectionUtils.unserializeType(dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD)));
+                        ReflectionUtils.unserializeType(dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD),
+                            Thread.currentThread().getContextClassLoader()));
                     cd.setRoleHint(dependency.getStringValue(COMPONENT_ROLE_HINT_FIELD));
                     dependencies.put(dependency.getStringValue(DEPENDENCY_BINDING_NAME_FIELD), cd);
                 } catch (ClassNotFoundException e) {

@@ -974,16 +974,16 @@ public class XWikiLDAPUtils
 
         // go through mapped groups to locate the user
         for (Map.Entry<String, Set<String>> entry : groupMappings.entrySet()) {
-            String xwikiGrouNamep = entry.getKey();
+            String xwikiGroupName = entry.getKey();
             Set<String> groupDNSet = entry.getValue();
 
-            if (xwikiUserGroupList.contains(xwikiGrouNamep)) {
+            if (xwikiUserGroupList.contains(xwikiGroupName)) {
                 if (!this.isMemberOfGroups(userDN, groupDNSet, context)) {
-                    removeUserFromXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
+                    removeUserFromXWikiGroup(xwikiUserName, xwikiGroupName, context);
                 }
             } else {
                 if (this.isMemberOfGroups(userDN, groupDNSet, context)) {
-                    addUserToXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
+                    addUserToXWikiGroup(xwikiUserName, xwikiGroupName, context);
                 }
             }
         }

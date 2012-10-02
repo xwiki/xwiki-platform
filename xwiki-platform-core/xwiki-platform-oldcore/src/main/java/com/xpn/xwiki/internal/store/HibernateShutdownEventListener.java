@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -74,8 +74,9 @@ public class HibernateShutdownEventListener implements EventListener
         SessionFactory sessionFactory = this.sessionFactoryFactory.getSessionFactory();
         if (sessionFactory != null) {
             // Close all connections in the Connection Pool.
-            // TODO: Find a public API way of closing
-            ConnectionProvider provider = ((SessionFactoryImpl) sessionFactory).getConnectionProvider();
+            // Note that we need to the cast because this is how Hibernate suggests to get the Connection Provider.
+            // See http://bit.ly/QAJXlr
+            ConnectionProvider provider = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider();
             // If the user has specified a Data Source we shouldn't close it. Fortunately the way Hibernate works is
             // the following: if the user has configured Hibernate to use a Data Source then Hibernate will use
             // the DatasourceConnectionProvider class which has a close() method that doesn't do anything...

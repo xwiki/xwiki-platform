@@ -40,7 +40,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.jdbc.Work;
@@ -168,7 +168,10 @@ public class XWikiHibernateBaseStore implements Initializable
         DatabaseProduct product = this.databaseProduct;
 
         if (product == DatabaseProduct.UNKNOWN) {
-            ConnectionProvider connectionProvider = ((SessionFactoryImpl) getSessionFactory()).getConnectionProvider();
+            // Note that we need to the cast because this is how Hibernate suggests to get the Connection Provider.
+            // See http://bit.ly/QAJXlr
+            ConnectionProvider connectionProvider =
+                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
             try {
                 connection = connectionProvider.getConnection();
                 product = DatabaseProduct.toProduct(connection.getMetaData().getDatabaseProductName());
@@ -302,8 +305,14 @@ public class XWikiHibernateBaseStore implements Initializable
         Session session = getSession(context);
         preCloseSession(session);
         closeSession(session);
+
+        // Close all connections
         if (getSessionFactory() != null) {
-            ((SessionFactoryImpl) getSessionFactory()).getConnectionProvider().close();
+            // Note that we need to the cast because this is how Hibernate suggests to get the Connection Provider.
+            // See http://bit.ly/QAJXlr
+            ConnectionProvider connectionProvider =
+                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
+            connectionProvider.close();
         }
     }
 

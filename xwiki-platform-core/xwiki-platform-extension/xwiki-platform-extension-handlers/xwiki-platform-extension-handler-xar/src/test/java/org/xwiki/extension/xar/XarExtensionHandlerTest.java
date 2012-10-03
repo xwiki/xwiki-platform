@@ -58,6 +58,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -591,8 +592,30 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         });
 
         importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
+    }
 
-        this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+    @Test
+    public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
+    {
+        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+
+        // register a mandatory document initializer
+        final MandatoryDocumentInitializer mandatoryInitializer =
+            registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mandatoryInitializer).updateDocument(with(any(XWikiDocument.class)));
+                will(returnValue(true));
+
+                // Make sure it does not produces any conflict
+                never(mockJobStatus).ask(with(anything()));
+            }
+        });
+
+        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
     }
 
     @Test

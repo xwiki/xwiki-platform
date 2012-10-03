@@ -37,6 +37,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
@@ -131,8 +132,11 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         // 3 ways merge
         XWikiDocument mergedDocument = currentDocument.clone();
 
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+        mergeConfiguration.setProvidedVersionsModifiables(true);
+
         MergeResult documentMergeResult =
-            mergedDocument.merge(previousDocument, nextDocument, configuration.getMergeConfiguration(), xcontext);
+            mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
 
         if (documentMergeResult.isModified()) {
             if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {

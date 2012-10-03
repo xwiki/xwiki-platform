@@ -55,7 +55,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -242,9 +241,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private PackageConfiguration createPackageConfiguration(Request request, String wiki)
     {
         DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
-
-        MergeConfiguration mergeConfiguration = new MergeConfiguration();
-        configuration.setMergeConfiguration(mergeConfiguration);
 
         configuration.setInteractive(request.isInteractive());
         configuration.setUser(getRequestUserReference(PROPERTY_USERREFERENCE, request));

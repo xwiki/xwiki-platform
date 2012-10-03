@@ -22,16 +22,12 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
-
 /**
  * @version $Id$
  * @since 4.0M2
  */
 public class DefaultPackageConfiguration implements PackageConfiguration
 {
-    private MergeConfiguration mergeConfiguration;
-
     private String wiki;
 
     private DocumentReference user;
@@ -73,17 +69,6 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     public void setInteractive(boolean interactive)
     {
         this.interactive = interactive;
-    }
-
-    @Override
-    public MergeConfiguration getMergeConfiguration()
-    {
-        return this.mergeConfiguration;
-    }
-
-    public void setMergeConfiguration(MergeConfiguration mergeConfiguration)
-    {
-        this.mergeConfiguration = mergeConfiguration;
     }
 
     @Override

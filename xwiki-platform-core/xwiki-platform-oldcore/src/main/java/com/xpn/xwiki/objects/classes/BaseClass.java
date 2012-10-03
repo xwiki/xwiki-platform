@@ -1210,7 +1210,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         // Properties
 
-        List<ObjectDiff> classDiff = previousClass.getDiff(newClass, context);
+        List<ObjectDiff> classDiff = newClass.getDiff(previousClass, context);
         for (ObjectDiff diff : classDiff) {
             PropertyClass propertyResult = (PropertyClass) getField(diff.getPropName());
             PropertyClass previousProperty = (PropertyClass) previousClass.getField(diff.getPropName());

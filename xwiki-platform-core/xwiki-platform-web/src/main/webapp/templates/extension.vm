@@ -166,6 +166,7 @@
 #end
 
 #macro (displayExtensionDetails_menu $extension)
+#getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
 <ul class="innerMenu">
 <li>#displayExtensionDetails_menuLink('description')</li>##
 ##
@@ -177,14 +178,8 @@
 <li>#displayExtensionDetails_menuLink('dependencies')</li>##
 #end
 ##
-## Display the progress tab if the install/uninstall plan is requested or if there is 
-## a previously stored job status for this extension (a previous install or uninstall).
-#set ($planRequested = $request.actionInstall || $request.actionInstallGlobally || $request.actionUninstall || $request.actionUninstallGlobally)
-#if (!$planRequested)
-#set ($discard = "#getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)")
-#end
-#if ($planRequested || $jobStatus)
-#set ($selected = $planRequested || (!$isAjaxRequest && $jobStatus.state != 'FINISHED'))
+#if ($jobStatus)
+#set ($selected = $jobStatus.state != 'FINISHED')
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
 </ul>
@@ -331,22 +326,12 @@
 
 #macro (displayExtensionDetails_progress $extension)
   #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-  #if ($jobStatus || $request.actionInstall || $request.actionInstallGlobally || $request.actionUninstall || $request.actionUninstallGlobally)
+  #if ($jobStatus)
     <div id="extension-body-progress-${extension.id.id}-${extension.id.version}"></div>
     <div class="extension-body-progress extension-body-section">
-      #if ($request.actionInstall)
-        #computeInstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
-      #elseif ($request.actionInstallGlobally)
-        #computeInstallPlan($extension.id.id $extension.id.version.value $NULL)
-      #elseif ($request.actionUninstall)
-        #computeUninstallPlan($extension.id.id $extension.id.version.value $extensionNamespace)
-      #elseif ($request.actionUninstallGlobally)
-        #computeUninstallPlan($extension.id.id $extension.id.version.value $NULL)
-      #else
-        #printStatusLog($jobStatus)
-        #if ($jobStatus.state == 'WAITING')
-          #displayExtensionDetails_progressQuestion($extension $jobStatus)
-        #end
+      #displayExtensionJobStatus($jobStatus)
+      #if ($jobStatus.state == 'WAITING')
+        #displayExtensionDetails_progressQuestion($extension $jobStatus)
       #end
     </div>
   #end
@@ -466,7 +451,7 @@
     ## Show the extension details if this extension has been explicitely requested or if the extension has a job waiting.
     #set ($showDetails = $request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
     #if (!$showDetails)
-      #set ($discard = "#getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)")
+      #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
       #set ($showDetails = $jobStatus.state == 'WAITING')
     #end
     #if ($showDetails)
@@ -482,76 +467,12 @@
     #set ($discard = $installRequest.removeProperty('user.reference'))
   #end
   #set ($discard = $extensionManager.install($installRequest))
-  #set ($lastError = $extensionManager.lastError)
-  #if ($lastError)
-    #set ($errorMessage = $msg.get('extensions.install.error.installFailure', [$extensionId, $extensionVersion]))
-    #if ($isAjaxRequest)
-      ## Send error back.
-      $response.sendError(400, $errorMessage)
-    #else
-      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
-    #end
-  #else
-    ## Redirect to extension display.
-    $response.sendRedirect("#getExtensionURL()")
-  #end
+  #handleExtensionJobStartFailure('extensions.install.error.installFailure')
 #end
 
 #macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #set($installPlan = $extensionManager.createInstallPlan($extensionId, $extensionVersion, $extensionNamespace))
-  #if (!$installPlan)
-    <div class="errormessage">$msg.get('extensions.install.error.prepareFailure', [$extensionId, $extensionVersion, $extensionManager.lastError.message])</div>
-  #else
-    #set($hasError = false)
-    #foreach($log in $installPlan.log)
-      #if ($log.level.name() == 'ERROR')
-        #set($hasError = true)
-        #break
-      #end
-    #end
-    ##
-    #if ($hasError)
-      #printStatusLog($installPlan)
-    #else
-      ## Group the extensions by the actions that will be performed on them.
-      #set($extensionsByAction = {'INSTALL': [], 'UPGRADE': [], 'DOWNGRADE': [], 'UNINSTALL': []})
-      #set ($noAction = true)
-      #foreach($planAction in $installPlan.actions)
-        #set ($targetExtensions = $extensionsByAction.get($planAction.action.name()))
-        #if ($targetExtensions)
-          #set ($discard = $targetExtensions.add($planAction))
-          #set ($noAction = false)
-        #end
-      #end
-      ##
-      #if ($noAction)
-        <div class="infomessage">$msg.get('extensions.install.error.alreadyInstalled')</div>
-      #else
-        #foreach($entry in $extensionsByAction.entrySet())
-          #if (!$entry.value.isEmpty())
-            <p>$msg.get("extensions.install.list.$entry.key.toLowerCase()")</p>
-            <ul>
-              #foreach ($planAction in $entry.value)
-                <li>#displayDependency($planAction.extension $planAction.namespace)</li>
-              #end
-            </ul>
-          #end
-        #end
-        <form action="" class="xform">
-          <div class="hidden">
-            #extensionHiddenFormFields($extensionId $extensionVersion)
-            <input name="actionInstall#if ($request.actionInstallGlobally)Globally#end" type="hidden" />
-          </div>
-          <p>
-            #em_submitButton('extensions.install.actions.submit' 'confirm')
-            #if ("$!{request.xback}" != '')
-              #em_linkButton($request.xback 'extensions.install.actions.cancel')
-            #end
-          </p>
-        </form>
-      #end
-    #end
-  #end
+  #set($discard = $extensionManager.createInstallPlan($extensionId, $extensionVersion, $extensionNamespace))
+  #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
 #end
 
 #macro (uninstallExtension $extensionId $extensionVersion $extensionNamespace)
@@ -565,9 +486,27 @@
       #set ($discard = $extensionManager.uninstall($extension.id))
     #end
   #end
-  #set($lastError = $extensionManager.lastError)
+  #handleExtensionJobStartFailure('extensions.uninstall.error.uninstallFailure')
+#end
+
+#macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
+  #if ($extensionNamespace && $xwiki.isVirtualMode())
+    ## Create the uninstall plan only for the specified wiki.
+    #set ($discard = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
+  #else
+    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
+    #if ($extension)
+      ## Create the uninstall plan for the entire farm.
+      #set ($discard = $extensionManager.createUninstallPlan($extension.id))
+    #end
+  #end
+  #handleExtensionJobStartFailure('extensions.uninstall.error.prepareFailure')
+#end
+
+#macro (handleExtensionJobStartFailure $errorMessageKey)
+  #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
-    #set ($errorMessage = $msg.get('extensions.uninstall.error.uninstallFailure', [$extensionId, $extensionVersion]))
+    #set ($errorMessage = $msg.get($errorMessageKey, [$extensionId, $extensionVersion]))
     #if ($isAjaxRequest)
       ## Send error back.
       $response.sendError(400, $errorMessage)
@@ -580,64 +519,67 @@
   #end
 #end
 
-#macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #if ($extensionNamespace && $xwiki.isVirtualMode())
-    ## Create the uninstall plan only for the specified wiki.
-    #set ($uninstallPlan = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
-  #else
-    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
-    #if ($extension)
-      ## Create the uninstall plan for the entire farm.
-      #set ($uninstallPlan = $extensionManager.createUninstallPlan($extension.id))
-    #else
-      #set ($uninstallPlan = $NULL)
-    #end
-  #end
-  #if (!$uninstallPlan)
-    <div class="errormessage">$msg.get('extensions.uninstall.error.prepareFailure', [$extensionId, $extensionVersion, $lasterror.message])</div>
-  #else
-    #set($hasError = false)
-    #foreach($log in $uninstallPlan.log)
+#macro (displayExtensionJobStatus $jobStatus)
+  #set ($isExtensionPlan = $jobStatus.state == 'FINISHED' && $jobStatus.actions)
+  #if ($isExtensionPlan)
+    ## Check if there are any logged errors.
+    #foreach($log in $jobStatus.log)
       #if ($log.level.name() == 'ERROR')
-        #set($hasError = true)
+        #set ($isExtensionPlan = false)
         #break
       #end
     #end
-    ##
-    #if ($hasError)
-      #printStatusLog($uninstallPlan)
-    #else
-      #set($extensionsToUninstall = [])
-      ##
-      #foreach($planAction in $uninstallPlan.actions)
-        #if ($planAction.action.name() == "UNINSTALL")
-          #set($void = $extensionsToUninstall.add($planAction))
-        #end
-      #end
-      ##
-      #if ($extensionsToUninstall.isEmpty())
-        <div class="infomessage">$msg.get('extensions.uninstall.error.notInstalled')</div>
-      #else
-        <p>$msg.get('extensions.uninstall.list')</p>
+  #end
+  #if ($isExtensionPlan)
+    #displayExtensionPlan($jobStatus)
+  #else
+    #printStatusLog($jobStatus)
+  #end
+#end
+
+#macro (displayExtensionPlan $plan)
+  ## Group the extensions by the actions that will be performed on them.
+  #set($extensionsByAction = {'INSTALL': [], 'UPGRADE': [], 'DOWNGRADE': [], 'UNINSTALL': []})
+  #set ($noAction = true)
+  #foreach($planAction in $plan.actions)
+    #set ($targetExtensions = $extensionsByAction.get($planAction.action.name()))
+    #if ($targetExtensions)
+      #set ($discard = $targetExtensions.add($planAction))
+      #set ($noAction = false)
+    #end
+  #end
+  ##
+  #if ($noAction)
+    #set ($emptyPlanMessageKeys = {
+      'installplan': 'extensions.install.error.alreadyInstalled',
+      'uninstallplan': 'extensions.uninstall.error.notInstalled'
+    })
+    <div class="infomessage">$msg.get($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
+  #else
+    #foreach($entry in $extensionsByAction.entrySet())
+      #if (!$entry.value.isEmpty())
+        <p>$msg.get("extensions.install.list.$entry.key.toLowerCase()")</p>
         <ul>
-          #foreach ($planAction in $extensionsToUninstall)
+          #foreach ($planAction in $entry.value)
             <li>#displayDependency($planAction.extension $planAction.namespace)</li>
           #end
         </ul>
-        <form action="" class="xform">
-          <div class="hidden">
-            #extensionHiddenFormFields($extensionId $extensionVersion)
-            <input name="actionUninstall#if ($request.actionUninstallGlobally)Globally#end" type="hidden" />
-          </div>
-          <p>
-            #em_submitButton('extensions.uninstall.actions.submit' 'confirm')
-            #if ("$!{request.xback}" != '')
-              #em_linkButton($request.xback 'extensions.uninstall.actions.cancel')
-            #end
-          </p>
-        </form>
       #end
     #end
+    <form action="" class="xform">
+      <div class="hidden">
+        #set ($_extensionId = $plan.request.extensions.get(0))
+        #extensionHiddenFormFields($_extensionId.id $_extensionId.version.value)
+        #set ($_action = $stringtool.capitalize($stringtool.removeEnd($plan.request.getProperty('job.type'), 'plan')))
+        <input name="action$_action#if (!$plan.request.hasNamespaces())Globally#end" type="hidden" />
+      </div>
+      <p>
+        #em_submitButton('extensions.install.actions.submit' 'confirm')
+        #if ("$!{request.xback}" != '')
+          #em_linkButton($request.xback 'extensions.install.actions.cancel')
+        #end
+      </p>
+    </form>
   #end
 #end
 
@@ -693,25 +635,42 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (getExtensionJobStatusForNamespace $extensionId $extensionVersion $extensionNamespace $return)
-  ## Make sure the value of $return is always reset.
-  #set ($return = $NULL)
-  #setVariable ("$return" $NULL)
+  ## Retrieve the latest job status stored for the specified extension.
   #set ($_jobStatus = $extensionManager.getExtensionJobStatus($extensionId, $extensionNamespace))
   #if ($_jobStatus)
-    ## Check if the stored job status also matches the extension version.
-    #foreach ($_extension in $_jobStatus.request.extensions)
-      #if ($_extension.id == $extensionId)
-        #set ($_version = $_extension.version)
-        #if (!$_version)
-          ## Some jobs don't require the extension version. Let's determine the currently available version.
-          #set ($_version = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
-        #end
-        #if (!$_version || $extensionVersion == $_version.value)
-          #setVariable ("$return" $_jobStatus)
-          #break
-        #end
-      #end
+    ## Check if the job status matches the extension version.
+    #set ($targetVersion = $_jobStatus.request.extensions.get(0).version)
+    #if (!$targetVersion)
+      ## Some jobs don't require the extension version. Let's determine the currently available version.
+      #set ($targetVersion = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
     #end
+    #if ($targetVersion && $extensionVersion != $targetVersion.value)
+      #set ($_jobStatus = $NULL)
+    #end
+  #end
+  ## Retrieve the latest plan stored for the specified extension.
+  #set ($_plan = $extensionManager.getExtensionPlanJobStatus($extensionId, $extensionNamespace))
+  #if ($_plan)
+    ## Check if the plan matches the extension version.
+    #set ($targetVersion = $_plan.request.extensions.get(0).version)
+    #if (!$targetVersion)
+      ## Some jobs don't require the extension version. Let's determine the currently available version.
+      #set ($targetVersion = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+    #end
+    #if ($targetVersion && $extensionVersion != $targetVersion.value)
+      #set ($_plan = $NULL)
+    #end
+  #end
+  #set ($return = $NULL)
+  #if (!$_jobStatus)
+    #setVariable ("$return" $_plan)
+  #elseif (!$_plan)
+    #setVariable ("$return" $_jobStatus)
+  ## Return the most recent one between the job status and the plan.
+  #elseif ($_jobStatus.startDate.after($_plan.startDate))
+    #setVariable ("$return" $_jobStatus)
+  #else
+    #setVariable ("$return" $_plan)
   #end
 #end
 
@@ -747,6 +706,14 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #else
       $response.sendRedirect($services.csrf.getResubmissionURL())
     #end
+  #elseif ($request.actionInstall)
+    #computeInstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
+  #elseif ($request.actionInstallGlobally)
+    #computeInstallPlan($request.extensionId $request.extensionVersion $NULL)
+  #elseif ($request.actionUninstall)
+    #computeUninstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
+  #elseif ($request.actionUninstallGlobally)
+    #computeUninstallPlan($request.extensionId $request.extensionVersion $NULL)
   #elseif ($request.extensionVersionConstraint)
     #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
     #displayDependency($dependency $extensionNamespace true)
@@ -813,7 +780,7 @@ Caused by: #printThrowable($throwable.cause true)
   #end
 #end
 
-#macro (printLogMessage $log)
+#macro (printLogMessage $log $resolveRemotely)
   #set ($message = '')
   #set ($messageElements = $log.messageElements)
   #foreach ($argument in $log.argumentArray)
@@ -822,20 +789,38 @@ Caused by: #printThrowable($throwable.cause true)
     #set ($reference = $services.model.serialize($argument))
     #if ($reference)
       #set ($message = "$message<a href=""$xwiki.getURL($argument)"">$escapetool.xml($reference)</a>")
-    #else
-      ## Assume the argument is an extension dependency.
-      #set ($_extension = $extensionManager.resolve($argument))
-      #if (!$_extension)
-        ## Assume the argument is an extension id.
-        #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
+    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
+      #if ($resolveRemotely)
+        ## Assume the argument is an extension dependency.
+        #set ($_extension = $extensionManager.resolve($argument))
+        #if (!$_extension)
+          ## Assume the argument is an extension id.
+          #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
+        #end
+      #else
+        ## Search for the extension/dependency only in the core and local repositories.
+        ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
+        ## downloaded). We need a resolve method that doesn't perform any remote calls.
+        #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
+        #if (!$_extension)
+          #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
+        #end
       #end
       #if ($_extension)
         #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
         #set ($_extensionName = "#displayExtensionName($_extension)")
-        #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)</a>")
+        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
       #else
-        #set ($message = "$message$escapetool.xml($argument)")
+        #set ($version = $argument.version)
+        #if (!$version)
+          #set ($version = $argument.versionConstraint)
+        #end
+        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
+        #set ($_extensionName = $argument)
       #end
+      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
+    #else
+      #set ($message = "$message$escapetool.xml($argument)")
     #end
   #end
   $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##

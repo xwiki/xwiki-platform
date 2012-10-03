@@ -17,13 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.classes;
+package com.xpn.xwiki.internal.mandatory;
 
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.XClassProvider;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 
 /**
  * Base class for standard class providers.
@@ -31,26 +29,25 @@ import com.xpn.xwiki.objects.classes.XClassProvider;
  * @version $Id$
  * @since 4.3M1
  */
-public abstract class AbstractXClassProvider implements XClassProvider, Initializable
+public abstract class AbstractMandatoryDocumentInitializer implements MandatoryDocumentInitializer
 {
     /**
-     * The standard class.
+     * @see #getDocumentReference()
      */
-    private BaseClass bclass;
+    private EntityReference reference;
 
-    @Override
-    public void initialize() throws InitializationException
+    /**
+     * @param reference the reference of the document to update. Can be either local or absolute depending if the
+     *            document is associated to a specific wiki or not
+     */
+    public AbstractMandatoryDocumentInitializer(EntityReference reference)
     {
-        this.bclass = new BaseClass();
-
-        initialize(this.bclass);
+        this.reference = reference;
     }
 
-    protected abstract void initialize(BaseClass bclass) throws InitializationException;
-
     @Override
-    public BaseClass getXClass()
+    public EntityReference getDocumentReference()
     {
-        return this.bclass;
+        return this.reference;
     }
 }

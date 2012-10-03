@@ -6,7 +6,6 @@ com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
 com.xpn.xwiki.internal.MessageToolVelocityContextInitializer
 com.xpn.xwiki.internal.XWikiContextProvider
 com.xpn.xwiki.internal.XWikiStubContextInitializer
-com.xpn.xwiki.internal.classes.XWikiPreferencesXClassProvider
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCacheConfiguration
@@ -16,6 +15,7 @@ com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.internal.display.scripting.DisplayScriptService
 com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
+com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver

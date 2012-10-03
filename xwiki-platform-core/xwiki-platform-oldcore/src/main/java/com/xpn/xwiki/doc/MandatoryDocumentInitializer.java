@@ -17,23 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects.classes;
+package com.xpn.xwiki.doc;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
+
 
 /**
- * Provide a class that should be initialized at startup and when creating new wiki.
+ * Provide a document that should be initialized at startup and when creating new wiki.
  * <p>
- * The role hint should be the local reference of the document in which the class is supposed to be saved so that I can
- * easily be found.
+ * The role hint should be the local (or absolute if it's supposed to be used only for a specific wiki) reference of the
+ * document so that I can easily be found.
  * 
  * @version $Id$
  */
 @Role
-public interface XClassProvider
+public interface MandatoryDocumentInitializer
 {
     /**
-     * @return the standard class for the current context, null if there is none
+     * @return the reference of the document to update. Can be either local or absolute depending if the document is
+     *         associated to a specific wiki or not
      */
-    BaseClass getXClass();
+    EntityReference getDocumentReference();
+
+    /**
+     * Update the provided document according to the need.
+     * 
+     * @param document the existing document to update
+     * @return true if the document has been modified, false otherwise
+     */
+    boolean updateDocument(XWikiDocument document);
 }

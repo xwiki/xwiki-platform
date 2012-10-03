@@ -130,6 +130,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -153,7 +154,6 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
-import com.xpn.xwiki.objects.classes.XClassProvider;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -3111,50 +3111,20 @@ public class XWiki implements EventListener
      */
     public BaseClass getPrefsClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
+        XWikiDocument document = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"), context);
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"), context);
-
-        BaseClass bclass = doc.getXClass();
+        BaseClass bclass = document.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
 
-        XClassProvider xclassProvider = Utils.getComponent(XClassProvider.class, "XWiki.XWikiPreferences");
+        MandatoryDocumentInitializer preferencesProvider =
+            Utils.getComponent(MandatoryDocumentInitializer.class, "XWiki.XWikiPreferences");
 
-        BaseClass newClass = xclassProvider.getXClass();
-
-        if (doc.isNew()) {
-            doc.setXClass(newClass);
-        } else {
-            bclass.apply(newClass, false);
+        if (preferencesProvider.updateDocument(document)) {
+            saveDocument(document, context);
         }
 
-        // Sheet
-
-        SheetBinder documentSheetBinder = Utils.getComponent((Type) SheetBinder.class, "document");
-        boolean withoutDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
-        if (withoutDocumentSheets) {
-            // Bind a document sheet to prevent the default class sheet from being used.
-            documentSheetBinder.bind(doc, doc.getDocumentReference());
-        }
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
-        if (withoutDocumentSheets) {
-            // Unbind the document sheet we bound earlier.
-            documentSheetBinder.unbind(doc, doc.getDocumentReference());
-        }
-
-        // Use AdminSheet to display documents having XWikiPreferences objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
-        if (classSheetBinder.getSheets(doc).isEmpty()) {
-            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "AdminSheet");
-            needsUpdate |= classSheetBinder.bind(doc, sheet);
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
         return bclass;
     }
 

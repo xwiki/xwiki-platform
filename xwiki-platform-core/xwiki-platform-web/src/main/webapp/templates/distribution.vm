@@ -285,7 +285,7 @@
 #if ($services.distribution.jobStatus.state == 'FINISHED')
   #set ($redirectURL = $request.xredirect)
   #if ("$!redirectURL" == '')
-    #set ($redirectURL = $xwiki.getURL('Main.WebHome'))
+    #set ($redirectURL = $xwiki.getURL($services.model.resolveDocument('', 'default')))
   #end
   $response.sendRedirect($redirectURL)
 #elseif ("$!request.action" != '')

@@ -23,11 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
@@ -35,10 +32,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * XWiki.XWikiPreferences class.
+ * Update XWiki.XWikiPreferences document with all required informations.
  * 
  * @version $Id$
  * @since 4.3M1
@@ -48,18 +44,19 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
-    @Inject
-    @Named("document")
-    private SheetBinder documentSheetBinder;
-
+    /**
+     * Used to bind a class to a document sheet.
+     */
     @Inject
     @Named("class")
-    private SheetBinder classSheetBinder;
+    protected SheetBinder classSheetBinder;
 
+    /**
+     * Default constructor.
+     */
     public XWikiPreferencesDocumentInitializer()
     {
-        super(new EntityReference("XWikiPreferences", EntityType.DOCUMENT, new EntityReference("XWiki",
-            EntityType.SPACE)));
+        super(XWiki.SYSTEM_SPACE, "XWikiPreferences");
     }
 
     @Override
@@ -199,49 +196,6 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
             String wikiName = document.getDocumentReference().getWikiReference().getName();
             DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "AdminSheet");
             needsUpdate |= this.classSheetBinder.bind(document, sheet);
-        }
-
-        return needsUpdate;
-    }
-
-    /**
-     * Set the fields of the class document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
-     * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
-     * otherwise generate XWiki Syntax 2.0.
-     * 
-     * @param title the page title to set
-     * @return true if the document has been modified, false otherwise
-     */
-    private boolean setClassDocumentFields(XWikiDocument doc, String title)
-    {
-        boolean needsUpdate = false;
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle(title);
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
-        if (this.documentSheetBinder.getSheets(doc).isEmpty()) {
-            String wikiName = doc.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "ClassSheet");
-            needsUpdate |= this.documentSheetBinder.bind(doc, sheet);
         }
 
         return needsUpdate;

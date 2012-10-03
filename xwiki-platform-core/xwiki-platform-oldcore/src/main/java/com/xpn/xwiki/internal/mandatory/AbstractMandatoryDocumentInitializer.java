@@ -19,9 +19,19 @@
  */
 package com.xpn.xwiki.internal.mandatory;
 
-import org.xwiki.model.reference.EntityReference;
+import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.sheet.SheetBinder;
+
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Base class for standard class providers.
@@ -31,6 +41,13 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
  */
 public abstract class AbstractMandatoryDocumentInitializer implements MandatoryDocumentInitializer
 {
+    /**
+     * Used to associate a document with a document sheet.
+     */
+    @Inject
+    @Named("document")
+    protected SheetBinder documentSheetBinder;
+
     /**
      * @see #getDocumentReference()
      */
@@ -45,9 +62,62 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
         this.reference = reference;
     }
 
+    /**
+     * @param spaceName the space name of the document
+     * @param documentName the document name of the document
+     */
+    public AbstractMandatoryDocumentInitializer(String spaceName, String documentName)
+    {
+        this(new EntityReference(documentName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE)));
+    }
+
     @Override
     public EntityReference getDocumentReference()
     {
         return this.reference;
+    }
+
+    /**
+     * Set the fields of the class document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
+     * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
+     * otherwise generate XWiki Syntax 2.0.
+     * 
+     * @param document the document
+     * @param title the page title to set
+     * @return true if the document has been modified, false otherwise
+     */
+    protected boolean setClassDocumentFields(XWikiDocument document, String title)
+    {
+        boolean needsUpdate = false;
+
+        if (StringUtils.isBlank(document.getCreator())) {
+            needsUpdate = true;
+            document.setCreator(XWikiRightService.SUPERADMIN_USER);
+        }
+        if (StringUtils.isBlank(document.getAuthor())) {
+            needsUpdate = true;
+            document.setAuthor(document.getCreator());
+        }
+        if (StringUtils.isBlank(document.getParent())) {
+            needsUpdate = true;
+            document.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(document.getTitle())) {
+            needsUpdate = true;
+            document.setTitle(title);
+        }
+        if (!document.isHidden()) {
+            needsUpdate = true;
+            document.setHidden(true);
+        }
+
+        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
+        if (this.documentSheetBinder.getSheets(document).isEmpty()) {
+            String wikiName = document.getDocumentReference().getWikiReference().getName();
+            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "ClassSheet");
+            needsUpdate |= this.documentSheetBinder.bind(document, sheet);
+        }
+
+        return needsUpdate;
     }
 }

@@ -44,6 +44,7 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
+import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
@@ -95,6 +96,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private DocumentReference contextUser;
 
     private DefaultPackager defaultPackager;
+
+    private DocumentMergeImporter importer;
 
     @Override
     @Before
@@ -271,6 +274,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         this.jobManager = getComponentManager().getInstance(JobManager.class);
         this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
         this.defaultPackager = getComponentManager().getInstance(Packager.class);
+        this.importer = getComponentManager().getInstance(DocumentMergeImporter.class);
 
         // Get rid of wiki macro listener
         getComponentManager().<ObservationManager> getInstance(ObservationManager.class).removeListener(
@@ -563,7 +567,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         }
 
         DocumentImporterHandler documentHandler =
-            new DocumentImporterHandler(this.defaultPackager, getComponentManager(), wiki);
+            new DocumentImporterHandler(this.defaultPackager, getComponentManager(), wiki, this.importer);
         documentHandler.setConfiguration(configuration);
 
         InputStream is = getClass().getResourceAsStream(resource);

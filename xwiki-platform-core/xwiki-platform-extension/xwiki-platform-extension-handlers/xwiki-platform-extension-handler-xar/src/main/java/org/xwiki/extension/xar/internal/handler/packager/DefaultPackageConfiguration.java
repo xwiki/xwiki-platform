@@ -97,6 +97,7 @@ public class DefaultPackageConfiguration implements PackageConfiguration
         this.jobStatus = jobStatus;
     }
 
+    @Override
     public boolean isLogEnabled()
     {
         return this.logEnabled;

@@ -17,7 +17,6 @@
             #set($redirect = $doc.getURL('import', 'section=Import'))
             #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
             <a class="deletelink" href="${attachurl}"
-               onclick="return confirm('$msg.get('core.viewers.attachments.delete.confirm')');"
                title="$msg.get('core.viewers.attachments.delete.title')"></a>
           </span>
         </div>

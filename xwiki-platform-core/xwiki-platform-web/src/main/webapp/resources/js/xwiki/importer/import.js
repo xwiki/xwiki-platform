@@ -31,7 +31,7 @@ var XWiki = (function(XWiki){
      * FIXME: right now disabled for IE6 - until the rich UI is fully debugged for this browser
      */
     var hookRichImporterUI = function() {
-        $$("#packagelistcontainer ul.xlist li.xitem a.package").invoke("observe", "click", function(event) {
+        $$("#packagelistcontainer a.package").invoke("observe", "click", function(event) {
             var a = event.element(), file = a.href.substring(a.href.indexOf("&file=") + 6);
 
             event.stop(); // prevent loading the link.
@@ -43,6 +43,18 @@ var XWiki = (function(XWiki){
             // Create a package explorer widget to let the user browse
             // and select/unselect the documents he wants.
             new importer.PackageExplorer( "packagecontainer", decodeURIComponent(file) );
+        });
+        $$("#packagelistcontainer .deletelink").invoke("observe", "click", function(event) {
+            event.stop();
+            new XWiki.widgets.ConfirmedAjaxRequest(event.findElement('a').href,
+                {onSuccess: function() {
+                    if (event.element().up('div.active')) {
+                        $('packagecontainer').update();
+                    }
+                    event.findElement('li').remove();
+                }},
+                {confirmationText: "$msg.get('core.viewers.attachments.delete.confirm')"}
+            );
         });
     }
     if (!browser.isIE6x) {

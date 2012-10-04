@@ -290,7 +290,7 @@ select#childPagesNamingMethod {
 &lt;/label&gt;
 &lt;label for="targetPageInputId" class="inputtext"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.targetpage") : &lt;/span&gt;
-&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" onchange="javascript:validateUserInputs();"/&gt;
+&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" /&gt;
 &lt;/label&gt;
 &lt;label for="appendContentInputId" id="appenContent" class="radio"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.appendresult") : &lt;/span&gt;

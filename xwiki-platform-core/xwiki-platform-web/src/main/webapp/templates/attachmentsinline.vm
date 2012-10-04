@@ -9,7 +9,11 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 ###
 #set($redirect = "$!{request.xredirect}")
 #if($redirect == '')
-  #set($redirect = "${doc.getURL()}#Attachments")
+  #if ("$!{request.viewer}" == 'attachments')
+    #set($redirect = "${doc.getURL('view', 'viewer=attachments')}")
+  #else
+    #set($redirect = "${doc.getURL()}#Attachments")
+  #end
 #end
 #set($showactions = 0)
 <div id="attachmentscontent" class="xwikiintracontent">

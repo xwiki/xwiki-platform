@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1795,7 +1796,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
-        List<DocumentReference> backlinkReferences = new ArrayList<DocumentReference>();
+        // Note: Ideally the method should return a Set but it would break the current API.
+        Set<DocumentReference> backlinkReferences = new HashSet<DocumentReference>();
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1830,7 +1832,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
             }
         }
-        return backlinkReferences;
+        return new ArrayList<DocumentReference>(backlinkReferences);
     }
 
     /**

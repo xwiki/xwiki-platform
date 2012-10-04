@@ -330,13 +330,15 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
     XWiki.officeImporter = new Object();
   }
   XWiki.officeImporter.populateTargetPageInputField = function() {
+    var targetPageInput = $('targetPageInputId');
+    if (targetPageInput.value != '') return;
     var fileName = XWiki.extractFileName('filepath');
     var dot = fileName.lastIndexOf(".");
     if (-1 != dot) {
       fileName = fileName.substring(0, dot);
     }
     fileName = fileName.replace(/[\.:]/g, "-");
-    $('targetPageInputId').value = fileName;
+    targetPageInput.value = fileName;
   }
 /* ]]&gt; */
 &lt;/script&gt;

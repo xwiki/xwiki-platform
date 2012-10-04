@@ -7493,7 +7493,7 @@ public class XWikiDocument implements DocumentModelBridge
                 this.xdom = parseContent(getContent());
             } catch (XWikiException e) {
                 if (StringUtils.isEmpty(getContent())) {
-                    LOGGER.debug("Syntax {} cannot handle empty input.  Returning empty XDOM.", getSyntax());
+                    LOGGER.debug("Syntax [{}] cannot handle empty input. Returning empty XDOM.", getSyntax());
                     return new XDOM(Collections.<Block>emptyList());
                 }
                 LOGGER.error("Failed to parse document content to XDOM", e);

@@ -134,6 +134,10 @@ blockquote {
   quotes: none;
 }
 
+li > dl, dt > dl, dd > dl {
+  margin-left: 2em;
+}
+
 dt {
   font-style: normal;
   font-weight: 700;

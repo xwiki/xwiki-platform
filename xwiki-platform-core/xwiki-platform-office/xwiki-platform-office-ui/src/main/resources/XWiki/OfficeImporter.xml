@@ -299,7 +299,7 @@ select#childPagesNamingMethod {
 &lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.target")&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.styles")&lt;/h2&gt;
 &lt;p class="office_importer_styles"&gt;
-&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict"/&gt;&lt;/label&gt;
+&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict" checked="checked"/&gt;&lt;/label&gt;
 &lt;/p&gt;
 &lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.styles")&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/h2&gt;

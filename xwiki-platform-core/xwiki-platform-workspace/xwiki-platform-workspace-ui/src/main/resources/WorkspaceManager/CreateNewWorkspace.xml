@@ -402,26 +402,29 @@ function prettyNameChanged()
     &lt;/dt&gt;
     &lt;dd&gt;&lt;input size='60' id='XWiki.XWikiServerClass_0_wikiprettyname' name='XWiki.XWikiServerClass_0_wikiprettyname' type='text' onchange='prettyNameChanged();' onkeyup='prettyNameChanged();' #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;&lt;/dd&gt;
 
+  #set ($templates = $WorkspaceManager.getWorkspaceTemplates())
+  #if ($templates.size() &gt; 1)
     &lt;dt&gt;
-      &lt;label for='template'&gt;Template&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.template')&lt;/span&gt;
+      &lt;label for='template'&gt;$msg.get('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('platform.workspace.newWorkspaceTemplateHint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name='template' id='template'&gt;
-        #set($WorkspaceManager = $services.workspace)
-        #set($templates = $WorkspaceManager.getWorkspaceTemplates())
-        #foreach($template in $templates)
-          #set($wiki = $template.getWikiDescriptor())
-          #set($wikiAliasList = $wiki.wikiAliasList)
-          #set($firstalias = $wikiAliasList.get(0))
-          #set($name = $wiki.wikiName)
-          #if($stringtool.isNotBlank("$!firstalias.wikiPrettyName"))
-            #set($name = "${firstalias.wikiPrettyName} (${name})")
-          #end          
-          &lt;option value="$template.getWikiName()" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected="selected" #end &gt;$name&lt;/option&gt;
+      &lt;select name='template' id='template' #if(!$isInstallComplete)disabled='disabled'#{end}&gt;
+        #foreach ($template in $templates)
+          #set ($wikiDescriptor = $template.getWikiDescriptor())
+          #set ($name = $wikiDescriptor.wikiName)
+          #if ($stringtool.isNotBlank("$!wikiDescriptor.wikiPrettyName"))
+            #set($name = "${wikiDescriptor.wikiPrettyName} (${name})")
+          #end
+          &lt;option value="$template.getWikiName()" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected='selected' #end &gt;$name&lt;/option&gt;
         #end
       &lt;/select&gt;
     &lt;/dd&gt;
+  #else
+    &lt;div&gt;
+      &lt;input id='template' name='template' type='hidden' value="$templates[0].wikiDescriptor.wikiName" #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
+    &lt;/div&gt;
+  #end
 
     &lt;dt&gt;
       &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.wiki.description')&lt;/label&gt;

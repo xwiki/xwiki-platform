@@ -159,6 +159,14 @@
   #else
     #set ($needsAdminRights = true)
   #end
+#elseif (!${services.workspace.isWorkspace($TEMPLATE_NAME)})
+  ##
+  ## Migration introduced in 4.3M1. Workspace templates are now marked as workspaces to diferentiate them between regular wiki templates.
+  ##
+  #set ($workspaceObject = $template.getObject("WorkspaceManager.WorkspaceClass", true))
+  #set ($discard = $template.save($msg.get('platform.workspace.templateMigrateSuccess')))
+  
+  {{warning}}$msg.get('platform.workspace.templateMigrateSuccess'){{/warning}}
 #else
   ##
   ## Don't display this information if the code is included from somewhere else.

@@ -289,7 +289,7 @@ function prettyNameChanged()
 #end
 ############################################################################################
 ## WORKSPACE INSTALLATION STATUS CHECK
-#set ($isInstallComplete = "$!{WikiManager.getWikiTemplateDocument('workspacetemplate')}" != '')
+#set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))
 #if (!$isInstallComplete)
   {{warning}}$msg.get('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
 

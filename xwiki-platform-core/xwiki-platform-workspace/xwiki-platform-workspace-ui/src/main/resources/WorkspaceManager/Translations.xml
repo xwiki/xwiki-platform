@@ -54,6 +54,7 @@ workspacemanager.wikiname.error.empty=Identifier can't be empty
 workspacemanager.wikiname.error.alreadyused=This identifier is already used
 workspacemanager.error.notinvirtualmode=The current XWiki installation is not in virtual mode. This means you can only access the main wiki. Make sure you have &lt;tt&gt;xwiki.virtual=1&lt;/tt&gt; in the &lt;tt&gt;xwiki.cfg&lt;/tt&gt; file.
 platform.workspace.templateNotInstalledInstallNow=Workspace template is not yet installed. Install the workspace template now?
+platform.workspace.templateMigrateSuccess=The existing default workspace template has been successfully migrated to the new format.
 platform.workspace.templateInstallConfirm=Install
 platform.workspace.templateFeaturesInstallErrorNeedTemplateFirst=Workspace template features can not be installed without the workspace base template being installed first.
 platform.workspace.templateFeaturesInstallTranslationsAndPanelSaveComment=Automatically registered workspace translations and panel

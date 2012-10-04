@@ -278,9 +278,11 @@ ul.xlist li.xitem div.xshowonhover img {
 ##
 $xwiki.ssx.use('WorkspaceManager.Workspaces')
 ##
-#set ($workspaceDocumentsList = $services.query.xwql('select wikiServerDescriptorDocument.fullName from Document wikiServerDescriptorDocument, wikiServerDescriptorDocument.object(WorkspaceManager.WorkspaceClass) as workspaceDescriptor, wikiServerDescriptorDocument.object(XWiki.XWikiServerClass) as wikiServerDescriptor').execute())
+#set ($WorkspaceManager = $services.workspace)
+#set ($workspaces = $WorkspaceManager.getWorkspaces())
+#set ($discard = $workspaces.removeAll($WorkspaceManager.getWorkspaceTemplates()))
 ##
-#if (!$workspaceDocumentsList || $workspaceDocumentsList.size() == 0 )
+#if (!$workspaces || $workspaces.size() == 0 )
 $msg.get('platform.workspace.macroNoWorkspaces')
 
 #end
@@ -289,9 +291,8 @@ $msg.get('platform.workspace.macroNoWorkspaces')
   ##
   ## List workspaces.
   ##
-  #foreach($workspaceDocumentName in $workspaceDocumentsList)
-    #set ($workspaceWikiDocument = $services.wikimanager.getWikiFromDocumentName($workspaceDocumentName))
-    #set ($workspaceWikiDescriptor = $workspaceWikiDocument.firstWikiAlias)
+  #foreach($workspace in $workspaces)
+    #set ($workspaceWikiDescriptor = $workspace.wikiDescriptor)
       &lt;li class='xitem xunderline xhighlight workspace spWorkspaceItem'&gt;
         &lt;div class='xitemcontainer'&gt;
           &lt;div class='spWorkspaceName'&gt;{{html}}&lt;a href="${workspaceWikiDescriptor.homePageUrl}"&gt;${workspaceWikiDescriptor.wikiPrettyName}&lt;/a&gt;{{/html}}&lt;/div&gt;  

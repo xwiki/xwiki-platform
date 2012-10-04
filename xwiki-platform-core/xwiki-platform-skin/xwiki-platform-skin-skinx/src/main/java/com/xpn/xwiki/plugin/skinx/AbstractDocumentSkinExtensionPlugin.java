@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.skinx;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,9 +30,9 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -206,7 +205,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public boolean hasPageExtensions(XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();
-        Collection<BaseObject> objects = doc.getObjects(getExtensionClassName());
+        List<BaseObject> objects = doc.getObjects(getExtensionClassName());
         if (objects != null) {
             for (BaseObject obj : objects) {
                 if (obj == null) {

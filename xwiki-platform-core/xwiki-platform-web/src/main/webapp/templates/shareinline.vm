@@ -6,12 +6,16 @@
   #set ($message = "$!{request.message.trim()}")
   #set ($sender = $xwiki.getUserName($context.user, false))
   #set ($display = "$!{request.includeDocument}")
-##  #if ("$!{xwiki.getXWikiPreference('admin_email')}" != '')
-##    #set ($sender = "$sender <$!{xwiki.getXWikiPreference('admin_email')}>")
-##  #else
-    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{request.serverName}>")
-##  #end
-
+  #set ($serverName = $request.serverName)
+  #if ($serverName.matches('\[.*\]|(\d{1,3}+\.){3}+\d{1,3}+'))
+    #if ("$!{xwiki.getXWikiPreference('admin_email')}" != '')
+      #set ($sender = "$!{escapetool.q($sender)} <$!{xwiki.getXWikiPreference('admin_email')}>")
+    #else
+      #set ($sender = "$!{escapetool.q($sender)} <noreply@domain.net>")
+    #end
+  #else
+    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{serverName}>")
+  #end
   #set ($recipients = [])
   #set ($errors = {})
   #set ($successes = [])

@@ -136,26 +136,46 @@ public class OfficeImporterScriptService implements ScriptService
      * 
      * @param officeFileStream binary data stream corresponding to input office document
      * @param officeFileName name of the input office document, this argument is mainly used for determining input
-     *        document format where necessary
-     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this argument affects
-     *        the attachment URLs generated during the import process where all references to attachments will be
-     *        calculated assuming that the attachments are contained on the reference document
+     *            document format where necessary
+     * @param targetDocumentReference the document the import process is carried out relative to; this argument affects
+     *            the attachment URLs generated during the import process where all references to attachments will be
+     *            calculated assuming that the attachments are contained on the specified target document
      * @param filterStyles whether to filter styling information associated with the office document's content or not
      * @return {@link XHTMLOfficeDocument} containing xhtml result of the import operation or null if an error occurs
-     * @since 2.2M1
+     * @since 4.3M1
      */
     public XHTMLOfficeDocument officeToXHTML(InputStream officeFileStream, String officeFileName,
-        String referenceDocument, boolean filterStyles)
+        DocumentReference targetDocumentReference, boolean filterStyles)
     {
         try {
             assertConnected();
-            return this.xhtmlBuilder.build(officeFileStream, officeFileName, this.currentMixedDocumentReferenceResolver
-                .resolve(referenceDocument), filterStyles);
+            return this.xhtmlBuilder.build(officeFileStream, officeFileName, targetDocumentReference, filterStyles);
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
         }
         return null;
+    }
+
+    /**
+     * Imports the given office document into an {@link XHTMLOfficeDocument}.
+     * 
+     * @param officeFileStream binary data stream corresponding to input office document
+     * @param officeFileName name of the input office document, this argument is mainly used for determining input
+     *            document format where necessary
+     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this argument affects
+     *            the attachment URLs generated during the import process where all references to attachments will be
+     *            calculated assuming that the attachments are contained on the reference document
+     * @param filterStyles whether to filter styling information associated with the office document's content or not
+     * @return {@link XHTMLOfficeDocument} containing xhtml result of the import operation or null if an error occurs
+     * @since 2.2M1
+     * @deprecated use {@link #officeToXHTML(InputStream, String, DocumentReference, boolean)} instead
+     */
+    public XHTMLOfficeDocument officeToXHTML(InputStream officeFileStream, String officeFileName,
+        String referenceDocument, boolean filterStyles)
+    {
+        return officeToXHTML(officeFileStream, officeFileName,
+            this.currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
     }
 
     /**
@@ -181,26 +201,79 @@ public class OfficeImporterScriptService implements ScriptService
      * 
      * @param officeFileStream binary data stream corresponding to input office document
      * @param officeFileName name of the input office document, this argument is mainly is used for determining input
-     *        document format where necessary
-     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this srgument affects
-     *        the attachment URLs generated during the import process where all references to attachments will be
-     *        calculated assuming that the attachments are contained on the reference document
+     *            document format where necessary
+     * @param targetDocumentReference the document the import process is carried out relative to; this argument affects
+     *            the attachment URLs generated during the import process where all references to attachments will be
+     *            calculated assuming that the attachments are contained on the specified target document
      * @param filterStyles whether to filter styling information associated with the office document's content or not
      * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
      *         operation or null if an error occurs
+     * @since 4.3M1
+     */
+    public XDOMOfficeDocument officeToXDOM(InputStream officeFileStream, String officeFileName,
+        DocumentReference targetDocumentReference, boolean filterStyles)
+    {
+        try {
+            assertConnected();
+            if (isPresentation(officeFileName)) {
+                return this.presentationBuilder.build(officeFileStream, officeFileName, targetDocumentReference);
+            } else {
+                return this.xdomBuilder.build(officeFileStream, officeFileName, targetDocumentReference, filterStyles);
+            }
+        } catch (Exception ex) {
+            setErrorMessage(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    /**
+     * Imports the given office document into an {@link XDOMOfficeDocument}.
+     * 
+     * @param officeFileStream binary data stream corresponding to input office document
+     * @param officeFileName name of the input office document, this argument is mainly is used for determining input
+     *            document format where necessary
+     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this srgument affects
+     *            the attachment URLs generated during the import process where all references to attachments will be
+     *            calculated assuming that the attachments are contained on the reference document
+     * @param filterStyles whether to filter styling information associated with the office document's content or not
+     * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
+     *         operation or null if an error occurs
+     * @deprecated use {@link #officeToXDOM(InputStream, String, DocumentReference, boolean)} instead
      */
     public XDOMOfficeDocument officeToXDOM(InputStream officeFileStream, String officeFileName,
         String referenceDocument, boolean filterStyles)
     {
+        return officeToXDOM(officeFileStream, officeFileName,
+            this.currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
+    }
+
+    /**
+     * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
+     * specified criterion. This method is useful when a single office document has to be imported and split into
+     * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
+     * {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor} entry.
+     * 
+     * @param xdomDocument {@link XDOMOfficeDocument} to be split
+     * @param headingLevels heading levels defining the split points on the original document
+     * @param namingCriterionHint hint indicating the child pages naming criterion
+     * @param rootDocumentReference the reference of the root document w.r.t which splitting will occur; in the results
+     *            set the entry corresponding to the <b>root document</b> {@link TargetDocumentDescriptor} will hold an
+     *            auto-generated TOC structure
+     * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
+     *         instances or null if an error occurs
+     * @since 4.3M1
+     */
+    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
+        String[] headingLevels, String namingCriterionHint, DocumentReference rootDocumentReference)
+    {
+        int[] splitLevels = new int[headingLevels.length];
+        for (int i = 0; i < headingLevels.length; i++) {
+            splitLevels[i] = Integer.parseInt(headingLevels[i]);
+        }
         try {
-            assertConnected();
-            DocumentReference reference = this.currentMixedDocumentReferenceResolver.resolve(referenceDocument);
-            if (isPresentation(officeFileName)) {
-                return this.presentationBuilder.build(officeFileStream, officeFileName, reference);
-            } else {
-                return this.xdomBuilder.build(officeFileStream, officeFileName, reference, filterStyles);
-            }
-        } catch (Exception ex) {
+            return this.xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint, rootDocumentReference);
+        } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
         }
@@ -217,26 +290,89 @@ public class OfficeImporterScriptService implements ScriptService
      * @param headingLevels heading levels defining the split points on the original document
      * @param namingCriterionHint hint indicating the child pages naming criterion
      * @param rootDocumentName name of the root document w.r.t which splitting will occur; in the results set the entry
-     *        corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated TOC
-     *        structure
+     *            corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated
+     *            TOC structure
      * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
      *         instances or null if an error occurs
+     * @deprecated use {@link #split(XDOMOfficeDocument, String[], String, DocumentReference)} instead
      */
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
         String[] headingLevels, String namingCriterionHint, String rootDocumentName)
     {
-        int[] splitLevels = new int[headingLevels.length];
-        for (int i = 0; i < headingLevels.length; i++) {
-            splitLevels[i] = Integer.parseInt(headingLevels[i]);
-        }
+        return split(xdomDocument, headingLevels, namingCriterionHint,
+            this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
+    }
+
+    /**
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments.
+     * 
+     * @param doc {@link XDOMOfficeDocument} to be saved
+     * @param documentReference the reference of the target wiki page
+     * @param syntaxId syntax of the target wiki page
+     * @param parentReference the reference of the parent wiki page or {@code null}
+     * @param title title of the target wiki page or {@code null}
+     * @param append whether to append content if the target wiki page exists
+     * @return true if the operation completes successfully, false otherwise
+     * @since 4.3M1
+     */
+    public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, String syntaxId,
+        DocumentReference parentReference, String title, boolean append)
+    {
         try {
-            return this.xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint,
-                this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
+            // First check if the user has edit rights on the target document.
+            if (!this.docBridge.isDocumentEditable(documentReference)) {
+                String message = "You do not have edit rights on [%s] document.";
+                throw new OfficeImporterException(String.format(message, documentReference));
+            }
+
+            // Save.
+            if (this.docBridge.exists(documentReference) && append) {
+                // Check whether existing document's syntax is same as target syntax.
+                String currentSyntaxId = this.docBridge.getDocument(documentReference).getSyntax().toIdString();
+                if (!currentSyntaxId.equals(syntaxId)) {
+                    String message =
+                        "Target document [%s] exists but it's sytax [%s] is different from specified syntax [%s]";
+                    throw new OfficeImporterException(String.format(message, documentReference, currentSyntaxId,
+                        syntaxId));
+                }
+
+                // Append the content.
+                String currentContent = this.docBridge.getDocumentContent(documentReference, null);
+                String newContent = currentContent + "\n" + doc.getContentAsString(syntaxId);
+                this.docBridge.setDocumentContent(documentReference, newContent, "Updated by office importer.", false);
+            } else {
+                this.docBridge.setDocumentSyntaxId(documentReference, syntaxId);
+                this.docBridge.setDocumentContent(documentReference, doc.getContentAsString(syntaxId),
+                    "Created by office importer.", false);
+
+                // Set parent if provided.
+                if (null != parentReference) {
+                    this.docBridge.setDocumentParentReference(documentReference, parentReference);
+                }
+
+                // If no title is specified, try to extract one.
+                String docTitle = (null == title) ? doc.getTitle() : title;
+
+                // Set title if applicable.
+                if (null != docTitle) {
+                    this.docBridge.setDocumentTitle(documentReference, docTitle);
+                }
+            }
+
+            // Finally attach all the artifacts into target document.
+            attachArtifacts(doc.getArtifacts(), documentReference);
+
+            return true;
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            String message = "Error while saving document [%s].";
+            message = String.format(message, documentReference);
+            setErrorMessage(message);
+            logger.error(message, ex);
         }
-        return null;
+        return false;
     }
 
     /**
@@ -249,67 +385,14 @@ public class OfficeImporterScriptService implements ScriptService
      * @param title title of the target wiki page or null
      * @param append whether to append content if the target wiki page exists
      * @return true if the operation completes successfully, false otherwise
+     * @deprecated use {@link #save(XDOMOfficeDocument, DocumentReference, String, DocumentReference, String, boolean)}
+     *             instead
      */
     public boolean save(XDOMOfficeDocument doc, String target, String syntaxId, String parent, String title,
         boolean append)
     {
-        try {
-            DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(target);
-            DocumentReference parentReference = this.currentMixedDocumentReferenceResolver.resolve(parent);
-
-            // First check if the user has edit rights on the target document.
-            if (!this.docBridge.isDocumentEditable(docReference)) {
-                String message = "You do not have edit rights on [%s] document.";
-                throw new OfficeImporterException(String.format(message, target));
-            }
-
-            // Save.
-            if (this.docBridge.exists(docReference) && append) {
-                // Check whether existing document's syntax is same as target syntax.
-                String currentSyntaxId = this.docBridge.getDocument(docReference).getSyntax().toIdString();
-                if (!currentSyntaxId.equals(syntaxId)) {
-                    String message =
-                        "Target document [%s] exists but it's sytax [%s] is different from specified syntax [%s]";
-                    throw new OfficeImporterException(String.format(message, target, currentSyntaxId, syntaxId));
-                }
-
-                // Append the content.
-                String currentContent = this.docBridge.getDocumentContent(docReference, null);
-                String newContent = currentContent + "\n" + doc.getContentAsString(syntaxId);
-                this.docBridge.setDocumentContent(docReference, newContent, "Updated by office importer.", false);
-            } else {
-                this.docBridge.setDocumentSyntaxId(docReference, syntaxId);
-                this.docBridge.setDocumentContent(docReference, doc.getContentAsString(syntaxId),
-                    "Created by office importer.", false);
-
-                // Set parent if provided.
-                if (null != parent) {
-                    this.docBridge.setDocumentParentReference(docReference, parentReference);
-                }
-
-                // If no title is specified, try to extract one.
-                String docTitle = (null == title) ? doc.getTitle() : title;
-
-                // Set title if applicable.
-                if (null != docTitle) {
-                    this.docBridge.setDocumentTitle(docReference, docTitle);
-                }
-            }
-
-            // Finally attach all the artifacts into target document.
-            attachArtifacts(doc.getArtifacts(), docReference);
-
-            return true;
-        } catch (OfficeImporterException ex) {
-            setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
-        } catch (Exception ex) {
-            String message = "Error while saving document [%s].";
-            message = String.format(message, target);
-            setErrorMessage(message);
-            logger.error(message, ex);
-        }
-        return false;
+        return save(doc, this.currentMixedDocumentReferenceResolver.resolve(target), syntaxId,
+            this.currentMixedDocumentReferenceResolver.resolve(parent), title, append);
     }
 
     /**

@@ -1797,7 +1797,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         // Note: Ideally the method should return a Set but it would break the current API.
+
+        // TODO: We use a Set here so that we don't get duplicates. In the future, when we can reference a page in
+        // another language using a syntax, we should modify this code to return one DocumentReference per language
+        // found. To implement this we need to be able to either serialize the reference with the language information
+        // or add some new column for the XWikiLink table in the database.
         Set<DocumentReference> backlinkReferences = new HashSet<DocumentReference>();
+
         try {
             if (bTransaction) {
                 checkHibernate(context);

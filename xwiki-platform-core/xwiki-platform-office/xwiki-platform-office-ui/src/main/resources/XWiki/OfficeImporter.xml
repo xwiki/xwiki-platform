@@ -386,7 +386,7 @@ select#childPagesNamingMethod {
   font-weight: normal;
 }
 
-.office_importer_target label span {
+.office_importer_target &gt; label &gt; span {
   display: block;
   float: left;
   display: inline;

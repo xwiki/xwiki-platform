@@ -103,28 +103,70 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>var XWiki = (function (XWiki) {
-// Start XWiki augmentation.
-XWiki.officeImporter = XWiki.officeImporter || {};
-XWiki.officeImporter.populateTargetPageInputField = function() {
-  var targetPageInput = $('targetPageInputId');
-  if (targetPageInput.value != '') return;
-  var fileName = XWiki.extractFileName('filepath');
-  var dot = fileName.lastIndexOf(".");
-  if (-1 != dot) {
-    fileName = fileName.substring(0, dot);
+      <code>(function() {
+  var onFilePathChange = function() {
+    var targetPageInput = $('targetPageInputId');
+    if (targetPageInput.value != '' &amp;&amp; targetPageInput.value != targetPageInput.__defaultValue) {
+      return;
+    }
+
+    var fileName = XWiki.extractFileName('filepath');
+    var dotIndex = fileName.lastIndexOf(".");
+    if (dotIndex &gt;= 0) {
+      fileName = fileName.substring(0, dotIndex);
+    }
+    targetPageInput.value = fileName;
+    // Save the default value to be able to distinguish it from the value set by the user.
+    targetPageInput.__defaultValue = fileName;
   }
-  targetPageInput.value = fileName;
-}
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));</code>
+
+  var onSubmit = function(event) {
+    if ($('appendContentInputId').checked || $('targetPageInputId').value == '' || $('targetSpaceInputId').value == '') {
+      return
+    }
+    // Check if the target document exists.
+    event.stop();
+    event.element().disable();
+    var url = new XWiki.Document($('targetPageInputId').value, $('targetSpaceInputId').value).getRestURL();
+    new Ajax.Request(url, {
+      // Would be nice to use the HEAD method, but it's not supported currently..
+      method: 'get',
+      onSuccess: function() {
+        // The target document exists.
+        new XWiki.widgets.ConfirmationBox({
+          onYes: function() {
+            // Overwrite the target document.
+            $('targetPageInputId').form.enable().submit();
+          },
+          onNo: function() {
+            // Allow the user to change the target document.
+            $('targetPageInputId').form.enable();
+          }
+        }, {
+          confirmationText: "$escapetool.javascript($msg.get('platform.office.importDocumentOverwriteConfirmation'))"
+        });
+      },
+      onFailure: function() {
+        // The target page doesn't exist so we can safely proceed with the import.
+        $('targetPageInputId').form.enable().submit();
+      }
+    });
+  }
+
+  var init = function() {
+    $('filepath').observe('change', onFilePathChange);
+    $('filepath').form.observe('submit', onSubmit);
+    return true;
+  }
+
+  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+})()</code>
     </property>
     <property>
       <name>Code</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -390,7 +432,7 @@ select#childPagesNamingMethod {
   &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
     &lt;p class="office_importer_document"&gt;
       &lt;label for="filepath"&gt;$msg.get("xe.officeimporter.import.document") : &lt;/label&gt;
-      &lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="XWiki.officeImporter.populateTargetPageInputField();"/&gt;
+      &lt;input id="filepath" type="file" name="filePath" value="" size="40" /&gt;
     &lt;/p&gt;
 
     &lt;h2&gt;$msg.get("xe.officeimporter.import.target")&lt;/h2&gt;

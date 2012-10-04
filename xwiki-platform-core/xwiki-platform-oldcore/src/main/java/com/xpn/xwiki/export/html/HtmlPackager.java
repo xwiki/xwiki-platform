@@ -186,6 +186,11 @@ public class HtmlPackager
         DocumentReference docReference = new DocumentReference(resolver.resolve(pageName, EntityType.DOCUMENT));
         XWikiDocument doc = context.getWiki().getDocument(docReference, context);
 
+        if (doc.isNew()) {
+            // Skip non-existing documents.
+            return;
+        }
+
         String zipname = doc.getDocumentReference().getWikiReference().getName();
         for (EntityReference space : doc.getDocumentReference().getSpaceReferences()) {
             zipname += POINT + space.getName();

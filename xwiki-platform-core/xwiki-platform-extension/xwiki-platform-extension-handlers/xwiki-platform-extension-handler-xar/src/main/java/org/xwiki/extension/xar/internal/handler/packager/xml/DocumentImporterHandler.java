@@ -111,6 +111,10 @@ public class DocumentImporterHandler extends DocumentHandler
         XWikiDocument currentDocument = getDatabaseDocument();
         DocumentReference userReference = this.configuration.getUserReference();
 
+        if (!this.hasCurrentDocument && userReference != null) {
+            currentDocument.setCreatorReference(userReference);
+        }
+
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
                 if (document.isNew()) {
@@ -123,9 +127,6 @@ public class DocumentImporterHandler extends DocumentHandler
             }
         } else {
             currentDocument = document;
-            if (userReference != null) {
-                currentDocument.setCreatorReference(userReference);
-            }
         }
 
         if (userReference != null) {

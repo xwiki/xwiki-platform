@@ -281,7 +281,7 @@ select#childPagesNamingMethod {
 &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
 &lt;p class="office_importer_document"&gt;
 &lt;label for="filepath"&gt;$msg.get("xe.officeimporter.import.document") : &lt;/label&gt;
-&lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
+&lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField();"/&gt;&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.target")&lt;/h2&gt;
 &lt;p class="office_importer_target"&gt;
 &lt;label for="targetSpaceInputId"  class="inputtext"&gt;
@@ -329,13 +329,14 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
   if (typeof(XWiki.officeImporter) == 'undefined') {
     XWiki.officeImporter = new Object();
   }
-  XWiki.officeImporter.populateTargetPageInputField = function(fileName) {
+  XWiki.officeImporter.populateTargetPageInputField = function() {
+    var fileName = XWiki.extractFileName('filepath');
     var dot = fileName.lastIndexOf(".");
     if (-1 != dot) {
       fileName = fileName.substring(0, dot);
     }
     fileName = fileName.replace(/[\.:]/g, "-");
-    document.getElementById("targetPageInputId").value = fileName;
+    $('targetPageInputId').value = fileName;
   }
 /* ]]&gt; */
 &lt;/script&gt;

@@ -171,7 +171,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     @Override
     public Set<String> getAlwaysUsedExtensions(XWikiContext context)
     {
-        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.class);
+        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         Set<DocumentReference> references = getAlwaysUsedExtensions();
         Set<String> names = new HashSet<String>(references.size());
         for (DocumentReference reference : references) {
@@ -416,11 +416,10 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      */
     private String getCanonicalDocumentName(String documentName)
     {
-
         @SuppressWarnings("unchecked")
-        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class, "current");
+        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
         @SuppressWarnings("unchecked")
-        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.class, "default");
+        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         return serializer.serialize(resolver.resolve(documentName, EntityType.DOCUMENT));
     }
 }

@@ -54,8 +54,6 @@ import org.xwiki.job.event.JobStartedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
-
 /**
  * Listen to job finished events to properly clean pages after upgrades.
  * 
@@ -276,9 +274,6 @@ public class XarExtensionJobFinishedListener implements EventListener
     private PackageConfiguration createPackageConfiguration(Request request, String wiki)
     {
         DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
-
-        MergeConfiguration mergeConfiguration = new MergeConfiguration();
-        configuration.setMergeConfiguration(mergeConfiguration);
 
         configuration.setInteractive(false);
         configuration.setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE,

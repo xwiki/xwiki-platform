@@ -67,15 +67,10 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     private Logger logger;
 
     @Override
-    public XarEntryMergeResult saveDocumen(String comment, XWikiDocument document, XWikiDocument previousDocument,
-        PackageConfiguration configuration) throws Exception
+    public XarEntryMergeResult saveDocumen(String comment, XWikiDocument previousDocument,
+        XWikiDocument currentDocument, XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception
     {
         XarEntryMergeResult mergeResult = null;
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        XWikiDocument currentDocument = xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext);
-        XWikiDocument nextDocument = document;
 
         if (configuration.isLogEnabled()) {
             this.logger.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
@@ -83,13 +78,13 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         }
 
         // Merge and save
-        if (!currentDocument.isNew()) {
+        if (currentDocument != null && !currentDocument.isNew()) {
             if (previousDocument != null) {
                 // 3 ways merge
                 mergeResult = merge(comment, currentDocument, previousDocument, nextDocument, configuration);
             } else {
                 // Check if a mandatory document initializer exists for the current document
-                XWikiDocument mandatoryDocument = getMandatoryDocument(document.getDocumentReference());
+                XWikiDocument mandatoryDocument = getMandatoryDocument(nextDocument.getDocumentReference());
 
                 if (mandatoryDocument != null) {
                     // 3 ways merge
@@ -112,13 +107,13 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                         }
 
                         if (documentToSave != currentDocument) {
-                            saveDocument(documentToSave, comment, configuration);
+                            saveDocument(documentToSave, comment, false, configuration);
                         }
                     }
                 }
             }
         } else {
-            saveDocument(nextDocument, comment, configuration);
+            saveDocument(nextDocument, comment, true, configuration);
         }
 
         return mergeResult;
@@ -155,10 +150,10 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                     askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration);
 
                 if (documentToSave != currentDocument) {
-                    saveDocument(documentToSave, comment, configuration);
+                    saveDocument(documentToSave, comment, false, configuration);
                 }
             } else {
-                saveDocument(mergedDocument, comment, configuration);
+                saveDocument(mergedDocument, comment, false, configuration);
             }
         }
 
@@ -240,8 +235,8 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         return documentToSave;
     }
 
-    private void saveDocument(XWikiDocument document, String comment, PackageConfiguration configuration)
-        throws Exception
+    private void saveDocument(XWikiDocument document, String comment, boolean setCreator,
+        PackageConfiguration configuration) throws Exception
     {
         XWikiContext context = this.xcontextProvider.get();
 
@@ -252,6 +247,9 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             if (document != currentDocument) {
                 if (document.isNew()) {
                     currentDocument.apply(document);
+                    if (setCreator) {
+                        currentDocument.setAuthorReference(document.getCreatorReference());
+                    }
                     currentDocument.setAuthorReference(document.getAuthorReference());
                     currentDocument.setContentAuthorReference(document.getContentAuthorReference());
                 } else {
@@ -260,12 +258,12 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             }
         } else {
             currentDocument = document;
-            if (userReference != null) {
-                currentDocument.setCreatorReference(userReference);
-            }
         }
 
         if (userReference != null) {
+            if (setCreator) {
+                currentDocument.setCreatorReference(userReference);
+            }
             currentDocument.setAuthorReference(userReference);
             currentDocument.setContentAuthorReference(userReference);
         }

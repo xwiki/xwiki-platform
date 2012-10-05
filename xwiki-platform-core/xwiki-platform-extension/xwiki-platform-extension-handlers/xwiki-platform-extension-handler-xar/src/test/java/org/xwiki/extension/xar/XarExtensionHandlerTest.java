@@ -359,8 +359,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertNull(page.getXObject(object.getXClassReference()));
 
         Assert.assertEquals("Wrong content", "content", page.getContent());
-        Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"), page.getCreatorReference());
+        Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
         Assert.assertFalse("Document is hidden", page.isHidden());
@@ -376,8 +376,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getContext());
         Assert.assertFalse(pagewithattachment.isNew());
         Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
-        Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
+        Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
 
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
@@ -402,7 +402,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             .assertFalse("Document wiki:translated.translated has not been saved in the database", translated.isNew());
 
         Assert.assertEquals("Wrong content", "translated content", translated.getContent());
+        Assert.assertEquals("Wrong creator", this.contextUser, translated.getCreatorReference());
         Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
+        Assert.assertEquals("Wrong content author", this.contextUser, translated.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // space.hiddenpage

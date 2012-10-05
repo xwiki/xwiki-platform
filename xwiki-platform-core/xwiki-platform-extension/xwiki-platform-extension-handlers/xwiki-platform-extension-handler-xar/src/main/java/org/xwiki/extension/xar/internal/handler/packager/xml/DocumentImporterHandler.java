@@ -120,8 +120,11 @@ public class DocumentImporterHandler extends DocumentHandler
     private void saveDocument(String comment) throws SAXException
     {
         try {
+            XWikiDocument databaseDocument = getDatabaseDocument();
+
             this.mergeResult =
-                this.importer.saveDocumen(comment, getDocument(), getPreviousDocument(), this.configuration);
+                this.importer.saveDocumen(comment, getPreviousDocument(), this.hasCurrentDocument ? databaseDocument
+                    : null, getDocument(), this.configuration);
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);
         }

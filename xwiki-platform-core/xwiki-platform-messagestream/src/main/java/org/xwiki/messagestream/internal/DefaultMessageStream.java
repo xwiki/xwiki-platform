@@ -146,7 +146,7 @@ public class DefaultMessageStream implements MessageStream
         try {
             Query q = this.qm.createQuery(
                 "where event.application = 'MessageStream' and event.type = 'personalMessage'"
-                + " and event.user = :user order by event.date desc",
+                    + " and event.user = :user order by event.date desc",
                 Query.XWQL);
             q.bindValue("user", this.serializer.serialize(author));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
@@ -170,7 +170,7 @@ public class DefaultMessageStream implements MessageStream
         try {
             Query q = this.qm.createQuery(
                 "where event.application = 'MessageStream' and event.type = 'directMessage'"
-                + " and event.stream = :targetUser order by event.date desc",
+                    + " and event.stream = :targetUser order by event.date desc",
                 Query.XWQL);
             q.bindValue("targetUser", this.serializer.serialize(this.bridge.getCurrentUserReference()));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
@@ -194,7 +194,7 @@ public class DefaultMessageStream implements MessageStream
         try {
             Query q = this.qm.createQuery(
                 "where event.application = 'MessageStream' and event.type = 'groupMessage'"
-                + " and event.stream = :group order by event.date desc",
+                    + " and event.stream = :group order by event.date desc",
                 Query.XWQL);
             q.bindValue("group", this.serializer.serialize(group));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
@@ -230,7 +230,7 @@ public class DefaultMessageStream implements MessageStream
      * It also fills in the provided message body and type.
      * 
      * @param message the message to store in the event; at most 2000 characters are stored, longer messages are
-     *            automatically trimmed
+     *        automatically trimmed
      * @param messageType the type of message
      * @return the initialized event object
      */

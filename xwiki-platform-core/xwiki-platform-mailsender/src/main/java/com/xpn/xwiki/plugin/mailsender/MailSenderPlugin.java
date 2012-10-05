@@ -636,8 +636,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         VelocityContext vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
 
-        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            vcontext.put(entry.getKey(), entry.getValue());
+        if (parameters != null) {
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                vcontext.put(entry.getKey(), entry.getValue());
+            }
         }
 
         return vcontext;

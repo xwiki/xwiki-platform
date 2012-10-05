@@ -430,16 +430,19 @@ XWiki.ExtensionBehaviour = Class.create({
         });
       }
     });
+    // Scroll the progress log to the end if it has a loading item.
+    // TODO: Preserve the scroll position if the user scrolls through the log.
+    var loadingLogItem = this.container.down('.extension-log-item-loading');
+    if (loadingLogItem) {
+      var log = loadingLogItem.up();
+      log.scrollTop = log.scrollHeight;
+    }
     // Execute Extension Manager jobs asynchronously.
     var confirmJobButton = this.container.down('input[name="confirm"]');
     confirmJobButton && confirmJobButton.observe('click', this._startJob.bindAsEventListener(this));
+    // Compute the changes asynchronously when there is a merge conflict.
     var diffButton = this.container.down('input[name="diff"]');
-    if (diffButton) {
-      // Compute the changes asynchronously when there is a merge conflict.
-      diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
-      // Scroll to the page to the merge conflict resolution section.
-      diffButton.form.scrollTo();
-    }
+    diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
   }
 });
 

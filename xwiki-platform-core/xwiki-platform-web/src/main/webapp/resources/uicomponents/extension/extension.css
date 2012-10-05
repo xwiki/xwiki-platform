@@ -125,8 +125,8 @@ ul.extension-metadata li {
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.dependency-item > p, .extension-log-item > p {
-  margin: 0;
+.dependency-item, .extension-log-item > div {
+  line-height: 1.4em;
 }
 .extension-item-core .extension-name, .extension-item-remote-core .extension-name,
 .dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
@@ -183,6 +183,9 @@ ul.extension-metadata li {
 
 .extension-body-progress > ul {
   margin-top: .5em;
+  /* This should accommodate 10 items */
+  max-height: 230px;
+  overflow: auto;
 }
 .extension-log-item {
   background-position: left .3em;

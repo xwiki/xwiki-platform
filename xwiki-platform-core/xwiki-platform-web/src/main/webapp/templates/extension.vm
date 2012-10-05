@@ -785,13 +785,13 @@ Caused by: #printThrowable($throwable.cause true)
       #if ($log.throwable)
         #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
         #if ("$!message.trim()" != '')
-          <p>$escapetool.xml($message)</p>
+          <div>$escapetool.xml($message)</div>
         #else
-          <p>#printLogMessage($log)</p>
+          <div>#printLogMessage($log)</div>
         #end
         #printThrowable($log.throwable)
       #else
-        <p>#printLogMessage($log)</p>
+        <div>#printLogMessage($log)</div>
       #end
     </li>
   #end

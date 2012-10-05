@@ -197,6 +197,28 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     }
 
     @Test
+    public void saveTwoOfSameAttachmentInOneTransactionTest() throws Exception
+    {
+        final File storeFile =
+            this.fileTools.getAttachmentFileProvider(this.mockAttach).getAttachmentContentFile();
+        Assert.assertFalse(this.storeFile.exists());
+        final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
+        attachments.add(this.mockAttach);
+        attachments.add(this.mockAttach);
+        this.attachStore.saveAttachmentsContent(attachments, this.doc, false, this.mockContext, false);
+        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
+
+        final InputStream is = new FileInputStream(storeFile);
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        IOUtils.copy(is, os);
+        is.close();
+        byte[] array = os.toByteArray();
+        Assert.assertEquals("The attachment file contained the wrong content",
+            HELLO,
+            new String(array, "UTF-8"));
+    }
+
+    @Test
     public void loadContentTest() throws Exception
     {
         this.storeFile.getParentFile().mkdirs();

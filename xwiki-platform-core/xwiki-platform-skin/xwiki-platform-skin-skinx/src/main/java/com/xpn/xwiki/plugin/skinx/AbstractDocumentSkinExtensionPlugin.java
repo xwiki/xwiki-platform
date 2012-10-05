@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.skinx;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,10 +30,14 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -72,7 +75,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * A Map with wiki/database name as keys and sets of extensions to use always for this wiki as values.
      */
-    private Map<String, Set<String>> alwaysUsedExtensions;
+    private Map<String, Set<DocumentReference>> alwaysUsedExtensions;
 
     /**
      * Used to match events on "use" property.
@@ -132,7 +135,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         super.init(context);
 
-        this.alwaysUsedExtensions = new HashMap<String, Set<String>>();
+        this.alwaysUsedExtensions = new HashMap<String, Set<DocumentReference>>();
         getExtensionClass(context);
 
         Utils.getComponent(ObservationManager.class).addListener(this);
@@ -168,6 +171,28 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     @Override
     public Set<String> getAlwaysUsedExtensions(XWikiContext context)
     {
+        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.class);
+        Set<DocumentReference> references = getAlwaysUsedExtensions();
+        Set<String> names = new HashSet<String>(references.size());
+        for (DocumentReference reference : references) {
+            names.add(serializer.serialize(reference));
+        }
+        return names;
+    }
+
+    /**
+     * Returns the list of always used extensions of this type as a set of document references. For this kind of
+     * resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always used extensions.
+     * The list of extensions for each wiki is lazily placed in a cache: if the extension set for the context wiki is
+     * null, then they will be looked up in the database and added to it. The cache is invalidated using the
+     * notification mechanism. Note that this method is called for each request, as the list might change in time, and
+     * it can be different for each wiki in a farm.
+     *
+     * @return a set of document references that should be pulled in the current response
+     */
+    public Set<DocumentReference> getAlwaysUsedExtensions()
+    {
+        XWikiContext context = Utils.getContext();
         // Retrieve the current wiki name from the XWiki context
         String currentWiki = StringUtils.defaultIfEmpty(context.getDatabase(), context.getMainXWiki());
         // If we already have extensions defined for this wiki, we return them
@@ -175,12 +200,13 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             return this.alwaysUsedExtensions.get(currentWiki);
         } else {
             // Otherwise, we look them up in the database.
-            Set<String> extensions = new HashSet<String>();
+            Set<DocumentReference> extensions = new HashSet<DocumentReference>();
             String query =
                 ", BaseObject as obj, StringProperty as use where obj.className='" + getExtensionClassName() + "'"
                     + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
             try {
-                for (String extension : context.getWiki().getStore().searchDocumentsNames(query, context)) {
+                for (DocumentReference extension : context.getWiki().getStore()
+                    .searchDocumentReferences(query, context)) {
                     try {
                         XWikiDocument doc = context.getWiki().getDocument(extension, context);
                         // Only add the extension as being "always used" if the page holding it has been saved with
@@ -206,7 +232,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public boolean hasPageExtensions(XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();
-        Collection<BaseObject> objects = doc.getObjects(getExtensionClassName());
+        List<BaseObject> objects = doc.getObjects(getExtensionClassName());
         if (objects != null) {
             for (BaseObject obj : objects) {
                 if (obj == null) {
@@ -218,6 +244,25 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             }
         }
         return false;
+    }
+
+    @Override
+    public void use(String resource, XWikiContext context)
+    {
+        String canonicalResource = getCanonicalDocumentName(resource);
+        LOGGER.debug("Using [{}] as [{}] extension", canonicalResource, this.getName());
+        getPulledResources(context).add(canonicalResource);
+        // In case a previous call added some parameters, remove them, since the last call for a resource always
+        // discards previous ones.
+        getParametersMap(context).remove(canonicalResource);
+    }
+
+    @Override
+    public void use(String resource, Map<String, Object> parameters, XWikiContext context)
+    {
+        String canonicalResource = getCanonicalDocumentName(resource);
+        getPulledResources(context).add(canonicalResource);
+        getParametersMap(context).put(canonicalResource, parameters);
     }
 
     /**
@@ -342,7 +387,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
                 if (context.getWiki().getRightService().hasProgrammingRights(document, context)) {
-                    getAlwaysUsedExtensions(context).add(document.getFullName());
+                    getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;
                 } else {
@@ -359,7 +404,23 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         }
 
         if (remove) {
-            getAlwaysUsedExtensions(context).remove(document.getFullName());
+            getAlwaysUsedExtensions().remove(document.getDocumentReference());
         }
+    }
+
+    /**
+     * Get the canonical serialization of a document name, in the {@code wiki:Space.Document} format.
+     *
+     * @param documentName the original document name to fix
+     * @return fixed document name
+     */
+    private String getCanonicalDocumentName(String documentName)
+    {
+
+        @SuppressWarnings("unchecked")
+        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class, "current");
+        @SuppressWarnings("unchecked")
+        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.class, "default");
+        return serializer.serialize(resolver.resolve(documentName, EntityType.DOCUMENT));
     }
 }

@@ -33,7 +33,6 @@ import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -67,9 +66,10 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     private static final String TABLE_PARAM = "table";
 
     /**
-     * The document name of the document holding the table.
+     * The document name of the document holding the table. If null then the data source is located in the current
+     * document.
      */
-    private DocumentReference documentRef;
+    private DocumentReference documentReference;
 
     /**
      * The id of the table holding the data.
@@ -95,12 +95,6 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     private DocumentAccessBridge docBridge;
 
     /**
-     * {@link EntityReferenceSerializer} component.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
      * A document reference resolver.
      */
     @Inject
@@ -116,23 +110,13 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     protected TableBlock getTableBlock(String macroContent, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // Parse the document content into an XDOM.
-        XDOM xdom;
-        try {
-            DocumentModelBridge document = this.docBridge.getDocument(this.documentRef);
-            DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-            parameters.setContentTranslated(true);
-            xdom = this.documentDisplayer.display(document, parameters);
-        } catch (Exception ex) {
-            throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
-                this.entityReferenceSerializer.serialize(this.documentRef)), ex);
-        }
+        XDOM xdom = computeXDOM(context);
 
         // Find the correct table block.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
         this.logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-            new Object[]{this.tableId, tableBlocks.size(), this.documentRef});
+            new Object[]{this.tableId, tableBlocks.size(), this.documentReference});
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
@@ -152,11 +136,41 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         return result;
     }
 
+    /**
+     * Get the XDOM for the data source.
+     *
+     * @param context the Macro context from which we can get the XDOM if the source is in the current content
+     * @return the XDOM in which the data source is located
+     * @throws MacroExecutionException in case of an error getting the XDOM
+     */
+    private XDOM computeXDOM(MacroTransformationContext context) throws MacroExecutionException
+    {
+        XDOM xdom;
+
+        // Parse the document content into an XDOM. If the reference is to the current document then we should not
+        // Parse the content again since 1) that's unnecessary since we can hold of the XDOM from the Transformation
+        // Context and 2) it's going to cause a cycle...
+        if (this.documentReference == null) {
+            xdom = context.getXDOM();
+        } else {
+            try {
+                DocumentModelBridge document = this.docBridge.getDocument(this.documentReference);
+                DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                parameters.setContentTranslated(true);
+                xdom = this.documentDisplayer.display(document, parameters);
+            } catch (Exception e) {
+                throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
+                    this.documentReference, e));
+            }
+        }
+        return xdom;
+    }
+
     @Override
     protected boolean setParameter(String key, String value) throws MacroExecutionException
     {
         if (DOCUMENT_PARAM.equals(key)) {
-            this.documentRef = this.documentReferenceResolver.resolve(value);
+            this.documentReference = this.documentReferenceResolver.resolve(value);
             return true;
         }
 
@@ -173,18 +187,17 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     {
         super.validateParameters();
 
-        if (null == this.documentRef) {
-            this.documentRef = this.docBridge.getCurrentDocumentReference();
-        } else if (!authorizationManager.hasAccess(Right.VIEW,
-            this.docBridge.getCurrentUserReference(),
-            this.documentRef))
-        {
-            throw new MacroExecutionException("You do not have permission to view the document.");
-        }
+        if (this.documentReference != null) {
+            if (!authorizationManager.hasAccess(Right.VIEW, this.docBridge.getCurrentUserReference(),
+                this.documentReference))
+            {
+                throw new MacroExecutionException("You do not have permission to view the document.");
+            }
 
-        if (!this.docBridge.exists(this.documentRef)) {
-            throw new MacroExecutionException(String.format("Document [%s] does not exist.",
-                this.entityReferenceSerializer.serialize(this.documentRef)));
+            if (!this.docBridge.exists(this.documentReference)) {
+                throw new MacroExecutionException(
+                    String.format("Document [%s] does not exist.", this.documentReference));
+            }
         }
     }
 }

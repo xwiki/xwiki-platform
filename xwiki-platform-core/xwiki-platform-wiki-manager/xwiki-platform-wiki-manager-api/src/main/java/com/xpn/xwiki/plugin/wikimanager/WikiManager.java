@@ -332,7 +332,7 @@ public final class WikiManager
      * Create a new virtual wiki. The new wiki is a copy of provided existing wiki.
      * 
      * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
-     * @param templateWikiName the of the wiki from where to copy document to the new wiki.
+     * @param templateWikiName the name of the wiki from where to copy document to the new wiki.
      * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.

@@ -1,4 +1,5 @@
 var XWiki = (function(XWiki) {
+XWiki.widgets = XWiki.widgets || {};
 /**
  * XWiki namespace.
  * TODO: move everything in it.
@@ -332,7 +333,7 @@ Object.extend(XWiki, {
    */
   insertCreatePageFromTemplateModalBoxes: function() {
       // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
           XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
               initialize : function($super, interactionParameters) {
                   var content =  new Element('div', {'class': 'modal-popup'});
@@ -526,14 +527,50 @@ Object.extend(XWiki, {
   },
 
   /**
+   * Extracts the file name from the value of the specified file input.
+   */
+  extractFileName: function(fileInput) {
+    fileInput = $(fileInput);
+    if (fileInput.files && fileInput.files.length > 0) {
+      // Modern browsers provide additional information about the selected file(s).
+      return fileInput.files[0].name;
+    } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
+      // Most browsers hide the real path for security reasons.
+      return fileInput.value.substr(12);
+    } else {
+      var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
+      if (lastPathSeparatorIndex >= 0) {
+        // Unix-based path.
+        return fileInput.value.substr(lastPathSeparatorIndex + 1);
+      }
+      lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
+      if (lastPathSeparatorIndex >= 0) {
+        // Windows-based path.
+        return fileInput.value.substr(lastPathSeparatorIndex + 1);
+      }
+      // The file input value is just the file name.
+      return fileInput.value;
+    }
+  },
+
+  /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
-  initialize: function(){
+  initialize: function() {
     // Extra security to make sure we do not get initalized twice.
-    // It would fire the custom dom:loaded event twice, which could make their observers misbehave.
+    // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
+      // This variable is set when the marker script is executed, which should always be the last script to execute.
+      // In case the dom:loaded event was fired prematurely, delay the execution and ask instead the marker script to
+      // re-invoke the initialization process.
+      if (typeof XWiki.lastScriptLoaded == "undefined") {
+        XWiki.failedInit = true;
+        return;
+      }
+
+      // All ready, continue with the initialization.
       this.isInitialized = true;
       document.fire("xwiki:dom:loading");
 
@@ -1209,9 +1246,9 @@ XWiki.Document = Class.create({
 
 /* Initialize the document URL factory, and create XWiki.currentDocument. */
 document.observe('xwiki:dom:loading', function() {
-  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : "xwiki";
-  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : "Main";
-  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : "WebHome";
+  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : (XWiki.currentWiki || "xwiki");
+  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : (XWiki.currentSpace || "Main");
+  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : (XWiki.currentPage || "WebHome");
   XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
   XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
   XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";

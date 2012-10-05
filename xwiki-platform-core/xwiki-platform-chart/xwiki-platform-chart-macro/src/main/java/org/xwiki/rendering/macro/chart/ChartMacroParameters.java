@@ -19,13 +19,8 @@
  */
 package org.xwiki.rendering.macro.chart;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.chart.ChartGenerator;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.rendering.internal.macro.chart.source.DataSource;
 
 /**
  * Parameters for chart macro.
@@ -58,7 +53,7 @@ public class ChartMacroParameters
     /**
      * @see ChartMacroParameters#getSource()
      */
-    private String source = "xdom";
+    private String source;
 
     /**
      * @see ChartMacroParameters#getParams()
@@ -166,20 +161,5 @@ public class ChartMacroParameters
     public void setParams(String params)
     {
         this.params = params;
-    }
-
-    /**
-     * @return a Map containing all the parameters.
-     */
-    public Map<String, String> getParametersMap()
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put(ChartGenerator.TITLE_PARAM, getTitle());
-        map.put(ChartGenerator.WIDTH_PARAM, String.valueOf(getWidth()));
-        map.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(getHeight()));
-        map.put(ChartGenerator.TYPE_PARAM, getType());
-        map.put(DataSource.SOURCE_PARAM, getSource());
-        map.put(DataSource.PARAMS_PARAM, getParams());
-        return map;
     }
 }

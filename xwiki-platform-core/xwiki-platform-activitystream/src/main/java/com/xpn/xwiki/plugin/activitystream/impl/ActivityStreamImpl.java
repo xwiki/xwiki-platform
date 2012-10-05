@@ -610,13 +610,39 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * @return True if the search methods must exclude hidden events, false otherwise.
+     * This method will add a where clause to filter events fired from hidden documents. The clause will not be added
+     * to the query if the user has specified that he wish to see hidden documents in his profile. If the clause is
+     * added this method will also add a 'where' to the query if it is missing.
+     *
+     * @param query The query to add the filter to
      */
-    private boolean filterHiddenEvents()
+    private void addHiddenEventsFilter(StringBuffer query)
     {
         ConfigurationSource source = Utils.getComponent(ConfigurationSource.class, "user");
         Integer preference = source.getProperty("displayHiddenDocuments", Integer.class);
-        return preference == null || preference != 1;
+        if (preference == null || preference != 1) {
+            if (!query.toString().contains(" where ")) {
+                query.append(" where ");
+            }
+            query.append(" (act.hidden <> true or act.hidden is null) and ");
+        }
+    }
+
+    /**
+     * This method will add the passed optional where clause to the given query if the optional clause is not an empty
+     * string nor null. If the clause is added this method will also add a 'where' to the query if it is missing.
+     *
+     * @param query The query to add the where clause to
+     * @param optionalWhereClause The optional where clause to add
+     */
+    private void addOptionalEventsFilter(StringBuffer query, String optionalWhereClause)
+    {
+        if (StringUtils.isNotBlank(optionalWhereClause)) {
+            if (!query.toString().contains(" where ")) {
+                query.append(" where ");
+            }
+            query.append(optionalWhereClause);
+        }
     }
 
     @Override
@@ -626,21 +652,18 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         StringBuffer searchHql = new StringBuffer();
         List<ActivityEvent> results;
 
-        String hiddenFilter = "";
-        if (filterHiddenEvents()) {
-            hiddenFilter = "(act.hidden <> true or act.hidden is null) and ";
-        }
-
         if (filter) {
             searchHql.append("select act from ActivityEventImpl as act, ActivityEventImpl as act2 ");
             searchHql.append(fromHql);
-            searchHql.append(" where act.eventId=act2.eventId and " + hiddenFilter);
+            searchHql.append(" where act.eventId=act2.eventId and ");
+            addHiddenEventsFilter(searchHql);
             searchHql.append(hql);
             searchHql.append(" group by act.requestId having (act.priority)=max(act2.priority) order by act.date desc");
         } else {
             searchHql.append("select act from ActivityEventImpl as act ");
             searchHql.append(fromHql);
-            searchHql.append(" where " + hiddenFilter);
+            searchHql.append(" where ");
+            addHiddenEventsFilter(searchHql);
             searchHql.append(hql);
             searchHql.append(" order by act.date desc");
         }
@@ -934,10 +957,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         List<Object[]> results;
 
         searchHql.append("select act.page, max(act.date) from ActivityEventImpl as act");
-        if (StringUtils.isNotBlank(optionalWhereClause)) {
-            searchHql.append(" where ");
-            searchHql.append(optionalWhereClause);
-        }
+        addHiddenEventsFilter(searchHql);
+        addOptionalEventsFilter(searchHql, optionalWhereClause);
         searchHql.append(" group by act.page order by 2 desc");
 
         String originalDatabase = context.getDatabase();
@@ -970,10 +991,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         searchHql.append("select year(act.date), month(act.date), day(act.date), act.page, max(act.date)"
             + "from ActivityEventImpl as act");
-        if (StringUtils.isNotBlank(optionalWhereClause)) {
-            searchHql.append(" where ");
-            searchHql.append(optionalWhereClause);
-        }
+        addHiddenEventsFilter(searchHql);
+        addOptionalEventsFilter(searchHql, optionalWhereClause);
         searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page order by 5 desc");
 
         String originalDatabase = context.getDatabase();

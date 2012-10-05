@@ -19,6 +19,8 @@
  */
 package org.xwiki.workspace.internal;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.workspace.Workspace;
 
 import com.xpn.xwiki.api.Document;
@@ -69,5 +71,34 @@ public class DefaultWorkspace implements Workspace
     public Document getGroupDocument()
     {
         return groupDocument;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(3, 17).append(wikiDocument == null ? 0 : wikiDocument.getPrefixedFullName())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+
+        DefaultWorkspace that = (DefaultWorkspace) object;
+        if (this.wikiDocument != null && that.wikiDocument != null) {
+            return new EqualsBuilder().append(this.wikiDocument.getPrefixedFullName(),
+                that.wikiDocument.getPrefixedFullName()).isEquals();
+        } else {
+            return false;
+        }
     }
 }

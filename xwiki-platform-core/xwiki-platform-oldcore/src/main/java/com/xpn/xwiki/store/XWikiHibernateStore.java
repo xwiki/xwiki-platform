@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
-    private static final Logger log = LoggerFactory.getLogger(XWikiHibernateStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateStore.class);
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
@@ -251,6 +252,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
 
+            // Capture Logs since we voluntarily generate storage errors to check if the wiki already exists and
+            // we don't want to pollute application logs with "normal errors"...
+            if (!LOGGER.isDebugEnabled()) {
+                this.loggerManager.pushLogListener(null);
+            }
+
             context.setDatabase(wikiName);
             try {
                 setDatabase(session, context);
@@ -271,6 +278,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+            }
+
+            // Restore proper logging
+            if (!LOGGER.isDebugEnabled()) {
+                this.loggerManager.popLogListener();
             }
         }
 
@@ -357,7 +369,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.DERBY == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema);
+                stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
             } else if (DatabaseProduct.DB2 == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + escapedSchema + " RESTRICT");
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
@@ -652,8 +664,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 }
                             }
                             if (newProperty == null) {
-                                log.warn("Incompatible data migration when changing field {} of class {}",
-                                    prop.getName(), prop.getClassName());
+                                LOGGER.warn("Incompatible data migration when changing field {} of class {}",
+                                        prop.getName(), prop.getClassName());
                                 continue;
                             }
                             newProperty.setId(brokenProperty.getId());
@@ -870,7 +882,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         }
 
-        log.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
+        LOGGER.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
 
         return doc;
     }
@@ -1346,10 +1358,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             } catch (ObjectNotFoundException e) {
-                // Let's accept that there is no data in property tables
-                // but log it
-                if (log.isErrorEnabled()) {
-                    log.error("No data for property " + property.getName() + " of object id " + property.getId());
+                // Let's accept that there is no data in property tables but log it
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("No data for property " + property.getName() + " of object id " + property.getId());
                 }
             }
 
@@ -1785,7 +1796,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
-        List<DocumentReference> backlinkReferences = new ArrayList<DocumentReference>();
+        // Note: Ideally the method should return a Set but it would break the current API.
+
+        // TODO: We use a Set here so that we don't get duplicates. In the future, when we can reference a page in
+        // another language using a syntax, we should modify this code to return one DocumentReference per language
+        // found. To implement this we need to be able to either serialize the reference with the language information
+        // or add some new column for the XWikiLink table in the database.
+        Set<DocumentReference> backlinkReferences = new HashSet<DocumentReference>();
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1820,7 +1838,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
             }
         }
-        return backlinkReferences;
+        return new ArrayList<DocumentReference>(backlinkReferences);
     }
 
     /**
@@ -2708,13 +2726,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String propname = hibprop.getName();
             PropertyClass propclass = (PropertyClass) bclass.getField(propname);
             if (propclass == null) {
-                log.warn("Mapping contains invalid field name " + propname);
+                LOGGER.warn("Mapping contains invalid field name " + propname);
                 return false;
             }
 
             boolean result = isValidColumnType(hibprop.getValue().getType().getName(), propclass.getClassName());
             if (result == false) {
-                log.warn("Mapping contains invalid type in field " + propname);
+                LOGGER.warn("Mapping contains invalid type in field " + propname);
                 return false;
             }
         }

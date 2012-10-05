@@ -323,7 +323,7 @@ function publishEntry(publishServiceName, blogPostName, sourceElement) {
   sourceElement.parentNode.removeChild(sourceElement);}});
   return false;
 }
-document.observe("dom:loaded", XWiki.Blog.initialize);</code>
+document.observe("xwiki:dom:loaded", XWiki.Blog.initialize);</code>
     </property>
     <property>
       <name>Blog enhancement scripts</name>

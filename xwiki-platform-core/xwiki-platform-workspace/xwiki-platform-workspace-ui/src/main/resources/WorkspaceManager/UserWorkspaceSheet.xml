@@ -299,8 +299,8 @@ if (XWiki.isInitialized) {
     </property>
   </object>
   <content>{{velocity}}
-#set($obj = $doc.getObject('XWiki.XWikiUsers'))
-#if(!$obj)
+#set ($obj = $doc.getObject('XWiki.XWikiUsers'))
+#if (!$obj)
 = $msg.get('xe.admin.users.sheet') =
 
 {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
@@ -314,10 +314,10 @@ if (XWiki.isInitialized) {
   #end
   #set($documentUser = $doc.prefixedFullName)
   #set($isMyProfile = ($currentUser == $documentUser))
-  {{html clean="false"}}
-  &lt;div class="half column"&gt;
+  {{html clean='false'}}
+  &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
-      &lt;h1&gt;Joined workspaces&lt;/h1&gt;
+      &lt;h1&gt;$msg.get('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
       #set ($joinedWorkspacesDescriptors = [])
       #set ($workspaces = $services.workspace.getWorkspaces())
       #foreach ($workspace in $workspaces)
@@ -331,20 +331,20 @@ if (XWiki.isInitialized) {
         #end
       #end
       #if ($joinedWorkspacesDescriptors.size() == 0)
-        &lt;span&gt;#if($isMyProfile)You are#{else}The user is#end not a member of any workspace yet.&lt;/span&gt;
+        &lt;span&gt;#if ($isMyProfile)$msg.get('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$msg.get('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
       #else
         &lt;ul id='workspaces'&gt;
         #foreach ($workspaceWikiDescriptor in $joinedWorkspacesDescriptors)
           &lt;li id='$workspaceWikiDescriptor.wikiName'&gt;
             &lt;span class='workspaceHomepage'&gt;&lt;a href='$workspaceWikiDescriptor.homePageUrl'&gt;$workspaceWikiDescriptor.getValue('wikiprettyname')&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;show activity &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;$msg.get('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;
       #end
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div id='workspaceActivity' class="half column"&gt;
+  &lt;div id='workspaceActivity' class='half column'&gt;
     &lt;div id='workspaceActivityColumn'&gt;
     &lt;/div&gt;
   &lt;/div&gt;

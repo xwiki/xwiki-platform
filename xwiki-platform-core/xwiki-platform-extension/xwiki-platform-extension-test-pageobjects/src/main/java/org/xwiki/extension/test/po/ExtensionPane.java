@@ -154,13 +154,13 @@ public class ExtensionPane extends BaseElement
     {
         String nameAndVersion = getUtil().findElementWithoutWaiting(getDriver(), container, EXTENSION_NAME).getText();
         button.click();
-        waitUntilElementIsVisible(By.xpath(String.format("//*[contains(@class, 'extension-item') and "
-            + "descendant::*[contains(@class, 'extension-name') and . = '%s']]%s", nameAndVersion, xpathSuffix)));
+        waitUntilElementIsVisible(By.xpath(String.format("//*[contains(@class, 'extension-item') and descendant::*"
+            + "[contains(@class, 'extension-name') and normalize-space(.) = '%s']]%s", nameAndVersion, xpathSuffix)));
         // We have to create a new extension pane because the DOM has changed.
         return new ExtensionPane(getUtil().findElementWithoutWaiting(
             getDriver(),
-            By.xpath(String.format("//*[contains(@class, 'extension-item') and"
-                + " descendant::*[contains(@class, 'extension-name') and . = '%s']]", nameAndVersion))));
+            By.xpath(String.format("//*[contains(@class, 'extension-item') and descendant::*["
+                + "contains(@class, 'extension-name') and normalize-space(.) = '%s']]", nameAndVersion))));
     }
 
     /**
@@ -186,7 +186,7 @@ public class ExtensionPane extends BaseElement
         return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']/*"
             + "[@class = 'extension-body-progress extension-body-section' and "
             + "(descendant::input[@name = 'confirm' and not(@disabled)] or "
-            + "count(descendant::div[contains(@class, 'extension-log-item-loading')]) = 0)]");
+            + "count(descendant::li[contains(@class, 'extension-log-item-loading')]) = 0)]");
     }
 
     /**
@@ -290,7 +290,7 @@ public class ExtensionPane extends BaseElement
      */
     private WebElement clickTab(String label)
     {
-        By tabXPath = By.xpath(".//*[@class = 'innerMenu']//a[. = '" + label + "']");
+        By tabXPath = By.xpath(".//*[@class = 'innerMenu']//a[normalize-space(.) = '" + label + "']");
         List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, tabXPath);
         if (found.size() == 0) {
             return null;

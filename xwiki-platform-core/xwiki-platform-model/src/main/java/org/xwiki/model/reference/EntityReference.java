@@ -27,7 +27,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -37,6 +39,12 @@ import org.xwiki.model.EntityType;
  */
 public class EntityReference implements Serializable, Cloneable, Comparable<EntityReference>
 {
+    /**
+     * Used to provide a nice and readable pretty name for the {@link #toString()} method.
+     */
+    protected static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =
+        new LocalizedStringEntityReferenceSerializer();
+
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
@@ -377,29 +385,9 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     public String toString()
     {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("name = [")
-            .append(getName())
-            .append("], type = [")
-            .append(getType())
-            .append("], parent = [")
-            .append(getParent())
-            .append(']');
-        if (parameters != null) {
-            sb.append(" parameters = {");
-            boolean first = true;
-            for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(", ");
-                }
-                sb.append(entry.getKey())
-                    .append(" = [")
-                    .append(entry.getValue().toString())
-                    .append(']');
-            }
-            sb.append('}');
-        }
+        sb.append(StringUtils.capitalize(StringUtils.lowerCase(getType().toString())));
+        sb.append(' ');
+        sb.append(TOSTRING_SERIALIZER.serialize(this));
         return sb.toString();
     }
 
@@ -423,7 +411,12 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     @Override
     public int hashCode()
     {
-        return toString().hashCode();
+        return new HashCodeBuilder(3, 17)
+            .append(getName())
+            .append(getType())
+            .append(getParent())
+            .append(this.parameters)
+            .toHashCode();
     }
 
     @Override

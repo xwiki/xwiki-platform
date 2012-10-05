@@ -158,9 +158,7 @@ public class Utils
             disablePlaceholders(context);
             content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
         } catch (IOException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("IOException while evaluating template [" + template + "] from /templates/", e);
-            }
+            LOGGER.debug("IOException while evaluating template [{}] from /templates/", template, e);
 
             // get Error template "This template does not exist
             try {

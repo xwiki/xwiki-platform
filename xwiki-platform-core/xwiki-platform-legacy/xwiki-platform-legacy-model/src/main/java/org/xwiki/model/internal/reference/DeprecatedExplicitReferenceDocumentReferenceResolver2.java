@@ -50,6 +50,6 @@ public class DeprecatedExplicitReferenceDocumentReferenceResolver2 implements
     @Override
     public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
-        return this.resolver.resolve((EntityReference) documentReferenceRepresentation, parameters);
+        return this.resolver.resolve(documentReferenceRepresentation, parameters);
     }
 }

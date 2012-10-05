@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,9 +59,9 @@ public class XWikiJaxRsApplication extends Application
         ComponentManager componentManager =
             (ComponentManager) context.getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
 
-        /* Look up all the component that are markes as XWikiRestComponent. */
+        /* Look up all the component that are marked as XWikiRestComponent. */
         List<ComponentDescriptor<XWikiRestComponent>> cds =
-            componentManager.getComponentDescriptorList(XWikiRestComponent.class);
+            componentManager.getComponentDescriptorList((Type) XWikiRestComponent.class);
 
         for (ComponentDescriptor<XWikiRestComponent> cd : cds) {
             this.jaxRsClasses.add(cd.getImplementation());

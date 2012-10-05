@@ -63,6 +63,12 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     }
 
     @Override
+    public LocalExtension getLocalExtension(ExtensionId extensionId)
+    {
+        return safe(getWrapped().getLocalExtension(extensionId));
+    }
+
+    @Override
     public Collection<LocalExtension> getLocalExtensions()
     {
         return safe(getWrapped().getLocalExtensions());

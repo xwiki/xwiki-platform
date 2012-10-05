@@ -55,7 +55,9 @@ public class SxResourceSource implements SxSource
     public String getContent()
     {
         try {
-            InputStream in = this.getClass().getResourceAsStream("/" + this.resourceName);
+            // Load from the current context class loader to allow extensions to contribute skin extensions.
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            InputStream in = contextClassLoader.getResourceAsStream(this.resourceName);
             return IOUtils.toString(in);
         } catch (NullPointerException e) {
             // This happens when the file was not found. Forward an IAE so that the sx action returns 404

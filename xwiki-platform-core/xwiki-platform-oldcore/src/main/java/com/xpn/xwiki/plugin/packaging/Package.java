@@ -34,18 +34,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -55,6 +54,13 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryException;
@@ -89,6 +95,13 @@ public class Package
     private String name = "My package";
 
     private String description = "";
+
+    /**
+     * @see #isInstallExension()
+     */
+    private boolean installExension = true;
+
+    private String extensionId;
 
     private String version = "1.0.0";
 
@@ -128,6 +141,40 @@ public class Package
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public String getId()
+    {
+        return this.extensionId;
+    }
+
+    public void setId(String id)
+    {
+        this.extensionId = id;
+    }
+
+    /**
+     * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
+     *         <code>false</code> otherwise.
+     */
+    public boolean isInstallExension()
+    {
+        return this.installExension;
+    }
+
+    public void setInstallExension(boolean installExension)
+    {
+        this.installExension = installExension;
+    }
+
+    public String getExtensionId()
+    {
+        return this.extensionId;
+    }
+
+    public void setExtensionId(String extensionId)
+    {
+        this.extensionId = extensionId;
     }
 
     public String getVersion()
@@ -383,7 +430,7 @@ public class Package
         return "";
     }
 
-    /**
+/**
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
      * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
      *
@@ -624,9 +671,47 @@ public class Package
             // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
             // imported documents. But for the moment it's fine
             om.notify(new XARImportedEvent(), null, context);
+
+            registerExtension(context);
         }
 
         return status;
+    }
+
+    private void registerExtension(XWikiContext context)
+    {
+        // Register the package as extension if it's one
+        if (isInstallExension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
+            ExtensionId extensionId = new ExtensionId(getExtensionId(), getVersion());
+
+            try {
+                LocalExtensionRepository localRepository = Utils.getComponent(LocalExtensionRepository.class);
+
+                LocalExtension localExtension;
+                try {
+                    localExtension = Utils.getComponent(LocalExtensionRepository.class).resolve(extensionId);
+                } catch (ResolveException e1) {
+                    Extension extension;
+                    try {
+                        // Try to find and download the extension from a repository
+                        extension = Utils.getComponent(ExtensionRepositoryManager.class).resolve(extensionId);
+                    } catch (ResolveException e) {
+                        LOGGER.debug("Can't find extension [{}]", extensionId, e);
+
+                        // FIXME: Create a dummy extension. Need support for partial/lazy extension.
+                        return;
+                    }
+
+                    localExtension = localRepository.storeExtension(extension);
+                }
+
+                // Register the extension as installed
+                Utils.getComponent(InstalledExtensionRepository.class).installExtension(localExtension,
+                    "wiki:" + context.getDatabase(), false);
+            } catch (Exception e) {
+                LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
+            }
+        }
     }
 
     /**
@@ -1149,9 +1234,14 @@ public class Package
 
     protected String getElementText(Element docel, String name)
     {
+        return getElementText(docel, name, "");
+    }
+
+    protected String getElementText(Element docel, String name, String def)
+    {
         Element el = docel.element(name);
         if (el == null) {
-            return "";
+            return def;
         } else {
             return el.getText();
         }
@@ -1163,12 +1253,14 @@ public class Package
         Document domdoc = reader.read(xml);
 
         Element docEl = domdoc.getRootElement();
+
         Element infosEl = docEl.element("infos");
 
         this.name = getElementText(infosEl, "name");
         this.description = getElementText(infosEl, "description");
         this.licence = getElementText(infosEl, "licence");
         this.authorName = getElementText(infosEl, "author");
+        this.extensionId = getElementText(infosEl, "extensionId", null);
         this.version = getElementText(infosEl, "version");
         this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();

@@ -22,6 +22,9 @@ package org.xwiki.query.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -29,7 +32,6 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Query filter excluding 'hidden' documents from a {@link Query}. Hidden documents should not be returned in public
@@ -40,8 +42,8 @@ import javax.inject.Singleton;
  */
 @Component
 @Named("hidden")
-@Singleton
-public class HiddenDocumentFilter implements QueryFilter
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class HiddenDocumentFilter implements QueryFilter, Initializable
 {
     /**
      * Used to retrieve user preference regarding hidden documents.
@@ -57,12 +59,18 @@ public class HiddenDocumentFilter implements QueryFilter
     private Logger logger;
 
     /**
-     * @return true if the filter must be applied, depending on the user configuration, false otherwise.
+     * @see #initialize()
      */
-    private boolean isActive()
+    private boolean isActive;
+
+    /**
+     * Sets the #isActive property, based on the user configuration.
+     */
+    @Override
+    public void initialize()
     {
         Integer preference = userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class);
-        return preference == null || preference != 1;
+        isActive = preference == null || preference != 1;
     }
 
     /**
@@ -82,7 +90,7 @@ public class HiddenDocumentFilter implements QueryFilter
         String lowerStatement = result.toLowerCase();
         String original = result;
 
-        if (Query.HQL.equals(language) && isActive() && isFilterable(lowerStatement)) {
+        if (Query.HQL.equals(language) && isActive && isFilterable(lowerStatement)) {
 
             int idx = lowerStatement.indexOf("where ");
             if (idx >= 0) {

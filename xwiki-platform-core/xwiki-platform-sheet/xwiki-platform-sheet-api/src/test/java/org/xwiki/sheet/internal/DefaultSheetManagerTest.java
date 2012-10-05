@@ -26,6 +26,7 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.jmock.Sequence;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -34,6 +35,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.sheet.SheetManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -45,7 +47,8 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @since 4.2M1
  */
 @AllComponents
-public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
+@MockingRequirement(value = DefaultSheetManager.class, exceptions = { DocumentReferenceResolver.class })
+public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase<SheetManager>
 {
     /**
      * The name of the execution context sheet property.
@@ -53,7 +56,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
     private static final String SHEET_PROPERTY = "sheet";
 
     /**
-     * The action property of the sheet descriptor class. See {@value #SHEET_CLASS_REFERENCE}.
+     * The action property of the sheet descriptor class. See {@link #SHEET_CLASS_REFERENCE}.
      */
     private static final String ACTION_PROPERTY = "action";
 
@@ -67,12 +70,6 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
      */
     private static final DocumentReference SHEET_CLASS_REFERENCE = new DocumentReference(WIKI_NAME, "XWiki",
         "SheetDescriptorClass");
-
-    /**
-     * The component being tested.
-     */
-    @MockingRequirement(exceptions = { DocumentReferenceResolver.class })
-    private DefaultSheetManager sheetManager;
 
     /**
      * The execution context.
@@ -104,11 +101,9 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
      */
     private DocumentModelBridge document;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
-
         documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         documentSheetBinder = getComponentManager().getInstance(SheetBinder.class, "document");
         classSheetBinder = getComponentManager().getInstance(SheetBinder.class, "class");
@@ -154,7 +149,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        Assert.assertEquals(Arrays.asList(sheetReference), sheetManager.getSheets(document, "view"));
+        Assert.assertEquals(Arrays.asList(sheetReference), getMockedComponent().getSheets(document, "view"));
 
         // (2) The sheet is specified on the execution context but the target document is not the current document.
         getMockery().checking(new Expectations()
@@ -170,7 +165,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.emptySet()));
             }
         });
-        Assert.assertTrue(sheetManager.getSheets(document, "edit").isEmpty());
+        Assert.assertTrue(getMockedComponent().getSheets(document, "edit").isEmpty());
 
         // (3) The sheet is not specified on the execution context.
         context.removeProperty(SHEET_PROPERTY);
@@ -186,7 +181,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        Assert.assertTrue(sheetManager.getSheets(document, "get").isEmpty());
+        Assert.assertTrue(getMockedComponent().getSheets(document, "get").isEmpty());
     }
 
     /**
@@ -257,6 +252,6 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        sheetManager.getSheets(document, currentAction);
+        getMockedComponent().getSheets(document, currentAction);
     }
 }

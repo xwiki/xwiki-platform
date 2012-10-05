@@ -28,7 +28,7 @@
 #set ($confirm = $request.confirm)
 ##
 #if ("$!workspaceId" == '')
-  {{error}}The [workspaceId] parameter is not specified.{{/error}}
+  {{error}}$msg.get('platform.workspace.oneParameterNotSpecified', 'workspaceId'){{/error}}
 #else
   ## FIXME: add plugin dependency checks.
   ##
@@ -38,9 +38,9 @@
   ##
   #if ("$!workspace" == '')
     #if ("$!{WorkspaceManager.lastException}" != '')
-      {{error}}Exception: $!{WorkspaceManager.lastException.message}{{/error}}
+      {{error}}$msg.get('platform.workspace.exceptionWithMessage', $WorkspaceManager.lastException.message){{/error}}
     #else
-      {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', ["$workspaceId"]){{/error}}
+      {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', $workspaceId){{/error}}
     #end
   #else
     #set ($wikiDescriptor = $workspace.wikiDescriptor)
@@ -61,12 +61,12 @@
     ##
     #set ($existingMemberObject = $workspaceGroupDocumentRestricted.getXObject($groupsClassReference, 'member', $currentUser))
     #if ("$!existingMemberObject" != '')
-      {{info}}The user [[$currentUser]] is already a member of the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/info}}
+      {{info}}$msg.get('platform.workspace.userAlreadyMemberOfWorkspace', [$currentUser, $workspaceName, $workspaceUrl]){{/info}}
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
       #set ($loginDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiLogin'))
       #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
       #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
-      {{error}}In order to continue, you need to [[log in&gt;&gt;$loginUrl]] first.{{/error}}
+      {{error}}$msg.get('platform.workspace.logInToContinue', $loginUrl){{/error}}
     #else
       ## The user is not already a member of the workspace.
       ##
@@ -92,8 +92,8 @@
         #if ($request.acceptInvitation || $request.rejectInvitation)
           ##
           ## The user decided whether to accept or to reject the invitation.
-          #set ($saveComment = "The user $currentUser accepted the invitation.")
-          #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has accepted the invitation to join the workspace '${workspaceName}' ($workspaceId).")
+          #set ($saveComment = $msg.get('platform.workspace.invitationUserAcceptedSaveComment', $currentUser))
+          #set ($notificationMessage = $msge.get('platform.workspace.invitationUserAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${workspaceName}, $workspaceId]))
           ## Common values.
           #set ($temp = $existingInvitation.setDateValue('date', $datetool.date))
           #set ($temp = $existingInvitation.setLargeStringValue('userComment', "$!{escapetool.xml($request.userComment)}"))
@@ -104,8 +104,8 @@
             #set ($newMemberObject = $workspaceGroupDocumentRestricted.newXObject($groupsClassReference, $xcontext.context))
             #set ($temp = $newMemberObject.setStringValue('member', $currentUser))
           #else
-            #set ($saveComment = "The user $currentUser rejected the invitation.")
-            #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has rejected the invitation to join the workspace '${workspaceName}' ($workspaceId).")
+            #set ($saveComment = $msg.get('platform.workspace.invitationUserRejectedSaveComment', $currentUser))
+            #set ($notificationMessage = $msg.get('platform.workspace.invitationUserRejectedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${workspaceName}, $workspaceId]))
             #set ($temp = $existingInvitation.setStringValue('status', 'rejected'))
           #end
           ## Save changes.
@@ -116,37 +116,37 @@
           ## Display the proper success info.
           {{success}}
           #if ($request.acceptInvitation)
-            The user [[$currentUser]] successfully accepted the invitation and joined the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
+            $msg.get('platform.workspace.invitationUserAcceptedSuccess', [$currentUser, $workspaceName, $workspaceUrl])
           #else
-            The user [[$currentUser]] successfully rejected the invitation to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
+            $msg.get('platform.workspace.invitationUserRejectedSuccess', [$currentUser, $workspaceName, $workspaceUrl])
           #end
           {{/success}}
         #else
           ##
           ## User can decide if to accept or reject the invitation.
           {{html wiki='true'}}
-          You have been invited to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].
+          $msg.get('platform.workspace.invitationViewTitle', [$workspaceName, $workspaceUrl])
 
           &lt;form class='xform third' method='GET'&gt;
             &lt;dl&gt;
             #if ("$!existingInvitation.get('reviewerComment').getValue()" != '')
               &lt;dt&gt;
-                &lt;label&gt;Invitation message:&lt;/label&gt;
+                &lt;label&gt;$msg.get('platform.workspace.invitationMessageLabel')&lt;/label&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 $existingInvitation.get('reviewerComment').getValue()
               &lt;/dd&gt;
             #end  
               &lt;dt&gt;
-                &lt;label for='userComment'&gt;Reply&lt;/label&gt;
-                &lt;span class='xHint'&gt;A reply message to send, viewable by the workspace admin, in which you can motivate your decision.&lt;/span&gt;
+                &lt;label for='userComment'&gt;$msg.get('platform.workspace.invitationReplyLabel')&lt;/label&gt;
+                &lt;span class='xHint'&gt;$msg.get('platform.workspace.invitationReplyHint')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
               &lt;span class='buttonwrapper'&gt;
                 &lt;br/&gt;
-                &lt;input type='submit' name='acceptInvitation' value='Accept' class='button'/&gt;
-                &lt;input type='submit' name='rejectInvitation' value='Reject' class='button'/&gt;
-                &lt;a href="$backUrl" class='button secondary'&gt;Later&lt;/a&gt;
+                &lt;input type='submit' name='acceptInvitation' value="$msg.get('platform.workspace.invitationAcceptLabel')" class='button'/&gt;
+                &lt;input type='submit' name='rejectInvitation' value="$msg.get('platform.workspace.invitationRejectLabel')" class='button'/&gt;
+                &lt;a href="$backUrl" class='button secondary'&gt;$msg.get('platform.workspace.invitationPostponeLabel')&lt;/a&gt;
               &lt;/span&gt;
               &lt;input type='hidden' name='workspaceId' value="$!workspaceId"/&gt;
               &lt;input type='hidden' name='workspaceName' value="$!workspaceName"/&gt;
@@ -155,11 +155,11 @@
           {{/html}}
         #end
       ##
-      ## The user is not invited to join, continue based on the current membership type of the workspace.
+      ## The user is not invited to join. Continue based on the current membership type of the workspace.
       #elseif ($membershipType == 'invite')
         ##
         ## User does not have an invitation.
-        {{error}}This workspace is invite only. In order to join it, you need to receive an invitation from one of its admins.{{/error}}
+        {{error}}$msg.get('platform.workspace.joinErrorNeedInvitation'){{/error}}
       #elseif ($membershipType == 'request')
         ## Determine if a pending request already exists.
         ##
@@ -177,41 +177,41 @@
           #if ("$!{request.cancelJoinRequest}" != '1')
             ## Request already exists.
             ##
-            {{info}}The user [[$currentUser]] already has a pending request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]. Please wait for a workspace admin to review it.{{/info}}
+            {{info}}$msg.get('platform.workspace.joinRequestPendingRequestExists', [$currentUser, $workspaceName, $workspaceUrl]){{/info}}
           #elseif ("$!confirm" != '1')
             ## User wants to cancel existing request.
             ##
             #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
             {{box}}
-              Are you sure you want cancel the request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]?
+              $msg.get('platform.workspace.joinRequestCancelConfirmation', [$workspaceName, $workspaceUrl])
               ((({{html}}
-                &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;Yes&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;No&lt;/a&gt;&lt;/span&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$msg.get('platform.workspace.joinRequestCancelYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$msg.get('platform.workspace.joinRequestCancelNo')&lt;/a&gt;&lt;/span&gt;
               {{/html}})))
             {{/box}}
           #else
             ## User confirms the cancel of existing request.
             ##
             #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($pendingRequest))
-            #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser canceled his join request.", true, $xcontext.context))
-            {{success}}The user [[$currentUser]] successfully canceled the request to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
+            #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $msg.get('platform.workspace.joinRequestCancelSaveCommit', $currentUser), true, $xcontext.context))
+            {{success}}$msg.get('platform.workspace.joinRequestCancelSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
           #end
         #elseif ("$!confirm" != '1')
           ## Join request.
           ##
           {{html wiki='true'}}
-            To join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]], you must first issue a join request. After this, a workspace admin will review your request and consider accepting or rejecting it.
+            $msg.get('platform.workspace.joinRequestHint', [$workspaceName, $workspaceUrl])
 
             &lt;form class='xform third' method='GET'&gt;
               &lt;dl&gt;
                 &lt;dt&gt;
-                  &lt;label for='userComment'&gt;Message&lt;/label&gt;
-                  &lt;span class='xHint'&gt;A message to send, viewable by the workspace admin, in which you can motivate this join request.&lt;/span&gt;
+                  &lt;label for='userComment'&gt;$msg.get('platform.workspace.joinRequestMessageLabel')&lt;/label&gt;
+                  &lt;span class='xHint'&gt;$msg.get('platform.workspace.joinRequestMessageHint')&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
                 &lt;span class='buttonwrapper'&gt;
                   &lt;br/&gt;
-                  &lt;input type='submit' name='submit' value='Send Request' class='button'/&gt;
-                  &lt;a href="$backUrl" class='button secondary'&gt;Back&lt;/a&gt;
+                  &lt;input type='submit' name='submit' value="$msg.get('platform.workspace.joinRequestSendLabel')" class='button'/&gt;
+                  &lt;a href="$backUrl" class='button secondary'&gt;$msg.get('platform.workspace.joinRequestCancelLabel')&lt;/a&gt;
                 &lt;/span&gt;
                 &lt;input type='hidden' name='workspaceId' value="$!workspaceId"/&gt;
                 &lt;input type='hidden' name='workspaceName' value="$!workspaceName"/&gt;
@@ -229,12 +229,12 @@
           #set ($temp = $newRequestObject.setLargeStringValue('userComment', "$!{escapetool.xml($request.userComment)}"))
           #set ($temp = $newRequestObject.setStringValue('status', 'pending'))
           #set ($temp = $newRequestObject.setStringValue('type', 'request'))
-          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser requested to join the workspace.", true, $xcontext.context))
+          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $msg.get('platform.workspace.joinRequestSaveComment', $currentUser), true, $xcontext.context))
           ## Send message to workspace admins. (XWikiAdminGroup)
           #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
-          #set ($notificationMessage = "The user '${xwiki.getUserName($currentUser, false)}' ($currentUser) has requested to join the workspace '${workspaceName}' ($workspaceId).")
+          #set ($notificationMessage = $msg.get('platform.workspace.joinRequestNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $workspaceName, $workspaceId]))
           #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
-          {{success}}The user [[$currentUser]] successfully sent the request to join workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
+          {{success}}$msg.get('platform.workspace.joinRequestSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
         #end
       #else
         ## Open membership as default.
@@ -244,9 +244,9 @@
           ##
           #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
           {{box}}
-            Are you sure you want to join the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]?
+            $msg.get('platform.workspace.joinConfirmation', [$workspaceName, $workspaceUrl])
             ((({{html}}
-              &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;Yes&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;No&lt;/a&gt;&lt;/span&gt;
+              &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$msg.get('platform.workspace.joinYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$msg.get('platform.workspace.joinNo')&lt;/a&gt;&lt;/span&gt;
             {{/html}})))
           {{/box}}
         #else
@@ -254,8 +254,8 @@
           ##
           #set ($newMemberObject = $workspaceGroupDocumentRestricted.newXObject($groupsClassReference, $xcontext.context))
           #set ($temp = $newMemberObject.setStringValue('member', $currentUser))
-          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, "The user $currentUser joined the workspace.", true, $xcontext.context))
-          {{success}}The user [[$currentUser]] successfully joined workspace [[$workspaceName&gt;&gt;$workspaceUrl]].{{/success}}
+          #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $msg.get('platform.workspace.joinSaveComment', $currentUser), true, $xcontext.context))
+          {{success}}$msg.get('platform.workspace.joinSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
         #end
       #end
     #end

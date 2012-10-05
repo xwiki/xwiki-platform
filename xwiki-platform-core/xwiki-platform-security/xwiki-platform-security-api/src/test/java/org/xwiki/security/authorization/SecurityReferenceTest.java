@@ -29,6 +29,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.SecurityReference;
+import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -43,11 +44,9 @@ import static org.junit.Assert.assertThat;
  * @version $Id$
  * @since 4.0M2
  */
-public class SecurityReferenceTest extends AbstractMockingComponentTestCase
+@MockingRequirement(DefaultSecurityReferenceFactory.class)
+public class SecurityReferenceTest extends AbstractMockingComponentTestCase<SecurityReferenceFactory>
 {
-    @MockingRequirement
-    private DefaultSecurityReferenceFactory factory;
-
     private EntityReference xwiki = new EntityReference("xwiki", EntityType.WIKI);
     private EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
     private EntityReference xspace = new EntityReference("space", EntityType.SPACE,
@@ -58,34 +57,35 @@ public class SecurityReferenceTest extends AbstractMockingComponentTestCase
     private EntityReference mainEntity = new EntityReference("page", EntityType.DOCUMENT, xspace);
     
     @Before
-    @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         final XWikiBridge wikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
         getMockery().checking(new Expectations()
         {{
                 allowing(wikiBridge).getMainWikiReference();
                 will(returnValue(new WikiReference("xwiki")));
-            }});
+        }});
     }
 
     @Test
     public void testEquality() throws Exception
     {
-        assertThat(factory.newEntityReference(mainEntity), equalTo(factory.newEntityReference(mainEntity)));
-        assertThat(factory.newEntityReference(subEntity), equalTo(factory.newEntityReference(subEntity)));
-        assertThat(factory.newEntityReference(mainEntity), not(equalTo(factory.newEntityReference(subEntity))));
-        assertThat(factory.newEntityReference(subEntity), not(equalTo(factory.newEntityReference(mainEntity))));
+        assertThat(getMockedComponent().newEntityReference(mainEntity),
+            equalTo(getMockedComponent().newEntityReference(mainEntity)));
+        assertThat(getMockedComponent().newEntityReference(subEntity),
+            equalTo(getMockedComponent().newEntityReference(subEntity)));
+        assertThat(getMockedComponent().newEntityReference(mainEntity),
+            not(equalTo(getMockedComponent().newEntityReference(subEntity))));
+        assertThat(getMockedComponent().newEntityReference(subEntity),
+            not(equalTo(getMockedComponent().newEntityReference(mainEntity))));
     }
 
     @Test
     public void testGetReversedSecurityReferenceChain() throws Exception
     {
-
-        List<SecurityReference> subList = (List<SecurityReference>) factory.newEntityReference(subEntity).getReversedSecurityReferenceChain();
+        List<SecurityReference> subList = (List<SecurityReference>) getMockedComponent().newEntityReference(subEntity)
+            .getReversedSecurityReferenceChain();
         assertThat(subList.get(0), equalTo(xwiki));
         assertThat(subList.get(0).getOriginalReference(), equalTo(xwiki));
         assertThat(subList.get(1), equalTo(wiki));
@@ -95,7 +95,8 @@ public class SecurityReferenceTest extends AbstractMockingComponentTestCase
         assertThat(subList.get(3), equalTo(subEntity));
         assertThat(subList.get(3).getOriginalReference(), equalTo(subEntity));
 
-        List<SecurityReference> mainList = (List<SecurityReference>) factory.newEntityReference(mainEntity).getReversedSecurityReferenceChain();
+        List<SecurityReference> mainList = (List<SecurityReference>) getMockedComponent().newEntityReference(mainEntity)
+            .getReversedSecurityReferenceChain();
         assertThat(mainList.get(0), equalTo(xwiki));
         assertThat(mainList.get(0).getOriginalReference(), equalTo(xwiki));
         assertThat(mainList.get(1), equalTo(xspace));

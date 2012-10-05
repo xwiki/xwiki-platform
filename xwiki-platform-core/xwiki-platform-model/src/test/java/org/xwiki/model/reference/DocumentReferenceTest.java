@@ -21,6 +21,7 @@ package org.xwiki.model.reference;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Test;
 import org.xwiki.model.EntityType;
@@ -77,8 +78,7 @@ public class DocumentReferenceTest
             new DocumentReference(new EntityReference("page", EntityType.DOCUMENT, new WikiReference("wiki")));
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [name = [wiki], type = [WIKI], parent = [null]] in a "
-                + "document reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [Wiki wiki] in a document reference", expected.getMessage());
         }
     }
 
@@ -130,5 +130,18 @@ public class DocumentReferenceTest
         Assert.assertEquals(new SpaceReference("space1", new WikiReference("wiki")), spaceRefs2.get(0));
         Assert.assertEquals(new SpaceReference("space2", new SpaceReference("space1", new WikiReference("wiki"))),
             spaceRefs2.get(1));
+    }
+
+    @Test
+    public void testToString()
+    {
+        DocumentReference reference1 = new DocumentReference("wiki", "space", "page");
+        Assert.assertEquals("wiki:space.page", reference1.toString());
+
+        DocumentReference reference2 = new DocumentReference("wiki", "space", "page", Locale.FRANCE);
+        Assert.assertEquals("wiki:space.page(fr_FR)", reference2.toString());
+
+        DocumentReference reference3 = new DocumentReference("wiki", "space", "page", "en");
+        Assert.assertEquals("wiki:space.page(en)", reference3.toString());
     }
 }

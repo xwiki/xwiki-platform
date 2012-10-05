@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
@@ -90,7 +90,7 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20080701</version>
-      <!-- This this provided as a transitive dependency of xwiki-platform-rest-server -->
+      <!-- This is provided as a transitive dependency of xwiki-platform-rest-server -->
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -103,6 +103,16 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parsers</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+      <groupId>de.l3s.boilerpipe</groupId>
+      <artifactId>boilerpipe</artifactId>
     </dependency>
     <!-- Runtime dependencies -->
     <dependency>

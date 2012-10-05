@@ -41,10 +41,31 @@
   <logger name="com.xpn.xwiki.render.XWikiRadeoxRenderEngine" level="warn"/>
 
   <!-- Hibernate logging options -->
+
+  <!-- Global level for all Hibernate logs -->
   <logger name="org.hibernate" level="warn"/>
-  <logger name="org.hibernate.type" level="warn"/>
-  <logger name="org.hibernate.ps.PreparedStatementCache" level="warn"/>
+
+  <!-- Log HQL query parser activity -->
+  <logger name="org.hibernate.hql.ast.AST" level="warn"/>
+  <!-- Log just the SQL -->
   <logger name="org.hibernate.SQL" level="warn"/>
+  <!-- Log JDBC bind parameters -->
+  <logger name="org.hibernate.type" level="warn"/>
+  <!-- Log schema export/update -->
+  <logger name="org.hibernate.tool.hbm2ddl" level="warn"/>
+  <!-- Log HQL parse trees -->
+  <logger name="org.hibernate.hql" level="warn"/>
+  <!-- Log cache activity -->
+  <logger name="org.hibernate.cache" level="warn"/>
+  <!-- Log transaction activity -->
+  <logger name="org.hibernate.transaction" level="warn"/>
+  <!-- Log JDBC resource acquisition -->
+  <logger name="org.hibernate.jdbc" level="warn"/>
+  <!-- Enable the following line if you want to track down connection leakages when using
+       DriverManagerConnectionProvider -->
+  <logger name="org.hibernate.connection.DriverManagerConnectionProvider" level="warn"/>
+  <!-- Log prepared statement cache activity -->
+  <logger name="org.hibernate.ps.PreparedStatementCache" level="warn"/>
 
   <!-- Deactivate Struts warnings -->
   <logger name="org.apache.struts.util.RequestUtils" level="error"/>

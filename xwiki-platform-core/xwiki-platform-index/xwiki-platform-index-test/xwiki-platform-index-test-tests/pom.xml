@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-test</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-test-tests</artifactId>
   <name>XWiki Platform - Index - Tests - Functional Tests</name>
@@ -78,6 +78,17 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
+           browser several times -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/AllTests.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

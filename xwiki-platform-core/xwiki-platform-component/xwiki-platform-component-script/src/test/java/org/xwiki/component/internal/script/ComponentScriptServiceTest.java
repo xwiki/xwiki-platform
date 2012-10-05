@@ -20,9 +20,11 @@
 package org.xwiki.component.internal.script;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -34,13 +36,19 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.1M2
  */
+@MockingRequirement(ComponentScriptService.class)
 public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
     private ComponentScriptService css;
 
     private interface SomeRole
     {
+    }
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.css = getComponentManager().getInstance(ScriptService.class, "component");
     }
 
     @Test
@@ -108,6 +116,7 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
 
         Assert.assertTrue(this.css.getInstance(SomeRole.class, "hint") instanceof SomeRole);
     }
+
     @Test
     public void getComponentManagerWhenProgrammingRights() throws Exception
     {

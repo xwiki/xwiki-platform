@@ -118,7 +118,7 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     @Override
     public DocumentReference getAnnotationClassReference()
     {
-        String annotationClassName = configuration.get().getProperty("annotationClass");
+        String annotationClassName = configuration.get().getProperty("annotationClass", "XWiki.XWikiComments");
 
         return resolver.resolve(annotationClassName);
     }

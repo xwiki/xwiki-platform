@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -74,11 +74,6 @@
       <version>4.3</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-    </dependency>
-
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
     <dependency>
       <groupId>info.informatica</groupId>
@@ -93,20 +88,10 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
-         http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
-         allow a release (this is for reproducibility). Thus we've had to upload JTidy into
-         our custom repository -->
     <dependency>
-      <groupId>jtidy</groupId>
+      <groupId>net.sf.jtidy</groupId>
       <artifactId>jtidy</artifactId>
-      <version>8.0-20060801.131059-3-dev</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>dom3-xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>r938</version>
     </dependency>
     
     <!-- Required by the XML-RPC implementation and tests.
@@ -174,12 +159,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
-    
+
     <!-- For extracting metadata from various document types -->
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>1.2</version>
     </dependency>
 
     <!-- XML processing -->
@@ -368,7 +352,7 @@
       <artifactId>yuicompressor</artifactId>
       <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
            yuicompressor -->
-      <version>2.4.2-xwiki</version>
+      <version>2.4.7-xwiki</version>
     </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>
@@ -457,6 +441,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other
@@ -575,6 +564,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -762,6 +756,9 @@
               **/i18n/i18n.java,
               **/internal/DefaultCoreConfiguration.java,
               **/internal/DefaultXWikiStubContextProvider.java,
+              **/internal/mandatory/AbstractRightsDocumentInitializer.java,
+              **/internal/mandatory/XWikiPreferencesDocumentInitializer.java,
+              **/internal/mandatory/XWikiUsersDocumentInitializer.java,
               **/internal/model/reference/CompactStringEntityReferenceSerializer.java,
               **/internal/model/reference/CompactWikiStringEntityReferenceSerializer.java,
               **/internal/model/reference/CurrentEntityReferenceValueProvider.java,

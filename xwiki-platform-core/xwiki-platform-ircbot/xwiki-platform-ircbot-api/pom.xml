@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ircbot</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot-api</artifactId>
   <name>XWiki Platform - IRC Bot - API</name>
   <packaging>jar</packaging>
   <description>Java API for the IRC Bot Application</description>
+  <properties>
+    <xwiki.clover.targetPercentage>55%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.pircbotx</groupId>

@@ -22,6 +22,6 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{include document="Main.Dashboard"/}}</content>
 </xwikidoc>

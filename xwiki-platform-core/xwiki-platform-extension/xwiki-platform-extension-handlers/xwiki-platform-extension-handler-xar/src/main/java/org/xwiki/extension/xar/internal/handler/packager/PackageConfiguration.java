@@ -22,8 +22,6 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
-
 /**
  * @version $Id$
  * @since 4.0M2
@@ -36,8 +34,6 @@ public interface PackageConfiguration
 
     boolean isInteractive();
 
-    MergeConfiguration getMergeConfiguration();
-    
     JobStatus getJobStatus();
 
     boolean isLogEnabled();

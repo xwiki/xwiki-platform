@@ -43,13 +43,17 @@ public class CancelAction extends XWikiAction
         XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
 
         String username = context.getUser();
-        XWikiLock lock = tdoc.getLock(context);
-        if (lock != null && lock.getUserName().equals(username)) {
-            if ("inline".equals(request.get("action"))) {
-                doc.removeLock(context);
-            } else {
-                tdoc.removeLock(context);
+        try {
+            XWikiLock lock = tdoc.getLock(context);
+            if (lock != null && lock.getUserName().equals(username)) {
+                if ("inline".equals(request.get("action"))) {
+                    doc.removeLock(context);
+                } else {
+                    tdoc.removeLock(context);
+                }
             }
+        } catch (Exception ex) {
+            // Just ignore this, locks aren't critical.
         }
 
         // forward to view

@@ -3,12 +3,7 @@ var XWiki = (function(XWiki) {
 var editors = XWiki.editors = XWiki.editors || {};
 editors.XDataEditors = Class.create({
   initialize : function() {
-    this.classDocument = $$('meta[name=document]')[0].content;
-    this.classDocumentName = $$('meta[name=page]')[0].content;
-    this.classDocumentSpace = $$('meta[name=space]')[0].content;
-    // URL template generated from velocity
-    this.urlEditTemplate = "$xwiki.getURL('__space__.__page__', 'edit')".replace('__space__', this.classDocumentSpace).replace('__page__', this.classDocumentName);
-    this.urlAddPropertyTemplate = "$xwiki.getURL('__space__.__page__', 'propadd')".replace('__space__', this.classDocumentSpace).replace('__page__', this.classDocumentName);
+    this.editedDocument = XWiki.currentDocument;
 
     $$('.xclass').each(function(item) {
       this.enhanceClassUX(item);
@@ -57,7 +52,11 @@ editors.XDataEditors = Class.create({
             classNameVal = classNameElt.options[classNameElt.selectedIndex].value;
           }
           validClassName = classNameVal && classNameVal != '-';
-          url = this.urlEditTemplate + "?xpage=editobject&xaction=addObject&className=" + classNameVal;
+          url = this.editedDocument.getURL('edit', Object.toQueryString({
+            xpage: 'editobject',
+            xaction: 'addObject',
+            className: classNameVal
+          }));
         }
         if (!item.disabled && validClassName) {
           new Ajax.Request(
@@ -221,7 +220,17 @@ editors.XDataEditors = Class.create({
         item.blur();
         event.stop();
         if (!item.disabled && item._x_propnameElt.value != '' && item._x_proptypeElt.selectedIndex >= 0) {
-          var ref = this.urlAddPropertyTemplate + "?propname=" + item._x_propnameElt.value + "&proptype=" + item._x_proptypeElt.options[item._x_proptypeElt.selectedIndex].value + "&xredirect=" + encodeURIComponent(this.urlEditTemplate + "?xpage=editclass&xaction=displayProperty&propName=" + item._x_propnameElt.value) + "&form_token=" + item._x_form_tokenElt.value;
+          var editURL = this.editedDocument.getURL('edit', Object.toQueryString({
+            xpage: 'editclass',
+            xaction: 'displayProperty',
+            propName: item._x_propnameElt.value
+          }));
+          var ref = this.editedDocument.getURL('propadd', Object.toQueryString({
+            propname: item._x_propnameElt.value,
+            proptype: item._x_proptypeElt.options[item._x_proptypeElt.selectedIndex].value,
+            xredirect: editURL,
+            form_token: item._x_form_tokenElt.value
+          }));
           new Ajax.Request(
             /* Ajax request URL */
             ref,
@@ -469,7 +478,7 @@ editors.XDataEditors = Class.create({
       }.bindAsEventListener());
     });
     // Attach behavior to the move buttons
-    Sortable.create('xclassContent', {
+    Sortable.create($('xclassContent'), {
       tag : 'div',
       only : 'xproperty',
       handle : 'move',

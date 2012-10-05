@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.util.Random;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.apache.commons.io.IOUtils;
@@ -68,7 +69,39 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
                                   attach.getAttachment_content().getContentInputStream()));
     }
 
-    /** An InputStream which will return a stream of zeros of length given in the constructor. */
+    @Test
+    public void testSetContentViaOutputStream() throws Exception
+    {
+        int attachLength = 20;
+        int seed = (int) System.currentTimeMillis();
+        final XWikiAttachment attach = new XWikiAttachment();
+        final InputStream ris = new RandomInputStream(attachLength, seed);
+        attach.setContent(ris);
+        Assert.assertTrue(
+            IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
+                                  attach.getAttachment_content().getContentInputStream()));
+        // Now write to the attachment via an OutputStream.
+        final XWikiAttachmentContent xac = attach.getAttachment_content();
+        xac.setContentDirty(false);
+        final OutputStream os = xac.getContentOutputStream();
+
+        // Adding content with seed+1 will make a radically different set of content.
+        IOUtils.copy(new RandomInputStream(attachLength, seed + 1), os);
+
+        // It should still be the old content.
+        Assert.assertTrue(
+            IOUtils.contentEquals(new RandomInputStream(attachLength, seed), xac.getContentInputStream()));
+        Assert.assertFalse(xac.isContentDirty());
+
+        os.close();
+
+        // Now it should be the new content.
+        Assert.assertTrue(
+            IOUtils.contentEquals(new RandomInputStream(attachLength, seed + 1), xac.getContentInputStream()));
+        Assert.assertTrue(xac.isContentDirty());
+    }
+
+    /** An InputStream which will return a stream of random bytes of length given in the constructor. */
     private static class RandomInputStream extends InputStream
     {
         private int bytes;

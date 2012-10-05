@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -113,7 +114,9 @@ public class OfficeExporter extends PdfExportImpl
         String outputFileName = "export_output." + format.getExtension();
 
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
-        inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes()));
+        // We assume that the HTML was generated using the XWiki encoding.
+        Charset charset = Charset.forName(context.getWiki().getEncoding());
+        inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes(charset)));
         addEmbeddedObjects(inputStreams, context);
 
         OpenOfficeConverter documentConverter = ooManager.getConverter();

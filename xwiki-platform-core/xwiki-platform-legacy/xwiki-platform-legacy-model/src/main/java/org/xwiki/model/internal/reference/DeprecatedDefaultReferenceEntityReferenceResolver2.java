@@ -47,6 +47,6 @@ public class DeprecatedDefaultReferenceEntityReferenceResolver2 implements Entit
     @Override
     public EntityReference resolve(EntityReference entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        return this.resolver.resolve((EntityReference) entityReferenceRepresentation, type, parameters);
+        return this.resolver.resolve(entityReferenceRepresentation, type, parameters);
     }
 }

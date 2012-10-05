@@ -48,20 +48,18 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
+@MockingRequirement(DefaultEventFactory.class)
 public class EventAndFactoryTest extends AbstractMockingComponentTestCase
 {
+    private EventFactory factory;
+
     Event defaultEvent;
 
     Event rawEvent;
 
-    @MockingRequirement
-    private DefaultEventFactory factory;
-
-    @Override
     @Before
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
         final DocumentAccessBridge mockDocumentAccessBridge =
             getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
@@ -91,6 +89,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
                 will(returnValue(new DocumentReference("xwiki", "XWiki", "Admin")));
             }
         });
+        this.factory = getComponentManager().getInstance(EventFactory.class);
         this.defaultEvent = this.factory.createEvent();
         this.rawEvent = this.factory.createRawEvent();
     }

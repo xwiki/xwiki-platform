@@ -27,15 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension</artifactId>
   <name>XWiki Platform - Extension - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Parent POM</description>
   <modules>
-    <module>xwiki-platform-extension-handlers</module>
     <module>xwiki-platform-extension-cluster</module>
+    <module>xwiki-platform-extension-distribution</module>
+    <module>xwiki-platform-extension-handlers</module>
     <module>xwiki-platform-extension-script</module>
     <module>xwiki-platform-extension-ui</module>
   </modules>

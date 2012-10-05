@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{{
 # Wiki Manager translation page
 wikimanager.wikimanager=Wiki Manager
@@ -150,6 +150,9 @@ wikimanager.doc.createwiki.members.readers=Give "read" and "comment" rights to p
 wikimanager.doc.createwiki.members.writers=Give readers rights as well as "write" to provided users and groups.
 wikimanager.doc.createwiki.members.administrators=Give "admin" right which means all rights to provided users and groups.
 wikimanager.doc.createwiki.summary=You are about to create a new wiki with following options. Makes sure it's correct. You can click Previous to reach previous pages and modify informations.
+
+# APPLICATIONS PANEL ENTRY
+wikimanager.panels.applicationsPanelEntryLabel=Wiki Manager
 
 # MOVE IN STANDARD XWIKI
 error.ERROR_XWIKI_ACCESS_DENIED=You don't have permission to make this action.

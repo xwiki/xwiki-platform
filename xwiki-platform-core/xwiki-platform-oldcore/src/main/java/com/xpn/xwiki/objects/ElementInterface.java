@@ -69,6 +69,18 @@ public interface ElementInterface
      * @param mergeResult the merge report
      * @since 3.2M1
      */
-    void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration, XWikiContext context,
-        MergeResult mergeResult);
+    void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult);
+
+    /**
+     * Apply the provided element so that the current one contains the same informations and indicate if it was
+     * necessary to modify it in any way.
+     * 
+     * @param newElement the element to apply
+     * @param clean true if informations that are not in the new element should be removed (for example class properties
+     *            not in the new class)
+     * @return true if the element has been modified
+     * @since 4.3M1
+     */
+    boolean apply(ElementInterface newElement, boolean clean);
 }

@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentEventManager;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
@@ -71,12 +70,6 @@ public class ContextComponentManager extends DelegateComponentManager implements
 
     @Override
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException
-    {
-        throwException();
-    }
-
-    @Override
-    public void release(Object component) throws ComponentLifecycleException
     {
         throwException();
     }

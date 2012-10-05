@@ -62,11 +62,23 @@ public class XWikiLDAPConnection
     private LDAPConnection connection;
 
     /**
+     * @param context the XWiki context.
+     * @return the maximum number of milliseconds the client waits for any operation under these constraints to
+     *         complete.
+     */
+    private int getTimeout(XWikiContext context)
+    {
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        return config.getLDAPTimeout(context);
+    }
+
+    /**
      * @return the {@link LDAPConnection}.
      */
     public LDAPConnection getConnection()
     {
-        return connection;
+        return this.connection;
     }
 
     /**
@@ -159,7 +171,7 @@ public class XWikiLDAPConnection
 
             // set referral following
             LDAPConstraints constraints = this.connection.getConstraints();
-            constraints.setTimeLimit(1000);
+            constraints.setTimeLimit(getTimeout(context));
             constraints.setReferralFollowing(true);
             constraints.setReferralHandler(new LDAPPluginReferralHandler(loginDN, password, context));
             this.connection.setConstraints(constraints);
@@ -331,7 +343,7 @@ public class XWikiLDAPConnection
     {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("LDAP search: baseDN=[{}] query=[{}] attr=[{}] ldapScope=[{}]", new Object[] {baseDN, filter,
-                attr != null ? Arrays.asList(attr) : null, ldapScope});
+            attr != null ? Arrays.asList(attr) : null, ldapScope});
         }
 
         return this.connection.search(baseDN, ldapScope, filter, attr, false);

@@ -24,10 +24,12 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.csrf.internal.CSRFTokenInvalidator;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -38,11 +40,17 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.0M1
  */
+@MockingRequirement(CSRFTokenInvalidator.class)
 public class CSRFTokenInvalidatorTest extends AbstractMockingComponentTestCase
 {
     /** Tested component. */
-    @MockingRequirement
-    private CSRFTokenInvalidator invalidator;
+    private EventListener invalidator;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.invalidator = getComponentManager().getInstance(EventListener.class, "csrf-token-invalidator");
+    }
 
     /**
      * Test that the list of monitored events contains an ActionExecutingEvent for the /logout/ action.

@@ -104,6 +104,9 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void postDirectMessageToUser(String message, DocumentReference user)
     {
+        if (!this.bridge.exists(user)) {
+            throw new IllegalArgumentException("Target user does not exist");
+        }
         Event e = createMessageEvent(message, "directMessage");
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiUsers", user));
         e.setStream(this.serializer.serialize(user));
@@ -114,6 +117,9 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void postMessageToGroup(String message, DocumentReference group) throws IllegalAccessError
     {
+        if (!this.bridge.exists(group)) {
+            throw new IllegalArgumentException("Target group does not exist");
+        }
         Event e = createMessageEvent(message, "groupMessage");
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiGroups", group));
         e.setStream(this.serializer.serialize(group));

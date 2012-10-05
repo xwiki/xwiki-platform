@@ -27,14 +27,11 @@
 
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
-#if($hasEdit)
-$xwiki.jsx.use($blogScriptsDocumentName)##
-##
-##
-##
 #set($name = "$!request.entryTitle")
 #if($name == '')
   ## First step, display the create form
+  #if($hasEdit)
+  $xwiki.jsx.use($blogScriptsDocumentName)##
   #set($space = "$!request.entrySpace")
   #if($space == '')
     #set($space = $doc.space)
@@ -49,6 +46,9 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
     &lt;label class="createPost" for="entryTitle"&gt;$msg.get('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$msg.get('xe.blog.post.title')" class="withTip" size="30" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="${escapetool.xml($msg.get('xe.blog.post.create'))}" class="button"/&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;/form&gt;
+  #elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
+    #template('accessdenied.vm')
+  #end## hasEdit
 #else
   ## Second step, form submitted, create the document
   #set($space = "$!request.entrySpace")
@@ -66,9 +66,5 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #end
   $response.sendRedirect($xwiki.getURL($postDocName, 'edit', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}&amp;form_token=$!{request.getParameter('form_token')}"))
 #end## name == ''
-#elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
-  #template('accessdenied.vm')
-#end## hasEdit
 {{/html}}
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

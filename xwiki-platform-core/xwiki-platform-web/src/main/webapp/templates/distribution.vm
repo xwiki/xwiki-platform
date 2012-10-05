@@ -47,21 +47,31 @@
   #template('htmlfooter.vm')
 #end
 
-#macro(displayStepHeader $stepId)
+#macro(displayStepHeader $currentStepId)
   <div class="wizard-header">
     #set ($stepNames = {
       'welcome': $msg.get('extensions.distribution.wizardTitle'),
       'extension.mainui': 'User Interface',
       'extension.outdatedextensions': 'Extensions'
     })
-    #set ($stepOrder = ['extension.mainui', 'extension.outdatedextensions'])
-    #set ($stepNumber = $stepOrder.indexOf($stepId))
-    <h1>#if ($stepNumber >= 0)Step $mathtool.add($stepNumber, 1) &#151; #{end}$!stepNames.get($stepId)</h1>
+    #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)
+    <h1>#if ($currentStepIndex > 0)Step $currentStepIndex &#151; #{end}$!stepNames.get($currentStepId)</h1>
+    #set ($steps = $services.distribution.jobStatus.steps)
+    ## Ignore the welcome step.
+    #set ($steps = $steps.subList(1, $steps.size()))
     <ul class="steps">
-      #foreach ($step in $stepOrder)
+      #foreach ($step in $steps)
         <li>
-          <span class="number#if($step == $stepId) active#end">$velocityCount</span>
-          <span class="name#if($step == $stepId) active#end">$stepNames.get($step)</span>
+          #set ($stepStatus = "")
+          #set ($stepNumber = $velocityCount)
+          #if ($step.stepId == $currentStepId)
+            #set ($stepStatus = " active")
+          #elseif($velocityCount < $currentStepIndex)
+            #set ($stepStatus = " done")
+            #set ($stepNumber = '&#10004;')
+          #end
+          <span class="number$stepStatus">$stepNumber</span>
+          <span class="name$stepStatus">$stepNames.get($step.stepId)</span>
         </li>
       #end
     </ul>
@@ -94,11 +104,11 @@
     'extension.outdatedextensions': 'Update the installed extensions'
   })
   <ul class="steps vertical">
-    #foreach ($step in $stepOrder)
+    #foreach ($step in $steps)
     <li>
       <span class="number">$velocityCount</span>
-      <span class="name">$stepNames.get($step)</span>
-      <span class="description">$stepGoals.get($step)</span>
+      <span class="name">$stepNames.get($step.stepId)</span>
+      <span class="description">$stepGoals.get($step.stepId)</span>
     </li>
     #end
   </ul>

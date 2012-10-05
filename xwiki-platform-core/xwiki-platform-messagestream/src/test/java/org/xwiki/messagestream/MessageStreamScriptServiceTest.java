@@ -36,7 +36,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  */
 @MockingRequirement(MessageStreamScriptService.class)
-public class MessageStreamScriptServiceTest extends AbstractMockingComponentTestCase
+public class MessageStreamScriptServiceTest extends AbstractMockingComponentTestCase<ScriptService>
 {
     private MessageStreamScriptService streamService;
 

@@ -161,4 +161,31 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
         });
         Assert.assertFalse(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
     }
+
+    @Test
+    public void testDeleteMessage() throws Exception
+    {
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockStream).deleteMessage("abc123");
+            }
+        });
+        Assert.assertTrue(this.streamService.deleteMessage("abc123"));
+    }
+
+    @Test
+    public void testDeleteMessageWithFailure() throws Exception
+    {
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockStream).deleteMessage("abc123");
+                will(throwException(new IllegalArgumentException()));
+            }
+        });
+        Assert.assertFalse(this.streamService.deleteMessage("abc123"));
+    }
 }

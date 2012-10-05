@@ -218,6 +218,20 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase<MessageS
     }
 
     @Test
+    public void testGetRecentPersonalMessages() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+        this.stream.getRecentPersonalMessages();
+    }
+
+    @Test
+    public void testGetRecentPersonalMessagesForAuthor() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+        this.stream.getRecentPersonalMessages(this.currentUser);
+    }
+
+    @Test
     public void testGetRecentPersonalMessagesWithNegativeLimit() throws Exception
     {
         setupForLimitQueries(30, 0);

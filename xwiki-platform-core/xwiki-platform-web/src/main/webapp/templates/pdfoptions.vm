@@ -17,7 +17,8 @@
   <div class="main layoutsubsection">
   <div id="mainContentArea">
     <div id="document-title"><h1>$msg.get('core.export.pdf.options.title')</h1></div>
-    <form id="pdfExportOptions" method="get" class="xform half" action="$doc.getURL('export')">
+    ## Submit using POST method to preserve the query string parameters of the action URL.
+    <form id="pdfExportOptions" method="post" class="xform half" action="$doc.getURL('export', $request.qs)">
       <div class="hidden">
         <input type="hidden" name="format" value="pdf" />
       </div>
@@ -88,7 +89,7 @@
       </dl>
       <div class="buttons">
         <span class="buttonwrapper"><input type="submit" value="$msg.get('export')" class="button" /></span>
-        <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$msg.get('cancel')</a></span>
+        <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view', $request.qs)">$msg.get('cancel')</a></span>
       </div>
     </form>
     <div class="clearfloats"></div>

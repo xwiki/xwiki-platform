@@ -46,6 +46,7 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
@@ -245,6 +246,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
         final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);
         final StringWriter writer = new StringWriter();
+        final EntityReferenceSerializer<String> serializer =
+            registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
         writer.append("value=foo");
         final XDOM xdom = new XDOM(new ArrayList<Block>());
         extensionObjects.add(extensionObject);
@@ -253,6 +256,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         getMockery().checking(new Expectations()
         {
             {
+                allowing(serializer).serialize(with(any(EntityReference.class)), with(anything()));
+                will(returnValue("does not matter"));
                 oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(extensionObjects));
                 oneOf(xwiki).getRightService();
@@ -263,7 +268,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue(true));
                 oneOf(extensionObject).getReference();
                 will(returnValue(extensionReference));
-                oneOf(extensionObject).getStringValue(NAME_PROPERTY);
+                oneOf(extensionObject).getStringValue(ID_PROPERTY);
                 will(returnValue("name"));
                 oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
                 will(returnValue("extensionPointId"));
@@ -281,6 +286,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue(execution));
                 oneOf(componentManager).getInstance(VelocityManager.class);
                 will(returnValue(velocityManager));
+                oneOf(componentManager).getInstance(EntityReferenceSerializer.TYPE_STRING);
+                will(returnValue(serializer));
                 allowing(velocityManager).getVelocityEngine();
                 will(returnValue(velocityEngine));
                 allowing(velocityManager).getVelocityContext();

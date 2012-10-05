@@ -20,10 +20,7 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,7 +33,6 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -63,16 +59,18 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 @Component
 @Singleton
-@Named("xar")
+@Named(XarExtensionHandler.TYPE)
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
-    private static final String WIKI_NAMESPACEPREFIX = "wiki:";
+    public static final String TYPE = "xar";
 
-    private static final String PROPERTY_USERREFERENCE = "user.reference";
+    protected static final String WIKI_NAMESPACEPREFIX = "wiki:";
 
-    private static final String PROPERTY_CALLERREFERENCE = "caller.reference";
+    protected static final String PROPERTY_USERREFERENCE = "user.reference";
 
-    private static final String PROPERTY_CHECKRIGHTS = "checkrights";
+    protected static final String PROPERTY_CALLERREFERENCE = "caller.reference";
+
+    protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
     /**
      * The full name (space.page) of the XWikiPreference page.
@@ -88,7 +86,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private Packager packager;
 
     @Inject
-    @Named("xar")
+    @Named(XarExtensionHandler.TYPE)
     private InstalledExtensionRepository xarRepository;
 
     @Inject
@@ -103,7 +101,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
-    private String getWikiFromNamespace(String namespace) throws UnsupportedNamespaceException
+    protected static String getWikiFromNamespace(String namespace) throws UnsupportedNamespaceException
     {
         String wiki = namespace;
 
@@ -119,7 +117,17 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         return wiki;
     }
 
-    // TODO: support question/answer with the UI to resolve conflicts
+    protected static DocumentReference getRequestUserReference(String property, Request request)
+    {
+        Object obj = request.getProperty(property);
+
+        if (obj instanceof DocumentReference) {
+            return (DocumentReference) obj;
+        }
+
+        return null;
+    }
+
     @Override
     public void install(LocalExtension localExtension, String namespace, Request request) throws InstallException
     {
@@ -137,7 +145,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    // TODO: support question/answer with the UI to resolve conflicts
     @Override
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace,
         Request request) throws InstallException
@@ -163,33 +170,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
             // Install new pages
             install(previousXarExtension, newLocalExtension, wiki, request);
-
-            // Uninstall old version pages not anymore in the new version
-            Set<XarEntry> previousPages = new HashSet<XarEntry>(previousXarExtension.getPages());
-
-            List<XarEntry> newPages;
-            try {
-                XarInstalledExtension newXarExtension =
-                    (XarInstalledExtension) this.xarRepository.resolve(newLocalExtension.getId());
-                newPages = newXarExtension.getPages();
-            } catch (ResolveException e) {
-                try {
-                    newPages = this.packager.getEntries(new File(newLocalExtension.getFile().getAbsolutePath()));
-                } catch (IOException e1) {
-                    throw new InstallException("Failed to get xar extension [" + newLocalExtension.getId() + "] pages",
-                        e);
-                }
-            }
-
-            for (XarEntry entry : newPages) {
-                previousPages.remove(entry);
-            }
-
-            try {
-                this.packager.unimportPages(previousPages, createPackageConfiguration(request, wiki));
-            } catch (Exception e) {
-                this.logger.warn("Exception when cleaning pages removed since previous xar extension version", e);
-            }
         }
     }
 
@@ -257,17 +237,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         return configuration;
-    }
-
-    private DocumentReference getRequestUserReference(String property, Request request)
-    {
-        Object obj = request.getProperty(property);
-
-        if (obj instanceof DocumentReference) {
-            return (DocumentReference) obj;
-        }
-
-        return null;
     }
 
     private String getRequestUserString(String property, Request request)

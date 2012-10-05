@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-handlers</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handler-xar</artifactId>
   <name>XWiki Platform - Extension - Handler - XAR</name>
@@ -45,6 +45,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-script</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -91,4 +96,43 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/ConflictQuestion.java,
+              **/UnsupportedNamespaceException.java,
+              **/XarExtensionHandler.java,
+              **/XarExtensionJobFinishedListener.java,
+              **/DefaultPackageConfiguration.java,
+              **/DefaultPackager.java,
+              **/NotADocumentException.java,
+              **/PackageConfiguration.java,
+              **/Packager.java,
+              **/PackagerException.java,
+              **/XarEntry.java,
+              **/XarEntryMergeResult.java,
+              **/XarFile.java,
+              **/XarMergeResult.java,
+              **/AbstractHandler.java,
+              **/AttachmentHandler.java,
+              **/DocumentHandler.java,
+              **/DocumentImporterHandler.java,
+              **/RootHandler.java,
+              **/UnknownRootElement.java,
+              **/XarPageLimitedHandler.java,
+              **/XarInstalledExtension.java,
+              **/XarInstalledExtensionRepository.java,
+              **/DocumentScriptSafeProvider.java,
+              **/SafeConflictQuestion.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

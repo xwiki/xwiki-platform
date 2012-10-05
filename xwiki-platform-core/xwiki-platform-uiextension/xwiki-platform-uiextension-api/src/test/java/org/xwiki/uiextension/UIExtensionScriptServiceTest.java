@@ -36,6 +36,8 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -49,6 +51,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
+import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 import org.xwiki.uiextension.internal.scripting.UIExtensionScriptService;
 import org.xwiki.velocity.VelocityManager;
 
@@ -74,51 +77,52 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
     private UIExtensionScriptService service;
 
-    private Map<String, UIExtension> uiExtensions = new HashMap<String, UIExtension>();
-
-    private BlockRenderer blockRenderer;
+    private List<UIExtension> uiExtensions = new ArrayList<UIExtension>();
 
     private Transformation transformation;
 
-    private Execution execution;
+    //private Execution execution;
+
+    private EntityReferenceSerializer<String> serializer;
 
     XDOM xdom = new XDOM(new ArrayList<Block>());
 
     @Before
     public void configure() throws Exception
     {
-        execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext context = new ExecutionContext();
+        //execution = getComponentManager().getInstance(Execution.class);
+        //final ExecutionContext context = new ExecutionContext();
 
         contextComponentManager =
             getComponentManager().registerMockComponent(getMockery(), ComponentManager.class, "context", "context");
         final Provider<ComponentManager> componentManagerProvider =
             getComponentManager().getInstance(
                 new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        blockRenderer =
-            getComponentManager().registerMockComponent(getMockery(), BlockRenderer.class,
-                Syntax.XHTML_1_0.toIdString());
         getComponentManager().registerMockComponent(getMockery(), VelocityManager.class);
+        serializer = registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
         transformation = getComponentManager().registerMockComponent(getMockery(), Transformation.class, "macro");
         this.service = getComponentManager().getInstance(ScriptService.class, "uix");
-        uiExtensions.put("1id3", new WikiUIExtension(OBJ1_REF, "1id3", "epId1", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.put("1id1", new WikiUIExtension(OBJ2_REF, "1id1", "epId1", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.put("1id2", new WikiUIExtension(OBJ3_REF, "1id2", "epId1", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.put("2id1", new WikiUIExtension(OBJ4_REF, "2id1", "epId2", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
 
         getMockery().checking(new Expectations()
         {
             {
-                allowing(execution).getContext();
-                will(returnValue(context));
+                //allowing(execution).getContext();
+                //will(returnValue(context));
+                allowing(serializer).serialize(with(any(EntityReference.class)), with(anything()));
+                will(returnValue("does not matter"));
                 allowing(componentManagerProvider).get();
                 will(returnValue(contextComponentManager));
             }
         });
+
+        uiExtensions.add(new WikiUIExtension(OBJ1_REF, "1id3", "epId1", xdom, Syntax.XWIKI_2_0,
+            new HashMap<String, String>(), getComponentManager()));
+        uiExtensions.add(new WikiUIExtension(OBJ2_REF, "1id1", "epId1", xdom, Syntax.XWIKI_2_0,
+            new HashMap<String, String>(), getComponentManager()));
+        uiExtensions.add(new WikiUIExtension(OBJ3_REF, "1id2", "epId1", xdom, Syntax.XWIKI_2_0,
+            new HashMap<String, String>(), getComponentManager()));
+        uiExtensions.add(new WikiUIExtension(OBJ4_REF, "2id1", "epId2", xdom, Syntax.XWIKI_2_0,
+            new HashMap<String, String>(), getComponentManager()));
     }
 
     @Test
@@ -127,7 +131,7 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(contextComponentManager).getInstanceMap(UIExtension.class);
+                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
                 will(returnValue(uiExtensions));
             }
         });
@@ -142,7 +146,7 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(contextComponentManager).getInstanceMap(UIExtension.class);
+                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
                 will(returnValue(uiExtensions));
             }
         });
@@ -157,17 +161,21 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(contextComponentManager).getInstanceMap(UIExtension.class);
+                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
                 will(returnValue(uiExtensions));
+                oneOf(contextComponentManager).getInstance(UIExtensionFilter.class, "sortById");
+                will(returnValue(new SortByIdFilter()));
             }
         });
 
         List<UIExtension> extensions = new ArrayList<UIExtension>();
-        extensions.addAll(this.service.getExtensions("epId1"));
+        HashMap<String, String> filters = new HashMap<String, String>();
+        filters.put("sortById", "");
+        extensions.addAll(this.service.getExtensions("epId1", filters));
 
-        Assert.assertEquals("1id1", extensions.get(0).getName());
-        Assert.assertEquals("1id2", extensions.get(1).getName());
-        Assert.assertEquals("1id3", extensions.get(2).getName());
+        Assert.assertEquals("1id1", extensions.get(0).getId());
+        Assert.assertEquals("1id2", extensions.get(1).getId());
+        Assert.assertEquals("1id3", extensions.get(2).getId());
     }
 
     @Test
@@ -176,7 +184,7 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(contextComponentManager).getInstanceMap(UIExtension.class);
+                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
                 will(throwException(new ComponentLookupException("")));
                 // Make sure it prints an error in the log
                 oneOf(getMockLogger()).error(with(any(String.class)), with(any(ComponentLookupException.class)));
@@ -185,24 +193,5 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
         Collection<UIExtension> extensions = this.service.getExtensions("doesn'tMatter");
         Assert.assertEquals(0, extensions.size());
-    }
-
-
-
-    @Test
-    public void render() throws Exception
-    {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(contextComponentManager).getInstanceMap(UIExtension.class);
-                will(returnValue(uiExtensions));
-                allowing(transformation).transform(with(any(XDOM.class)), with(any(TransformationContext.class)));
-                allowing(blockRenderer).render(with(any(Block.class)), with(any(WikiPrinter.class)));
-            }
-        });
-
-        String result = this.service.render("epId1");
-        Assert.assertEquals("", result);
     }
 }

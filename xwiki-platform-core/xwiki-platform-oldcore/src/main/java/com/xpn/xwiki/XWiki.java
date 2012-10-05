@@ -749,16 +749,16 @@ public class XWiki implements EventListener
         // Prepare the store
         setConfig(config);
 
-        XWikiStoreInterface basestore =
+        XWikiStoreInterface mainStore =
             Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint", "hibernate"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
-            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(basestore, context);
+            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
             setStore(cachestore);
         } else {
-            setStore(basestore);
+            setStore(mainStore);
         }
 
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",

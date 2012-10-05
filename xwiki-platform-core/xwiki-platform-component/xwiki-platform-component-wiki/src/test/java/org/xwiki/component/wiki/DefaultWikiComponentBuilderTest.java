@@ -254,8 +254,8 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
             {
                 oneOf(componentDoc).getObject(COMPONENT_CLASS);
                 will(returnValue(componentObject));
-                allowing(componentDoc).getPrefixedFullName();
-                will(returnValue("xwiki:XWiki.MyComponent"));
+                allowing(componentDoc).getDocumentReference();
+                will(returnValue(DOC_REFERENCE));
                 oneOf(componentObject).getStringValue(COMPONENT_ROLE_TYPE_FIELD);
                 will(returnValue(TestRole.class.getCanonicalName()));
                 oneOf(componentObject).getStringValue(COMPONENT_ROLE_HINT_FIELD);
@@ -264,6 +264,8 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
                 will(returnValue(1));
                 oneOf(componentDoc).getObjectNumbers(INTERFACE_CLASS);
                 will(returnValue(1));
+                oneOf(componentDoc).getObjectNumbers(DEPENDENCY_CLASS);
+                will(returnValue(0));
                 oneOf(componentDoc).getObjects(METHOD_CLASS);
                 will(returnValue(methodObjects));
                 oneOf(componentDoc).getObjects(INTERFACE_CLASS);
@@ -283,7 +285,7 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
                 oneOf(componentManager).getInstance(Parser.class, Syntax.XWIKI_2_0.toIdString());
                 will(returnValue(parser));
                 oneOf(getMockLogger()).warn("Interface [{}] not found, declared for wiki component [{}]",
-                    "an.interface.which.does.not.Exist", "xwiki:XWiki.MyComponent");
+                    "an.interface.which.does.not.Exist", DOC_REFERENCE);
             }
         });
 
@@ -322,6 +324,8 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
                 will(returnValue(1));
                 oneOf(componentDoc).getObjectNumbers(INTERFACE_CLASS);
                 will(returnValue(1));
+                oneOf(componentDoc).getObjectNumbers(DEPENDENCY_CLASS);
+                will(returnValue(0));
                 oneOf(componentDoc).getObjects(METHOD_CLASS);
                 will(returnValue(methodObjects));
                 oneOf(componentDoc).getObjects(INTERFACE_CLASS);

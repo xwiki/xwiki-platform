@@ -27,13 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels</artifactId>
   <name>XWiki Platform - Panels</name>
   <packaging>pom</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
   <modules>
+    <module>xwiki-platform-panels-api</module>
     <module>xwiki-platform-panels-ui</module>
   </modules>
   <profiles>

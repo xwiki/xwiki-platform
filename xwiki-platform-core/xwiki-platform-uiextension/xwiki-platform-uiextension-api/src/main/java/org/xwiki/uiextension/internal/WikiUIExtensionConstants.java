@@ -43,9 +43,9 @@ public interface WikiUIExtensionConstants
     String EXTENSION_POINT_ID_PROPERTY = "extensionPointId";
 
     /**
-     * Extension name property.
+     * Extension ID property.
      */
-    String NAME_PROPERTY = "name";
+    String ID_PROPERTY = "name";
 
     /**
      * Extension content property.

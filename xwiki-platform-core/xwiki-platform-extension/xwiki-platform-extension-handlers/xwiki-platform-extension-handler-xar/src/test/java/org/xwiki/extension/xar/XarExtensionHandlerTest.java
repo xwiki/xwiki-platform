@@ -42,6 +42,7 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
@@ -273,7 +274,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         // lookup
 
         this.jobManager = getComponentManager().getInstance(JobManager.class);
-        this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
+        this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
         this.defaultPackager = getComponentManager().getInstance(Packager.class);
         this.importer = getComponentManager().getInstance(DocumentMergeImporter.class);
 
@@ -331,7 +332,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-
                 oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
@@ -342,6 +342,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         BaseObject object = new BaseObject();
         object.setXClassReference(new DocumentReference("wiki", "space", "class"));
         existingDocument.addXObject(object);
+        existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
         this.mockXWiki.saveDocument(existingDocument, "", getContext());
 
         // install
@@ -359,6 +360,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("Wrong content", "content", page.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
+        Assert.assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"), page.getCreatorReference());
+        Assert.assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
         Assert.assertFalse("Document is hidden", page.isHidden());
 
@@ -373,6 +376,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getContext());
         Assert.assertFalse(pagewithattachment.isNew());
         Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
+        Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
+        Assert.assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
+        Assert.assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
 
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);

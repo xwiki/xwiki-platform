@@ -251,6 +251,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
 
+            // Capture Logs since we voluntarily generate storage errors to check if the wiki already exists and
+            // we don't want to pollute application logs with "normal errors"...
+            if (!LOGGER.isDebugEnabled()) {
+                this.loggerManager.pushLogListener(null);
+            }
+
             context.setDatabase(wikiName);
             try {
                 setDatabase(session, context);
@@ -271,6 +277,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+            }
+
+            // Restore proper logging
+            if (!LOGGER.isDebugEnabled()) {
+                this.loggerManager.popLogListener();
             }
         }
 
@@ -357,7 +368,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.DERBY == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema);
+                stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
             } else if (DatabaseProduct.DB2 == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + escapedSchema + " RESTRICT");
             } else if (DatabaseProduct.MYSQL == databaseProduct) {

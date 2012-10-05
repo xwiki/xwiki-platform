@@ -58,11 +58,14 @@ fi
 
 # For enabling YourKit Profiling.
 # $3 must the path where Yourkit can find the agent.
-# For example: "/Applications/YourKit Java Profiler 7.0.11.app/bin/mac"
+# For example: "/Applications/YourKit Java Profiler 7.0.11.app/bin/mac" or "/home/User/yjp-11.0.8/bin/linux-x86-64/"
 # Note: you must also pass the port as $1 for now till we use getopts.
 if [ "$2" = "profiler" ]; then
   XWIKI_OPTS="$XWIKI_OPTS -agentlib:yjpagent"
-  export DYLD_LIBRARY_PATH="$3"
+  # Linux
+  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$3"
+  # Mac
+  export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$3"
 fi
 
 echo Starting Jetty on port $JETTY_PORT ...

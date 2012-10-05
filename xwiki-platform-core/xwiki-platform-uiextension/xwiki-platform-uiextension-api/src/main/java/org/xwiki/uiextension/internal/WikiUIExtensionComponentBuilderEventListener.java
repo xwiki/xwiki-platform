@@ -161,7 +161,7 @@ public class WikiUIExtensionComponentBuilderEventListener implements EventListen
 
         needsUpdate |= setClassesDocumentFields(doc, "UI Extension Class");
         needsUpdate |= bclass.addTextField(EXTENSION_POINT_ID_PROPERTY, "Extension Point ID", 30);
-        needsUpdate |= bclass.addTextField(NAME_PROPERTY, "Extension Name", 30);
+        needsUpdate |= bclass.addTextField(ID_PROPERTY, "Extension ID", 30);
         needsUpdate |= bclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10);
         needsUpdate |= bclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10);
         if (needsUpdate) {

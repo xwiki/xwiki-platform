@@ -1,6 +1,7 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Test an XDOM data source in another document
 .#-----------------------------------------------------
 {{chart type="bar" source="xdom" params="
         document:wiki:space.page;

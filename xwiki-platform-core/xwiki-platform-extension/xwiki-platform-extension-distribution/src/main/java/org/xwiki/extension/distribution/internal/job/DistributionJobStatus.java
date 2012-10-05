@@ -52,7 +52,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     public DistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
         LoggerManager loggerManager, List<DistributionStepStatus> steps)
     {
-        super(request, observationManager, loggerManager);
+        super(request, observationManager, loggerManager, false);
 
         this.steps = steps;
     }

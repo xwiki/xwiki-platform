@@ -19,9 +19,11 @@
  */
 package org.xwiki.component.wiki;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 
@@ -45,7 +47,7 @@ public interface WikiComponent
     /**
      * @return the role implemented by this component implementation.
      */
-    Class< ? > getRole();
+    Type getRoleType();
 
     /**
      * @return the hint of the role implemented by this component implementation.
@@ -73,4 +75,15 @@ public interface WikiComponent
      * @return the map of method name/wiki code this component implementation handles. 
      */
     Map<String, XDOM> getHandledMethods();
+
+    /**
+     * Methods returned by {@link #getHandledMethods()} can require other components to be injected in their context.
+     * Each entry in the map returned by this method will be injected in the rendering context when methods will be
+     * executed. The name of the variable in the context is defined by the key in the returned Map.
+     *
+     * Classes extending this interface only need to return an empty list here since they can handle their dependencies.
+     *
+     * @return the map of dependencies of this component
+     */
+    Map<String, ComponentDescriptor> getDependencies();
 }

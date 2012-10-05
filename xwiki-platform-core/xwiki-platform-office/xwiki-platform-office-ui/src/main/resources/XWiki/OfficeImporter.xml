@@ -281,7 +281,7 @@ select#childPagesNamingMethod {
 &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
 &lt;p class="office_importer_document"&gt;
 &lt;label for="filepath"&gt;$msg.get("xe.officeimporter.import.document") : &lt;/label&gt;
-&lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
+&lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField();"/&gt;&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.target")&lt;/h2&gt;
 &lt;p class="office_importer_target"&gt;
 &lt;label for="targetSpaceInputId"  class="inputtext"&gt;
@@ -290,7 +290,7 @@ select#childPagesNamingMethod {
 &lt;/label&gt;
 &lt;label for="targetPageInputId" class="inputtext"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.targetpage") : &lt;/span&gt;
-&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" onchange="javascript:validateUserInputs();"/&gt;
+&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" /&gt;
 &lt;/label&gt;
 &lt;label for="appendContentInputId" id="appenContent" class="radio"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.appendresult") : &lt;/span&gt;
@@ -299,7 +299,7 @@ select#childPagesNamingMethod {
 &lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.target")&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.styles")&lt;/h2&gt;
 &lt;p class="office_importer_styles"&gt;
-&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict"/&gt;&lt;/label&gt;
+&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict" checked="checked"/&gt;&lt;/label&gt;
 &lt;/p&gt;
 &lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.styles")&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/h2&gt;
@@ -329,13 +329,16 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
   if (typeof(XWiki.officeImporter) == 'undefined') {
     XWiki.officeImporter = new Object();
   }
-  XWiki.officeImporter.populateTargetPageInputField = function(fileName) {
+  XWiki.officeImporter.populateTargetPageInputField = function() {
+    var targetPageInput = $('targetPageInputId');
+    if (targetPageInput.value != '') return;
+    var fileName = XWiki.extractFileName('filepath');
     var dot = fileName.lastIndexOf(".");
     if (-1 != dot) {
       fileName = fileName.substring(0, dot);
     }
     fileName = fileName.replace(/[\.:]/g, "-");
-    document.getElementById("targetPageInputId").value = fileName;
+    targetPageInput.value = fileName;
   }
 /* ]]&gt; */
 &lt;/script&gt;

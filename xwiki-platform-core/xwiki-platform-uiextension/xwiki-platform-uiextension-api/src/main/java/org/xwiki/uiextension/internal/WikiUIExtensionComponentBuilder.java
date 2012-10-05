@@ -72,8 +72,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private Execution execution;
 
     /**
-     * Used to transform the wiki page reference where the UI Extension is defined into a Component Role Hint.
-     * We use a compact serializer since UI Extensions are registered for a given wiki only.
+     * Used to transform the reference to the UI Extension XClass to a string usable in a query.
+     * {@see #searchDocumentReferences()}
      */
     @Inject
     @Named("compactwiki")
@@ -134,7 +134,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
         for (BaseObject extensionDefinition : extensionDefinitions) {
             // Extract extension definition.
-            String id = extensionDefinition.getStringValue(NAME_PROPERTY);
+            String id = extensionDefinition.getStringValue(ID_PROPERTY);
             String extensionPointId = extensionDefinition.getStringValue(EXTENSION_POINT_ID_PROPERTY);
             String content = extensionDefinition.getStringValue(CONTENT_PROPERTY);
             Map<String, String> parameters = parseParameters(extensionDefinition.getStringValue(PARAMETERS_PROPERTY));

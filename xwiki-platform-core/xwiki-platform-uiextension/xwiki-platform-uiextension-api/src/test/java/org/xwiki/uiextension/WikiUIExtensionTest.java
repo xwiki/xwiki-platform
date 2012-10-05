@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -85,6 +86,7 @@ public class WikiUIExtensionTest
         final Execution execution = getMockery().mock(Execution.class);
         velocityManager = getMockery().mock(VelocityManager.class);
         objectReference = new ObjectReference(CLASS_REF.toString() + "[1]", DOC_REF);
+        final EntityReferenceSerializer<String> serializer = getMockery().mock(EntityReferenceSerializer.class);
 
         getMockery().checking(new Expectations()
         {
@@ -95,6 +97,10 @@ public class WikiUIExtensionTest
                 will(returnValue(execution));
                 oneOf(componentManager).getInstance(VelocityManager.class);
                 will(returnValue(velocityManager));
+                oneOf(componentManager).getInstance(EntityReferenceSerializer.TYPE_STRING);
+                will(returnValue(serializer));
+                oneOf(serializer).serialize(objectReference);
+                will(returnValue("xwiki:XWiki.MyUIExtension^xwiki:XWiki.UIExtensionClass[1]"));
             }
         });
 
@@ -131,13 +137,13 @@ public class WikiUIExtensionTest
             }
         });
 
-        Assert.assertEquals("name", wikiUIExtension.getName());
+        Assert.assertEquals("name", wikiUIExtension.getId());
         Assert.assertEquals("epId", wikiUIExtension.getExtensionPointId());
         Assert.assertEquals(MapUtils.EMPTY_MAP, wikiUIExtension.getHandledMethods());
         Assert.assertEquals(ListUtils.EMPTY_LIST, wikiUIExtension.getImplementedInterfaces());
         Assert.assertEquals(DOC_REF, wikiUIExtension.getDocumentReference());
-        Assert.assertEquals(UIExtension.class, wikiUIExtension.getRole());
-        Assert.assertEquals("Object xwiki:XWiki.MyUIExtension^xwiki:XWiki.UIExtensionClass[1]",
+        Assert.assertEquals(UIExtension.class, wikiUIExtension.getRoleType());
+        Assert.assertEquals("xwiki:XWiki.MyUIExtension^xwiki:XWiki.UIExtensionClass[1]",
             wikiUIExtension.getRoleHint());
         wikiUIExtension.execute();
     }

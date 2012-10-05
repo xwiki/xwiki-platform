@@ -20,9 +20,8 @@
 package org.xwiki.uiextension.internal.scripting;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,13 +32,9 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.UIExtensionFilter;
 
 /**
  * Allows scripts to easily access Interface Extensions APIs.
@@ -68,63 +63,81 @@ public class UIExtensionScriptService implements ScriptService
     private Provider<ComponentManager> contextComponentManagerProvider;
 
     /**
-     * Used to render the content of the extension to XHTML.
-     */
-    @Inject
-    @Named("xhtml/1.0")
-    private BlockRenderer xhtmlRenderer;
-
-    /**
-     * The execution context, used to access to the {@link com.xpn.xwiki.XWikiContext}.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
-     * Get the extensions for a given extension point. By default extensions are ordered  by name alphabetically.
+     * Utility method to split a list of extension names, for example {code}"Panels.Apps,Panels.QuickLinks"{code} to get
+     * a List containing those names.
      *
-     * @param extensionPointId the ID of the extension point to retrieve the extensions for
-     * @return the list of extensions registered for the given extension point
+     * @param nameList the list of extension names to split
+     * @return a List containing all the names from the given String.
      */
-    public Collection<UIExtension> getExtensions(String extensionPointId)
+    private String[] parserFilterParameters(String nameList)
     {
-        Map<String, UIExtension> results = new TreeMap<String, UIExtension>();
-        Map<String, UIExtension> extensions = null;
+        return nameList.replaceAll(" ", "").split(",");
+    }
+
+    /**
+     * Retrieves all the {@link UIExtension}s for a given Extension Point.
+     *
+     * @param extensionPointId The ID of the Extension Point to retrieve the {@link UIExtension}s for
+     * @return the list of {@link UIExtension} for the given Extension Point
+     */
+    public List<UIExtension> getExtensions(String extensionPointId)
+    {
+        List<UIExtension> extensions = new ArrayList<UIExtension>();
 
         try {
-            extensions = this.contextComponentManagerProvider.get().getInstanceMap(UIExtension.class);
+            List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
+            for (UIExtension extension : allExtensions) {
+                if (extension.getExtensionPointId().equals(extensionPointId)) {
+                    extensions.add(extension);
+                }
+            }
         } catch (ComponentLookupException e) {
             logger.error("Failed to lookup UIExtension instances, error: [{}]", e);
         }
 
-        if (extensions != null) {
-            for (UIExtension extension : extensions.values()) {
-                if (extension.getExtensionPointId().equals(extensionPointId)) {
-                    results.put(extension.getName(), extension);
-                }
-            }
-        }
-
-        return results.values();
+        return extensions;
     }
 
     /**
-     * Render in XHTML all the extensions provided for a given extension point.
+     * Retrieves the list of {@link UIExtension} for a given Extension Point.
      *
-     * @param extensionPointId the ID of the extension point to render the extensions for
-     * @return the HTML resulting of the rendering of the extensions registered for the given extension point
+     * Examples:
+     * <ul>
+     * <li>Get only the {@link UIExtension}s with the given IDs for the Extension Point "platform.example"
+     * <pre>$services.uix.getExtensions('platform.example', {'select' : 'id1, id2, id3'})</pre></li>
+     * <li>Get all the {@link UIExtension}s for the Extension Point "platform.example" except the
+     * {@link UIExtension}s with the IDs "id2" and "id3"
+     * <pre>$services.uix.getExtensions('platform.example', {'exclude' : 'id2, id3'})</pre></li>
+     * <li>Get all the {@link UIExtension}s for the Extension Point "platform.example" and order them by one of their
+     * parameter
+     * <pre>$services.uix.getExtensions('platform.example', {'sortByParameter' : 'parameterKey'})</pre></li>
+     * <li>Get only the {@link UIExtension}s with the given IDs for the Extension Point "platform.example" and order
+     * them by one of their parameter
+     * <pre>$services.uix.getExtensions('platform.example',
+     * {'select' : 'id1, id2, id3', 'sortByParameter' : 'parameterKey'})</pre></li>
+     * </ul>
+     *
+     * @param extensionPointId The ID of the Extension Point to retrieve the {@link UIExtension}s for
+     * @param filters Optional filters to apply before retrieving the list
+     * @return the list of {@link UIExtension} for the given Extension Point
      */
-    public String render(String extensionPointId)
+    public List<UIExtension> getExtensions(String extensionPointId, Map<String, String> filters)
     {
-        Collection<UIExtension> uiExtensions = getExtensions(extensionPointId);
-        XDOM xdom = new XDOM(new ArrayList<Block>());
+        List<UIExtension> extensions = getExtensions(extensionPointId);
 
-        for (UIExtension uiExtension : uiExtensions) {
-            xdom.addChildren(uiExtension.execute());
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            String filterHint = entry.getKey();
+
+            try {
+                UIExtensionFilter filter =
+                    contextComponentManagerProvider.get().getInstance(UIExtensionFilter.class, filterHint);
+                extensions = filter.filter(extensions, this.parserFilterParameters(entry.getValue()));
+            } catch (ComponentLookupException e) {
+                logger.warn("Unable to find a UIExtensionFilter for hint [{}] "
+                    + "while getting UIExtensions for extension point [{}]", filterHint, extensionPointId);
+            }
         }
 
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        this.xhtmlRenderer.render(xdom, printer);
-        return printer.toString();
+        return extensions;
     }
 }

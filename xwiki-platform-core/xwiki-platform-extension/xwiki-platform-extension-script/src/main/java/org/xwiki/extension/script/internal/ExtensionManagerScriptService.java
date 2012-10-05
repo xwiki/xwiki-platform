@@ -162,9 +162,6 @@ public class ExtensionManagerScriptService implements ScriptService
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    /**
-     * 
-     */
     @Inject
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider scriptProvider;

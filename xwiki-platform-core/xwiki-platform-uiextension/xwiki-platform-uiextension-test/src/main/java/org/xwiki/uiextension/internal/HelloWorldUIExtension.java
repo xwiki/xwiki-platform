@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.uiextension.UIExtension;
 
@@ -44,7 +45,7 @@ import org.xwiki.uiextension.UIExtension;
 public class HelloWorldUIExtension implements UIExtension
 {
     @Override
-    public String getName()
+    public String getId()
     {
         return "my extension";
     }
@@ -64,10 +65,10 @@ public class HelloWorldUIExtension implements UIExtension
     }
 
     @Override
-    public List<Block> execute()
+    public Block execute()
     {
         List<Block> blocks = new ArrayList<Block>();
         blocks.add(new WordBlock("HelloWorld"));
-        return blocks;
+        return new CompositeBlock(blocks);
     }
 }

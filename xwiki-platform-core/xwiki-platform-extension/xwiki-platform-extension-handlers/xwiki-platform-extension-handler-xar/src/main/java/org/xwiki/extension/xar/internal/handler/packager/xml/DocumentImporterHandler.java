@@ -68,8 +68,8 @@ public class DocumentImporterHandler extends DocumentHandler
      */
     private Boolean hasCurrentDocument;
 
-    public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki, DocumentMergeImporter importer)
-        throws ComponentLookupException
+    public DocumentImporterHandler(DefaultPackager packager, ComponentManager componentManager, String wiki,
+        DocumentMergeImporter importer) throws ComponentLookupException
     {
         super(componentManager, wiki);
 

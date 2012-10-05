@@ -57,7 +57,8 @@ public class ObjectsResource extends BaseObjectsResource
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+        @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
@@ -76,7 +77,7 @@ public class ObjectsResource extends BaseObjectsResource
             if (object != null) {
                 objects.getObjectSummaries().add(
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                        .getXWikiContext(componentManager), doc, object, false));
+                        .getXWikiContext(componentManager), doc, object, false, Utils.getXWikiApi(componentManager), withPrettyNames));
             }
         }
 
@@ -131,7 +132,7 @@ public class ObjectsResource extends BaseObjectsResource
             UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName, spaceName, pageName,
                 object.getClassName(), objectNumber)).entity(
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, xwikiObject, false)).build();
+                .getXWikiContext(componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager), false)).build();
     }
 
 }

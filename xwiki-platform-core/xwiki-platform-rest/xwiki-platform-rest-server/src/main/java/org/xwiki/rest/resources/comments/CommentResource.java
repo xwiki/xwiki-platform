@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Comment;
+import org.xwiki.rest.Utils;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -47,7 +48,8 @@ public class CommentResource extends XWikiResource
     @GET
     public Comment getComment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("id") Integer id,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -58,7 +60,7 @@ public class CommentResource extends XWikiResource
 
         for (com.xpn.xwiki.api.Object xwikiComment : xwikiComments) {
             if (id.equals(xwikiComment.getNumber())) {
-                return DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment);
+                return DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc, xwikiComment, Utils.getXWikiApi(componentManager), withPrettyNames);
             }
         }
 

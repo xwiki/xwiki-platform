@@ -43,7 +43,8 @@ public class SpaceSearchResource extends BaseSearchResult
     @GET
     public SearchResults search(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("q") String keywords, @QueryParam("scope") List<String> searchScopeStrings,
-        @QueryParam("number") @DefaultValue("-1") Integer number,@QueryParam("start") @DefaultValue("0") Integer start) throws QueryException, XWikiException
+        @QueryParam("number") @DefaultValue("-1") Integer number,@QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("order") String order, @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
         searchResults.setTemplate(String.format("%s?%s",
@@ -54,7 +55,7 @@ public class SpaceSearchResource extends BaseSearchResult
 
         searchResults.getSearchResults().addAll(
             search(searchScopes, keywords, wikiName, spaceName, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true));
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, order, withPrettyNames));
 
         return searchResults;
     }

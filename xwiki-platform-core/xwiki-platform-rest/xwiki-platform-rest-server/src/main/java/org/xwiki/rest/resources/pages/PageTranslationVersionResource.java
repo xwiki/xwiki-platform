@@ -19,9 +19,11 @@
  */
 package org.xwiki.rest.resources.pages;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
@@ -42,13 +44,14 @@ public class PageTranslationVersionResource extends XWikiResource
     @GET
     public Page getPageTranslationVersion(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName, @PathParam("pageName") String pageName,
-        @PathParam("language") String language, @PathParam("version") String version) throws XWikiException
+        @PathParam("language") String language, @PathParam("version") String version,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, version, true, false);
 
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-            false, Utils.getXWikiApi(componentManager));
+            false, Utils.getXWikiApi(componentManager), withPrettyNames);
     }
 }

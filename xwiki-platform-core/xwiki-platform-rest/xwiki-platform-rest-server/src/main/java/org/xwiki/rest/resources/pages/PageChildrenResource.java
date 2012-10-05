@@ -48,7 +48,8 @@ public class PageChildrenResource extends XWikiResource
     @GET
     public Pages getPageChildren(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException, QueryException
+        @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws XWikiException, QueryException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
@@ -76,7 +77,7 @@ public class PageChildrenResource extends XWikiResource
                 if (childDoc != null) {
                     pages.getPageSummaries().add(
                         DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), childDoc, Utils
-                            .getXWikiApi(componentManager)));
+                            .getXWikiApi(componentManager), withPrettyNames));
                 }
             }
         }

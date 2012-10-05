@@ -46,7 +46,8 @@ public class ObjectsAtPageVersionResource extends BaseObjectsResource
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("version") String version,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
@@ -65,7 +66,7 @@ public class ObjectsAtPageVersionResource extends BaseObjectsResource
             if (object != null) {
                 objects.getObjectSummaries().add(
                     DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
-                        .getXWikiContext(componentManager), doc, object, true));
+                        .getXWikiContext(componentManager), doc, object, true, Utils.getXWikiApi(componentManager), withPrettyNames));
             }
         }
 

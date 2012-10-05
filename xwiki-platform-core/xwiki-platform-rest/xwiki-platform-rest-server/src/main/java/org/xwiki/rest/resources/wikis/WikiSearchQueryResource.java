@@ -19,8 +19,6 @@
  */
 package org.xwiki.rest.resources.wikis;
 
-import java.util.List;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,29 +34,29 @@ import org.xwiki.rest.resources.BaseSearchResult;
 
 import com.xpn.xwiki.XWikiException;
 
-@Component("org.xwiki.rest.resources.wikis.WikiSearchResource")
-@Path("/wikis/{wikiName}/search")
-public class WikiSearchResource extends BaseSearchResult
+@Component("org.xwiki.rest.resources.wikis.WikiSearchQueryResource")
+@Path("/wikis/{wikiName}/query")
+public class WikiSearchQueryResource extends BaseSearchResult
 {
     @GET
-    public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String keywords,
-        @QueryParam("scope") List<String> searchScopeStrings, @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("order") String order, 
-        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
+    public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String query,
+        @QueryParam("type") String queryType, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("distinct") @DefaultValue("1") Integer distinct, 
+        @QueryParam("wikis") String searchWikis, @QueryParam("order") String order,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames,
+        @QueryParam("classname") @DefaultValue("") String className)
         throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
         searchResults.setTemplate(String.format("%s?%s",
-            UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString(),
-            SEARCH_TEMPLATE_INFO));
+            UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchQueryResource.class).build(wikiName).toString(),
+            QUERY_TEMPLATE_INFO));
 
         Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-        List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
-
         searchResults.getSearchResults().addAll(
-            search(searchScopes, keywords, wikiName, null, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, order, withPrettyNames));
+            searchQuery(query, queryType, wikiName, searchWikis, Utils.getXWiki(componentManager).getRightService()
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), order, (distinct == 1), number, start, withPrettyNames, className));
 
         return searchResults;
     }

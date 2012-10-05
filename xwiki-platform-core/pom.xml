@@ -247,7 +247,6 @@
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>org/xwiki/rest/**</exclude>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
@@ -259,6 +258,11 @@
             <!-- Introduced by XWIKI-8236, "Provide a configuration mechanism for UI extension points" -->
             <!-- To be removed once 4.3 final is released -->
             <exclude>org/xwiki/uiextension/UIExtension</exclude>
+            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
+            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
+            <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
+            <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
+            <exclude>org/xwiki/rest/resources/**</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -28,7 +28,7 @@ var XWiki = (function(XWiki){
     // Display a "no results" message, or simply hide the suggest box when no suggestions are available
     shownoresults : true,
     // The message to display as the "no results" message
-    noresults : "No results!",
+    noresults : "$msg.get('core.widgets.suggest.noResults')",
     maxheight : 250,
     cache : false,
     seps : "",
@@ -55,12 +55,14 @@ var XWiki = (function(XWiki){
     highlight: true,
     // Fade the suggestion container on clear
     fadeOnClear: true,
+    // Show a 'hide suggestions' button
+    enableHideButton: true,
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
-    displayValueText: "Value :",
-    // How to align the suggestion list when its with is different than the input field width
+    displayValueText: "$msg.get('core.widgets.suggest.valuePrefix')",
+    // How to align the suggestion list when its width is different from the input field width
     align: "left",
     // When there are several suggest sources, should the widget displays only one, unified, "loading" indicator for all requests undergoing,
     // Or should it displays one loading indicator per request next to the corresponding source.
@@ -230,19 +232,17 @@ var XWiki = (function(XWiki){
    */
   getSuggestions: function (val)
   {
-    // if input stays the same, do nothing
-    //
-    val = val.strip();
+    // If input stays the same, do nothing.
+    val = val.strip().toLowerCase();
     if (val == this.sInput) {
       return false;
     }
 
-    // input length is less than the min required to trigger a request
-    // reset input string
-    // do nothing
-    //
+    // Input length is less than the min required to trigger a request.
+    // Reset input string, hide the suggestions (if any), and return.
     if (val.length < this.options.minchars) {
       this.sInput = "";
+      this.clearSuggestions();
       return false;
     }
 
@@ -253,7 +253,7 @@ var XWiki = (function(XWiki){
     {
       var arr = [];
       for (var i=0;i<this.aSuggestions.length;i++) {
-        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val.toLowerCase()) {
+        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val) {
           arr.push( this.aSuggestions[i] );
         }
       }
@@ -276,6 +276,7 @@ var XWiki = (function(XWiki){
       var pointer = this;
       var requestId = this.latestRequest;
       clearTimeout(this.ajID);
+      this.container.select('.hide-button-wrapper').invoke('hide');
       this.ajID = setTimeout( function() { pointer.doAjaxRequests(requestId) }, this.options.delay );
 
     }
@@ -309,7 +310,7 @@ var XWiki = (function(XWiki){
         requestHeaders: headers,
         onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
         onFailure: function (response) {
-          new XWiki.widgets.Notification("Failed to retrieve suggestions : ')" + response.statusText, "error", {timeout: 5});
+          new XWiki.widgets.Notification("$msg.get('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
         }
       });
     }
@@ -385,7 +386,7 @@ var XWiki = (function(XWiki){
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
 
       // Get position of target textfield
-      var pos = this.fld.cumulativeOffset();
+      var pos = $(this.options.parentContainer).tagName.toLowerCase() == 'body' ? this.fld.cumulativeOffset() : this.fld.positionedOffset();
 
       // Container width is passed as an option, or field width if no width provided.
       // The 2px substracted correspond to one pixel of border on each side of the field,
@@ -502,6 +503,16 @@ var XWiki = (function(XWiki){
       }
     }
 
+    if (this.options.enableHideButton && !this.container.down('.hide-button')) {
+      var hideButton = new Element('span', {'class' : 'hide-button'}).update("$msg.get('core.widgets.suggest.hide')");
+      hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
+      this.container.insert({top : new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton)});
+
+      hideButton = new Element('span', {'class' : 'hide-button'}).update("$msg.get('core.widgets.suggest.hide')");
+      hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
+      this.container.insert({bottom : new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton)});
+    }
+
     var ev = this.container.fire("xwiki:suggest:containerPrepared", {
       'container' : this.container,
       'suggest' : this
@@ -552,6 +563,9 @@ var XWiki = (function(XWiki){
       div.down('ul').remove();
     }
 
+    // Show the "hide suggestions" buttons
+    this.container.select('.hide-button-wrapper').invoke('show');
+
     // create and populate list
     var list = new XWiki.widgets.XList([], {
        icon: this.options.icon,
@@ -567,7 +581,7 @@ var XWiki = (function(XWiki){
     //
     for (var i=0,len=arr.length;i<len;i++)
     {
-	  // Output is either emphasized or row value depending on source option
+      // Output is either emphasized or row value depending on source option
       var output = source.highlight ? this.emphasizeMatches(this.sInput, arr[i].value) : arr[i].value;
       if (arr[i].hint) {
         output += "<span class='hint'>" + arr[i].hint + "</span>";
@@ -629,6 +643,9 @@ var XWiki = (function(XWiki){
    */
   emphasizeMatches:function(input, value)
   {
+    if (!input) {
+      return value;
+    }
     // If the source declares that results are matching, we highlight them in the value
     var output = value,
         // Separate words (called fragments hereafter) in user input

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tools</artifactId>
   <name>XWiki Platform - Tools - Parent POM</name>
@@ -42,4 +42,20 @@
     <module>xwiki-platform-tool-standards-validator</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
   </modules>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- Exclude Tools from being Clovered since 1) we don't really care getting TPC for our tools and
+               2) it's a bit involved to configure the various Maven poms using those plugins to have the Clover JAR
+               injected in the right places. -->
+          <groupId>com.atlassian.maven.plugins</groupId>
+          <artifactId>maven-clover2-plugin</artifactId>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

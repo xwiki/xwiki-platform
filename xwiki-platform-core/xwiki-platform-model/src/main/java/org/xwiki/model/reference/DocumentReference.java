@@ -288,4 +288,12 @@ public class DocumentReference extends EntityReference
     {
         return new DocumentReference(this, oldParent, newParent);
     }
+
+    @Override
+    public String toString()
+    {
+        // Compared to EntityReference we don't print the type since the type is already indicated by the fact that
+        // this is a DocumentReference instance.
+        return TOSTRING_SERIALIZER.serialize(this);
+    }
 }

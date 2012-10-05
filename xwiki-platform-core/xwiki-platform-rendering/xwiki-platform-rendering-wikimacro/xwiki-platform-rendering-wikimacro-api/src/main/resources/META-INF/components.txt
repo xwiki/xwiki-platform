@@ -1,2 +1,3 @@
 org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager
 org.xwiki.rendering.internal.macro.wikibridge.WikiMacroEventListener
+org.xwiki.rendering.internal.macro.wikibridge.WikiMacroInitializerListener

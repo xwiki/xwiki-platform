@@ -27,14 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-faq</artifactId>
   <name>XWiki Platform - FAQ</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>FAQ application</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-faq-ui</module>
+  </modules>
 </project>

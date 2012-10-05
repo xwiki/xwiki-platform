@@ -290,6 +290,12 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         final Map<Date, DeletedAttachmentFileProvider> attachMap =
             this.fileTools.deletedAttachmentsForDocument(attachment.getDoc().getDocumentReference())
                 .get(attachment.getFilename());
+
+        // There may not be any deleted versions matching the requested attachment filename.
+        if (attachMap == null) {
+            return Collections.<DeletedAttachment>emptyList();
+        }
+
         final List<Date> deleteDatesList = new ArrayList<Date>(attachMap.keySet());
         Collections.sort(deleteDatesList, NewestFirstDateComparitor.INSTANCE);
 

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,14 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.messagestream.MessageStream;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.query.Query;
@@ -67,11 +64,6 @@ public class DefaultMessageStream implements MessageStream
     @Inject
     private ModelContext context;
 
-    /** Entity parser used for converting the current user name into a proper reference. */
-    @Inject
-    @Named("current")
-    private EntityReferenceResolver<String> currentResolver;
-
     /** Entity serializer, used for converting references to strings suitable for storing in the "stream" field. */
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -92,9 +84,7 @@ public class DefaultMessageStream implements MessageStream
     public void postPublicMessage(String message)
     {
         Event e = createMessageEvent(message, "publicMessage");
-        // FIXME This shouldn't be needed if the current user were already available as a reference.
-        DocumentReference userDoc =
-            new DocumentReference(this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
+        DocumentReference userDoc = this.bridge.getCurrentUserReference();
         e.setRelatedEntity(userDoc);
         e.setImportance(Importance.MINOR);
         e.setStream(this.serializer.serialize(userDoc));
@@ -105,9 +95,7 @@ public class DefaultMessageStream implements MessageStream
     public void postPersonalMessage(String message)
     {
         Event e = createMessageEvent(message, "personalMessage");
-        // FIXME This shouldn't be needed if the current user were already available as a reference.
-        DocumentReference userDoc =
-            new DocumentReference(this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
+        DocumentReference userDoc = this.bridge.getCurrentUserReference();
         e.setRelatedEntity(userDoc);
         e.setStream(this.serializer.serialize(userDoc));
         this.stream.addEvent(e);
@@ -116,6 +104,9 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void postDirectMessageToUser(String message, DocumentReference user)
     {
+        if (!this.bridge.exists(user)) {
+            throw new IllegalArgumentException("Target user does not exist");
+        }
         Event e = createMessageEvent(message, "directMessage");
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiUsers", user));
         e.setStream(this.serializer.serialize(user));
@@ -126,6 +117,9 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public void postMessageToGroup(String message, DocumentReference group) throws IllegalAccessError
     {
+        if (!this.bridge.exists(group)) {
+            throw new IllegalArgumentException("Target group does not exist");
+        }
         Event e = createMessageEvent(message, "groupMessage");
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiGroups", group));
         e.setStream(this.serializer.serialize(group));
@@ -136,17 +130,13 @@ public class DefaultMessageStream implements MessageStream
     @Override
     public List<Event> getRecentPersonalMessages()
     {
-        DocumentReference currentUser = new DocumentReference(
-            this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
-        return getRecentPersonalMessages(currentUser, 30, 0);
+        return getRecentPersonalMessages(this.bridge.getCurrentUserReference(), 30, 0);
     }
 
     @Override
     public List<Event> getRecentPersonalMessages(int limit, int offset)
     {
-        DocumentReference currentUser = new DocumentReference(
-            this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
-        return getRecentPersonalMessages(currentUser, limit, offset);
+        return getRecentPersonalMessages(this.bridge.getCurrentUserReference(), limit, offset);
     }
 
     @Override
@@ -162,7 +152,7 @@ public class DefaultMessageStream implements MessageStream
         try {
             Query q = this.qm.createQuery(
                 "where event.application = 'MessageStream' and event.type = 'personalMessage'"
-                + " and event.user = :user order by event.date desc",
+                    + " and event.user = :user order by event.date desc",
                 Query.XWQL);
             q.bindValue("user", this.serializer.serialize(author));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
@@ -184,13 +174,11 @@ public class DefaultMessageStream implements MessageStream
     {
         List<Event> result = new ArrayList<Event>();
         try {
-            DocumentReference currentUser = new DocumentReference(
-                this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
             Query q = this.qm.createQuery(
                 "where event.application = 'MessageStream' and event.type = 'directMessage'"
-                + " and event.stream = :targetUser order by event.date desc",
+                    + " and event.stream = :targetUser order by event.date desc",
                 Query.XWQL);
-            q.bindValue("targetUser", this.serializer.serialize(currentUser));
+            q.bindValue("targetUser", this.serializer.serialize(this.bridge.getCurrentUserReference()));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
             result = this.stream.searchEvents(q);
         } catch (QueryException ex) {
@@ -212,7 +200,7 @@ public class DefaultMessageStream implements MessageStream
         try {
             Query q = this.qm.createQuery(
                 "where event.application = 'MessageStream' and event.type = 'groupMessage'"
-                + " and event.stream = :group order by event.date desc",
+                    + " and event.stream = :group order by event.date desc",
                 Query.XWQL);
             q.bindValue("group", this.serializer.serialize(group));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
@@ -228,14 +216,12 @@ public class DefaultMessageStream implements MessageStream
     {
         Query q;
         try {
-            DocumentReference currentUser = new DocumentReference(
-                this.currentResolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
             q = this.qm.createQuery("where event.id = :id", Query.XWQL);
             q.bindValue("id", id);
             List<Event> events = this.stream.searchEvents(q);
             if (events == null || events.isEmpty()) {
                 throw new IllegalArgumentException("This message does not exist");
-            } else if (events.get(0).getUser().equals(currentUser)) {
+            } else if (events.get(0).getUser().equals(this.bridge.getCurrentUserReference())) {
                 this.stream.deleteEvent(events.get(0));
             } else {
                 throw new IllegalArgumentException("You are not authorized to delete this message");
@@ -250,7 +236,7 @@ public class DefaultMessageStream implements MessageStream
      * It also fills in the provided message body and type.
      * 
      * @param message the message to store in the event; at most 2000 characters are stored, longer messages are
-     *            automatically trimmed
+     *        automatically trimmed
      * @param messageType the type of message
      * @return the initialized event object
      */

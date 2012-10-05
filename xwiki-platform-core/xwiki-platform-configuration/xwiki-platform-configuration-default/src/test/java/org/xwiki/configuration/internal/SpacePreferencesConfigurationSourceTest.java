@@ -21,8 +21,10 @@ package org.xwiki.configuration.internal;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -35,10 +37,16 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.4M2
  */
+@MockingRequirement(SpacePreferencesConfigurationSource.class)
 public class SpacePreferencesConfigurationSourceTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private SpacePreferencesConfigurationSource source;
+    private ConfigurationSource source;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.source = getComponentManager().getInstance(ConfigurationSource.class, "space");
+    }
 
     @Test
     public void getPropertyForStringWhenExists() throws Exception

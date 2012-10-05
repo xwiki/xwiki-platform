@@ -29,26 +29,24 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
- * Test class for various {@link VelocityContextInitializer} implementations.
+ * Integration tests for various {@link VelocityContextInitializer} implementations specific to the Office Importer
+ * module.
  * 
  * @version $Id$
  * @since 1.9RC2
  */
-public class VelocityContextInitializerTest extends AbstractMockingComponentTestCase
+public class VelocityContextInitializerTest extends AbstractComponentTestCase
 {
-    /**
-     * Test the presence of velocity bridges.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testVelocityBridges() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
+        super.registerComponents();
+
         registerMockComponent(ScriptService.class, "officeimporter", "importer");
         registerMockComponent(ScriptService.class, "officemanager", "manager");
         final ConfigurationSource configurationSource = registerMockComponent(ConfigurationSource.class);
@@ -59,7 +57,16 @@ public class VelocityContextInitializerTest extends AbstractMockingComponentTest
                 will(returnValue(new Properties()));
             }
         });
+    }
 
+    /**
+     * Test the presence of velocity bridges.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testVelocityBridges() throws Exception
+    {
         // Make sure the execution context is not null when velocity bridges are initialized.
         getComponentManager().<Execution> getInstance(Execution.class).setContext(new ExecutionContext());
 

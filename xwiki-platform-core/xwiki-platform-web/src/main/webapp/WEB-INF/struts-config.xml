@@ -409,6 +409,13 @@
             <forward name="get" path="/templates/get.vm"/>
         </action>
 
+        <action path="/distribution/"
+                type="org.xwiki.extension.distribution.internal.DistributionAction"
+                name="distribution"
+                scope="request">
+            <forward name="distribution" path="/templates/distribution.vm"/>
+        </action>
+
         <action path="/imagecaptcha/"
                 type="org.xwiki.captcha.internal.DefaultImageCaptchaAction">
         </action>

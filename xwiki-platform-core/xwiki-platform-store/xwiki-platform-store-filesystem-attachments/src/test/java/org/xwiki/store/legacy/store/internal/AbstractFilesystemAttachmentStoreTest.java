@@ -24,12 +24,10 @@ import java.io.File;
 import com.xpn.xwiki.web.Utils;
 import javax.servlet.ServletContext;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Boilerplate for filesystem attachment tests.
@@ -37,7 +35,7 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
  * @version $Id$
  * @since 4.1M2
  */
-public abstract class AbstractFilesystemAttachmentStoreTest extends AbstractMockingComponentTestCase
+public abstract class AbstractFilesystemAttachmentStoreTest extends AbstractComponentTestCase
 {
     @Before
     public void setUp() throws Exception

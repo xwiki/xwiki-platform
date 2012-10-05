@@ -44,12 +44,16 @@ import org.xwiki.security.AbstractSecurityTestCase;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
+import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
+import org.xwiki.security.authorization.cache.SecurityCache;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.annotation.MockingRequirements;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -65,13 +69,16 @@ import static org.junit.Assert.fail;
  * @version $Id$
  * @since 4.0M2
  */
+@AllComponents
+@MockingRequirements({
+    @MockingRequirement(value = DefaultSecurityCache.class, exceptions = {EntityReferenceSerializer.class}),
+    @MockingRequirement(DefaultSecurityReferenceFactory.class)
+})
 public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
-    @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
-    private DefaultSecurityCache securityCache;
+    private SecurityCache securityCache;
 
-    @MockingRequirement
-    private DefaultSecurityReferenceFactory factory;
+    private SecurityReferenceFactory factory;
 
     private TestCache<?> cache;
 
@@ -193,7 +200,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
     }
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         if (cache == null) {
@@ -205,13 +212,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
                 oneOf (cacheManager).createNewCache(with(any(CacheConfiguration.class))); will(returnValue(cache));
             }});
         }
-    }
 
-    @Before
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
+        this.factory = getComponentManager().getInstance(SecurityReferenceFactory.class);
+        this.securityCache = getComponentManager().getInstance(SecurityCache.class);
 
         aMissingParentRef = factory.newEntityReference(new SpaceReference("space", new WikiReference("missing")));
         aMissingEntityRef = factory.newEntityReference(new DocumentReference("missingPage",

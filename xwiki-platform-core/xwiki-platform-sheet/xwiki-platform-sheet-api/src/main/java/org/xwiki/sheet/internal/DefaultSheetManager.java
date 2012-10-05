@@ -109,9 +109,10 @@ public class DefaultSheetManager implements SheetManager
     {
         DocumentReference documentReference = document.getDocumentReference();
 
-        // (1) Check if there is a sheet specified for the current execution context.
+        // (1) Check if there is a sheet specified for the current execution context. Apply it only if the given
+        // document is the current document on the execution context.
         String sheetStringRef = (String) execution.getContext().getProperty("sheet");
-        if (sheetStringRef != null) {
+        if (sheetStringRef != null && documentReference.equals(documentAccessBridge.getCurrentDocumentReference())) {
             DocumentReference sheetReference = documentReferenceResolver.resolve(sheetStringRef, documentReference);
             if (matchSheet(sheetReference, action)) {
                 return Collections.singletonList(sheetReference);

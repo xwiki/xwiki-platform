@@ -387,7 +387,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
 
   username.className = "username";
   tr.appendChild(username);
-  activeRights.each(function(right) {
+  window.activeRights.each(function(right) {
     if (right)
     {
       var td = document.createElement('td');

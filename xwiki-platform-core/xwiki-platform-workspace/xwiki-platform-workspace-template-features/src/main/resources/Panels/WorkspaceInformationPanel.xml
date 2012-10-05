@@ -115,20 +115,20 @@
 ##
 #set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
 #if (!$workspace)
-  {{error}}The current wiki is not a workspace.{{/error}}
+  {{error}}$msg.get('platform.workspace.wikiNotWorkspace'){{/error}}
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
-  **Name**
+  **$msg.get('platform.workspace.panelInformationNameLabel')**
   $wikiDescriptor.wikiPrettyName
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
-    **Description**
+    **$msg.get('platform.workspace.panelInformationDescriptionLabel')**
     $workspaceDescription
   #end
   ----
   ## Join/Leave
   #if ($isGuest)
-    To join this workspace you need to be logged in.
+    $msg.get('platform.workspace.joinNeedToLogIn')
   #else
     #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
     #set ($workspaceGroupDocument = $workspace.groupDocument)
@@ -155,18 +155,18 @@
       #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}"))
       #if ($existingInvitationOrRequest)
         #if ("$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
-          #set ($joinText = 'You have been invited to join this workspace')
-          #set ($actionLabel = 'View Invitation')
+          #set ($joinText = $msg.get('platform.workspace.invitationPendingForCurrentWorkspace'))
+          #set ($actionLabel = $msg.get('platform.workspace.invitationActionViewLabel'))
         #else
-          #set ($joinText = 'You have requested to join this workspace')
-          #set ($actionLabel = 'Cancel Request')
+          #set ($joinText = $msg.get('platform.workspace.joinRequestPendingForCurrentWorkspace'))
+          #set ($actionLabel = $msg.get('platform.workspace.joinRequestActionCancelLabel'))
           #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;cancelJoinRequest=1"))
         #end
       #else
         #if ($membershipType == 'request')
-          #set ($actionLabel = 'Request Join')
+          #set ($actionLabel = $msg.get('platform.workspace.joinRequestActionRequestLabel'))
         #elseif ($membershipType == 'open')
-          #set ($actionLabel = 'Join')
+          #set ($actionLabel = $msg.get('platform.workspace.joinActionJoinLabel'))
         #end
       #end
       ## Display
@@ -175,16 +175,16 @@
         (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:$actionUrl||class='button']](%%)
       #end
     #elseif (!$hasOwner)
-      You are a member of this workspace
+      $msg.get('platform.workspace.currentUserIsMember')
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
-      (% class='buttonwrapper' %)[[Leave Workspace&gt;&gt;path:$leaveUrl||class='button']](%%)
+      (% class='buttonwrapper' %)[[$msg.get('platform.workspace.leaveWorkspace')&gt;&gt;path:$leaveUrl||class='button']](%%)
     #else
-      You are the owner of this workspace
+      $msg.get('platform.workspace.currentUserIsOwner')
     #end
   #end
   ----
-  **Members**
+  **$msg.get('platform.workspace.panelInformationMembersLabel')**
   #set ($workspaceGroupDocument = $workspace.groupDocument)
   #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
   #set ($totalNrOfUsers = $workspaceGroupMemberObjects.size())

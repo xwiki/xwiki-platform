@@ -34,7 +34,7 @@ import org.xwiki.component.phase.InitializationException;
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current user in the
  * Execution Context. These Component Managers are created on the fly the first time a component is registered for the
  * current user.
- *  
+ * 
  * @version $Id$
  * @since 2.1RC1
  */

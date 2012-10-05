@@ -58,7 +58,7 @@ public class DeleteVersionsAction extends XWikiAction
         if (v1 != null && v2 != null) {
             XWikiDocument doc = context.getDoc();
             String language = form.getLanguage();
-            XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
+            XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
 
             XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
             archive.removeVersions(v1, v2, context);

@@ -27,7 +27,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * Interface for defining various data sources for charts.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -35,22 +35,12 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public interface ChartDataSource
 {
     /**
-     * Parameter identifier for data source.
-     */
-    String SOURCE = "source";
-    
-    /**
-     * Parameter identifier for data source specific parameters.
-     */
-    String PARAMS = "params";    
-    
-    /**
      * Decodes the given macroContent / extraParams and builds a {@link ChartModel}.
-     * 
+     *
      * @param macroContent content of the macro.
-     * @param macroParameters parameters provided for the macro.
+     * @param sourceParameters parameters provided for the source.
      * @return a {@link ChartModel} corresponding to the parameters passed in.
      * @throws MacroExecutionException if something goes wrong while decoding source / parameters.
      */
-    ChartModel buildModel(String macroContent, Map<String, String> macroParameters) throws MacroExecutionException;
+    ChartModel buildModel(String macroContent, Map<String, String> sourceParameters) throws MacroExecutionException;
 }

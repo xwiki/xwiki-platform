@@ -33,6 +33,7 @@ import javax.servlet.http.HttpSession;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -50,6 +51,7 @@ import static org.hamcrest.Matchers.*;
  * @version $Id$
  * @since 2.5M2
  */
+@MockingRequirement(DefaultCSRFTokenTest.InsecureCSRFToken.class)
 public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 {
     /** URL of the current document. */
@@ -59,8 +61,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     private static final String resubmitUrl = mockDocumentUrl;
 
     /** Tested CSRF token component. */
-    @MockingRequirement
-    private InsecureCSRFToken csrf;
+    private CSRFToken csrf;
 
     /**
      * This class is here because it doesn't require a SecureRandom generator
@@ -84,7 +85,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         }
     }
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         // set up mocked dependencies
@@ -157,6 +158,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             // Ignore all calls to debug()
             ignoring(any(Logger.class)).method("debug");
         }});
+
+        this.csrf = getComponentManager().getInstance(CSRFToken.class);
     }
 
     /**

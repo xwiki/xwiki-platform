@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -114,6 +115,37 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     {
         try {
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
+                this.context);
+        } catch (Exception e) {
+            // If the exception is a null pointer exception there is no message and e.getMessage() is null.
+            if (e.getMessage() != null) {
+                this.context.put("error", e.getMessage());
+            }
+            LOGGER.error("sendMessageFromTemplate", e);
+            return -1;
+        }
+    }
+
+    /**
+     * Uses an XWiki document to build the message subject and context, based on variables stored in a map. Sends the
+     * email.
+     * 
+     * @param from Email sender
+     * @param to Email recipient
+     * @param cc Email Carbon Copy
+     * @param bcc Email Hidden Carbon Copy
+     * @param language Language of the email
+     * @param documentFullName Full name of the template to be used (example: XWiki.MyEmailTemplate). The template needs
+     *        to have an XWiki.Email object attached
+     * @param parameters variables to be passed to the velocity context
+     * @return 0 on success, -1 on failure. On failure the error message is stored in the XWiki context under the
+     *         "error" key.
+     */
+    public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
+        String documentFullName, Map<String, Object> parameters)
+    {
+        try {
+            return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, parameters,
                 this.context);
         } catch (Exception e) {
             // If the exception is a null pointer exception there is no message and e.getMessage() is null.

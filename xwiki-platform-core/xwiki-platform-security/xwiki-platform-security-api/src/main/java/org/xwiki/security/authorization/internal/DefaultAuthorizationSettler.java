@@ -50,7 +50,6 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 @Singleton
 public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
 {
-
     /**
      * Check if the entity reference refers to a document that may contain global rights objects.  In other words
      * '*:XWiki.XWikiPreferences' or '*:*.WebPreferences'.

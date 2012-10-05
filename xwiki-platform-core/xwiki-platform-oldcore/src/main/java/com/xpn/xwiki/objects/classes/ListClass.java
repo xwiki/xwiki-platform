@@ -44,6 +44,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public abstract class ListClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "list";
 
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -58,7 +59,7 @@ public abstract class ListClass extends PropertyClass
 
     public ListClass(PropertyMetaClass wclass)
     {
-        this("list", "List", wclass);
+        this(XCLASSNAME, "List", wclass);
     }
 
     public ListClass()
@@ -490,7 +491,7 @@ public abstract class ListClass extends PropertyClass
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
                 + name, value);
-            radio.setID("xwiki-form-" + name + "-" + count);
+            radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());
 
             if (selectlist.contains(value)) {
@@ -498,7 +499,8 @@ public abstract class ListClass extends PropertyClass
             }
             radio.addElement(display);
 
-            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + name + "-" + count++ + "\">");
+            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + name + "-" + object.getNumber()
+                + "-" + count++ + "\">");
             buffer.append(radio.toString());
             buffer.append("</label>");
         }

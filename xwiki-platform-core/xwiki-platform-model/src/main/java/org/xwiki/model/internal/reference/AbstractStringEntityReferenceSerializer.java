@@ -51,7 +51,7 @@ public abstract class AbstractStringEntityReferenceSerializer implements EntityR
      * Serialize a single reference element into the representation string builder.
      *
      * @param currentReference the reference to serialize
-     * @param representation the builder where to happen the serialized member
+     * @param representation the builder where to write the serialized member to (this is an output parameter)
      * @param isLastReference indicate if it's the last member of the reference
      * @param parameters optional parameters
      */

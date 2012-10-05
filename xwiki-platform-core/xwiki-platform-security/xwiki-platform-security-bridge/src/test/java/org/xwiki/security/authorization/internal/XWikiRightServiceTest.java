@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.Collections;
-
 import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.security.authorization.AuthorizationManager;

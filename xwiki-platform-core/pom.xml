@@ -27,15 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.4.0</gwt.version>
-    <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
+    <gwt.version>2.5.0-rc1</gwt.version>
+    <gwt.maven.plugin.version>2.5.0-rc1</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
   </properties>
   <dependencies>
@@ -86,19 +86,44 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2</version>
-      </dependency>
-      <!-- JFreeChart -->
-      <dependency>
-        <groupId>org.jfree</groupId>
-        <artifactId>jfreechart</artifactId>
-        <version>1.0.14</version>
+        <version>2.5.3</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.0.10.Final</version>
+        <version>3.1.0.Final</version>
+      </dependency>
+      <!-- Apache Tika used by Lucene and Office modules -->
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parsers</artifactId>
+        <version>1.2</version>
+        <exclusions>
+          <exclusion>
+            <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
+            <groupId>de.l3s.boilerpipe</groupId>
+            <artifactId>boilerpipe</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
+        <groupId>de.l3s.boilerpipe</groupId>
+        <artifactId>boilerpipe</artifactId>
+        <version>1.2.0-xwiki</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
+      <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>xalan</artifactId>
+        <version>2.7.1</version>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
@@ -225,25 +250,15 @@
             <exclude>org/xwiki/rest/**</exclude>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
-            <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Add a method to the oldcore/wikimacro bridge -->
-            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroFactory</exclude>
-            <!-- The following excludes are needed because we've upgraded from AspectJ 1.6.7 to AspectJ 1.6.11
-                 in 4.0-milestone-1 and AspectJ has changed the way they weave stuff in class files thus leading to
-                 false CLIRR errors (see http://www.eclipse.org/aspectj/doc/released/README-169.html - search for
-                 "Intertype fields preserve visibility and name" for details).
-
-                 Thus we have to add those excludes. However those excludes could hide real breakages and thus before
-                 the release is done the Release Manager must absolutely remove those excludes below and try running
-                 CLIRR with AspectJ 1.6.7 to verify that no breakages have been added. To do so simply edit the
-                 Legacy OldCore pom.xml and add <version>1.6.7</version> for aspectjrt and <version>1.3</version> for
-                 the AspectJ Maven plugin version.
-            -->
-            <exclude>com/xpn/xwiki/XWikiCompatibilityAspect</exclude>
-            <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
-            <!-- End of excludes required for the AspectJ 1.6.7 -> 1.6.11 upgrade -->
-            <!-- Minor modification in the AS event implementation, can be removed after the 4.1 release -->
-            <exclude>com/xpn/xwiki/plugin/activitystream/impl/ActivityEventImpl</exclude>
+            <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
+                 from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
+            <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
+            <!-- Introduced by XWIKI-8232, "Handle wiki components dependencies injection" -->
+            <!-- To be removed once 4.3 final is released -->
+            <exclude>org/xwiki/component/wiki/WikiComponent</exclude>
+            <!-- Introduced by XWIKI-8236, "Provide a configuration mechanism for UI extension points" -->
+            <!-- To be removed once 4.3 final is released -->
+            <exclude>org/xwiki/uiextension/UIExtension</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -259,7 +274,6 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>
@@ -284,6 +298,7 @@
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-formula</module>
+    <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-index</module>
@@ -294,6 +309,7 @@
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
@@ -304,6 +320,7 @@
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-rendering</module>
+    <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
@@ -317,6 +334,7 @@
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-toucan</module>
     <module>xwiki-platform-user</module>
+    <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-watchlist</module>

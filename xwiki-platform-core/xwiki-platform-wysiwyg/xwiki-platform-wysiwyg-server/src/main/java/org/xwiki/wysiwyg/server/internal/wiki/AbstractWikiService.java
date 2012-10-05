@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -71,11 +72,12 @@ public abstract class AbstractWikiService implements WikiService
     private QueryManager queryManager;
 
     /**
-     * The query filter used to filter hidden documents.
+     * Provides the query filter used to filter hidden documents. We need to get the filter through a provider because
+     * it uses a per-lookup instantiation strategy.
      */
     @Inject
     @Named("hidden")
-    private QueryFilter hiddenDocumentsQueryFilter;
+    private Provider<QueryFilter> hiddenDocumentsQueryFilterProvider;
 
     /**
      * The service used to create links.
@@ -101,8 +103,8 @@ public abstract class AbstractWikiService implements WikiService
     public List<String> getSpaceNames(String wikiName)
     {
         try {
-            return queryManager.getNamedQuery("getSpaces").setWiki(wikiName).addFilter(hiddenDocumentsQueryFilter)
-                .execute();
+            return queryManager.getNamedQuery("getSpaces").setWiki(wikiName)
+                .addFilter(hiddenDocumentsQueryFilterProvider.get()).execute();
         } catch (QueryException e) {
             logger.error("Failed to get the list of spaces.", e);
             return Collections.emptyList();
@@ -166,7 +168,7 @@ public abstract class AbstractWikiService implements WikiService
     private Query createHQLQuery(String statement)
     {
         try {
-            return queryManager.createQuery(statement, Query.HQL).addFilter(hiddenDocumentsQueryFilter);
+            return queryManager.createQuery(statement, Query.HQL).addFilter(hiddenDocumentsQueryFilterProvider.get());
         } catch (QueryException e) {
             throw new RuntimeException(e);
         }

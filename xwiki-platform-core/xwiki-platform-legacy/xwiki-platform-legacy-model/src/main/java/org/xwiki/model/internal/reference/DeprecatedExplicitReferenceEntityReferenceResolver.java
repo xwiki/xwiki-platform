@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * type.
  * 
  * @version $Id$
- * @since 2.23
+ * @since 2.2.3
  * @deprecated use {@link ExplicitReferenceEntityReferenceResolver} instead.
  */
 @Component

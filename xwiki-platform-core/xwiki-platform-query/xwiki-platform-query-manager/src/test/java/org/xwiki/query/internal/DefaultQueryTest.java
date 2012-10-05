@@ -21,18 +21,16 @@ package org.xwiki.query.internal;
 
 import org.junit.Test;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.test.AbstractMockingComponentTestCase;
 
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for {@link DefaultQuery}
+ * Tests for {@link DefaultQuery}.
  *
  * @version $Id$
  */
-public class DefaultQueryTest extends AbstractMockingComponentTestCase
+public class DefaultQueryTest
 {
     @Test
     public void addSameFilterMultipleTimes()

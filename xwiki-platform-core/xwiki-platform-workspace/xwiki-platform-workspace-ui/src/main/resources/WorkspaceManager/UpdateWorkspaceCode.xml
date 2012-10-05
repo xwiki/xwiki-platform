@@ -36,22 +36,22 @@ The 'xredirect' parameter is also accepted, currently used in the administration
 ## TODO: use a dependency check macro.
 ##
 #if ("$!workspaceId" == '')
-  {{error}}Parameter 'workspaceId' was not specified.{{/error}}
+  {{error}}$msg.get('platform.workspace.oneParameterNotSpecified', 'workspaceId'){{/error}}
 #else
   #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
   #if (!$workspace)
     #if (!$WorkspaceManager.lastException)
-      {{error}}The workspace '$workspaceId' does not exist.{{/error}}
-    #elseif("${WorkspaceManager.lastException.message}" != '')
-      {{error}}$WorkspaceManager.lastException.message{{/error}}
+      {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', $workspaceId){{/error}}
+    #elseif("$!{WorkspaceManager.lastException.message}" != '')
+      {{error}}$msg.get('platform.workspace.exceptionWithMessage', $WorkspaceManager.lastException.message){{/error}}
     #else
       {{error}}$WorkspaceManager.lastException.class{{/error}}
     #end
   #else
-    #set($wikiDocument = $workspace.wikiDocument)
-    #set($temp = $wikiDocument.updateObjectFromRequest("${xcontext.mainWikiName}:XWiki.XWikiServerClass"))
-    #set($temp = $wikiDocument.updateObjectFromRequest("${xcontext.mainWikiName}:WorkspaceManager.WorkspaceClass"))
-    #set($temp = $WorkspaceManager.editWorkspace($workspaceId, $wikiDocument.firstWikiAlias))
+    #set ($wikiDocument = $workspace.wikiDocument)
+    #set ($temp = $wikiDocument.updateObjectFromRequest("${xcontext.mainWikiName}:XWiki.XWikiServerClass"))
+    #set ($temp = $wikiDocument.updateObjectFromRequest("${xcontext.mainWikiName}:WorkspaceManager.WorkspaceClass"))
+    #set ($temp = $WorkspaceManager.editWorkspace($workspaceId, $wikiDocument.firstWikiAlias))
   #end
   #if($request.xredirect)
     $response.sendRedirect($request.xredirect)

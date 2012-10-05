@@ -117,7 +117,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -404,6 +403,10 @@ public class XWiki implements EventListener
                 // object) which make it unusable
                 Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
                     .initialize(context);
+
+                // Send Event to signal that the application is ready to service requests.
+                Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
+                    new ApplicationReadyEvent(), xwiki, context);
             } else {
                 context.setWiki(xwiki);
             }
@@ -748,16 +751,16 @@ public class XWiki implements EventListener
         // Prepare the store
         setConfig(config);
 
-        XWikiStoreInterface basestore =
+        XWikiStoreInterface mainStore =
             Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint", "hibernate"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
-            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(basestore, context);
+            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
             setStore(cachestore);
         } else {
-            setStore(basestore);
+            setStore(mainStore);
         }
 
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
@@ -801,16 +804,8 @@ public class XWiki implements EventListener
         String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
         this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
-        // Initialize all wiki macros.
-        // TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note
-        // that we need DB access to be available (at component initialization) to make this possible.
-        registerWikiMacros();
-
         ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
         observationManager.addListener(this);
-
-        // Send Event to signal that the application is ready to service requests.
-        observationManager.notify(new ApplicationReadyEvent(), this, context);
     }
 
     /**
@@ -830,34 +825,9 @@ public class XWiki implements EventListener
         getSheetClass(context);
         getEditModeClass(context);
 
-        try {
-            WikiMacroInitializer wikiMacroInitializer =
-                Utils.getComponentManager().getInstance(WikiMacroInitializer.class);
-            wikiMacroInitializer.installOrUpgradeWikiMacroClasses();
-        } catch (Exception ex) {
-            LOGGER.error("Error while installing / upgrading xwiki classes required for wiki macros.", ex);
-        }
-
         if (context.getDatabase().equals(context.getMainXWiki())
             && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
             getRedirectClass(context);
-        }
-    }
-
-    /**
-     * TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note that we
-     * need DB access to be available (at component initialization) to make this possible.
-     * <p>
-     * This method is protected to be able to skip it in unit tests.
-     */
-    protected void registerWikiMacros()
-    {
-        try {
-            WikiMacroInitializer wikiMacroInitializer =
-                Utils.getComponentManager().getInstance(WikiMacroInitializer.class);
-            wikiMacroInitializer.registerExistingWikiMacros();
-        } catch (Exception ex) {
-            LOGGER.error("Error while registering wiki macros.", ex);
         }
     }
 
@@ -922,17 +892,16 @@ public class XWiki implements EventListener
                         getPluginManager().virtualInit(context);
                         getRenderingEngine().virtualInit(context);
                     }
+
+                    // Add initdone which will allow to
+                    // bypass some initializations
+                    context.put("initdone", "1");
+
+                    // Send event to notify listeners that the subwiki is ready
+                    ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
+                    observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
                 }
             }
-
-            // Add initdone which will allow to
-            // bypass some initializations
-            context.put("initdone", "1");
-
-            // Send event to notify listeners that the subwiki is ready
-            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-            observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
-
         } finally {
             context.setDatabase(database);
         }
@@ -3006,6 +2975,12 @@ public class XWiki implements EventListener
             return bclass;
         }
 
+        // Force the class document to use the 2.1 syntax default syntax, the same syntax used in the custom displayer.
+        if (!Syntax.XWIKI_2_1.equals(doc.getSyntax())) {
+            doc.setSyntax(Syntax.XWIKI_2_1);
+            needsUpdate = true;
+        }
+
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
         needsUpdate |= bclass.addTextField("email", "e-Mail", 30);
@@ -3053,11 +3028,11 @@ public class XWiki implements EventListener
             builder.append("  {{html}}\n");
             builder.append("    #if($xwiki.jodatime)\n");
             builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
-            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>" +
-                "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
+            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
+                + "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
             builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
-            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>" +
-                "$tz</option>\n");
+            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
+                + "$tz</option>\n");
             builder.append("        #end\n");
             builder.append("      </select>\n");
             builder.append("    #else\n");
@@ -4303,39 +4278,54 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-
-        // Inform notification mechanisms that a document is about to be deleted
-        // Note that for the moment the event being send is a bridge event, as we are still passing around
-        // an XWikiDocument as source and an XWikiContext as data.
-        om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), new XWikiDocument(doc.getDocumentReference()),
-            context);
-
-        if (hasRecycleBin(context) && totrash) {
-            getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
-        }
-
-        getStore().deleteXWikiDoc(doc, context);
-
+        String server = null, database = null;
         try {
-            // Inform notification mecanisms that a document has been deleted
+            server = doc.getDocumentReference().getWikiReference().getName();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            ObservationManager om = Utils.getComponent(ObservationManager.class);
+
+            // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            // The source document is a new empty XWikiDocument to follow
-            // DocumentUpdatedEvent policy: source document in new document and the old version is available using
-            // doc.getOriginalDocument()
-            if (om != null) {
-                XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
-                // Again to follow general event policy, new document author is the user who modified the document (here
-                // the modification is delete)
-                blankDoc.setOriginalDocument(doc);
-                blankDoc.setAuthor(context.getUser());
-                blankDoc.setContentAuthor(context.getUser());
-                om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+            om.notify(new DocumentDeletingEvent(doc.getDocumentReference()),
+                new XWikiDocument(doc.getDocumentReference()), context);
+
+            if (hasRecycleBin(context) && totrash) {
+                getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
             }
-        } catch (Exception ex) {
-            LOGGER.error("Failed to send document delete notifications for document [" + doc.getPrefixedFullName()
-                + "]", ex);
+
+            getStore().deleteXWikiDoc(doc, context);
+
+            try {
+                // Inform notification mecanisms that a document has been deleted
+                // Note that for the moment the event being send is a bridge event, as we are still passing around
+                // an XWikiDocument as source and an XWikiContext as data.
+                // The source document is a new empty XWikiDocument to follow
+                // DocumentUpdatedEvent policy: source document in new document and the old version is available using
+                // doc.getOriginalDocument()
+                if (om != null) {
+                    XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
+                    // Again to follow general event policy, new document author is the user who modified the document
+                    // (here
+                    // the modification is delete)
+                    blankDoc.setOriginalDocument(doc);
+                    blankDoc.setAuthor(context.getUser());
+                    blankDoc.setContentAuthor(context.getUser());
+                    om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Failed to send document delete notifications for document [{}]",
+                    doc.getDocumentReference(), ex);
+            }
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
         }
     }
 

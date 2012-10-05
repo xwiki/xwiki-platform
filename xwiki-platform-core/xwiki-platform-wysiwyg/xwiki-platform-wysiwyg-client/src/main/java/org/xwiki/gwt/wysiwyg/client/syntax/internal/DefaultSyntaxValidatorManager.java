@@ -25,7 +25,6 @@ import java.util.Map;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
 
-
 /**
  * The default implementation for the {@link SyntaxValidatorManager}. We don't plan to provide another implementation.
  * 
@@ -45,7 +44,7 @@ public class DefaultSyntaxValidatorManager implements SyntaxValidatorManager
      */
     public SyntaxValidator addSyntaxValidator(SyntaxValidator validator)
     {
-        return (SyntaxValidator) validators.put(validator.getSyntax(), validator);
+        return validators.put(validator.getSyntax(), validator);
     }
 
     /**
@@ -55,7 +54,7 @@ public class DefaultSyntaxValidatorManager implements SyntaxValidatorManager
      */
     public SyntaxValidator getSyntaxValidator(String syntax)
     {
-        return (SyntaxValidator) validators.get(syntax);
+        return validators.get(syntax);
     }
 
     /**
@@ -65,6 +64,6 @@ public class DefaultSyntaxValidatorManager implements SyntaxValidatorManager
      */
     public SyntaxValidator removeSyntaxValidator(String syntax)
     {
-        return (SyntaxValidator) validators.remove(syntax);
+        return validators.remove(syntax);
     }
 }

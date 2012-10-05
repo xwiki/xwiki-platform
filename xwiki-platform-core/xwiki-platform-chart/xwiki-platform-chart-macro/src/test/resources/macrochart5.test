@@ -3,8 +3,11 @@
 .input|xwiki/2.0
 .# Test the output when the macro is used inline
 .#-----------------------------------------------------
-Inline{{testchart type="line"/}}
+|1.0|3.0|2.5
+|4.0|1.0|2.3
+
+Inline{{chart type="line"/}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Inline<span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding"/></a></span></p>
+<table><tr><td>1.0</td><td>3.0</td><td>2.5</td></tr><tr><td>4.0</td><td>1.0</td><td>2.3</td></tr></table><p>Inline<span class="wikiexternallink"><a class="wikimodel-freestanding" href="temppath/chart/${{{regex:.*}}}"><img src="temppath/chart/${{{regex:.*}}}" class="wikimodel-freestanding"/></a></span></p>

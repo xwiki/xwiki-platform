@@ -309,8 +309,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
                 retval = indexDocuments(wikiName, documents, searcher, context);
             } catch (XWikiException e) {
-                LOGGER.warn("Error getting document names for wiki [{}] and filter [{}]: {}.",
-                    new Object[] {wikiName, this.hqlFilter, e.getMessage()});
+                LOGGER.warn("Error getting document names for wiki [{}] and filter [{}]: {}.", new Object[] {wikiName,
+                this.hqlFilter, e.getMessage()});
 
                 return -1;
             } finally {
@@ -343,8 +343,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 try {
                     retval += addTranslationOfDocument(documentReference, language, context);
                 } catch (XWikiException e) {
-                    LOGGER.error("Error fetching document [{}] for language [{}]",
-                        new Object[] {documentReference, language, e});
+                    LOGGER.error("Error fetching document [{}] for language [{}]", new Object[] {documentReference,
+                    language, e});
 
                     return retval;
                 }

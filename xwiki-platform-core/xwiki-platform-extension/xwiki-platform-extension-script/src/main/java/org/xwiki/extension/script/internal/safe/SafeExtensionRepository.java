@@ -43,10 +43,12 @@ public class SafeExtensionRepository<T extends ExtensionRepository> extends Abst
      * @param repository the wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
      * @param execution provide access to the current context
+     * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
+    public SafeExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+        boolean hasProgrammingRight)
     {
-        super(repository, safeProvider, execution);
+        super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
     // ExtensionRepository

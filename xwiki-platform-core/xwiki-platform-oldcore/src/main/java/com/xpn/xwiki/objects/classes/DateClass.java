@@ -38,12 +38,14 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class DateClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "date";
+
     /** Logging helper object. */
     private static final Logger LOG = LoggerFactory.getLogger(DateClass.class);
 
     public DateClass(PropertyMetaClass wclass)
     {
-        super("date", "Date", wclass);
+        super(XCLASSNAME, "Date", wclass);
         setSize(20);
         setDateFormat("dd/MM/yyyy HH:mm:ss");
         setEmptyIsToday(1);

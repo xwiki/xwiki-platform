@@ -40,8 +40,19 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Action responsible for downloading temporary resources created by various modules. Refer JIRA issue:
- * <a>http://jira.xwiki.org/jira/browse/XWIKI-5227</a>.
+ * Action responsible for downloading temporary resources created by various modules. The temporary resource is put
+ * in the temporary directory in a directory named "temp" and in subdirectories
+ * "(module)/(wiki)/(space)/(page)/(file)" where:
+ * <ul>
+ *   <li>(module): it's the 3rd path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ *   <li>(wiki): the name of the current wiki (extracted from the URL too)</li>
+ *   <li>(space): it's the 1st path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ *   <li>(page): it's the 2nd path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ *   <li>(file): it's the 4th path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ * </ul>
+ * <p/>
+ * For example if the URL is {@code http://localhost:8080/xwiki/bin/temp/Main/WebHome/test/test.png} then the resource
+ * will be fetched from {@code TMPDIR/temp/test/xwiki/Main/WebHome/test.png}.
  * 
  * @version $Id$
  * @since 2.4M1

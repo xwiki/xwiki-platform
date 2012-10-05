@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-containers</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-container-servlet</artifactId>
   <name>XWiki Platform - Containers - Servlet</name>
@@ -53,11 +53,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-servlet</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-action</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

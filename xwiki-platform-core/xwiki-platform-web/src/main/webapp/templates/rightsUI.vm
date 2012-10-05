@@ -65,7 +65,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 <div id="xwikieditcontent">
   #if ("$!editor" == 'rights')
     ## Display a title if we're editing access rights for a particular page
-    <div id="document-title"><h1>$msg.get('core.editors.rights.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
+    <div id="document-title"><h1>$msg.get('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
   #end
   <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor" != '') $editor#end">
     <tr>
@@ -222,14 +222,14 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 
       window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
       window.saveUrl = "$saveUrl";
-      saveUrl.replace(/&amp;/g, "&");
+      window.saveUrl.replace(/&amp;/g, "&");
       window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
       window.unregUser = "XWiki.XWikiGuest";
       // the callback function is called from LiveTable with 3 arguments
       var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}") };
       var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
     #foreach($i in [0..$maxlevel])
-      var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", saveUrl, "${r.get($i)}");
+      var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
     #end
       Event.observe(window, 'load', function() {
         if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {

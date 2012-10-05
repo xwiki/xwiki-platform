@@ -185,9 +185,8 @@ public class CheckAnnotationClassEventListener implements EventListener
                     deprecatedContext);
             }
         } catch (Exception e) {
-            throw new AnnotationServiceException(String.format(
-                "Failed to update the configured annotation class [%s:%s.%s]",
-                serializer.serialize(annotationClassReference, (Object[]) null)), e);
+            throw new AnnotationServiceException(String.format("Failed to update the configured annotation class [%s]",
+                    annotationClassReference.toString()), e);
         }
     }
 

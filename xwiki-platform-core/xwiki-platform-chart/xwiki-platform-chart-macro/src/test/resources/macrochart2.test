@@ -1,9 +1,14 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Test an XDOM data source in another document
 .#-----------------------------------------------------
-{{testchart type="bar" source="xdom" params="document:Test.Test;table:table1;range:B1-C3;series:rows;" title="Chart Test" width="640" height="480"/}}
+{{chart type="bar" source="xdom" params="
+        document:wiki:space.page;
+        table:table1;
+        range:B1-C3;
+        series:rows;" title="Chart Test" width="640" height="480"/}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>
+<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="temppath/chart/${{{regex:.*}}}"><img src="temppath/chart/${{{regex:.*}}}" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>

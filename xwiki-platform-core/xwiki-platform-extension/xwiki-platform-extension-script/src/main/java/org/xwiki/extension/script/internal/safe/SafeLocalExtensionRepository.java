@@ -27,6 +27,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
@@ -45,10 +46,12 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
      * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
      * @param execution provide access to the current context
+     * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution)
+    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+        boolean hasProgrammingRight)
     {
-        super(repository, safeProvider, execution);
+        super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
     // LocalExtensionRepository
@@ -60,6 +63,12 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     }
 
     @Override
+    public LocalExtension getLocalExtension(ExtensionId extensionId)
+    {
+        return safe(getWrapped().getLocalExtension(extensionId));
+    }
+
+    @Override
     public Collection<LocalExtension> getLocalExtensions()
     {
         return safe(getWrapped().getLocalExtensions());
@@ -68,13 +77,37 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
     @Override
     public LocalExtension storeExtension(Extension extension)
     {
-        throw new UnsupportedOperationException(FORBIDDEN);
+        if (!this.hasProgrammingRight) {
+            setError(new UnsupportedOperationException(FORBIDDEN));
+
+            return null;
+        }
+
+        setError(null);
+
+        try {
+            return safe(getWrapped().storeExtension(extension));
+        } catch (LocalExtensionRepositoryException e) {
+            setError(e);
+        }
+
+        return null;
     }
 
     @Override
     public void removeExtension(LocalExtension extension)
     {
-        throw new UnsupportedOperationException(FORBIDDEN);
+        if (!this.hasProgrammingRight) {
+            setError(new UnsupportedOperationException(FORBIDDEN));
+        }
+
+        setError(null);
+
+        try {
+            getWrapped().removeExtension(extension);
+        } catch (ResolveException e) {
+            setError(e);
+        }
     }
 
     @Override
@@ -97,8 +130,17 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
 
     @Override
     public void setProperties(LocalExtension localExtension, Map<String, Object> properties)
-        throws LocalExtensionRepositoryException
     {
-        throw new UnsupportedOperationException("Operation forbidden in script proxy");
+        if (!this.hasProgrammingRight) {
+            setError(new UnsupportedOperationException(FORBIDDEN));
+        }
+
+        setError(null);
+
+        try {
+            getWrapped().setProperties(localExtension, properties);
+        } catch (LocalExtensionRepositoryException e) {
+            setError(e);
+        }
     }
 }

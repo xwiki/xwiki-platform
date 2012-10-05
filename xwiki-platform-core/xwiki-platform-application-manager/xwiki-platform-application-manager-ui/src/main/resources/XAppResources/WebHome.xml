@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>1 Space $doc.space
 
 This space contains all Application Manager application resources like translation pages.</content>

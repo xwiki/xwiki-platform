@@ -27,17 +27,18 @@
 #set ($parameterName = 'workspaceName')
 #set ($workspaceNames = $request.getParameterValues($parameterName))
 #if ("$!workspaceNames" == '' || $workspaceNames.size() == 0)
-  Generates an activity stream for the given workspace(s).
+  $msg.get('platform.workspace.activityHint')
 
-  {{error}}Parameter **$parameterName** needs to be specified. Multiple values accepted.{{/error}}
+  {{error}}$msg.get('platform.workspace.oneParameterNotSpecified', $parameterName) $msg.get('platform.workspace.parameterAcceptsMultipleValues'){{/error}}
 #else
-  #set ($wikiNames = "")
+  #set ($wikiNames = '')
   #foreach ($workspaceName in $workspaceNames)
     #if ("$!workspaceName" != '')
       #set ($wikiNames = "$workspaceName, $wikiNames")
     #end
   #end
-  = Activity of workspace#if($workspaceNames.size()&gt;1)s#end $wikiNames.replaceAll(',\s$','')=
+  #set ($wikiNames = $wikiNames.replaceAll(',\s$',''))
+  = #if ($workspaceNames.size() == 1)$msg.get('platform.workspace.activityTitle', $wikiNames)#{else}$msg.get('platform.workspace.activityMultipleTitle', $wikiNames)#end =
   {{activity wikis="$wikiNames"}}
 #end
 {{/velocity}}</content>

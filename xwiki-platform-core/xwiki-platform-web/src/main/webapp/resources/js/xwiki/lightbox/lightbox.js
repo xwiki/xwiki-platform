@@ -48,7 +48,7 @@ Lightbox = Class.create({
     if(this.loadedForms[url]) {
       $('lb-content').innerHTML = '';
       this.lbPlaceContentInDocument(this.loadedForms[url], $('lb-content'));
-      this.form = c.getElementsByTagName('form')[0];
+      this.form = $('lb-content').down('form');
     } else {
       new Ajax.Request(url, {onSuccess: this.lbFormDataLoaded.bind(this)});
     }
@@ -172,11 +172,14 @@ Lightbox = Class.create({
       // Finally, we place a script which fires a dom:loaded event. We are not just manually firing the event 
       // because we want to make sure all other scripts have been loaded and parsed first.
       var fireScript = document.createElement('script');
+      var scriptContent =
+            'document.fire("dom:loaded");'
+          + 'document.fire("xwiki:dom:loaded");';
       try {
-        fireScript.innerHTML = 'document.fire("dom:loaded");';
+        fireScript.innerHTML = scriptContent;
       } catch (ie) {
         // IE7
-        fireScript.text = 'document.fire("dom:loaded");';
+        fireScript.text = scriptContent;
       }
       whereToPlace.appendChild(fireScript);
     }.bind(this));

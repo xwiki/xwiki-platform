@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -74,11 +74,6 @@
       <version>4.3</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-    </dependency>
-
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
     <dependency>
       <groupId>info.informatica</groupId>
@@ -93,20 +88,10 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
-         http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
-         allow a release (this is for reproducibility). Thus we've had to upload JTidy into
-         our custom repository -->
     <dependency>
-      <groupId>jtidy</groupId>
+      <groupId>net.sf.jtidy</groupId>
       <artifactId>jtidy</artifactId>
-      <version>8.0-20060801.131059-3-dev</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>dom3-xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>r938</version>
     </dependency>
     
     <!-- Required by the XML-RPC implementation and tests.
@@ -174,12 +159,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
-    
+
     <!-- For extracting metadata from various document types -->
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>1.1</version>
     </dependency>
 
     <!-- XML processing -->
@@ -368,7 +352,7 @@
       <artifactId>yuicompressor</artifactId>
       <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
            yuicompressor -->
-      <version>2.4.2-xwiki</version>
+      <version>2.4.7-xwiki</version>
     </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>
@@ -461,6 +445,15 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other
+         modules using it to the Servlet environment, which is pretty bad. To be able to remove this dependency
+         we first need to be able to split DefaultVelocityManager so that the part that is related to the Servlet
+         environment (the Velocity webapp loader) is moved to its own module. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-velocity-webapp</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -529,11 +522,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -576,6 +564,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -762,9 +755,6 @@
               **/export/html/HtmlPackager.java,
               **/i18n/i18n.java,
               **/internal/DefaultCoreConfiguration.java,
-              **/internal/macro/DefaultWikiMacroFactory.java,
-              **/internal/macro/DefaultWikiMacroInitializer.java,
-              **/internal/macro/WikiMacroConstants.java,
               **/internal/DefaultXWikiStubContextProvider.java,
               **/internal/model/reference/CompactStringEntityReferenceSerializer.java,
               **/internal/model/reference/CompactWikiStringEntityReferenceSerializer.java,
@@ -840,87 +830,6 @@
               **/pdf/impl/PdfExportImpl.java,
               **/plugin/image/ImagePlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
-              **/plugin/charts/actions/ChartingAction.java,
-              **/plugin/charts/actions/ChartWizardAction.java,
-              **/plugin/charts/actions/CreateChartAction.java,
-              **/plugin/charts/actions/PreviewChartAction.java,
-              **/plugin/charts/ChartCustomizer.java,
-              **/plugin/charts/ChartImpl.java,
-              **/plugin/charts/ChartingMacro.java,
-              **/plugin/charts/ChartingPluginApi.java,
-              **/plugin/charts/ChartingPlugin.java,
-              **/plugin/charts/Chart.java,
-              **/plugin/charts/CustomXWikiRenderingEngine.java,
-              **/plugin/charts/exceptions/ChartingException.java,
-              **/plugin/charts/exceptions/ColumnIndexOutOfBoundsException.java,
-              **/plugin/charts/exceptions/DataSourceException.java,
-              **/plugin/charts/exceptions/EmptyDataSourceException.java,
-              **/plugin/charts/exceptions/GenerateException.java,
-              **/plugin/charts/exceptions/InvalidArgumentException.java,
-              **/plugin/charts/exceptions/InvalidParamException.java,
-              **/plugin/charts/exceptions/MissingArgumentException.java,
-              **/plugin/charts/exceptions/MissingDataSourceException.java,
-              **/plugin/charts/exceptions/MissingMandatoryParamException.java,
-              **/plugin/charts/exceptions/NoHeaderColumnException.java,
-              **/plugin/charts/exceptions/NoHeaderRowException.java,
-              **/plugin/charts/exceptions/ParamException.java,
-              **/plugin/charts/exceptions/RowIndexOutOfBoundsException.java,
-              **/plugin/charts/params/AbstractChartParam.java,
-              **/plugin/charts/params/BooleanChartParam.java,
-              **/plugin/charts/params/CategoryLabelPositionsChartParam.java,
-              **/plugin/charts/params/ChartParam.java,
-              **/plugin/charts/params/ChartParams.java,
-              **/plugin/charts/params/ChoiceChartParam.java,
-              **/plugin/charts/params/ColorChartParam.java,
-              **/plugin/charts/params/DateChartParam.java,
-              **/plugin/charts/params/DateFormatChartParam.java,
-              **/plugin/charts/params/DateTickMarkPositionChartParam.java,
-              **/plugin/charts/params/DateTickUnitChartParam.java,
-              **/plugin/charts/params/DefaultChartParams2.java,
-              **/plugin/charts/params/DefaultChartParams.java,
-              **/plugin/charts/params/DoubleChartParam.java,
-              **/plugin/charts/params/FloatChartParam.java,
-              **/plugin/charts/params/FontChartParam.java,
-              **/plugin/charts/params/HorizontalAlignmentChartParam.java,
-              **/plugin/charts/params/IntegerChartParam.java,
-              **/plugin/charts/params/ListChartParam.java,
-              **/plugin/charts/params/LocaleChartParam.java,
-              **/plugin/charts/params/MapChartParam.java,
-              **/plugin/charts/params/NumberFormatChartParam.java,
-              **/plugin/charts/params/NumberTickUnitChartParam.java,
-              **/plugin/charts/params/PlotOrientationChartParam.java,
-              **/plugin/charts/params/Point2DChartParam.java,
-              **/plugin/charts/params/RangeTypeChartParam.java,
-              **/plugin/charts/params/RectangleAnchorChartParam.java,
-              **/plugin/charts/params/RectangleEdgeChartParam.java,
-              **/plugin/charts/params/RectangleInsetsChartParam.java,
-              **/plugin/charts/params/RendererClassChartParam.java,
-              **/plugin/charts/params/ShapeChartParam.java,
-              **/plugin/charts/params/StringChartParam.java,
-              **/plugin/charts/params/StrokeChartParam.java,
-              **/plugin/charts/params/TimePeriodClassChartParam.java,
-              **/plugin/charts/params/VerticalAlignmentChartParam.java,
-              **/plugin/charts/plots/AreaPlotFactory.java,
-              **/plugin/charts/plots/BarPlotFactory.java,
-              **/plugin/charts/plots/CategoryPlotFactory.java,
-              **/plugin/charts/plots/LinePlotFactory.java,
-              **/plugin/charts/plots/PiePlotFactory.java,
-              **/plugin/charts/plots/PlotFactory.java,
-              **/plugin/charts/plots/TableXYDatasetFactory.java,
-              **/plugin/charts/plots/TimePlotFactory.java,
-              **/plugin/charts/plots/TimeSeriesCollectionFactory.java,
-              **/plugin/charts/plots/XYPlotFactory.java,
-              **/plugin/charts/RadeoxHelper.java,
-              **/plugin/charts/source/DataSourceFactory.java,
-              **/plugin/charts/source/DataSource.java,
-              **/plugin/charts/source/DefaultDataSource.java,
-              **/plugin/charts/source/MainDataSourceFactory.java,
-              **/plugin/charts/source/ObjectDataSourceFactory.java,
-              **/plugin/charts/source/ObjectidDataSourceFactory.java,
-              **/plugin/charts/source/TableDataSourceFactory.java,
-              **/plugin/charts/source/TableDataSource.java,
-              **/plugin/charts/wizard/DatasourceDefaultsHelper.java,
-              **/plugin/charts/wizard/FontHelper.java,
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
               **/plugin/feed/FeedPluginApi.java,

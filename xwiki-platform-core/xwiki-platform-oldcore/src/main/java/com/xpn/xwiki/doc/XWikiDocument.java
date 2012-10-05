@@ -3355,17 +3355,20 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setValidationScript(getValidationScript());
             doc.setLanguage(getLanguage());
             doc.setTranslation(getTranslation());
-            doc.setXClass(getXClass().clone());
-            doc.setXClassXML(getXClassXML());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
 
+            BaseClass bClass = getXClass().clone();
+            doc.setXClass(bClass);
+
             if (keepsIdentity) {
+                doc.setXClassXML(getXClassXML());
                 doc.cloneXObjects(this);
                 doc.cloneAttachments(this);
             } else {
+                bClass.setCustomMapping(null);
                 doc.duplicateXObjects(this);
                 doc.copyAttachments(this);
             }
@@ -3505,7 +3508,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Datas
 
-        if (!equalsDatas(doc)) {
+        if (!equalsData(doc)) {
             return false;
         }
 
@@ -3527,7 +3530,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return true if bith documents have the same datas
      * @since 4.1.1
      */
-    public boolean equalsDatas(XWikiDocument doc)
+    public boolean equalsData(XWikiDocument doc)
     {
         // Same Java object, they sure are equal
         if (this == doc) {
@@ -7281,15 +7284,11 @@ public class XWikiDocument implements DocumentModelBridge
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
+        // The XWiki Context isn't recreated when the Execution Context is cloned so we have to backup some of its data.
+        // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
-        if (vcontext != null) {
-            backup.put("vdoc", vcontext.get("doc"));
-            backup.put("vcdoc", vcontext.get("cdoc"));
-            backup.put("vtdoc", vcontext.get("tdoc"));
-        }
 
+        // Backup the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext != null) {
@@ -7298,57 +7297,60 @@ public class XWikiDocument implements DocumentModelBridge
             backup.put("gtdoc", gcontext.get("tdoc"));
         }
 
-        // Clone the Execution Context to provide isolation
+        // Clone the Execution Context to provide isolation. The clone will have a new Velocity and Script Context.
         Execution execution = Utils.getComponent(Execution.class);
-        ExecutionContext clonedEc;
         try {
-            clonedEc = Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext());
+            execution.pushContext(Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext()));
         } catch (ExecutionContextException e) {
             throw new RuntimeException("Failed to clone the Execution Context", e);
         }
-        execution.pushContext(clonedEc);
+
+        // Trigger the initialization of the new Velocity and Script Context. This will also ensure that the Execution
+        // Context and the XWiki Context point to the same Velocity Context instance. There is old code that accesses
+        // the Velocity Context from the XWiki Context.
+        Utils.getComponent(VelocityManager.class).getVelocityContext();
     }
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
     {
-        // Restore the Execution Context
+        // Restore the Execution Context. This will also restore the previous Velocity and Script Context.
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
 
+        // Restore the Velocity Context reference from the XWiki Context, which is still used by some old code. Note
+        // that we take the Velocity Context directly from the Execution Context in order to avoid triggering a
+        // reinitialization of the Velocity Context.
+        VelocityContext vcontext = (VelocityContext) execution.getContext().getProperty("velocityContext");
+        if (vcontext != null) {
+            context.put("vcontext", vcontext);
+        } else {
+            context.remove("vcontext");
+        }
+
+        // Restore the current document on the XWiki Context.
+        context.setDoc((XWikiDocument) backup.get("doc"));
+
+        // Restore the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
         if (gcontext != null) {
             if (backup.get("gdoc") != null) {
                 gcontext.put("doc", backup.get("gdoc"));
+            } else {
+                gcontext.remove("doc");
             }
 
             if (backup.get("gcdoc") != null) {
                 gcontext.put("cdoc", backup.get("gcdoc"));
+            } else {
+                gcontext.remove("cdoc");
             }
 
             if (backup.get("gtdoc") != null) {
                 gcontext.put("tdoc", backup.get("gtdoc"));
+            } else {
+                gcontext.remove("tdoc");
             }
-        }
-
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
-        if (vcontext != null) {
-            if (backup.get("vdoc") != null) {
-                vcontext.put("doc", backup.get("vdoc"));
-            }
-
-            if (backup.get("vcdoc") != null) {
-                vcontext.put("cdoc", backup.get("vcdoc"));
-            }
-
-            if (backup.get("vtdoc") != null) {
-                vcontext.put("tdoc", backup.get("vtdoc"));
-            }
-        }
-
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
         }
     }
 
@@ -7358,18 +7360,21 @@ public class XWikiDocument implements DocumentModelBridge
             context.setDoc(this);
             com.xpn.xwiki.api.Document apidoc = newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
+
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
             if (vcontext != null) {
                 vcontext.put("doc", apidoc);
                 vcontext.put("tdoc", tdoc);
+                vcontext.put("cdoc", tdoc);
             }
 
+            @SuppressWarnings("unchecked")
+            Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
             if (gcontext != null) {
                 gcontext.put("doc", apidoc);
                 gcontext.put("tdoc", tdoc);
+                gcontext.put("cdoc", tdoc);
             }
         } catch (XWikiException ex) {
             LOGGER.warn("Unhandled exception setting context", ex);
@@ -7487,6 +7492,10 @@ public class XWikiDocument implements DocumentModelBridge
             try {
                 this.xdom = parseContent(getContent());
             } catch (XWikiException e) {
+                if (StringUtils.isEmpty(getContent())) {
+                    LOGGER.debug("Syntax [{}] cannot handle empty input. Returning empty XDOM.", getSyntax());
+                    return new XDOM(Collections.<Block>emptyList());
+                }
                 LOGGER.error("Failed to parse document content to XDOM", e);
             }
         }

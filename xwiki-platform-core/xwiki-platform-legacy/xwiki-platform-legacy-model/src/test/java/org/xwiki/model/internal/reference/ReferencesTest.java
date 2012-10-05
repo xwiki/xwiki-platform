@@ -22,6 +22,8 @@ package org.xwiki.model.internal.reference;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class ReferencesTest extends AbstractComponentTestCase
@@ -30,6 +32,16 @@ public class ReferencesTest extends AbstractComponentTestCase
     public void testLookup() throws ComponentLookupException, Exception
     {
         getComponentManager().getInstance(DocumentReferenceResolver.class, "default/reference");
-        
+        getComponentManager().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default/reference");
+        getComponentManager().getInstance(DocumentReferenceResolver.class, "explicit/reference");
+        getComponentManager().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "explicit/reference");
+
+        getComponentManager().getInstance(EntityReferenceResolver.class, "default/reference");
+        getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "default/reference");
+        getComponentManager().getInstance(EntityReferenceResolver.class, "explicit/reference");
+        getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit/reference");
+
+        getComponentManager().getInstance(EntityReferenceSerializer.class, "local/reference");
+        getComponentManager().getInstance(EntityReferenceSerializer.TYPE_REFERENCE, "local/reference");
     }
 }

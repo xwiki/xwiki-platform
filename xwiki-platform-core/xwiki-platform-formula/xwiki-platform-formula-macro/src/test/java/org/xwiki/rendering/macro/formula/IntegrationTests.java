@@ -24,11 +24,10 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.formula.ImageData;
 import org.xwiki.formula.ImageStorage;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.test.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -41,29 +40,20 @@ import org.xwiki.rendering.test.integration.RenderingTestSuite;
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
 
         // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRoleType(DocumentAccessBridge.class);
-        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            componentManager.registerMockComponent(mockery, DocumentAccessBridge.class);
 
         // Image Storage Mock
-        final ImageStorage mockImageStorage = mockery.mock(ImageStorage.class);
-        DefaultComponentDescriptor<ImageStorage> descriptorIS = new DefaultComponentDescriptor<ImageStorage>();
-        descriptorIS.setRoleType(ImageStorage.class);
-        componentManager.registerComponent(descriptorIS, mockImageStorage);
+        final ImageStorage mockImageStorage = componentManager.registerMockComponent(mockery, ImageStorage.class);
 
         // Configuration Mock
-        final FormulaMacroConfiguration mockConfiguration = mockery.mock(FormulaMacroConfiguration.class);
-        DefaultComponentDescriptor<FormulaMacroConfiguration> descriptorEMC =
-            new DefaultComponentDescriptor<FormulaMacroConfiguration>();
-        descriptorEMC.setRoleType(FormulaMacroConfiguration.class);
-        componentManager.registerComponent(descriptorEMC, mockConfiguration);
+        final FormulaMacroConfiguration mockConfiguration =
+            componentManager.registerMockComponent(mockery, FormulaMacroConfiguration.class);
 
         mockery.checking(new Expectations()
         {

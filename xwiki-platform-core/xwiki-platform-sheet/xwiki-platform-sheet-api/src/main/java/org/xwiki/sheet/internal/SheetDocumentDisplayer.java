@@ -89,26 +89,28 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
+        XDOM xdom = null;
         if (isSheetExpected(document, parameters)) {
-            for (DocumentReference sheetReference : getSheetReferences(document)) {
-                if (document.getDocumentReference().equals(sheetReference)) {
-                    // If the sheet is the document itself then we simply display the document. We handle this case
-                    // differently because unsaved document changes might be ignored if we render the sheet (which is
-                    // loaded from the database). So in this case applying the sheet would actually mean displaying the
-                    // saved version of the document.
-                    break;
-                } else if (documentAccessBridge.isDocumentViewable(sheetReference)) {
-                    try {
-                        return applySheet(document, sheetReference, parameters);
-                    } catch (Exception e) {
-                        String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
-                        logger.warn("Failed to apply sheet [{}].", sheetStringReference, e);
-                    }
+            Map<String, Object> backupObjects = null;
+            try {
+                // It is very important to determine the sheet in a new, isolated, execution context, if the given
+                // document is not the currently on the execution context. Put the given document in the context only if
+                // it's not already there.
+                if (document != modelBridge.getCurrentDocument()) {
+                    backupObjects = modelBridge.pushDocumentInContext(document);
+                }
+                xdom = maybeDisplayWithSheet(document, parameters);
+            } finally {
+                if (backupObjects != null) {
+                    documentAccessBridge.popDocumentFromContext(backupObjects);
                 }
             }
         }
 
-        return documentDisplayer.display(document, parameters);
+        // Fall back on the default document displayer if no sheet was applied. Note that we don't isolate the context
+        // before calling the default document displayer. It is better to let the default document displayer choose if
+        // isolating the execution context is needed due to the way #isSheetExpected() checks for current document.
+        return xdom != null ? xdom : documentDisplayer.display(document, parameters);
     }
 
     /**
@@ -119,12 +121,56 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
      */
     private boolean isSheetExpected(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
-        // We test if the default edit mode is "edit" to ensure backward compatibility with older XWiki applications
+        // We make 3 checks:
+        //
+        // (1) If the content is not transformed then the goal is probably to include it in a bigger XDOM to be rendered
+        // later, in which case the actual document content is needed, not the content of the sheet.
+        //
+        // (2) If the execution context is not isolated then the document is probably included in another one
+        // (context=current) so we need to display the actual document content. Note that we also test if the given
+        // document is the current one because requested documents (e.g. /view/Space/Page) are displayed from Velocity
+        // templates using $doc.getRenderedContent() which doesn't isolate the execution context. We don't test if the
+        // document instances are the same but if their references are equal because Velocity templates use various
+        // document variables ($doc, $tdoc, $cdoc, etc.) to call getRenderedContent().
+        //
+        // (3) We test if the default edit mode is "edit" to ensure backward compatibility with older XWiki applications
         // that don't use the new sheet system (they most probably use "inline" as the default edit mode).
         return parameters.isContentTransformed()
             && (parameters.isExecutionContextIsolated() || document.getDocumentReference().equals(
                 documentAccessBridge.getCurrentDocumentReference()))
             && "edit".equals(modelBridge.getDefaultEditMode(document));
+    }
+
+    /**
+     * Iterates the list of sheets bound to the given document and tries to applies them, stopping after the first
+     * success. If none of the sheets can be applied (e.g. insufficient rights) then it displays the document without a
+     * sheet, using the default document displayer.
+     * 
+     * @param document the document that is displayed
+     * @param parameters the display parameters
+     * @return the result of displaying the given document, with or without a sheet
+     */
+    private XDOM maybeDisplayWithSheet(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    {
+        for (DocumentReference sheetReference : getSheetReferences(document)) {
+            if (document.getDocumentReference().equals(sheetReference)) {
+                // If the sheet is the document itself then we simply display the document. We handle this case
+                // differently because unsaved document changes might be ignored if we render the sheet (which is
+                // loaded from the database). So in this case applying the sheet would actually mean displaying the
+                // saved version of the document.
+                break;
+            } else if (documentAccessBridge.isDocumentViewable(sheetReference)) {
+                try {
+                    return applySheet(document, sheetReference, parameters);
+                } catch (Exception e) {
+                    String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
+                    logger.warn("Failed to apply sheet [{}].", sheetStringReference, e);
+                }
+            }
+        }
+
+        // No sheet was applied. Fall back on the default document displayer.
+        return null;
     }
 
     /**
@@ -153,7 +199,8 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     {
         DocumentModelBridge sheet = documentAccessBridge.getDocument(sheetReference);
         if (parameters.isTitleDisplayed() && StringUtils.isEmpty(sheet.getTitle())) {
-            return documentDisplayer.display(document, parameters);
+            // The sheet doesn't control the title. Fall back on the default document displayer.
+            return null;
         }
 
         if (modelBridge.hasProgrammingRights(document) ^ modelBridge.hasProgrammingRights(sheet)) {
@@ -200,19 +247,9 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     private XDOM display(DocumentModelBridge document, DocumentModelBridge sheet,
         DocumentDisplayerParameters parameters)
     {
-        Map<String, Object> backupObjects = null;
-        try {
-            // Put the given document in the context only if it's not already there.
-            if (document != modelBridge.getCurrentDocument()) {
-                backupObjects = modelBridge.pushDocumentInContext(document);
-            }
-            DocumentDisplayerParameters sheetDisplayParameters = parameters.clone();
-            sheetDisplayParameters.setExecutionContextIsolated(false);
-            return documentDisplayer.display(sheet, sheetDisplayParameters);
-        } finally {
-            if (backupObjects != null) {
-                documentAccessBridge.popDocumentFromContext(backupObjects);
-            }
-        }
+        DocumentDisplayerParameters sheetDisplayParameters = parameters.clone();
+        // The execution context was already isolated and we want to display the sheet in the context of the given doc.
+        sheetDisplayParameters.setExecutionContextIsolated(false);
+        return documentDisplayer.display(sheet, sheetDisplayParameters);
     }
 }

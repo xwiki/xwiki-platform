@@ -21,7 +21,6 @@ package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
@@ -35,8 +34,8 @@ import org.hibernate.Transaction;
 import org.jmock.Expectations;
 import org.jmock.lib.action.CustomAction;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.jmock.Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.context.ExecutionContext;
@@ -45,8 +44,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
-
 
 /**
  * Make sure the user's locks are released when they logout.
@@ -54,16 +53,17 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.1M1
  */
+@AllComponents
+@MockingRequirement(XWikiHibernateStore.class)
 public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private XWikiHibernateStore xhs;
+    private XWikiStoreInterface xhs;
 
     private ObservationManager observationManager;
 
     private final EventListener[] listener = new EventListener[1];
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         // Needed because XHS has initializers which depend on Utils.
@@ -137,6 +137,8 @@ public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCa
             oneOf(xc.getWiki()).Param(with("xwiki.store.hibernate.path"), with(any(String.class)));
                 will(returnValue("unimportant"));
         }});
+
+        this.xhs = getComponentManager().getInstance(XWikiStoreInterface.class, "hibernate");
     }
 
     @Test

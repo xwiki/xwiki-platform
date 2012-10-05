@@ -100,15 +100,26 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         ScriptContextManager scm = getComponentManager().getInstance(ScriptContextManager.class);
         scm.getScriptContext().setAttribute("xcontext", xcontext, ScriptContext.ENGINE_SCOPE);
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocBridge).getCurrentUser(); will(returnValue("dummy"));
-            allowing(mockWikiMacroFactory).isAllowed(with(any(DocumentReference.class)), with(any(WikiMacroVisibility.class))); will(returnValue(true));
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocBridge).getCurrentWiki();
+                will(returnValue("wiki"));
+                allowing(mockDocBridge).getCurrentUser();
+                will(returnValue("dummy"));
+                allowing(mockDocBridge).setCurrentUser(with(any(String.class)));
+                allowing(mockDocBridge).getCurrentUserReference();
+                will(returnValue(new DocumentReference("wiki", "XWiki", "dummy")));
+                allowing(mockWikiMacroFactory).isAllowed(with(any(DocumentReference.class)),
+                    with(any(WikiMacroVisibility.class)));
+                will(returnValue(true));
 
-            // This is the document containing the wiki macro that will be put in the context available in the macro
-            // Since we're not testing it here, it can be null.
-            allowing(mockDocBridge).getDocument(wikiMacroDocumentReference); will(returnValue(null));
-        }});
+                // This is the document containing the wiki macro that will be put in the context available in the macro
+                // Since we're not testing it here, it can be null.
+                allowing(mockDocBridge).getDocument(wikiMacroDocumentReference);
+                will(returnValue(null));
+            }
+        });
     }
 
     @Override
@@ -167,12 +178,15 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     {
         registerWikiMacro("wikimacro1", "{{toc/}}", Syntax.XWIKI_2_0);
 
-        getMockery().checking(new Expectations() {{
-            DocumentResourceReference reference = new DocumentResourceReference(null);
-            reference.setAnchor("Hheading");
-            allowing(mockWikiModel).getDocumentViewURL(reference);
-            will(returnValue("url"));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                DocumentResourceReference reference = new DocumentResourceReference(null);
+                reference.setAnchor("Hheading");
+                allowing(mockWikiModel).getDocumentViewURL(reference);
+                will(returnValue("url"));
+            }
+        });
 
         Converter converter = getComponentManager().getInstance(Converter.class);
 
@@ -198,16 +212,14 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("{{wikimacro param1=\"value1\" param2=\"value2\"/}}"),
-            Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
+        converter.convert(new StringReader("{{wikimacro param1=\"value1\" param2=\"value2\"/}}"), Syntax.XWIKI_2_0,
+            Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        Assert
-            .assertEquals("<p><span class=\"wikiinternallink\"><a href=\"/some/path\">" +
-            		"<span class=\"wikigeneratedlinkcontent\">/some/path</span></a></span></p>",
-                printer.toString());
+        Assert.assertEquals("<p><span class=\"wikiinternallink\"><a href=\"/some/path\">"
+            + "<span class=\"wikigeneratedlinkcontent\">/some/path</span></a></span></p>", printer.toString());
     }
-    
+
     /**
      * A wiki macro can directly provide the list of blocks instead of having to render them to let
      * {@link DefaultWikiMacro} re-parse it.
@@ -256,17 +268,21 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         final VelocityContext vContext = new VelocityContext();
         vContext.put("xcontext", xwikiContext);
 
-        getMockery().checking(new Expectations() {{
-            oneOf(mockVelocityManager).getVelocityContext();
-            will(returnValue(vContext));
-            oneOf(mockVelocityManager).getVelocityEngine();
-            will(returnValue(vEngine));
-        }});
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockVelocityManager).getVelocityContext();
+                will(returnValue(vContext));
+                oneOf(mockVelocityManager).getVelocityEngine();
+                will(returnValue(vEngine));
+            }
+        });
 
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, "default_value"));
 
-        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.param1{{/velocity}}", Syntax.XWIKI_2_0, parameterDescriptors);
+        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.param1{{/velocity}}", Syntax.XWIKI_2_0,
+            parameterDescriptors);
 
         Converter converter = getComponentManager().getInstance(Converter.class);
 
@@ -293,10 +309,10 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
                 WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
         Parser parser = getComponentManager().getInstance(Parser.class, syntax.toIdString());
-        
+
         DefaultWikiMacro wikiMacro =
-            new DefaultWikiMacro(wikiMacroDocumentReference, true, descriptor,
-                parser.parse(new StringReader(macroContent)), syntax, getComponentManager());
+            new DefaultWikiMacro(wikiMacroDocumentReference, null, true, descriptor, parser.parse(new StringReader(
+                macroContent)), syntax, getComponentManager());
 
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
     }

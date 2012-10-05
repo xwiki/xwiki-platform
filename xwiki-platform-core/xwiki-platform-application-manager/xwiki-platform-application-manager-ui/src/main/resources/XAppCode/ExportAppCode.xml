@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>#if($action &amp;&amp; $action == "export")
   #if($confirm &amp;&amp; $confirm == 1)
     #if($recurse &amp;&amp; $recurse == 1)

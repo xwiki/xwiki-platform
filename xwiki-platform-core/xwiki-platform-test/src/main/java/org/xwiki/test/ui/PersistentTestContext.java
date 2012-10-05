@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openqa.selenium.WebDriver;
 import org.xwiki.test.integration.XWikiExecutor;
 
@@ -30,6 +33,12 @@ import org.xwiki.test.integration.XWikiExecutor;
  */
 public class PersistentTestContext
 {
+    /**
+     * Decide on which browser to run the tests and defaults to Firefox if no system property is defined (useful
+     * for running in your IDE for example).
+     */
+    private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
+
     /** This starts and stops the wiki engine. */
     private final XWikiExecutor executor;
 
@@ -42,11 +51,7 @@ public class PersistentTestContext
 
     private WebDriverFactory webDriverFactory = new WebDriverFactory();
 
-    /**
-     * Decide on which browser to run the tests and defaults to Firefox if no system property is defined (useful
-     * for running in your IDE for example).
-     */
-    private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Starts an XWiki instance if not already started.
@@ -79,6 +84,7 @@ public class PersistentTestContext
     {
         this.executor = toClone.executor;
         this.driver = toClone.driver;
+        this.properties.putAll(toClone.properties);
     }
 
     public void setCurrentTestName(String currentTestName)
@@ -106,8 +112,13 @@ public class PersistentTestContext
 
     public void shutdown() throws Exception
     {
-        driver.close();
-        executor.stop();
+        this.driver.close();
+        this.executor.stop();
+    }
+
+    public Map<String, Object> getProperties()
+    {
+        return this.properties;
     }
 
     /**

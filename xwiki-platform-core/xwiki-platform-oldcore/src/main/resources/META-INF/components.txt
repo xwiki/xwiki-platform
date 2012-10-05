@@ -4,6 +4,7 @@ com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
 com.xpn.xwiki.internal.MessageToolVelocityContextInitializer
+com.xpn.xwiki.internal.XWikiContextProvider
 com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
@@ -14,11 +15,6 @@ com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.internal.display.scripting.DisplayScriptService
 com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
-com.xpn.xwiki.internal.macro.CoreWikiMacroBindingInitializer
-com.xpn.xwiki.internal.macro.DefaultWikiMacroFactory
-com.xpn.xwiki.internal.macro.DefaultWikiMacroInitializer
-com.xpn.xwiki.internal.macro.WikiMacroExecutionEventListener
-com.xpn.xwiki.internal.macro.RegisterMacrosOnImportListener
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver
@@ -36,6 +32,7 @@ com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolv
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
+500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
@@ -55,6 +52,7 @@ com.xpn.xwiki.store.migration.hibernate.R35100XWIKI7564DataMigration
 com.xpn.xwiki.store.migration.hibernate.R35101XWIKI7645DataMigration
 com.xpn.xwiki.store.migration.hibernate.R35102XWIKI7771DataMigration
 com.xpn.xwiki.store.migration.hibernate.R40000XWIKI6990DataMigration
+com.xpn.xwiki.store.migration.hibernate.R42000XWIKI7726DataMigration
 com.xpn.xwiki.store.migration.hibernate.R4340XWIKI883DataMigration
 com.xpn.xwiki.store.migration.hibernate.R4359XWIKI1459DataMigration
 com.xpn.xwiki.store.migration.hibernate.R6079XWIKI1878DataMigration
@@ -67,3 +65,4 @@ com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateRecycleBinStore
 com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore
+com.xpn.xwiki.internal.store.HibernateShutdownEventListener

@@ -71,7 +71,7 @@ public interface WikiIRCModel
     void setActive(boolean isActive) throws IRCBotException;
 
     /**
-     * @return the Bot Listener data for all documents containing {@link WikiIRCBotConstants#WIKI_BOT_LISTENER_CLASS}
+     * @return the Bot Listener data for all documents containing {@link org.xwiki.ircbot.wiki.WikiIRCBotConstants#WIKI_BOT_LISTENER_CLASS}
      *         objects in the current wiki
      * @throws IRCBotException if we fail in searching the wiki
      */

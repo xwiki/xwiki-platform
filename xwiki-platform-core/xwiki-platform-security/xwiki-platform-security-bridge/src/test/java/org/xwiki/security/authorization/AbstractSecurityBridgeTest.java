@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.test.annotation.MockingRequirement;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -27,19 +26,15 @@ import org.jmock.lib.action.CustomAction;
 import org.jmock.api.Invocation;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 import java.util.Map;
-import java.util.HashMap;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 public abstract class AbstractSecurityBridgeTest extends AbstractMockingComponentTestCase
 {
-
     private final static String TEST_WIKI_DEFINITIONS_DIRECTORY = "testwikis";
 
     private Map<String, XWiki> wikis;

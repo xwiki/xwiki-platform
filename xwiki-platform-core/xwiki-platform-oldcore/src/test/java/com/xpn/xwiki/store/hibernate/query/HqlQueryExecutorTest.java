@@ -22,25 +22,26 @@ package com.xpn.xwiki.store.hibernate.query;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jmock.Expectations;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.query.QueryExecutor;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link HqlQueryExecutor}
  *
  * @version $Id$
  */
-public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase {
-
-    @MockingRequirement
+@MockingRequirement(HqlQueryExecutor.class)
+public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase
+{
     private HqlQueryExecutor executor;
 
     HibernateSessionFactory sessionFactory;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         sessionFactory = getComponentManager().getInstance(HibernateSessionFactory.class);
@@ -49,42 +50,44 @@ public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase {
             allowing(sessionFactory).getConfiguration();
             will(returnValue(new Configuration()));
         }});
+
+        this.executor = getComponentManager().getInstance(QueryExecutor.class, "hql");
     }
 
     @Test
     public void completeShortStatementStartingWithWhere()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
-                executor.completeShortFormStatement("where doc.author='XWiki.Admin'"));
+        Assert.assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
+            executor.completeShortFormStatement("where doc.author='XWiki.Admin'"));
     }
 
 
     @Test
     public void completeShortStatementStartingWithFrom()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name " +
-                "and obj.className='XWiki.MyClass'", executor.completeShortFormStatement(", BaseObject obj where " +
-                "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
+        Assert.assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
+            + "and obj.className='XWiki.MyClass'", executor.completeShortFormStatement(", BaseObject obj where "
+            + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
     }
 
     @Test
     public void completeShortStatementStartingWithOrderBy()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
-                executor.completeShortFormStatement("order by doc.date desc"));
+        Assert.assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
+            executor.completeShortFormStatement("order by doc.date desc"));
     }
 
     @Test
     public void completeShortStatementPassingAnAlreadyCompleteQuery()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
-                executor.completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
+        Assert.assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
+            executor.completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
     }
 
     @Test
     public void completeShortStatementPassingAQueryOnSomethingElseThanADocument()
     {
-        assertEquals("select lock.docId from XWikiLock as lock ",
-                executor.completeShortFormStatement("select lock.docId from XWikiLock as lock "));
+        Assert.assertEquals("select lock.docId from XWikiLock as lock ",
+            executor.completeShortFormStatement("select lock.docId from XWikiLock as lock "));
     }
 }

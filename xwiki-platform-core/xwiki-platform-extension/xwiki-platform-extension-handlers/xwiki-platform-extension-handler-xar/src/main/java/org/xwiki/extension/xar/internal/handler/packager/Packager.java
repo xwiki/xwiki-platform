@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.manager.ComponentLookupException;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -38,7 +39,7 @@ import com.xpn.xwiki.XWikiException;
 public interface Packager
 {
     void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException;
+        XWikiException, ComponentLookupException;
 
     void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
 

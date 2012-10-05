@@ -54,6 +54,7 @@ import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -67,7 +68,7 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named("xar")
+@Named(XarExtensionHandler.TYPE)
 public class XarInstalledExtensionRepository extends AbstractExtensionRepository implements
     InstalledExtensionRepository, Initializable
 {
@@ -95,7 +96,7 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     @Override
     public void initialize() throws InitializationException
     {
-        setId(new ExtensionRepositoryId("xar", "xar", this.installedRepository.getId().getURI()));
+        setId(new ExtensionRepositoryId(XarExtensionHandler.TYPE, XarExtensionHandler.TYPE, this.installedRepository.getId().getURI()));
 
         loadExtensions();
 
@@ -105,7 +106,7 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
             public void onEvent(Event event, Object arg1, Object arg2)
             {
                 LocalExtension extension = (LocalExtension) arg1;
-                if (extension.getType().equals("xar")) {
+                if (extension.getType().equals(XarExtensionHandler.TYPE)) {
                     updateXarExtension(extension);
                 }
 
@@ -160,7 +161,7 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     private void loadExtensions()
     {
         for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
-            if (localExtension.getType().equalsIgnoreCase("xar")) {
+            if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
                 try {
                     addXarExtension(localExtension);
                 } catch (IOException e) {
@@ -238,11 +239,17 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     }
 
     @Override
+    public InstalledExtension getInstalledExtension(ExtensionId extensionId)
+    {
+        return this.extensions.get(extensionId);
+    }
+
+    @Override
     public InstalledExtension getInstalledExtension(String id, String namespace)
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        if (extension.getType().equals("xar")) {
+        if (extension.getType().equals(XarExtensionHandler.TYPE)) {
             extension = this.extensions.get(extension.getId());
         } else {
             extension = null;
@@ -269,7 +276,7 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals("xar") ? this.installedRepository.getBackwardDependencies(id, namespace)
+        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(id, namespace)
             : null;
     }
 
@@ -279,7 +286,7 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals("xar") ? this.installedRepository.getBackwardDependencies(extensionId) : null;
+        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(extensionId) : null;
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -34,9 +35,11 @@ import java.util.Vector;
 
 import junit.framework.Assert;
 
+import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,13 +49,13 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
@@ -101,6 +104,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiMessageTool;
 
     private Mock mockXWikiRightService;
+
+    private Mock mockVelocityManager;
 
     private Mock mockVelocityEngine;
 
@@ -159,6 +164,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
+        this.mockXWiki.stubs().method("exists").will(returnValue(false));
+        this.mockXWiki.stubs().method("evaluateTemplate").will(returnValue(""));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().put("msg", this.mockXWikiMessageTool.proxy());
@@ -199,10 +207,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
 
         // Setup the mock Velocity engine.
-        Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
+        this.mockVelocityManager = registerMockComponent(VelocityManager.class);
         this.mockVelocityEngine = mock(VelocityEngine.class);
-        mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(null));
-        mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
+        this.mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(null));
+        this.mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
         velocityEngineEvaluateStub = new CustomStub("Implements VelocityEngine.evaluate")
         {
             public Object invoke(Invocation invocation) throws Throwable
@@ -393,6 +401,16 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(1, copy.getXObjects().size());
         BaseObject bobject = copy.getXObjects().get(copy.getXObjects().keySet().iterator().next()).get(0);
         assertEquals(new DocumentReference("copywiki", DOCSPACE, DOCNAME), bobject.getXClassReference());
+    }
+
+    public void testCustomMappingAfterDocumentCopy() throws Exception
+    {
+        this.document.getXClass().setCustomMapping("internal");
+
+        XWikiDocument copy =
+            this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"), getContext());
+
+        assertEquals("",copy.getXClass().getCustomMapping());
     }
 
     public void testCloneNullObjects() throws XWikiException
@@ -1295,8 +1313,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set
-     * to true).
+     * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set to
+     * true).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetCreatorReferenceSetsMetadataDirtyFlag()
@@ -1311,8 +1330,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision
-     * (we verify that the metadata dirty flag is not set).
+     * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision (we
+     * verify that the metadata dirty flag is not set).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
@@ -1329,8 +1349,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set
-     * to true).
+     * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set to
+     * true).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetAuthorReferenceSetsMetadataDirtyFlag()
@@ -1345,8 +1366,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision
-     * (we verify that the metadata dirty flag is not set).
+     * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision (we
+     * verify that the metadata dirty flag is not set).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
@@ -1365,6 +1387,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Verify that setting a new content author will create a new revision (we verify that that metadata dirty flag is
      * set to true).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
@@ -1381,6 +1404,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Verify that setting a new content author that is the same as the currenet creator doesn't create a new revision
      * (we verify that the metadata dirty flag is not set).
+     * 
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
      */
     public void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
@@ -1414,5 +1438,83 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("good {{include reference=\"One.Two\"/}}");
         assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
+    }
+
+    /**
+     * XWIKI-8024: XWikiDocument#setAsContextDoc doesn't set the 'cdoc' in the Velocity context
+     */
+    public void testSetAsContextDoc() throws Exception
+    {
+        VelocityContext velocityContext = new VelocityContext();
+        this.mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(velocityContext));
+
+        assertNotSame(this.document, getContext().getDoc());
+        this.document.setAsContextDoc(getContext());
+        assertSame(this.document, getContext().getDoc());
+
+        Assert.assertEquals(this.document.getDocumentReference(),
+            ((Document) velocityContext.get("doc")).getDocumentReference());
+        Assert.assertEquals(this.document.getDocumentReference(),
+            ((Document) velocityContext.get("tdoc")).getDocumentReference());
+        Assert.assertEquals(this.document.getDocumentReference(),
+            ((Document) velocityContext.get("cdoc")).getDocumentReference());
+    }
+
+    /**
+     * XWIKI-8025: XWikiDocument#backup/restoreContext doesn't update the reference to the Velocity context stored on
+     * the XWiki context
+     */
+    public void testBackupRestoreContextUpdatesVContext() throws Exception
+    {
+        final Execution execution = getComponentManager().getInstance(Execution.class);
+        this.mockVelocityManager.stubs().method("getVelocityContext")
+            .will(new CustomStub("Implements VelocityManager.getVelocityContext")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    VelocityContext velocityContext =
+                        (VelocityContext) execution.getContext().getProperty("velocityContext");
+                    // See DefaultVelocityManagerTest#testGetVelocityContextUpdatesXContext()
+                    getContext().put("vcontext", velocityContext);
+                    return velocityContext;
+                }
+            });
+
+        VelocityContext oldVelocityContext = new VelocityContext();
+        execution.getContext().setProperty("velocityContext", oldVelocityContext);
+
+        Map<String, Object> backup = new HashMap<String, Object>();
+        XWikiDocument.backupContext(backup, getContext());
+
+        VelocityContext newVelocityContext = (VelocityContext) execution.getContext().getProperty("velocityContext");
+        assertNotNull(newVelocityContext);
+        assertNotSame(oldVelocityContext, newVelocityContext);
+        assertSame(newVelocityContext, getContext().get("vcontext"));
+
+        XWikiDocument.restoreContext(backup, getContext());
+
+        assertSame(oldVelocityContext, execution.getContext().getProperty("velocityContext"));
+        assertSame(oldVelocityContext, getContext().get("vcontext"));
+    }
+
+    public void testEqualsDatas()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument otherDocyment = document.clone();
+
+        Assert.assertTrue(document.equals(otherDocyment));
+        Assert.assertTrue(document.equalsData(otherDocyment));
+
+        otherDocyment.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
+        otherDocyment.setContentAuthorReference(otherDocyment.getAuthorReference());
+        otherDocyment.setCreatorReference(otherDocyment.getAuthorReference());
+        otherDocyment.setVersion("42.0");
+        otherDocyment.setComment("other comment");
+        otherDocyment.setMinorEdit(true);
+
+        document.setMinorEdit(false);
+
+        Assert.assertFalse(document.equals(otherDocyment));
+        Assert.assertTrue(document.equalsData(otherDocyment));
     }
 }

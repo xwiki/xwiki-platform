@@ -15,7 +15,7 @@
   <date>1307188675000</date>
   <contentUpdateDate>1307188675000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.livetable.resultsmacros")</title>
+  <title>$msg.get("platform.livetable.resultsMacros")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

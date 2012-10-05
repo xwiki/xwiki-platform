@@ -53,7 +53,7 @@ public abstract class AbstractPackager
      * @throws Exception failed to initialize context.
      * @todo Replace the Hibernate config file with a list of parameters required for the packaging operation
      */
-    protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
+    public XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
     {
         // Initialize the Component Manager and Environment
         ComponentManager cm = org.xwiki.environment.System.initialize();
@@ -63,7 +63,7 @@ public abstract class AbstractPackager
         xcontext.put(ComponentManager.class.getName(), cm);
 
         // Initialize the Container fields (request, response, session).
-        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+        ExecutionContextManager ecim = cm.getInstance(ExecutionContextManager.class);
         try {
             ExecutionContext econtext = new ExecutionContext();
 
@@ -103,7 +103,7 @@ public abstract class AbstractPackager
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");
 
-        new XWiki(config, xcontext, null, true);
+        XWiki xwiki = new XWiki(config, xcontext, null, true);
 
         xcontext.setUserReference(new DocumentReference("xwiki", "XWiki", "superadmin"));
 
@@ -115,6 +115,9 @@ public abstract class AbstractPackager
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to set up URL Factory", e);
         }
+
+        // Trigger extensions that need to initialize the database (create classes, etc.)
+        xwiki.updateDatabase(xcontext.getMainXWiki(), xcontext);
 
         return xcontext;
     }

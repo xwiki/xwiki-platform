@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-component</artifactId>
   <name>XWiki Platform - Component - Parent POM</name>
@@ -37,6 +37,6 @@
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-component-multi</module>
     <module>xwiki-platform-component-script</module>
+    <module>xwiki-platform-component-wiki</module>
   </modules>
 </project>
-       

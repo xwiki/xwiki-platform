@@ -50,6 +50,11 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
 public class ApplicationManagerListener implements EventListener
 {
     /**
+     * Wiki preferences document and class full name.
+     */
+    private static final String XWIKIPREFERENCES = "XWiki.XWikiPreferences";
+
+    /**
      * The events matchers.
      */
     private static final List<Event> EVENTS = new ArrayList<Event>()
@@ -100,6 +105,8 @@ public class ApplicationManagerListener implements EventListener
         try {
             if (XWikiApplicationClass.isApplication(document)) {
                 getApplicationManager(xcontext).updateApplicationsTranslation(document, xcontext);
+            } else if (document.getFullName().equals(XWIKIPREFERENCES)) {
+                getApplicationManager(xcontext).updateAllApplicationTranslation(xcontext);
             }
         } catch (XWikiException e) {
             this.logger.error(

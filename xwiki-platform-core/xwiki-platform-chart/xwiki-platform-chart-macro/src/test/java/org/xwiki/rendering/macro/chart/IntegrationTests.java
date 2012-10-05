@@ -19,19 +19,26 @@
  */
 package org.xwiki.rendering.macro.chart;
 
-import org.apache.commons.io.IOUtils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.test.MockingComponentManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.block.XDOM;
+
+import java.io.InputStreamReader;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -43,49 +50,49 @@ import org.xwiki.rendering.test.integration.RenderingTestSuite;
 @RunWith(RenderingTestSuite.class)
 public class IntegrationTests
 {
+    private final static String WIKI_CONTENT_FILE = "wiki.txt";
+
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
 
-        // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
-
-        final DocumentReference documentReference = new DocumentReference("xwiki", "Test", "Test");
-        final DocumentModelBridge mockDocument = mockery.mock(DocumentModelBridge.class);
-
+        final ModelContext modelContext = componentManager.registerMockComponent(mockery, ModelContext.class);
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getURL(with(any(String.class)), with(equal("charting")),
-                with(any(String.class)), with(any(String.class)));
-                will(returnValue("http://localhost/charts"));
-            allowing(mockDocumentAccessBridge).getCurrentDocumentReference();
-                will(returnValue(documentReference));
-            allowing(mockDocumentAccessBridge).getDocument(documentReference);
-                will(returnValue(mockDocument));
-            allowing(mockDocument).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-            allowing(mockDocumentAccessBridge).exists(with(any(String.class)));
-                will(returnValue(true));
-            allowing(mockDocumentAccessBridge).getDocumentSyntaxId(with(any(String.class)));
-                will(returnValue("xwiki/2.0"));
-            allowing(mockDocumentAccessBridge).getDocumentContent("Test.Test");
-                will(returnValue(IOUtils.toString(
-                    IntegrationTests.class.getClassLoader().getResourceAsStream("wiki.txt"))));
+            allowing(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("currentWiki")));
         }});
 
-        // Document Name Serializer Mock
-        final EntityReferenceSerializer mockEntityReferenceSerializer = mockery.mock(EntityReferenceSerializer.class);
-        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorERS =
-            new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        descriptorERS.setRoleType(EntityReferenceSerializer.TYPE_STRING);
-        componentManager.registerComponent(descriptorERS, mockEntityReferenceSerializer);
+        // Document Access Bridge Mock
+        final DocumentAccessBridge dab = componentManager.registerMockComponent(mockery, DocumentAccessBridge.class);
+        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        final DocumentModelBridge document = mockery.mock(DocumentModelBridge.class);
+        final DocumentDisplayer displayer = componentManager.registerMockComponent(mockery, DocumentDisplayer.class);
+
+        Parser parser = componentManager.getInstance(Parser.class, Syntax.XWIKI_2_0.toIdString());
+        final XDOM xdom = parser.parse(new InputStreamReader(
+            getClass().getClassLoader().getResourceAsStream(WIKI_CONTENT_FILE)));
+
+        final AuthorizationManager authorizationManager =
+            componentManager.registerMockComponent(mockery,  AuthorizationManager.class);
 
         mockery.checking(new Expectations() {{
-            allowing(mockEntityReferenceSerializer).serialize(documentReference); will(returnValue("Test.Test"));
+            allowing(dab).getDocumentURL(new DocumentReference("unused", "space", "page"), "temp", null, null);
+                will(returnValue("temppath"));
+
+            allowing(dab).getCurrentDocumentReference();
+                will(returnValue(documentReference));
+            allowing(dab).exists(documentReference);
+                will(returnValue(true));
+            allowing(dab).getDocument(documentReference);
+                will(returnValue(document));
+            allowing(displayer).display(with(equal(document)), with(any(DocumentDisplayerParameters.class)));
+                will(returnValue(xdom));
+
+            allowing(dab).getCurrentUserReference();
+                will(returnValue(null));
+            allowing(authorizationManager).hasAccess(Right.VIEW, null, documentReference);
+                will(returnValue(true));
         }});
     }
 }

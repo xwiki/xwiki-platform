@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ldap</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ldap-ui</artifactId>
   <name>XWiki Platform - LDAP - UI</name>
@@ -48,7 +48,7 @@
     <!-- TODO: put it back when the admin application is a real application and doesn't contain datas anymore
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration</artifactId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

@@ -19,16 +19,12 @@
  */
 package org.xwiki.rendering.macro.chart;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.chart.ChartGenerator;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for chart macro.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -57,7 +53,7 @@ public class ChartMacroParameters
     /**
      * @see ChartMacroParameters#getSource()
      */
-    private String source = "xdom";
+    private String source;
 
     /**
      * @see ChartMacroParameters#getParams()
@@ -143,7 +139,6 @@ public class ChartMacroParameters
 
     /**
      * @param source - refer to {@link #getSource()
-
      */
     @PropertyDescription("The string describing the type of input data source (Ex. xdom or inline)")
     public void setSource(String source)
@@ -166,20 +161,5 @@ public class ChartMacroParameters
     public void setParams(String params)
     {
         this.params = params;
-    }
-
-    /**
-     * @return a Map containing all the parameters.
-     */
-    public Map<String, String> getParametersMap()
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put(ChartGenerator.TITLE_PARAM, getTitle());
-        map.put(ChartGenerator.WIDTH_PARAM, String.valueOf(getWidth()));
-        map.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(getHeight()));
-        map.put(ChartGenerator.TYPE_PARAM, getType());
-        map.put(ChartDataSource.SOURCE, getSource());
-        map.put(ChartDataSource.PARAMS, getParams());
-        return map;
     }
 }

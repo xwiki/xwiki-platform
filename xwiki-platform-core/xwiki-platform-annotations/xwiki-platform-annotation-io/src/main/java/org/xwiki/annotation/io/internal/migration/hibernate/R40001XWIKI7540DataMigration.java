@@ -35,12 +35,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
+import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -48,6 +51,7 @@ import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -83,6 +87,10 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Inject
     protected EntityReferenceSerializer<String> referenceSerializer;
 
+    /** Used to determine the current annotation class. */
+    @Inject
+    protected AnnotationConfiguration configuration;
+
     /** Holds the work to be done by grouping datedComments by documents. */
     protected Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap =
         new HashMap<DocumentReference, List<Entry<Date, BaseObject>>>();
@@ -103,9 +111,61 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         return new XWikiDBVersion(40001);
     }
 
+    /**
+     * Check if the migration can be executed by verifying if the current annotation class is the default one and that
+     * the comments class does not have any custom mappings set up.
+     * <p/>
+     * Note: We can not do this in {@link #shouldExecute(XWikiDBVersion)} because we need to read the database and we
+     * can not do that until the previous migrations are executed.
+     * 
+     * @return true if the migration can be executed, false otherwise.
+     * @throws DataMigrationException if the annotation or comments class can not be properly retrieved
+     */
+    protected boolean checkAnnotationsAndComments() throws DataMigrationException
+    {
+        XWikiContext context = getXWikiContext();
+        String resultOfSkippingDatabase = "Comments and anotations will remain separated";
+
+        try {
+            EntityReference currentAnnotationClassReference = configuration.getAnnotationClassReference();
+            currentAnnotationClassReference =
+                currentAnnotationClassReference.removeParent(new WikiReference(context.getDatabase()));
+            if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
+                logger.warn("Skipping database [{}] because it uses a custom annotation class. "
+                    + resultOfSkippingDatabase, context.getDatabase());
+                return false;
+            }
+
+            BaseClass commentsClass = context.getWiki().getCommentsClass(context);
+            if (commentsClass.hasCustomMapping()) {
+                logger.warn("Skipping database [{}] because it uses a custom mapping for comments. "
+                    + resultOfSkippingDatabase, context.getDatabase());
+                return false;
+            }
+        } catch (Exception e) {
+            // Should not happen
+            String message =
+                "Failed to check the current annotation and comments classes for customizations. "
+                    + "Migration will not execute";
+            logger.error(message, e);
+            throw new DataMigrationException(message, e);
+        }
+
+        return true;
+    }
+
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
+        // Check if the migration can be executed.
+        if (!checkAnnotationsAndComments()) {
+            return;
+        }
+
+        // Clear any existing migration data/cache from previously migrated wikis.
+        documentToDatedObjectsMap.clear();
+        objectToPropertiesMap.clear();
+
         logger.info("Computing the work to be done.");
 
         // 1st step: populate the 2 maps with the work to be done.

@@ -67,6 +67,9 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
         final XWikiContext context)
         throws XWikiException
     {
+        if (archive instanceof VoidAttachmentArchive) {
+            return;
+        }
         if (archive.getVersions().length == 0 && archive.getAttachment() != null) {
             archive.updateArchive(null, context);
         }

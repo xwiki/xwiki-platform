@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test</artifactId>
   <name>XWiki Platform - Test Framework</name>
@@ -56,6 +56,12 @@
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
       <version>1.7.0</version>
+    </dependency>
+
+    <!-- Manipulate xwiki.properrties -->
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
     </dependency>
 
     <!-- Dependencies for the UI test framework -->
@@ -96,7 +102,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-repository-xwiki-model</artifactId>
+      <artifactId>xwiki-commons-repository-model</artifactId>
       <version>${commons.version}</version>
     </dependency>
 

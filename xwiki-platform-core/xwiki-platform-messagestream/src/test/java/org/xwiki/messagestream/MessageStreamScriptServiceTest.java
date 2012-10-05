@@ -36,7 +36,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  */
 @MockingRequirement(MessageStreamScriptService.class)
-public class MessageStreamScriptServiceTest extends AbstractMockingComponentTestCase
+public class MessageStreamScriptServiceTest extends AbstractMockingComponentTestCase<ScriptService>
 {
     private MessageStreamScriptService streamService;
 
@@ -55,7 +55,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postPublicMessage("Hello World!");
             }
@@ -68,7 +68,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postPublicMessage("Hello World!");
                 will(throwException(new NullPointerException()));
@@ -82,7 +82,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postPersonalMessage("Hello World!");
             }
@@ -95,7 +95,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postPersonalMessage("Hello World!");
                 will(throwException(new NullPointerException()));
@@ -109,7 +109,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postDirectMessageToUser("Hello World!",
                     MessageStreamScriptServiceTest.this.targetUser);
@@ -123,7 +123,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postDirectMessageToUser("Hello World!",
                     MessageStreamScriptServiceTest.this.targetUser);
@@ -138,7 +138,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postMessageToGroup("Hello World!",
                     MessageStreamScriptServiceTest.this.targetGroup);
@@ -152,7 +152,7 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     {
         final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
         getMockery().checking(new Expectations()
-                    {
+        {
             {
                 exactly(1).of(mockStream).postMessageToGroup("Hello World!",
                     MessageStreamScriptServiceTest.this.targetGroup);
@@ -160,5 +160,32 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
             }
         });
         Assert.assertFalse(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
+    }
+
+    @Test
+    public void testDeleteMessage() throws Exception
+    {
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockStream).deleteMessage("abc123");
+            }
+        });
+        Assert.assertTrue(this.streamService.deleteMessage("abc123"));
+    }
+
+    @Test
+    public void testDeleteMessageWithFailure() throws Exception
+    {
+        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockStream).deleteMessage("abc123");
+                will(throwException(new IllegalArgumentException()));
+            }
+        });
+        Assert.assertFalse(this.streamService.deleteMessage("abc123"));
     }
 }

@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1795,7 +1796,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
-        List<DocumentReference> backlinkReferences = new ArrayList<DocumentReference>();
+        // Note: Ideally the method should return a Set but it would break the current API.
+
+        // TODO: We use a Set here so that we don't get duplicates. In the future, when we can reference a page in
+        // another language using a syntax, we should modify this code to return one DocumentReference per language
+        // found. To implement this we need to be able to either serialize the reference with the language information
+        // or add some new column for the XWikiLink table in the database.
+        Set<DocumentReference> backlinkReferences = new HashSet<DocumentReference>();
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1830,7 +1838,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
             }
         }
-        return backlinkReferences;
+        return new ArrayList<DocumentReference>(backlinkReferences);
     }
 
     /**

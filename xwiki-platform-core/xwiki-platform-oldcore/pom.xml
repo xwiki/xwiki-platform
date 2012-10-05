@@ -88,20 +88,10 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
-         http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
-         allow a release (this is for reproducibility). Thus we've had to upload JTidy into
-         our custom repository -->
     <dependency>
-      <groupId>jtidy</groupId>
+      <groupId>net.sf.jtidy</groupId>
       <artifactId>jtidy</artifactId>
-      <version>8.0-20060801.131059-3-dev</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>dom3-xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>r938</version>
     </dependency>
     
     <!-- Required by the XML-RPC implementation and tests.
@@ -451,6 +441,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other

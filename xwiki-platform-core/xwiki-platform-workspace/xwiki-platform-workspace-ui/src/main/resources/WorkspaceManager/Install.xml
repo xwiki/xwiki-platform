@@ -114,6 +114,12 @@
       #if ("$!request.confirmTemplateInstall" == '1')
         #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, $msg.get('platform.workspace.templateWikiTitle'), $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
+          #set($wikiTemplateDocument = $WikiManager.getWikiDocument($TEMPLATE_NAME))
+          #set($workspaceObj = $wikiTemplateDocument.getObject('WorkspaceManager.WorkspaceClass'))
+          #if(!$workspaceObj)
+            #set($discard = $wikiTemplateDocument.createNewObject('WorkspaceManager.WorkspaceClass'))
+            #set($discard = $wikiTemplateDocument.save())
+          #end          
           ## Use a redirect so that the page can be refreshed after the form's POST.
           #set ($discard = $response.sendRedirect($doc.getURL()))
 
@@ -153,6 +159,14 @@
   #else
     #set ($needsAdminRights = true)
   #end
+#elseif (!${services.workspace.isWorkspace($TEMPLATE_NAME)})
+  ##
+  ## Migration introduced in 4.3M1. Workspace templates are now marked as workspaces to diferentiate them between regular wiki templates.
+  ##
+  #set ($workspaceObject = $template.getObject("WorkspaceManager.WorkspaceClass", true))
+  #set ($discard = $template.save($msg.get('platform.workspace.templateMigrateSuccess')))
+  
+  {{warning}}$msg.get('platform.workspace.templateMigrateSuccess'){{/warning}}
 #else
   ##
   ## Don't display this information if the code is included from somewhere else.

@@ -26,7 +26,10 @@
   <content>{{include document="WorkspaceManager.BrowseWorkspacesLiveTableResultsMacros" /}}
 
 {{velocity wiki="false"}}
-#set($extra = "")
+#set($from =  ", BaseObject as wikiObj, BaseObject as workspaceObj")
+#set($extra = "AND wikiObj.className='XWiki.XWikiServerClass' AND wikiObj.name = doc.fullName AND workspaceObj.className='WorkspaceManager.WorkspaceClass' AND workspaceObj.name = doc.fullName AND (not exists (from IntegerProperty as templateProp where templateProp.id = wikiObj.id AND templateProp.name='iswikitemplate') OR exists (from IntegerProperty as templateProp where templateProp.id = wikiObj.id AND templateProp.name='iswikitemplate' AND templateProp.value = 0))")
+##set($from = "")
+##set($extra = "")
 #set($params = [])
 #if("$!request.space" != '')
   #set($extra = "${extra} and doc.space = ?")
@@ -35,6 +38,6 @@
 #if("$!request.orphaned" == '1')
   #set($extra = "${extra} and doc.parent='' and doc.name&lt;&gt;'WebHome'")
 #end
-#gridresultwithfilter("$!request.classname" $request.collist.split(",") "" "${extra}" $params)
+#gridresultwithfilter("$!request.classname" $request.collist.split(",") "${from}" "${extra}" $params)
 {{/velocity}}</content>
 </xwikidoc>

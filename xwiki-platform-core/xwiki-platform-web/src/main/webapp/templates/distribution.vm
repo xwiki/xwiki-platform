@@ -269,11 +269,11 @@
         <button type="submit" name="action" value="COMPLETE_STEP">$msg.get('extensions.distribution.stepAction.complete')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
-        <button class="secondary" type="submit" name="action" value="SKIP_STEP"
+        <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
           title="$escapetool.xml($msg.get('extensions.distribution.stepAction.skip.hint'))">$msg.get('extensions.distribution.stepAction.skip')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
-        <button class="secondary" type="submit" name="action" value="CANCEL_STEP"
+        <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
           title="$escapetool.xml($msg.get('extensions.distribution.stepAction.cancel.hint'))">$msg.get('extensions.distribution.stepAction.cancel')</button>
       </span>
     </div>

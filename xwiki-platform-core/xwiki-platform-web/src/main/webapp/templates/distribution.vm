@@ -50,12 +50,12 @@
 #macro(displayStepHeader $currentStepId)
   <div class="wizard-header">
     #set ($stepNames = {
-      'welcome': $msg.get('extensions.distribution.wizardTitle'),
-      'extension.mainui': 'User Interface',
-      'extension.outdatedextensions': 'Extensions'
+      'welcome': $msg.get('platform.extension.distributionWizard.welcomeStepTitle'),
+      'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepTitle'),
+      'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepTitle')
     })
     #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)
-    <h1>#if ($currentStepIndex > 0)Step $currentStepIndex &#151; #{end}$!stepNames.get($currentStepId)</h1>
+    <h1>$msg.get('platform.extension.distributionWizard.stepHeading', [$currentStepIndex, $stepNames.get($currentStepId)])</h1>
     #set ($steps = $services.distribution.jobStatus.steps)
     ## Ignore the welcome step.
     #set ($steps = $steps.subList(1, $steps.size()))
@@ -80,7 +80,7 @@
 #end
 
 #macro(displayStepContent $stepId)
-  <div class="warningmessage">This feature is currently experimental. It has some rough edges we hope to fix in the next versions. Please report any <a href="http://jira.xwiki.org/browse/XWIKI/component/10987">issues</a> you may encounter while using the distribution wizard.</div>
+  <div class="warningmessage">$msg.get('platform.extension.distributionWizard.experimentalWarning', ['<a href="http://jira.xwiki.org/browse/XWIKI/component/10987">', '</a>'])</div>
   #if ($stepId == 'welcome')
     #displayWelcomeStep()
   #elseif ($stepId == 'extension.mainui')
@@ -88,20 +88,16 @@
   #elseif ($stepId == 'extension.outdatedextensions')
     #displayOutdatedExtensionsStep()
   #else
-    <div class="errormessage">Unknown step</div>
+    <div class="errormessage">$msg.get('platform.extension.distributionWizard.unknownStepError')</div>
   #end
 #end
 
 #macro(displayWelcomeStep)
-  <p>This wizard will guide you through the process of installing, upgrading or downgrading the XWiki distribution. You are seeing this wizard for one of the following reasons:</p>
-  <ul>
-    <li>the default wiki pages recommended for the current version of the XWiki runtime are not installed</li>
-    <li>the version of the XWiki runtime has changed</li>
-  </ul>
-  <p class="steps-hint">The following steps are required in order to complete the XWiki installation:</p>
+  <p>$msg.get('platform.extension.distributionWizard.welcomeStepDescription', ['</p><ul><li>', '</li><li>'])</li></ul>
+  <p class="steps-hint">$msg.get('platform.extension.distributionWizard.welcomeStepStepsHint')</p>
   #set ($stepGoals = {
-    'extension.mainui': 'Install the default set of wiki pages recommended for the current version of the XWiki runtime',
-    'extension.outdatedextensions': 'Update the installed extensions'
+    'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepSummary'),
+    'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepSummary')
   })
   <ul class="steps vertical">
     #foreach ($step in $steps)
@@ -112,7 +108,7 @@
     </li>
     #end
   </ul>
-  <p class="xHint">If you want to perform the install manually then you should cancel the wizard. Alternatively, if you haven't finished configuring XWiki you can skip the wizard for now and it will reappear after the XWiki runtime is restarted. Continue to the next step if you wish to perform the install now. Whatever you choose, after the wizard is closed you will be redirected back to the page you have requested.</p>
+  <p class="xHint">$msg.get('platform.extension.distributionWizard.welcomeStepActionsHint')</p>
   #set ($showCompleteStepButton = true)
   #set ($canCloseWizard = true)
 #end
@@ -120,11 +116,11 @@
 #macro(displayMainUIStep)
   #set ($distributionState = $services.distribution.state)
   #if (!$distributionState || $distributionState == 'NONE')
-    <div class="errormessage">$msg.get('extensions.distribution.error.noState')</div>
+    <div class="errormessage">$msg.get('platform.extension.distributionWizard.uiStepNoStateError')</div>
   #else
-    <p>The user interface is a set of wiki pages that provide high level features on top of the XWiki runtime. These wiki pages are grouped by fuctionality into applications such as blog, activity stream, dashboard. Applications are packaged as extensions installable with the Extension Manager.</p>
-    <div class="xLabel">Distribution</div>
-    <div class="xHint">$msg.get('extensions.distribution.hint')</div>
+    <p>$msg.get('platform.extension.distributionWizard.uiStepDescription')</p>
+    <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepDistributionLabel')</div>
+    <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepDistributionHint')</div>
     #set ($distributionExtension = $services.distribution.distributionExtension)
     #if ($distributionExtension)
       ## Wrap the extension in a DIV so that its bottom border is displayed.
@@ -141,16 +137,16 @@
       #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
 
       ## Allow the user to install, upgrade or downgrade the UI.
-      <div class="xLabel">User Interface</div>
-      <div class="xHint">$msg.get('extensions.distribution.uiHint')</div>
+      <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepUILabel')</div>
+      <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepUIHint')</div>
       #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
       #if ($distributionUIExtension)
-        <div class="warningmessage">The installation process requires internet access and it might take a few minutes to complete depending on the internet bandwidth and the load of the remote extension repository. Thank you for your patience.</div>
+        <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepInternetAccessWarning')</div>
         #displayExtension($distributionUIExtension)
       #else
         <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
           ["<strong>$!escapetool.xml($distributionUIId.id)</strong>",
-          "<strong>$!escapetool.xml($distributionUIId.version)</strong>"]) Make sure you have the right extension repositories configured.</div>
+          "<strong>$!escapetool.xml($distributionUIId.version)</strong>"])</div>
       #end
 
       #if ($distributionState == 'NEW' && !$showCompleteStepButton)
@@ -162,7 +158,7 @@
         ## TODO: Display the previous distribution UI extension to let the user uninstall it.
       #end
     #else
-      <div class="warningmessage">$msg.get('extensions.distribution.error.noUI')</div>
+      <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepUIUnspecifiedError')</div>
       ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
     #end
   #end
@@ -170,11 +166,7 @@
 
 #macro(displayOutdatedExtensionsStep)
   #if (!$isAjaxRequest)
-    <p>Extensions provide additional features on top of the XWiki runtime. They are commonly distributed as XARs (e.g. <a href="http://platform.xwiki.org/xwiki/bin/view/Features/Applications">XWiki applications</a>,
-      <a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application">wiki macros</a>,
-      <a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application">color themes</a>) and JARs (server side code including
-      especially <a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module">components</a> and
-      <a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices">scrip services</a>).</p>
+    <p>$msg.get('platform.extension.distributionWizard.extensionsStepDescription', ['<a href="http://platform.xwiki.org/xwiki/bin/view/Features/Applications">', '</a>', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices">'])</p>
   #end
   #set ($distributionId = "$services.distribution.distributionExtension.id")
   ## Get the status of the upgrade plan job for the entire farm.
@@ -184,7 +176,7 @@
     #prepareUpgrade($upgradePlan)
   #end
   #if ($upgradePlan.state != 'FINISHED')
-    <p>Please wait a few minutes for the upgrade plan to be computed...</p>
+    <p>$msg.get('platform.extension.distributionWizard.extensionsStepLoading')</p>
     #displayJobProgressBar($upgradePlan)
     #displayUpgradePlanStatus($upgradePlan)
   #else
@@ -230,21 +222,21 @@
     #set ($showCompleteStepButton = $invalid.isEmpty())
     ##
     #if ($outdated.isEmpty() && $invalid.isEmpty())
-      <div class="infomessage">$msg.get('extensions.distribution.upToDate')</div>
+      <div class="infomessage">$msg.get('platform.extension.distributionWizard.extensionsStepUpToDate')</div>
     #else
-      #displayPlanActionList($invalid 'invalid')
-      #displayPlanActionList($outdated 'outdated')
+      #displayPlanActionList($invalid 'Invalid')
+      #displayPlanActionList($outdated 'Outdated')
     #end
   #end
-  <p class="xHint">In case this information is outdated you can <a id="prepareUpgradeLink"
-    href="?action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)">recompute</a> the upgrade plan.</p>
+  <p class="xHint">$msg.get('platform.extension.distributionWizard.extensionsStepReloadHint', ["<a id=""prepareUpgradeLink""
+    href=""?action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)"">", '</a>'])</p>
 #end
 
 #macro(displayPlanActionList $list $key)
   #if ($list.size() > 0)
-    <div class="xLabel">$msg.get("extensions.distribution.list.${key}.label")</div>
-    <div class="xHint">$msg.get("extensions.distribution.list.${key}.hint")</div>
-    <div id="${key}Extensions">
+    <div class="xLabel">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel")</div>
+    <div class="xHint">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint")</div>
+    <div id="$key.toLowerCase()Extensions">
     #foreach ($planAction in $list)
       #set ($extensionNamespace = $planAction.namespace)
       #displayExtension($planAction.extension)
@@ -258,7 +250,7 @@
   #set ($upgradePlanJob = $services.extension.createUpgradePlan())
   #set ($lastError = $services.extension.lastError)
   #if ($lastError)
-    <div class="errormessage">$msg.get('extensions.distribution.error.prepareUpgradeFailure') #printThrowable($lastError)</div>
+    <div class="errormessage">$msg.get('platform.extension.distributionWizard.extensionsStepPrepareUpgradeFailure') #printThrowable($lastError)</div>
   #else
     #set ($distributionId = "$services.distribution.distributionExtension.id")
     #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
@@ -276,15 +268,15 @@
       ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
       ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
       <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-        <button type="submit" name="action" value="COMPLETE_STEP">$msg.get('extensions.distribution.stepAction.complete')</button>
+        <button type="submit" name="action" value="COMPLETE_STEP">$msg.get('platform.extension.distributionWizard.continueLabel')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
         <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($msg.get('extensions.distribution.stepAction.skip.hint'))">$msg.get('extensions.distribution.stepAction.skip')</button>
+          title="$escapetool.xml($msg.get('platform.extension.distributionWizard.skipHint'))">$msg.get('platform.extension.distributionWizard.skipLabel')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
         <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($msg.get('extensions.distribution.stepAction.cancel.hint'))">$msg.get('extensions.distribution.stepAction.cancel')</button>
+          title="$escapetool.xml($msg.get('platform.extension.distributionWizard.cancelHint'))">$msg.get('platform.extension.distributionWizard.cancelLabel')</button>
       </span>
     </div>
   </form>

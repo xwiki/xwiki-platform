@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -35,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
@@ -235,12 +237,34 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         return documentToSave;
     }
 
+    private XWikiDocument getDatabaseDocument(XWikiDocument document, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
+
+        if (StringUtils.isNotEmpty(document.getLanguage())) {
+            String defaultLanguage = existingDocument.getDefaultLanguage();
+            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+
+            if (translatedDocument == existingDocument) {
+                translatedDocument = new XWikiDocument(document.getDocumentReference());
+                translatedDocument.setDefaultLanguage(defaultLanguage);
+                translatedDocument.setTranslation(1);
+                translatedDocument.setLanguage(document.getLanguage());
+            }
+
+            existingDocument = translatedDocument;
+        }
+
+        return existingDocument;
+    }
+
     private void saveDocument(XWikiDocument document, String comment, boolean setCreator,
         PackageConfiguration configuration) throws Exception
     {
         XWikiContext context = this.xcontextProvider.get();
 
-        XWikiDocument currentDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
+        XWikiDocument currentDocument = getDatabaseDocument(document, context);
+
         DocumentReference userReference = configuration.getUserReference();
 
         if (!currentDocument.isNew()) {

@@ -184,7 +184,7 @@
 #set ($discard = "#getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)")
 #end
 #if ($planRequested || $jobStatus)
-#set ($selected = $planRequested || $jobStatus.state != 'FINISHED')
+#set ($selected = $planRequested || (!$isAjaxRequest && $jobStatus.state != 'FINISHED'))
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
 </ul>

@@ -276,8 +276,9 @@ XWiki.ExtensionBehaviour = Class.create({
       lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
       // Add the progress menu.
       var progressMenuLabel = "$escapetool.javascript($msg.get('extensions.info.category.progress'))";
-      this.container.down('.innerMenu').insert('<li><span class="wikilink"><a href="#' + progressSectionAnchor + '">'
-        + progressMenuLabel + '</a></span></li>');
+      var progressMenu = new Element('a', {href: '#' + progressSectionAnchor}).update(progressMenuLabel);
+      this._enhanceMenuItemBehaviour(progressMenu);
+      this.container.down('.innerMenu').insert(new Element('li').insert(progressMenu));
     } else if (progressSection.down('.extension-log-item-loading')) {
       // Just hide the question that has been answered if there is any progress item loading.
       progressSection.down('form').hide();
@@ -384,11 +385,18 @@ XWiki.ExtensionBehaviour = Class.create({
     if (currentMenuItem) {
       this._activateMenuItem(currentMenuItem);
       // Make the activation of menu items persistent.
-      this.container.select(menuItemSelector).invoke('observe', 'click', function(event) {
-        event.stop();
-        this._activateMenuItem(event.element());
-      }.bindAsEventListener(this));
+      this.container.select(menuItemSelector).each(this._enhanceMenuItemBehaviour, this);
     }
+  },
+
+  /**
+   * Makes sure that menu items are activated when clicked.
+   */
+  _enhanceMenuItemBehaviour : function(menuItem) {
+    menuItem.observe('click', function(event) {
+      event.stop();
+      this._activateMenuItem(event.element());
+    }.bindAsEventListener(this));
   },
 
   _activateMenuItem : function(menuItem) {
@@ -429,7 +437,7 @@ XWiki.ExtensionBehaviour = Class.create({
         // Hide the stacktrace by default.
         stacktrace.toggle();
         // Show the stacktrace when the log message is clicked.
-        var logMessage = logItem.down('p');
+        var logMessage = logItem.down('div');
         logMessage.setStyle({"cursor": "pointer"});
         logMessage.observe('click', function() {
           stacktrace.toggle();

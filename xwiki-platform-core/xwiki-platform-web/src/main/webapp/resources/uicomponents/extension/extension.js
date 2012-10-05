@@ -340,6 +340,9 @@ XWiki.ExtensionBehaviour = Class.create({
     var form = this.container.down('.extension-actions');
     var formData = new Hash(form.serialize({submit: false}));
 
+    // Preserve the menu selection while the extension display is refreshed.
+    this._preserveMenuSelection = true;
+
     // Launch the AJAX call.
     new Ajax.Request(this._getServiceURL(formData.get('section')), {
       parameters : formData,
@@ -371,17 +374,19 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _enhanceMenuBehaviour : function() {
     var menuItemSelector = '.innerMenu li a';
-    // Expand the current menu item.
+    // Preserve the menu selection only when the extension display is triggered by a refresh. If the display is
+    // triggered by the start of an extension job then activate the menu indicated by the server.
     var currentMenuItem = this.container.down(menuItemSelector + '.current');
-    if (!currentMenuItem) {
+    if (!currentMenuItem || this._preserveMenuSelection) {
       // Expand the previously selected menu item, if specified, to preserve the state of the extension display.
       if (this._previouslySelectedMenuItem) {
         currentMenuItem = this.container.down(menuItemSelector + '[href="' + this._previouslySelectedMenuItem + '"]');
-      } else {
+      } else if (!currentMenuItem) {
         // Expand the first menu item.
         currentMenuItem = this.container.down(menuItemSelector);
       }
     }
+    this._preserveMenuSelection = false;
     if (currentMenuItem) {
       this._activateMenuItem(currentMenuItem);
       // Make the activation of menu items persistent.

@@ -25,6 +25,9 @@ XWiki.ExtensionBehaviour = Class.create({
     // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
     this._enhanceMenuBehaviour();
 
+    // Enhances the behaviour of the Dependencies section.
+    this._enhanceDependenciesBehaviour();
+
     // Enhances the behaviour of the Progress section.
     this._enhanceProgressBehaviour();
 
@@ -273,8 +276,9 @@ XWiki.ExtensionBehaviour = Class.create({
       lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
       // Add the progress menu.
       var progressMenuLabel = "$escapetool.javascript($msg.get('extensions.info.category.progress'))";
-      this.container.down('.innerMenu').insert('<li><span class="wikilink"><a href="#' + progressSectionAnchor + '">'
-        + progressMenuLabel + '</a></span></li>');
+      var progressMenu = new Element('a', {href: '#' + progressSectionAnchor}).update(progressMenuLabel);
+      this._enhanceMenuItemBehaviour(progressMenu);
+      this.container.down('.innerMenu').insert(new Element('li').insert(progressMenu));
     } else if (progressSection.down('.extension-log-item-loading')) {
       // Just hide the question that has been answered if there is any progress item loading.
       progressSection.down('form').hide();
@@ -333,8 +337,11 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _refresh : function() {
     // Prepare the data for the AJAX call.
-    var form = this.container.down('.extension-actions').up('form');
+    var form = this.container.down('.extension-actions');
     var formData = new Hash(form.serialize({submit: false}));
+
+    // Preserve the menu selection while the extension display is refreshed.
+    this._preserveMenuSelection = true;
 
     // Launch the AJAX call.
     new Ajax.Request(this._getServiceURL(formData.get('section')), {
@@ -347,7 +354,10 @@ XWiki.ExtensionBehaviour = Class.create({
           // Use a longer refresh timeout after an AJAX request failure.
           this._maybeScheduleRefresh(10);
         }
-      }.bind(this)
+      }.bind(this),
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      }
     });
   },
 
@@ -364,25 +374,34 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _enhanceMenuBehaviour : function() {
     var menuItemSelector = '.innerMenu li a';
-    // Expand the current menu item.
+    // Preserve the menu selection only when the extension display is triggered by a refresh. If the display is
+    // triggered by the start of an extension job then activate the menu indicated by the server.
     var currentMenuItem = this.container.down(menuItemSelector + '.current');
-    if (!currentMenuItem) {
+    if (!currentMenuItem || this._preserveMenuSelection) {
       // Expand the previously selected menu item, if specified, to preserve the state of the extension display.
       if (this._previouslySelectedMenuItem) {
         currentMenuItem = this.container.down(menuItemSelector + '[href="' + this._previouslySelectedMenuItem + '"]');
-      } else {
+      } else if (!currentMenuItem) {
         // Expand the first menu item.
         currentMenuItem = this.container.down(menuItemSelector);
       }
     }
+    this._preserveMenuSelection = false;
     if (currentMenuItem) {
       this._activateMenuItem(currentMenuItem);
       // Make the activation of menu items persistent.
-      this.container.select(menuItemSelector).invoke('observe', 'click', function(event) {
-        event.stop();
-        this._activateMenuItem(event.element());
-      }.bindAsEventListener(this));
+      this.container.select(menuItemSelector).each(this._enhanceMenuItemBehaviour, this);
     }
+  },
+
+  /**
+   * Makes sure that menu items are activated when clicked.
+   */
+  _enhanceMenuItemBehaviour : function(menuItem) {
+    menuItem.observe('click', function(event) {
+      event.stop();
+      this._activateMenuItem(event.element());
+    }.bindAsEventListener(this));
   },
 
   _activateMenuItem : function(menuItem) {
@@ -423,23 +442,71 @@ XWiki.ExtensionBehaviour = Class.create({
         // Hide the stacktrace by default.
         stacktrace.toggle();
         // Show the stacktrace when the log message is clicked.
-        var logMessage = logItem.down('p');
+        var logMessage = logItem.down('div');
         logMessage.setStyle({"cursor": "pointer"});
         logMessage.observe('click', function() {
           stacktrace.toggle();
         });
       }
     });
+    // Scroll the progress log to the end if it has a loading item.
+    // TODO: Preserve the scroll position if the user scrolls through the log.
+    var loadingLogItem = this.container.down('.extension-log-item-loading');
+    if (loadingLogItem) {
+      var log = loadingLogItem.up();
+      log.scrollTop = log.scrollHeight;
+    }
     // Execute Extension Manager jobs asynchronously.
     var confirmJobButton = this.container.down('input[name="confirm"]');
     confirmJobButton && confirmJobButton.observe('click', this._startJob.bindAsEventListener(this));
+    // Compute the changes asynchronously when there is a merge conflict.
     var diffButton = this.container.down('input[name="diff"]');
-    if (diffButton) {
-      // Compute the changes asynchronously when there is a merge conflict.
-      diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
-      // Scroll to the page to the merge conflict resolution section.
-      diffButton.form.scrollTo();
+    diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
+  },
+
+  /**
+   * Enhances the behaviour of the Dependencies section within the extension details.
+   */
+  _enhanceDependenciesBehaviour : function() {
+    // Don't resolve unknown dependencies while the extension has a job running.
+    if (!this.container.hasClassName('extension-item-loading')) {
+      this._resolveUnknownDependency(this.container.select('.dependency-item.extension-item-unknown'), 0);
     }
+  },
+
+  /**
+   * Makes an AJAX request to resolve the specified dependency.
+   */
+  _resolveUnknownDependency : function(dependencies, index) {
+    if (index >= dependencies.length) {
+      return;
+    }
+
+    var dependency = dependencies[index];
+    var section = this.container.down('input[name="section"]');
+    new Ajax.Request(this._getServiceURL(section && section.value), {
+      parameters : {
+        extensionId: dependency.down('.extension-name').innerHTML,
+        extensionVersionConstraint: dependency.down('.extension-version').innerHTML
+      },
+      onCreate : function() {
+        dependency.removeClassName('extension-item-unknown').addClassName('extension-item-loading');
+      },
+      onSuccess : function(response) {
+        // Update the dependency if it's still attached to the document.
+        if (dependency.up('html')) {
+          dependency.insert({before: response.responseText}).remove();
+          this._resolveUnknownDependency(dependencies, index + 1);
+        }
+      }.bind(this),
+      onFailure : function(response) {
+        dependency.removeClassName('extension-item-loading').addClassName('extension-item-unknown');
+        this._onAjaxRequestFailure(response);
+      }.bind(this),
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      }
+    });
   }
 });
 

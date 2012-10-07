@@ -27,6 +27,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
+
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
@@ -67,7 +69,7 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
         final XWikiContext context)
         throws XWikiException
     {
-        if (archive instanceof VoidAttachmentArchive) {
+        if (archive instanceof VoidAttachmentVersioningStore.VoidAttachmentArchive) {
             return;
         }
         if (archive.getVersions().length == 0 && archive.getAttachment() != null) {

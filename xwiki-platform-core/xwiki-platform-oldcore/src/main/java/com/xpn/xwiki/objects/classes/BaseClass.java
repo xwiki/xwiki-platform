@@ -44,6 +44,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -1182,20 +1183,34 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return difflist;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#merge(com.xpn.xwiki.objects.ElementInterface,
-     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
-     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
-     */
+    @Override
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
 
-        List<ObjectDiff> classDiff = previousClass.getDiff(newClass, context);
+        setCustomClass(MergeUtils.mergeCharacters(previousClass.getCustomClass(), newClass.getCustomClass(),
+            getCustomClass(), mergeResult));
+
+        setCustomMapping(MergeUtils.mergeCharacters(previousClass.getCustomMapping(), newClass.getCustomMapping(),
+            getCustomMapping(), mergeResult));
+
+        setDefaultWeb(MergeUtils.mergeCharacters(previousClass.getDefaultWeb(), newClass.getDefaultWeb(),
+            getDefaultWeb(), mergeResult));
+
+        setDefaultViewSheet(MergeUtils.mergeCharacters(previousClass.getDefaultViewSheet(),
+            newClass.getDefaultViewSheet(), getDefaultViewSheet(), mergeResult));
+
+        setDefaultEditSheet(MergeUtils.mergeCharacters(previousClass.getDefaultEditSheet(),
+            newClass.getDefaultEditSheet(), getDefaultEditSheet(), mergeResult));
+
+        setNameField(MergeUtils.mergeCharacters(previousClass.getNameField(), newClass.getNameField(), getNameField(),
+            mergeResult));
+
+        // Properties
+
+        List<ObjectDiff> classDiff = newClass.getDiff(previousClass, context);
         for (ObjectDiff diff : classDiff) {
             PropertyClass propertyResult = (PropertyClass) getField(diff.getPropName());
             PropertyClass previousProperty = (PropertyClass) previousClass.getField(diff.getPropName());
@@ -1247,5 +1262,45 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 }
             }
         }
+    }
+
+    @Override
+    public boolean apply(ElementInterface newElement, boolean clean)
+    {
+        boolean modified = super.apply(newElement, clean);
+
+        BaseClass newBaseClass = (BaseClass) newElement;
+
+        if (!StringUtils.equals(getCustomClass(), newBaseClass.getCustomClass())) {
+            setCustomClass(newBaseClass.getCustomClass());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
+            setCustomMapping(newBaseClass.getCustomMapping());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
+            setDefaultWeb(newBaseClass.getDefaultWeb());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
+            setDefaultViewSheet(newBaseClass.getDefaultViewSheet());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
+            setDefaultEditSheet(newBaseClass.getDefaultEditSheet());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getNameField(), newBaseClass.getNameField())) {
+            setNameField(newBaseClass.getNameField());
+            modified = true;
+        }
+
+        return modified;
     }
 }

@@ -45,6 +45,7 @@ import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
+import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
@@ -58,6 +59,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -96,6 +98,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private DocumentReference contextUser;
 
     private DefaultPackager defaultPackager;
+
+    private DocumentMergeImporter importer;
 
     @Override
     @Before
@@ -270,8 +274,10 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         // lookup
 
         this.jobManager = getComponentManager().getInstance(JobManager.class);
-        this.xarExtensionRepository = getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
+        this.xarExtensionRepository =
+            getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
         this.defaultPackager = getComponentManager().getInstance(Packager.class);
+        this.importer = getComponentManager().getInstance(DocumentMergeImporter.class);
 
         // Get rid of wiki macro listener
         getComponentManager().<ObservationManager> getInstance(ObservationManager.class).removeListener(
@@ -294,7 +300,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         }
         Job installJob = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
 
-        List<LogEvent> errors = installJob.getStatus().getLog().getLogs(LogLevel.ERROR);
+        List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
@@ -313,7 +319,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         }
         Job uninstallJob = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
 
-        List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogs(LogLevel.ERROR);
+        List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
             throw errors.get(0).getThrowable();
         }
@@ -354,8 +360,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertNull(page.getXObject(object.getXClassReference()));
 
         Assert.assertEquals("Wrong content", "content", page.getContent());
+        Assert.assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"),
+            page.getCreatorReference());
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
-        Assert.assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"), page.getCreatorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
         Assert.assertFalse("Document is hidden", page.isHidden());
@@ -371,8 +378,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getContext());
         Assert.assertFalse(pagewithattachment.isNew());
         Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
-        Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
+        Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
 
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
@@ -388,17 +395,48 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
 
-        // translated.translated.tr
+        // translated.translated
         DocumentReference translatedReference = new DocumentReference("wiki", "translated", "translated");
+        XWikiDocument defaultTranslated = this.mockXWiki.getDocument(translatedReference, getContext());
+
+        Assert.assertNotNull("Document wiki:translated.translated has not been saved in the database",
+            defaultTranslated);
+        Assert.assertFalse("Document wiki:translated.translated has not been saved in the database",
+            defaultTranslated.isNew());
+
+        Assert.assertEquals("Wrong content", "default content", defaultTranslated.getContent());
+        Assert.assertEquals("Wrong creator", this.contextUser, defaultTranslated.getCreatorReference());
+        Assert.assertEquals("Wrong author", this.contextUser, defaultTranslated.getAuthorReference());
+        Assert.assertEquals("Wrong content author", this.contextUser, defaultTranslated.getContentAuthorReference());
+        Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
+
+        // translated.translated.tr
         XWikiDocument translated = this.documents.get(translatedReference).get("tr");
 
-        Assert.assertNotNull("Document wiki:translated.translated has not been saved in the database", translated);
-        Assert
-            .assertFalse("Document wiki:translated.translated has not been saved in the database", translated.isNew());
+        Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
+            translated);
+        Assert.assertFalse("Document wiki:translated.translated in langauge tr has not been saved in the database",
+            translated.isNew());
 
-        Assert.assertEquals("Wrong content", "translated content", translated.getContent());
+        Assert.assertEquals("Wrong content", "tr content", translated.getContent());
+        Assert.assertEquals("Wrong creator", this.contextUser, translated.getCreatorReference());
         Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
+        Assert.assertEquals("Wrong content author", this.contextUser, translated.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
+
+        // translated.translated.fr
+        XWikiDocument translated2 = this.documents.get(translatedReference).get("fr");
+
+        Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
+            translated2);
+        Assert.assertFalse("Document wiki:translated.translated in langauge fr has not been saved in the database",
+            translated2.isNew());
+
+        Assert.assertEquals("Wrong content", "fr content", translated2.getContent());
+        Assert.assertEquals("Wrong creator", this.contextUser, translated2.getCreatorReference());
+        Assert.assertEquals("Wrong author", this.contextUser, translated2.getAuthorReference());
+        Assert.assertEquals("Wrong content author", this.contextUser, translated2.getContentAuthorReference());
+        Assert.assertEquals("Wrong version", "1.1", translated2.getVersion());
 
         // space.hiddenpage
 
@@ -569,7 +607,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         }
 
         DocumentImporterHandler documentHandler =
-            new DocumentImporterHandler(this.defaultPackager, getComponentManager(), wiki);
+            new DocumentImporterHandler(this.defaultPackager, getComponentManager(), wiki, this.importer);
         documentHandler.setConfiguration(configuration);
 
         InputStream is = getClass().getResourceAsStream(resource);
@@ -593,8 +631,30 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         });
 
         importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
+    }
 
-        this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+    @Test
+    public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
+    {
+        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+
+        // register a mandatory document initializer
+        final MandatoryDocumentInitializer mandatoryInitializer =
+            registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mandatoryInitializer).updateDocument(with(any(XWikiDocument.class)));
+                will(returnValue(true));
+
+                // Make sure it does not produces any conflict
+                never(mockJobStatus).ask(with(anything()));
+            }
+        });
+
+        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
     }
 
     @Test

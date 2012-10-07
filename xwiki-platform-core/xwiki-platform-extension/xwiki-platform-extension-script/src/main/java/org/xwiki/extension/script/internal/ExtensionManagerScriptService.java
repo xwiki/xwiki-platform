@@ -34,6 +34,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
@@ -49,7 +50,6 @@ import org.xwiki.extension.job.internal.InstallPlanJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.job.internal.UninstallPlanJob;
 import org.xwiki.extension.job.internal.UpgradePlanJob;
-import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -110,6 +110,12 @@ public class ExtensionManagerScriptService implements ScriptService
     private static final String PROPERTY_CALLERREFERENCE = "caller.reference";
 
     private static final String PROPERTY_CHECKRIGHTS = "checkrights";
+
+    /**
+     * This property is set on requests to create an install or uninstall plan in order to specify which type of job
+     * generated the plan.
+     */
+    private static final String PROPERTY_JOB_TYPE = "job.type";
 
     /**
      * The real extension manager bridged by this script service.
@@ -494,7 +500,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
      *         {@code null} in case of failure
      */
-    public ExtensionPlan createInstallPlan(String id, String version, String namespace)
+    public Job createInstallPlan(String id, String version, String namespace)
     {
         setError(null);
 
@@ -512,18 +518,16 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
 
-        ExtensionPlan status;
+        Job job = null;
         try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(InstallPlanJob.JOBTYPE, installRequest).getStatus());
+            job = this.jobManager.addJob(InstallPlanJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
-
-            status = null;
         }
 
-        return status;
+        return job;
     }
 
     /**
@@ -605,9 +609,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param id the identifier of the extension that is going to be removed
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
      *            extension will be removed from all namespaces
-     * @return the uninstall plan
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    public ExtensionPlan createUninstallPlan(String id, String namespace)
+    public Job createUninstallPlan(String id, String namespace)
     {
         return createUninstallPlan(new ExtensionId(id, (Version) null), namespace);
     }
@@ -619,9 +624,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * Uninstall from all namespaces.
      * 
      * @param extensionId the identifier of the extension that is going to be removed
-     * @return the uninstall plan
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
+    public Job createUninstallPlan(ExtensionId extensionId)
     {
         return createUninstallPlan(extensionId, null);
     }
@@ -635,9 +641,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param extensionId the id of the extension for which to create the uninstall plan
      * @param namespace the namespace from where the specified extension is going to be removed, {@code null} or blank
      *            string if the extension is supposed to be removed from all namespaces
-     * @return the uninstall plan
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    private ExtensionPlan createUninstallPlan(ExtensionId extensionId, String namespace)
+    private Job createUninstallPlan(ExtensionId extensionId, String namespace)
     {
         setError(null);
 
@@ -655,18 +662,16 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallPlanJob.JOBTYPE);
 
-        ExtensionPlan status;
+        Job job = null;
         try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
+            job = this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest);
         } catch (JobException e) {
             setError(e);
-
-            status = null;
         }
 
-        return status;
+        return job;
     }
 
     private InstallRequest createUpgradePlanRequest(String namespace)
@@ -876,6 +881,26 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             return new DefaultVersionConstraint(versionConstraint);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates an extension dependency object.
+     * 
+     * @param id the dependency identifier
+     * @param versionConstraint the dependency version constraint
+     * @return the extension dependency object
+     */
+    public ExtensionDependency createExtensionDependency(String id, String versionConstraint)
+    {
+        setError(null);
+
+        try {
+            return new DefaultExtensionDependency(id, new DefaultVersionConstraint(versionConstraint));
         } catch (Exception e) {
             setError(e);
         }

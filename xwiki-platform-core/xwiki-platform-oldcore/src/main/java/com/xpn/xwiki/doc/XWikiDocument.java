@@ -7948,9 +7948,9 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Apply modification comming from provided document.
      * <p>
-     * Thid method does not take into account versions and author related infrmations and the provided document should
+     * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
-     * this method is dealing with "real" data and should not change everything related to version managerment and
+     * this method is dealing with "real" data and should not change everything related to version management and
      * document identifier.
      * <p>
      * This method also does not take into account attachments because: <u>
@@ -7965,7 +7965,33 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public boolean apply(XWikiDocument document)
     {
+        return apply(document, true);
+    }
+
+    /**
+     * Apply modification comming from provided document.
+     * <p>
+     * Thid method does not take into account versions and author related informations and the provided document should
+     * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
+     * this method is dealing with "real" data and should not change everything related to version management and
+     * document identifier.
+     * <p>
+     * This method also does not take into account attachments because: <u>
+     * <li>removing attachments means directly modifying the database, there is no way to indicate attachment to remove
+     * later like with objects (this could be improved later)</li>
+     * <li>copying them all from one XWikiDocument to another could be very expensive for the memory if done all at once
+     * since it mean loading all the attachment content in memory. Better doing it one by after before or after the call
+     * to this method.</li>
+     * 
+     * @param document the document to apply
+     * @return false is nothing changed
+     */
+    public boolean apply(XWikiDocument document, boolean clean)
+    {
         boolean modified = false;
+
+        // /////////////////////////////////
+        // Document
 
         if (!StringUtils.equals(getComment(), document.getContent())) {
             setContent(document.getContent());
@@ -8018,37 +8044,51 @@ public class XWikiDocument implements DocumentModelBridge
             setCustomClass(document.getCustomClass());
             modified = true;
         }
-        if (ObjectUtils.notEqual(getXClass(), document.getXClass())) {
-            setXClass(document.getXClass().clone());
-            setXClassXML(document.getXClassXML());
-            modified = true;
-        }
 
-        // Objects
-        for (List<BaseObject> objects : getXObjects().values()) {
-            // Duplicate the list since we are potentially going to modify it
-            for (BaseObject originalObj : new ArrayList<BaseObject>(objects)) {
-                if (originalObj != null) {
-                    BaseObject newObj = document.getXObject(originalObj.getXClassReference(), originalObj.getNumber());
-                    if (newObj == null) {
-                        // The object was deleted
-                        removeXObject(originalObj);
-                        modified = true;
+        // /////////////////////////////////
+        // XObjects
+
+        if (clean) {
+            // Delete objects that don't exist anymore
+            for (List<BaseObject> objects : getXObjects().values()) {
+                // Duplicate the list since we are potentially going to modify it
+                for (BaseObject originalObj : new ArrayList<BaseObject>(objects)) {
+                    if (originalObj != null) {
+                        BaseObject newObj =
+                            document.getXObject(originalObj.getXClassReference(), originalObj.getNumber());
+                        if (newObj == null) {
+                            // The object was deleted
+                            removeXObject(originalObj);
+                            modified = true;
+                        }
                     }
                 }
             }
         }
+        // Add new objects or update existing objects
         for (List<BaseObject> objects : document.getXObjects().values()) {
             for (BaseObject newObj : objects) {
                 if (newObj != null) {
                     BaseObject originalObj = getXObject(newObj.getXClassReference(), newObj.getNumber());
-                    if (ObjectUtils.notEqual(newObj, originalObj)) {
+                    if (originalObj == null) {
                         // The object added or modified
                         setXObject(newObj.getNumber(), newObj);
                         modified = true;
+                    } else {
+                        // The object added or modified
+                        modified |= originalObj.apply(newObj, clean);
                     }
                 }
             }
+        }
+
+        // /////////////////////////////////
+        // XClass
+
+        modified |= getXClass().apply(document.getXClass(), clean);
+        if (ObjectUtils.notEqual(getXClassXML(), document.getXClassXML())) {
+            setXClassXML(document.getXClassXML());
+            modified = true;
         }
 
         return modified;

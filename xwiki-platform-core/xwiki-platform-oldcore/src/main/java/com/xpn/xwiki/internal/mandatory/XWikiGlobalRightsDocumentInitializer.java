@@ -17,33 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.mandatory;
 
-import org.dom4j.Element;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public interface PropertyInterface extends ElementInterface
+import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+
+/**
+ * Update XWiki.XWikiGlobalRights document with all required informations.
+ * 
+ * @version $Id$
+ * @since 4.3M1
+ */
+@Component
+@Named("XWiki.XWikiGlobalRights")
+@Singleton
+public class XWikiGlobalRightsDocumentInitializer extends AbstractRightsDocumentInitializer
 {
     /**
-     * Returns the identifier of this property for hibernate. The return type is long since 4.0M1
-     * 
-     * @return the identifier of this property
+     * Default constructor.
      */
-    long getId();
+    public XWikiGlobalRightsDocumentInitializer()
+    {
+        super("XWikiGlobalRights");
+    }
 
-    /**
-     * Dummy function to satisfy hibernate requirements.
-     * 
-     * @param id the identifier. A long since 4.0M1
-     */
-    void setId(long id);
+    @Override
+    public boolean updateDocument(XWikiDocument document)
+    {
+        boolean needsUpdate = super.updateDocument(document);
 
-    BaseCollection getObject();
+        needsUpdate |= setClassDocumentFields(document, "XWiki Global Rights Class");
 
-    void setObject(BaseCollection object);
-
-    String toFormString();
-
-    Element toXML();
-
-    PropertyInterface clone();
+        return needsUpdate;
+    }
 }

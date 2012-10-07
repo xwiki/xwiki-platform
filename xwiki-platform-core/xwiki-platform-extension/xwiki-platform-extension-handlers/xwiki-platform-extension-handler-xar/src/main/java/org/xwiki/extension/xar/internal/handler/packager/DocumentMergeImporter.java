@@ -17,33 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects;
+package org.xwiki.extension.xar.internal.handler.packager;
 
-import org.dom4j.Element;
+import org.xwiki.component.annotation.Role;
 
-public interface PropertyInterface extends ElementInterface
+import com.xpn.xwiki.doc.XWikiDocument;
+
+/**
+ * Take care of properly merging and saving a document.
+ * 
+ * @version $Id$
+ */
+@Role
+public interface DocumentMergeImporter
 {
-    /**
-     * Returns the identifier of this property for hibernate. The return type is long since 4.0M1
-     * 
-     * @return the identifier of this property
-     */
-    long getId();
-
-    /**
-     * Dummy function to satisfy hibernate requirements.
-     * 
-     * @param id the identifier. A long since 4.0M1
-     */
-    void setId(long id);
-
-    BaseCollection getObject();
-
-    void setObject(BaseCollection object);
-
-    String toFormString();
-
-    Element toXML();
-
-    PropertyInterface clone();
+    XarEntryMergeResult saveDocumen(String comment, XWikiDocument previousDocument, XWikiDocument currentDocument,
+        XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception;
 }

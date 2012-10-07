@@ -260,4 +260,20 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         mergeResult.error(new CollisionException("Collision found on property [" + getName() + "] between from value ["
             + getValue() + "] and to [" + newValue + "]"));
     }
+
+    @Override
+    public boolean apply(ElementInterface newProperty, boolean clean)
+    {
+        boolean modified = super.apply(newProperty, clean);
+
+        BaseProperty<R> newBaseProperty = (BaseProperty<R>) newProperty;
+
+        // Value
+        if (ObjectUtils.equals(newBaseProperty.getValue(), getValue())) {
+            setValue(newBaseProperty.getValue());
+            modified = true;
+        }
+
+        return modified;
+    }
 }

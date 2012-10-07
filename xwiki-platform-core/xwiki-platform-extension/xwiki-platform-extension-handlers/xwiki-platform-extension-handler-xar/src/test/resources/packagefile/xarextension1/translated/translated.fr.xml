@@ -2,7 +2,7 @@
 <xwikidoc>
 <web>translated</web>
 <name>translated</name>
-<language>tr</language>
+<language>fr</language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent></parent>
@@ -22,4 +22,4 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>tr content</content></xwikidoc>
+<content>fr content</content></xwikidoc>

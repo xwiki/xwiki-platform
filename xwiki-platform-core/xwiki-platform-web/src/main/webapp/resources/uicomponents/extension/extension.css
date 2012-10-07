@@ -17,7 +17,7 @@
   border-bottom-color: $theme.borderColor;
 }
 
-.extension-name {
+.extension-title {
   color: $theme.titleColor;
   font-size: 1.2em;
   font-weight: 700;
@@ -41,7 +41,8 @@
   margin: 0 0 0 5px;
 }
 
-.extension-header-right {
+.extension-actions {
+  clear: right;
   float: right;
   text-align: right;
 }
@@ -49,7 +50,8 @@
 .extension-status {
   font-size: 0.8em;
 }
-.extension-header-right .extension-status {
+.extension-header .extension-status {
+  float: right;
   margin: -2em 0 1em;
 }
 
@@ -74,7 +76,7 @@
   color: $theme.notificationErrorColor;
 }
 
-.extension-description {
+.extension-summary {
   font-size: .9em;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -125,24 +127,24 @@ ul.extension-metadata li {
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.dependency-item > p, .extension-log-item > p {
-  margin: 0;
+.dependency-item, .extension-log-item > div {
+  line-height: 1.4em;
 }
-.extension-item-core .extension-name, .extension-item-remote-core .extension-name,
+.extension-item-core .extension-title, .extension-item-remote-core .extension-title,
 .dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
-.extension-item-installed .extension-name, .extension-item-remote-installed .extension-name,
-.extension-item-installed-invalid .extension-name, .extension-item-remote-installed-invalid .extension-name,
+.extension-item-installed .extension-title, .extension-item-remote-installed .extension-title,
+.extension-item-installed-invalid .extension-title, .extension-item-remote-installed-invalid .extension-title,
 .dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed,
 .dependency-item.extension-item-installed-invalid, .dependency-item.extension-item-remote-installed-invalid,
 .dependency-item.extension-item-remote-installed-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
-.extension-item-remote .extension-name, .dependency-item.extension-item-remote {
+.extension-item-remote .extension-title, .dependency-item.extension-item-remote {
   background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
-.extension-item-loading .extension-name, .dependency-item.extension-item-loading {
+.extension-item-loading .extension-title, .dependency-item.extension-item-loading {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
 }
 .dependency-item.extension-item-unknown {
@@ -183,6 +185,9 @@ ul.extension-metadata li {
 
 .extension-body-progress > ul {
   margin-top: .5em;
+  /* This should accommodate 10 items */
+  max-height: 230px;
+  overflow: auto;
 }
 .extension-log-item {
   background-position: left .3em;

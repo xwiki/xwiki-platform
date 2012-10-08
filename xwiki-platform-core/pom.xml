@@ -260,7 +260,7 @@
             <exclude>org/xwiki/uiextension/UIExtension</exclude>
             <!-- Added a common method to all elements to set all the data from another element -->
             <!-- Technically this does not really break anything because all elements are supposed to extends BaseElement -->
-            <exclude>com.xpn.xwiki.objects.ElementInterface</exclude>
+            <exclude>com/xpn/xwiki/objects/ElementInterface</exclude>
           </excludes>
         </configuration>
       </plugin>

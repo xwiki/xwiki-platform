@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <object>
     <class>
@@ -99,7 +99,11 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get('xe.statistics.contributors.leastactive'))
+      <content>{{include document="Stats.Macros" /}}
+{{velocity}}
+#panelheader($msg.get('xe.statistics.contributors.leastactive'))
+
+{{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($period = $xwiki.criteriaService.periodFactory.ALL_TIME)
   #set ($interval = $xwiki.criteriaService.rangeFactory.createTailRange(5))
@@ -112,8 +116,10 @@
 #else
   #printStatisticsDisabled()
 #end
+{{/html}}
+
 #panelfooter()
-#includeMacros("Stats.Macros")</content>
+{{/velocity}}</content>
     </property>
     <property>
       <description>Displays the least active contributors</description>
@@ -125,5 +131,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>#includeForm("Panels.PanelSheet")</content>
+  <content>{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

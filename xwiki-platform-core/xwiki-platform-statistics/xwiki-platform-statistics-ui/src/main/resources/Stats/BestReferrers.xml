@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <object>
     <class>
@@ -99,7 +99,11 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get('xe.statistics.bestreferrers'))
+      <content>{{include document="Stats.Macros" /}}
+{{velocity}}
+#panelheader($msg.get('xe.statistics.bestreferrers'))
+
+{{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($scope = $xwiki.criteriaService.scopeFactory.ALL_PAGES)
   #set ($period = $xwiki.criteriaService.periodFactory.ALL_TIME)
@@ -113,8 +117,9 @@
 #else
   #printStatisticsDisabled()
 #end
-#panelfooter()
-#includeMacros("Stats.Macros")</content>
+{{/html}}
+
+#panelfooter()</content>
     </property>
     <property>
       <description>Displays the best referrers</description>
@@ -126,5 +131,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>#includeForm("Panels.PanelSheet")</content>
+  <content>{{include document="Panels.PanelSheet"/}}</content>
 </xwikidoc>

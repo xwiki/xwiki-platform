@@ -21,12 +21,17 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>#if ($xwiki.statsService.enabledForCurrentWiki)
+  <content>{{include document="Stats.Macros" /}}
+
+{{velocity}}
+{{html wiki="true"}}
+#if ($xwiki.statsService.enabledForCurrentWiki)
   #displayPanelLayout(2 ['Stats.MostViewedPages', 'Stats.MostEditedPages', 'Stats.MostViewedSpaces', 'Stats.MostEditedSpaces'])
 #else
   #printStatisticsDisabled()
 #end
-#includeMacros("Stats.Macros")</content>
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

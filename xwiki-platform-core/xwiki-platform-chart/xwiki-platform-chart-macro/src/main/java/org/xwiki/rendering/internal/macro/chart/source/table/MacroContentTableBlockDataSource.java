@@ -41,7 +41,7 @@ import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_
  * A data source for building charts from a wiki table defined in the macro content.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
 @Component
 @Named("inline")

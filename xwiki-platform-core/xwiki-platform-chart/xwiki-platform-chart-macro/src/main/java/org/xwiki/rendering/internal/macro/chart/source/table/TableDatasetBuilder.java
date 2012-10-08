@@ -26,7 +26,11 @@ import org.xwiki.rendering.internal.macro.chart.source.LocaleConfiguration;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * A dataset builder interface for table data sources.
+ * The jfree chart library generates charts from different classes of datasets.  This is a common interface for classes
+ * that implements building datasets from table data sources.
+ *
+ * Please, note the distinction between a data source and a dataset.  A data source is something from which data is
+ * extracted, while a dataset is an encapsulation of data that can be passed to the chart library.
  *
  * @version $Id$
  * @since 4.2M1

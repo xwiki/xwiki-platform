@@ -207,7 +207,7 @@
       #if ("$!{extension.webSite}" != '')
         <li>
           $msg.get('extensions.info.website')
-          <a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/]++)/?.*+$', '$1'))</a>
+          <a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a>
         </li>
       #end
       #if ($extension.features.size() > 0)

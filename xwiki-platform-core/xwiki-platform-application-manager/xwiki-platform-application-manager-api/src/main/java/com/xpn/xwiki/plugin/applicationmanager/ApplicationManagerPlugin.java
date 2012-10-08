@@ -78,7 +78,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
                 context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
             context.setDatabase(context.getMainXWiki());
-            this.applicationManager.updateAllApplicationTranslation(context);
+            this.applicationManager.init(context);
         } catch (XWikiException e) {
             LOGGER.error(
                 ApplicationManagerMessageTool.getDefault(context).get(

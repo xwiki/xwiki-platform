@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -387,5 +388,28 @@ public final class ApplicationManager
         }
 
         return updateprefs;
+    }
+
+    /**
+     * During initialization the method updateApplicationTranslation must be called.  However, it cannot be called
+     * directly, as the application list will be searched for using the access rights of the context user.  This means
+     * that applications that aren't viewable by the user that happens to initiate the wiki will not be on the list.
+     * Hence, the only purpose of this method is to query the datastore without checking access rights on the documents
+     * holding instances of XWikiApplicationClass.
+     * 
+     * @param context The xwiki context.
+     * @since 4.2.1
+     * @throws XWikiException on failure.
+     */
+    void init(XWikiContext context) throws XWikiException
+    {
+        final XWikiApplicationClass instance = XWikiApplicationClass.getInstance(context, false);
+        final List<Object> parameterValues = new ArrayList<Object>();
+        final String where = instance.createWhereClause(null, parameterValues);
+        final List<XWikiApplication> applicationList
+            = instance.newXObjectDocumentList(context.getWiki().getStore()
+                 .searchDocuments(where, true, false, false, 0, 0, parameterValues, context), context);
+        updateApplicationsTranslation(applicationList, getMessageTool(context).get(
+            ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS), context);
     }
 }

@@ -81,4 +81,10 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     {
         return getWrapped().isDependency();
     }
+
+    @Override
+    public boolean isDependency(String namespace)
+    {
+        return getWrapped().isDependency(namespace);
+    }
 }

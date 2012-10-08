@@ -411,12 +411,12 @@ function prettyNameChanged()
     &lt;dd&gt;
       &lt;select name='template' id='template' #if(!$isInstallComplete)disabled='disabled'#{end}&gt;
         #foreach ($template in $templates)
-          #set ($wikiDescriptor = $template.getWikiDescriptor())
+          #set ($wikiDescriptor = $template.wikiDescriptor)
           #set ($name = $wikiDescriptor.wikiName)
           #if ($stringtool.isNotBlank("$!wikiDescriptor.wikiPrettyName"))
             #set($name = "${wikiDescriptor.wikiPrettyName} (${name})")
           #end
-          &lt;option value="$template.getWikiName()" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected='selected' #end &gt;$name&lt;/option&gt;
+          &lt;option value="${wikiDescriptor.wikiName}" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected='selected' #end &gt;$name&lt;/option&gt;
         #end
       &lt;/select&gt;
     &lt;/dd&gt;

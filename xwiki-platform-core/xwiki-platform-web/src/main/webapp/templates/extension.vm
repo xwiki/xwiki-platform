@@ -179,7 +179,7 @@
 #end
 ##
 #if ($jobStatus)
-#set ($selected = $jobStatus.state != 'FINISHED')
+#set ($selected = $jobStatus.state != 'FINISHED' || $request.extensionSection == 'progress')
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
 </ul>
@@ -515,7 +515,7 @@
     #end
   #else
     ## Redirect to extension display.
-    $response.sendRedirect("#getExtensionURL()")
+    $response.sendRedirect("#getExtensionURL($extensionId $extensionVersion {'extensionSection': 'progress'})")
   #end
 #end
 
@@ -583,8 +583,12 @@
   #end
 #end
 
-#macro (getExtensionURL $extensionId $extensionVersion)
+#macro (getExtensionURL $extensionId $extensionVersion $extraParams)
 #set ($parameters = {})
+##
+#if ($extraParams)
+  #set ($discard = $parameters.putAll($extraParams))
+#end
 ##
 #if ($extensionId)
 #set ($discard = $parameters.put('extensionId', $extensionId))

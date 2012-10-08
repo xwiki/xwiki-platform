@@ -282,7 +282,9 @@
   </form>
 #end
 
-#if ($services.distribution.jobStatus.state == 'FINISHED')
+## Keep displaying the wizard after the distribution job is done if the request targets a specific extension (e.g. if you
+## follow the link to an extension dependency).
+#if ($services.distribution.jobStatus.state == 'FINISHED' && "$!request.extensionId" == '')
   #set ($redirectURL = $request.xredirect)
   #if ("$!redirectURL" == '')
     #set ($redirectURL = $xwiki.getURL($services.model.resolveDocument('', 'default')))

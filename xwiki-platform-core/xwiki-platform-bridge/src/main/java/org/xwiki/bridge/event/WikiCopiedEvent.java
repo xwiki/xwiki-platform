@@ -19,15 +19,14 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered after a wiki is deleted.
+ * An event triggered after a wiki has been copied.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 4.3M1
  */
-public class WikiDeletedEvent extends AbstractWikiEvent
+public class WikiCopiedEvent extends AbstractWikiEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -36,31 +35,58 @@ public class WikiDeletedEvent extends AbstractWikiEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * Matches all {@link WikiDeletedEvent} events.
+     * The wiki where the documents have been copied.
      */
-    public WikiDeletedEvent()
+    private String targetWikiId;
+
+    /**
+     * Matches all {@link WikiCopiedEvent} events.
+     */
+    public WikiCopiedEvent()
     {
 
     }
 
     /**
-     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only events affecting the same wiki.
+     * Matches events affecting the same wikis.
      * 
-     * @param wikiId the wiki identifier
+     * @param sourceWikiId the source wiki identifier
+     * @param targetWikiId the target wiki identifier
      */
-    public WikiDeletedEvent(String wikiId)
+    public WikiCopiedEvent(String sourceWikiId, String targetWikiId)
     {
-        super(wikiId);
+        super(sourceWikiId);
+
+        this.targetWikiId = targetWikiId;
+    }
+
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        boolean matches = super.matches(otherEvent);
+
+        if (matches) {
+            WikiCopiedEvent wikiCopiedEvent = (WikiCopiedEvent) otherEvent;
+
+            matches = getTargetWikiId() == null || getTargetWikiId().equals(wikiCopiedEvent.getTargetWikiId());
+        }
+
+        return matches;
     }
 
     /**
-     * Constructor using a custom {@link EventFilter}.
-     * 
-     * @param eventFilter the filter to use for matching events
+     * @return the source wiki identifier
      */
-    public WikiDeletedEvent(EventFilter eventFilter)
+    public String getSourceWikiId()
     {
-        super(eventFilter);
+        return getWikiId();
+    }
+
+    /**
+     * @return the target wiki identifier
+     */
+    public String getTargetWikiId()
+    {
+        return this.targetWikiId;
     }
 }

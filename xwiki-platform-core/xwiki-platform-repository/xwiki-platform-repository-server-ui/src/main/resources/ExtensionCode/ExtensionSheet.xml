@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1312816151000</creationDate>
-  <date>1340030506000</date>
-  <contentUpdateDate>1340030506000</contentUpdateDate>
+  <date>1349706717000</date>
+  <contentUpdateDate>1349706717000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
   <template/>
@@ -228,17 +228,26 @@
       ##------- Features --------
       #set($features = $doc.getValue("features"))
       #if ($features &amp;&amp; $features.size() &gt; 0)
-        |(% class="label" %)Features(%%)|#foreach($feature in $features)#if($velocityCount &gt; 1), #end${feature}#end
+        |(% class="label" %)Features(%%)|#if($features.size() &gt; 1)
+          (((
+            #foreach($feature in $features)
+              * ${feature}
+            #end
+          )))
+          #elseif ($features.size() == 1)
+            $features.get(0)
+          #else
 
+          #end
       #end
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')
         |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
-                                          [[{{{$website.substring(0, 40)...}}}&gt;&gt;url:$website]]
-                                        #else
-                                          $website
-                                        #end
+            [[{{{$website.substring(0, 40)...}}}&gt;&gt;url:$website]]
+          #else
+            $website
+          #end
       #end
       ##------- License --------
       #set($licenseName = $doc.getValue("licenseName"))
@@ -392,6 +401,7 @@
         = Dependencies =
 
          #foreach($extensionDependency in $extensionDependencies)
+          #set($dependencyDocumentName = $null)
           #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
           #if (!$dependencyDocumentNames.isEmpty())
             #set($dependencyDocumentName = $dependencyDocumentNames.get(0))

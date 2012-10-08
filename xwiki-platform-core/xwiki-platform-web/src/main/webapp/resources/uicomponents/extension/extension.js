@@ -424,8 +424,8 @@ XWiki.ExtensionBehaviour = Class.create({
    * are loaded asynchronously because they use the 'get' action (specific to AJAX requests) instead of the 'view' or
    * 'admin' action (depending whether the extension is displayed alone or in the administration section).
    */
-  _fixExtensionLinks : function() {
-    this.container.select("a.extension-link").each(function (link) {
+  _fixExtensionLinks : function(container) {
+    (container || this.container).select("a.extension-link").each(function (link) {
       var queryString = link.getAttribute('href').replace(/.*\?/, '');
       link.setAttribute('href', XWiki.currentDocument.getURL(XWiki.contextaction, queryString));
     });
@@ -482,20 +482,26 @@ XWiki.ExtensionBehaviour = Class.create({
       return;
     }
 
+    // Prepare the data for the AJAX call.
+    var form = this.container.down('.extension-actions');
+    var formData = new Hash(form.serialize({submit: false}));
+    formData.unset('extensionVersion');
+
     var dependency = dependencies[index];
-    var section = this.container.down('input[name="section"]');
-    new Ajax.Request(this._getServiceURL(section && section.value), {
-      parameters : {
-        extensionId: dependency.down('.extension-name').innerHTML,
-        extensionVersionConstraint: dependency.down('.extension-version').innerHTML
-      },
+    formData.set('extensionId', dependency.down('.extension-name').innerHTML);
+    formData.set('extensionVersionConstraint', dependency.down('.extension-version').innerHTML);
+
+    new Ajax.Request(this._getServiceURL(formData.get('section')), {
+      parameters : formData,
       onCreate : function() {
         dependency.removeClassName('extension-item-unknown').addClassName('extension-item-loading');
       },
       onSuccess : function(response) {
         // Update the dependency if it's still attached to the document.
         if (dependency.up('html')) {
-          dependency.insert({before: response.responseText}).remove();
+          dependency.insert({before: response.responseText});
+          this._fixExtensionLinks(dependency.previous());
+          dependency.remove();
           this._resolveUnknownDependency(dependencies, index + 1);
         }
       }.bind(this),

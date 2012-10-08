@@ -78,6 +78,7 @@
 
 .extension-summary {
   font-size: .9em;
+  margin-top: .5em;
   white-space: pre-wrap;
   word-wrap: break-word;
 }

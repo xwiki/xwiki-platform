@@ -99,10 +99,8 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Stats.Macros" /}}
-{{velocity}}
+      <content>{{velocity}}
 #panelheader($msg.get('xe.statistics.current.month.caps'))
-
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #if (not $chartWidth)
@@ -127,7 +125,7 @@
                 range:B2-C.;
                 dataset:timetable_xy;
                 date_format:${pattern};
-                time_period:week;
+                time_period:day;
                 domain_axis_type:date;
                 domain_axis_lower:${dtf.print($monthStart)};
                 domain_axis_upper:${dtf.print($monthEnd)}" /}}&lt;/div&gt;
@@ -135,7 +133,6 @@
   #printStatisticsDisabled()
 #end
 {{/html}}
-
 #panelfooter()
 {{/velocity}}</content>
     </property>
@@ -149,5 +146,6 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content>{{include document="Stats.Macros" /}}
+{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

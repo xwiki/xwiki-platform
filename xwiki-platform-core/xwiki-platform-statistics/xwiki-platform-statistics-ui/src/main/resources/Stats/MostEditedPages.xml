@@ -99,10 +99,8 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Stats.Macros" /}}
-{{velocity}}
+      <content>{{velocity}}
 #panelheader($msg.get('xe.statistics.pages.mostedited'))
-
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($scope = $xwiki.criteriaService.scopeFactory.ALL_PAGES)
@@ -118,7 +116,6 @@
   #printStatisticsDisabled()
 #end
 {{/html}}
-
 #panelfooter()
 {{/velocity}}</content>
     </property>
@@ -132,5 +129,6 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet" /}}</content>
+  <content>{{include document="Stats.Macros" /}}
+{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

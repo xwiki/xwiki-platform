@@ -26,23 +26,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering-macros</artifactId>
+    <artifactId>xwiki-platform-rendering</artifactId>
     <version>4.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rendering-macro-context</artifactId>
-  <name>XWiki Platform - Rendering - Macro - Context</name>
-  <description>XWiki Platform - Rendering - Macro - Context</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-transformation-macro</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-rendering-transformations</artifactId>
+  <name>XWiki Platform - Rendering - Transformations - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Transformations implementations depending on the XWiki Platform</description>
+  <modules>
+    <module>xwiki-platform-rendering-transformation-macro</module>
+  </modules>
 </project>

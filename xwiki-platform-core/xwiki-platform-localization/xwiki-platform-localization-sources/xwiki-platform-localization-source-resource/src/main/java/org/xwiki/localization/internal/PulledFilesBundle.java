@@ -36,6 +36,7 @@ import org.xwiki.localization.Bundle;
  * <code>$l10n.use("resource", "ModuleResources")</code>
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 @Component("resource")
 public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundle, Initializable

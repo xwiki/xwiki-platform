@@ -19,47 +19,41 @@
  */
 package org.xwiki.localization.internal;
 
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Bundle;
+import org.xwiki.localization.BundleContext;
+import org.xwiki.localization.BundleDoesNotExistsException;
+import org.xwiki.localization.BundleFactory;
+import org.xwiki.localization.BundleFactoryDoesNotExistsException;
 import org.xwiki.localization.LocalizationManager;
-import org.xwiki.localization.WikiInformation;
+import org.xwiki.localization.Translation;
 
 /**
  * Default implementation of the {@link LocalizationManager} component.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 @Component
-public class DefaultLocalizationManager implements LocalizationManager, Initializable
+public class DefaultLocalizationManager implements LocalizationManager
 {
-    /**
-     * Provides access to wiki localization information.
-     */
-    @Inject
-    private WikiInformation wikiInfo;
-
     /**
      * Provides access to different bundles based on their hint. Needed in {@link #use(String, String)}.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
 
-    /**
-     * The list of {@link Bundle}s to use.
-     */
-    @Inject
-    private List<Bundle> bundles;
+    private BundleContext bundleContext;
 
     /**
      * The logger to log.
@@ -68,54 +62,32 @@ public class DefaultLocalizationManager implements LocalizationManager, Initiali
     private Logger logger;
 
     @Override
-    public String get(String key)
+    public Translation getTranslation(String key, Locale locale)
     {
-        return get(key, this.wikiInfo.getContextLanguage());
-    }
-
-    @Override
-    public String get(String key, String language)
-    {
-        String result = key;
-        for (Bundle bundle : this.bundles) {
-            result = bundle.getTranslation(key, language);
-            if (!result.equals(key)) {
-                break;
+        for (Bundle bundle : this.bundleContext.getBundles()) {
+            Translation translation = bundle.getTranslation(key, locale);
+            if (translation != null) {
+                return translation;
             }
         }
-        return result;
+
+        return null;
     }
 
     @Override
-    public String get(String key, List< ? > params)
+    public void use(String bundleType, String bundleId) throws BundleDoesNotExistsException,
+        BundleFactoryDoesNotExistsException
     {
-        return get(key, params, this.wikiInfo.getContextLanguage());
-    }
-
-    @Override
-    public String get(String key, List< ? > params, String language)
-    {
-        String translation = get(key, language);
-        if (params != null) {
-            translation = MessageFormat.format(translation, params.toArray());
-        }
-        return translation;
-    }
-
-    @Override
-    public void use(String bundleTypeHint, String bundleLocation)
-    {
+        BundleFactory bundleFactory;
         try {
-            Bundle bundle = (Bundle) this.componentManager.getInstance(Bundle.class, bundleTypeHint);
-            bundle.use(bundleLocation);
+            bundleFactory = this.componentManager.get().getInstance(BundleFactory.class, bundleType);
         } catch (ComponentLookupException e) {
-            this.logger.warn("Unknown bundle type: {0}", bundleTypeHint);
+            throw new BundleFactoryDoesNotExistsException(String.format("Failed to lookup BundleFactory for type [%s]",
+                bundleType), e);
         }
-    }
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        Collections.sort(this.bundles);
+        Bundle bundle = bundleFactory.getBundle(bundleId);
+
+        this.bundleContext.addBundle(bundle);
     }
 }

@@ -23,21 +23,15 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.xwiki.localization.Bundle;
-import org.xwiki.localization.WikiInformation;
 
 /**
  * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 public abstract class AbstractBundle implements Bundle
 {
-    /**
-     * Provides access to wiki localization information.
-     */
-    @Inject
-    protected WikiInformation wikiInfo;
-
     /**
      * The logger to log.
      */
@@ -45,36 +39,32 @@ public abstract class AbstractBundle implements Bundle
     protected Logger logger;
 
     /**
-     * @see #setPriority(int)
+     * @see #getId()
+     */
+    private String id;
+
+    /**
+     * @see #getPriority()
      * @see #compareTo(Bundle)
-     * @see Bundle#getPriority()
      */
     private int priority;
+
+    public AbstractBundle(String id, int priority)
+    {
+        this.id = id;
+        this.priority = priority;
+    }
+
+    @Override
+    public String getId()
+    {
+        return this.id;
+    }
 
     @Override
     public int getPriority()
     {
         return this.priority;
-    }
-
-    /**
-     * @param priority the Bundle priority, when searching for a translation. Lower is better.
-     */
-    public void setPriority(int priority)
-    {
-        this.priority = priority;
-    }
-
-    @Override
-    public String getTranslation(String key)
-    {
-        return getTranslation(key, this.wikiInfo.getContextLanguage());
-    }
-
-    @Override
-    public void use(String bundleLocation)
-    {
-        // Do nothing, as by default bundles don't accept pulling.
     }
 
     /**
@@ -86,11 +76,13 @@ public abstract class AbstractBundle implements Bundle
      *         a positive number otherwise.
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
+    @Override
     public int compareTo(Bundle otherBundle)
     {
         if (getPriority() != otherBundle.getPriority()) {
             return getPriority() - otherBundle.getPriority();
         }
-        return this.getClass().getSimpleName().compareTo(otherBundle.getClass().getSimpleName());
+
+        return getClass().getSimpleName().compareTo(otherBundle.getClass().getSimpleName());
     }
 }

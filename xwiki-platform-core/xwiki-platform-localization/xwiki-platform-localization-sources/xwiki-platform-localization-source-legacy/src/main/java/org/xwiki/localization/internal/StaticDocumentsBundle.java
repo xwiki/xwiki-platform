@@ -41,6 +41,7 @@ import org.xwiki.observation.event.Event;
  * calls that would be needed if each document would be stored in its own Properties object.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 @Component("staticDocuments")
 public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable

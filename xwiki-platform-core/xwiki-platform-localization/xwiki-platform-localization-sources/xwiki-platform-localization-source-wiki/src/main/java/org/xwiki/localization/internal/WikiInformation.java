@@ -17,19 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization;
+package org.xwiki.localization.internal;
 
 import java.util.Locale;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Provides helper methods used by the {@link LocalizationManager} and {@link Bundle}s, such as extracting the current
  * language and current wiki name from the execution context.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
-@ComponentRole
+@Role
 public interface WikiInformation
 {
     /**

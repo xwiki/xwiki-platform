@@ -34,6 +34,7 @@ import org.xwiki.localization.Bundle;
  * would be needed if each resource would be stored in its own Properties object.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 @Component("staticResources")
 public class StaticFilesBundle extends AbstractFilesystemBundle implements Bundle, Initializable

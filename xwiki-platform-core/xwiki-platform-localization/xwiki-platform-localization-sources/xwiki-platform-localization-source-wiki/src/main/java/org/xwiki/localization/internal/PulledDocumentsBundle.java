@@ -43,6 +43,7 @@ import org.xwiki.observation.event.filter.RegexEventFilter;
  * <code>$l10n.use("document", "Space.Name")</code>
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 @Component("document")
 public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable

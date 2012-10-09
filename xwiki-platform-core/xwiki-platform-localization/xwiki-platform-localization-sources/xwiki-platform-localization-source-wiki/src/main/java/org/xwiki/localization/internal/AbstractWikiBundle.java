@@ -37,7 +37,6 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.localization.Bundle;
-import org.xwiki.localization.WikiInformation;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -49,6 +48,7 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
  * documents, watching loaded documents and invalidating cached translations.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 public abstract class AbstractWikiBundle extends AbstractBundle implements Bundle, EventListener
 {

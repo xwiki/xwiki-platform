@@ -36,6 +36,7 @@ import org.xwiki.localization.WikiInformation;
  * to access information the current request, and the {@link DocumentAccessBridge} to access the wiki configuration.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 @Component
 public class DefaultWikiInformation implements WikiInformation

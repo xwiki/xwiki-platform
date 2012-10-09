@@ -34,6 +34,7 @@ import org.xwiki.localization.Bundle;
  * such resources.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
 public abstract class AbstractFilesystemBundle extends AbstractBundle implements Bundle
 {

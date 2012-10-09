@@ -19,16 +19,24 @@
  */
 package org.xwiki.localization;
 
-import org.xwiki.component.annotation.ComponentRole;
+import java.util.Locale;
+
+import org.xwiki.component.annotation.Role;
 
 /**
  * A collection of translation properties.
  * 
  * @version $Id$
+ * @since 4.3M1
  */
-@ComponentRole
+@Role
 public interface Bundle extends Comparable<Bundle>
 {
+    /**
+     * @return the unique identifier of the bundle
+     */
+    String getId();
+
     /**
      * When searching for a translation, the bundles are searched in order until one of these bundles contains a value
      * for the searched key. The bundle priority defines this order. Lower is better, meaning that a bundle with a
@@ -40,32 +48,11 @@ public interface Bundle extends Comparable<Bundle>
     int getPriority();
 
     /**
-     * Return the translation for the given key, in the current language.
-     * 
-     * @param key The key to translate.
-     * @return If a translation is defined for this key, return it as a <code>String</code>. Otherwise, return the key
-     *         unchanged.
-     * @see #getTranslation(String, String)
-     */
-    String getTranslation(String key);
-
-    /**
      * Return the translation for the given key, in the specified language.
      * 
-     * @param key The key to translate.
-     * @param language The language to translate into.
-     * @return If a translation is defined for this key, return it as a <code>String</code>. Otherwise, return the key
-     *         unchanged.
-     * @see #getTranslation(String, String)
+     * @param key the key to translate.
+     * @param language the language to translate into.
+     * @return the {@link Translation} or null if none can be found.
      */
-    String getTranslation(String key, String language);
-
-    /**
-     * Some bundle types allow the client to add additional bundle locations at runtime. Generally, the given location
-     * is registered in the current execution context, and is unregistered after the execution ends,
-     * 
-     * @param bundleLocation The location to use. Depending on the type of bundle, this could be a location on the
-     *            filesystem, or the name of a <tt>.properties</tt> resource, or the name of a wiki document, etc.
-     */
-    void use(String bundleLocation);
+    Translation getTranslation(String key, Locale language);
 }

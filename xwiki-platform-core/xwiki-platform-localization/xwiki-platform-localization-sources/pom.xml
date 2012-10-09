@@ -26,18 +26,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-localization</artifactId>
     <version>4.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-localization</artifactId>
-  <name>XWiki Platform - Localization - Parent POM</name>
+  <artifactId>xwiki-platform-localization-sources</artifactId>
+  <name>XWiki Platform - Localization - Sources Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Localization - Parent POM</description>
+  <description>XWiki Platform - Localization - Sources Parent POM</description>
   <modules>
-    <module>xwiki-platform-localization-api</module>
-    <module>xwiki-platform-localization-sources</module>
-    <module>xwiki-platform-localization-macro</module>
-    <module>xwiki-platform-localization-script</module>
+    <module>xwiki-platform-localization-source-resource</module>
+    <module>xwiki-platform-localization-source-wiki</module>
+    <module>xwiki-platform-localization-source-legacy</module>
   </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>
 

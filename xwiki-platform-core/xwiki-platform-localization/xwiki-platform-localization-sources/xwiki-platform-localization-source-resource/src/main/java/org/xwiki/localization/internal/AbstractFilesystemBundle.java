@@ -38,12 +38,9 @@ import org.xwiki.localization.Bundle;
 public abstract class AbstractFilesystemBundle extends AbstractBundle implements Bundle
 {
     /**
-     * <p>
      * Cached properties corresponding to resources loaded from filesystem files.
-     * </p>
      * <p>
      * Map: (filename -&gt; map: (language -&gt; bundle)).
-     * </p>
      */
     protected Map<String, Map<String, Properties>> fileBundles = new HashMap<String, Map<String, Properties>>();
 
@@ -69,6 +66,7 @@ public abstract class AbstractFilesystemBundle extends AbstractBundle implements
 
             Properties result = loadFileBundle(fileName, language);
             this.fileBundles.get(fileName).put(language, result);
+
             return result;
         }
     }
@@ -94,10 +92,11 @@ public abstract class AbstractFilesystemBundle extends AbstractBundle implements
                 String key = keys.nextElement();
                 props.setProperty(key, bundle.getString(key));
             }
+
             // ResourceBundles already have inherited properties included.
             return props;
         } catch (MissingResourceException ex) {
-            getLogger().warn("Invalid file bundle used: [{0}]", fileName);
+            this.logger.warn("Invalid file bundle used: [{0}]", fileName);
         }
         return new Properties();
     }

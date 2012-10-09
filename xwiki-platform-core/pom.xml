@@ -311,6 +311,7 @@
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>

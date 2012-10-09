@@ -24,16 +24,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.WikiInformation;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.RegexEventFilter;
 
@@ -46,11 +47,15 @@ import org.xwiki.observation.event.filter.RegexEventFilter;
 @Component("document")
 public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable
 {
-    /** The key used for placing the list of pulled document bundles in the current execution context. */
+    /**
+     * The key used for placing the list of pulled document bundles in the current execution context.
+     */
     public static final String PULLED_CONTEXT_KEY = PulledDocumentsBundle.class.getName() + "_bundles";
 
-    /** Provides access to the request context. */
-    @Requirement
+    /**
+     * Provides access to the request context.
+     */
+    @Inject
     protected Execution execution;
 
     /**
@@ -61,20 +66,17 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
      * 
      * @see Initializable#initialize()
      */
+    @Override
     public void initialize() throws InitializationException
     {
         // Set the Bundle priority
         setPriority(100);
-        
-        this.observation.addListener(new DocumentUpdateEvent(new RegexEventFilter(".+:"
+
+        this.observation.addListener(new DocumentUpdatedEvent(new RegexEventFilter(".+:"
             + WikiInformation.PREFERENCES_DOCUMENT_NAME)), this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#getTranslation(String, String)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public String getTranslation(String key, String language)
     {
@@ -94,7 +96,7 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
                             break;
                         }
                     } catch (Exception ex) {
-                        getLogger().warn("Cannot load document bundle: [{0}]", documentName);
+                        this.logger.warn("Cannot load document bundle: [{0}]", documentName);
                     }
                 }
             }
@@ -102,11 +104,6 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
         return translation;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Bundle#use(String)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public void use(String bundleLocation)

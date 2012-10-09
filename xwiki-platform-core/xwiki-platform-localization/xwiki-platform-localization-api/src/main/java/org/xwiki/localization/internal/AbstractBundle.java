@@ -19,8 +19,9 @@
  */
 package org.xwiki.localization.internal;
 
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.WikiInformation;
 
@@ -29,11 +30,19 @@ import org.xwiki.localization.WikiInformation;
  * 
  * @version $Id$
  */
-public abstract class AbstractBundle extends AbstractLogEnabled implements Bundle
+public abstract class AbstractBundle implements Bundle
 {
-    /** Provides access to wiki localization information. */
-    @Requirement
+    /**
+     * Provides access to wiki localization information.
+     */
+    @Inject
     protected WikiInformation wikiInfo;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    protected Logger logger;
 
     /**
      * @see #setPriority(int)
@@ -55,7 +64,7 @@ public abstract class AbstractBundle extends AbstractLogEnabled implements Bundl
     {
         this.priority = priority;
     }
-    
+
     @Override
     public String getTranslation(String key)
     {

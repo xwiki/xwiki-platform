@@ -23,14 +23,14 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.phase.LogEnabled;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.WikiInformation;
@@ -41,24 +41,31 @@ import org.xwiki.localization.WikiInformation;
  * @version $Id$
  */
 @Component
-public class DefaultLocalizationManager extends AbstractLogEnabled implements LocalizationManager, Initializable,
-    LogEnabled
+public class DefaultLocalizationManager implements LocalizationManager, Initializable
 {
-    /** 
+    /**
      * Provides access to wiki localization information.
      */
-    @Requirement
+    @Inject
     private WikiInformation wikiInfo;
 
-    /** Provides access to different bundles based on their hint. Needed in {@link #use(String, String)} */
-    @Requirement
+    /**
+     * Provides access to different bundles based on their hint. Needed in {@link #use(String, String)}.
+     */
+    @Inject
     private ComponentManager componentManager;
 
-    /** 
+    /**
      * The list of {@link Bundle}s to use.
      */
-    @Requirement
+    @Inject
     private List<Bundle> bundles;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     @Override
     public String get(String key)
@@ -99,10 +106,10 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
     public void use(String bundleTypeHint, String bundleLocation)
     {
         try {
-            Bundle bundle = (Bundle) this.componentManager.lookup(Bundle.class, bundleTypeHint);
+            Bundle bundle = (Bundle) this.componentManager.getInstance(Bundle.class, bundleTypeHint);
             bundle.use(bundleLocation);
         } catch (ComponentLookupException e) {
-            getLogger().warn("Unknown bundle type: {0}", bundleTypeHint);
+            this.logger.warn("Unknown bundle type: {0}", bundleTypeHint);
         }
     }
 

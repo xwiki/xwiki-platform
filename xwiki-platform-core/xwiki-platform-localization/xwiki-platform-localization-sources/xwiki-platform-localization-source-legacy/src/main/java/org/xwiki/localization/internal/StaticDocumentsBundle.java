@@ -45,29 +45,28 @@ import org.xwiki.observation.event.Event;
 @Component("staticDocuments")
 public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable
 {
-    /** The name of the property containing the list of global document bundles. */
+    /**
+     * The name of the property containing the list of global document bundles.
+     */
     private static final String DOCUMENT_BUNDLE_PROPERTY = "documentBundles";
 
-    /** String to use when joining the list of document names. */
+    /**
+     * String to use when joining the list of document names.
+     */
     private static final String JOIN_SEPARATOR = ",";
 
     /**
-     * <p>
      * Cached bundles corresponding to all the documents globally registered in the wiki preferences. For each wiki, for
      * each language, only one {@link Properties} object is created, since this needs less memory than keeping one
      * object per document, and this list is not supposed to change very often. This trades an increased initial
      * overhead for a better performance afterwards.
-     * </p>
      * <p>
      * Map: (wiki name -&gt; map: (language -&gt; bundle)).
-     * </p>
      */
     private Map<String, Map<String, Properties>> staticBundles = new HashMap<String, Map<String, Properties>>();
 
     /**
-     * <p>
      * Cache storing the previously seen list of document bundles for each wiki.
-     * </p>
      * <p>
      * Map: (wiki name -&gt; array of document names).
      * </p>
@@ -91,7 +90,7 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 translation = props.getProperty(key);
             }
         } catch (Exception e) {
-            getLogger().info("Unhandled exception while translating: {0}", e.getMessage());
+            this.logger.info("Unhandled exception while translating: {0}", e.getMessage());
         }
         return translation;
     }
@@ -100,7 +99,6 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
      * {@inheritDoc}
      * <p>
      * If the configured list of global bundles was changed, invalidate the whole wiki bundle.
-     * </p>
      * 
      * @see EventListener#onEvent(Event, Object, Object)
      * @see AbstractWikiBundle#onEvent(Event, Object, Object)
@@ -182,7 +180,7 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 }
                 properties.putAll(getDocumentBundle(fullDocumentName, language));
             } catch (Exception ex) {
-                getLogger().warn("Exception loading document bundle [{0}]", fullDocumentName);
+                this.logger.warn("Exception loading document bundle [{0}]", fullDocumentName);
             }
         }
         // Also watch the preferences for this wiki, in case the list of documents is changed.
@@ -215,9 +213,10 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
                     result = bundles.split("[,|]\\s*");
                 }
             } catch (Exception ex) {
-                getLogger().warn("Cannot access a wiki setting", ex);
+                this.logger.warn("Cannot access a wiki setting", ex);
             }
             this.staticBundleNames.put(wiki, result);
+
             return result;
         }
     }

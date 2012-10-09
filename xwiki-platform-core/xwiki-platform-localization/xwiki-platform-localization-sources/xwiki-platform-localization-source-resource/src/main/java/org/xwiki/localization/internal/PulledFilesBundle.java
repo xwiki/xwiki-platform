@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -43,7 +44,7 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
     public static final String PULLED_CONTEXT_KEY = PulledFilesBundle.class.getName() + "_bundles";
 
     /** Provides access to the request context. */
-    @Requirement
+    @Inject
     protected Execution execution;
 
     @Override
@@ -76,7 +77,7 @@ public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundl
                             break;
                         }
                     } catch (Exception e) {
-                        getLogger().warn("Cannot load resource bundle: [{0}]", fileName);
+                        this.logger.warn("Cannot load resource bundle: [{0}]", fileName);
                     }
                 }
             }

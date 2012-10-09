@@ -22,11 +22,12 @@ package org.xwiki.localization.internal;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.localization.WikiInformation;
 
@@ -37,7 +38,7 @@ import org.xwiki.localization.WikiInformation;
  * @version $Id$
  */
 @Component
-public class DefaultWikiInformation extends AbstractLogEnabled implements WikiInformation
+public class DefaultWikiInformation implements WikiInformation
 {
     /** The default wiki name to use when the context does not define one. */
     private static final String DEFAULT_WIKI = "xwiki";
@@ -56,16 +57,28 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
      */
     private static final String XWIKICONTEXT_KEY = "xwikicontext";
 
-    /** The key used for placing the configured locale in the current execution context. */
+    /**
+     * The key used for placing the configured locale in the current execution context.
+     */
     private static final String LOCALE_CONTEXT_KEY = "locale";
 
-    /** Provides access to the request context. */
-    @Requirement
+    /**
+     * Provides access to the request context.
+     */
+    @Inject
     private Execution execution;
 
-    /** Provides access to documents. */
-    @Requirement
+    /**
+     * Provides access to documents.
+     */
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     @Override
     public String getDefaultWikiLanguage()
@@ -80,8 +93,9 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
             return StringUtils.defaultIfEmpty(this.documentAccessBridge.getProperty(wiki + ":"
                 + PREFERENCES_DOCUMENT_NAME, PREFERENCES_CLASS_NAME, DEFAULT_LANGUAGE_PROPERTY_NAME), DEFAULT_LANGUAGE);
         } catch (Exception ex) {
-            getLogger().warn("Error getting the default language of the wiki [{0}]", ex, wiki);
+            this.logger.warn("Error getting the default language of the wiki [{0}]", ex, wiki);
         }
+
         return DEFAULT_LANGUAGE;
     }
 
@@ -91,11 +105,7 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
         return getContextLocale().getLanguage();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiInformation#getContextLocale()
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public Locale getContextLocale()
     {
@@ -106,16 +116,12 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
                 return (Locale) xcontext.get(LOCALE_CONTEXT_KEY);
             }
         } catch (Exception ex) {
-            getLogger().warn("Error getting the current locale", ex);
+            this.logger.warn("Error getting the current locale", ex);
         }
         return new Locale(getDefaultWikiLanguage());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiInformation#getCurrentWikiName()
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public String getCurrentWikiName()
     {
@@ -124,7 +130,7 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
                 (Map<Object, Object>) this.execution.getContext().getProperty(XWIKICONTEXT_KEY);
             return StringUtils.defaultIfEmpty((String) xcontext.get("wikiName"), DEFAULT_WIKI);
         } catch (Exception ex) {
-            getLogger().warn("Error getting the current wiki name", ex);
+            this.logger.warn("Error getting the current wiki name", ex);
             return DEFAULT_WIKI;
         }
     }

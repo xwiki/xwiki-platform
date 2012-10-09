@@ -28,17 +28,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.WikiInformation;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.observation.event.filter.FixedNameEventFilter;
@@ -51,18 +52,26 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
  */
 public abstract class AbstractWikiBundle extends AbstractBundle implements Bundle, EventListener
 {
-    /** The encoding used for storing unicode characters as bytes. */
+    /**
+     * The encoding used for storing unicode characters as bytes.
+     */
     protected static final String UNICODE_BYTE_ENCODING = "UTF-8";
 
-    /** The encoding assumed by the ResourceBundle loader. */
+    /**
+     * The encoding assumed by the ResourceBundle loader.
+     */
     protected static final String DEFAULT_RESOURCE_BYTE_ENCODING = "ISO-8859-1";
 
-    /** Allows to register for receiving notifications about document changes. */
-    @Requirement
+    /**
+     * Allows to register for receiving notifications about document changes.
+     */
+    @Inject
     protected ObservationManager observation;
 
-    /** Provides access to documents. */
-    @Requirement
+    /**
+     * Provides access to documents.
+     */
+    @Inject
     protected DocumentAccessBridge documentAccessBridge;
 
     /**
@@ -71,9 +80,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
     protected Map<String, String> defaultWikiLanguage = new HashMap<String, String>();
 
     /**
-     * <p>
      * Cached properties corresponding to resources loaded from wiki documents.
-     * </p>
      * <p>
      * Map: (document name -&gt; map: (language -&gt; properties)). The document name is always prefixed with the wiki
      * name.
@@ -106,6 +113,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
             Properties result = loadDocumentBundle(documentName, language);
             this.documentBundles.get(documentName).put(language, result);
             watchDocument(documentName);
+
             return result;
         }
     }
@@ -131,6 +139,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
         } else {
             wiki = this.wikiInfo.getCurrentWikiName();
         }
+
         return loadDocumentBundle(wiki, documentName, language);
     }
 
@@ -151,6 +160,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
     protected Properties loadDocumentBundle(String wiki, String documentName, String language) throws Exception
     {
         Properties properties = new Properties();
+
         String defaultContent =
             this.documentAccessBridge.getDocumentContent(documentName, this.wikiInfo.getDefaultWikiLanguage());
         loadPropertiesFromString(properties, defaultContent, documentName);
@@ -158,15 +168,15 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
             String content = this.documentAccessBridge.getDocumentContent(documentName, language);
             loadPropertiesFromString(properties, content, documentName);
         }
+
         watchDocument(documentName);
+
         return properties;
     }
 
     /**
-     * <p>
      * Loads the translations defined in a document into an existing {@link Properties} object. Old values from the
      * passed Properties are overwritten when translations are found in the document content.
-     * </p>
      * <p>
      * Since the Properties {@link Properties#load(InputStream) load} method always assumes the stream contains only
      * ISO-8859-1 characters, we need to embed somehow Unicode characters outside the 8859-1 encoding into the input
@@ -175,7 +185,6 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
      * we must re-split and re-combine each property back into the UTF-8 encoding. Although this is time consuming, the
      * alternative is to re-implement the Properties class so that it accepts a proper character input stream. And
      * besides, resources are supposed to be loaded only once in real live wikis.
-     * </p>
      * 
      * @param props The {@link Properties} object to enhance. It is modified inside the method body.
      * @param content The content from which to load translations.
@@ -192,7 +201,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
             bcontent = content.getBytes(UNICODE_BYTE_ENCODING);
         } catch (UnsupportedEncodingException ex) {
             // This should not happen, ever! If it does, there is something wrong in the system.
-            getLogger().error("Error splitting a document resource bundle into bytes using the UTF-8 encoding", ex);
+            this.logger.error("Error splitting a document resource bundle into bytes using the UTF-8 encoding", ex);
             bcontent = content.getBytes();
         }
         InputStream is = new ByteArrayInputStream(bcontent);
@@ -206,8 +215,9 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
             }
         } catch (IOException ex) {
             // Cannot do anything more
-            getLogger().error("Invalid document resource bundle: [{0}]", ex, documentName);
+            this.logger.error("Invalid document resource bundle: [{0}]", ex, documentName);
         }
+
         return props;
     }
 
@@ -257,9 +267,9 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
     {
         // addListener ignores duplicates, so it is safe to add a listener many times.
         EventFilter filter = new FixedNameEventFilter(documentName);
-        this.observation.addListener(new DocumentUpdateEvent(filter), this);
-        this.observation.addListener(new DocumentSaveEvent(filter), this);
-        this.observation.addListener(new DocumentDeleteEvent(filter), this);
+        this.observation.addListener(new DocumentUpdatedEvent(filter), this);
+        this.observation.addListener(new DocumentCreatedEvent(filter), this);
+        this.observation.addListener(new DocumentDeletedEvent(filter), this);
     }
 
     /**
@@ -270,6 +280,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
      * 
      * @see EventListener#onEvent(Event, Object, Object)
      */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         // - if doc is a cached bundle
@@ -284,6 +295,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
             // need to invalidate the cached properties.
             return;
         }
+
         String docName = doc.getWikiName() + ":" + doc.getFullName();
         synchronized (this.documentBundles) {
             if (this.documentBundles.containsKey(docName)) {

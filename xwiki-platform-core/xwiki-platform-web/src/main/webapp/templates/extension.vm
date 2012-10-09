@@ -195,10 +195,10 @@
           #if ($foreach.hasNext), #end
         #end
       </li>
-      #if ($extension.repository.id.URI && $extension.repository.id.URI.scheme != 'file')
+      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
         <li>
           $msg.get('extensions.info.repository')
-          <a href="$extension.repository.id.URI">$escapetool.xml($extension.repository.id.id)</a>
+          <a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a>
         </li>
       #end
       #if ($extension.dependency)
@@ -854,7 +854,7 @@ Caused by: #printThrowable($throwable.cause true)
   #if ($jobStatus && $jobStatus.state != 'FINISHED')
     #set ($status = 'loading')
   #else
-    #set ($status = $extension.repository.id.id)
+    #set ($status = $extension.repository.descriptor.id)
     #if ($status == 'installed')
       ## Determine if the extension is still valid.
       #if ("$!extension.isValid($extensionNamespace)" == 'false')
@@ -868,7 +868,7 @@ Caused by: #printThrowable($throwable.cause true)
         #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
       #end
       #if ($currentVersion)
-        #set ($repoId = $currentVersion.repository.id.id)
+        #set ($repoId = $currentVersion.repository.descriptor.id)
         #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
         #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
       #else

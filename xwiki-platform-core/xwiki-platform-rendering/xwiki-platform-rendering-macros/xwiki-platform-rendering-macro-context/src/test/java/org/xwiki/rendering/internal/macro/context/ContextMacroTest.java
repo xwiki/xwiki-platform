@@ -35,8 +35,10 @@ import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.Macro;
@@ -188,6 +190,41 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
 
         // Note: we're not testing the returned value since we don't need to and is tested by the unit tests for both
         // the Macro Content Parser and the XDOM Resource Reference Resolver.
-        this.macro.execute(parameters, "[[]]", macroContext);
+        this.macro.execute(parameters, "", macroContext);
+    }
+
+    @Test
+    public void executeWhenBaseMetaDataInXDOM() throws Exception
+    {
+        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metaData = new MetaData(
+            Collections.<String, Object> singletonMap(MetaData.BASE, "basewiki:basespace.basepage"));
+        new XDOM(Arrays.<Block>asList(new MetaDataBlock(Arrays.<Block>asList(macroBlock), metaData)));
+
+        final MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
+
+        final DocumentReferenceResolver<String> drr =
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
+        final DocumentReference docReference = new DocumentReference("basewiki", "basespace", "page");
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(drr).resolve("page", macroBlock);
+            will(returnValue(docReference));
+            // First call to hasProgrammingRights is for the current document
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(false));
+            oneOf(dab).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
+            oneOf(dab).popDocumentFromContext(with(any(Map.class)));
+            // Second call is for the passed document
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(false));
+        }});
+
+        ContextMacroParameters parameters = new ContextMacroParameters();
+        parameters.setDocument("page");
+
+        this.macro.execute(parameters, "", macroContext);
     }
 }

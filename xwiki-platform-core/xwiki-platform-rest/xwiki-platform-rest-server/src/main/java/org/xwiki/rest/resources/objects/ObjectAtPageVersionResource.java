@@ -19,9 +19,11 @@
  */
 package org.xwiki.rest.resources.objects;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -45,7 +47,8 @@ public class ObjectAtPageVersionResource extends XWikiResource
     @GET
     public Object getObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("version") String version,
-        @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber)
+        @PathParam("className") String className, @PathParam("objectNumber") Integer objectNumber,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyName)
         throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
@@ -65,7 +68,7 @@ public class ObjectAtPageVersionResource extends XWikiResource
         }
 
         return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-            .getXWikiContext(componentManager), doc, baseObject, true);
+            .getXWikiContext(componentManager), doc, baseObject, true, Utils.getXWikiApi(componentManager), withPrettyName);
     }
 
 }

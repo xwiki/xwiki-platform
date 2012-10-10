@@ -88,7 +88,7 @@ public class AttachmentHistoryResource extends XWikiResource
 
             attachments.getAttachments().add(
                 DomainObjectFactory.createAttachmentAtVersion(objectFactory, uriInfo.getBaseUri(),
-                    xwikiAttachmentAtVersion, attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl));
+                    xwikiAttachmentAtVersion, attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager), false));
         }
 
         return attachments;

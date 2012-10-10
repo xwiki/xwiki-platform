@@ -51,7 +51,8 @@ public class ModificationsResource extends XWikiResource
     public History getModifications(@PathParam("wikiName") String wikiName,
         @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("25") Integer number,
-        @QueryParam("order") @DefaultValue("desc") String order, @QueryParam("date") @DefaultValue("0") Long ts)
+        @QueryParam("order") @DefaultValue("desc") String order, @QueryParam("date") @DefaultValue("0") Long ts,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -89,7 +90,8 @@ public class ModificationsResource extends XWikiResource
 
                 HistorySummary historySummary =
                     DomainObjectFactory.createHistorySummary(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName,
-                        pageName, language, nodeId.getVersion(), modifier, modified);
+                        pageName, language, nodeId.getVersion(), modifier, modified, Utils
+                        .getXWikiApi(componentManager), withPrettyNames);
 
                 history.getHistorySummaries().add(historySummary);
             }

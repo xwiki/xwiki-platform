@@ -105,6 +105,9 @@
           <element name="title" type="string"></element>
           <element name="parent" type="string"></element>
           <element name="parentId" type="string"></element>
+          <element name="version" type="string"></element>
+          <element name="author" type="string"></element>
+          <element name="authorName" type="string"></element>
           <element name="xwikiRelativeUrl" type="string"></element>
           <element name="xwikiAbsoluteUrl" type="string"></element>
           <element name="translations" type="xwiki:Translations"></element>
@@ -119,13 +122,14 @@
       <extension base="xwiki:PageSummary">
         <sequence>
           <element name="language" type="string"></element>
-          <element name="version" type="string"></element>
           <element name="majorVersion" type="int"></element>
           <element name="minorVersion" type="int"></element>
           <element name="created" type="dateTime"></element>
           <element name="creator" type="string"></element>
+          <element name="creatorName" type="string"></element>
           <element name="modified" type="dateTime"></element>
           <element name="modifier" type="string"></element>
+          <element name="modifierName" type="string"></element>
           <element name="content" type="string"></element>
         </sequence>
       </extension>
@@ -145,6 +149,7 @@
           <element name="minorVersion" type="int"></element>
           <element name="modified" type="dateTime"></element>
           <element name="modifier" type="string"></element>
+          <element name="modifierName" type="string"></element>
           <element name="language" type="string"></element>
         </sequence>
       </extension>
@@ -163,6 +168,7 @@
           <element name="pageVersion" type="string"></element>
           <element name="mimeType" type="string"></element>
           <element name="author" type="string"></element>
+          <element name="authorName" type="string"></element>
           <element name="date" type="dateTime"></element>
           <element name="xwikiRelativeUrl" type="string"></element>
           <element name="xwikiAbsoluteUrl" type="string"></element>
@@ -178,6 +184,7 @@
           <element name="id" type="int"></element>
           <element name="pageId" type="string"></element>
           <element name="author" type="string"></element>
+          <element name="authorName" type="string"></element>
           <element name="date" type="dateTime"></element>
           <element name="highlight" type="string"></element>
           <element name="text" type="string"></element>
@@ -194,9 +201,12 @@
           <element name="id" type="string"></element>
           <element name="guid" type="string"></element>
           <element name="pageId" type="string"></element>
+          <element name="pageVersion" type="string"></element>
           <element name="wiki" type="string"></element>
           <element name="space" type="string"></element>
           <element name="pageName" type="string"></element>
+          <element name="pageAuthor" type="string"></element>
+          <element name="pageAuthorName" type="string"></element>
           <element name="className" type="string"></element>
           <element name="number" type="int"></element>
           <element name="headline" type="string"></element>
@@ -443,13 +453,21 @@
           <element name="type" type="string"></element>
           <element name="id" type="string"></element>
           <element name="pageFullName" type="string"></element>
+          <element name="title" type="string"></element>
           <element name="wiki" type="string"></element>
           <element name="space" type="string"></element>
           <element name="pageName" type="string"></element>
+          <element name="modified" type="dateTime"></element>
+          <element name="author" type="string"></element>
+          <element name="authorName" type="string"></element>
+          <element name="version" type="string"></element>
           <element name="language" type="string"></element>
           <element name="className" type="string" minOccurs="0"></element>
           <element name="objectNumber" type="int" minOccurs="0"></element>
-        </sequence>
+          <element name="filename" type="string" minOccurs="0"></element>
+          <element name="score" type="float" minOccurs="0"></element>
+          <element name="object" type="xwiki:Object" minOccurs="0"></element>
+	  </sequence>
       </extension>
     </complexContent>
   </complexType>

@@ -42,7 +42,9 @@ public class WikiSearchResource extends BaseSearchResult
 {
     @GET
     public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String keywords,
-        @QueryParam("scope") List<String> searchScopeStrings, @QueryParam("number") @DefaultValue("-1") Integer number)
+        @QueryParam("scope") List<String> searchScopeStrings, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("order") @DefaultValue("") String order, 
+        @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames)
         throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
@@ -56,7 +58,7 @@ public class WikiSearchResource extends BaseSearchResult
 
         searchResults.getSearchResults().addAll(
             search(searchScopes, keywords, wikiName, null, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number));
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, order, withPrettyNames));
 
         return searchResults;
     }

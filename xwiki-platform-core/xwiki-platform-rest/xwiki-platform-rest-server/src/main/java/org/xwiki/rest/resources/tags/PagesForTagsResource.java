@@ -46,7 +46,8 @@ public class PagesForTagsResource extends XWikiResource
 {
     @GET
     public Pages getTags(@PathParam("wikiName") String wikiName, @PathParam("tagNames") String tagNames,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
         throws XWikiException, QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -78,7 +79,7 @@ public class PagesForTagsResource extends XWikiResource
                 if (doc != null) {
                     pages.getPageSummaries().add(
                         DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, Utils
-                            .getXWikiApi(componentManager)));
+                            .getXWikiApi(componentManager), withPrettyNames));
                 }
             }
 

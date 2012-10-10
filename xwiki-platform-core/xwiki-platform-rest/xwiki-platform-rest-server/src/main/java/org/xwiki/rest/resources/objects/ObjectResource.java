@@ -20,10 +20,12 @@
 package org.xwiki.rest.resources.objects;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -47,7 +49,8 @@ public class ObjectResource extends BaseObjectsResource
     @GET
     public Object getObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @PathParam("className") String className,
-        @PathParam("objectNumber") Integer objectNumber) throws XWikiException
+        @PathParam("objectNumber") Integer objectNumber,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
@@ -59,7 +62,7 @@ public class ObjectResource extends BaseObjectsResource
         }
 
         return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-            .getXWikiContext(componentManager), doc, baseObject, false);
+            .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
     }
 
     @PUT
@@ -91,7 +94,7 @@ public class ObjectResource extends BaseObjectsResource
 
         return Response.status(Status.ACCEPTED).entity(
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                .getXWikiContext(componentManager), doc, baseObject, false)).build();
+                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), false)).build();
     }
 
     @DELETE

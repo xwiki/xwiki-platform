@@ -82,6 +82,11 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-lucene</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
       <artifactId>jaxb2-fluent-api</artifactId>
       <version>3.0</version>
@@ -163,6 +168,7 @@
             org/xwiki/rest/resources/wikis/WikiAttachmentsResource.java,
             org/xwiki/rest/resources/wikis/WikiPagesResource.java,
             org/xwiki/rest/resources/wikis/WikiSearchResource.java,
+            org/xwiki/rest/resources/wikis/WikiSearchQueryResource.java,
             org/xwiki/rest/resources/wikis/WikisResource.java,
             org/xwiki/rest/Utils.java,
             org/xwiki/rest/XWikiAuthentication.java,

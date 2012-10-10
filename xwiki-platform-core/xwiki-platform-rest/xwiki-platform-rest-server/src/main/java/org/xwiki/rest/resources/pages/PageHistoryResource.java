@@ -51,7 +51,8 @@ public class PageHistoryResource extends XWikiResource
     public History getPageHistory(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("order") @DefaultValue("desc") String order) throws QueryException
+        @QueryParam("order") @DefaultValue("desc") String order,
+        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws QueryException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -82,7 +83,8 @@ public class PageHistoryResource extends XWikiResource
 
                 HistorySummary historySummary =
                     DomainObjectFactory.createHistorySummary(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName,
-                        pageName, null, nodeId.getVersion(), modifier, modified);
+                        pageName, null, nodeId.getVersion(), modifier, modified, Utils
+                        .getXWikiApi(componentManager), withPrettyNames);
 
                 history.getHistorySummaries().add(historySummary);
             }

@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources.spaces;
-
-import java.util.List;
+package org.xwiki.rest.resources.wikis;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -36,26 +34,29 @@ import org.xwiki.rest.resources.BaseSearchResult;
 
 import com.xpn.xwiki.XWikiException;
 
-@Component("org.xwiki.rest.resources.spaces.SpaceSearchResource")
-@Path("/wikis/{wikiName}/spaces/{spaceName}/search")
-public class SpaceSearchResource extends BaseSearchResult
+@Component("org.xwiki.rest.resources.wikis.WikiSearchQueryResource")
+@Path("/wikis/{wikiName}/query")
+public class WikiSearchQueryResource extends BaseSearchResult
 {
     @GET
-    public SearchResults search(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
-        @QueryParam("q") String keywords, @QueryParam("scope") List<String> searchScopeStrings,
-        @QueryParam("number") @DefaultValue("-1") Integer number,@QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("order") String order, @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames) throws QueryException, XWikiException
+    public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String query,
+        @QueryParam("type") String queryType, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("start") @DefaultValue("1") Integer start, @QueryParam("distinct") @DefaultValue("1") Integer distinct, 
+        @QueryParam("wikis") String searchWikis, @QueryParam("order") @DefaultValue("") String order,
+        @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames,
+        @QueryParam("classname") @DefaultValue("") String className)
+        throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
         searchResults.setTemplate(String.format("%s?%s",
-            UriBuilder.fromUri(uriInfo.getBaseUri()).path(SpaceSearchResource.class).build(wikiName, spaceName)
-                .toString(), SEARCH_TEMPLATE_INFO));
+            UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchQueryResource.class).build(wikiName).toString(),
+            QUERY_TEMPLATE_INFO));
 
-        List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
+        Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
         searchResults.getSearchResults().addAll(
-            search(searchScopes, keywords, wikiName, spaceName, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, order, withPrettyNames));
+            searchQuery(query, queryType, wikiName, searchWikis, Utils.getXWiki(componentManager).getRightService()
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), order, (distinct == 1), number, start, withPrettyNames, className));
 
         return searchResults;
     }

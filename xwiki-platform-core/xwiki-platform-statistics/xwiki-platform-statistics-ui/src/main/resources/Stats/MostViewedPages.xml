@@ -130,5 +130,6 @@
     </property>
   </object>
   <content>{{include document="Stats.Macros" /}}
+
 {{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

@@ -47,12 +47,12 @@ import org.xwiki.rendering.internal.macro.chart.source.LocaleConfiguration;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Dataset builder that builds a time table dataset from a table data source.
+ * A builder of time table xy datasets ({@see TimeTableXYDataset}) from table data sources.
  *
  * @version $Id$
  * @since 4.2M1
  */
-public class TableTimeTableXYBuilder implements TableDatasetBuilder
+public class TableTimeTableXYDatasetBuilder implements TableDatasetBuilder
 {
     /**
      * The name of the time period type parameter.

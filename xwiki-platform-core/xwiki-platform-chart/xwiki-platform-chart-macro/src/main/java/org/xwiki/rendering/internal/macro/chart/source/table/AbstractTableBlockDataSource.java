@@ -43,7 +43,14 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * Class for representing values extracted from a table block.
+ * Data source that extracts values from a table (in any syntax that supports tables).  For example in xwiki/2.1 syntax:
+ *
+ * <p/>
+ * <code><pre>
+ * |=           |= column label 1 |= column label 2  
+ * | row label 1| 11              |  12
+ * | row label 2| 21              |  22
+ * </pre></code>
  *
  * @version $Id$
  * @since 4.2M1
@@ -144,7 +151,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
                 datasetBuilder = new TablePieDatasetBuilder();
                 break;
             case TIMETABLE_XY:
-                datasetBuilder = new TableTimeTableXYBuilder();
+                datasetBuilder = new TableTimeTableXYDatasetBuilder();
                 break;
             default:
                 throw new MacroExecutionException(String.format("Unsupported dataset type [%s]",

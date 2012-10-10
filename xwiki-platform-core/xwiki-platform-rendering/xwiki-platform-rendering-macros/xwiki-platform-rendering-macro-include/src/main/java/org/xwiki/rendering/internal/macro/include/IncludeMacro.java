@@ -39,7 +39,6 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -69,11 +68,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Used to transform the passed document reference macro parameter to a typed {@link DocumentReference} object.
+     * Used to transform the passed document reference macro parameter into a typed {@link DocumentReference} object.
      */
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    @Named("macro")
+    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
@@ -224,36 +223,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 reference = parentMacro.getParameter("document");
             }
 
-            return documentReference.equals(resolve(parentMacro, reference));
+            return documentReference.equals(this.macroDocumentReferenceResolver.resolve(reference, parentMacro));
         }
 
         return false;
-    }
-
-    /**
-     * Convert document name into proper {@link DocumentReference}.
-     * 
-     * @param block the block from which to look for a MetaData Block containing the Source
-     * @param documentName the document reference passed by the user to the macro
-     * @return the resolved absolute document reference
-     */
-    private DocumentReference resolve(Block block, String documentName)
-    {
-        DocumentReference result;
-
-        MetaDataBlock metaDataBlock = block.getFirstBlock(new MetadataBlockMatcher(MetaData.BASE), Block.Axes.ANCESTOR);
-
-        // If no Source MetaData was found resolve against the current document as a failsafe solution.
-        if (metaDataBlock == null) {
-            result = this.currentDocumentReferenceResolver.resolve(documentName);
-        } else {
-            String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.BASE);
-            result =
-                this.currentDocumentReferenceResolver.resolve(documentName,
-                    this.currentDocumentReferenceResolver.resolve(sourceMetaData));
-        }
-
-        return result;
     }
 
     private DocumentReference resolve(MacroBlock block, IncludeMacroParameters parameters)
@@ -266,6 +239,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 "You must specify a 'reference' parameter pointing to the entity to include.");
         }
 
-        return resolve(block, reference);
+        return this.macroDocumentReferenceResolver.resolve(reference, block);
     }
 }

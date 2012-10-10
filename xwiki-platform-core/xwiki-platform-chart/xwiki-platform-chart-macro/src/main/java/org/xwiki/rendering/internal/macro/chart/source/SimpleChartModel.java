@@ -27,7 +27,7 @@ import org.jfree.data.general.Dataset;
 import org.xwiki.chart.model.ChartModel;
 
 /**
- * Internal implementation of chart model.
+ * A chart model implementation that simply holds a dataset and axis configurations.
  *
  * @version $Id$
  * @since 4.2M1

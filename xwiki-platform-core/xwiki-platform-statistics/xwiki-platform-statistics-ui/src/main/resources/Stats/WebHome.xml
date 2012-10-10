@@ -21,16 +21,18 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>#if ($xwiki.statsService.enabledForCurrentWiki)
+  <content>{{velocity}}
+{{html wiki="true"}}
+#if ($xwiki.statsService.enabledForCurrentWiki)
 #set ($chartWidth = 380)
 #displayPanelLayout(2 ['Stats.MostViewedPages', 'Stats.MostActiveContributors', 'Stats.CurrentMonthActivity', 'Stats.MostReferredPages'])
 $msg.get('xe.statistics.more')
-* [$msg.get('xe.statistics.document')&gt;Stats.Document]
-* [$msg.get('xe.statistics.visit')&gt;Stats.Visit]
-* [$msg.get('xe.statistics.activity')&gt;Stats.Activity]
-* [$msg.get('xe.statistics.referrer')&gt;Stats.Referrer]
+* [[$msg.get('xe.statistics.document')&gt;&gt;Stats.Document]]
+* [[$msg.get('xe.statistics.visit')&gt;&gt;Stats.Visit]]
+* [[$msg.get('xe.statistics.activity')&gt;&gt;Stats.Activity]]
+* [[$msg.get('xe.statistics.referrer')&gt;&gt;Stats.Referrer]]
 #else
 #warning($msg.get('xe.statistics.module.disabled'))
 
@@ -42,5 +44,7 @@ $msg.get('xe.statistics.module.activating')
 * $msg.get('xe.statistics.contributors.mostactive')
 * $msg.get('xe.statistics.pages.mostreferred')
 * $msg.get('xe.statistics.module.muchmore')
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

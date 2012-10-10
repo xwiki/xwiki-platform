@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <object>
     <class>
@@ -99,7 +99,9 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get('xe.statistics.current.week.caps'))
+      <content>{{velocity}}
+#panelheader($msg.get('xe.statistics.current.week.caps'))
+{{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #if (not $chartWidth)
     #set ($chartWidth = 250)
@@ -112,12 +114,27 @@
   #set ($weekStart = $!xwiki.jodatime.getDateTime($currentWeek.start))
   #set ($weekEnd = $!xwiki.jodatime.getDateTime($currentWeek.end))
   #set ($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern($pattern))
-  &lt;div style="text-align:center;"&gt;{chart:type=time|source=type:table;doc:Stats.ActivityData;table_number:0;ignore_alpha:true|date_format=type:custom;pattern:$pattern|height=$chartHeight|width=$chartWidth|domain_axis_date_format_override=type:custom;pattern:MMM dd|domain_axis_lower_date=value:$dtf.print($weekStart);type:custom;pattern:$pattern|domain_axis_upper_date=value:$dtf.print($weekEnd);type:custom;pattern:$pattern|domain_axis_date_tick_unit=unit:day;count:1|domain_axis_tick_mark_position:ende|title=${msg.get('xe.statistics.current.week.caps')}}&lt;/div&gt;
+  &lt;div style="text-align:center;"&gt;{{chart
+        type="xy_line_and_shape"
+        source="xdom"
+        height="$chartHeight"
+        width="$chartWidth"
+        title="${msg.get('xe.statistics.current.week.caps')}"
+        params="document:Stats.ActivityData;
+                table:table_statistics_current_week;
+                range:B2-C.;
+                dataset:timetable_xy;
+                date_format:${pattern};
+                time_period:day;
+                domain_axis_type:date;
+                domain_axis_lower:${dtf.print($weekStart)};
+                domain_axis_upper:${dtf.print($weekEnd)}" /}}&lt;/div&gt;
 #else
   #printStatisticsDisabled()
 #end
+{{/html}}
 #panelfooter()
-#includeMacros("Stats.Macros")</content>
+{{/velocity}}</content>
     </property>
     <property>
       <description>Displays the activity during the current week</description>
@@ -129,5 +146,6 @@
       <type>view</type>
     </property>
   </object>
-  <content>#includeForm("Panels.PanelSheet")</content>
+  <content>{{include document="Stats.Macros" /}}
+{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

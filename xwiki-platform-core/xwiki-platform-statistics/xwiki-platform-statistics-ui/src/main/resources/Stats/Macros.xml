@@ -21,9 +21,10 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>#macro(printPageStats $stats)
+  <content>{{velocity}}
+#macro(printPageStats $stats)
 $!xwiki.ssx.use('Stats.Style')
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
@@ -113,5 +114,6 @@ $!xwiki.ssx.use('Stats.Style')
 #macro(printStatisticsDisabled)
 #set($statsHome = "[$msg.get('xe.statistics.homepage')&gt;Stats.WebHome].")
 #warning($msg.get('xe.statistics.disabled', [$statsHome]))
-#end</content>
+#end
+{{/velocity}}</content>
 </xwikidoc>

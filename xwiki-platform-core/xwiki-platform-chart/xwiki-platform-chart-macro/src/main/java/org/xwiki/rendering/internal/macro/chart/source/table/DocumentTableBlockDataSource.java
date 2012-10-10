@@ -48,7 +48,7 @@ import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_
  * A data source that allows building charts from {@link XDOM} sources.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
 @Component
 @Named("xdom")

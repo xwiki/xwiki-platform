@@ -79,8 +79,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
      * Used to transform document links into absolute references.
      */
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    @Named("macro")
+    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -110,7 +110,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 + "set in the context as the current document.");
         }
 
-        DocumentReference docReference = this.currentDocumentReferenceResolver.resolve(parameters.getDocument());
+        DocumentReference docReference = this.macroDocumentReferenceResolver.resolve(parameters.getDocument(),
+            context.getCurrentMacroBlock());
 
         boolean currentContextHasProgrammingRights = this.documentAccessBridge.hasProgrammingRights();
 

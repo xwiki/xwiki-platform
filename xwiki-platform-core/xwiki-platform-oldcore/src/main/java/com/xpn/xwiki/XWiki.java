@@ -89,6 +89,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
+import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
@@ -4273,7 +4274,15 @@ public class XWiki implements EventListener
     public int copyWiki(String sourceWiki, String targetWiki, String language, boolean clean, XWikiContext context)
         throws XWikiException
     {
-        return copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
+        int documents = copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
+
+        ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+
+        if (om != null) {
+            om.notify(new WikiCopiedEvent(sourceWiki, targetWiki), sourceWiki, context);
+        }
+
+        return documents;
     }
 
     public String getEncoding()

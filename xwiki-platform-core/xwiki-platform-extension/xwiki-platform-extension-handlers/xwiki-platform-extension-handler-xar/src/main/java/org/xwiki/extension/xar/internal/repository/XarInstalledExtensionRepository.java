@@ -48,7 +48,7 @@ import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.AbstractExtensionRepository;
-import org.xwiki.extension.repository.ExtensionRepositoryId;
+import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -96,7 +96,8 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     @Override
     public void initialize() throws InitializationException
     {
-        setId(new ExtensionRepositoryId(XarExtensionHandler.TYPE, XarExtensionHandler.TYPE, this.installedRepository.getId().getURI()));
+        setDescriptor(new DefaultExtensionRepositoryDescriptor(XarExtensionHandler.TYPE, XarExtensionHandler.TYPE,
+            this.installedRepository.getDescriptor().getURI()));
 
         loadExtensions();
 
@@ -276,8 +277,8 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(id, namespace)
-            : null;
+        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(
+            id, namespace) : null;
     }
 
     @Override
@@ -286,7 +287,8 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(extensionId) : null;
+        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository
+            .getBackwardDependencies(extensionId) : null;
     }
 
     @Override

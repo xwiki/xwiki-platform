@@ -179,7 +179,7 @@
 #end
 ##
 #if ($jobStatus)
-#set ($selected = $jobStatus.state != 'FINISHED')
+#set ($selected = $jobStatus.state != 'FINISHED' || $request.extensionSection == 'progress')
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
 </ul>
@@ -195,10 +195,10 @@
           #if ($foreach.hasNext), #end
         #end
       </li>
-      #if ($extension.repository.id.URI && $extension.repository.id.URI.scheme != 'file')
+      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
         <li>
           $msg.get('extensions.info.repository')
-          <a href="$extension.repository.id.URI">$escapetool.xml($extension.repository.id.id)</a>
+          <a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a>
         </li>
       #end
       #if ($extension.dependency)
@@ -207,7 +207,7 @@
       #if ("$!{extension.webSite}" != '')
         <li>
           $msg.get('extensions.info.website')
-          <a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/]++)/?.*+$', '$1'))</a>
+          <a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a>
         </li>
       #end
       #if ($extension.features.size() > 0)
@@ -515,7 +515,7 @@
     #end
   #else
     ## Redirect to extension display.
-    $response.sendRedirect("#getExtensionURL()")
+    $response.sendRedirect("#getExtensionURL($extensionId $extensionVersion {'extensionSection': 'progress'})")
   #end
 #end
 
@@ -583,8 +583,12 @@
   #end
 #end
 
-#macro (getExtensionURL $extensionId $extensionVersion)
+#macro (getExtensionURL $extensionId $extensionVersion $extraParams)
 #set ($parameters = {})
+##
+#if ($extraParams)
+  #set ($discard = $parameters.putAll($extraParams))
+#end
 ##
 #if ($extensionId)
 #set ($discard = $parameters.put('extensionId', $extensionId))
@@ -850,7 +854,7 @@ Caused by: #printThrowable($throwable.cause true)
   #if ($jobStatus && $jobStatus.state != 'FINISHED')
     #set ($status = 'loading')
   #else
-    #set ($status = $extension.repository.id.id)
+    #set ($status = $extension.repository.descriptor.id)
     #if ($status == 'installed')
       ## Determine if the extension is still valid.
       #if ("$!extension.isValid($extensionNamespace)" == 'false')
@@ -864,7 +868,7 @@ Caused by: #printThrowable($throwable.cause true)
         #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
       #end
       #if ($currentVersion)
-        #set ($repoId = $currentVersion.repository.id.id)
+        #set ($repoId = $currentVersion.repository.descriptor.id)
         #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
         #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
       #else

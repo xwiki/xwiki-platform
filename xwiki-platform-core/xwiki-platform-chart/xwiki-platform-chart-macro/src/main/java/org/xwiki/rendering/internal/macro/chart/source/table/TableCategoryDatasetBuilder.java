@@ -29,7 +29,7 @@ import org.xwiki.rendering.internal.macro.chart.source.LocaleConfiguration;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * A table dataset builder for building category datasets.
+ * A builder of category datasets ({@see org.jfree.data.category.CategoryDataset}) from table data sources.
  *
  * @version $Id$
  * @since 4.2M1

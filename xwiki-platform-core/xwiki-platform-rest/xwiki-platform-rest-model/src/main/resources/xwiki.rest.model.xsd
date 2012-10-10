@@ -457,6 +457,7 @@
           <element name="wiki" type="string"></element>
           <element name="space" type="string"></element>
           <element name="pageName" type="string"></element>
+          <element name="modified" type="dateTime"></element>
           <element name="author" type="string"></element>
           <element name="authorName" type="string"></element>
           <element name="version" type="string"></element>

@@ -43,8 +43,8 @@ public class WikiSearchResource extends BaseSearchResult
     @GET
     public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String keywords,
         @QueryParam("scope") List<String> searchScopeStrings, @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("order") String order, 
-        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames)
+        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("order") @DefaultValue("") String order, 
+        @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames)
         throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();

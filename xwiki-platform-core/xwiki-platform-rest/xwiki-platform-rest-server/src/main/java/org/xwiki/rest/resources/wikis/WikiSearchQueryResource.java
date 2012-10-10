@@ -41,9 +41,9 @@ public class WikiSearchQueryResource extends BaseSearchResult
     @GET
     public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String query,
         @QueryParam("type") String queryType, @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("distinct") @DefaultValue("1") Integer distinct, 
-        @QueryParam("wikis") String searchWikis, @QueryParam("order") String order,
-        @QueryParam("prettynames") @DefaultValue("0") Boolean withPrettyNames,
+        @QueryParam("start") @DefaultValue("1") Integer start, @QueryParam("distinct") @DefaultValue("1") Integer distinct, 
+        @QueryParam("wikis") String searchWikis, @QueryParam("order") @DefaultValue("") String order,
+        @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames,
         @QueryParam("classname") @DefaultValue("") String className)
         throws QueryException, XWikiException
     {

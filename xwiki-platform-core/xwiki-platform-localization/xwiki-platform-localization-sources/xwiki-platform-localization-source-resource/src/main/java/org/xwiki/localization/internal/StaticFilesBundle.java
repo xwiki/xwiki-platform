@@ -37,7 +37,7 @@ import org.xwiki.localization.Bundle;
  * @since 4.3M1
  */
 @Component("staticResources")
-public class StaticFilesBundle extends AbstractFilesystemBundle implements Bundle, Initializable
+public class StaticFilesBundle extends AbstractResourceBundle implements Bundle, Initializable
 {
     /**
      * <p>

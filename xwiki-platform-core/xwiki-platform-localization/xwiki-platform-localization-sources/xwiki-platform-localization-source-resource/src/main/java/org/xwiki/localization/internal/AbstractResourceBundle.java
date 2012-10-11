@@ -36,14 +36,23 @@ import org.xwiki.localization.Bundle;
  * @version $Id$
  * @since 4.3M1
  */
-public abstract class AbstractFilesystemBundle extends AbstractBundle implements Bundle
+public abstract class AbstractResourceBundle extends AbstractBundle implements Bundle
 {
-    /**
-     * Cached properties corresponding to resources loaded from filesystem files.
-     * <p>
-     * Map: (filename -&gt; map: (language -&gt; bundle)).
-     */
-    protected Map<String, Map<String, Properties>> fileBundles = new HashMap<String, Map<String, Properties>>();
+    public final static String ID_PREFIX = "resource:";
+
+    private String baseName;
+
+    public AbstractResourceBundle(String baseName, String id, int priority)
+    {
+        super(ID_PREFIX + baseName, priority);
+
+        this.baseName = baseName;
+    }
+
+    public String getBaseName()
+    {
+        return this.baseName;
+    }
 
     /**
      * Gets the translations corresponding to a given {@link ResourceBundle resource bundle}. If these properties are

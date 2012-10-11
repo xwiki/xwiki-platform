@@ -19,10 +19,16 @@
  */
 package org.xwiki.localization.internal;
 
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.localization.Bundle;
+import org.xwiki.localization.Translation;
 
 /**
  * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>.
@@ -32,6 +38,21 @@ import org.xwiki.localization.Bundle;
  */
 public abstract class AbstractBundle implements Bundle
 {
+    public static final Bundle EMPTY = new AbstractBundle(null)
+    {
+        @Override
+        public Translation getTranslation(String key, Locale locale)
+        {
+            return null;
+        };
+
+        @Override
+        protected LocaleBundle createBundle(Locale locale)
+        {
+            return LocaleBundle.EMPTY;
+        }
+    };
+
     /**
      * The logger to log.
      */
@@ -47,7 +68,17 @@ public abstract class AbstractBundle implements Bundle
      * @see #getPriority()
      * @see #compareTo(Bundle)
      */
-    private int priority;
+    private int priority = 1000;
+
+    /**
+     * The bundle cache.
+     */
+    protected Map<String, LocaleBundle> bundleCache = new ConcurrentHashMap<String, LocaleBundle>();
+
+    public AbstractBundle(String id)
+    {
+        this.id = id;
+    }
 
     public AbstractBundle(String id, int priority)
     {
@@ -66,6 +97,69 @@ public abstract class AbstractBundle implements Bundle
     {
         return this.priority;
     }
+
+    private Locale getParentLocale(Locale locale)
+    {
+        String language = locale.getLanguage();
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
+
+        if (StringUtils.isEmpty(language)) {
+            return null;
+        }
+
+        if (StringUtils.isEmpty(country)) {
+            return Locale.ROOT;
+        }
+
+        if (StringUtils.isEmpty(variant)) {
+            return new Locale(language);
+        }
+
+        return new Locale(language, country);
+    }
+
+    private LocaleBundle getLocaleBundle(Locale locale)
+    {
+        LocaleBundle bundle = this.bundleCache.get(locale.toString());
+        if (bundle != null) {
+            return bundle;
+        }
+
+        bundle = createBundle(locale);
+
+        if (bundle == null) {
+            Locale parentLocale = getParentLocale(locale);
+            if (parentLocale != null) {
+                bundle = getLocaleBundle(parentLocale);
+            }
+        }
+
+        return bundle;
+    }
+
+    @Override
+    public Translation getTranslation(String key, Locale locale)
+    {
+        Translation translation;
+
+        LocaleBundle bundle = getLocaleBundle(locale);
+        if (bundle != null) {
+            translation = bundle.getTranslation(key);
+            if (translation == null) {
+                Locale parentLocale = getParentLocale(locale);
+                if (parentLocale != null) {
+                    translation = getTranslation(key, parentLocale);
+                }
+            }
+        } else {
+            translation = null;
+        }
+
+        return translation;
+    }
+
+    protected abstract LocaleBundle createBundle(Locale locale);
 
     /**
      * Compares two {@link Bundle}s according to their priority. If they have the same priority, use their class names

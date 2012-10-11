@@ -39,7 +39,7 @@ import org.xwiki.localization.Bundle;
  * @since 4.3M1
  */
 @Component("resource")
-public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundle, Initializable
+public class PulledFilesBundle extends AbstractResourceBundle implements Bundle, Initializable
 {
     /** The key used for placing the list of pulled file bundles in the current execution context. */
     public static final String PULLED_CONTEXT_KEY = PulledFilesBundle.class.getName() + "_bundles";

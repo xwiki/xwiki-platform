@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.Role;
  */
 @Role
 public interface Bundle extends Comparable<Bundle>
-{
+{   
     /**
      * @return the unique identifier of the bundle
      */
@@ -48,11 +48,12 @@ public interface Bundle extends Comparable<Bundle>
     int getPriority();
 
     /**
-     * Return the translation for the given key, in the specified language.
+     * Return the translation for the given key, in the specified {@link Locale}. If not translation for the exact
+     * Locale can be found it fallback on the language and then on the default translation if any.
      * 
      * @param key the key to translate.
-     * @param language the language to translate into.
+     * @param locale the locale to translate into.
      * @return the {@link Translation} or null if none can be found.
      */
-    Translation getTranslation(String key, Locale language);
+    Translation getTranslation(String key, Locale locale);
 }

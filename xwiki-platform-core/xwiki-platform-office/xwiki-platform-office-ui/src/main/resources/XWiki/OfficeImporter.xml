@@ -153,10 +153,14 @@
     });
   }
 
-  var init = function() {
-    $('filepath').observe('change', onFilePathChange);
-    $('filepath').form.observe('submit', onSubmit);
-    return true;
+  function init() {
+    var filePath = $('filepath');
+    if (filePath) {
+      filepath.observe('change', onFilePathChange);
+      filepath.form.observe('submit', onSubmit);
+      return true;
+    }
+    return false;
   }
 
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);

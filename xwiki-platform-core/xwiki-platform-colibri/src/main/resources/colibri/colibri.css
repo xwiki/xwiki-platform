@@ -1731,8 +1731,9 @@ h1.xwikipaneltitle {
   border-top: 1px dotted $theme.borderColor;
 }
 
-.DocumentInformation input.xhidden {
+.DocumentInformation input#xhidden {
   width: auto;
+  margin-right: 0.5em;
 }
 
 /* @group CONTAINERS GENERAL STYLING */

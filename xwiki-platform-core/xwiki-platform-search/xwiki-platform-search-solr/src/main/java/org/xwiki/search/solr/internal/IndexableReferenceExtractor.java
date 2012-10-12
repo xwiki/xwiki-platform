@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,24 +16,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.search.solr.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-query</artifactId>
-  <name>XWiki Platform - Query - Parent POM</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-query-jpql-parser</module>
-    <module>xwiki-platform-query-manager</module>
-    <module>xwiki-platform-query-xwql</module>
-    <module>xwiki-platform-query-solr</module>
-  </modules>
-</project>
+import java.util.List;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.search.solr.SolrIndexException;
+
+/**
+ * Recursively retrieves the references for all the indexable entities contained by the given start entity.
+ * 
+ * @version $Id$
+ */
+@Role
+public interface IndexableReferenceExtractor
+{
+    /**
+     * @param startReference the start entity reference.
+     * @return references for the indexable contained entities, including the given one (but only if it is indexable).
+     * @throws SolrIndexException if problems occur.
+     */
+    List<EntityReference> getReferences(EntityReference startReference) throws SolrIndexException;
+}

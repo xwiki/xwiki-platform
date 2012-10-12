@@ -1,20 +1,29 @@
 package org.xwiki.localization.internal;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.collections.map.HashedMap;
+import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 
 public class DefaultLocaleBundle implements LocaleBundle
 {
+    private Bundle bundle;
+
     private Locale locale;
 
-    private Map<String, Translation> translations = new HashedMap();
+    private Map<String, Translation> translations = new HashMap<String, Translation>();
 
-    public DefaultLocaleBundle(Locale locale)
+    public DefaultLocaleBundle(Bundle bundle, Locale locale)
     {
         this.locale = locale;
+    }
+
+    @Override
+    public Bundle getBundle()
+    {
+        return this.bundle;
     }
 
     @Override
@@ -29,4 +38,8 @@ public class DefaultLocaleBundle implements LocaleBundle
         return translations.get(key);
     }
 
+    public void addTranslation(Translation translation)
+    {
+        this.translations.put(translation.getKey(), translation);
+    }
 }

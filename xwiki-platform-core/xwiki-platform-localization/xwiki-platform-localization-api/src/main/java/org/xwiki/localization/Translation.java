@@ -19,12 +19,12 @@
  */
 package org.xwiki.localization;
 
-import java.util.Collection;
 import java.util.Locale;
 
+import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 
-public interface Translation
+public interface Translation extends TranslationMessage
 {
     /**
      * @return the bundle from which this translation comes
@@ -32,19 +32,14 @@ public interface Translation
     Bundle getBundle();
 
     /**
-     * @return the key of the translation
-     */
-    String getKey();
-
-    /**
-     * @return the raw source of the translation as it is stored
-     */
-    String getRawSource();
-
-    /**
      * @return the locale of the translation
      */
     Locale getLocale();
+
+    /**
+     * @return the key of the translation
+     */
+    String getKey();
 
     /**
      * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an
@@ -56,14 +51,4 @@ public interface Translation
      * @return the result translation
      */
     Block render(Object... parameters);
-
-    /**
-     * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an
-     * into a XDOM or to render as it is.
-     * 
-     * @param bundles the bundles to resolve variables with
-     * @param parameters the parameters
-     * @return the result translation
-     */
-    Block render(Collection<Bundle> bundles, Object... parameters);
 }

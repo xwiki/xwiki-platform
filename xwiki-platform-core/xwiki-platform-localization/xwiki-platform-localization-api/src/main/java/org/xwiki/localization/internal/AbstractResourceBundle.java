@@ -19,15 +19,18 @@
  */
 package org.xwiki.localization.internal;
 
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
+import org.apache.commons.collections.EnumerationUtils;
+
 public class AbstractResourceBundle extends AbstractBundle
 {
     public final static String ID_PREFIX = "resource:";
-
+    
     protected String baseName;
 
     protected ClassLoader classloader;
@@ -61,8 +64,21 @@ public class AbstractResourceBundle extends AbstractBundle
             bundle = null;
         }
 
-        // TODO: Convert to LocalBundle
-        LocaleBundle localeBundle;
+        // Convert to LocalBundle
+        DefaultLocaleBundle localeBundle;
+
+        if (bundle != null) {
+            localeBundle = new DefaultLocaleBundle(this, locale);
+
+            Enumeration<String> keys = bundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+
+                localeBundle.addTranslation(new DefaultTranslation(context, localeBundle, key, message));
+            }
+        } else {
+            localeBundle = null;
+        }
 
         return localeBundle;
     }

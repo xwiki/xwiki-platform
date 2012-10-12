@@ -2,12 +2,19 @@ package org.xwiki.localization.internal;
 
 import java.util.Locale;
 
+import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 
 public interface LocaleBundle
 {
     LocaleBundle EMPTY = new LocaleBundle()
     {
+        @Override
+        public Bundle getBundle()
+        {
+            return null;
+        }
+
         @Override
         public Translation getTranslation(String key)
         {
@@ -20,6 +27,8 @@ public interface LocaleBundle
             return null;
         }
     };
+
+    Bundle getBundle();
 
     Locale getLocale();
 

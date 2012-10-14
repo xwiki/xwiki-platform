@@ -19,12 +19,10 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.GrantAllController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiAction;
 import com.xpn.xwiki.web.Utils;
 
@@ -44,12 +42,6 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTION_ACTION = "distribution";
 
-    /**
-     * The reference of the superadmin user document.
-     */
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki",
-        XWikiRightService.SUPERADMIN_USER);
-
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -62,15 +54,9 @@ public class DistributionAction extends XWikiAction
                                                    DISTRIBUTION_ACTION));
         }
 
-        // Make sure to have programming rights
-        // TODO: find something nicer
-        XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getDatabase(), SUPERADMIN_REFERENCE.getLastSpaceReference()
-                .getName(), "Distribution"));
-        document.setContentAuthorReference(SUPERADMIN_REFERENCE);
-        document.setAuthorReference(SUPERADMIN_REFERENCE);
-        document.setCreatorReference(SUPERADMIN_REFERENCE);
-        context.setDoc(document);
+        // We put a grant all document at the bottom of the security stack to ensure that we get full privileges, as
+        // long as we're not rendering any document.
+        Utils.getComponent(GrantAllController.class).pushGrantAll();
 
         return true;
     }

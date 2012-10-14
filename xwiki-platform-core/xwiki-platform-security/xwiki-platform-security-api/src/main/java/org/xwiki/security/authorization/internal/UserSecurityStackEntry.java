@@ -17,23 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.DocumentReference;
 
-public class XWikiConstant
+/**
+ * This is an entry that holds an explicit user reference.
+ *
+ * @version $Id$
+ * @since 4.4RC1
+ */
+public class UserSecurityStackEntry implements SecurityStackEntry
 {
-    public static final String TAG_CLASS = "XWiki.TagClass";
-
-    public static final String TAG_CLASS_PROP_TAGS = "tags";
 
     /**
-     * The class that holds the default edit mode for a document. The object of this class can be attached either to the
-     * document itself or to an included sheet. If both are found, the one attached to the document is used.
-     * 
-     * @since 3.1M2
+     * The literal user that will be considered "content author" while this entry is at the top of the security
+     * stack.
      */
-    public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,
-        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+    private final DocumentReference userReference;
+
+    /**
+     * @param userReference {@see userReference}
+     */
+    public UserSecurityStackEntry(DocumentReference userReference)
+    {
+        this.userReference = userReference;
+    }
+
+    @Override
+    public boolean grantAll()
+    {
+        return false;
+    }
+
+    @Override
+    public DocumentReference getContentAuthor()
+    {
+        return userReference;
+    }
+
 }

@@ -40,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.ContentDocumentController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -56,11 +57,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
 {
-    /**
-     * Name of the security document property in the XWiki Context.
-     */
-    private static final String SECURITY_DOC_PROPERTY = "sdoc";
-
     /**
      * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
      */
@@ -85,6 +81,13 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
      */
     @Inject
     private QueryManager queryManager;
+
+    /**
+     * Used by executeAsUser to chage the privileges to that of the particular user.
+     */
+    @Inject
+    private ContentDocumentController contentDocumentController;
+
 
     @Override
     public XWikiDocument getDocument(DocumentReference reference) throws IRCBotException
@@ -165,20 +168,15 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     {
         XWikiContext xwikiContext = getXWikiContext();
         DocumentReference currentUserReference = xwikiContext.getUserReference();
-        XWikiDocument currentSecurityDocument = (XWikiDocument) xwikiContext.get(SECURITY_DOC_PROPERTY);
+        // Set the security document which is used to test permissions
+        contentDocumentController.pushContentDocument(getDocument(securityDocumentReference));
         try {
             // Set executing user in the XWiki Context
             xwikiContext.setUserReference(executingUserReference);
-            // Set the security document which is used to test permissions
-            xwikiContext.put(SECURITY_DOC_PROPERTY, getDocument(securityDocumentReference));
             executor.execute();
         } finally {
+            contentDocumentController.popContentDocument();
             xwikiContext.setUserReference(currentUserReference);
-            if (currentSecurityDocument != null) {
-                xwikiContext.put(SECURITY_DOC_PROPERTY, currentSecurityDocument);
-            } else {
-                xwikiContext.remove(SECURITY_DOC_PROPERTY);
-            }
         }
     }
 

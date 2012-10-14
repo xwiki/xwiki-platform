@@ -113,24 +113,12 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
         DocumentReference docReference = this.macroDocumentReferenceResolver.resolve(parameters.getDocument(),
             context.getCurrentMacroBlock());
 
-        boolean currentContextHasProgrammingRights = this.documentAccessBridge.hasProgrammingRights();
-
         List<Block> result;
         try {
             Map<String, Object> backupObjects = new HashMap<String, Object>();
+            this.documentAccessBridge.pushDocumentInContext(backupObjects, docReference);
             try {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, docReference);
-
-                // The current document is now the passed document. Check for programming rights for it. If it has
-                // programming rights then the initial current document also needs programming right, else throw an
-                // error since it would be a security breach otherwise.
-                if (this.documentAccessBridge.hasProgrammingRights() && !currentContextHasProgrammingRights) {
-                    throw new MacroExecutionException("Current document must have programming rights since the "
-                        + "context document provided [" + parameters.getDocument() + "] has programming rights.");
-                }
-
                 result = this.contentParser.parse(content, context, true, false).getChildren();
-
             } finally {
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }

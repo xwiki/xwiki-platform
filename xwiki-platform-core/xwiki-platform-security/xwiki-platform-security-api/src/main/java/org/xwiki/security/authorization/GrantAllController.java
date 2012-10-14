@@ -17,23 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki;
+package org.xwiki.security.authorization;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.component.annotation.Role;
 
-public class XWikiConstant
+/**
+ * Interface for temporarily granting all rights.
+ *
+ * Pushing a "grant all" entry will not override any subsequent security entries pushed to the stack.
+ *
+ * The grant all controller must always be used in a try-finally statement to ensure that the grant-all security stack
+ * entry is correctly popped of the stack.
+ *
+ * @version $Id$
+ * @since 4.4RC1
+ */
+@Role
+public interface GrantAllController
 {
-    public static final String TAG_CLASS = "XWiki.TagClass";
-
-    public static final String TAG_CLASS_PROP_TAGS = "tags";
+    /**
+     * Put a "grant all" entry on top of the security stack.
+     */
+    void pushGrantAll();
 
     /**
-     * The class that holds the default edit mode for a document. The object of this class can be attached either to the
-     * document itself or to an included sheet. If both are found, the one attached to the document is used.
-     * 
-     * @since 3.1M2
+     * Remove a "grant all" entry from the top of the security stack.
      */
-    public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,
-        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+    void popGrantAll();
+
 }

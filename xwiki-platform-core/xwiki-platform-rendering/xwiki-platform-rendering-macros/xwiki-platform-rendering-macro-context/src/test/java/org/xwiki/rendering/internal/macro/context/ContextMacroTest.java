@@ -85,70 +85,6 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void testExecuteWithReferencedDocumentHavingProgrammingRightsButNotCallingDocument() throws Exception
-    {
-        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
-        final DocumentReferenceResolver<String> resolver =
-            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(resolver).resolve("wiki:space.page", macroBlock);
-            will(returnValue(new DocumentReference("wiki", "space", "page")));
-            // First call to hasProgrammingRights is for the current document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
-            oneOf(dab).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
-            oneOf(dab).popDocumentFromContext(with(any(Map.class)));
-            // Second call is for the passed document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(true));
-        }});
-
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("wiki:space.page");
-
-        MacroTransformationContext macroContext = new MacroTransformationContext();
-        macroContext.setCurrentMacroBlock(macroBlock);
-        try {
-            this.macro.execute(parameters, "", macroContext);
-            Assert.fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("Current document must have programming rights since the context document provided ["
-                + "wiki:space.page] has programming rights.", expected.getMessage());
-        }
-    }
-
-    @Test
-    public void testExecuteWithReferencedDocumentHavingProgrammingRightsAndCallingDocumentToo() throws Exception
-    {
-        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
-        final MacroTransformationContext macroContext = new MacroTransformationContext();
-        macroContext.setSyntax(Syntax.XWIKI_2_0);
-        macroContext.setCurrentMacroBlock(macroBlock);
-
-        final DocumentReferenceResolver<String> drr =
-            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(drr).resolve("wiki:space.page", macroBlock);
-            will(returnValue(new DocumentReference("wiki", "space", "page")));
-            // First call to hasProgrammingRights is for the current document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(true));
-            oneOf(dab).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
-            oneOf(dab).popDocumentFromContext(with(any(Map.class)));
-            // Second call is for the passed document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(true));
-        }});
-
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("wiki:space.page");
-
-        this.macro.execute(parameters, "", macroContext);
-    }
-
-    @Test
     public void testExecute() throws Exception
     {
         final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
@@ -175,14 +111,8 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("wiki:space.page", macroBlock);
             will(returnValue(docReference));
-            // First call to hasProgrammingRights is for the current document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
             oneOf(dab).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
             oneOf(dab).popDocumentFromContext(with(any(Map.class)));
-            // Second call is for the passed document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
         }});
 
         ContextMacroParameters parameters = new ContextMacroParameters();
@@ -212,14 +142,8 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("page", macroBlock);
             will(returnValue(docReference));
-            // First call to hasProgrammingRights is for the current document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
             oneOf(dab).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
             oneOf(dab).popDocumentFromContext(with(any(Map.class)));
-            // Second call is for the passed document
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
         }});
 
         ContextMacroParameters parameters = new ContextMacroParameters();

@@ -702,17 +702,19 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         VelocityContext vcontext = velocityManager.getVelocityContext();
 
         this.xwiki.prepareDocuments(this.xwikiContext.getRequest(), this.xwikiContext, vcontext);
-        if (content.length() == 0) {
-            /*
-             * If content is not provided, then the existing content of the page is used
-             */
-            content = doc.getContent();
-        } else {
+        /*
+         * If content is not provided, then the existing content of the page is used
+         */
+        if (content.length() > 0) {
+            baseDocument.setContent(content);
             baseDocument.setAuthor(this.xwikiContext.getUser());
             baseDocument.setContentAuthor(this.xwikiContext.getUser());
+            baseDocument.setNew(false);
+            baseDocument.setContentDirty(false);
+            baseDocument.setMetaDataDirty(false);
         }
 
-        return baseDocument.getRenderedContent(content, baseDocument.getSyntaxId(), xwikiContext);
+        return baseDocument.getRenderedContent(xwikiContext);
     }
 
     /**

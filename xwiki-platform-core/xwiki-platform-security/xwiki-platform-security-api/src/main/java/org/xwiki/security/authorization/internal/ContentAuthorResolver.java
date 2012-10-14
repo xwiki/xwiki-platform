@@ -17,23 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.Role;
 
-public class XWikiConstant
+/**
+ * Bridge component for resolving content author on behalf of the AuthorizationContextFactory.
+ *
+ * @version $Id$
+ * @since 4.4RC1
+ */
+@Role
+public interface ContentAuthorResolver
 {
-    public static final String TAG_CLASS = "XWiki.TagClass";
-
-    public static final String TAG_CLASS_PROP_TAGS = "tags";
 
     /**
-     * The class that holds the default edit mode for a document. The object of this class can be attached either to the
-     * document itself or to an included sheet. If both are found, the one attached to the document is used.
+     * Resolve the content author of a document, for authorization purposes.
      * 
-     * @since 3.1M2
+     * @param document The document, which author should be resolved.
+     * @return A reference identifying the author of the document contents, if such an author can be reliably
+     * determined, and if the author have authorized that his or her privileges may be delegated.  Otherwise {@code
+     * null}.
      */
-    public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,
-        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+    DocumentReference resolveContentAuthor(DocumentModelBridge document);
+
 }

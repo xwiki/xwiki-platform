@@ -17,23 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.DocumentReference;
 
-public class XWikiConstant
+/**
+ * This is an entry that grants all rights while at the top of the security stack.
+ *
+ * @version $Id$
+ * @since 4.4RC1
+ */
+public class GrantAllSecurityStackEntry implements SecurityStackEntry
 {
-    public static final String TAG_CLASS = "XWiki.TagClass";
+    @Override
+    public boolean grantAll()
+    {
+        return true;
+    }
 
-    public static final String TAG_CLASS_PROP_TAGS = "tags";
-
-    /**
-     * The class that holds the default edit mode for a document. The object of this class can be attached either to the
-     * document itself or to an included sheet. If both are found, the one attached to the document is used.
-     * 
-     * @since 3.1M2
-     */
-    public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,
-        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+    @Override
+    public DocumentReference getContentAuthor()
+    {
+        return null;
+    }
 }

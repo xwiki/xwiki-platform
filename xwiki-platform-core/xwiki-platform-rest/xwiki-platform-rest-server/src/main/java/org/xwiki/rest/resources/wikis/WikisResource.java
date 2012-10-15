@@ -23,11 +23,14 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Wikis;
 
 import com.xpn.xwiki.XWikiException;
@@ -54,6 +57,12 @@ public class WikisResource extends XWikiResource
         for (String databaseName : databaseNames) {
             wikis.getWikis().add(DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), databaseName));
         }
+        
+        String queryUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikisSearchQueryResource.class).toString();
+        Link queryLink = objectFactory.createLink();
+        queryLink.setHref(queryUri);
+        queryLink.setRel(Relations.QUERY);
+        wikis.getLinks().add(queryLink);
 
         return wikis;
     }

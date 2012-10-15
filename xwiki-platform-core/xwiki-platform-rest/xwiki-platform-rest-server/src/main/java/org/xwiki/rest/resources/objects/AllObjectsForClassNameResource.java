@@ -64,8 +64,9 @@ public class AllObjectsForClassNameResource extends XWikiResource
 
             String query =
                 "select doc, obj from BaseObject as obj, XWikiDocument as doc where obj.name=doc.fullName and obj.className=:className";
-            if ("date".equals(order))
+            if ("date".equals(order)) {
                 query += " order by doc.date desc";
+            }
 
             List<Object> queryResult = null;
             queryResult =

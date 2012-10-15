@@ -38,6 +38,7 @@ import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
+import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
@@ -60,13 +61,14 @@ import org.slf4j.LoggerFactory;
  */
 public class BaseSearchResult extends XWikiResource
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSearchResult.class);
-
     protected static final String SEARCH_TEMPLATE_INFO =
-        "q={keywords}(&scope={content|name|title|spaces|objects)*(&number={number})(&start={start})(&order={documentfield asc,documentfield desc})(&prettynames=true)";
+        "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&order={documentfield asc,documentfield desc})(&prettynames={false|true})";
+
+    protected static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
+        "q={lucenequery}(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
 
     protected static final String QUERY_TEMPLATE_INFO =
-        "q={query}(&type={xwql,hql,lucene)(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames=true)(&wikis={wikis})(&classname={classname})";
+        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&order={lucenefield,-lucenefield, documentfield asc, documentfield desc})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
 
     protected static enum SearchScope
     {
@@ -76,12 +78,12 @@ public class BaseSearchResult extends XWikiResource
         TITLE,
         OBJECTS
     }
-    
-    protected final static class QueryType
+
+    protected static enum QueryType
     {
-        public final static String XWQL = "xwql";
-        public final static String HQL = "hql";
-        public final static String LUCENE = "lucene";
+        XWQL,
+        HQL,
+        LUCENE
     }
 
     /**
@@ -112,14 +114,16 @@ public class BaseSearchResult extends XWikiResource
 
             List<SearchResult> result = new ArrayList<SearchResult>();
 
-            result.addAll(searchPages(searchScopes, keywords, wikiName, space, hasProgrammingRights, number, start, order, withPrettyNames));
+            result.addAll(searchPages(searchScopes, keywords, wikiName, space, hasProgrammingRights, number, start,
+                order, withPrettyNames));
 
             if (searchScopes.contains(SearchScope.SPACES)) {
                 result.addAll(searchSpaces(keywords, wikiName, hasProgrammingRights, number, start));
             }
 
             if (searchScopes.contains(SearchScope.OBJECTS)) {
-                result.addAll(searchObjects(keywords, wikiName, space, hasProgrammingRights, number, start, order, withPrettyNames));
+                result.addAll(searchObjects(keywords, wikiName, space, hasProgrammingRights, number, start, order,
+                    withPrettyNames));
             }
 
             return result;
@@ -144,8 +148,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
-        String space, boolean hasProgrammingRights, int number, int start, String order, Boolean withPrettyNames) throws QueryException,
-        IllegalArgumentException, UriBuilderException, XWikiException
+        String space, boolean hasProgrammingRights, int number, int start, String order, Boolean withPrettyNames)
+        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -159,8 +163,10 @@ public class BaseSearchResult extends XWikiResource
 
             Formatter f = new Formatter();
 
-            String orderColumn = (order.indexOf(" ")==-1) ? order : order.substring(0, order.indexOf(" "));
-            String addColumn = (order.equals("")||order.equals("fullName")||order.equals("name")||order.equals("space")) ? "" : ", doc." + orderColumn;
+            String orderColumn = (order.indexOf(" ") == -1) ? order : order.substring(0, order.indexOf(" "));
+            String addColumn =
+                (order.equals("") || order.equals("fullName") || order.equals("name") || order.equals("space")) ? ""
+                    : ", doc." + orderColumn;
             if (space != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);
@@ -201,11 +207,18 @@ public class BaseSearchResult extends XWikiResource
                 return result;
             }
 
-            String sOrder = (order.equals("") ? "doc.fullName asc" : "doc." + order);
-            if (hasProgrammingRights) {
-                f.format(") order by " + sOrder);
+            String orderClause = null;
+            if (order.isEmpty()) {
+                orderClause = "doc.fullName asc";
             } else {
-                f.format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by " + sOrder);
+                orderClause = String.format("doc.%s", order);
+            }
+
+            if (hasProgrammingRights) {
+                f.format(") order by " + orderClause);
+            } else {
+                f.format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by "
+                    + orderClause);
             }
 
             String query = f.toString();
@@ -251,8 +264,10 @@ public class BaseSearchResult extends XWikiResource
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(doc.getDate());
                     searchResult.setModified(calendar);
-                    if (withPrettyNames)
+
+                    if (withPrettyNames) {
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
+                    }
 
                     String pageUri = null;
                     try {
@@ -399,8 +414,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchObjects(String keywords, String wikiName, String space,
-        boolean hasProgrammingRights, int number, int start, String order, Boolean withPrettyNames) throws QueryException, IllegalArgumentException,
-        UriBuilderException, XWikiException
+        boolean hasProgrammingRights, int number, int start, String order, Boolean withPrettyNames)
+        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -414,8 +429,10 @@ public class BaseSearchResult extends XWikiResource
 
             Formatter f = new Formatter();
 
-            String orderColumn = (order.indexOf(" ")==-1) ? order : order.substring(0, order.indexOf(" "));
-            String addColumn = (order.equals("")||order.equals("fullName")||order.equals("name")||order.equals("space")) ? "" : ", doc." + orderColumn;
+            String orderColumn = (order.indexOf(" ") == -1) ? order : order.substring(0, order.indexOf(" "));
+            String addColumn =
+                (order.equals("") || order.equals("fullName") || order.equals("name") || order.equals("space")) ? ""
+                    : ", doc." + orderColumn;
             if (space != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number");
                 f.format(addColumn);
@@ -426,11 +443,18 @@ public class BaseSearchResult extends XWikiResource
                 f.format(" from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             }
 
-            String sOrder = (order.equals("") ? "doc.fullName asc" : "doc." + order);
-            if (hasProgrammingRights) {
-                f.format(" order by " + sOrder);
+            String orderClause = null;
+            if (order.isEmpty()) {
+                orderClause = "doc.fullName asc";
             } else {
-                f.format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by " + sOrder);
+                orderClause = String.format("doc.%s", order);
+            }
+
+            if (hasProgrammingRights) {
+                f.format(" order by " + orderClause);
+            } else {
+                f.format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by "
+                    + orderClause);
             }
 
             String query = f.toString();
@@ -481,8 +505,10 @@ public class BaseSearchResult extends XWikiResource
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(doc.getDate());
                     searchResult.setModified(calendar);
-                    if (withPrettyNames)
+
+                    if (withPrettyNames) {
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
+                    }
 
                     String pageUri =
                         UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
@@ -513,8 +539,8 @@ public class BaseSearchResult extends XWikiResource
     /**
      * Search for query using xwql, hql, lucene. Limit the search only to Pages. Search for keyword
      * 
-     * @param query
-     * @param queryType
+     * @param query the query to be executed
+     * @param queryTypeString can be "xwql", "hql" or "lucene".
      * @param wikiName
      * @param wikis
      * @param hasProgrammingRights
@@ -522,17 +548,18 @@ public class BaseSearchResult extends XWikiResource
      * @param distinct
      * @param number
      * @param start
-     * @param withPrettyNames 
-     * @param className 
-     * @return
+     * @param withPrettyNames
+     * @param className
+     * @return a list of {@link SearchResult} objects containing the found items, or an empty list if the specified
+     *         query type string doesn't represent a supported query type.
      * @throws QueryException
      * @throws IllegalArgumentException
      * @throws UriBuilderException
      * @throws XWikiException
      */
-    protected List<SearchResult> searchQuery(String query, String queryType, String wikiName, String wikis,
-        boolean hasProgrammingRights, String order, boolean distinct, int number, int start, Boolean withPrettyNames, String className) throws QueryException,
-        IllegalArgumentException, UriBuilderException, XWikiException
+    protected List<SearchResult> searchQuery(String query, String queryTypeString, String wikiName, String wikis,
+        boolean hasProgrammingRights, String order, boolean distinct, int number, int start, Boolean withPrettyNames,
+        String className) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -542,19 +569,32 @@ public class BaseSearchResult extends XWikiResource
 
             List<SearchResult> result = new ArrayList<SearchResult>();
 
-   
-            if (QueryType.LUCENE.equals(queryType)) {
-                result.addAll(searchLucene(query, wikiName, wikis, hasProgrammingRights, order, number, start, withPrettyNames));
-                } else {
-                    result.addAll(searchDatabaseQuery(query, QueryType.XWQL.equals(queryType) ? Query.XWQL : Query.HQL, 
-                        wikiName, hasProgrammingRights, distinct, number, start, withPrettyNames, className));
+            QueryType queryType = parseQueryType(queryTypeString);
+
+            /* Add results only if the specified query type string corresponds to one of the supported query types. */
+            if (queryType != null) {
+                switch (queryType) {
+                    case LUCENE:
+                        result.addAll(searchLucene(query, wikiName, wikis, hasProgrammingRights, order, number, start,
+                            withPrettyNames));
+                        break;
+                    case XWQL:
+                        result.addAll(searchDatabaseQuery(query, "xwql", wikiName, hasProgrammingRights, distinct,
+                            number, start, withPrettyNames, className));
+                        break;
+                    case HQL:
+                        result.addAll(searchDatabaseQuery(query, "hql", wikiName, hasProgrammingRights, distinct,
+                            number, start, withPrettyNames, className));
+                        break;
                 }
+            }
+
             return result;
         } finally {
-                Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
-    
+
     /**
      * Search for query in the given scopes. Limit the search only to Pages. Search for keyword
      * 
@@ -573,9 +613,9 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      * @return list of results
      */
-    protected List<SearchResult> searchDatabaseQuery(String query, String queryType, String wikiName,
-        boolean hasProgrammingRights, boolean distinct, int number, int start, Boolean withPrettyNames, String className) throws QueryException,
-        IllegalArgumentException, UriBuilderException, XWikiException
+    protected List<SearchResult> searchDatabaseQuery(String query, String queryLanguage, String wikiName,
+        boolean hasProgrammingRights, boolean distinct, int number, int start, Boolean withPrettyNames, String className)
+        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -603,8 +643,8 @@ public class BaseSearchResult extends XWikiResource
 
             List<Object> queryResult = null;
 
-            queryResult = queryManager.createQuery(squery, queryType).setLimit(number).setOffset(start).execute();
-  
+            queryResult = queryManager.createQuery(squery, queryLanguage).setLimit(number).setOffset(start).execute();
+
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
@@ -632,13 +672,17 @@ public class BaseSearchResult extends XWikiResource
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(doc.getDate());
                     searchResult.setModified(calendar);
-                    if (withPrettyNames)
+
+                    if (withPrettyNames) {
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
-                    if (className!=null&&!className.equals("")) {
+                    }
+
+                    if (className != null && !className.equals("")) {
                         BaseObject baseObject = Utils.getBaseObject(doc, className, 0, componentManager);
-                        if (baseObject!=null)
-                            searchResult.setObject(DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                                .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), false));
+                        if (baseObject != null)
+                            searchResult.setObject(DomainObjectFactory.createObject(objectFactory,
+                                uriInfo.getBaseUri(), Utils.getXWikiContext(componentManager), doc, baseObject, false,
+                                Utils.getXWikiApi(componentManager), false));
                     }
 
                     String pageUri = null;
@@ -681,14 +725,19 @@ public class BaseSearchResult extends XWikiResource
     }
 
     /**
-     * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
+     * Search for keywords using lucene search. It returns results for pages and attachments. The query can be executed
+     * on multiple wikis if the wikis parameter is specified. Otherwise it's run only on the wiki specified by
+     * defaultWikiName. wikis and defaultWikiName parameters cannot be both null.
      * 
-     * @param searchScopes
-     * @param keywords
-     * @param wikiName
-     * @param space
+     * @param query
+     * @param defaultWikiName the name of the wiki to run the query on (can be null)
+     * @param wikis the name of the wikis to run the query on (can be null). This takes precedence if defaultWikiName is
+     *            specified as well.
      * @param hasProgrammingRights
-     * @param number
+     * @param order
+     * @param number the number of results to be returned. If it's -1 then the first 20 results are returned.
+     * @param start
+     * @param withPrettyNames
      * @return
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -696,17 +745,25 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchLucene(String query, String defaultWikiName, String wikis,
-        boolean hasProgrammingRights, String order, int number, int start, Boolean withPrettyNames) throws QueryException,
-        IllegalArgumentException, UriBuilderException, XWikiException
+        boolean hasProgrammingRights, String order, int number, int start, Boolean withPrettyNames)
+        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
         try {
             List<SearchResult> result = new ArrayList<SearchResult>();
 
-            LOGGER.error("HERE");
-
             if (query == null) {
+                return result;
+            }
+
+            /*
+             * One of the two must be non-null. If default wiki name is non-null and wikis is null, then it's a local
+             * search in a specific wiki. If wiki name is null and wikis is non-null it's a global query on different
+             * wikis. If both of them are non-null then the wikis parameter takes the precedence.
+             */
+            if (defaultWikiName == null && wikis == null) {
                 return result;
             }
 
@@ -714,16 +771,17 @@ public class BaseSearchResult extends XWikiResource
                 query += " AND NOT space:XWiki AND NOT space:Admin AND NOT space:Panels AND NOT name:WebPreferences";
             }
 
-            LOGGER.error("Query is: " + query);
-
             try {
                 XWikiContext context = Utils.getXWikiContext(componentManager);
                 LucenePlugin lucene = (LucenePlugin) Utils.getXWiki(componentManager).getPlugin("lucene", context);
+
                 SearchResults luceneSearchResults =
-                    lucene.getSearchResults(query, order, (wikis == null) ? defaultWikiName : wikis, "",
-                        context);
+                    lucene.getSearchResults(query, order, (wikis == null) ? defaultWikiName : wikis, "", context);
+
+                /* Return only the first 20 results otherwise specified. */
                 List<com.xpn.xwiki.plugin.lucene.SearchResult> luceneResults =
                     luceneSearchResults.getResults(start, (number == -1) ? 20 : number);
+
                 for (com.xpn.xwiki.plugin.lucene.SearchResult luceneSearchResult : luceneResults) {
                     String wikiName = luceneSearchResult.getWiki();
                     String spaceName = luceneSearchResult.getSpace();
@@ -733,28 +791,53 @@ public class BaseSearchResult extends XWikiResource
                     String title = doc.getDisplayTitle();
 
                     SearchResult searchResult = objectFactory.createSearchResult();
-                    searchResult.setType(luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE) ? "page"
-                        : "file");
-                    searchResult.setId(luceneSearchResult.getId());
+
                     searchResult.setPageFullName(pageFullName);
                     searchResult.setTitle(title);
                     searchResult.setWiki(wikiName);
                     searchResult.setSpace(spaceName);
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
-                    if (luceneSearchResult.equals(LucenePlugin.DOCTYPE_ATTACHMENT))
+
+                    String attachmentUri = null;
+                    if (luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE)) {
+                        searchResult.setType("page");
+                        searchResult.setId(Utils.getPageId(wikiName, spaceName, pageName));
+                    } else {
+                        searchResult.setType("file");
+                        searchResult.setId(String.format("%s@%s", Utils.getPageId(wikiName, pageFullName),
+                            luceneSearchResult.getFilename()));
                         searchResult.setFilename(luceneSearchResult.getFilename());
+
+                        attachmentUri =
+                            UriBuilder
+                                .fromUri(this.uriInfo.getBaseUri())
+                                .path(AttachmentResource.class)
+                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                    URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
+                                    URLEncoder.encode(luceneSearchResult.getFilename(), "UTF-8")).toString();
+
+                        Link attachmentLink = new Link();
+                        attachmentLink.setHref(attachmentUri);
+                        attachmentLink.setRel(Relations.ATTACHMENT_DATA);
+                        searchResult.getLinks().add(attachmentLink);
+                    }
+
                     searchResult.setScore(luceneSearchResult.getScore());
                     searchResult.setAuthor(luceneSearchResult.getAuthor());
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(doc.getDate());
                     searchResult.setModified(calendar);
-                    if (withPrettyNames)
-                        searchResult.setAuthorName(Utils.getAuthorName(luceneSearchResult.getAuthor(), componentManager));
+
+                    if (withPrettyNames) {
+                        searchResult
+                            .setAuthorName(Utils.getAuthorName(luceneSearchResult.getAuthor(), componentManager));
+                    }
 
                     String language = luceneSearchResult.getLanguage();
-                    if (language.equals("default"))
+                    if (language.equals("default")) {
                         language = "";
+                    }
 
                     String pageUri = null;
                     try {
@@ -784,6 +867,7 @@ public class BaseSearchResult extends XWikiResource
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     searchResult.getLinks().add(pageLink);
+
                     result.add(searchResult);
                 }
             } catch (Exception e) {
@@ -793,7 +877,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            // Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 
@@ -825,5 +909,23 @@ public class BaseSearchResult extends XWikiResource
         return searchScopes;
     }
 
-}
+    /**
+     * Return the QueryType enum object corresponding to a string.
+     * 
+     * @param queryTypeString a string representing a query type.
+     * @return the query type enum object, or null if the passed string doesn't correspond to any of them.
+     */
+    protected QueryType parseQueryType(String queryTypeString)
+    {
+        try {
+            if (queryTypeString != null) {
+                return QueryType.valueOf(queryTypeString.toUpperCase());
+            }
+        } catch (IllegalArgumentException e) {
+            // Invalid query type string.
+        }
 
+        return null;
+    }
+
+}

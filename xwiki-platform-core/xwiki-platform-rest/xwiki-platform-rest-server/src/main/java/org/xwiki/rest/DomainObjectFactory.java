@@ -276,8 +276,9 @@ public class DomainObjectFactory
         pageSummary.setSyntax(doc.getSyntaxId());
         pageSummary.setVersion(doc.getVersion());
         pageSummary.setAuthor(doc.getAuthor());
-        if (withPrettyNames)
+        if (withPrettyNames) {
             pageSummary.setAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
+        }
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
         pageSummary.setParent(doc.getParent());
@@ -425,16 +426,18 @@ public class DomainObjectFactory
         page.setMinorVersion(doc.getRCSVersion().at(1));
         page.setLanguage(doc.getLanguage());
         page.setCreator(doc.getCreator());
-        if (withPrettyNames)
+        if (withPrettyNames) {
             page.setCreatorName(xwikiApi.getUserName(doc.getCreator(), false));
+        }
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(doc.getCreationDate());
         page.setCreated(calendar);
 
         page.setModifier(doc.getContentAuthor());
-        if (withPrettyNames)
+        if (withPrettyNames) {
             page.setModifierName(xwikiApi.getUserName(doc.getContentAuthor(), false));
+        }
             
 
         calendar = Calendar.getInstance();
@@ -479,8 +482,9 @@ public class DomainObjectFactory
         historySummary.setMajorVersion(version.at(0));
         historySummary.setMinorVersion(version.at(1));
         historySummary.setModifier(modifier);
-        if (withPrettyNames)
+        if (withPrettyNames) {
             historySummary.setModifierName(xwikiApi.getUserName(modifier, false));
+        }
 
         historySummary.setLanguage(language);
 
@@ -522,8 +526,9 @@ public class DomainObjectFactory
         attachment.setPageVersion(doc.getVersion());
         attachment.setMimeType(xwikiAttachment.getMimeType());
         attachment.setAuthor(xwikiAttachment.getAuthor());
-        if (withPrettyNames)
+        if (withPrettyNames) {
             attachment.setAuthorName(xwikiApi.getUserName(xwikiAttachment.getAuthor(), false));
+        }
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(xwikiAttachment.getDate());
@@ -626,8 +631,9 @@ public class DomainObjectFactory
         com.xpn.xwiki.api.Property property = xwikiComment.getProperty("author");
         if (property != null) {
             comment.setAuthor((String) property.getValue());
-            if (withPrettyNames)
+            if (withPrettyNames) {
                 comment.setAuthorName(xwikiApi.getUserName((String) property.getValue(), false));
+            }
         }
 
         property = xwikiComment.getProperty("date");
@@ -673,8 +679,9 @@ public class DomainObjectFactory
         objectSummary.setPageId(doc.getPrefixedFullName());
         objectSummary.setPageVersion(doc.getVersion());
         objectSummary.setPageAuthor(doc.getAuthor());       
-        if (withPrettyNames)
+        if (withPrettyNames) {
             objectSummary.setPageAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
+        }
         objectSummary.setWiki(doc.getWiki());
         objectSummary.setSpace(doc.getSpace());
         objectSummary.setPageName(doc.getName());

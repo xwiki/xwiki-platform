@@ -1,11 +1,5 @@
 #template('colorThemeInit.vm')
 
-#macro(__css3 $rule)
-  -moz-$rule;
-  -webkit-$rule;
-  $rule;
-#end
-
 /* panels style gadget settings */
 .panels .gadget .gadget-title {
   background-color: $theme.panelHeaderBackgroundColor;
@@ -94,7 +88,7 @@
 /* Add button decoration */
 .dashboard-edit .addgadget, .dashboard-edit .addcontainer {
   background: url($xwiki.getSkinFile("icons/silk/add.png")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
-  #__css3('border-radius: 4px')
+  border-radius: 4px;
   color: $theme.menuAddEntryLinkColor;
   cursor: pointer;
   float: right;

@@ -439,8 +439,6 @@ th.avatar {
 
 #headerlanguages a {
   background: $theme.menuBackgroundColor;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
   color: $theme.menuLinkColor;
   display: inline-block;

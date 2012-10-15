@@ -1,4 +1,3 @@
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">

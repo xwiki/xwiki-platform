@@ -38,6 +38,7 @@ import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
+import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
@@ -61,10 +62,10 @@ import org.slf4j.LoggerFactory;
 public class BaseSearchResult extends XWikiResource
 {
     protected static final String SEARCH_TEMPLATE_INFO =
-        "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&order={documentfield asc,documentfield desc})(&prettynames={0|1})";
+        "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&order={documentfield asc,documentfield desc})(&prettynames={false|true})";
 
     protected static final String QUERY_TEMPLATE_INFO =
-        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames={0|1})(&wikis={wikis})(&classname={classname})";
+        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
 
     protected static enum SearchScope
     {
@@ -757,9 +758,7 @@ public class BaseSearchResult extends XWikiResource
                     String title = doc.getDisplayTitle();
 
                     SearchResult searchResult = objectFactory.createSearchResult();
-                    searchResult.setType(luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE) ? "page"
-                        : "file");
-                    searchResult.setId(luceneSearchResult.getId());
+
                     searchResult.setPageFullName(pageFullName);
                     searchResult.setTitle(title);
                     searchResult.setWiki(wikiName);
@@ -767,8 +766,28 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
 
-                    if (luceneSearchResult.equals(LucenePlugin.DOCTYPE_ATTACHMENT)) {
+                    String attachmentUri = null;
+                    if (luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE)) {
+                        searchResult.setType("page");
+                        searchResult.setId(Utils.getPageId(wikiName, spaceName, pageName));
+                    } else {
+                        searchResult.setType("file");
+                        searchResult.setId(String.format("%s@%s", Utils.getPageId(wikiName, pageFullName),
+                            luceneSearchResult.getFilename()));
                         searchResult.setFilename(luceneSearchResult.getFilename());
+
+                        attachmentUri =
+                            UriBuilder
+                                .fromUri(this.uriInfo.getBaseUri())
+                                .path(AttachmentResource.class)
+                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                    URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
+                                    URLEncoder.encode(luceneSearchResult.getFilename(), "UTF-8")).toString();
+
+                        Link attachmentLink = new Link();
+                        attachmentLink.setHref(attachmentUri);
+                        attachmentLink.setRel(Relations.ATTACHMENT_DATA);
+                        searchResult.getLinks().add(attachmentLink);
                     }
 
                     searchResult.setScore(luceneSearchResult.getScore());
@@ -815,6 +834,7 @@ public class BaseSearchResult extends XWikiResource
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     searchResult.getLinks().add(pageLink);
+
                     result.add(searchResult);
                 }
             } catch (Exception e) {

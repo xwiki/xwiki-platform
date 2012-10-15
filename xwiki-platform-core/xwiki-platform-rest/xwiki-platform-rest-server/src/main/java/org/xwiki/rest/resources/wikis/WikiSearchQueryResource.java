@@ -51,9 +51,7 @@ public class WikiSearchQueryResource extends BaseSearchResult
         searchResults.setTemplate(String.format("%s?%s",
             UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchQueryResource.class).build(wikiName).toString(),
             QUERY_TEMPLATE_INFO));
-
-        Utils.getXWikiContext(componentManager).setDatabase(wikiName);
-
+       
         searchResults.getSearchResults().addAll(
             searchQuery(query, queryTypeString, wikiName, searchWikis, Utils.getXWiki(componentManager).getRightService()
                 .hasProgrammingRights(Utils.getXWikiContext(componentManager)), order, (distinct == 1), number, start, withPrettyNames, className));

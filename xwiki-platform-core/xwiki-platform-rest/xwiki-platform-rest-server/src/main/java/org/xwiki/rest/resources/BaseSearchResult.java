@@ -204,12 +204,18 @@ public class BaseSearchResult extends XWikiResource
                 return result;
             }
 
-            String sOrder = (order.equals("") ? "doc.fullName asc" : "doc." + order);
+            String orderClause = null;
+            if (order.isEmpty()) {
+                orderClause = "doc.fullName asc";
+            } else {
+                orderClause = String.format("doc.%s", order);
+            }
+
             if (hasProgrammingRights) {
-                f.format(") order by " + sOrder);
+                f.format(") order by " + orderClause);
             } else {
                 f.format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by "
-                    + sOrder);
+                    + orderClause);
             }
 
             String query = f.toString();
@@ -434,12 +440,18 @@ public class BaseSearchResult extends XWikiResource
                 f.format(" from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             }
 
-            String sOrder = (order.equals("") ? "doc.fullName asc" : "doc." + order);
+            String orderClause = null;
+            if (order.isEmpty()) {
+                orderClause = "doc.fullName asc";
+            } else {
+                orderClause = String.format("doc.%s", order);
+            }
+
             if (hasProgrammingRights) {
-                f.format(" order by " + sOrder);
+                f.format(" order by " + orderClause);
             } else {
                 f.format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by "
-                    + sOrder);
+                    + orderClause);
             }
 
             String query = f.toString();

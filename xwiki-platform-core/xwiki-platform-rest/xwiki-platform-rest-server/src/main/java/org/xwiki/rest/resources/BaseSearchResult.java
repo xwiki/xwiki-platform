@@ -64,8 +64,11 @@ public class BaseSearchResult extends XWikiResource
     protected static final String SEARCH_TEMPLATE_INFO =
         "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&order={documentfield asc,documentfield desc})(&prettynames={false|true})";
 
+    protected static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
+        "q={lucenequery}(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
+
     protected static final String QUERY_TEMPLATE_INFO =
-        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
+        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&order={lucenefield,-lucenefield, documentfield asc, documentfield desc})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
 
     protected static enum SearchScope
     {
@@ -722,14 +725,19 @@ public class BaseSearchResult extends XWikiResource
     }
 
     /**
-     * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
+     * Search for keywords using lucene search. It returns results for pages and attachments. The query can be executed
+     * on multiple wikis if the wikis parameter is specified. Otherwise it's run only on the wiki specified by
+     * defaultWikiName. wikis and defaultWikiName parameters cannot be both null.
      * 
-     * @param searchScopes
-     * @param keywords
-     * @param wikiName
-     * @param space
+     * @param query
+     * @param defaultWikiName the name of the wiki to run the query on (can be null)
+     * @param wikis the name of the wikis to run the query on (can be null). This takes precedence if defaultWikiName is
+     *            specified as well.
      * @param hasProgrammingRights
-     * @param number
+     * @param order
+     * @param number the number of results to be returned. If it's -1 then the first 20 results are returned.
+     * @param start
+     * @param withPrettyNames
      * @return
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -750,6 +758,15 @@ public class BaseSearchResult extends XWikiResource
                 return result;
             }
 
+            /*
+             * One of the two must be non-null. If default wiki name is non-null and wikis is null, then it's a local
+             * search in a specific wiki. If wiki name is null and wikis is non-null it's a global query on different
+             * wikis. If both of them are non-null then the wikis parameter takes the precedence.
+             */
+            if (defaultWikiName == null && wikis == null) {
+                return result;
+            }
+
             if (!hasProgrammingRights) {
                 query += " AND NOT space:XWiki AND NOT space:Admin AND NOT space:Panels AND NOT name:WebPreferences";
             }
@@ -757,10 +774,14 @@ public class BaseSearchResult extends XWikiResource
             try {
                 XWikiContext context = Utils.getXWikiContext(componentManager);
                 LucenePlugin lucene = (LucenePlugin) Utils.getXWiki(componentManager).getPlugin("lucene", context);
+
                 SearchResults luceneSearchResults =
                     lucene.getSearchResults(query, order, (wikis == null) ? defaultWikiName : wikis, "", context);
+
+                /* Return only the first 20 results otherwise specified. */
                 List<com.xpn.xwiki.plugin.lucene.SearchResult> luceneResults =
                     luceneSearchResults.getResults(start, (number == -1) ? 20 : number);
+
                 for (com.xpn.xwiki.plugin.lucene.SearchResult luceneSearchResult : luceneResults) {
                     String wikiName = luceneSearchResult.getWiki();
                     String spaceName = luceneSearchResult.getSpace();

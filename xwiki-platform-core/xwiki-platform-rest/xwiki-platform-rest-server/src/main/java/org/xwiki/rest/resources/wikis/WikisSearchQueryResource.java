@@ -34,26 +34,25 @@ import org.xwiki.rest.resources.BaseSearchResult;
 
 import com.xpn.xwiki.XWikiException;
 
-@Component("org.xwiki.rest.resources.wikis.WikiSearchQueryResource")
-@Path("/wikis/{wikiName}/query")
-public class WikiSearchQueryResource extends BaseSearchResult
+@Component("org.xwiki.rest.resources.wikis.WikisSearchQueryResource")
+@Path("/wikis/query")
+public class WikisSearchQueryResource extends BaseSearchResult
 {
     @GET
-    public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String query,
-        @QueryParam("type") String queryTypeString, @QueryParam("number") @DefaultValue("-1") Integer number,
+    public SearchResults search(@QueryParam("q") String query,
+        @QueryParam("number") @DefaultValue("-1") Integer number,
         @QueryParam("start") @DefaultValue("1") Integer start,
-        @QueryParam("distinct") @DefaultValue("1") Integer distinct,
+        @QueryParam("distinct") @DefaultValue("1") Integer distinct, @QueryParam("wikis") String searchWikis,
         @QueryParam("order") @DefaultValue("") String order,
         @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames,
         @QueryParam("classname") @DefaultValue("") String className) throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
-        searchResults.setTemplate(String.format("%s?%s",
-            UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchQueryResource.class).build(wikiName).toString(),
-            QUERY_TEMPLATE_INFO));
-        
+        searchResults.setTemplate(String.format("%s?%s", UriBuilder.fromUri(uriInfo.getBaseUri()).toString(),
+            MULTIWIKI_QUERY_TEMPLATE_INFO));
+
         searchResults.getSearchResults().addAll(
-            searchQuery(query, queryTypeString, wikiName, null, Utils.getXWiki(componentManager).getRightService()
+            searchQuery(query, QueryType.LUCENE.toString(), null, searchWikis, Utils.getXWiki(componentManager).getRightService()
                 .hasProgrammingRights(Utils.getXWikiContext(componentManager)), order, (distinct == 1), number, start,
                 withPrettyNames, className));
 

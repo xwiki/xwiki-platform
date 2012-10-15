@@ -40,7 +40,7 @@ public class WikiSearchQueryResource extends BaseSearchResult
 {
     @GET
     public SearchResults search(@PathParam("wikiName") String wikiName, @QueryParam("q") String query,
-        @QueryParam("type") String queryType, @QueryParam("number") @DefaultValue("-1") Integer number,
+        @QueryParam("type") String queryTypeString, @QueryParam("number") @DefaultValue("-1") Integer number,
         @QueryParam("start") @DefaultValue("1") Integer start, @QueryParam("distinct") @DefaultValue("1") Integer distinct, 
         @QueryParam("wikis") String searchWikis, @QueryParam("order") @DefaultValue("") String order,
         @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames,
@@ -55,7 +55,7 @@ public class WikiSearchQueryResource extends BaseSearchResult
         Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
         searchResults.getSearchResults().addAll(
-            searchQuery(query, queryType, wikiName, searchWikis, Utils.getXWiki(componentManager).getRightService()
+            searchQuery(query, queryTypeString, wikiName, searchWikis, Utils.getXWiki(componentManager).getRightService()
                 .hasProgrammingRights(Utils.getXWikiContext(componentManager)), order, (distinct == 1), number, start, withPrettyNames, className));
 
         return searchResults;

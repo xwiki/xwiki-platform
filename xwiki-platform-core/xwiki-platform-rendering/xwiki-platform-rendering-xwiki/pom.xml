@@ -58,7 +58,9 @@
       <!-- For parsing the CSS from the style attribute. -->
       <groupId>net.sourceforge.cssparser</groupId>
       <artifactId>cssparser</artifactId>
-      <version>0.9.7</version>
+      <!-- Using a custom version that fixes:
+        * https://sourceforge.net/p/cssparser/bugs/35/ -->
+      <version>0.9.7-20121016</version>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

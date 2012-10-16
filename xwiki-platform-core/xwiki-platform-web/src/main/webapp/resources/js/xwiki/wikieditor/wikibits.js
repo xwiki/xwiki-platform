@@ -45,8 +45,11 @@ function escapeQuotes(text) {
 // apply tagOpen/tagClose to selection in textarea,
 // use sampleText instead of selection if there is none
 // copied and adapted from phpBB
-function insertTags(tagOpen, tagClose, sampleText) {
-  var txtarea = document.forms.edit.content;
+// NOTE: We define this function through the window object to prevent it from being namespaced because it is used above
+// in the value of the href attribute which isn't rewritten. Revisit this after we improve the way the tool bar buttons
+// are created (without document.write!)
+window.insertTags = function(tagOpen, tagClose, sampleText) {
+  var txtarea = document.getElementById('edit').content;
   if (!txtarea) {
     txtarea = document.getElementById("content");
   }

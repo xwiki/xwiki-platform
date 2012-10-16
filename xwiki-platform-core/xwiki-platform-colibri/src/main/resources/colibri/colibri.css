@@ -1282,7 +1282,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   padding: 0 0 0.1em;
   position: absolute;
   text-align: center;
-  text-shadow: 0 1px 0 $theme.pageContentBackgroundColor;
+  #css_textShadow('0', '1px', '0', $theme.menuContentGradientColor)
   width: 100%;
 }
 .floating-menu:hover:after {
@@ -1434,7 +1434,7 @@ input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;
-  text-shadow: 0px 1px 0px $theme.buttonPrimaryGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.buttonPrimaryGradientColor)
   text-transform: uppercase;
 }
 
@@ -1466,7 +1466,7 @@ input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
   border-color: $theme.buttonSecondaryBackgroundColor;
   border-radius: 3px 3px 3px 3px;
   color: $theme.buttonSecondaryTextColor;
-  text-shadow: 0px 1px 0px $theme.buttonSecondaryGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.buttonSecondaryGradientColor)
 }
 
 input.secondary:hover, button.secondary:hover, .buttonwrapper a.secondary:hover {
@@ -1790,7 +1790,7 @@ h1.xwikipaneltitle {
   })
   border-radius: 4px 4px 0 0;
   color: $theme.panelHeaderTextColor;
-  text-shadow: 0 1px 0 $theme.panelHeaderGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.panelHeaderGradientColor)
 }
 
 .collapsed h1.xwikipaneltitle {
@@ -1803,7 +1803,7 @@ h1.xwikipaneltitle {
     ]
   })
   color: $theme.panelCollapsedTextColor;
-  text-shadow: 0 1px 0 $theme.panelCollapsedGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.panelCollapsedGradientColor)
 }
 
 #contentmenu, #editmenu, ul.xwikitabbar {
@@ -1822,7 +1822,7 @@ h1.xwikipaneltitle {
 #editmenu.actionmenu a, #editmenu.actionmenu a:visited, #editmenu .menuarrow, #editmenu .tmetype,
 .xwikitabbar li a, .xwikitabbar li a:visited, .xwikitabbar li a:active  {
   color: $theme.menuContentLinkColor;
-  text-shadow: 0 1px 0 $theme.menuContentGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.menuContentGradientColor)
 }
 
 #contentmenu.actionmenu .submenuitem a ,
@@ -1847,7 +1847,7 @@ h1.xwikipaneltitle {
 }
 
 #mainmenu .tmetype, #mainmenu .tme {
-  text-shadow: 0 1px 0 $theme.menuGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.menuGradientColor)
 }
 
 #mainmenu .tmCreate .tme {

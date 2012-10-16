@@ -140,16 +140,16 @@ public class BaseSearchResult extends XWikiResource
      * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
      * 
      * @param searchScopes
-     * @param keywords
+     * @param keywords the string that will be used in a "like" XWQL clause.
      * @param wikiName
      * @param space
      * @param hasProgrammingRights
      * @param number
      * @param start
-     * @param orderField
-     * @param order
+     * @param orderField the field to be used to order the results.
+     * @param order "asc" or "desc"
      * @param withPrettyNames
-     * @return
+     * @return the results.
      * @throws QueryException
      * @throws IllegalArgumentException
      * @throws UriBuilderException
@@ -327,16 +327,15 @@ public class BaseSearchResult extends XWikiResource
     }
 
     /**
-     * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
+     * Search for keyword in the given scopes. Limit the search only to spaces.
      * 
-     * @param searchScopes
-     * @param keywords
+     * @param keywords the string that will be used in a "like" XWQL clause.
      * @param wikiName
      * @param space
      * @param hasProgrammingRights
      * @param number
      * @param start
-     * @return
+     * @return the results.
      * @throws QueryException
      * @throws IllegalArgumentException
      * @throws UriBuilderException
@@ -427,10 +426,10 @@ public class BaseSearchResult extends XWikiResource
      * @param hasProgrammingRights
      * @param number
      * @param start
-     * @param orderField
-     * @param order
+     * @param orderField the field to be used to order the results
+     * @param order "asc" or "desc"
      * @param withPrettyNames
-     * @return
+     * @return the results
      * @throws QueryException
      * @throws IllegalArgumentException
      * @throws UriBuilderException
@@ -577,13 +576,13 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName
      * @param wikis
      * @param hasProgrammingRights
-     * @param orderField
-     * @param order
+     * @param orderField the field to be used to order the results.
+     * @param order "asc" or "desc"
      * @param distinct
      * @param number
      * @param start
      * @param withPrettyNames
-     * @param className
+     * @param className 
      * @return a list of {@link SearchResult} objects containing the found items, or an empty list if the specified
      *         query type string doesn't represent a supported query type.
      * @throws QueryException
@@ -664,10 +663,11 @@ public class BaseSearchResult extends XWikiResource
 
             Formatter f = new Formatter();
             if (distinct) {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc "
-                    + query);
+                f.format(
+                    "select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc %s",
+                    query);
             } else {
-                f.format("select doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc " + query);
+                f.format("select doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc %s", query);
             }
             String squery = f.toString();
 

@@ -62,13 +62,13 @@ import org.slf4j.LoggerFactory;
 public class BaseSearchResult extends XWikiResource
 {
     protected static final String SEARCH_TEMPLATE_INFO =
-        "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&order={documentfield asc,documentfield desc})(&prettynames={false|true})";
+        "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&orderfield={fieldname}(&order={asc|desc}))(&prettynames={false|true})";
 
     protected static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
-        "q={lucenequery}(&number={number})(&start={start})(&order={lucenefield,-lucenefield})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
+        "q={lucenequery}(&number={number})(&start={start})(&orderfield={fieldname}(&order={asc|desc}))(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
 
     protected static final String QUERY_TEMPLATE_INFO =
-        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&order={lucenefield,-lucenefield, documentfield asc, documentfield desc})(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
+        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&orderfield={fieldname}(&order={asc|desc}))(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
 
     protected static enum SearchScope
     {
@@ -95,6 +95,10 @@ public class BaseSearchResult extends XWikiResource
      * @param space
      * @param hasProgrammingRights
      * @param number
+     * @param start
+     * @param distinct
+     * @param orderField
+     * @param order
      * @param withPrettyNames true if the users are displayed with their full name
      * @return
      * @throws IllegalArgumentException
@@ -103,8 +107,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> search(List<SearchScope> searchScopes, String keywords, String wikiName, String space,
-        boolean hasProgrammingRights, int number, int start, boolean distinct, String order, Boolean withPrettyNames)
-        throws IllegalArgumentException, UriBuilderException, QueryException, XWikiException
+        boolean hasProgrammingRights, int number, int start, boolean distinct, String orderField, String order,
+        Boolean withPrettyNames) throws IllegalArgumentException, UriBuilderException, QueryException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -115,15 +119,15 @@ public class BaseSearchResult extends XWikiResource
             List<SearchResult> result = new ArrayList<SearchResult>();
 
             result.addAll(searchPages(searchScopes, keywords, wikiName, space, hasProgrammingRights, number, start,
-                order, withPrettyNames));
+                orderField, order, withPrettyNames));
 
             if (searchScopes.contains(SearchScope.SPACES)) {
                 result.addAll(searchSpaces(keywords, wikiName, hasProgrammingRights, number, start));
             }
 
             if (searchScopes.contains(SearchScope.OBJECTS)) {
-                result.addAll(searchObjects(keywords, wikiName, space, hasProgrammingRights, number, start, order,
-                    withPrettyNames));
+                result.addAll(searchObjects(keywords, wikiName, space, hasProgrammingRights, number, start, orderField,
+                    order, withPrettyNames));
             }
 
             return result;
@@ -141,6 +145,10 @@ public class BaseSearchResult extends XWikiResource
      * @param space
      * @param hasProgrammingRights
      * @param number
+     * @param start
+     * @param orderField
+     * @param order
+     * @param withPrettyNames
      * @return
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -148,8 +156,8 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
-        String space, boolean hasProgrammingRights, int number, int start, String order, Boolean withPrettyNames)
-        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+        String space, boolean hasProgrammingRights, int number, int start, String orderField, String order,
+        Boolean withPrettyNames) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -163,10 +171,14 @@ public class BaseSearchResult extends XWikiResource
 
             Formatter f = new Formatter();
 
-            String orderColumn = (order.indexOf(" ") == -1) ? order : order.substring(0, order.indexOf(" "));
+            /*
+             * If the order field is already one of the field hard coded in the base query, then do not add it to the
+             * select clause.
+             */
             String addColumn =
-                (order.equals("") || order.equals("fullName") || order.equals("name") || order.equals("space")) ? ""
-                    : ", doc." + orderColumn;
+                (orderField.equals("") || orderField.equals("fullName") || orderField.equals("name") || orderField
+                    .equals("space")) ? "" : ", doc." + orderField;
+
             if (space != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);
@@ -207,11 +219,17 @@ public class BaseSearchResult extends XWikiResource
                 return result;
             }
 
+            /* Build the order clause. */
             String orderClause = null;
-            if (order.isEmpty()) {
+            if (orderField.isEmpty()) {
                 orderClause = "doc.fullName asc";
             } else {
-                orderClause = String.format("doc.%s", order);
+                /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
+                if ("asc".equals(order) || "desc".equals(order)) {
+                    orderClause = String.format("doc.%s %s", orderField, order);
+                } else {
+                    orderClause = String.format("doc.%s asc", orderField);
+                }
             }
 
             if (hasProgrammingRights) {
@@ -317,6 +335,7 @@ public class BaseSearchResult extends XWikiResource
      * @param space
      * @param hasProgrammingRights
      * @param number
+     * @param start
      * @return
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -407,6 +426,10 @@ public class BaseSearchResult extends XWikiResource
      * @param space
      * @param hasProgrammingRights
      * @param number
+     * @param start
+     * @param orderField
+     * @param order
+     * @param withPrettyNames
      * @return
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -414,7 +437,7 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchObjects(String keywords, String wikiName, String space,
-        boolean hasProgrammingRights, int number, int start, String order, Boolean withPrettyNames)
+        boolean hasProgrammingRights, int number, int start, String orderField, String order, Boolean withPrettyNames)
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -429,10 +452,14 @@ public class BaseSearchResult extends XWikiResource
 
             Formatter f = new Formatter();
 
-            String orderColumn = (order.indexOf(" ") == -1) ? order : order.substring(0, order.indexOf(" "));
+            /*
+             * If the order field is already one of the field hard coded in the base query, then do not add it to the
+             * select clause.
+             */
             String addColumn =
-                (order.equals("") || order.equals("fullName") || order.equals("name") || order.equals("space")) ? ""
-                    : ", doc." + orderColumn;
+                (orderField.equals("") || orderField.equals("fullName") || orderField.equals("name") || orderField
+                    .equals("space")) ? "" : ", doc." + orderField;
+
             if (space != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number");
                 f.format(addColumn);
@@ -443,11 +470,17 @@ public class BaseSearchResult extends XWikiResource
                 f.format(" from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             }
 
+            /* Build the order clause. */
             String orderClause = null;
-            if (order.isEmpty()) {
+            if (orderField.isEmpty()) {
                 orderClause = "doc.fullName asc";
             } else {
-                orderClause = String.format("doc.%s", order);
+                /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
+                if ("asc".equals(order) || "desc".equals(order)) {
+                    orderClause = String.format("doc.%s %s", orderField, order);
+                } else {
+                    orderClause = String.format("doc.%s asc", orderField);
+                }
             }
 
             if (hasProgrammingRights) {
@@ -544,6 +577,7 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName
      * @param wikis
      * @param hasProgrammingRights
+     * @param orderField
      * @param order
      * @param distinct
      * @param number
@@ -558,8 +592,9 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchQuery(String query, String queryTypeString, String wikiName, String wikis,
-        boolean hasProgrammingRights, String order, boolean distinct, int number, int start, Boolean withPrettyNames,
-        String className) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+        boolean hasProgrammingRights, String orderField, String order, boolean distinct, int number, int start,
+        Boolean withPrettyNames, String className) throws QueryException, IllegalArgumentException,
+        UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -575,8 +610,8 @@ public class BaseSearchResult extends XWikiResource
             if (queryType != null) {
                 switch (queryType) {
                     case LUCENE:
-                        result.addAll(searchLucene(query, wikiName, wikis, hasProgrammingRights, order, number, start,
-                            withPrettyNames));
+                        result.addAll(searchLucene(query, wikiName, wikis, hasProgrammingRights, orderField, order,
+                            number, start, withPrettyNames));
                         break;
                     case XWQL:
                         result.addAll(searchDatabaseQuery(query, "xwql", wikiName, hasProgrammingRights, distinct,
@@ -596,7 +631,7 @@ public class BaseSearchResult extends XWikiResource
     }
 
     /**
-     * Search for query in the given scopes. Limit the search only to Pages. Search for keyword
+     * Execute a database query using a supported query language. Limit search to documents.
      * 
      * @param query
      * @param queryLanguage
@@ -628,13 +663,14 @@ public class BaseSearchResult extends XWikiResource
             }
 
             Formatter f = new Formatter();
-            if (distinct)
+            if (distinct) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc "
                     + query);
-            else
+            } else {
                 f.format("select doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc " + query);
-
+            }
             String squery = f.toString();
+
             if (!hasProgrammingRights) {
                 squery
                     .replace("where ",
@@ -734,6 +770,7 @@ public class BaseSearchResult extends XWikiResource
      * @param wikis the name of the wikis to run the query on (can be null). This takes precedence if defaultWikiName is
      *            specified as well.
      * @param hasProgrammingRights
+     * @param orderField
      * @param order
      * @param number the number of results to be returned. If it's -1 then the first 20 results are returned.
      * @param start
@@ -745,7 +782,7 @@ public class BaseSearchResult extends XWikiResource
      * @throws XWikiException
      */
     protected List<SearchResult> searchLucene(String query, String defaultWikiName, String wikis,
-        boolean hasProgrammingRights, String order, int number, int start, Boolean withPrettyNames)
+        boolean hasProgrammingRights, String orderField, String order, int number, int start, Boolean withPrettyNames)
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
@@ -775,8 +812,22 @@ public class BaseSearchResult extends XWikiResource
                 XWikiContext context = Utils.getXWikiContext(componentManager);
                 LucenePlugin lucene = (LucenePlugin) Utils.getXWiki(componentManager).getPlugin("lucene", context);
 
+                /*
+                 * Compute the parameter to be passed to the plugin for ordering: orderField (for ordering on orderField
+                 * in ascending order) or -orderFiled (for descending order)
+                 */
+                String orderParameter = "";
+                if (!orderField.isEmpty()) {
+                    if ("desc".equals(order)) {
+                        orderParameter = String.format("-%s", orderField);
+                    } else {
+                        orderParameter = orderField;
+                    }
+                }
+
                 SearchResults luceneSearchResults =
-                    lucene.getSearchResults(query, order, (wikis == null) ? defaultWikiName : wikis, "", context);
+                    lucene.getSearchResults(query, orderParameter, (wikis == null) ? defaultWikiName : wikis, "",
+                        context);
 
                 /* Return only the first 20 results otherwise specified. */
                 List<com.xpn.xwiki.plugin.lucene.SearchResult> luceneResults =

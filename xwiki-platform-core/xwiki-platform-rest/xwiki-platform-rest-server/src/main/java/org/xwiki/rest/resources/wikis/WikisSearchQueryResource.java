@@ -41,9 +41,10 @@ public class WikisSearchQueryResource extends BaseSearchResult
     @GET
     public SearchResults search(@QueryParam("q") String query,
         @QueryParam("number") @DefaultValue("-1") Integer number,
-        @QueryParam("start") @DefaultValue("1") Integer start,
+        @QueryParam("start") @DefaultValue("0") Integer start,
         @QueryParam("distinct") @DefaultValue("1") Integer distinct, @QueryParam("wikis") String searchWikis,
-        @QueryParam("order") @DefaultValue("") String order,
+        @QueryParam("orderfield") @DefaultValue("") String orderField,
+        @QueryParam("order") @DefaultValue("asc") String order,
         @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames,
         @QueryParam("classname") @DefaultValue("") String className) throws QueryException, XWikiException
     {
@@ -53,7 +54,7 @@ public class WikisSearchQueryResource extends BaseSearchResult
 
         searchResults.getSearchResults().addAll(
             searchQuery(query, QueryType.LUCENE.toString(), null, searchWikis, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), order, (distinct == 1), number, start,
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, (distinct == 1), number, start,
                 withPrettyNames, className));
 
         return searchResults;

@@ -13,9 +13,7 @@
 #end
   <div id="company">
   <div id="companylogo">
-#set ($homepageReference = $services.model.resolveDocument('', 'default'))
-#set ($homepageReference = $homepageReference.replaceParent($homepageReference.root, $doc.documentReference.root))
-    <a href="$!xwiki.getURL($homepageReference)" title="Home" rel="home">
+    <a href="$!xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))" title="Home" rel="home">
 #set($logoname = $xwiki.getSkinPreference("logo", "logo.png"))
 #set($logo = $!prefdoc.getAttachment($logoname))
 #if(!$logo)

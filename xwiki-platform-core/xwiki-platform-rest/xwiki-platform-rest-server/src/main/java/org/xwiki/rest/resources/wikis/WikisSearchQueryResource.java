@@ -42,7 +42,7 @@ public class WikisSearchQueryResource extends BaseSearchResult
     public SearchResults search(@QueryParam("q") String query,
         @QueryParam("number") @DefaultValue("-1") Integer number,
         @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("distinct") @DefaultValue("1") Integer distinct, @QueryParam("wikis") String searchWikis,
+        @QueryParam("distinct") @DefaultValue("true") Boolean distinct, @QueryParam("wikis") String searchWikis,
         @QueryParam("orderfield") @DefaultValue("") String orderField,
         @QueryParam("order") @DefaultValue("asc") String order,
         @QueryParam("prettynames") @DefaultValue("false") Boolean withPrettyNames,
@@ -53,9 +53,9 @@ public class WikisSearchQueryResource extends BaseSearchResult
             MULTIWIKI_QUERY_TEMPLATE_INFO));
 
         searchResults.getSearchResults().addAll(
-            searchQuery(query, QueryType.LUCENE.toString(), null, searchWikis, Utils.getXWiki(componentManager).getRightService()
-                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, (distinct == 1), number, start,
-                withPrettyNames, className));
+            searchQuery(query, QueryType.LUCENE.toString(), null, searchWikis, Utils.getXWiki(componentManager)
+                .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order,
+                distinct, number, start, withPrettyNames, className));
 
         return searchResults;
     }

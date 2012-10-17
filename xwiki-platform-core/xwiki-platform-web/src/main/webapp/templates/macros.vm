@@ -2314,7 +2314,7 @@ Wysiwyg.onModuleLoad(function() {
  *#
 #macro (css_textShadow $offsetX $offsetY $blurRadius $color)
   ## In order to ensure consistency across browsers and also to accommodate old ColorThemes that might not have gradientColor defined, we test the existence of $color param
-  #if (("$!{offsetX}" != '') && ("$!{offsetY}" != '') && ("$!{blurRadius}" != '') && ("$!{color}" != ''))
+  #if (("$!{offsetX}" != '') && ("$!{offsetY}" != '') && ("$!{color}" != ''))
     text-shadow: ${offsetX} ${offsetY} ${blurRadius} ${color};
   #end
 #end

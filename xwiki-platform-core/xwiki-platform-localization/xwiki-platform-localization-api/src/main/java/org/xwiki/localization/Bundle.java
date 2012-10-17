@@ -31,7 +31,9 @@ import org.xwiki.component.annotation.Role;
  */
 @Role
 public interface Bundle extends Comparable<Bundle>
-{   
+{
+    int DEFAULTPRIORITY = 1000;
+
     /**
      * @return the unique identifier of the bundle
      */

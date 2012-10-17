@@ -50,17 +50,12 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
  * @version $Id$
  * @since 4.3M1
  */
-public abstract class AbstractWikiBundle extends AbstractBundle implements Bundle, EventListener
+public abstract class AbstractWikiBundle extends AbstractLocalizedBundle implements Bundle
 {
     /**
      * The encoding used for storing unicode characters as bytes.
      */
     protected static final String UNICODE_BYTE_ENCODING = "UTF-8";
-
-    /**
-     * The encoding assumed by the ResourceBundle loader.
-     */
-    protected static final String DEFAULT_RESOURCE_BYTE_ENCODING = "ISO-8859-1";
 
     /**
      * Allows to register for receiving notifications about document changes.
@@ -223,7 +218,7 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
 
     /**
      * Retrieves the default language configured for a wiki. This method uses a cache, If a value is defined in the
-     * cache, then return it. Otherwise, ask the setting from {@link AbstractBundle#wikiInfo} and add it to the cache.
+     * cache, then return it. Otherwise, ask the setting from {@link AbstractLocalizedBundle#wikiInfo} and add it to the cache.
      * This method does not detect stale values, the cache will be invalidated when changes to the preferences document
      * are detected.
      * 

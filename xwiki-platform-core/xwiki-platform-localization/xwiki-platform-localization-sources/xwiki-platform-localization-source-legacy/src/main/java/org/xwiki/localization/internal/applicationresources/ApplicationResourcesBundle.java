@@ -17,21 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.localization;
+package org.xwiki.localization.internal.applicationresources;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.internal.AbstractResourceBundle;
+import org.xwiki.localization.message.TranslationMessageParser;
 
 @Component
 @Singleton
 @Named("resource:ApplicationResources")
 public class ApplicationResourcesBundle extends AbstractResourceBundle
 {
+    @Inject
+    @Named("xwikil10n/1.0")
+    TranslationMessageParser parser;
+
     public ApplicationResourcesBundle()
     {
         super("ApplicationResources", ApplicationResourcesBundle.class.getClassLoader());
+    }
+
+    @Override
+    protected TranslationMessageParser getTranslationMessageParser()
+    {
+        return this.parser;
     }
 }

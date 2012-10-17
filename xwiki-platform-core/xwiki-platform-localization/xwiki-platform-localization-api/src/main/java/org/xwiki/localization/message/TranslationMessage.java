@@ -1,5 +1,7 @@
 package org.xwiki.localization.message;
 
+import org.xwiki.localization.internal.message.TranslationMessageElement;
+
 
 public interface TranslationMessage extends TranslationMessageElement
 {

@@ -25,12 +25,19 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-import org.apache.commons.collections.EnumerationUtils;
+import javax.inject.Inject;
 
-public class AbstractResourceBundle extends AbstractBundle
+import org.xwiki.localization.BundleContext;
+import org.xwiki.localization.message.TranslationMessage;
+import org.xwiki.localization.message.TranslationMessageParser;
+
+public abstract class AbstractResourceBundle extends AbstractLocalizedBundle
 {
     public final static String ID_PREFIX = "resource:";
-    
+
+    @Inject
+    protected BundleContext bundleContext;
+
     protected String baseName;
 
     protected ClassLoader classloader;
@@ -48,6 +55,8 @@ public class AbstractResourceBundle extends AbstractBundle
 
         this.classloader = classloader;
     }
+
+    protected abstract TranslationMessageParser getTranslationMessageParser();
 
     @Override
     protected LocaleBundle createBundle(Locale locale)
@@ -70,11 +79,17 @@ public class AbstractResourceBundle extends AbstractBundle
         if (bundle != null) {
             localeBundle = new DefaultLocaleBundle(this, locale);
 
+            TranslationMessageParser parser = getTranslationMessageParser();
+
             Enumeration<String> keys = bundle.getKeys();
             while (keys.hasMoreElements()) {
                 String key = keys.nextElement();
+                String message = bundle.getString(key);
 
-                localeBundle.addTranslation(new DefaultTranslation(context, localeBundle, key, message));
+                TranslationMessage translationMessage = parser.parse(message);
+
+                localeBundle.addTranslation(new DefaultTranslation(this.bundleContext, localeBundle, key,
+                    translationMessage));
             }
         } else {
             localeBundle = null;

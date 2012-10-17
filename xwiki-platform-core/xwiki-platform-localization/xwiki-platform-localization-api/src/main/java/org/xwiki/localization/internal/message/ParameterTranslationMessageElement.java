@@ -1,4 +1,4 @@
-package org.xwiki.localization.message;
+package org.xwiki.localization.internal.message;
 
 import java.io.StringReader;
 import java.util.Collection;

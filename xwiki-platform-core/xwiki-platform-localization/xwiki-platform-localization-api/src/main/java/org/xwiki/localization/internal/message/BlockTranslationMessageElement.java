@@ -1,4 +1,4 @@
-package org.xwiki.localization.message;
+package org.xwiki.localization.internal.message;
 
 import java.util.Collection;
 import java.util.Locale;

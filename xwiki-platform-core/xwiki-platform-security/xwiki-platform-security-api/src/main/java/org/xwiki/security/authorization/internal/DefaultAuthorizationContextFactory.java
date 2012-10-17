@@ -70,7 +70,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
     @Override
     public void initialize(ExecutionContext executionContext)
     {
-        if (executionContext.getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY) == null) {
+        if (!executionContext.hasProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY)) {
             ExecutionContextProperty property
                 = new ExecutionContextProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
             property.setReadonly(true);

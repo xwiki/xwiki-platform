@@ -112,7 +112,7 @@
  * duplicating the code from actionButtons.js.
  */
 function enhanceNextStepButton(nextStepButton, actionButtons) {
-  var saveAndViewButton = actionButtons.down("input[name='xaction_save']");
+  var saveAndViewButton = actionButtons.down("input[name$='action_save']");
   // Replace the 'Next Step' button with the 'Save &amp; View' button.
   nextStepButton.insert({before: saveAndViewButton}).remove();
   Object.extend(saveAndViewButton, {

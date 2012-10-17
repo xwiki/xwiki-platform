@@ -24,6 +24,7 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
@@ -49,6 +50,8 @@ public class ModelScriptServiceTest
 
     private EntityReferenceValueProvider mockValueProvider;
 
+    private Logger mockLogger;
+
     private Mockery mockery = new Mockery();
 
     @SuppressWarnings("unchecked")
@@ -58,6 +61,8 @@ public class ModelScriptServiceTest
         this.service = new ModelScriptService();
         this.mockComponentManager = this.mockery.mock(ComponentManager.class);
         ReflectionUtils.setFieldValue(this.service, "componentManager", this.mockComponentManager);
+        this.mockLogger = this.mockery.mock(Logger.class);
+        ReflectionUtils.setFieldValue(this.service, "logger", this.mockLogger);
         this.mockResolver = this.mockery.mock(DocumentReferenceResolver.class);
         this.mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
     }
@@ -76,6 +81,24 @@ public class ModelScriptServiceTest
         });
 
         this.service.createDocumentReference("wiki", "space", "page", "default");
+    }
+
+    @Test
+    public void testCreateDocumentReferenceWithDefaultHint() throws Exception
+    {
+        this.mockery.checking(new Expectations()
+        {
+            {
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "currentmixed");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
+
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(
+                    new DocumentReference("wiki", "space", "page"));
+            }
+        });
+
+        this.service.createDocumentReference("wiki", "space", "page");
     }
 
     @Test
@@ -176,6 +199,31 @@ public class ModelScriptServiceTest
         });
 
         Assert.assertNull(this.service.createDocumentReference("wiki", "space", "page", "invalid"));
+    }
+
+    @Test
+    public void testCreateDocumentReferenceWithDeprecatedHint() throws Exception
+    {
+        final DocumentReference ref = new DocumentReference("wiki", "space", "page");
+        this.mockery.checking(new Expectations()
+        {
+            {
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "current/reference");
+                will(throwException(new ComponentLookupException("error")));
+                // Make sure backward compatibility is preserved.
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(DocumentReferenceResolver.class,
+                    "current/reference");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
+
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(
+                    new DocumentReference("wiki", "space", "page"));
+                will(returnValue(ref));
+                allowing(ModelScriptServiceTest.this.mockLogger).warn(with(any(String.class)), with(any(String.class)));
+            }
+        });
+
+        Assert.assertEquals(ref, this.service.createDocumentReference("wiki", "space", "page", "current/reference"));
     }
 
     @Test

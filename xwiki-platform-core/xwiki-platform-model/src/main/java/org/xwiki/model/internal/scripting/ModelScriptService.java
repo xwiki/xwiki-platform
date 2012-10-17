@@ -55,7 +55,7 @@ public class ModelScriptService implements ScriptService
      * The default hint used when resolving references.
      */
     private static final String DEFAULT_RESOLVER_HINT = "currentmixed";
-    
+
     /**
      * The object used to log messages.
      */
@@ -222,7 +222,7 @@ public class ModelScriptService implements ScriptService
     {
         return resolveObject(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
     }
-    
+
     /**
      * @param stringRepresentation an object reference specified as {@link String} (using the "wiki:space.page^object"
      *            format and with special characters escaped where required)
@@ -243,7 +243,7 @@ public class ModelScriptService implements ScriptService
             return null;
         }
     }
-    
+
     /**
      * @param stringRepresentation an object property reference specified as {@link String} (using the 
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
@@ -257,7 +257,7 @@ public class ModelScriptService implements ScriptService
     {
         return resolveObjectProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
     }
-    
+
     /**
      * @param stringRepresentation an object property reference specified as {@link String} (using the
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
@@ -279,7 +279,7 @@ public class ModelScriptService implements ScriptService
             return null;
         }
     }
-    
+
     /**
      * @param reference the entity reference to transform into a String representation
      * @return the string representation of the passed entity reference (using the "compact" serializer)

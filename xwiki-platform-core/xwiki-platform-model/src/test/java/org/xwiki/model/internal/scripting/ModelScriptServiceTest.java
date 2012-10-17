@@ -73,10 +73,12 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default");
-                will(returnValue(mockResolver));
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
-                allowing(mockResolver).resolve(new DocumentReference("wiki", "space", "page"));
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(
+                    new DocumentReference("wiki", "space", "page"));
             }
         });
 
@@ -107,10 +109,11 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default");
-                will(returnValue(mockResolver));
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
-                allowing(mockResolver).resolve(null);
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(null);
             }
         });
 
@@ -123,11 +126,13 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default");
-                will(returnValue(mockResolver));
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
-                allowing(mockResolver).resolve(new EntityReference("page", EntityType.DOCUMENT,
-                    new EntityReference("space", EntityType.SPACE)));
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(
+                    new EntityReference("page", EntityType.DOCUMENT,
+                        new EntityReference("space", EntityType.SPACE)));
             }
         });
 
@@ -140,11 +145,13 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default");
-                will(returnValue(mockResolver));
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
-                allowing(mockResolver).resolve(new EntityReference("page", EntityType.DOCUMENT,
-                    new EntityReference("wiki", EntityType.WIKI)));
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(
+                    new EntityReference("page", EntityType.DOCUMENT,
+                        new EntityReference("wiki", EntityType.WIKI)));
             }
         });
 
@@ -157,11 +164,13 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default");
-                will(returnValue(mockResolver));
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
-                allowing(mockResolver).resolve(new EntityReference("space", EntityType.SPACE,
-                    new EntityReference("wiki", EntityType.WIKI)));
+                allowing(ModelScriptServiceTest.this.mockResolver).resolve(
+                    new EntityReference("space", EntityType.SPACE,
+                        new EntityReference("wiki", EntityType.WIKI)));
             }
         });
 
@@ -174,10 +183,12 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default");
-                will(returnValue(mockResolver));
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "default");
+                will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
-                allowing(mockResolver).resolve(new EntityReference("wiki", EntityType.WIKI));
+                allowing(ModelScriptServiceTest.this.mockResolver)
+                    .resolve(new EntityReference("wiki", EntityType.WIKI));
             }
         });
 
@@ -190,10 +201,12 @@ public class ModelScriptServiceTest
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "invalid");
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    DocumentReferenceResolver.TYPE_REFERENCE, "invalid");
                 will(throwException(new ComponentLookupException("error")));
                 // Make sure backward compatibility is preserved.
-                allowing(mockComponentManager).getInstance(DocumentReferenceResolver.class, "invalid");
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(DocumentReferenceResolver.class,
+                    "invalid");
                 will(throwException(new ComponentLookupException("error")));
             }
         });

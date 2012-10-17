@@ -31,6 +31,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.scripting.ModelScriptService}.
@@ -46,6 +47,8 @@ public class ModelScriptServiceTest
 
     private DocumentReferenceResolver<EntityReference> mockResolver;
 
+    private EntityReferenceValueProvider mockValueProvider;
+
     private Mockery mockery = new Mockery();
 
     @SuppressWarnings("unchecked")
@@ -56,6 +59,7 @@ public class ModelScriptServiceTest
         this.mockComponentManager = this.mockery.mock(ComponentManager.class);
         ReflectionUtils.setFieldValue(this.service, "componentManager", this.mockComponentManager);
         this.mockResolver = this.mockery.mock(DocumentReferenceResolver.class);
+        this.mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
     }
 
     @Test
@@ -172,5 +176,41 @@ public class ModelScriptServiceTest
         });
 
         Assert.assertNull(this.service.createDocumentReference("wiki", "space", "page", "invalid"));
+    }
+
+    @Test
+    public void testGetEntityReferenceValue() throws Exception
+    {
+        this.mockery.checking(new Expectations()
+        {
+            {
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    EntityReferenceValueProvider.class, "current");
+                will(returnValue(ModelScriptServiceTest.this.mockValueProvider));
+                allowing(ModelScriptServiceTest.this.mockValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue("somewiki"));
+            }
+        });
+        Assert.assertEquals("somewiki", this.service.getEntityReferenceValue(EntityType.WIKI));
+    }
+
+    @Test
+    public void testGetEntityReferenceValueWithInvalidHint() throws Exception
+    {
+        this.mockery.checking(new Expectations()
+        {
+            {
+                allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
+                    EntityReferenceValueProvider.class, "invalid");
+                will(throwException(new ComponentLookupException("error")));
+            }
+        });
+        Assert.assertNull(this.service.getEntityReferenceValue(EntityType.WIKI, "invalid"));
+    }
+
+    @Test
+    public void testGetEntityReferenceValueWithNullType() throws Exception
+    {
+        Assert.assertNull(this.service.getEntityReferenceValue(null));
     }
 }

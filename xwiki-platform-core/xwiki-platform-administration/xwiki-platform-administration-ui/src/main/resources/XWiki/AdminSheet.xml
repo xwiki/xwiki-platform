@@ -3758,7 +3758,11 @@ document.observe('xwiki:dom:loaded', function() {
 #else
   $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
   $xwiki.jsx.use('XWiki.AdminSheet')##
-  $xwiki.ssx.use('XWiki.AdminSheet')##
+  #if ($themeDoc)
+    $xwiki.ssx.use('XWiki.AdminSheet', {'colorTheme' : $themeDocFullName})##
+  #else
+    $xwiki.ssx.use('XWiki.AdminSheet')##
+  #end
   #if ($crtSectionId != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0)
     #set ($sectionName = $xwiki.getDocument($crtSectionId).getDisplayTitle())
   #elseif ($crtSectionId != '' &amp;&amp; $msg.get("admin.${crtSectionId.toLowerCase()}") != "admin.${crtSectionId.toLowerCase()}")

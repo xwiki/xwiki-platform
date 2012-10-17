@@ -221,7 +221,7 @@ public class BaseSearchResult extends XWikiResource
 
             /* Build the order clause. */
             String orderClause = null;
-            if (orderField.isEmpty()) {
+            if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
                 /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
@@ -232,11 +232,13 @@ public class BaseSearchResult extends XWikiResource
                 }
             }
 
+            /* Add some filters if the user doesn't have programming rights. */
             if (hasProgrammingRights) {
-                f.format(") order by " + orderClause);
+                f.format(") order by %s", orderClause);
             } else {
-                f.format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by "
-                    + orderClause);
+                f.format(
+                    ") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by %s",
+                    orderClause);
             }
 
             String query = f.toString();
@@ -358,6 +360,7 @@ public class BaseSearchResult extends XWikiResource
 
             f.format("select distinct doc.space from XWikiDocument as doc where upper(doc.space) like :keywords ");
 
+            /* Add some filters if the user doesn't have programming rights. */
             if (hasProgrammingRights) {
                 f.format(" order by doc.space asc");
             } else {
@@ -471,7 +474,7 @@ public class BaseSearchResult extends XWikiResource
 
             /* Build the order clause. */
             String orderClause = null;
-            if (orderField.isEmpty()) {
+            if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
                 /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
@@ -482,11 +485,13 @@ public class BaseSearchResult extends XWikiResource
                 }
             }
 
+            /* Add some filters if the user doesn't have programming rights. */
             if (hasProgrammingRights) {
-                f.format(" order by " + orderClause);
+                f.format(" order by %s", orderClause);
             } else {
-                f.format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by "
-                    + orderClause);
+                f.format(
+                    " and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by %s",
+                    orderClause);
             }
 
             String query = f.toString();
@@ -506,6 +511,7 @@ public class BaseSearchResult extends XWikiResource
                         .execute();
             }
 
+            /* Build the result. */
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
@@ -681,6 +687,7 @@ public class BaseSearchResult extends XWikiResource
 
             queryResult = queryManager.createQuery(squery, queryLanguage).setLimit(number).setOffset(start).execute();
 
+            /* Build the result. */
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
@@ -817,7 +824,7 @@ public class BaseSearchResult extends XWikiResource
                  * in ascending order) or -orderFiled (for descending order)
                  */
                 String orderParameter = "";
-                if (!orderField.isEmpty()) {
+                if (!StringUtils.isBlank(orderField)) {
                     if ("desc".equals(order)) {
                         orderParameter = String.format("-%s", orderField);
                     } else {
@@ -837,6 +844,7 @@ public class BaseSearchResult extends XWikiResource
                 List<com.xpn.xwiki.plugin.lucene.SearchResult> luceneResults =
                     luceneSearchResults.getResults(start + 1, (number == -1) ? 20 : number);
 
+                /* Build the result. */
                 for (com.xpn.xwiki.plugin.lucene.SearchResult luceneSearchResult : luceneResults) {
                     String wikiName = luceneSearchResult.getWiki();
                     String spaceName = luceneSearchResult.getSpace();
@@ -854,7 +862,10 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
 
-                    String attachmentUri = null;
+                    /*
+                     * Check if the result is a page or an attachment, and fill the corresponding fields in the result
+                     * accordingly.
+                     */
                     if (luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE)) {
                         searchResult.setType("page");
                         searchResult.setId(Utils.getPageId(wikiName, spaceName, pageName));
@@ -864,7 +875,7 @@ public class BaseSearchResult extends XWikiResource
                             luceneSearchResult.getFilename()));
                         searchResult.setFilename(luceneSearchResult.getFilename());
 
-                        attachmentUri =
+                        String attachmentUri =
                             UriBuilder
                                 .fromUri(this.uriInfo.getBaseUri())
                                 .path(AttachmentResource.class)

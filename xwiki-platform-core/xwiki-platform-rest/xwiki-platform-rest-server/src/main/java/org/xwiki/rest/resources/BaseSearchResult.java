@@ -268,6 +268,7 @@ public class BaseSearchResult extends XWikiResource
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
+                /* Check if the user has the right to see the found document */
                 if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
                     Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
@@ -376,42 +377,45 @@ public class BaseSearchResult extends XWikiResource
                     .setOffset(start).execute();
 
             for (Object object : queryResult) {
-
                 String spaceName = (String) object;
                 Document spaceDoc = Utils.getXWikiApi(componentManager).getDocument(spaceName + ".WebHome");
-                String title = spaceDoc.getDisplayTitle();
 
-                SearchResult searchResult = objectFactory.createSearchResult();
-                searchResult.setType("space");
-                searchResult.setId(String.format("%s:%s", wikiName, spaceName));
-                searchResult.setWiki(wikiName);
-                searchResult.setSpace(spaceName);
-                searchResult.setTitle(title);
+                /* Check if the user has the right to see the found document */
+                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", spaceDoc.getPrefixedFullName())) {
+                    String title = spaceDoc.getDisplayTitle();
 
-                /* Add a link to the space information */
-                Link spaceLink = new Link();
-                spaceLink.setRel(Relations.SPACE);
-                String spaceUri =
-                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(SpaceResource.class).build(wikiName, spaceName)
-                        .toString();
-                spaceLink.setHref(spaceUri);
-                searchResult.getLinks().add(spaceLink);
+                    SearchResult searchResult = objectFactory.createSearchResult();
+                    searchResult.setType("space");
+                    searchResult.setId(String.format("%s:%s", wikiName, spaceName));
+                    searchResult.setWiki(wikiName);
+                    searchResult.setSpace(spaceName);
+                    searchResult.setTitle(title);
 
-                /* Add a link to the webhome if it exists */
-                String webHomePageId = Utils.getPageId(wikiName, spaceName, "WebHome");
-                if (Utils.getXWikiApi(componentManager).exists(webHomePageId)
-                    && Utils.getXWikiApi(componentManager).hasAccessLevel("view", webHomePageId)) {
-                    String pageUri =
-                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
-                            .build(wikiName, spaceName, "WebHome").toString();
+                    /* Add a link to the space information */
+                    Link spaceLink = new Link();
+                    spaceLink.setRel(Relations.SPACE);
+                    String spaceUri =
+                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(SpaceResource.class).build(wikiName, spaceName)
+                            .toString();
+                    spaceLink.setHref(spaceUri);
+                    searchResult.getLinks().add(spaceLink);
 
-                    Link pageLink = new Link();
-                    pageLink.setHref(pageUri);
-                    pageLink.setRel(Relations.HOME);
-                    searchResult.getLinks().add(pageLink);
+                    /* Add a link to the webhome if it exists */
+                    String webHomePageId = Utils.getPageId(wikiName, spaceName, "WebHome");
+                    if (Utils.getXWikiApi(componentManager).exists(webHomePageId)
+                        && Utils.getXWikiApi(componentManager).hasAccessLevel("view", webHomePageId)) {
+                        String pageUri =
+                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
+                                .build(wikiName, spaceName, "WebHome").toString();
+
+                        Link pageLink = new Link();
+                        pageLink.setHref(pageUri);
+                        pageLink.setRel(Relations.HOME);
+                        searchResult.getLinks().add(pageLink);
+                    }
+
+                    result.add(searchResult);
                 }
-
-                result.add(searchResult);
             }
 
             return result;
@@ -525,6 +529,7 @@ public class BaseSearchResult extends XWikiResource
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
+                /* Check if the user has the right to see the found document */
                 if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
                     Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
@@ -698,6 +703,7 @@ public class BaseSearchResult extends XWikiResource
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
+                /* Check if the user has the right to see the found document */
                 if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
                     Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
@@ -720,7 +726,14 @@ public class BaseSearchResult extends XWikiResource
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
                     }
 
-                    if (className != null && !className.equals("")) {
+                    /*
+                     * In order to add object data to the result, view rights are not enough. Check for edit rights.
+                     * Practical case: XWiki.Admin can be viewed by guest but the information stored in the
+                     * XWiki.XWikiUsers objects (containing the password hash, for example) should not be exposed unless
+                     * the user making the request has actually the right to modify it.
+                     */
+                    if (className != null && !className.equals("")
+                        && Utils.getXWikiApi(componentManager).hasAccessLevel("edit", pageId)) {
                         BaseObject baseObject = Utils.getBaseObject(doc, className, 0, componentManager);
                         if (baseObject != null)
                             searchResult.setObject(DomainObjectFactory.createObject(objectFactory,
@@ -849,92 +862,97 @@ public class BaseSearchResult extends XWikiResource
                     String wikiName = luceneSearchResult.getWiki();
                     String spaceName = luceneSearchResult.getSpace();
                     String pageName = luceneSearchResult.getName();
-                    String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
-                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
-                    String title = doc.getDisplayTitle();
+                    String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
-                    SearchResult searchResult = objectFactory.createSearchResult();
+                    /* Check if the user has the right to see the found document */
+                    if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
+                        String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
+                        Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                        String title = doc.getDisplayTitle();
 
-                    searchResult.setPageFullName(pageFullName);
-                    searchResult.setTitle(title);
-                    searchResult.setWiki(wikiName);
-                    searchResult.setSpace(spaceName);
-                    searchResult.setPageName(pageName);
-                    searchResult.setVersion(doc.getVersion());
+                        SearchResult searchResult = objectFactory.createSearchResult();
 
-                    /*
-                     * Check if the result is a page or an attachment, and fill the corresponding fields in the result
-                     * accordingly.
-                     */
-                    if (luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE)) {
-                        searchResult.setType("page");
-                        searchResult.setId(Utils.getPageId(wikiName, spaceName, pageName));
-                    } else {
-                        searchResult.setType("file");
-                        searchResult.setId(String.format("%s@%s", Utils.getPageId(wikiName, pageFullName),
-                            luceneSearchResult.getFilename()));
-                        searchResult.setFilename(luceneSearchResult.getFilename());
+                        searchResult.setPageFullName(pageFullName);
+                        searchResult.setTitle(title);
+                        searchResult.setWiki(wikiName);
+                        searchResult.setSpace(spaceName);
+                        searchResult.setPageName(pageName);
+                        searchResult.setVersion(doc.getVersion());
 
-                        String attachmentUri =
-                            UriBuilder
-                                .fromUri(this.uriInfo.getBaseUri())
-                                .path(AttachmentResource.class)
-                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                    URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
-                                    URLEncoder.encode(luceneSearchResult.getFilename(), "UTF-8")).toString();
-
-                        Link attachmentLink = new Link();
-                        attachmentLink.setHref(attachmentUri);
-                        attachmentLink.setRel(Relations.ATTACHMENT_DATA);
-                        searchResult.getLinks().add(attachmentLink);
-                    }
-
-                    searchResult.setScore(luceneSearchResult.getScore());
-                    searchResult.setAuthor(luceneSearchResult.getAuthor());
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(doc.getDate());
-                    searchResult.setModified(calendar);
-
-                    if (withPrettyNames) {
-                        searchResult
-                            .setAuthorName(Utils.getAuthorName(luceneSearchResult.getAuthor(), componentManager));
-                    }
-
-                    String language = luceneSearchResult.getLanguage();
-                    if (language.equals("default")) {
-                        language = "";
-                    }
-
-                    String pageUri = null;
-                    try {
-                        if (StringUtils.isBlank(language)) {
-                            pageUri =
-                                UriBuilder
-                                    .fromUri(this.uriInfo.getBaseUri())
-                                    .path(PageResource.class)
-                                    .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                        URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"))
-                                    .toString();
+                        /*
+                         * Check if the result is a page or an attachment, and fill the corresponding fields in the
+                         * result accordingly.
+                         */
+                        if (luceneSearchResult.getType().equals(LucenePlugin.DOCTYPE_WIKIPAGE)) {
+                            searchResult.setType("page");
+                            searchResult.setId(Utils.getPageId(wikiName, spaceName, pageName));
                         } else {
-                            searchResult.setLanguage(language);
-                            pageUri =
+                            searchResult.setType("file");
+                            searchResult.setId(String.format("%s@%s", Utils.getPageId(wikiName, pageFullName),
+                                luceneSearchResult.getFilename()));
+                            searchResult.setFilename(luceneSearchResult.getFilename());
+
+                            String attachmentUri =
                                 UriBuilder
                                     .fromUri(this.uriInfo.getBaseUri())
-                                    .path(PageTranslationResource.class)
+                                    .path(AttachmentResource.class)
                                     .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
                                         URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"),
-                                        language).toString();
+                                        URLEncoder.encode(luceneSearchResult.getFilename(), "UTF-8")).toString();
+
+                            Link attachmentLink = new Link();
+                            attachmentLink.setHref(attachmentUri);
+                            attachmentLink.setRel(Relations.ATTACHMENT_DATA);
+                            searchResult.getLinks().add(attachmentLink);
                         }
-                    } catch (UnsupportedEncodingException ex) {
-                        // This should never happen, UTF-8 is always valid.
+
+                        searchResult.setScore(luceneSearchResult.getScore());
+                        searchResult.setAuthor(luceneSearchResult.getAuthor());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(doc.getDate());
+                        searchResult.setModified(calendar);
+
+                        if (withPrettyNames) {
+                            searchResult.setAuthorName(Utils.getAuthorName(luceneSearchResult.getAuthor(),
+                                componentManager));
+                        }
+
+                        String language = luceneSearchResult.getLanguage();
+                        if (language.equals("default")) {
+                            language = "";
+                        }
+
+                        String pageUri = null;
+                        try {
+                            if (StringUtils.isBlank(language)) {
+                                pageUri =
+                                    UriBuilder
+                                        .fromUri(this.uriInfo.getBaseUri())
+                                        .path(PageResource.class)
+                                        .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                            URLEncoder.encode(spaceName, "UTF-8"), URLEncoder.encode(pageName, "UTF-8"))
+                                        .toString();
+                            } else {
+                                searchResult.setLanguage(language);
+                                pageUri =
+                                    UriBuilder
+                                        .fromUri(this.uriInfo.getBaseUri())
+                                        .path(PageTranslationResource.class)
+                                        .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                            URLEncoder.encode(spaceName, "UTF-8"),
+                                            URLEncoder.encode(pageName, "UTF-8"), language).toString();
+                            }
+                        } catch (UnsupportedEncodingException ex) {
+                            // This should never happen, UTF-8 is always valid.
+                        }
+
+                        Link pageLink = new Link();
+                        pageLink.setHref(pageUri);
+                        pageLink.setRel(Relations.PAGE);
+                        searchResult.getLinks().add(pageLink);
+
+                        result.add(searchResult);
                     }
-
-                    Link pageLink = new Link();
-                    pageLink.setHref(pageUri);
-                    pageLink.setRel(Relations.PAGE);
-                    searchResult.getLinks().add(pageLink);
-
-                    result.add(searchResult);
                 }
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,

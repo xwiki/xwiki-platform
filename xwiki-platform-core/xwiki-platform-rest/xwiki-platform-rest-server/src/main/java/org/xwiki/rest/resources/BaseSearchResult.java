@@ -94,8 +94,8 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName
      * @param space
      * @param hasProgrammingRights
-     * @param number
-     * @param start
+     * @param number number of results to be returned.
+     * @param start 0-based start offset.
      * @param distinct
      * @param orderField
      * @param order
@@ -144,8 +144,8 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName
      * @param space
      * @param hasProgrammingRights
-     * @param number
-     * @param start
+     * @param number number of results to be returned.
+     * @param start 0-based start offset.
      * @param orderField the field to be used to order the results.
      * @param order "asc" or "desc"
      * @param withPrettyNames
@@ -329,12 +329,12 @@ public class BaseSearchResult extends XWikiResource
     /**
      * Search for keyword in the given scopes. Limit the search only to spaces.
      * 
-     * @param keywords the string that will be used in a "like" XWQL clause.
+     * @param keywords the string that will be used in a "like" XWQL clause
      * @param wikiName
      * @param space
      * @param hasProgrammingRights
-     * @param number
-     * @param start
+     * @param number number of results to be returned
+     * @param start 0-based start offset
      * @return the results.
      * @throws QueryException
      * @throws IllegalArgumentException
@@ -424,8 +424,8 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName
      * @param space
      * @param hasProgrammingRights
-     * @param number
-     * @param start
+     * @param number number of results to be returned
+     * @param start 0-based start offset
      * @param orderField the field to be used to order the results
      * @param order "asc" or "desc"
      * @param withPrettyNames
@@ -579,10 +579,10 @@ public class BaseSearchResult extends XWikiResource
      * @param orderField the field to be used to order the results.
      * @param order "asc" or "desc"
      * @param distinct
-     * @param number
-     * @param start
+     * @param number number of results to be returned
+     * @param start 0-based start offset.
      * @param withPrettyNames
-     * @param className 
+     * @param className
      * @return a list of {@link SearchResult} objects containing the found items, or an empty list if the specified
      *         query type string doesn't represent a supported query type.
      * @throws QueryException
@@ -637,8 +637,8 @@ public class BaseSearchResult extends XWikiResource
      * @param wikiName
      * @param hasProgrammingRights
      * @param distinct
-     * @param number
-     * @param start
+     * @param number number of results to be returned
+     * @param start 0-based start offset
      * @param withPrettyNames Add the pretty names for users
      * @param className Add object of type className
      * @throws QueryException
@@ -773,7 +773,7 @@ public class BaseSearchResult extends XWikiResource
      * @param orderField
      * @param order
      * @param number the number of results to be returned. If it's -1 then the first 20 results are returned.
-     * @param start
+     * @param start 0-based start offset
      * @param withPrettyNames
      * @return
      * @throws QueryException
@@ -829,9 +829,13 @@ public class BaseSearchResult extends XWikiResource
                     lucene.getSearchResults(query, orderParameter, (wikis == null) ? defaultWikiName : wikis, "",
                         context);
 
-                /* Return only the first 20 results otherwise specified. */
+                /*
+                 * Return only the first 20 results otherwise specified. It also seems that Lucene indexing starts at 1
+                 * (though starting from 0 works as well, and gives the samer results as if starting from 1). To keep
+                 * things consistent we add 1 to the passed start value (which is always 0-based).
+                 */
                 List<com.xpn.xwiki.plugin.lucene.SearchResult> luceneResults =
-                    luceneSearchResults.getResults(start, (number == -1) ? 20 : number);
+                    luceneSearchResults.getResults(start + 1, (number == -1) ? 20 : number);
 
                 for (com.xpn.xwiki.plugin.lucene.SearchResult luceneSearchResult : luceneResults) {
                     String wikiName = luceneSearchResult.getWiki();

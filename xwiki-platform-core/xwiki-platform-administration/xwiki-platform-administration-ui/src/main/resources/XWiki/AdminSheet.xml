@@ -3292,7 +3292,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.configurationIcon {
   background-image: $configurationIcon;
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3301,7 +3301,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.configurationIcon:hover , .admin-menu .current.configurationIcon {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -3313,7 +3313,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.lfIcon {
   background-image: $lfIcon;
   #css3_backgroundIconAndLinearGradient($lfIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3322,7 +3322,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.lfIcon:hover , .admin-menu .current.lfIcon {
   #css3_backgroundIconAndLinearGradient($lfIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -3334,7 +3334,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.usersgroupsIcon {
   background-image: $usersgroupsIcon;
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3343,7 +3343,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.usersgroupsIcon:hover , .admin-menu .current.usersgroupsIcon {
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -3355,7 +3355,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.contentIcon {
   background-image: $contentIcon;
   #css3_backgroundIconAndLinearGradient($contentIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3364,7 +3364,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.contentIcon:hover , .admin-menu .current.contentIcon {
   #css3_backgroundIconAndLinearGradient($contentIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -3376,7 +3376,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.extensionmanagerIcon {
   background-image: $extensionmanagerIcon;
   #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3385,7 +3385,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.extensionmanagerIcon:hover , .admin-menu .current.extensionmanagerIcon {
   #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -3397,7 +3397,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.applicationsIcon {
   background-image: $applicationsIcon;
   #css3_backgroundIconAndLinearGradient($applicationsIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3406,7 +3406,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.applicationsIcon:hover , .admin-menu .current.applicationsIcon {
   #css3_backgroundIconAndLinearGradient($applicationsIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -3418,7 +3418,7 @@ document.observe('xwiki:dom:loaded', function() {
 .admin-menu .group.readOnly {
   background-image: $readOnlyIcon;
   #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -3427,7 +3427,7 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .admin-menu .group.readOnly:hover , .admin-menu .current.readOnly {
   #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}

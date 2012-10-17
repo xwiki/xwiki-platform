@@ -147,7 +147,7 @@ dt {
 input[type="text"], input[type="password"] {
   background-color: $theme.pageContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.fieldGradientColor, 'position': '1px'},
       {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
@@ -162,7 +162,7 @@ input[type="text"], input[type="password"] {
 textarea, select {
   background-color: $theme.pageContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.fieldGradientColor, 'position': '1px'},
       {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
@@ -1118,8 +1118,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
   ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
-  #foreach ($prefix in ['-moz-', '-webkit-', '-o-', '-ms-', ''])
-    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #foreach ($prefix in ['-webkit-'])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
+  #foreach ($prefix in ['-moz-', '-o-', ''])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(bottom, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
   #end
 }
 
@@ -1420,7 +1423,7 @@ input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.buttonPrimaryGradientColor, 'position': '0%'},
       {'color': $theme.buttonPrimaryBackgroundColor, 'position': '100%'}
@@ -1441,7 +1444,7 @@ input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:
 input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
   background-color: $theme.buttonPrimaryBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.buttonPrimaryBackgroundColor, 'position': '0%'},
       {'color': $theme.buttonPrimaryGradientColor, 'position': '100%'}
@@ -1457,7 +1460,7 @@ input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
   background-color: $theme.buttonSecondaryBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.buttonSecondaryGradientColor, 'position': '0%'},
       {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
@@ -1542,7 +1545,7 @@ input.icon-button {
 .vertical-menu .group {
   background-color: $theme.menuContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -1562,7 +1565,7 @@ input.icon-button {
 .vertical-menu .group:hover {
   background-color: $theme.menuBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -1581,7 +1584,7 @@ input.icon-button {
 .vertical-menu .current-group {
   background-color: $theme.menuBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -1782,7 +1785,7 @@ ul.xwikitabbar {
 h1.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
       {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
@@ -1796,7 +1799,7 @@ h1.xwikipaneltitle {
 .collapsed h1.xwikipaneltitle {
   background-color: $theme.panelCollapsedBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.panelCollapsedGradientColor, 'position': '0%'},
       {'color': $theme.panelCollapsedBackgroundColor, 'position': '100%'}
@@ -1809,7 +1812,7 @@ h1.xwikipaneltitle {
 #contentmenu, #editmenu, ul.xwikitabbar {
   background-color: $theme.menuContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -1837,7 +1840,7 @@ h1.xwikipaneltitle {
 
 #mainmenu {
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}

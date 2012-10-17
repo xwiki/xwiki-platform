@@ -248,27 +248,32 @@ public class HtmlPackager
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");
 
+            ExecutionContext executionContext = ecim.clone(execution.getContext());
+
+            // Bridge with old XWiki Context, required for old code.
+            executionContext.setProperty("xwikicontext", renderContext);
+
             // Push a clean new Execution Context since we don't want the main Execution Context to be used for
             // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
             // Execution Context automatically gets initialized with a new Velocity Context by
             // the VelocityRequestInitializer class.
-            execution.pushContext(new ExecutionContext());
+            execution.pushContext(executionContext);
 
-            // Bridge with old XWiki Context, required for old code.
-            execution.getContext().setProperty("xwikicontext", renderContext);
+            try {
 
-            ecim.initialize(execution.getContext());
+                VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
-            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+                // At this stage we have a clean Velocity Context
+                VelocityContext vcontext = velocityManager.getVelocityContext();
 
-            // At this stage we have a clean Velocity Context
-            VelocityContext vcontext = velocityManager.getVelocityContext();
+                urlf.init(this.pages, tempdir, renderContext);
+                renderContext.setURLFactory(urlf);
 
-            urlf.init(this.pages, tempdir, renderContext);
-            renderContext.setURLFactory(urlf);
-
-            for (String pageName : this.pages) {
-                renderDocument(pageName, zos, renderContext, vcontext);
+                for (String pageName : this.pages) {
+                    renderDocument(pageName, zos, renderContext, vcontext);
+                } 
+            } finally {
+                execution.popContext();
             }
         } catch (ExecutionContextException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_INIT_FAILED,
@@ -276,8 +281,6 @@ public class HtmlPackager
         } finally {
             // We must ensure that the new request we've used is removed so that the current
             // thread can continue to use its original Execution Context.
-            execution.popContext();
-
             context.put("vcontext", oldVelocityContext);
         }
     }

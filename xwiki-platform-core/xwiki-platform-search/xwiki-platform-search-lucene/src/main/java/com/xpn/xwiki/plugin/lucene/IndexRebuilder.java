@@ -38,6 +38,7 @@ import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -118,7 +119,10 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
-        super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
+        ExecutionContextProperty property = new ExecutionContextProperty("xwikicontext");
+        property.setValue(context.clone());
+        property.setInherited(true);
+        addPropertyDeclaration(property);
 
         this.indexUpdater = indexUpdater;
     }

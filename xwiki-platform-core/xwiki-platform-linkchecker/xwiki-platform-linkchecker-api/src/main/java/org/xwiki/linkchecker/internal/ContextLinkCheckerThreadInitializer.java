@@ -80,7 +80,7 @@ public class ContextLinkCheckerThreadInitializer implements LinkCheckerThreadIni
 
             // Bridge with old XWiki Context, required for old code.
             XWikiContext xwikiContext = this.stubContextProvider.createStubContext();
-            context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
+            xwikiContext.declareInExecutionContext(context);
 
             this.execution.pushContext(context);
         }

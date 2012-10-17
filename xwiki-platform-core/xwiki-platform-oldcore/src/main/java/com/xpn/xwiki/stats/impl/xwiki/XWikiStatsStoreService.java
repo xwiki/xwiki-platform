@@ -38,6 +38,8 @@ import com.xpn.xwiki.web.DownloadAction;
 import com.xpn.xwiki.web.SaveAction;
 import com.xpn.xwiki.web.ViewAction;
 
+import org.xwiki.context.ExecutionContextProperty;
+
 /**
  * Back-end statistics storing service.
  * 
@@ -68,7 +70,10 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
      */
     public XWikiStatsStoreService(XWikiContext context)
     {
-        super(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+        ExecutionContextProperty property = new ExecutionContextProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        property.setValue(context);
+        property.setInherited(true);
+        addPropertyDeclaration(property);
 
         long queueSize = context.getWiki().ParamAsLong("stats.queue.size", 200);
         this.queue = new ArrayBlockingQueue<XWikiStatsStoreItem>((int) queueSize);

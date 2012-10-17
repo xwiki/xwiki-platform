@@ -68,7 +68,7 @@ public abstract class AbstractPackager
             ExecutionContext econtext = new ExecutionContext();
 
             // Bridge with old XWiki Context, required for old code.
-            econtext.setProperty("xwikicontext", xcontext);
+            xcontext.declareInExecutionContext(econtext);
 
             ecim.initialize(econtext);
         } catch (ExecutionContextException e) {

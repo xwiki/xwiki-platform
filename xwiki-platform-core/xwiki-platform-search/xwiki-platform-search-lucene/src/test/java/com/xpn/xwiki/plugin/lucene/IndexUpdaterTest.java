@@ -154,6 +154,10 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("search").will(returnValue(Collections.EMPTY_LIST));
+        // Since "xwikicontext" will be declared before running execution context initializers as a result of
+        // implementing XWIKI-8322, the message tool velocity context initializer will be triggered to call
+        // the prepareResources method.  So, we will just allow it.
+        this.mockXWiki.stubs().method("prepareResources").with(ANYTHING);
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().setDatabase("wiki");

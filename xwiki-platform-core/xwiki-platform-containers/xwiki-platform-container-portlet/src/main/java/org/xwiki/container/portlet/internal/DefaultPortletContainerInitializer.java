@@ -38,6 +38,7 @@ import org.xwiki.container.portlet.PortletResponse;
 import org.xwiki.container.portlet.PortletSession;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
@@ -90,7 +91,10 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         // 3) Bridge with old code to play well with new components. Old code relies on the
         // XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
-            this.execution.getContext().setProperty("xwikicontext", xwikiContext);
+            ExecutionContextProperty property = new ExecutionContextProperty("xwikicontext");
+            property.setValue(xwikiContext);
+            property.setInherited(true);
+            execution.getContext().declareProperty(property);
         }
 
         // 4) Call the request initializers to populate the Request.

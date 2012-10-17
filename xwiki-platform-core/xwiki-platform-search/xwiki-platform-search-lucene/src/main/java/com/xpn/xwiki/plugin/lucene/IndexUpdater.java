@@ -42,6 +42,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -117,7 +118,10 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
-        super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
+        ExecutionContextProperty property = new ExecutionContextProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        property.setValue(context.clone());
+        property.setInherited(true);
+        addPropertyDeclaration(property);
 
         this.plugin = plugin;
 

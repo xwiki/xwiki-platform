@@ -30,6 +30,8 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -712,5 +714,19 @@ public class XWikiContext extends Hashtable<Object, Object>
         context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
         return context;
+    }
+
+    /**
+     * There are several places where the XWiki context needs to be declared in the execution, so we add a common method
+     * here.
+     *
+     * @param executionContext The execution context.
+     */
+    public void declareInExecutionContext(ExecutionContext executionContext)
+    {
+        ExecutionContextProperty property = new ExecutionContextProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        property.setValue(this);
+        property.setInherited(true);
+        executionContext.declareProperty(property);
     }
 }

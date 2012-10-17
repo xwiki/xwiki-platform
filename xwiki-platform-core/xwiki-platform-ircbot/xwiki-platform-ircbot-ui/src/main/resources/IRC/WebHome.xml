@@ -41,7 +41,7 @@ Here are the IRC logs archived by the IRC Bot:
 })
 #set ($options = {
   'className': 'IRC.IRCBotArchiveClass',
-  'translationPrefix' : 'irc.',
+  'translationPrefix' : 'ircbot.livetable.',
   'rowCount': 10,
   'defaultOrder': 'desc'
 })

@@ -46,6 +46,7 @@ import org.xwiki.rest.resources.spaces.SpaceResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import com.xpn.xwiki.XWikiContext;
@@ -159,6 +160,8 @@ public class BaseSearchResult extends XWikiResource
         String space, boolean hasProgrammingRights, int number, int start, String orderField, String order,
         Boolean withPrettyNames) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
@@ -269,8 +272,8 @@ public class BaseSearchResult extends XWikiResource
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
                 /* Check if the user has the right to see the found document */
-                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
-                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                if (xwikiApi.hasAccessLevel("view", pageId)) {
+                    Document doc = xwikiApi.getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("page");
@@ -347,6 +350,8 @@ public class BaseSearchResult extends XWikiResource
     protected List<SearchResult> searchSpaces(String keywords, String wikiName, boolean hasProgrammingRights,
         int number, int start) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
@@ -378,10 +383,10 @@ public class BaseSearchResult extends XWikiResource
 
             for (Object object : queryResult) {
                 String spaceName = (String) object;
-                Document spaceDoc = Utils.getXWikiApi(componentManager).getDocument(spaceName + ".WebHome");
+                Document spaceDoc = xwikiApi.getDocument(String.format("%s.WebHome", spaceName));
 
                 /* Check if the user has the right to see the found document */
-                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", spaceDoc.getPrefixedFullName())) {
+                if (xwikiApi.hasAccessLevel("view", spaceDoc.getPrefixedFullName())) {
                     String title = spaceDoc.getDisplayTitle();
 
                     SearchResult searchResult = objectFactory.createSearchResult();
@@ -402,8 +407,7 @@ public class BaseSearchResult extends XWikiResource
 
                     /* Add a link to the webhome if it exists */
                     String webHomePageId = Utils.getPageId(wikiName, spaceName, "WebHome");
-                    if (Utils.getXWikiApi(componentManager).exists(webHomePageId)
-                        && Utils.getXWikiApi(componentManager).hasAccessLevel("view", webHomePageId)) {
+                    if (xwikiApi.exists(webHomePageId) && xwikiApi.hasAccessLevel("view", webHomePageId)) {
                         String pageUri =
                             UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
                                 .build(wikiName, spaceName, "WebHome").toString();
@@ -446,6 +450,8 @@ public class BaseSearchResult extends XWikiResource
         boolean hasProgrammingRights, int number, int start, String orderField, String order, Boolean withPrettyNames)
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+        
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
@@ -530,8 +536,8 @@ public class BaseSearchResult extends XWikiResource
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
                 /* Check if the user has the right to see the found document */
-                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
-                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                if (xwikiApi.hasAccessLevel("view", pageId)) {
+                    Document doc = xwikiApi.getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("object");
@@ -662,6 +668,8 @@ public class BaseSearchResult extends XWikiResource
         boolean hasProgrammingRights, boolean distinct, int number, int start, Boolean withPrettyNames, String className)
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
@@ -704,8 +712,8 @@ public class BaseSearchResult extends XWikiResource
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
                 /* Check if the user has the right to see the found document */
-                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
-                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                if (xwikiApi.hasAccessLevel("view", pageId)) {
+                    Document doc = xwikiApi.getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
 
                     SearchResult searchResult = objectFactory.createSearchResult();
@@ -733,12 +741,12 @@ public class BaseSearchResult extends XWikiResource
                      * the user making the request has actually the right to modify it.
                      */
                     if (className != null && !className.equals("")
-                        && Utils.getXWikiApi(componentManager).hasAccessLevel("edit", pageId)) {
+                        && xwikiApi.hasAccessLevel("edit", pageId)) {
                         BaseObject baseObject = Utils.getBaseObject(doc, className, 0, componentManager);
                         if (baseObject != null)
                             searchResult.setObject(DomainObjectFactory.createObject(objectFactory,
                                 uriInfo.getBaseUri(), Utils.getXWikiContext(componentManager), doc, baseObject, false,
-                                Utils.getXWikiApi(componentManager), false));
+                                xwikiApi, false));
                     }
 
                     String pageUri = null;
@@ -805,6 +813,8 @@ public class BaseSearchResult extends XWikiResource
         boolean hasProgrammingRights, String orderField, String order, int number, int start, Boolean withPrettyNames)
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+        
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
@@ -865,9 +875,9 @@ public class BaseSearchResult extends XWikiResource
                     String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
                     /* Check if the user has the right to see the found document */
-                    if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
+                    if (xwikiApi.hasAccessLevel("view", pageId)) {
                         String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
-                        Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+                        Document doc = xwikiApi.getDocument(pageFullName);
                         String title = doc.getDisplayTitle();
 
                         SearchResult searchResult = objectFactory.createSearchResult();

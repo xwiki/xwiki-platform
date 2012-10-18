@@ -450,8 +450,10 @@ public class BaseSearchResult extends XWikiResource
         boolean hasProgrammingRights, int number, int start, String orderField, String order, Boolean withPrettyNames)
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
+        XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
+
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
-        
+
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
@@ -535,8 +537,11 @@ public class BaseSearchResult extends XWikiResource
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
                 String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
 
-                /* Check if the user has the right to see the found document */
-                if (xwikiApi.hasAccessLevel("view", pageId)) {
+                /*
+                 * Check if the user has the right to see the found document. We also prevent guest users to access
+                 * object data in order to avoid leaking important information such as emails to crawlers.
+                 */
+                if (xwikiApi.hasAccessLevel("view", pageId) && xwikiContext.getUserReference() != null) {
                     Document doc = xwikiApi.getDocument(pageFullName);
                     String title = doc.getDisplayTitle();
                     SearchResult searchResult = objectFactory.createSearchResult();
@@ -669,6 +674,7 @@ public class BaseSearchResult extends XWikiResource
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+        XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
 
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -735,18 +741,14 @@ public class BaseSearchResult extends XWikiResource
                     }
 
                     /*
-                     * In order to add object data to the result, view rights are not enough. Check for edit rights.
-                     * Practical case: XWiki.Admin can be viewed by guest but the information stored in the
-                     * XWiki.XWikiUsers objects (containing the password hash, for example) should not be exposed unless
-                     * the user making the request has actually the right to modify it.
+                     * Avoid to return object information if the user is not authenticated. This will prevent crawlers
+                     * to retrieve information such as email addresses and passwords from user's profiles.
                      */
-                    if (className != null && !className.equals("")
-                        && xwikiApi.hasAccessLevel("edit", pageId)) {
+                    if (className != null && !className.equals("") && xwikiContext.getUserReference() != null) {
                         BaseObject baseObject = Utils.getBaseObject(doc, className, 0, componentManager);
                         if (baseObject != null)
                             searchResult.setObject(DomainObjectFactory.createObject(objectFactory,
-                                uriInfo.getBaseUri(), Utils.getXWikiContext(componentManager), doc, baseObject, false,
-                                xwikiApi, false));
+                                uriInfo.getBaseUri(), xwikiContext, doc, baseObject, false, xwikiApi, false));
                     }
 
                     String pageUri = null;
@@ -814,7 +816,7 @@ public class BaseSearchResult extends XWikiResource
         throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
-        
+
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */

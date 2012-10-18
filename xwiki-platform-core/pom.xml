@@ -261,6 +261,9 @@
             <!-- Added a common method to all elements to set all the data from another element -->
             <!-- Technically this does not really break anything because all elements are supposed to extends BaseElement -->
             <exclude>com/xpn/xwiki/objects/ElementInterface</exclude>
+            <!-- IRCBot is still a young API. Added a new initialize() method to support installing the IRC Bot
+                 application in a subwiki -->
+            <exclude>org/xwiki/ircbot/IRCBot</exclude>
           </excludes>
         </configuration>
       </plugin>

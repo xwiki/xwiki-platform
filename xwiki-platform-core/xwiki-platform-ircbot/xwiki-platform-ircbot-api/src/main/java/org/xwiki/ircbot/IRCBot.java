@@ -37,6 +37,14 @@ import org.xwiki.component.annotation.Role;
 public interface IRCBot
 {
     /**
+     * Initialize the IRC Bot. Needs to be called before the Bot can be used.
+     *
+     * @param wikiName the name of the wiki under which the IRC Bot listener will execute (eg "xwiki")
+     * @since 4.3M1
+     */
+    void initialize(String wikiName);
+
+    /**
      * Sets the name of the bot, which will be used as its nick when it tries to join an IRC server. This should be
      * set before joining any servers, otherwise the default nick will be used.
      *

@@ -44,6 +44,8 @@ import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 
 /**
  * Default implementation of {@link org.xwiki.ircbot.wiki.WikiIRCBotManager}.
@@ -92,12 +94,22 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     @Inject
     private WikiIRCBotListenerManager botListenerManager;
 
+    /**
+     * Used to initialize the Bot by passing the current wiki (so that Bot listeners will execute in the right wiki
+     * context) thereafter.
+     */
+    @Inject
+    private ModelContext modelContext;
+
     @Override
     public void startBot(boolean updateBotStatus) throws IRCBotException
     {
         if (isBotStarted()) {
             throw new IRCBotException("Bot is already started!");
         }
+
+        // Initialize the Bot
+        initializeBot();
 
         // Get configuration data for the Bot
         BotData botData = this.ircModel.loadBotData();
@@ -207,5 +219,18 @@ public class DefaultWikiIRCBotManager implements WikiIRCBotManager, WikiIRCBotCo
     {
         return (Map<String, Object>) this.ircModel.getXWikiContext().get(
             WikiIRCBotListener.LISTENER_XWIKICONTEXT_PROPERTY);
+    }
+
+    /**
+     * Initialize the Bot by passing the current wiki (so that Bot listeners will execute in the right wiki context)
+     * thereafter.
+     *
+     * Note that we don't use Initializable since we want to control the initialization so that we can pass the
+     * current wiki in the init process so that it's set in the PircBotX listener thread (so that Bot Listeners
+     * execute in that wiki context).
+     */
+    private synchronized void initializeBot()
+    {
+        this.bot.initialize(this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName());
     }
 }

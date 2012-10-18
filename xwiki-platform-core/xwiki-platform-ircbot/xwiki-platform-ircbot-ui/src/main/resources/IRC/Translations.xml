@@ -25,6 +25,6 @@
   <hidden>true</hidden>
   <content>ircbot.livetable.doc.name=Name
 ircbot.livetable.channel=Channel
-ircbot.livetable.doc.date=Date
+ircbot.livetable.doc.creationDate=Creation Date
 ircbot.panels.applicationsPanelEntryLabel=IRC Bot</content>
 </xwikidoc>

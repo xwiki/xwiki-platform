@@ -33,9 +33,9 @@
 Here are the IRC logs archived by the IRC Bot:
 
 {{velocity}}
-#set ($columns = ['doc.date', 'channel', 'doc.name'])
+#set ($columns = ['doc.creationDate', 'channel', 'doc.name'])
 #set ($columnsProperties = {
-  'doc.date' : { 'type' : 'text' },
+  'doc.creationDate' : { 'type' : 'text' },
   'channel' : { 'type' : 'text' },
   'doc.name' : { 'type' : 'text', 'link' : 'view'}
 })

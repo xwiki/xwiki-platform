@@ -89,31 +89,35 @@ public class HiddenDocumentFilter implements QueryFilter, Initializable
         String result = statement.trim();
         String lowerStatement = result.toLowerCase();
         String original = result;
+        String where = " where ";
 
         if (Query.HQL.equals(language) && isActive && isFilterable(lowerStatement)) {
 
-            int idx = lowerStatement.indexOf("where ");
-            if (idx >= 0) {
+            int whereIdx = lowerStatement.indexOf(where);
+            int orderByIdx = Math.min(lowerStatement.indexOf(" order by "), Integer.MAX_VALUE);
+            int groupByIdx = Math.min(lowerStatement.indexOf(" group by "), Integer.MAX_VALUE);
+            // We need to handle the case where there's only one of them and not both (ie. avoid -1)
+            orderByIdx = orderByIdx < 0 ? Integer.MAX_VALUE : orderByIdx;
+            groupByIdx = groupByIdx < 0 ? Integer.MAX_VALUE : groupByIdx;
+            // Get the index of the first or only one
+            int orderOrGroupByIdx = Math.min(orderByIdx, groupByIdx);
+
+            if (whereIdx >= 0) {
                 // With 'WHERE'
-                idx = idx + 6;
+                // We need the index at the end of the " where " part
+                whereIdx = whereIdx + where.length();
+                int whereEndIdx = Math.min(orderOrGroupByIdx, lowerStatement.length());
+                result = result.substring(0, whereEndIdx) + ")" + result.substring(whereEndIdx);
                 result =
-                        result.substring(0, idx) + "(doc.hidden <> true or doc.hidden is null) and "
-                                + result.substring(idx);
+                    result.substring(0, whereIdx) + "(doc.hidden <> true or doc.hidden is null) and ("
+                                + result.substring(whereIdx);
             } else {
                 // Without 'WHERE', look for 'ORDER BY' or 'GROUP BY'
-                int oidx = Math.min(lowerStatement.indexOf("order by "), Integer.MAX_VALUE);
-                int gidx = Math.min(lowerStatement.indexOf("group by "), Integer.MAX_VALUE);
-                // We need to handle the case where there's only one of them and not both (ie. avoid -1)
-                oidx = oidx < 0 ? Integer.MAX_VALUE : oidx;
-                gidx = gidx < 0 ? Integer.MAX_VALUE : gidx;
-                // Get the index of the first or only one
-                idx = Math.min(oidx, gidx);
-
-                if (idx > 0 && idx < Integer.MAX_VALUE) {
+                if (orderOrGroupByIdx > 0 && orderOrGroupByIdx < Integer.MAX_VALUE) {
                     // Without 'WHERE', but with 'ORDER BY' and/or 'GROUP BY'
                     result =
-                            result.substring(0, idx) + "where doc.hidden <> true or doc.hidden is null "
-                                    + result.substring(idx);
+                            result.substring(0, orderOrGroupByIdx) + " where doc.hidden <> true or doc.hidden is null"
+                                    + result.substring(orderOrGroupByIdx);
                 } else {
                     // Without 'WHERE', 'ORDER BY' or 'GROUP BY'... This should not happen at all.
                     result = result + " where (doc.hidden <> true or doc.hidden is null)";

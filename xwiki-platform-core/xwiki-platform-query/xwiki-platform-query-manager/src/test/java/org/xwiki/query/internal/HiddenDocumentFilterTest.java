@@ -63,7 +63,7 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     public void filterHQLStatementWithDoNotDisplayHiddenDocumentsInTheUserPreferences() throws Exception
     {
         assertEquals(
-                "select doc.fullName from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and 1=1",
+                "select doc.fullName from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and (1=1)",
                 filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.HQL));
     }
 
@@ -95,6 +95,36 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         assertEquals("select doc.fullName from XWikiDocument doc where 1=1",
                 filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.XWQL));
+    }
+
+    @Test
+    public void filterHQLStatementWithWhereAndOrderBy()
+    {
+        // Insertions of distinct
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
+            + "(1=1) order by doc.name",
+                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name",
+                    Query.HQL));
+    }
+
+    @Test
+    public void filterHQLStatementWithWhereAndGroupBy()
+    {
+        // Insertions of distinct
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
+            + "(1=1) group by doc.name",
+                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 group by doc.name",
+                    Query.HQL));
+    }
+
+    @Test
+    public void filterHQLStatementWithWhereAndOrderByAndGroupBy()
+    {
+        // Insertions of distinct
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
+            + "(1=1) order by doc.name group by doc.name",
+                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name group by "
+                    + "doc.name", Query.HQL));
     }
 
     @Test

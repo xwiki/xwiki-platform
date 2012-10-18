@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1331905409000</creationDate>
-  <date>1331910045000</date>
-  <contentUpdateDate>1331910045000</contentUpdateDate>
+  <creationDate>1350563405000</creationDate>
+  <date>1350567054000</date>
+  <contentUpdateDate>1350567054000</contentUpdateDate>
   <version>1.1</version>
   <title>Wiki News Bot Listener</title>
   <template/>
@@ -179,8 +179,7 @@ import com.xpn.xwiki.*
 
 def irccontext = services.get("ircbot").getContext() 
 def message = irccontext.get("message")
-def wikiServerPrefix = "XWiki.XWikiServer"
-def wikiNames = irccontext.get("wikis")
+wikiNames = irccontext.get("wikis")
 
 if (message.startsWith("!news")) {
   println "Last 4 pages modified:"
@@ -199,13 +198,10 @@ List getLastModifications(String sql, int nbModifications, XWiki xwiki, XWikiCon
   if (xwiki.isVirtualMode()) {
     def names = wikiNames
     if (names == null || names.size() == 0) {
-      def allwikilist = xwiki.store.searchDocumentsNames(", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className='XWiki.XWikiServerClass' and doc.fullName&lt;&gt;'XWiki.XWikiServerClassTemplate' and prop.id.id=obj.id and prop.id.name='server'", context)
-      names = []
-      for (wikidocname in allwikilist) {
-        names.add(wikidocname.substring(wikiServerPrefix.length()).toLowerCase())
-      }
-      if (!names.contains(context.getMainXWiki())) {
-        names.add(context.getMainXWiki())
+      def mainWiki = services.model.resolveDocument('', 'default').wikiReference.name
+      names = xwiki.getVirtualWikisDatabaseNames(context)
+      if (!names.contains(mainWiki)) {
+        names.add(mainWiki)
       }
     }
   

@@ -22,15 +22,31 @@ package org.xwiki.rest.resources.wikis;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerPluginApi;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
 /**
  * @version $Id$
@@ -39,6 +55,8 @@ import com.xpn.xwiki.XWikiException;
 @Path("/wikis")
 public class WikisResource extends XWikiResource
 {
+    private static final String PLUGIN_ID = "wikimanager";
+
     @GET
     public Wikis get() throws XWikiException
     {
@@ -57,4 +75,66 @@ public class WikisResource extends XWikiResource
 
         return wikis;
     }
+
+    @POST
+    public Response createWiki(@QueryParam("template") String template, Wiki wiki) throws XWikiException
+    {
+        /* Get the wiki manager plugin */
+        XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
+        WikiManagerPlugin wikiManagerPlugin =
+            new WikiManagerPlugin(PLUGIN_ID, WikiManagerPlugin.class.getName(), xwikiContext);
+        wikiManagerPlugin.init(xwikiContext);
+        WikiManagerPluginApi wikiManager =
+            (WikiManagerPluginApi) wikiManagerPlugin.getPluginApi(wikiManagerPlugin, xwikiContext);
+
+        /* Create the wiki */
+        XWikiServer wikiServer = wikiManager.createWikiDocument();
+        if (wiki.getId() != null) {
+            wikiServer.setServer(wiki.getId());
+        } else {
+            throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity("Wiki id must be specified")
+                .build());
+        }
+
+        /* If the owner is not specified, set it to the user who made the request. */
+        if (wiki.getOwner() != null) {
+            wikiServer.setOwner(wiki.getOwner());
+        } else {
+            wikiServer.setOwner(xwikiContext.getUser());
+        }
+
+        wikiServer.setWikiPrettyName(wiki.getName());
+        wikiServer.setDescription(wiki.getDescription());
+
+        int resultCode = wikiManager.createNewWiki(wiki.getId(), template, null, wikiServer, true);
+
+        switch (resultCode) {
+            case XWikiExceptionApi.ERROR_NOERROR:
+                break;
+            case WikiManagerException.ERROR_WM_WIKIALREADYEXISTS:
+                throw new WebApplicationException(Response.status(Status.CONFLICT)
+                    .entity(String.format("Wiki '%s' already exists", wiki.getId())).build());
+            default:
+                throw new WebApplicationException(Response.serverError()
+                    .entity(String.format("Error creating wiki (Error number %d)", resultCode)).build());
+        }
+
+        try {
+            /* Build the response. */
+            Wiki result = DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wiki.getId());
+
+            /* Add a link to the WebHome of the newly created wiki. */
+            Link home = objectFactory.createLink();
+            home.setRel(Relations.HOME);
+            home.setHref(wikiServer.getHomePageUrl().toString());
+            result.getLinks().add(home);
+
+            return Response
+                .created(UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiResource.class).build(wiki.getId()))
+                .entity(result).build();
+        } catch (Exception e) {
+            throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

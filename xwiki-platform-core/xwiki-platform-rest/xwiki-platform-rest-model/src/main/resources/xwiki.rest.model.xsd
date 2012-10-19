@@ -20,8 +20,8 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   *
 -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org"
-  xmlns:xwiki="http://www.xwiki.org" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org" xmlns:xwiki="http://www.xwiki.org"
+  elementFormDefault="qualified">
 
   <complexType name="Link">
     <attribute name="href" type="string"></attribute>
@@ -40,8 +40,7 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="translation" type="xwiki:Translation"
-            minOccurs="0" maxOccurs="unbounded"></element>
+          <element name="translation" type="xwiki:Translation" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
         <attribute name="default" type="string"></attribute>
       </extension>
@@ -73,6 +72,8 @@
         <sequence>
           <element name="id" type="string"></element>
           <element name="name" type="string"></element>
+          <element name="description" type="string"></element>
+          <element name="owner" type="string"></element>
         </sequence>
       </extension>
     </complexContent>
@@ -209,8 +210,7 @@
     <complexContent>
       <extension base="xwiki:ObjectSummary">
         <sequence>
-          <element name="property" type="xwiki:Property" minOccurs="0"
-            maxOccurs="unbounded">
+          <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded">
           </element>
         </sequence>
       </extension>
@@ -221,8 +221,7 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="attribute" type="xwiki:Attribute" maxOccurs="unbounded"
-            minOccurs="0"></element>
+          <element name="attribute" type="xwiki:Attribute" maxOccurs="unbounded" minOccurs="0"></element>
           <element name="value" type="string"></element>
         </sequence>
 
@@ -251,8 +250,7 @@
         <sequence>
           <element name="id" type="string"></element>
           <element name="name" type="string"></element>
-          <element name="property" type="xwiki:Property" minOccurs="0"
-            maxOccurs="unbounded"></element>
+          <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
 
       </extension>
@@ -261,9 +259,9 @@
 
 
   <!--
-  *
-  * ELEMENTS
-  *
+    *
+    * ELEMENTS
+    *
   -->
 
   <element name="xwiki" type="xwiki:XWiki"></element>
@@ -273,8 +271,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="wiki" type="xwiki:Wiki" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="wiki" type="xwiki:Wiki" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -287,8 +284,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="space" type="xwiki:Space" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="space" type="xwiki:Space" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -301,8 +297,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="pageSummary" type="xwiki:PageSummary"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="pageSummary" type="xwiki:PageSummary" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -320,8 +315,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="historySummary" type="xwiki:HistorySummary"
-              minOccurs="0" maxOccurs="unbounded">
+            <element name="historySummary" type="xwiki:HistorySummary" minOccurs="0" maxOccurs="unbounded">
             </element>
           </sequence>
 
@@ -335,8 +329,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="attachment" type="xwiki:Attachment"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="attachment" type="xwiki:Attachment" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -348,8 +341,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="comment" type="xwiki:Comment" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="comment" type="xwiki:Comment" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -369,8 +361,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="class" type="xwiki:Class" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -383,8 +374,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="objectSummary" type="xwiki:ObjectSummary"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="objectSummary" type="xwiki:ObjectSummary" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -402,8 +392,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="property" type="xwiki:Property" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="property" type="xwiki:Property" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
 
         </extension>
@@ -428,8 +417,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="tag" type="xwiki:Tag" minOccurs="0"
-              maxOccurs="unbounded"></element>
+            <element name="tag" type="xwiki:Tag" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
         </extension>
       </complexContent>
@@ -461,8 +449,7 @@
       <complexContent>
         <extension base="xwiki:LinkCollection">
           <sequence>
-            <element name="searchResult" type="xwiki:SearchResult"
-              minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="searchResult" type="xwiki:SearchResult" minOccurs="0" maxOccurs="unbounded"></element>
           </sequence>
           <attribute name="template" type="string"></attribute>
         </extension>

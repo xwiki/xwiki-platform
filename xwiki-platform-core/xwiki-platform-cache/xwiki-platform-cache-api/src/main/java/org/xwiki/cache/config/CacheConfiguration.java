@@ -21,6 +21,8 @@ package org.xwiki.cache.config;
 
 import java.util.HashMap;
 
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
+
 /**
  * Contains all informations used to create the cache.
  * <p>
@@ -48,6 +50,57 @@ public class CacheConfiguration extends HashMap<String, Object>
     private String configurationId;
 
     /**
+     * The default constructor.
+     */
+    public CacheConfiguration()
+    {
+
+    }
+
+    /**
+     * @param configurationId the configuration identifier
+     * @since 4.3M1
+     */
+    public CacheConfiguration(String configurationId)
+    {
+        this(configurationId, null);
+    }
+
+    /**
+     * Creates CacheConfiguration instance with given eviction configuration.
+     * 
+     * @param evictionConfiguration describes details of entry eviction method.
+     * @since 4.3M1
+     */
+    public CacheConfiguration(EntryEvictionConfiguration evictionConfiguration)
+    {
+        this(null, evictionConfiguration);
+    }
+
+    /**
+     * Creates CacheConfiguration instance with given eviction configuration and id.
+     * 
+     * @param evictionConfiguration describes details of entry eviction method.
+     * @param configurationId the configuration identifier.
+     * @since 4.3M1
+     */
+    public CacheConfiguration(String configurationId, EntryEvictionConfiguration evictionConfiguration)
+    {
+        setEvictionConfiguration(evictionConfiguration);
+        setConfigurationId(configurationId);
+    }
+
+    /**
+     * Sets details of entry eviction method.
+     * 
+     * @param evictionConfiguration describes details of entry eviction method.
+     */
+    private void setEvictionConfiguration(EntryEvictionConfiguration evictionConfiguration)
+    {
+        put(EntryEvictionConfiguration.CONFIGURATIONID, evictionConfiguration);
+    }
+
+    /**
      * @param configurationId the configuration identifier.
      */
     public void setConfigurationId(String configurationId)
@@ -60,6 +113,6 @@ public class CacheConfiguration extends HashMap<String, Object>
      */
     public String getConfigurationId()
     {
-        return configurationId;
+        return this.configurationId;
     }
 }

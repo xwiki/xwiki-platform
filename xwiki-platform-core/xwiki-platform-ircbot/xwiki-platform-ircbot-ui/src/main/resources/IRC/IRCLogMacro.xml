@@ -148,9 +148,7 @@
 #set ($data = $configDoc.getObject("IRC.LoggingBotListener"))
 #set ($pageScript = $data.getProperty("page").getValue())
 #set ($pageName = $logListenerDoc.getRenderedContent($pageScript, $logListenerDoc.syntax.toIdString(), "plain/1.0"))
-## Protection against rogue script execution: only do something if the evaluated script returns a page name starting
-## with "IRC."
-#if ($pageName.startsWith("IRC."))
+#if ("$!pageName" != '')
   #set ($logDoc = $xwiki.getDocument($pageName))
   ## ============================================
   ## If the Doc doesn't exist, create it
@@ -163,11 +161,16 @@
     #if ("$!irccontext" != "")
       #set ($channel = "$!irccontext.channel.name")
       #if ("$!channel" == "")
-        #set ($channel = "$!irccontext.bot.channelsNames.iterator().next()")
+        #set ($channelNameIterator = $!irccontext.bot.channelsNames.iterator())
+        #if ($channelNameIterator.hasNext())
+          #set ($channel = "$channelNameIterator.next()")
+        #else
+          #set ($channel = '')
+        #end
       #end
       #set ($channel = $stringtool.stripStart($channel, '#'))
     #end
-    #if ("$!channel" == "")
+    #if ("$!channel" == '')
       #set ($channel = "&lt;unknown&gt;")
     #end
     #set ($titleDate = $datetool.get('dd MMMM yyyy'))

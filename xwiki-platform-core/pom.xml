@@ -246,6 +246,15 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <ignored>
+            <difference>
+              <className>org/xwiki/ircbot/IRCBot</className>
+              <method>void initialize(java.lang.String)</method>
+              <differenceType>7012</differenceType>
+              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                IRC Bot application in a subwiki</justification>
+            </difference>
+          </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
@@ -261,9 +270,6 @@
             <!-- Added a common method to all elements to set all the data from another element -->
             <!-- Technically this does not really break anything because all elements are supposed to extends BaseElement -->
             <exclude>com/xpn/xwiki/objects/ElementInterface</exclude>
-            <!-- IRCBot is still a young API. Added a new initialize() method to support installing the IRC Bot
-                 application in a subwiki -->
-            <exclude>org/xwiki/ircbot/IRCBot</exclude>
           </excludes>
         </configuration>
       </plugin>

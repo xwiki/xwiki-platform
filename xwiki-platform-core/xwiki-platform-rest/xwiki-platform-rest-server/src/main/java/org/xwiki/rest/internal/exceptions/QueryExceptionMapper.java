@@ -17,17 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest;
+package org.xwiki.rest.internal.exceptions;
 
-import org.xwiki.rest.internal.DomainObjectFactory;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.query.QueryException;
+import org.xwiki.rest.XWikiRestComponent;
 
 /**
  * @version $Id$
  */
-public class Constants
+@Component("org.xwiki.rest.internal.exceptions.QueryExceptionMapper")
+@Provider
+public class QueryExceptionMapper implements ExceptionMapper<QueryException>, XWikiRestComponent
 {
-    /**
-     * The key used to store the current HTTP request object in the current Restlet context.
-     */
-    public static final String HTTP_REQUEST = "httpRequest";
+    @Override
+    public Response toResponse(QueryException exception)
+    {
+        return Response.serverError()
+            .entity(String.format("%s\n%s\n", exception.getMessage(), exception.getCause().getMessage()))
+            .type(MediaType.TEXT_PLAIN).build();
+    }
+
 }

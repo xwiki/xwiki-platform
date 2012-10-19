@@ -17,17 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest;
+package org.xwiki.rest.internal.representations;
 
-import org.xwiki.rest.internal.DomainObjectFactory;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+
+import javax.ws.rs.ext.MessageBodyReader;
+
+import org.xwiki.rest.XWikiRestComponent;
 
 /**
  * @version $Id$
  */
-public class Constants
+public abstract class TextPlainReader<T> implements MessageBodyReader<T>, XWikiRestComponent
 {
-    /**
-     * The key used to store the current HTTP request object in the current Restlet context.
-     */
-    public static final String HTTP_REQUEST = "httpRequest";
+    protected String getEntityAsString(InputStream entityStream) throws IOException
+    {
+        StringWriter writer = new StringWriter();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            writer.write(line);
+        }
+
+        return writer.toString();
+    }
 }

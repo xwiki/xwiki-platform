@@ -38,6 +38,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
+import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
 import com.xpn.xwiki.XWikiContext;

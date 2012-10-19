@@ -43,6 +43,7 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationStub;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
@@ -191,7 +192,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         Collection<Annotation> annotations) throws XWikiException, AnnotationServiceException
     {
         String isInRenderingEngineKey = "isInRenderingEngine";
-        XWikiContext context = org.xwiki.rest.Utils.getXWikiContext(componentManager);
+        XWikiContext context = getXWikiContext(componentManager);
         Object isInRenderingEngine = context.get(isInRenderingEngineKey);
         // set the context url factory to the servlet url factory so that all links get correctly generated as if we
         // were view-ing the page
@@ -236,7 +237,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
 
-            XWikiContext context = org.xwiki.rest.Utils.getXWikiContext(componentManager);
+            XWikiContext context = getXWikiContext(componentManager);
             XWiki xwiki = context.getWiki();
 
             // prepare the messaging tools and set them on context
@@ -341,6 +342,28 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             // Just log it.
             logger.log(Level.SEVERE,
                 String.format("Failed to update the context for page [%s:%s.%s].", wiki, space, page), e);
+        }
+    }
+    
+    /**
+     * <p>
+     * Retrieve the XWiki context from the current execution context
+     * </p>
+     * 
+     * @param componentManager The component manager to be used to retrieve the execution context.
+     * @return The XWiki context.
+     * @throws RuntimeException If there was an error retrieving the context.
+     */
+    public XWikiContext getXWikiContext(ComponentManager componentManager)
+    {
+        Execution execution;
+        XWikiContext xwikiContext;
+        try {
+            execution = componentManager.getInstance(Execution.class);
+            xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+            return xwikiContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to get XWiki context", e);
         }
     }
 }

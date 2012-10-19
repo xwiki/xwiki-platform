@@ -17,17 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest;
+package org.xwiki.rest.internal.resources;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.Utils;
+import org.xwiki.rest.model.jaxb.Xwiki;
 
 /**
  * @version $Id$
  */
-public class Constants
+@Component("org.xwiki.rest.internal.resources.RootResource")
+@Path("/")
+public class RootResource extends XWikiResource
 {
-    /**
-     * The key used to store the current HTTP request object in the current Restlet context.
-     */
-    public static final String HTTP_REQUEST = "httpRequest";
+    @GET
+    public Xwiki getRoot()
+    {
+        return DomainObjectFactory.createXWikiRoot(objectFactory, uriInfo.getBaseUri(), Utils
+            .getXWiki(componentManager).getVersion());
+    }
 }

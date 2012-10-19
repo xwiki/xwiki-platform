@@ -178,10 +178,13 @@ public class BaseSearchResult extends XWikiResource
              * If the order field is already one of the field hard coded in the base query, then do not add it to the
              * select clause.
              */
-            String addColumn =
-                (orderField.equals("") || orderField.equals("fullName") || orderField.equals("name") || orderField
-                    .equals("space")) ? "" : ", doc." + orderField;
-
+            String addColumn = "";
+            if (!StringUtils.isBlank(orderField)) {
+                addColumn =
+                    (orderField.equals("") || orderField.equals("fullName") || orderField.equals("name") || orderField
+                        .equals("space")) ? "" : ", doc." + orderField;
+            }
+            
             if (space != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);

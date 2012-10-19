@@ -17,17 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest;
+package org.xwiki.rest.internal.resources;
 
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.MediaType;
+import org.restlet.representation.Variant;
+import org.restlet.resource.ServerResource;
 
 /**
  * @version $Id$
  */
-public class Constants
+public class BrowserAuthenticationResource extends ServerResource
 {
-    /**
-     * The key used to store the current HTTP request object in the current Restlet context.
-     */
-    public static final String HTTP_REQUEST = "httpRequest";
+    public static final String URI_PATTERN = "/browser_authentication";
+
+    public BrowserAuthenticationResource(Context context, Request request, Response response)
+    {
+        super();
+        this.init(context, request, response);
+        getVariants().clear();
+        getVariants().add(new Variant(MediaType.TEXT_PLAIN));
+    }
+
+    
+    public void handleGet()
+    {
+        getResponse().redirectSeeOther(String.format("%s/", getRequest().getRootRef()));
+    }
+
 }

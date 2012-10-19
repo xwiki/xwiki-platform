@@ -304,7 +304,12 @@
             <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
             <!-- Added a common method to all elements to set all the data from another element -->
             <!-- Technically this does not really break anything because all elements are supposed to extends BaseElement -->
-            <exclude>com/xpn/xwiki/objects/ElementInterface</exclude>
+            <exclude>com.xpn.xwiki.objects.ElementInterface</exclude>
+            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
+            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
+            <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
+            <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
+            <exclude>org/xwiki/rest/resources/**</exclude>
           </excludes>
         </configuration>
       </plugin>

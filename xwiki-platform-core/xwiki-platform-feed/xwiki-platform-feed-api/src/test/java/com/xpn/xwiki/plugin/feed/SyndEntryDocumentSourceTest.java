@@ -52,6 +52,8 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
+import junit.framework.Assert;
+
 /**
  * Unit tests for {@link SyndEntryDocumentSource}.
  */
@@ -250,7 +252,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
      */
     public void testSourceConsistency()
     {
-        assertEquals(INCONSISTENCY, source(doc), source(doc));
+        Assert.assertEquals(INCONSISTENCY, source(doc), source(doc));
     }
 
     /**
@@ -262,9 +264,9 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         SyndEntryImpl fromXDoc = source(doc);
         SyndEntryImpl fromDoc = source(doc.newDocument(getContext()));
         SyndEntryImpl fromFullName = source(doc.getFullName());
-        assertEquals(POLYMORPHISM_INCONSISTENCY, fromXDoc, fromDoc);
-        assertEquals(POLYMORPHISM_INCONSISTENCY, fromXDoc, fromFullName);
-        assertEquals(POLYMORPHISM_INCONSISTENCY, fromDoc, fromFullName);
+        Assert.assertEquals(POLYMORPHISM_INCONSISTENCY, fromXDoc, fromDoc);
+        Assert.assertEquals(POLYMORPHISM_INCONSISTENCY, fromXDoc, fromFullName);
+        Assert.assertEquals(POLYMORPHISM_INCONSISTENCY, fromDoc, fromFullName);
     }
 
     /**
@@ -278,10 +280,10 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         getContext().setUser("XWiki.Albatross");
         try {
             source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, getContext());
-            fail(ACCESS_RIGHTS_VIOLATED);
+            Assert.fail(ACCESS_RIGHTS_VIOLATED);
         } catch (XWikiException expected) {
             // we should get an exception
-            assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
+            Assert.assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
         }
         // even user name length implies all access rights
         getContext().setUser("Condor");
@@ -297,12 +299,12 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         Map instanceParams = new HashMap();
         instanceParams.put(SyndEntryDocumentSource.CONTENT_TYPE, SVG_MIME_TYPE);
         source.setParams(instanceParams);
-        assertEquals(PARAMETERS_IGNORED, SVG_MIME_TYPE, source(doc).getDescription().getType());
+        Assert.assertEquals(PARAMETERS_IGNORED, SVG_MIME_TYPE, source(doc).getDescription().getType());
 
         Map methodParams = new HashMap();
         methodParams.put(SyndEntryDocumentSource.CONTENT_TYPE, PNG_MIME_TYPE);
         SyndEntry entry = source(doc, methodParams);
-        assertEquals(PARAMETERS_IGNORED, PNG_MIME_TYPE, entry.getDescription().getType());
+        Assert.assertEquals(PARAMETERS_IGNORED, PNG_MIME_TYPE, entry.getDescription().getType());
     }
 
     /**
@@ -318,9 +320,9 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         source.setParams(params);
         doc.setStringValue(ARTICLE_CLASS_NAME, "content", "Somewhere in la Mancha, in a place..");
-        assertTrue(doc.display("content", getContext()).length() > maxLength);
+        Assert.assertTrue(doc.display("content", getContext()).length() > maxLength);
         int descriptionLength = source(doc).getDescription().getValue().length();
-        assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
+        Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
     }
 
     /**
@@ -336,10 +338,10 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content",
             "Somewhere \n\tin   <i>la</i> <a href=\"http://www.mancha.es\">  Mancha</a>, in a place..");
-        assertTrue(getXMLContentLength(doc.display("content", getContext())) > maxLength);
+        Assert.assertTrue(getXMLContentLength(doc.display("content", getContext())) > maxLength);
         String description = source(doc, params).getDescription().getValue();
         int descriptionLength = getXMLContentLength(description);
-        assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
+        Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
     }
 
     public void testArticleSourceXMLContentLength()
@@ -351,9 +353,9 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content",
             "<text>Somewhere \n\tin   la <region>  Mancha</region>, in a place..</text>");
-        assertTrue(getXMLContentLength(doc.display("content", getContext())) > maxLength);
+        Assert.assertTrue(getXMLContentLength(doc.display("content", getContext())) > maxLength);
         String description = source(doc, params).getDescription().getValue();
         int descriptionLength = getXMLContentLength(description);
-        assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
+        Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
     }
 }

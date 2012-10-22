@@ -272,7 +272,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                 if (document.isNew()) {
                     currentDocument.apply(document);
                     if (setCreator) {
-                        currentDocument.setAuthorReference(document.getCreatorReference());
+                        currentDocument.setCreatorReference(document.getCreatorReference());
                     }
                     currentDocument.setAuthorReference(document.getAuthorReference());
                     currentDocument.setContentAuthorReference(document.getContentAuthorReference());

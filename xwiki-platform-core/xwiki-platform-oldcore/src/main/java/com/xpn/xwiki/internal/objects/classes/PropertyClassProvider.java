@@ -17,40 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects.meta;
+package com.xpn.xwiki.internal.objects.classes;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import org.xwiki.component.annotation.Role;
 
-import org.xwiki.component.annotation.Component;
-
-import com.xpn.xwiki.objects.classes.EmailClass;
+import com.xpn.xwiki.internal.objects.meta.PropertyMetaClassInterface;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
 /**
- * Email Field Class allows to create a field for email values. This will allow using a custom displayer assigned to
- * that field by default. The field also includes a default regexp for validation.
+ * Provides new instances of a specific type of XClass property and also give access to the meta class of an XClass
+ * property (its definition).
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 4.3M1
  */
-@Component
-@Named("Email")
-@Singleton
-public class EmailMetaClass extends StringMetaClass
+@Role
+public interface PropertyClassProvider
 {
     /**
-     * Constructor for EmailMetaClass.
+     * @return a new XClass property instance
      */
-    public EmailMetaClass()
-    {
-        setPrettyName("Email");
-        setName(getClass().getAnnotation(Named.class).value());
-    }
+    PropertyClassInterface getInstance();
 
-    @Override
-    public PropertyClassInterface getInstance()
-    {
-        return new EmailClass();
-    }
+    /**
+     * @return the meta class of this type of XClass property
+     */
+    PropertyMetaClassInterface getDefinition();
 }

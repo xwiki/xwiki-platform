@@ -172,7 +172,9 @@ public class DateClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        buffer.append(toFormString(prop));
+        if (prop != null) {
+            buffer.append(toFormString(prop));
+        }
     }
 
     @Override

@@ -19,21 +19,35 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.classes.LevelsClass;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.objects.classes.LevelsClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
+
+/**
+ * Defines the meta properties of a access rights levels XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Levels")
+@Singleton
 public class LevelsMetaClass extends ListMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Access Rights Levels XClass property.
+     */
     public LevelsMetaClass()
     {
-        super();
         setPrettyName("Access Right Levels");
-        setName(LevelsClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
     }
 
     @Override
-    public BaseCollection newObject(XWikiContext context)
+    public PropertyClassInterface getInstance()
     {
         return new LevelsClass();
     }

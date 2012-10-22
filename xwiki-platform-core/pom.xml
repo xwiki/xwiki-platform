@@ -310,6 +310,12 @@
             <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
             <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
             <exclude>org/xwiki/rest/resources/**</exclude>
+            <!-- Not a breakage! The plugin has been moved to its own module. -->
+            <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
+            <!-- Module has been retired as it was unmaintained. -->
+            <exclude>com/xpn/xwiki/plugin/userdirectory/**/*</exclude>
+            <!-- Module has been retired as it was unmaintained. -->
+            <exclude>com/xpn/xwiki/plugin/usertools/**/*</exclude>
           </excludes>
         </configuration>
       </plugin>

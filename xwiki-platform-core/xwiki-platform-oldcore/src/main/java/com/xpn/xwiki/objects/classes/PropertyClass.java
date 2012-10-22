@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  */
 public class PropertyClass extends BaseCollection<ClassPropertyReference> implements PropertyClassInterface,
-    PropertyInterface, Comparable<PropertyClass>
+    Comparable<PropertyClass>
 {
     /**
      * Logging helper object.
@@ -410,13 +410,33 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         setIntValue("number", number);
     }
 
+    /**
+     * Each type of XClass property is identified by a string that specifies the data type of the property value (e.g.
+     * 'String', 'Number', 'Date') without disclosing implementation details. The internal implementation of an XClass
+     * property type can change over time but its {@code classType} should not.
+     * <p>
+     * The {@code classType} can be used as a hint to lookup various components related to this specific XClass property
+     * type. See {@link com.xpn.xwiki.internal.objects.classes.PropertyClassProvider} for instance.
+     * 
+     * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
+     */
     public String getClassType()
     {
-        return getClass().getName();
+        // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
+        // (without the package). Subclasses can overwrite this method to use a different hint format.
+        return StringUtils.removeEnd(getClass().getSimpleName(), "Class");
     }
 
+    /**
+     * Sets the property class type.
+     * 
+     * @param type the class type
+     * @deprecated since 4.3M1, the property class type cannot be modified
+     */
+    @Deprecated
     public void setClassType(String type)
     {
+        LOGGER.warn("The property class type cannot be modified!");
     }
 
     @Override
@@ -424,7 +444,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     {
         PropertyClass pclass = (PropertyClass) super.clone();
         pclass.setObject(getObject());
-        pclass.setClassType(getClassType());
         return pclass;
     }
 

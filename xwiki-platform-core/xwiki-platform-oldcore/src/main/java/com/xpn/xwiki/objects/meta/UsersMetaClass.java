@@ -19,30 +19,44 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.UsersClass;
 
+/**
+ * Defines the meta properties of a users XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Users")
+@Singleton
 public class UsersMetaClass extends ListMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a List of Users XClass property.
+     */
     public UsersMetaClass()
     {
-        super();
         setPrettyName("List of Users");
-        setName(UsersClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        BooleanClass uselist_class = new BooleanClass(this);
-        uselist_class.setName("usesList");
-        uselist_class.setPrettyName("Uses List");
-        uselist_class.setDisplayType("yesno");
-        uselist_class.setDisplayFormType("checkbox");
-        uselist_class.setDefaultValue(1);
-        safeput("usesList", uselist_class);
+        BooleanClass useListClass = new BooleanClass(this);
+        useListClass.setName("usesList");
+        useListClass.setPrettyName("Uses List");
+        useListClass.setDisplayType("yesno");
+        useListClass.setDisplayFormType("checkbox");
+        useListClass.setDefaultValue(1);
+        safeput(useListClass.getName(), useListClass);
     }
 
     @Override
-    public BaseCollection newObject(XWikiContext context)
+    public PropertyClassInterface getInstance()
     {
         return new UsersClass();
     }

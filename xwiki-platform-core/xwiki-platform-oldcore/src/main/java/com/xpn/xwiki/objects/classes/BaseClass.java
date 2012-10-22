@@ -45,6 +45,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.internal.objects.classes.PropertyClassProvider;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -557,7 +558,20 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 Element pcel = list.get(i);
                 String name = pcel.getName();
                 String classType = pcel.element("classType").getText();
-                PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
+                PropertyClassProvider provider = null;
+                try {
+                    // First try to use the specified class type as hint.
+                    provider = Utils.getComponent(PropertyClassProvider.class, classType);
+                } catch (Exception e) {
+                    // In previous versions the class type was the full Java class name of the property class
+                    // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
+                    classType = StringUtils.removeEnd(StringUtils.substringAfterLast(classType, "."), "Class");
+                    provider = Utils.getComponent(PropertyClassProvider.class, classType);
+                }
+                // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but it
+                // doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
+                // assumption that all property classes extend PropertyClass.
+                PropertyClass property = (PropertyClass) provider.getInstance();
                 property.setName(name);
                 property.setObject(this);
                 property.fromXML(pcel);
@@ -1158,7 +1172,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();
             PropertyClass oldProperty = (PropertyClass) oldClass.get(propertyName);
-            String propertyType = StringUtils.substringAfterLast(newProperty.getClassType(), ".");
+            String propertyType = newProperty.getClassType();
 
             if (oldProperty == null) {
                 difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
@@ -1172,7 +1186,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         for (PropertyClass oldProperty : (Collection<PropertyClass>) oldClass.getFieldList()) {
             String propertyName = oldProperty.getName();
             PropertyClass newProperty = (PropertyClass) get(propertyName);
-            String propertyType = StringUtils.substringAfterLast(oldProperty.getClassType(), ".");
+            String propertyType = oldProperty.getClassType();
 
             if (newProperty == null) {
                 difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYREMOVED,

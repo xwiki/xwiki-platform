@@ -31,7 +31,7 @@ import org.xwiki.localization.BundleContext;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 
-public abstract class AbstractResourceBundle extends AbstractLocalizedBundle
+public abstract class AbstractResourceBundle extends AbstractCachedBundle
 {
     public final static String ID_PREFIX = "resource:";
 

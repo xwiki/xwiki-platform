@@ -19,17 +19,13 @@
  */
 package org.xwiki.localization.internal.xwikipreferences;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentModelBridge;
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
@@ -38,12 +34,9 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractBundle;
-import org.xwiki.localization.internal.AbstractWikiBundle;
-import org.xwiki.localization.internal.WikiInformation;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * Bundle corresponding to global (at the wiki level) localization documents.
@@ -55,12 +48,18 @@ import org.xwiki.observation.event.Event;
 public class XWikiPreferencesBundle extends AbstractBundle implements Initializable
 {
     protected final static String ID = "XWikiPreferences";
-    
+
     @Inject
     private ModelContext modelContext;
 
     @Inject
     private CacheManager cacheManager;
+
+    @Inject
+    private ObservationManager observationManager;
+
+    @Inject
+    private Logger logger;
 
     private Cache<Bundle> bundlesCache;
 
@@ -68,29 +67,25 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
     {
         super(ID, 300);
     }
-    
+
     @Override
     public void initialize() throws InitializationException
     {
         // Setup cache
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
-        cacheConfiguration.setConfigurationId("localization.XWikiPreferences");
+        cacheConfiguration.setConfigurationId("localization." + getId());
 
-        this.bundlesCache = this.cacheManager.createNewCache(cacheConfiguration);
-    }
-
-
-    @Override
-    public int getPriority()
-    {
-        return 300;
+        try {
+            this.bundlesCache = this.cacheManager.createNewCache(cacheConfiguration);
+        } catch (CacheException e) {
+            this.logger.error("Failed to create cache [{}]", cacheConfiguration.getConfigurationId());
+        }
     }
 
     @Override
     public Translation getTranslation(String key, Locale locale)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return getBundle().getTranslation(key, locale);
     }
 
     private Bundle getBundle()
@@ -118,73 +113,6 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
 
     private Bundle createWikiBundle(String wiki)
     {
-        
-    }
-
-    // OLD
-
-
-
-    /**
-     * Constructs the {@link Properties} object corresponding to a wiki in a given language, from all the individual
-     * documents registered as wiki-wide localization bundles.
-     * 
-     * @param wiki The target wiki.
-     * @param language The 2-character code of the requested language.
-     * @return A {@link Properties} object with the static translations of the wiki, in the requested language.
-     */
-    protected Properties loadStaticBundle(String wiki, String language)
-    {
-        Properties properties = new Properties();
-        String[] bundles = getStaticDocumentBundles(wiki);
-        // Reverse the order of the bundles, so that the first entry in the list has the most priority.
-        ArrayUtils.reverse(bundles);
-        for (String documentName : bundles) {
-            String fullDocumentName = documentName;
-            try {
-                if (documentName.indexOf(WikiInformation.WIKI_PREFIX_SEPARATOR) < 0) {
-                    fullDocumentName = wiki + WikiInformation.WIKI_PREFIX_SEPARATOR + documentName;
-                }
-                properties.putAll(getDocumentBundle(fullDocumentName, language));
-            } catch (Exception ex) {
-                this.logger.warn("Exception loading document bundle [{0}]", fullDocumentName);
-            }
-        }
-        // Also watch the preferences for this wiki, in case the list of documents is changed.
-        watchDocument(wiki + WikiInformation.WIKI_PREFIX_SEPARATOR + WikiInformation.PREFERENCES_DOCUMENT_NAME);
-        return properties;
-    }
-
-    /**
-     * Return the list of document names configured for a wiki as global localization bundles. If this list is already
-     * cached, then use it. Otherwise, first load from the wiki and update the cache.
-     * 
-     * @param wiki The target wiki.
-     * @return An array of <code>String</code>, each value representing the name of a document that should be used as a
-     *         global localization resource. The names do not usually contain the wiki prefix, as these are the raw
-     *         values taken from the wiki settings.
-     */
-    protected String[] getStaticDocumentBundles(String wiki)
-    {
-        synchronized (this.staticBundleNames) {
-            if (this.staticBundleNames.containsKey(wiki)) {
-                return this.staticBundleNames.get(wiki);
-            }
-            String[] result = new String[0];
-            try {
-                String bundles =
-                    this.documentAccessBridge.getProperty(wiki + WikiInformation.WIKI_PREFIX_SEPARATOR
-                        + WikiInformation.PREFERENCES_DOCUMENT_NAME, WikiInformation.PREFERENCES_CLASS_NAME,
-                        DOCUMENT_BUNDLE_PROPERTY);
-                if (!StringUtils.isBlank(bundles)) {
-                    result = bundles.split("[,|]\\s*");
-                }
-            } catch (Exception ex) {
-                this.logger.warn("Cannot access a wiki setting", ex);
-            }
-            this.staticBundleNames.put(wiki, result);
-
-            return result;
-        }
+        return new XWikiPreferencesWikiBundle(wiki, this.observationManager);
     }
 }

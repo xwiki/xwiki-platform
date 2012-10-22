@@ -46,7 +46,7 @@ import org.xwiki.observation.event.filter.RegexEventFilter;
  * @since 4.3M1
  */
 @Component("document")
-public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable
+public class PulledDocumentsBundle extends AbstractWikiDocumentBundle implements Bundle, EventListener, Initializable
 {
     /**
      * The key used for placing the list of pulled document bundles in the current execution context.

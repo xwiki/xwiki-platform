@@ -32,19 +32,19 @@ import org.xwiki.localization.Translation;
  * @version $Id$
  * @since 4.3M1
  */
-public abstract class AbstractLocalizedBundle extends AbstractBundle
+public abstract class AbstractCachedBundle extends AbstractBundle
 {
     /**
      * The bundle cache.
      */
     protected Map<String, LocaleBundle> bundleCache = new ConcurrentHashMap<String, LocaleBundle>();
 
-    public AbstractLocalizedBundle(String id)
+    public AbstractCachedBundle(String id)
     {
         super(id);
     }
 
-    public AbstractLocalizedBundle(String id, int priority)
+    public AbstractCachedBundle(String id, int priority)
     {
         super(id, priority);
     }

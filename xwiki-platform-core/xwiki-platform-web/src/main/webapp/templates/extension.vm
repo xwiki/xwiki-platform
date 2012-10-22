@@ -131,8 +131,11 @@
 #end
 
 #macro (displayProgressBar $extension)
-  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-  #if ($jobStatus && $jobStatus.state != 'FINISHED')
+  #if (!$jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #set ($jobState = $jobStatus.state)
+  #end
+  #if ($jobStatus && $jobState != 'FINISHED')
     #displayJobProgressBar($jobStatus)
   #end
 #end
@@ -166,7 +169,10 @@
 #end
 
 #macro (displayExtensionDetails_menu $extension)
-#getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+#if (!$jobStatus)
+  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+  #set ($jobState = $jobStatus.state)
+#end
 <ul class="innerMenu">
 <li>#displayExtensionDetails_menuLink('description')</li>##
 ##
@@ -179,7 +185,7 @@
 #end
 ##
 #if ($jobStatus)
-#set ($selected = $jobStatus.state != 'FINISHED' || $request.extensionSection == 'progress')
+#set ($selected = $jobState != 'FINISHED' || $request.extensionSection == 'progress')
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
 </ul>
@@ -325,12 +331,15 @@
 #end
 
 #macro (displayExtensionDetails_progress $extension)
-  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+  #if (!$jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #set ($jobState = $jobStatus.state)
+  #end
   #if ($jobStatus)
     <div id="extension-body-progress-${extension.id.id}-${extension.id.version}"></div>
     <div class="extension-body-progress extension-body-section">
       #displayExtensionJobStatus($jobStatus)
-      #if ($jobStatus.state == 'WAITING')
+      #if ($jobState == 'WAITING')
         #displayExtensionDetails_progressQuestion($extension $jobStatus)
       #end
     </div>
@@ -428,6 +437,8 @@
 #end
 
 #macro (displayExtension $extension)
+  ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
+  #set ($jobStatus = $NULL)
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   <div class="extension-item extension-item-${extensionStatus}">
     <div class="extension-header">
@@ -451,8 +462,11 @@
     ## Show the extension details if this extension has been explicitely requested or if the extension has a job waiting.
     #set ($showDetails = $request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
     #if (!$showDetails)
-      #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-      #set ($showDetails = $jobStatus.state == 'WAITING')
+      #if (!$jobStatus)
+        #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+        #set ($jobState = $jobStatus.state)
+      #end
+      #set ($showDetails = $jobState == 'WAITING')
     #end
     #if ($showDetails)
       #displayExtensionDetails($extension)
@@ -520,7 +534,10 @@
 #end
 
 #macro (displayExtensionJobStatus $jobStatus)
-  #set ($isExtensionPlan = $jobStatus.state == 'FINISHED' && $jobStatus.actions)
+  #if (!$jobState)
+    #set ($jobState = $jobStatus.state)
+  #end
+  #set ($isExtensionPlan = $jobState == 'FINISHED' && $jobStatus.actions)
   #if ($isExtensionPlan)
     ## Check if there are any logged errors.
     #foreach($log in $jobStatus.log)
@@ -850,8 +867,11 @@ Caused by: #printThrowable($throwable.cause true)
 
 #macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage $versionConstraint)
   #set ($currentVersion = $NULL)
-  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-  #if ($jobStatus && $jobStatus.state != 'FINISHED')
+  #if (!$jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #set ($jobState = $jobStatus.state)
+  #end
+  #if ($jobStatus && $jobState != 'FINISHED')
     #set ($status = 'loading')
   #else
     #set ($status = $extension.repository.descriptor.id)
@@ -915,7 +935,7 @@ $status##
   #if ($action == 'uninstall')
     #set ($actionName = 'Uninstall')
   #end
-  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace) && !$installedExtension.isInstalled($null)) || !$xwiki.isVirtualMode())
+  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace) && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
     ## Button that targets only the current wiki.
     #em_submitButton("extensions.actions.$action" "action$actionName" $secondary)
   #end

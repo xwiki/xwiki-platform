@@ -295,6 +295,13 @@
               <differenceType>7012</differenceType>
               <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
             </difference>
+            <difference>
+              <className>com/xpn/xwiki/objects/ElementInterface</className>
+              <method>boolean apply(com.xpn.xwiki.objects.ElementInterface, boolean)</method>
+              <differenceType>7012</differenceType>
+              <justification>Added a common method to all elements to set all the data from another element.
+                Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -302,9 +309,6 @@
             <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
                  from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
             <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
-            <!-- Added a common method to all elements to set all the data from another element -->
-            <!-- Technically this does not really break anything because all elements are supposed to extends BaseElement -->
-            <exclude>com/xpn/xwiki/objects/ElementInterface</exclude>
             <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
             <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
             <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->

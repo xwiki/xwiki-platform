@@ -1,7 +1,7 @@
 #template('colorThemeInit.vm')
 
 /* panels style gadget settings (forced in inline mode) */
-.panels .gadget .gadget-title, body.inlinebody .gadget .gadget-title {
+.panels .gadget .gadget-title, .dashboard-edit .gadget .gadget-title {
   font-size: 0.8em;
   font-weight: 700;
   letter-spacing: 0;
@@ -23,12 +23,12 @@
   #css_textShadow('0', '1px', '0', $theme.panelHeaderGradientColor)
 }
 
-.panels .gadget, body.inlinebody .gadget {
+.panels .gadget, .dashboard-edit .gadget {
   background-color: $theme.panelBackgroundColor;
   margin: 1em 0;
 }
 
-.panels .gadget .gadget-content, body.inlinebody .gadget .gadget-content {
+.panels .gadget .gadget-content, .dashboard-edit .gadget .gadget-content {
   background-color: $theme.panelBackgroundColor;
   color: $theme.panelTextColor;
   padding: 10px 15px;

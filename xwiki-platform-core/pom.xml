@@ -336,7 +336,8 @@
             <exclude>com/xpn/xwiki/plugin/userdirectory/**/*</exclude>
             <!-- Module has been retired as it was unmaintained. -->
             <exclude>com/xpn/xwiki/plugin/usertools/**/*</exclude>
-            <!-- FIXME: (Write a more detailed and meaningful comment) Added methods for creating workspaces and retrieving workspace templates. 
+            <!-- Added methods for creating workspaces and retrieving workspace templates.
+                 Vote mail: http://markmail.org/thread/gtxoszztc5lt7o4f
                  Remove this check on the next release (i.e., 4.3-M2) -->
             <exclude>org/xwiki/workspace/WorkspaceManager</exclude>
           </excludes>

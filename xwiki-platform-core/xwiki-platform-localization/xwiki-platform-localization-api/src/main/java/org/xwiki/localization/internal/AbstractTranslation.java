@@ -72,20 +72,20 @@ public class AbstractTranslation implements Translation
 
     // Render
 
-    @Override
-    public Block render(Locale locale, Collection<Bundle> bundles, Object... parameters)
-    {
-        return this.message.render(locale != null ? locale : getLocale(), bundles, parameters);
-    }
-
     private Collection<Bundle> getCurrentBundles()
     {
         return this.context != null ? this.context.getBundles() : null;
     }
 
     @Override
+    public Block render(Locale locale, Object... parameters)
+    {
+        return this.message.render(locale != null ? locale : getLocale(), getCurrentBundles(), parameters);
+    }
+
+    @Override
     public Block render(Object... parameters)
     {
-        return render(getLocale(), getCurrentBundles(), parameters);
+        return render(null, parameters);
     }
 }

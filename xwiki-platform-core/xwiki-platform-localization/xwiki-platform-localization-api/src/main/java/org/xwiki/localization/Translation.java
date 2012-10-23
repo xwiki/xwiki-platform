@@ -21,10 +21,9 @@ package org.xwiki.localization;
 
 import java.util.Locale;
 
-import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 
-public interface Translation extends TranslationMessage
+public interface Translation
 {
     /**
      * @return the bundle from which this translation comes
@@ -42,6 +41,11 @@ public interface Translation extends TranslationMessage
     String getKey();
 
     /**
+     * @return the raw source of the translation as it is stored
+     */
+    String getRawSource();
+
+    /**
      * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an
      * XDOM or to render as it is.
      * <p>
@@ -51,4 +55,16 @@ public interface Translation extends TranslationMessage
      * @return the result translation
      */
     Block render(Object... parameters);
+
+    /**
+     * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an
+     * XDOM or to render as it is.
+     * <p>
+     * The variables are resolved using the current {@link BundleContext} bundles.
+     * 
+     * @param locale the locale for which this translation is rendered
+     * @param parameters the parameters
+     * @return the result translation
+     */
+    Block render(Locale locale, Object... parameters);
 }

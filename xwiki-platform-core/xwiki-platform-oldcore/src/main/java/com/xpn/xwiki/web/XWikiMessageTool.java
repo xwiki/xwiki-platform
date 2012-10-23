@@ -28,13 +28,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.LocalizationManager;
+import org.xwiki.localization.Translation;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -105,6 +115,17 @@ public class XWikiMessageTool
      */
     private Set<Long> docsToRefresh = new HashSet<Long>();
 
+    private LocalizationManager localization;
+
+    private ComponentManager componentManager;
+
+    public XWikiMessageTool(LocalizationManager localization, ComponentManager componentManager, XWikiContext context)
+    {
+        this.localization = localization;
+        this.componentManager = componentManager;
+        this.context = context;
+    }
+
     /**
      * @param bundle the default Resource Bundle to fall back to if no document bundle is found when trying to get a key
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
@@ -124,14 +145,43 @@ public class XWikiMessageTool
      */
     public String get(String key)
     {
-        String translation = getTranslation(key);
-        if (translation == null) {
-            try {
-                translation = this.bundle.getString(key);
-            } catch (Exception e) {
+        String translation;
+        if (this.localization != null) {
+            String language = this.context.getWiki().getLanguagePreference(this.context);
+            Locale locale = LocaleUtils.toLocale(language);
+            Translation translations = this.localization.getTranslation(key, locale);
+            if (translations != null) {
+                Block block = translations.render(locale);
+
+                String currentSyntax =
+                    this.context.getWiki().getCurrentContentSyntaxId(Syntax.PLAIN_1_0.toIdString(), this.context);
+                try {
+                    BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, currentSyntax);
+
+                    DefaultWikiPrinter wikiprinter = new DefaultWikiPrinter();
+                    renderer.render(block, wikiprinter);
+
+                    translation = wikiprinter.toString();
+                } catch (ComponentLookupException e) {
+                    LOGGER.error("Failed to find a proper Block serializer for syntax [{}]", currentSyntax, e);
+
+                    translation = key;
+                }
+
+            } else {
                 translation = key;
             }
+        } else {
+            translation = getTranslation(key);
+            if (translation == null) {
+                try {
+                    translation = this.bundle.getString(key);
+                } catch (Exception e) {
+                    translation = key;
+                }
+            }
         }
+
         return translation;
     }
 
@@ -160,7 +210,7 @@ public class XWikiMessageTool
      * 
      * @param key the key of the string to find
      * @param params the list of parameters to use for replacing "{N}" elements in the string. See
-     *        {@link java.text.MessageFormat} for the full syntax
+     *            {@link java.text.MessageFormat} for the full syntax
      * @return the translated string with parameters resolved
      */
     public String get(String key, Object... params)

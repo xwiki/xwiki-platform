@@ -1,2 +1,3 @@
-org.xwiki.localization.internal.DefaultLocalizationManager
-org.xwiki.localization.internal.PulledDocumentsBundle
+org.xwiki.localization.internal.applicationresources.ApplicationResourcesBundle
+org.xwiki.localization.internal.xwikipreferences.XWiki10TranslationMessageParser
+org.xwiki.localization.internal.xwikipreferences.XWikiPreferencesBundle

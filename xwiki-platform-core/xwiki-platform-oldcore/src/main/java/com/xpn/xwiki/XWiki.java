@@ -102,6 +102,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -3603,7 +3604,9 @@ public class XWiki implements EventListener
             if (bundle == null) {
                 bundle = ResourceBundle.getBundle("ApplicationResources");
             }
-            XWikiMessageTool msg = new XWikiMessageTool(bundle, context);
+            XWikiMessageTool msg =
+                new XWikiMessageTool(Utils.getComponent(LocalizationManager.class), Utils.getComponentManager(),
+                    context);
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {

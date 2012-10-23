@@ -254,7 +254,11 @@ public class XWikiContext extends Hashtable<Object, Object>
             previous = get(WIKI_KEY);
             setDatabase((String) value);
         } else {
-            previous = super.put(key, value);
+            if (value != null) {
+                previous = super.put(key, value);    
+            } else {
+                previous = super.remove(key);
+            }
         }
 
         return previous;

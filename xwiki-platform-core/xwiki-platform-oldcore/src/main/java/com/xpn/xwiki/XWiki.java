@@ -1685,7 +1685,7 @@ public class XWiki implements EventListener
     {
         String parsedContent;
 
-        if ((content != null) && (!content.equals(""))) {
+        if (StringUtils.isNotEmpty(content)) {
             parsedContent = context.getWiki().getRenderingEngine().interpretText(content, context.getDoc(), context);
         } else {
             parsedContent = "";

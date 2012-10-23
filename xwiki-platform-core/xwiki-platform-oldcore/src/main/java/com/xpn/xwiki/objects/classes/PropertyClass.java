@@ -466,7 +466,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             pel.add(bprop.toXML());
         }
         Element el = new DOMElement("classType");
-        el.addText(getClassType());
+        String classType = getClassType();
+        if (this.getClass().getSimpleName().equals(classType + "Class")) {
+            // Keep exporting the full Java class name for old/default property types to avoid breaking the XAR format
+            // (to allow XClasses created with the current version of XWiki to be imported in an older version).
+            classType = this.getClass().getName();
+        }
+        el.addText(classType);
         pel.add(el);
         return pel;
     }

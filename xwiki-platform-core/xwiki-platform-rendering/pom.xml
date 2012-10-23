@@ -34,7 +34,9 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Rendering - Parent POM</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-rendering-macros</module>
+    <module>xwiki-platform-rendering-transformations</module>
     <module>xwiki-platform-rendering-xwiki</module>
     <module>xwiki-platform-rendering-wikimacro</module>
   </modules>

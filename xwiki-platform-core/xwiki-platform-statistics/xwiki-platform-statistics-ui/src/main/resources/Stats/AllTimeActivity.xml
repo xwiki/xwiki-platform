@@ -99,10 +99,8 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Stats.Macros" /}}
-{{velocity}}
+      <content>{{velocity}}
 #panelheader($msg.get('xe.statistics.alltime.caps'))
-
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #if (not $chartWidth)
@@ -135,7 +133,6 @@
   #printStatisticsDisabled()
 #end
 {{/html}}
-
 #panelfooter()
 {{/velocity}}</content>
     </property>
@@ -149,5 +146,7 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content>{{include document="Stats.Macros" /}}
+
+{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

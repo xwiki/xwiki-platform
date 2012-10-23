@@ -20,6 +20,7 @@
 package org.xwiki.ircbot.internal;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -127,7 +128,13 @@ public class DocumentModifiedEventListener implements EventListener
                         getNotificationAuthor(event, document),
                         getNotificationComment(event, document),
                         getNotificationURL(event, document));
-                    this.bot.sendMessage(this.bot.getChannelsNames().iterator().next(), message);
+
+                    // Get the channel to which to send to. If there's no channel name it means the Bot hasn't joined
+                    // any channel yet so don't do anything!
+                    Iterator<String> channelNameItator = this.bot.getChannelsNames().iterator();
+                    if (channelNameItator.hasNext()) {
+                        this.bot.sendMessage(channelNameItator.next(), message);
+                    }
                 }
             } catch (IRCBotException e) {
                 // Failed to handle the event, log an error

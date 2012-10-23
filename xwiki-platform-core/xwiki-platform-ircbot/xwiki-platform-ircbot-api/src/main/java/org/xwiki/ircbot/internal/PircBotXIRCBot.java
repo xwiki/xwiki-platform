@@ -27,8 +27,6 @@ import javax.inject.Singleton;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.ircbot.IRCBot;
@@ -43,7 +41,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  */
 @Component
 @Singleton
-public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot, Initializable
+public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot
 {
     /**
      * Used to construct a clean Execution Context for the PircBotX input threads.
@@ -64,7 +62,7 @@ public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot, Initiali
     private XWikiStubContextProvider stubContextProvider;
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize(String wikiName)
     {
         // We use a Fixed Thread Pool instead of the default Cached Thread Pool that PircBotX uses by default because
         // we need to initialize each thread with an Execution Context (it's a ThreadLocal) and since we haven't found
@@ -72,6 +70,6 @@ public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot, Initiali
         // (as it's done by the Cached Thread Pool) will slowly use up all memory...
         setListenerManager(new ThreadedListenerManager<PircBotX>(
             Executors.newFixedThreadPool(3, new XWikiContextualizedThreadFactory(this.execution,
-                this.executionContextManager, this.stubContextProvider))));
+                this.executionContextManager, this.stubContextProvider, wikiName))));
     }
 }

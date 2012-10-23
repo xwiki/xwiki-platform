@@ -360,31 +360,6 @@
       <artifactId>joda-time</artifactId>
       <version>1.6</version>
     </dependency>
-    <!-- RSS Feed processing -->
-    <dependency>
-      <groupId>net.java.dev.rome</groupId>
-      <artifactId>rome</artifactId>
-      <version>1.0.0</version>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.rome</groupId>
-      <artifactId>rome-fetcher</artifactId>
-      <version>1.0.0</version>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     <!-- Mail sender -->
     <dependency>
       <groupId>javax.mail</groupId>
@@ -835,13 +810,6 @@
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
-              **/plugin/feed/FeedPluginApi.java,
-              **/plugin/feed/FeedPlugin.java,
-              **/plugin/feed/SyndEntryDocumentSource.java,
-              **/plugin/feed/SyndEntrySourceApi.java,
-              **/plugin/feed/SyndEntrySource.java,
-              **/plugin/feed/UpdateThread.java,
-              **/plugin/feed/XWikiFeedFetcher.java,
               **/plugin/google/GooglePluginApi.java,
               **/plugin/google/GooglePlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,
@@ -875,12 +843,6 @@
               **/plugin/svg/SVGMacro.java,
               **/plugin/svg/SVGPluginApi.java,
               **/plugin/svg/SVGPlugin.java,
-              **/plugin/userdirectory/Group.java,
-              **/plugin/userdirectory/UserDirectoryPluginAPI.java,
-              **/plugin/userdirectory/UserDirectoryPlugin.java,
-              **/plugin/usertools/XWikiUserManagementToolsAPI.java,
-              **/plugin/usertools/XWikiUserManagementToolsImpl.java,
-              **/plugin/usertools/XWikiUserManagementTools.java,
               **/plugin/XWikiPluginManager.java,
               **/pref/api/XWikiPrefService.java,
               **/pref/impl/xwiki/XWikiPrefServiceImpl.java,

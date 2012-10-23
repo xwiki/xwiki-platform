@@ -142,6 +142,7 @@
               <exclude>**/modalPopup.css</exclude>
               <exclude>**/searchSuggest.js</exclude>
               <exclude>**/upload.js</exclude>
+              <exclude>**/dashboard.css</exclude>
             </excludes>
           </configuration>
         </plugin>

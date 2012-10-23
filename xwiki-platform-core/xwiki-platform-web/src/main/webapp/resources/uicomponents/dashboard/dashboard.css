@@ -1,34 +1,41 @@
 #template('colorThemeInit.vm')
 
-#macro(__css3 $rule)
-  -moz-$rule;
-  -webkit-$rule;
-  $rule;
-#end
-
-/* panels style gadget settings */
-.panels .gadget .gadget-title {
-  background-color: $theme.panelHeaderBackgroundColor;
-  border-bottom: 1px dotted $theme.borderColor;
-  color: $theme.panelHeaderTextColor;
-  font-size: .83em;
+/* panels style gadget settings (forced in inline mode) */
+.panels .gadget .gadget-title, body.inlinebody .gadget .gadget-title {
+  font-size: 0.8em;
   font-weight: 700;
+  letter-spacing: 0;
   margin: 0;
-  padding: 6px 20px 6px 15px;
+  padding: 5px 20px 5px 15px;
   text-align: left;
   text-transform: uppercase;
+  background-color: $theme.panelHeaderBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'top',
+     'colors': [
+      {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
+      {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
+    ]
+  })
+  border-radius: 4px 4px 0 0;
+  border: 1px solid $theme.borderColor;
+  color: $theme.panelHeaderTextColor;
+  #css_textShadow('0', '1px', '0', $theme.panelHeaderGradientColor)
 }
 
-.panels .gadget {
+.panels .gadget, body.inlinebody .gadget {
   background-color: $theme.panelBackgroundColor;
-  border: 1px dotted $theme.borderColor;
   margin: 1em 0;
 }
 
-.panels .gadget .gadget-content {
+.panels .gadget .gadget-content, body.inlinebody .gadget .gadget-content {
   background-color: $theme.panelBackgroundColor;
   color: $theme.panelTextColor;
   padding: 10px 15px;
+  border-radius: 0 0 4px 4px;
+  border-width: 0 1px 1px;
+  border-style: solid;
+  border-color: $theme.borderColor;
 }
 
 /* Hide the dashboard metadata and any metadata that appears in a dashboard (e.g. the gadget metadata) */
@@ -38,11 +45,12 @@
 
 /* gadget handles on the dashboard */
 .gadget .gadget-title .settings-menu .action {
+  border-top: solid 1px $theme.borderColor;
   background-repeat: no-repeat;
+  background-position: center;
   cursor: pointer;
-  height: 16px;
-  margin: 2px;
-  width: 16px;
+  width: 30px;
+  height: 24px;
 }
 
 .gadget .gadget-title .settings-menu .remove {
@@ -57,12 +65,16 @@
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 4px 4px 0 0;
+  border-width: 1px 1px 0 1px;
+  border-color: $theme.borderColor;
+  border-style: solid;
   cursor: pointer;
-  height: 16px;
+  height: 24px;
   position: absolute;
-  right: 2px;
-  top: 2px;
-  width: 20px;
+  right: 0px;
+  top: 0px;
+  width: 30px;
 }
 
 .gadget .gadget-title .settings-open {
@@ -71,9 +83,14 @@
 
 .gadget .gadget-title .settings-menu {
   background-color: $theme.backgroundSecondaryColor;
+  background-color: $theme.backgroundSecondaryColor;
+  border-radius: 0 0 4px 4px;
+  border-width: 0 1px 1px;
+  border-color: $theme.borderColor;
+  border-style: solid;
   position: absolute;
-  right: 2px;
-  top: 18px;
+  right: 0;
+  top: 24px;
 }
 
 /* Drag & drop effects */
@@ -94,7 +111,7 @@
 /* Add button decoration */
 .dashboard-edit .addgadget, .dashboard-edit .addcontainer {
   background: url($xwiki.getSkinFile("icons/silk/add.png")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
-  #__css3('border-radius: 4px')
+  border-radius: 4px;
   color: $theme.menuAddEntryLinkColor;
   cursor: pointer;
   float: right;

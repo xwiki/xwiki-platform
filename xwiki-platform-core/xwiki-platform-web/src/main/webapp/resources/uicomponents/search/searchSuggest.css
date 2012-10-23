@@ -2,8 +2,6 @@
 
 div.suggestItems.searchSuggest {
   border-top: 1px solid $theme.borderColor;
-  -moz-box-shadow:3px 3px 5px;
-  -webkit-box-shadow:3px 3px 5px;
   box-shadow:3px 3px 5px;
 }
 

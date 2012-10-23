@@ -32,8 +32,8 @@
         <img alt="XWiki Logo" src="$xwiki.getSkinFile('uicomponents/extension/logo.png')">
       </div>
       #set ($stepId = $services.distribution.jobStatus.question.stepId)
-      <div id="$!stepId" class="xdialog-content">
-        #if ($request.extensionId && $request.extensionVersion)
+      <div#if($stepId) id="$stepId"#end class="xdialog-content">
+        #if ($request.extensionId)
           ## The user can get here by clicking on an extension link.
           #handleExtensionRequest()
         #else

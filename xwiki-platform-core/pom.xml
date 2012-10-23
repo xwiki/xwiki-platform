@@ -246,21 +246,80 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <ignored>
+            <difference>
+              <className>org/xwiki/ircbot/IRCBot</className>
+              <method>void initialize(java.lang.String)</method>
+              <differenceType>7012</differenceType>
+              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                IRC Bot application in a subwiki</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.lang.Class getRole()</method>
+              <differenceType>7002</differenceType>
+              <justification>WikiComponent is still a young API. Removed the method to implement XWIKI-8233, 
+                "Allow wiki components to implement parameterized types"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.lang.reflect.Type getRoleType()</method>
+              <differenceType>7012</differenceType>
+              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8233, 
+                "Allow wiki components to implement parameterized types"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.util.Map getDependencies()</method>
+              <differenceType>7012</differenceType>
+              <justification>WikiComponent is still a young API. Added a new method to handle XWIKI-8232, 
+                "Handle wiki components dependencies injection"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/uiextension/UIExtension</className>
+              <method>java.util.List execute()</method>
+              <differenceType>7006</differenceType>
+              <to>org.xwiki.rendering.block.Block</to>
+              <justification>UIExtension is still a young API. Replaced the List of Block by a Block since Block can
+                can now hold a list of Block</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/uiextension/UIExtension</className>
+              <method>java.lang.String getName()</method>
+              <differenceType>7002</differenceType>
+              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/uiextension/UIExtension</className>
+              <method>java.lang.String getId()</method>
+              <differenceType>7012</differenceType>
+              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/objects/ElementInterface</className>
+              <method>boolean apply(com.xpn.xwiki.objects.ElementInterface, boolean)</method>
+              <differenceType>7012</differenceType>
+              <justification>Added a common method to all elements to set all the data from another element.
+                Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
+            </difference>
+          </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
                  from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
             <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
-            <!-- Introduced by XWIKI-8232, "Handle wiki components dependencies injection" -->
-            <!-- To be removed once 4.3 final is released -->
-            <exclude>org/xwiki/component/wiki/WikiComponent</exclude>
-            <!-- Introduced by XWIKI-8236, "Provide a configuration mechanism for UI extension points" -->
-            <!-- To be removed once 4.3 final is released -->
-            <exclude>org/xwiki/uiextension/UIExtension</exclude>
-            <!-- Added a common method to all elements to set all the data from another element -->
-            <!-- Technically this does not really break anything because all elements are supposed to extends BaseElement -->
-            <exclude>com/xpn/xwiki/objects/ElementInterface</exclude>
+            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
+            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
+            <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
+            <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
+            <exclude>org/xwiki/rest/resources/**</exclude>
+            <!-- Not a breakage! The plugin has been moved to its own module. -->
+            <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
+            <!-- Module has been retired as it was unmaintained. -->
+            <exclude>com/xpn/xwiki/plugin/userdirectory/**/*</exclude>
+            <!-- Module has been retired as it was unmaintained. -->
+            <exclude>com/xpn/xwiki/plugin/usertools/**/*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -299,6 +358,7 @@
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
+    <module>xwiki-platform-feed</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>

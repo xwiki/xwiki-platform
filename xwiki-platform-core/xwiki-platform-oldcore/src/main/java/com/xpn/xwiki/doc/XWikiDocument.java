@@ -91,6 +91,9 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -4625,13 +4628,32 @@ public class XWikiDocument implements DocumentModelBridge
         // the current wiki.
         // - the parent document reference saved in the database matches the page name part of this document's
         // reference (eg "page") and the parent document's space is the same as this document's space.
-        List<String> params =
-            Arrays.asList(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()),
-                this.localEntityReferenceSerializer.serialize(getDocumentReference()),
-                getDocumentReference().getName(), getDocumentReference().getLastSpaceReference().getName());
+        List<DocumentReference> children = new ArrayList<DocumentReference>();
 
-        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
-        return context.getWiki().getStore().searchDocumentReferences(whereStatement, nb, start, params, context);
+        try {
+            Query query = getStore().getQueryManager()
+                .createQuery("select distinct doc.space, doc.name from XWikiDocument doc where "
+                    + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
+                Query.XWQL);
+            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden"));
+            query.bindValue("prefixedFullName",
+                this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+            query.bindValue("fullName", this.localEntityReferenceSerializer.serialize(getDocumentReference()));
+            query.bindValue("name", getDocumentReference().getName());
+            query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
+            List<Object[]> queryResults = query.execute();
+
+            for (Object[] queryResult : queryResults) {
+                children.add(new DocumentReference(this.getDocumentReference().getWikiReference().getName(),
+                    (String) queryResult[0], (String) queryResult[1]));
+            }
+
+        } catch (QueryException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                String.format("Failed to retrieve children for document [%s]", this.getDocumentReference()), e);
+        }
+
+        return children;
     }
 
     /**

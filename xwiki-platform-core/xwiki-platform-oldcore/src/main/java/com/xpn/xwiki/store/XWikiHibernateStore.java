@@ -2455,7 +2455,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             XWikiDocument doc =
                 new XWikiDocument(new DocumentReference(context.getDatabase(), (String) result[0], (String) result[1]));
             if (checkRight) {
-                if (context.getWiki().getRightService().checkAccess("view", doc, context) == false) {
+                if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {
                     continue;
                 }
             }

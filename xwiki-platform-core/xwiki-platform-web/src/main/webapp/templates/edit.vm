@@ -27,7 +27,6 @@
   ##
   ## Determine what editor to show
   ##
-  $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
   #if("$!editor" == '')
     ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
     #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")

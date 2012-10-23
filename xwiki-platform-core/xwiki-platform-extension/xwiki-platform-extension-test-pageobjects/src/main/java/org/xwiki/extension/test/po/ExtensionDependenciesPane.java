@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -54,6 +56,16 @@ public class ExtensionDependenciesPane extends BaseElement
      */
     public List<DependencyPane> getDirectDependencies()
     {
+        // Wait until all remote dependencies are resolved asynchronously.
+        getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver driver)
+            {
+                return getUtil().findElementsWithoutWaiting(driver, container, By.className("extension-item-loading"))
+                    .size() > 0 ? null : container;
+            }
+        });
         return getDependenciesAfter("This extension depends on:");
     }
 

@@ -79,6 +79,9 @@ public class CommentAddAction extends XWikiAction
                 while (author.startsWith(USER_SPACE_PREFIX)) {
                     author = StringUtils.removeStart(author, USER_SPACE_PREFIX);
                 }
+                // We need to make sure the author will fit in a String property, this is mostly a protection against
+                // spammers who try to put large texts in this field
+                author = author.substring(0, Math.min(author.length(), 255));
                 object.set(AUTHOR_PROPERTY_NAME, author, context);
             } else {
                 // A registered user must always post with his name.

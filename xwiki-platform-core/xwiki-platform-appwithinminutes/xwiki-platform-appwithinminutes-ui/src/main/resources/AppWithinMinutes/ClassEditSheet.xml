@@ -447,7 +447,7 @@ XWiki.FormField = Class.create({
     container.select('link').each(function(link) {
       head.insert(link);
     });
-    this.container.insert(container.innerHTML);
+    this.container.insert(container);
   },
   _createToolBox : function() {
     var deleteIcon = new Element('img', {

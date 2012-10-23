@@ -40,6 +40,8 @@ import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -74,11 +76,15 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
         final IRCBotListener componentBotListener = getMockery().mock(IRCBotListener.class);
         final WikiIRCBotListenerManager botListenerManager =
             getComponentManager().getInstance(WikiIRCBotListenerManager.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
 
         getMockery().checking(new Expectations()
         {{
+            oneOf(modelContext).getCurrentEntityReference();
+            will(returnValue(new WikiReference("currentwiki")));
             oneOf(bot).isConnected();
             will(returnValue(false));
+            oneOf(bot).initialize("currentwiki");
             oneOf(ircModel).loadBotData();
             will(returnValue(botData));
             allowing(bot).getListenerManager();

@@ -79,7 +79,7 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
     public void getComponentInstanceWithNoHintWhenProgrammingRights() throws Exception
     {
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class);
+        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class, "context");
         getMockery().checking(new Expectations() {{
             oneOf(dab).hasProgrammingRights();
             will(returnValue(true));
@@ -106,7 +106,7 @@ public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
     public void getComponentInstanceWithHintWhenProgrammingRights() throws Exception
     {
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class);
+        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class, "context");
         getMockery().checking(new Expectations() {{
             oneOf(dab).hasProgrammingRights();
             will(returnValue(true));

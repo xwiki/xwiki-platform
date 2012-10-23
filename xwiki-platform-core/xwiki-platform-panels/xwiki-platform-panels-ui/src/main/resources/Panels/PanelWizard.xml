@@ -599,7 +599,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
           #set ($counterleft = 0)
           #set ($issetright = 0)
           #set ($counterright = 0)
-          #foreach ($element in $leftPanels)
+          #foreach ($element in $leftPanels.split(','))
             #if ($item == $element)
               window.allPanelsPlace[$counter]['left'] = $counterleft;
               #set ($issetleft = 1)
@@ -610,7 +610,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
           #if ($issetleft == 0)
             window.allPanelsPlace[$counter]['left'] = -1;
           #end
-          #foreach ($element in $rightPanels)
+          #foreach ($element in $rightPanels.split(','))
             #if ($item == $element)
               window.allPanelsPlace[$counter]['right'] = $counterright;
               #set ($issetright = 1)

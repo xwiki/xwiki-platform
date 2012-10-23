@@ -147,7 +147,7 @@ dt {
 input[type="text"], input[type="password"] {
   background-color: $theme.pageContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.fieldGradientColor, 'position': '1px'},
       {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
@@ -162,7 +162,7 @@ input[type="text"], input[type="password"] {
 textarea, select {
   background-color: $theme.pageContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.fieldGradientColor, 'position': '1px'},
       {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
@@ -439,8 +439,6 @@ th.avatar {
 
 #headerlanguages a {
   background: $theme.menuBackgroundColor;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
   color: $theme.menuLinkColor;
   display: inline-block;
@@ -619,6 +617,7 @@ ul.xwikitabbar {
   color: $theme.menuSelectedEntryLinkColor;
   cursor: default;
   text-decoration: none;
+  text-shadow: none;
 }
 
 /* ----------------History----------------*/
@@ -1119,8 +1118,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
   ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
-  #foreach ($prefix in ['-moz-', '-webkit-', '-o-', '-ms-', ''])
-    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #foreach ($prefix in ['-webkit-'])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
+  #foreach ($prefix in ['-moz-', '-o-', ''])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(bottom, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
   #end
 }
 
@@ -1283,7 +1285,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   padding: 0 0 0.1em;
   position: absolute;
   text-align: center;
-  text-shadow: 0 1px 0 $theme.pageContentBackgroundColor;
+  #css_textShadow('0', '1px', '0', $theme.menuContentGradientColor)
   width: 100%;
 }
 .floating-menu:hover:after {
@@ -1421,7 +1423,7 @@ input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.buttonPrimaryGradientColor, 'position': '0%'},
       {'color': $theme.buttonPrimaryBackgroundColor, 'position': '100%'}
@@ -1435,14 +1437,14 @@ input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;
-  text-shadow: 0px 1px 0px $theme.buttonPrimaryGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.buttonPrimaryGradientColor)
   text-transform: uppercase;
 }
 
 input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
   background-color: $theme.buttonPrimaryBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.buttonPrimaryBackgroundColor, 'position': '0%'},
       {'color': $theme.buttonPrimaryGradientColor, 'position': '100%'}
@@ -1458,7 +1460,7 @@ input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
   background-color: $theme.buttonSecondaryBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.buttonSecondaryGradientColor, 'position': '0%'},
       {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
@@ -1467,7 +1469,7 @@ input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
   border-color: $theme.buttonSecondaryBackgroundColor;
   border-radius: 3px 3px 3px 3px;
   color: $theme.buttonSecondaryTextColor;
-  text-shadow: 0px 1px 0px $theme.buttonSecondaryGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.buttonSecondaryGradientColor)
 }
 
 input.secondary:hover, button.secondary:hover, .buttonwrapper a.secondary:hover {
@@ -1543,7 +1545,7 @@ input.icon-button {
 .vertical-menu .group {
   background-color: $theme.menuContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -1563,7 +1565,7 @@ input.icon-button {
 .vertical-menu .group:hover {
   background-color: $theme.menuBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -1582,7 +1584,7 @@ input.icon-button {
 .vertical-menu .current-group {
   background-color: $theme.menuBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -1731,8 +1733,9 @@ h1.xwikipaneltitle {
   border-top: 1px dotted $theme.borderColor;
 }
 
-.DocumentInformation input.xhidden {
+.DocumentInformation input#xhidden {
   width: auto;
+  margin-right: 0.5em;
 }
 
 /* @group CONTAINERS GENERAL STYLING */
@@ -1782,7 +1785,7 @@ ul.xwikitabbar {
 h1.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
       {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
@@ -1790,26 +1793,26 @@ h1.xwikipaneltitle {
   })
   border-radius: 4px 4px 0 0;
   color: $theme.panelHeaderTextColor;
-  text-shadow: 0 1px 0 $theme.panelHeaderGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.panelHeaderGradientColor)
 }
 
 .collapsed h1.xwikipaneltitle {
   background-color: $theme.panelCollapsedBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.panelCollapsedGradientColor, 'position': '0%'},
       {'color': $theme.panelCollapsedBackgroundColor, 'position': '100%'}
     ]
   })
   color: $theme.panelCollapsedTextColor;
-  text-shadow: 0 1px 0 $theme.panelCollapsedGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.panelCollapsedGradientColor)
 }
 
 #contentmenu, #editmenu, ul.xwikitabbar {
   background-color: $theme.menuContentBackgroundColor;
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuContentGradientColor, 'position': '0%'},
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
@@ -1822,7 +1825,7 @@ h1.xwikipaneltitle {
 #editmenu.actionmenu a, #editmenu.actionmenu a:visited, #editmenu .menuarrow, #editmenu .tmetype,
 .xwikitabbar li a, .xwikitabbar li a:visited, .xwikitabbar li a:active  {
   color: $theme.menuContentLinkColor;
-  text-shadow: 0 1px 0 $theme.menuContentGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.menuContentGradientColor)
 }
 
 #contentmenu.actionmenu .submenuitem a ,
@@ -1837,7 +1840,7 @@ h1.xwikipaneltitle {
 
 #mainmenu {
   #css3_backgroundLinearGradient({
-     'angle': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.menuGradientColor, 'position': '0%'},
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
@@ -1847,7 +1850,7 @@ h1.xwikipaneltitle {
 }
 
 #mainmenu .tmetype, #mainmenu .tme {
-  text-shadow: 0 1px 0 $theme.menuGradientColor;
+  #css_textShadow('0', '1px', '0', $theme.menuGradientColor)
 }
 
 #mainmenu .tmCreate .tme {

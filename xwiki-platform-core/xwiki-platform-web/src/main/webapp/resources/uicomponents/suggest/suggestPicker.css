@@ -50,10 +50,7 @@
   border: 0 none;
   background: #fff;
   padding: 4px 8px;
-  -moz-border-radius: 0 12px 12px 12px;
-  -webkit-border-radius: 0 12px 12px 12px;
   border-radius: 0 12px 12px 12px;
-  -moz-box-shadow: 0 0 6px #777;
   box-shadow: 0 0 6px #777;
   z-index: 20;
 }

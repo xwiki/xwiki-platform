@@ -41,6 +41,19 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
+     * Create a new EntryEvictionConfiguration with given capacity, eviction will be based on LRU algorithm.
+     * 
+     * @param maxEntries the maximum entries the cache can contain.
+     * @since 4.3M1
+     */
+    public LRUEvictionConfiguration(int maxEntries)
+    {
+        this();
+
+        setMaxEntries(maxEntries);
+    }
+
+    /**
      * @param maxEntries the maximum entries the cache can contain.
      */
     public void setMaxEntries(int maxEntries)

@@ -19,6 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -92,7 +93,8 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public List<String> getKeys()
     {
-        return null;
+        // TODO: introduce a DocumentAccessBridge#getXClassPropertyNames(DocumentReference) to properly implement that
+        return Collections.emptyList();
     }
 
     @Override

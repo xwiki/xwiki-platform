@@ -123,10 +123,10 @@
     <className>XWiki.SchedulerJobClass</className>
     <guid>d7aee508-3f2a-459c-a215-f9cf2de831d7</guid>
     <property>
-      <contextDatabase>xwiki</contextDatabase>
+      <contextDatabase/>
     </property>
     <property>
-      <contextLang>en</contextLang>
+      <contextLang/>
     </property>
     <property>
       <contextUser/>
@@ -151,7 +151,7 @@ if (!botManager.isStarted()) {
 </script>
     </property>
     <property>
-      <status>Normal</status>
+      <status>None</status>
     </property>
   </object>
   <content>{{include document="XWiki.SchedulerJobSheet"/}}</content>

@@ -39,6 +39,10 @@ public abstract class AbstractCachedBundle extends AbstractBundle
      */
     protected Map<String, LocaleBundle> bundleCache = new ConcurrentHashMap<String, LocaleBundle>();
 
+    protected AbstractCachedBundle()
+    {
+    }
+
     public AbstractCachedBundle(String id)
     {
         super(id);

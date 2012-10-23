@@ -1,36 +1,57 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.localization.internal.xwikipreferences;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import org.apache.ecs.storage.Array;
-import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.DisposableCacheValue;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractBundle;
+import org.xwiki.localization.internal.DefaultDocumentBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.RegexEntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventListener, DisposableCacheValue
 {
+    public static final String ID = XWikiPreferencesBundle.ID + ".wiki";
+
     /**
      * The name of the property containing the list of global document bundles.
      */
@@ -41,22 +62,30 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
      */
     private static final String JOIN_SEPARATOR = ",";
 
-    private final ObservationManager observation;
-    
+    private ComponentManager componentManager;
+
+    private ObservationManager observation;
+
     private DocumentAccessBridge documentAccessBridge;
 
-    private List<Event> events;
+    private DocumentReferenceResolver<String> resolver;
 
-    private String wiki;
+    private final List<Event> events;
 
-    private Map<DocumentReference, Bundle> bundles;
+    private final String wiki;
 
-    public XWikiPreferencesWikiBundle(String wiki, ObservationManager observation)
+    private Map<DocumentReference, Bundle> bundles = new ConcurrentHashMap<DocumentReference, Bundle>();
+
+    public XWikiPreferencesWikiBundle(String wiki, ComponentManager componentManager) throws ComponentLookupException
     {
-        super("localization." + XWikiPreferencesBundle.ID + '.' + wiki);
+        super(XWikiPreferencesWikiBundle.ID + '.' + wiki);
 
-        this.observation = observation;
         this.wiki = wiki;
+
+        this.componentManager = componentManager;
+        this.observation = componentManager.getInstance(ObservationManager.class);
+        this.documentAccessBridge = componentManager.getInstance(DocumentAccessBridge.class);
+        this.resolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
 
         intializeBundles();
 
@@ -74,17 +103,39 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
         this.observation.addListener(this);
     }
 
+    private Set<DocumentReference> getDocuments()
+    {
+        DocumentReference preferencesReference = new DocumentReference(this.wiki, "XWiki", "XWikiPreferences");
+
+        String documentNameListString =
+            (String) this.documentAccessBridge.getProperty(preferencesReference, preferencesReference,
+                DOCUMENT_BUNDLE_PROPERTY);
+
+        List<String> documentNameList = ListClass.getListFromString(documentNameListString, JOIN_SEPARATOR, false);
+
+        Set<DocumentReference> documents = new LinkedHashSet<DocumentReference>(documentNameList.size());
+        for (String documentName : documentNameList) {
+            documents.add(this.resolver.resolve(documentName, preferencesReference));
+        }
+
+        return documents;
+    }
+
     private void intializeBundles()
     {
-        List<String> documentList = this.documentAccessBridge.getProperty(arg0);
-        
-        WikiReference wikiReference = new WikiReference(this.wiki);
-        
-        Map<DocumentReference, Bundle> bundles = new LinkedHashMap<DocumentReference, Bundle>(documentList.size());
-        for (String document : documentList) {
-            DocumentReference reference = this.resolver.resolve(document, wikiReference);
+        Set<DocumentReference> documents = getDocuments();
 
-            bundles.put(reference, new DocumentBundle(reference));
+        Map<DocumentReference, Bundle> bundles = new LinkedHashMap<DocumentReference, Bundle>(documents.size());
+        for (DocumentReference document : documents) {
+            DefaultDocumentBundle documentBundle;
+            try {
+                documentBundle = new DefaultDocumentBundle(document, this.componentManager);
+
+                bundles.put(document, documentBundle);
+            } catch (ComponentLookupException e) {
+                // Should never happen
+                this.logger.error("Failed to create document bundle for document [{}]", document, e);
+            }
         }
     }
 
@@ -113,7 +164,7 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
     @Override
     public Translation getTranslation(String key, Locale locale)
     {
-        for (Bundle bundle : bundles) {
+        for (Bundle bundle : this.bundles.values()) {
             Translation translation = bundle.getTranslation(key, locale);
             if (translation != null) {
                 return translation;

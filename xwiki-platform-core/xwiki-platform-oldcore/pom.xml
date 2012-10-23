@@ -599,11 +599,6 @@
       <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>

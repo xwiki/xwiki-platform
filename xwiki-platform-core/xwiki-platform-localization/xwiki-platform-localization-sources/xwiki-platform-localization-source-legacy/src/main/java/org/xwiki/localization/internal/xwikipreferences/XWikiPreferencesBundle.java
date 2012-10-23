@@ -23,12 +23,13 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Bundle;
@@ -36,7 +37,6 @@ import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Bundle corresponding to global (at the wiki level) localization documents.
@@ -56,10 +56,7 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
     private CacheManager cacheManager;
 
     @Inject
-    private ObservationManager observationManager;
-
-    @Inject
-    private Logger logger;
+    private ComponentManager componentManager;
 
     private Cache<Bundle> bundlesCache;
 
@@ -102,8 +99,12 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
             synchronized (this.bundlesCache) {
                 bundle = this.bundlesCache.get(wiki);
                 if (bundle == null) {
-                    bundle = createWikiBundle(wiki);
-                    this.bundlesCache.set(wiki, bundle);
+                    try {
+                        bundle = createWikiBundle(wiki);
+                        this.bundlesCache.set(wiki, bundle);
+                    } catch (ComponentLookupException e) {
+                        this.logger.error("Failed to create preferences bundle for wiki [{}]", wiki, e);
+                    }
                 }
             }
         }
@@ -111,8 +112,8 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
         return bundle;
     }
 
-    private Bundle createWikiBundle(String wiki)
+    private Bundle createWikiBundle(String wiki) throws ComponentLookupException
     {
-        return new XWikiPreferencesWikiBundle(wiki, this.observationManager);
+        return new XWikiPreferencesWikiBundle(wiki, this.componentManager);
     }
 }

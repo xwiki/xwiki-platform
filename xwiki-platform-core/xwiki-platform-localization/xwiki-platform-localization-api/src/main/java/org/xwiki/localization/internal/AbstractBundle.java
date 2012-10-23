@@ -61,6 +61,11 @@ public abstract class AbstractBundle implements Bundle
      */
     private int priority = DEFAULTPRIORITY;
 
+    protected AbstractBundle()
+    {
+
+    }
+
     public AbstractBundle(String id)
     {
         this.id = id;
@@ -76,6 +81,11 @@ public abstract class AbstractBundle implements Bundle
     public String getId()
     {
         return this.id;
+    }
+
+    protected void setId(String id)
+    {
+        this.id = id;
     }
 
     @Override

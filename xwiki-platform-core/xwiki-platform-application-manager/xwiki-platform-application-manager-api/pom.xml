@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-application-manager-api</artifactId>
   <name>XWiki Platform - Application Manager - API</name>
-  <description>XWiki Platform - Application Manager - API</description>
+  <description>API to manage application descriptors</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -566,6 +566,12 @@
       <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used by XClass property displayers to pull required JS/CSS resources. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -752,7 +758,6 @@
               **/objects/classes/BaseClass.java,
               **/objects/classes/BooleanClass.java,
               **/objects/classes/ClassInterface.java,
-              **/objects/classes/DateClass.java,
               **/objects/classes/DBListClass.java,
               **/objects/classes/DBTreeListClass.java,
               **/objects/classes/GroupsClass.java,
@@ -767,7 +772,6 @@
               **/objects/classes/StringClass.java,
               **/objects/classes/TextAreaClass.java,
               **/objects/classes/UsersClass.java,
-              **/objects/DateProperty.java,
               **/objects/DBStringListProperty.java,
               **/objects/DoubleProperty.java,
               **/objects/ElementComparator.java,

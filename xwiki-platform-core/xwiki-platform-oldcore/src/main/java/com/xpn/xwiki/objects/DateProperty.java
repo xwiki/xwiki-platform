@@ -25,18 +25,29 @@ import java.util.Date;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
+/**
+ * Represents a date property.
+ * 
+ * @version $Id$
+ */
 public class DateProperty extends BaseProperty implements Cloneable
 {
+    /**
+     * The property value.
+     */
     private Date value;
-
-    public DateProperty()
-    {
-    }
 
     @Override
     public Object getValue()
     {
         return this.value;
+    }
+
+    @Override
+    public void setValue(Object value)
+    {
+        setValueDirty(value);
+        this.value = (Date) value;
     }
 
     @Override
@@ -54,26 +65,26 @@ public class DateProperty extends BaseProperty implements Cloneable
     }
 
     @Override
-    public void setValue(Object value)
+    public String toText()
     {
-        setValueDirty(value);
-        this.value = (Date) value;
+        // FIXME: The value of a date property should be serialized using the date timestamp or the date format
+        // specified in the XClass the date property belongs to.
+        return getValue() == null ? "" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(getValue());
     }
 
     @Override
-    public String toText()
+    public int hashCode()
     {
-        if (getValue() == null) {
-            return "";
-        }
-        
-        return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")).format(getValue());        
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj)
     {
-        // Same Java object, they sure are equal
+        // Same Java object, they sure are equal.
         if (this == obj) {
             return true;
         }
@@ -82,7 +93,7 @@ public class DateProperty extends BaseProperty implements Cloneable
             return false;
         }
 
-        if ((getValue() == null) && (((DateProperty) obj).getValue() == null)) {
+        if (getValue() == null && ((DateProperty) obj).getValue() == null) {
             return true;
         }
 
@@ -97,5 +108,4 @@ public class DateProperty extends BaseProperty implements Cloneable
 
         return property;
     }
-
 }

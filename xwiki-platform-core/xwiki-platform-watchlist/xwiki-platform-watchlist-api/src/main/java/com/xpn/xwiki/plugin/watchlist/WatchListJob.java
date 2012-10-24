@@ -91,7 +91,7 @@ public class WatchListJob extends AbstractJob implements Job
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
         // clone the context to make sure we have a new one per run
-        this.context = (XWikiContext) ((XWikiContext) data.get("context")).clone();
+        this.context =  ((XWikiContext) data.get("context")).clone();
         // clean up the database connections
         this.context.getWiki().getStore().cleanUp(this.context);
         this.plugin = (WatchListPlugin) this.context.getWiki().getPlugin(WatchListPlugin.ID, this.context);

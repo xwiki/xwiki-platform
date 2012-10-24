@@ -11,7 +11,7 @@
   text-transform: uppercase;
   background-color: $theme.panelHeaderBackgroundColor;
   #css3_backgroundLinearGradient({
-     'to': 'top',
+     'to': 'bottom',
      'colors': [
       {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
       {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}

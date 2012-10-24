@@ -1,0 +1,131 @@
+/**
+ * This is the plain style sheet for CalendarDateSelect widget, adapted to use XWiki's color theme mechanism.
+ * See https://github.com/timcharper/calendar_date_select/blob/master/public/stylesheets/calendar_date_select/plain.css
+ */
+#template('colorThemeInit.vm')
+.calendar_date_select {
+  background-color: $theme.pageContentBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  width: 195px;
+  z-index: 1000;
+}
+/* This is a fun ie6 hack to get drop downs to stay behind the popup window. This should always be just underneath .calendar_date_select */
+iframe.ie6_blocker {
+  position: absolute;
+  z-index: 999;
+}
+
+.calendar_date_select thead th {
+}
+
+.calendar_date_select .cds_buttons {
+  padding: 0.4em 0;
+  text-align: center;
+}
+
+.calendar_date_select .cds_footer {
+  font-size: smaller;
+  padding: 0.2em;
+  text-align: center;
+}
+
+.calendar_date_select table {
+  font-size: 90%;
+  margin: 0;
+  padding: 0;
+}
+
+.calendar_date_select .cds_header {
+  text-align: center;
+}
+
+.calendar_date_select .cds_header span {
+  font-weight: bolder;
+  line-height: 20px;
+}
+
+.calendar_date_select .cds_header a {
+  color: $theme.textColor !important;
+  font-size: 1.1em;
+  font-weight: bolder;
+  height: 20px;
+  line-height: 20px;
+  text-decoration: none;
+  width: 22px;
+}
+
+.calendar_date_select .cds_header a.prev {
+  float:left;
+}
+.calendar_date_select .cds_header a.next {
+  float:right;
+}
+.calendar_date_select .cds_header a.close {
+  float:right;
+  display:none;
+}
+
+.calendar_date_select select {
+  font-size: smaller;
+}
+.calendar_date_select .cds_header select {
+  border: 0;
+  vertical-align: middle;
+}
+
+.calendar_date_select .cds_header select.month {
+  width: 90px;
+}
+
+.calendar_date_select .cds_header select.year {
+  width: 61px;
+}
+
+.calendar_date_select .cds_buttons a {
+  color: $theme.textColor;
+  font-size: xx-small;
+}
+
+.calendar_date_select td {
+  height: 21px;
+  text-align: center;
+  vertical-align: middle;
+  width: 24px;
+}
+
+.calendar_date_select th {
+  padding: 0.2em 0;
+  text-align: center;
+}
+
+.calendar_date_select td.weekend {
+}
+
+.calendar_date_select td div.other {
+  color: $theme.textSecondaryColor;
+}
+
+.calendar_date_select td.selected div {
+  color: $theme.panelHeaderTextColor;
+}
+
+.calendar_date_select td.selected {
+  background-color: $theme.panelHeaderBackgroundColor !important;
+}
+
+.calendar_date_select td:hover {
+  background-color: $theme.highlightColor;
+}
+
+.calendar_date_select td.today {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.calendar_date_select td.disabled div {
+  color: $theme.textSecondaryColor;
+  opacity: 0.4;
+}
+
+.fieldWithErrors .calendar_date_select {
+  border: 2px solid $theme.notificationErrorColor;
+}

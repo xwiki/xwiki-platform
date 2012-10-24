@@ -97,9 +97,9 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             builder.append("#else\n");
             builder.append("  ## Allow $obfuscateEmail to be set in some other place.\n");
             builder.append("  #if(\"$obfuscateEmail\" == 'false')\n");
-            builder.append("    $value\n");
+            builder.append("    $!value\n");
             builder.append("  #else\n");
-            builder.append("    $value.replaceAll('@.*', '@ xxxxxx')\n");
+            builder.append("    $!value.replaceAll('@.*', '@ xxxxxx')\n");
             builder.append("  #end\n");
             builder.append("#end\n");
             builder.append("{{/velocity}}");
@@ -141,7 +141,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             builder.append("    #end\n");
             builder.append("  {{/html}}\n");
             builder.append("#else\n");
-            builder.append("  $value\n");
+            builder.append("  $!value\n");
             builder.append("#end\n");
             builder.append("{{/velocity}}\n");
             timezoneProperty.setCustomDisplay(builder.toString());

@@ -29,8 +29,11 @@ import org.junit.Test;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
+import org.slf4j.Logger;
+import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.internal.ExtendedPircBotX;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,6 +57,32 @@ import junit.framework.Assert;
  */
 public class WikiIRCBotListenerTest extends AbstractComponentTestCase
 {
+    private ExtendedPircBotX bot;
+
+    public class TestableWikiIRCBotListener extends WikiIRCBotListener
+    {
+        private Logger logger;
+
+        public TestableWikiIRCBotListener(WikiBotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
+            Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel,
+            DocumentReference executingUserReference)
+        {
+            super(listenerData, events, syntax, macroTransformation, plainTextBlockRenderer, ircModel,
+                executingUserReference);
+        }
+
+        public void setLogger(Logger logger)
+        {
+            this.logger = logger;
+        }
+
+        @Override
+        protected Logger getLogger()
+        {
+            return this.logger;
+        }
+    }
+
     @Override
     public void setUp() throws Exception
     {
@@ -72,25 +101,81 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer renderer = getMockery().mock(BlockRenderer.class);
         final WikiIRCModel ircModel = getMockery().mock(WikiIRCModel.class);
-        final ExtendedPircBotX bot = getMockery().mock(ExtendedPircBotX.class);
 
         Utils.setComponentManager(getComponentManager());
         final XWikiContext xwikiContext = new XWikiContext();
 
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
-        WikiIRCBotListener listener = new WikiIRCBotListener(data, events, Syntax.XWIKI_2_1, macroTransformation,
-            renderer, ircModel, userReference);
+        WikiIRCBotListener listener = new TestableWikiIRCBotListener(data, events, Syntax.XWIKI_2_1,
+            macroTransformation, renderer, ircModel, userReference);
+
+        Event event = createTestEvent();
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(bot).getListenerManager();
-                will(returnValue(new ThreadedListenerManager<ExtendedPircBotX>()));
             oneOf(ircModel).getXWikiContext();
                 will(returnValue(xwikiContext));
             oneOf(ircModel).executeAsUser(with(equal(userReference)), with(equal(wikiBotListenerReference)),
                 with(any(WikiIRCModel.Executor.class)));
         }});
 
+        listener.onEvent(event);
+
+        // Verify that the XWikiContext has been populated with bindings
+        Map < String, Object > bindings = (Map<String, Object>) xwikiContext.get("irclistener");
+        Assert.assertTrue(bindings.get("channel") instanceof Channel);
+        Assert.assertEquals("channel", ((Channel) bindings.get("channel")).getName());
+
+        Assert.assertTrue(bindings.get("user") instanceof User);
+        Assert.assertEquals("nick", ((User) bindings.get("user")).getNick());
+
+        Assert.assertEquals("message", bindings.get("message"));
+    }
+
+    @Test
+    public void onMessageWhenBotListenerRaisesException() throws Exception
+    {
+        final DocumentReference wikiBotListenerReference = new DocumentReference("wiki", "space", "page");
+        WikiBotListenerData data = new WikiBotListenerData(wikiBotListenerReference,
+                "space.page", "name", "description");
+        Map<String, XDOM> events = new HashMap<String, XDOM>();
+        events.put("onMessage", new XDOM(Collections.<Block>emptyList()));
+        final Transformation macroTransformation = getMockery().mock(Transformation.class);
+        final BlockRenderer renderer = getMockery().mock(BlockRenderer.class);
+        final WikiIRCModel ircModel = getMockery().mock(WikiIRCModel.class);
+
+        Utils.setComponentManager(getComponentManager());
+        final XWikiContext xwikiContext = new XWikiContext();
+
+        final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        TestableWikiIRCBotListener listener = new TestableWikiIRCBotListener(data, events, Syntax.XWIKI_2_1,
+            macroTransformation, renderer, ircModel, userReference);
+
+        final Logger logger = getMockery().mock(Logger.class);
+        listener.setLogger(logger);
+
+        Event event = createTestEvent();
+
+        getMockery().checking(new Expectations()
+        {{
+            oneOf(ircModel).getXWikiContext();
+            will(returnValue(xwikiContext));
+            oneOf(ircModel).executeAsUser(with(equal(userReference)), with(equal(wikiBotListenerReference)),
+                with(any(WikiIRCModel.Executor.class)));
+            will(throwException(new IRCBotException("error")));
+            // The real tests are here! Since we throw an exception, the code tries to send an error message to the IRC
+            // channel...
+            oneOf(bot).sendMessage(with(any(Channel.class)), with(any(User.class)), with(equal(
+                "An error occurred while executing Wiki IRC Bot Listener [wiki:space.page]. Check your server logs.")));
+            oneOf(logger).warn(with(equal("Failed to execute IRC Bot Listener script [onMessage]")),
+                with(any(IRCBotException.class)));
+        }});
+
+        listener.onEvent(event);
+    }
+
+    private Event createTestEvent()
+    {
         class TestableChannel extends Channel
         {
             public TestableChannel(PircBotX bot, String name)
@@ -107,17 +192,13 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
             }
         }
 
-        listener.onEvent(new MessageEvent(bot, new TestableChannel(bot, "channel"), new TestableUser(bot, "nick"),
-            "message"));
+        this.bot = getMockery().mock(ExtendedPircBotX.class);
+        getMockery().checking(new Expectations()
+        {{
+                oneOf(bot).getListenerManager();
+                will(returnValue(new ThreadedListenerManager<ExtendedPircBotX>()));
+            }});
 
-        // Verify that the XWikiContext has been populated with bindings
-        Map < String, Object > bindings = (Map<String, Object>) xwikiContext.get("irclistener");
-        Assert.assertTrue(bindings.get("channel") instanceof Channel);
-        Assert.assertEquals("channel", ((Channel) bindings.get("channel")).getName());
-
-        Assert.assertTrue(bindings.get("user") instanceof User);
-        Assert.assertEquals("nick", ((User) bindings.get("user")).getNick());
-
-        Assert.assertEquals("message", bindings.get("message"));
+        return new MessageEvent(bot, new TestableChannel(bot, "channel"), new TestableUser(bot, "nick"), "message");
     }
 }

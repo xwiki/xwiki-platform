@@ -153,8 +153,11 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         XDOM xdom = this.events.get("onRegistration");
         if (xdom != null) {
             try {
-                // Step 1: Execute the onRegistration XProperty content
-                renderContent(xdom);
+                // Step 1: Execute the onRegistration XProperty content. This allows for example binding variables
+                // in the execution context.
+                // Note that FTM we don't care about any returned result since onRegistration is usually not supposed
+                // to send back anything to the channel.
+                executeAsUser(xdom, null);
 
                 // Step 2: Save the bindings that the content could have set so that when other events execute later on
                 // they'll have those bindings set. This allow onRegistration content to set some initialization
@@ -165,7 +168,7 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                     this.initializationBindings.putAll(bindings);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to initialize Wiki Bot Listener [{}]", getName(), e);
+                getLogger().warn("Failed to initialize Wiki Bot Listener [{}]", getName(), e);
             }
         }
     }
@@ -195,29 +198,40 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                 addBindings(event);
 
                 // Execute the Macro Transformation on XDOM and send the result to the IRC server
-                // Note: We execute the macros with a current user being the user that was used to register the Wiki
-                // Bot Listener. The reason is that the XDOM might use privileged API that require some special rights
-                // (like Programming Rights if it contains a Groovy macro for example).
-                this.ircModel.executeAsUser(this.executingUserReference, listenerData.getReference(),
-                    new WikiIRCModel.Executor()
-                    {
-                        @Override public void execute() throws Exception
-                        {
-                            String result = renderContent(xdom);
-                            if (!StringUtils.isEmpty(result)) {
-                                event.respond(result);
-                            }
-                        }
-                    });
+                executeAsUser(xdom, event);
             } catch (Exception e) {
-                // An error happened, log a warning and do nothing
-                LOGGER.warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
+                // An error happened, try to send a message to the channel about the error and log a warning.
+                try {
+                    event.respond(String.format("An error occurred while executing Wiki IRC Bot Listener [%s]. "
+                        + "Check your server logs.", this.listenerData.getReference()));
+                } catch (Exception nestedException) {
+                    // We tried our best, give up!
+                }
+                getLogger().warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
             }
         }
     }
 
     /**
-     * Renders the content in plain text by executing the macros.
+     * Apply Macro transformations on the passed XDOM, render it with a plain text renderer and send the result
+     * to the IRC channel.
+     *
+     * @param xdom the XDOM for which to run the Macro transformations
+     * @param event the PircBotX event to use to send the message back to the channel
+     * @throws Exception in case of an error while rendering the content
+     */
+    private void executeAsUser(final XDOM xdom, final Event event) throws Exception
+    {
+        // Execute the Macro Transformation on XDOM and send the result to the IRC server
+        // Note: We execute the macros with a current user being the user that was used to register the Wiki
+        // Bot Listener. The reason is that the XDOM might use privileged API that require some special rights
+        // (like Programming Rights if it contains a Groovy macro for example).
+        this.ircModel.executeAsUser(this.executingUserReference, this.listenerData.getReference(),
+            new DefaultExecutor(xdom, this.syntax, event, this.macroTransformation, this.plainTextBlockRenderer));
+    }
+
+    /**
+     * Renders the content in plain text by executing the macros. This content will then be sent to the IRC Channel.
      *
      * @param xdom the parsed content to render and on which to apply the Macro transformation
      * @return the plain text result
@@ -232,6 +246,13 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         // Execute the Macro Transformation on XDOM and send the result to the IRC server
         TransformationContext txContext = new TransformationContext(temporaryXDOM, this.syntax);
         this.macroTransformation.transform(temporaryXDOM, txContext);
+
+        // Verify if there are any errors in the transformed macro and if so do some special handling:
+        // - Log the error in a wiki page
+        // - Return an explicit String to let the user know there's been a problem with a link to the wiki page
+        //   containing the detail of the error
+
+
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.plainTextBlockRenderer.render(temporaryXDOM, printer);
 
@@ -288,5 +309,16 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         } catch (Exception e) {
             // No such method, don't bind anything
         }
+    }
+
+    /**
+     * Useful for unit tests that need to capture logs; they can return a mock logger instead of the real logger and
+     * thus assert what's been logged.
+     *
+     * @return the Logger instance to use to log
+     */
+    protected Logger getLogger()
+    {
+        return LOGGER;
     }
 }

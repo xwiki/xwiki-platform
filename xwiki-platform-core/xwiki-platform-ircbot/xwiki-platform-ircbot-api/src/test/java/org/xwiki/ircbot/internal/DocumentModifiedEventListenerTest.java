@@ -142,12 +142,13 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
                 will(returnValue(ec));
 
             // The test is here!
-            oneOf(bot).sendMessage("channel", "wiki:space.page was modified by userwiki:userspace.userpage (created) - "
+            oneOf(bot).sendMessage("channel", "wiki:space.page was created by userwiki:userspace.userpage (comment) - "
                 + "http://someurl");
         }});
 
         XWikiDocument document = new XWikiDocument(reference);
         document.setAuthorReference(userReference);
+        document.setComment("comment");
 
         this.listener.onEvent(new DocumentCreatedEvent(reference), document, null);
     }

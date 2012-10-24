@@ -100,9 +100,9 @@ public class DocumentModifiedEventListener implements EventListener
     public List<Event> getEvents()
     {
         return Arrays.<Event>asList(
-                new DocumentUpdatedEvent(),
-                new DocumentDeletedEvent(),
-                new DocumentCreatedEvent());
+            new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent(),
+            new DocumentCreatedEvent());
     }
 
     @Override
@@ -123,8 +123,9 @@ public class DocumentModifiedEventListener implements EventListener
             try {
                 // Send notification to the IRC channel if we're allowed.
                 if (shouldSendNotification(referenceAsString)) {
-                    String message = String.format("%s was modified by %s %s - %s",
+                    String message = String.format("%s was %s by %s%s - %s",
                         referenceAsString,
+                        getNotificationAction(event),
                         getNotificationAuthor(event, document),
                         getNotificationComment(event, document),
                         getNotificationURL(event, document));
@@ -136,9 +137,10 @@ public class DocumentModifiedEventListener implements EventListener
                         this.bot.sendMessage(channelNameItator.next(), message);
                     }
                 }
-            } catch (IRCBotException e) {
+            } catch (Exception e) {
                 // Failed to handle the event, log an error
-                this.logger.error("Failed to send IRC notification for document [{}]", reference, e);
+                this.logger.error("Failed to send IRC notification for document [{}], event [{}] and date [{}]",
+                    reference, event, data, e);
             }
         }
     }
@@ -203,6 +205,25 @@ public class DocumentModifiedEventListener implements EventListener
     }
 
     /**
+     * Get the action on the page (created, deleted, modified).
+     *
+     * @param event the XWiki Document event
+     * @return the action (e.g. "created")
+     */
+    private String getNotificationAction(Event event)
+    {
+        String action;
+        if (event instanceof DocumentDeletedEvent) {
+            action = "deleted";
+        } else if (event instanceof DocumentCreatedEvent) {
+            action = "created";
+        } else {
+            action = "modified";
+        }
+        return action;
+    }
+
+    /**
      * Get a comment part that we want to print in the notification message we send to the IRC channel.
      *
      * @param event the XWiki Document event
@@ -212,17 +233,11 @@ public class DocumentModifiedEventListener implements EventListener
     private String getNotificationComment(Event event, XWikiDocument source)
     {
         String comment;
-        if (event instanceof DocumentDeletedEvent) {
-            comment = "(deleted)";
-        } else if (event instanceof DocumentCreatedEvent) {
-            comment = "(created)";
-            if (!StringUtils.isEmpty(source.getComment())) {
-                comment = comment + " " + source.getComment();
-            }
+        if (!StringUtils.isEmpty(source.getComment())) {
+            comment = String.format(" (%s)", source.getComment());
         } else {
-            comment = source.getComment();
+            comment = "";
         }
-
         return comment;
     }
 

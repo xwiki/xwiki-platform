@@ -145,7 +145,7 @@
     </property>
     <property>
       <script>def botManager = services.get("ircbot")
-if (!botManager.isStarted()) {
+if (botmanager &amp;&amp; !botManager.isStarted()) {
   botManager.start(false)
 }
 </script>

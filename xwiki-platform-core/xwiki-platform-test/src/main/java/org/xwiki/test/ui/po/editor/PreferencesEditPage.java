@@ -42,6 +42,9 @@ public class PreferencesEditPage extends EditPage
     @FindBy(xpath = "//select[@id='XWiki.XWikiUsers_0_usertype']")
     private WebElement userType;
 
+    @FindBy(xpath = "//select[@id='XWiki.XWikiUsers_0_timezone']")
+    private WebElement timezone;
+
     public void setSimpleUserType()
     {
         Select select = new Select(this.userType);
@@ -70,5 +73,11 @@ public class PreferencesEditPage extends EditPage
     {
         Select select = new Select(this.defaultEditor);
         select.selectByValue(EDITOR_TEXT);
+    }
+
+    public void setTimezone(String value)
+    {
+        Select select = new Select(this.timezone);
+        select.selectByValue(value);
     }
 }

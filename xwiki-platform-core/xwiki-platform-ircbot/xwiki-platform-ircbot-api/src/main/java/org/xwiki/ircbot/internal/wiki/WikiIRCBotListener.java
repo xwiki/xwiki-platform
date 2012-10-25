@@ -36,11 +36,8 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -228,35 +225,6 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         // (like Programming Rights if it contains a Groovy macro for example).
         this.ircModel.executeAsUser(this.executingUserReference, this.listenerData.getReference(),
             new DefaultExecutor(xdom, this.syntax, event, this.macroTransformation, this.plainTextBlockRenderer));
-    }
-
-    /**
-     * Renders the content in plain text by executing the macros. This content will then be sent to the IRC Channel.
-     *
-     * @param xdom the parsed content to render and on which to apply the Macro transformation
-     * @return the plain text result
-     * @throws TransformationException if the Macro transformation fails somewhere
-     */
-    private String renderContent(XDOM xdom) throws TransformationException
-    {
-        // Important: we clone the XDOM so that the transformation will not modify it. Otherwise next time
-        // this listener runs, it'll simply return the already transformed XDOM.
-        XDOM temporaryXDOM = xdom.clone();
-
-        // Execute the Macro Transformation on XDOM and send the result to the IRC server
-        TransformationContext txContext = new TransformationContext(temporaryXDOM, this.syntax);
-        this.macroTransformation.transform(temporaryXDOM, txContext);
-
-        // Verify if there are any errors in the transformed macro and if so do some special handling:
-        // - Log the error in a wiki page
-        // - Return an explicit String to let the user know there's been a problem with a link to the wiki page
-        //   containing the detail of the error
-
-
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        this.plainTextBlockRenderer.render(temporaryXDOM, printer);
-
-        return StringUtils.trim(printer.toString());
     }
 
     /**

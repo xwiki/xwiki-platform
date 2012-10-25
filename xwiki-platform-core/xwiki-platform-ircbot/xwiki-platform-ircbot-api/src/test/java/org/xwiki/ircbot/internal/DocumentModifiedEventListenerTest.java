@@ -111,7 +111,6 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
         final DocumentModifiedEventListenerConfiguration configuration =
             getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
-        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
 
         // We simulate an EC without any XAR started information
         final Execution execution = getComponentManager().getInstance(Execution.class);
@@ -135,8 +134,6 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
             will(returnValue(Collections.emptyList()));
             oneOf(serializer).serialize(userReference);
             will(returnValue("userwiki:userspace.userpage"));
-            oneOf(ircModel).getXWikiContext();
-            will(returnValue(xwikiContext));
             oneOf(factory).createExternalURL("space", "page", "view", null, null, "wiki", xwikiContext);
             will(returnValue(new URL("http://someurl")));
             oneOf(bot).getChannelsNames();

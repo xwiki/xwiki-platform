@@ -118,16 +118,16 @@ public class DefaultExecutor implements WikiIRCModel.Executor
         TransformationContext txContext = new TransformationContext(temporaryXDOM, syntax);
         this.macroTransformation.transform(temporaryXDOM, txContext);
 
-        // Verify if there are any errors in the transformed macro and if throw an exception so that it can be logged
-        // down the line
-        if (this.macroErrorManager.containsError(temporaryXDOM)) {
-            throw new IRCBotException("Macro error when rendering Wiki Bot Listener content");
-        }
-
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.plainTextBlockRenderer.render(temporaryXDOM, printer);
 
+        // Verify if there are any errors in the transformed macro and if throw an exception so that it can be logged
+        // down the line
+        if (this.macroErrorManager.containsError(temporaryXDOM)) {
+            throw new IRCBotException(String.format("Macro error when rendering Wiki Bot Listener content [%s]",
+                printer.toString()));
+        }
+
         return StringUtils.trim(printer.toString());
     }
-
 }

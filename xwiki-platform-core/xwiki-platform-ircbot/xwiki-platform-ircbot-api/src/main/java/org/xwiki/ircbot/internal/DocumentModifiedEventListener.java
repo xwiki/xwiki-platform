@@ -129,8 +129,8 @@ public class DocumentModifiedEventListener implements EventListener
                         referenceAsString,
                         getNotificationAction(event),
                         getNotificationAuthor(xcontext),
-                        getNotificationComment(event, document),
-                        getNotificationURL(event, document));
+                        getNotificationComment(document),
+                        getNotificationURL(event, document, xcontext));
 
                     // Get the channel to which to send to. If there's no channel name it means the Bot hasn't joined
                     // any channel yet so don't do anything!
@@ -217,11 +217,10 @@ public class DocumentModifiedEventListener implements EventListener
     /**
      * Get a comment part that we want to print in the notification message we send to the IRC channel.
      *
-     * @param event the XWiki Document event
      * @param source the source document from the Document event
      * @return the comment part
      */
-    private String getNotificationComment(Event event, XWikiDocument source)
+    private String getNotificationComment(XWikiDocument source)
     {
         String comment;
         if (!StringUtils.isEmpty(source.getComment())) {
@@ -237,16 +236,27 @@ public class DocumentModifiedEventListener implements EventListener
      *
      * @param event the XWiki Document event
      * @param source the source document from the Document event
+     * @param xcontext the XWiki Context that we use to compute the external URL
      * @return the notification URL
      * @throws IRCBotException if we cannot access the XWikiContext
      */
-    private String getNotificationURL(Event event, XWikiDocument source) throws IRCBotException
+    private String getNotificationURL(Event event, XWikiDocument source, XWikiContext xcontext) throws IRCBotException
     {
-        String queryString = null;
-        if (!(event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent)) {
-            // Return a diff URL since the action done was a modification
-            queryString = String.format("viewer=changes&amp;rev2=%s", source.getVersion());
+        String url;
+
+        try {
+            String queryString = null;
+            if (!(event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent)) {
+                // Return a diff URL since the action done was a modification
+                queryString = String.format("viewer=changes&amp;rev2=%s", source.getVersion());
+            }
+            url = source.getExternalURL("view", queryString, xcontext);
+        } catch (Exception e) {
+            // Ensures that an error in computing the URL won't prevent sending a message on the IRC channel
+            url = "Failed to compute URL";
+            this.logger.debug("Failed to compute URL for Document Modified Event Listener", e);
         }
-        return source.getExternalURL("view", queryString, this.ircModel.getXWikiContext());
+
+        return url;
     }
 }

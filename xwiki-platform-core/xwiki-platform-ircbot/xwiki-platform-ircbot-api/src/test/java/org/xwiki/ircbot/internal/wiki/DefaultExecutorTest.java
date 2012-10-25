@@ -131,7 +131,8 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
             executor.execute();
             Assert.fail("Should have raised an exception");
         } catch (IRCBotException expected) {
-            Assert.assertEquals("Macro error when rendering Wiki Bot Listener content", expected.getMessage());
+            Assert.assertEquals("Macro error when rendering Wiki Bot Listener content [test messagetest description]",
+                expected.getMessage());
         }
     }
 

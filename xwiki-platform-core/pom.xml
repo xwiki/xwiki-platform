@@ -125,6 +125,24 @@
         <artifactId>xalan</artifactId>
         <version>2.7.1</version>
       </dependency>
+      <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
+      <dependency>
+        <groupId>struts</groupId>
+        <artifactId>struts</artifactId>
+        <version>1.2.9</version>
+        <exclusions>
+          <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
+          <exclusion>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+          </exclusion>
+          <!-- We use a more recent version of Xalan (see above) -->
+          <exclusion>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
         <groupId>com.google.gwt</groupId>

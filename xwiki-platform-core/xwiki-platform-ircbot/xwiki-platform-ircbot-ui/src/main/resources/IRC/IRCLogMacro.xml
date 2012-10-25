@@ -178,6 +178,7 @@
     ## ===========================================
     ## Set other metadata
     ## ===========================================
+    #set ($discard = $logDoc.setSyntax('plain/1.0'))
     #set ($discard = $logDoc.setParent('IRC.WebHome'))
     #set ($discard = $logDoc.setCreator('IRCBot'))
     #set ($archiveClassName = 'IRC.IRCBotArchiveClass')

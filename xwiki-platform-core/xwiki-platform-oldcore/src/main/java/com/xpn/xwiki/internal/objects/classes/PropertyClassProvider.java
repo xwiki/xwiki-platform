@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
  * property (its definition).
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 @Role
 public interface PropertyClassProvider

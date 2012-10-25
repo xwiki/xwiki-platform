@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{include document="XWiki.LiveTableResultsMacros" /}}
 {{velocity}}
 #gridresultwithfilter($request.classname $request.collist.split(",") "" " and doc.fullName&lt;&gt;'FAQCode.FAQTemplate' and doc.space='$!request.space'")

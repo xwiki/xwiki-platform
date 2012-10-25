@@ -1605,7 +1605,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(displayPropertyEditInput $property $prefix $object)
   #set($wrappedProperty = $property.propertyClass)
-  #if("$!wrappedProperty.customDisplay" != '')
+  #if($wrappedProperty.isCustomDisplayed($xcontext.context))
     $xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object)
   #else
     $doc.displayEdit($property, $prefix, $object)

@@ -112,8 +112,8 @@ public class IRCBotTest extends AbstractTest
             + "  #end\n"
             + "#end\n"
             + "{{/velocity}}", "title");
-        messagesPage.waitUntilContent("xwiki:" + getTestClassName() + "\\." + SERVER_PAGE + " was modified by "
-                    + "xwiki:XWiki\\.superadmin \\(created\\) - .*" + getTestClassName() + "/" + SERVER_PAGE);
+        messagesPage.waitUntilContent("xwiki:" + getTestClassName() + "\\." + SERVER_PAGE + " was created by "
+            + "xwiki:XWiki\\.superadmin - .*" + getTestClassName() + "/" + SERVER_PAGE);
 
         // Simulate typing some content in the IRC Channel. This will have two effects:
         // - the message will be logged
@@ -123,9 +123,9 @@ public class IRCBotTest extends AbstractTest
         // Note: We don't assume any order for the 3 messages we're asserting.
         messagesPage.waitUntilContent(".*nick: gotcha!.*");
         Assert.assertTrue(messagesPage.getContent().contains(
-            "xwiki:IRCBotTest.IRCServer was modified by xwiki:XWiki.superadmin (created)"));
+            "xwiki:IRCBotTest.IRCServer was created by xwiki:XWiki.superadmin"));
         Assert.assertTrue(messagesPage.getContent().contains(
-            "xwiki:IRCBotTest.IRCArchive was modified by xwiki:XWiki.superadmin (created)"));
+            "xwiki:IRCBotTest.IRCArchive was created by xwiki:XWiki.superadmin"));
 
         // Verify the Archive page (this tests the Log Bot Listener).
         // It may take some time for the IRC Server to send back the events thus we wait for the archive page to

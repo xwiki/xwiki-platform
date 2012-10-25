@@ -45,6 +45,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -115,8 +116,9 @@ public class DocumentModifiedEventListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // Only send an event if the bot is connected and the Event has a source being a XWikiDocument.
-        if (this.bot.isConnected() && source instanceof XWikiDocument) {
+        if (this.bot.isConnected() && source instanceof XWikiDocument && data instanceof XWikiContext) {
             XWikiDocument document = (XWikiDocument) source;
+            XWikiContext xcontext = (XWikiContext) data;
             DocumentReference reference = document.getDocumentReference();
             String referenceAsString = this.serializer.serialize(reference);
 
@@ -126,7 +128,7 @@ public class DocumentModifiedEventListener implements EventListener
                     String message = String.format("%s was %s by %s%s - %s",
                         referenceAsString,
                         getNotificationAction(event),
-                        getNotificationAuthor(event, document),
+                        getNotificationAuthor(xcontext),
                         getNotificationComment(event, document),
                         getNotificationURL(event, document));
 
@@ -184,24 +186,13 @@ public class DocumentModifiedEventListener implements EventListener
     /**
      * Get the author name that we want to print in the notification message we send to the IRC channel.
      *
-     * @param event the XWiki Document event
-     * @param source the source document from the Document event
+     * @param xcontext the XWiki Context from which we extract the current user
      * @return the author name
      * @throws IRCBotException if we cannot access the XWikiContext
      */
-    private String getNotificationAuthor(Event event, XWikiDocument source) throws IRCBotException
+    private String getNotificationAuthor(XWikiContext xcontext) throws IRCBotException
     {
-        DocumentReference authorReference;
-
-        // If the document has been deleted then the author is the author who's done the delete (i.e. the current
-        // author) and not the author of the document.
-        if (event instanceof DocumentDeletedEvent) {
-            authorReference = this.ircModel.getXWikiContext().getUserReference();
-        } else {
-            authorReference = source.getAuthorReference();
-        }
-
-        return this.serializer.serialize(authorReference);
+        return this.serializer.serialize(xcontext.getUserReference());
     }
 
     /**

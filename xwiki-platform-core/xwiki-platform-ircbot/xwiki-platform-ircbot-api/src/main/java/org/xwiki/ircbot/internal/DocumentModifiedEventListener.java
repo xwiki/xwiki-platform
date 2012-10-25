@@ -192,7 +192,16 @@ public class DocumentModifiedEventListener implements EventListener
      */
     private String getNotificationAuthor(XWikiContext xcontext) throws IRCBotException
     {
-        return this.serializer.serialize(xcontext.getUserReference());
+        String user;
+
+        DocumentReference userReference = xcontext.getUserReference();
+        if (userReference != null) {
+            user = this.serializer.serialize(userReference);
+        } else {
+            user = "Guest";
+        }
+
+        return user;
     }
 
     /**

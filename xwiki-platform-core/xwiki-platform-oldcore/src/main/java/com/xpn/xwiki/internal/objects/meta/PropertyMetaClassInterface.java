@@ -28,7 +28,7 @@ import com.xpn.xwiki.objects.classes.ClassInterface;
  * its meta class.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 public interface PropertyMetaClassInterface extends ClassInterface, PropertyInterface
 {

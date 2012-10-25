@@ -232,15 +232,11 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
         // See Bug ID : 7063674
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7063674
         //
-        // So we have copied the source used for the openJDK7 implementation as a replacement here:
-        long i = rights;
-        i = rights - ((rights >>> 1) & 0x5555555555555555L);
-        i = (i & 0x3333333333333333L) + ((i >>> 2) & 0x3333333333333333L);
-        i = (i + (i >>> 4)) & 0x0f0f0f0f0f0f0f0fL;
-        i = i + (i >>> 8);
-        i = i + (i >>> 16);
-        i = i + (i >>> 32);
-        return (int) i & 0x7f;
+        // So we have reimplemented it based on public domain code snippets published in Bit Twiddling Hacks
+        // by Sean Eron Anderson (see http://www-graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallelw)
+        long v = rights - ((rights >>> 1) & 0x5555555555555555L);
+        v = (v & 0x3333333333333333L) + ((v >>> 2) & 0x3333333333333333L);
+        return (int) (((v + (v >> 4) & 0x0F0F0F0F0F0F0F0FL) * 0x0101010101010101L) >>> 56);
     }
 
     @Override

@@ -69,11 +69,9 @@ public class FAQTest extends AbstractTest
     @Test
     public void testFAQ()
     {
-        // Verify that the FAQ app is registered in the Applications Panel
+        // Navigate to the FAQ app by clicking in the Application Panel.
+        // This also verifies that the FAQ application is registered in the Applications Panel
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
-        Assert.assertTrue(applicationPanel.containsApplication("FAQ"));
-
-        // Navigate to the FAQ app by clicking in the Application Panel
         ViewPage vp = applicationPanel.clickApplication("FAQ");
 
         // Verify we're on the right page!

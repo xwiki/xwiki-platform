@@ -32,14 +32,33 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
 
+/**
+ * A {@link TranslationMessageElement} resolved based on a passed parameter.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class ParameterTranslationMessageElement implements TranslationMessageElement
 {
+    /**
+     * Used to clean the result of plain text parser.
+     */
     private static final ParserUtils PARSERUTILS = new ParserUtils();
 
+    /**
+     * The index of the parameter to return.
+     */
     private int index;
 
+    /**
+     * Used to parse the String content.
+     */
     private Parser plainParser;
 
+    /**
+     * @param index the index of the paramater to return
+     * @param plainParser used to parse the String content
+     */
     public ParameterTranslationMessageElement(int index, Parser plainParser)
     {
         this.index = index;

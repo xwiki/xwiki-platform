@@ -30,29 +30,43 @@ import org.xwiki.localization.Translation;
  * Extends {@link AbstractBundle} and add {@link Locale} based cache management.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 public abstract class AbstractCachedBundle extends AbstractBundle
 {
     /**
      * The bundle cache.
      */
-    protected Map<String, LocaleBundle> bundleCache = new ConcurrentHashMap<String, LocaleBundle>();
+    protected Map<String, LocalizedBundle> bundleCache = new ConcurrentHashMap<String, LocalizedBundle>();
 
+    /**
+     * Default constructor.
+     */
     protected AbstractCachedBundle()
     {
     }
 
+    /**
+     * @param id the identifier of the bundle
+     */
     public AbstractCachedBundle(String id)
     {
         super(id);
     }
 
+    /**
+     * @param id the identifier of the bundle
+     * @param priority the priority of the bundle
+     */
     public AbstractCachedBundle(String id, int priority)
     {
         super(id, priority);
     }
 
+    /**
+     * @param locale the locale
+     * @return the parent locale
+     */
     private Locale getParentLocale(Locale locale)
     {
         String language = locale.getLanguage();
@@ -74,9 +88,13 @@ public abstract class AbstractCachedBundle extends AbstractBundle
         return new Locale(language, country);
     }
 
-    private LocaleBundle getLocaleBundle(Locale locale)
+    /**
+     * @param locale th Locale
+     * @return the bundle containing translation for the passed Locale
+     */
+    private LocalizedBundle getLocalizedBundle(Locale locale)
     {
-        LocaleBundle bundle = this.bundleCache.get(locale.toString());
+        LocalizedBundle bundle = this.bundleCache.get(locale.toString());
         if (bundle != null) {
             return bundle;
         }
@@ -86,7 +104,7 @@ public abstract class AbstractCachedBundle extends AbstractBundle
         if (bundle == null) {
             Locale parentLocale = getParentLocale(locale);
             if (parentLocale != null) {
-                bundle = getLocaleBundle(parentLocale);
+                bundle = getLocalizedBundle(parentLocale);
             }
         }
 
@@ -98,7 +116,7 @@ public abstract class AbstractCachedBundle extends AbstractBundle
     {
         Translation translation;
 
-        LocaleBundle bundle = getLocaleBundle(locale);
+        LocalizedBundle bundle = getLocalizedBundle(locale);
         if (bundle != null) {
             translation = bundle.getTranslation(key);
             if (translation == null) {
@@ -114,5 +132,9 @@ public abstract class AbstractCachedBundle extends AbstractBundle
         return translation;
     }
 
-    protected abstract LocaleBundle createBundle(Locale locale);
+    /**
+     * @param locale the locale
+     * @return the bundle containing translation for the passed Locale
+     */
+    protected abstract LocalizedBundle createBundle(Locale locale);
 }

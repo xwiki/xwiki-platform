@@ -48,6 +48,11 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.classes.ListClass;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventListener, DisposableCacheValue
 {
     public static final String ID = XWikiPreferencesBundle.ID + ".wiki";

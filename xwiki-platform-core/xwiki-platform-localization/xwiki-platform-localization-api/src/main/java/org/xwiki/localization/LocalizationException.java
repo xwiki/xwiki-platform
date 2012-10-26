@@ -23,7 +23,7 @@ package org.xwiki.localization;
  * All Localization module API must raise an exception of this type.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.3M2
  */
 public class LocalizationException extends Exception
 {

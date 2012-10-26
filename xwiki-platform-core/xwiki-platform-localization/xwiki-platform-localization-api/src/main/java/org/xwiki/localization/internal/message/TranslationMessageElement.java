@@ -25,6 +25,12 @@ import java.util.Locale;
 import org.xwiki.localization.Bundle;
 import org.xwiki.rendering.block.Block;
 
+/**
+ * An element in a translation message.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public interface TranslationMessageElement
 {
     /**

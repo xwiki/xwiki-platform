@@ -21,8 +21,21 @@ package org.xwiki.localization;
 
 import org.xwiki.component.annotation.Role;
 
+/**
+ * Creates bundles.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Role
 public interface BundleFactory
 {
+    /**
+     * Get the {@link Bundle} associated to the passed identifier.
+     * 
+     * @param bundleId the bundle identifier
+     * @return the {@link Bundle}
+     * @throws BundleDoesNotExistsException could not create a Bundle for the passed bundle
+     */
     Bundle getBundle(String bundleId) throws BundleDoesNotExistsException;
 }

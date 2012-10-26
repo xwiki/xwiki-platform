@@ -36,23 +36,42 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.BundleContext;
 
+/**
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Component
 @Singleton
 // TODO: store directly a key/translation Map instead of an ordered list of bundles ?
 public class DefaultBundleContext implements BundleContext
 {
+    /**
+     * The key associated to the list of bundles in the {@link ExecutionContext}.
+     */
     private static final String CKEY_BUNDLES = "localization.bundles";
 
+    /**
+     * Used to access the current context.
+     */
     @Inject
     private Execution execution;
 
+    /**
+     * Used to access Bundles registered as components.
+     */
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManager;
 
+    /**
+     * The logger.
+     */
     @Inject
     private Logger logger;
 
+    /**
+     * @return the current bundles
+     */
     private PriorityQueue<Bundle> initializeContextBundle()
     {
         PriorityQueue<Bundle> bundles;
@@ -68,6 +87,9 @@ public class DefaultBundleContext implements BundleContext
         return bundles;
     }
 
+    /**
+     * @return the current bundles
+     */
     private PriorityQueue<Bundle> getBundlesInternal()
     {
         PriorityQueue<Bundle> bundles;

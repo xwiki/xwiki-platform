@@ -23,6 +23,12 @@ import java.util.Locale;
 
 import org.xwiki.rendering.block.Block;
 
+/**
+ * A translation is a specific {@link Locale} and {@link Bundle}.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public interface Translation
 {
     /**

@@ -24,7 +24,7 @@ import java.util.Locale;
 import org.xwiki.component.annotation.Role;
 
 /**
- * A collection of translation properties.
+ * A collection of translations in various Locales.
  * 
  * @version $Id$
  * @since 4.3M1
@@ -32,6 +32,9 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface Bundle extends Comparable<Bundle>
 {
+    /**
+     * The default priority of a Bundle.
+     */
     int DEFAULTPRIORITY = 1000;
 
     /**

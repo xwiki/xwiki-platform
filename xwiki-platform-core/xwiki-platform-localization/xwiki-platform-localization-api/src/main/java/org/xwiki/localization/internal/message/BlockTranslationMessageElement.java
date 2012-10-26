@@ -25,10 +25,22 @@ import java.util.Locale;
 import org.xwiki.localization.Bundle;
 import org.xwiki.rendering.block.Block;
 
+/**
+ * A static {@link Block} returned as it is without any modification.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class BlockTranslationMessageElement implements TranslationMessageElement
 {
+    /**
+     * The {@link Block} to return.
+     */
     private Block block;
 
+    /**
+     * @param block the {@link Block} to return
+     */
     public BlockTranslationMessageElement(Block block)
     {
         this.block = block;

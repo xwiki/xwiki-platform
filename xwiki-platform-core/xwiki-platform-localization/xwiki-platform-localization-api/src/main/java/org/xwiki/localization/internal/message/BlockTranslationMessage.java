@@ -22,10 +22,23 @@ package org.xwiki.localization.internal.message;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 
+/**
+ * A static {@link Block} returned as it is without any modification.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class BlockTranslationMessage extends BlockTranslationMessageElement implements TranslationMessage
 {
+    /**
+     * The source of the translation message.
+     */
     private String rawSource;
 
+    /**
+     * @param rawSource the source of the translarion message
+     * @param block the block
+     */
     public BlockTranslationMessage(String rawSource, Block block)
     {
         super(block);

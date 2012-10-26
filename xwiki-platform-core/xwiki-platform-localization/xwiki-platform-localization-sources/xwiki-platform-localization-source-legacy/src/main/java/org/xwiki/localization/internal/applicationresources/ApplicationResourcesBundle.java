@@ -27,6 +27,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.internal.AbstractResourceBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Component
 @Singleton
 @Named("resource:ApplicationResources")

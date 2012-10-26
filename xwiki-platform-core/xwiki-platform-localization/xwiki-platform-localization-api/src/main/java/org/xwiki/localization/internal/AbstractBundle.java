@@ -31,10 +31,13 @@ import org.xwiki.localization.Translation;
  * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 public abstract class AbstractBundle implements Bundle
 {
+    /**
+     * An empty bundle.
+     */
     public static final Bundle EMPTY = new AbstractBundle(null)
     {
         @Override
@@ -61,16 +64,26 @@ public abstract class AbstractBundle implements Bundle
      */
     private int priority = DEFAULTPRIORITY;
 
+    /**
+     * Default constructor.
+     */
     protected AbstractBundle()
     {
 
     }
 
+    /**
+     * @param id the identifier if the bundle
+     */
     public AbstractBundle(String id)
     {
         this.id = id;
     }
 
+    /**
+     * @param id the identifier of the bundle
+     * @param priority the priority of the bundle
+     */
     public AbstractBundle(String id, int priority)
     {
         this.id = id;
@@ -83,6 +96,9 @@ public abstract class AbstractBundle implements Bundle
         return this.id;
     }
 
+    /**
+     * @param id the identifier of the bundle
+     */
     protected void setId(String id)
     {
         this.id = id;

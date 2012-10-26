@@ -41,7 +41,7 @@ import org.xwiki.localization.Translation;
  * Default implementation of the {@link LocalizationManager} component.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 @Component
 public class DefaultLocalizationManager implements LocalizationManager
@@ -53,6 +53,9 @@ public class DefaultLocalizationManager implements LocalizationManager
     @Named("context")
     private Provider<ComponentManager> componentManager;
 
+    /**
+     * Used to access the current bundles.
+     */
     private BundleContext bundleContext;
 
     /**

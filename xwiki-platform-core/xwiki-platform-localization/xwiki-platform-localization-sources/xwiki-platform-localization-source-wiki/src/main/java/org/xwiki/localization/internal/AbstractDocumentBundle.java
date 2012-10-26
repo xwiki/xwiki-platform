@@ -48,10 +48,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * documents, watching loaded documents and invalidating cached translations.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 public class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle
 {
+    /**
+     * The prefix to use in all wiki document based translations.
+     */
     public final static String ID_PREFIX = "document:";
 
     @Inject
@@ -93,7 +96,7 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
         setId(ID_PREFIX + this.serializer.serialize(reference));
     }
 
-    protected LocaleBundle loadDocumentLocaleBundle(Locale locale) throws Exception
+    protected LocalizedBundle loadDocumentLocaleBundle(Locale locale) throws Exception
     {
         XWikiContext context = this.contextProvider.get();
 
@@ -114,7 +117,7 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
         properties.load(new StringReader(content));
 
         // Convert to LocalBundle
-        DefaultLocaleBundle localeBundle = new DefaultLocaleBundle(this, locale);
+        DefaultLocalizedBundle localeBundle = new DefaultLocalizedBundle(this, locale);
 
         TranslationMessageParser parser = getTranslationMessageParser();
 
@@ -139,9 +142,9 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
     }
 
     @Override
-    protected LocaleBundle createBundle(Locale locale)
+    protected LocalizedBundle createBundle(Locale locale)
     {
-        LocaleBundle localeBundle;
+        LocalizedBundle localeBundle;
         try {
             localeBundle = loadDocumentLocaleBundle(locale);
         } catch (Exception e) {

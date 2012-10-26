@@ -23,10 +23,24 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 
+/**
+ * The Bundles applying to the current context ordered by priority.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Role
 public interface BundleContext
 {
+    /**
+     * @return the bundles applying to the current context ordered by priority
+     */
     Collection<Bundle> getBundles();
 
+    /**
+     * Add a new bundle to the collection. It will be automatically ordered.
+     * 
+     * @param bundle the bundle
+     */
     void addBundle(Bundle bundle);
 }

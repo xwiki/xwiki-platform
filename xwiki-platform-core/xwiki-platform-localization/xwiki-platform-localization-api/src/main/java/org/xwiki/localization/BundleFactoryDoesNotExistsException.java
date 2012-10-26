@@ -23,7 +23,7 @@ package org.xwiki.localization;
  * Raised when trying to manipulate a bundle that does not exists.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 4.3M2
  */
 public class BundleFactoryDoesNotExistsException extends LocalizationException
 {

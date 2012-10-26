@@ -31,17 +31,36 @@ import org.xwiki.localization.BundleContext;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 
+/**
+ * @version $Id$
+ * @since 4.3M2
+ */
 public abstract class AbstractResourceBundle extends AbstractCachedBundle
 {
-    public final static String ID_PREFIX = "resource:";
+    /**
+     * The prefix used in front of all the resources based bundles.
+     */
+    public static final String ID_PREFIX = "resource:";
 
+    /**
+     * Passed to the created {@link org.xwiki.localization.Translation}.
+     */
     @Inject
     protected BundleContext bundleContext;
 
+    /**
+     * The name of the resource.
+     */
     protected String baseName;
 
+    /**
+     * The {@link ClassLoader} to use to search for the resource.
+     */
     protected ClassLoader classloader;
 
+    /**
+     * @param baseName the name of the resource
+     */
     public AbstractResourceBundle(String baseName)
     {
         super(ID_PREFIX + baseName);
@@ -49,6 +68,10 @@ public abstract class AbstractResourceBundle extends AbstractCachedBundle
         this.baseName = baseName;
     }
 
+    /**
+     * @param baseName the name of the resource
+     * @param classloader the {@link ClassLoader} to use to search for the resource
+     */
     public AbstractResourceBundle(String baseName, ClassLoader classloader)
     {
         this(baseName);
@@ -56,10 +79,13 @@ public abstract class AbstractResourceBundle extends AbstractCachedBundle
         this.classloader = classloader;
     }
 
+    /**
+     * @return the parser to use to generate {@link TranslationMessageParser} from translation values
+     */
     protected abstract TranslationMessageParser getTranslationMessageParser();
 
     @Override
-    protected LocaleBundle createBundle(Locale locale)
+    protected LocalizedBundle createBundle(Locale locale)
     {
         // Get corresponding ResourceBundle
 
@@ -74,10 +100,10 @@ public abstract class AbstractResourceBundle extends AbstractCachedBundle
         }
 
         // Convert to LocalBundle
-        DefaultLocaleBundle localeBundle;
+        DefaultLocalizedBundle localeBundle;
 
         if (bundle != null) {
-            localeBundle = new DefaultLocaleBundle(this, locale);
+            localeBundle = new DefaultLocalizedBundle(this, locale);
 
             TranslationMessageParser parser = getTranslationMessageParser();
 

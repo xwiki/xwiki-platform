@@ -22,9 +22,22 @@ package org.xwiki.localization.internal;
 import org.xwiki.localization.BundleContext;
 import org.xwiki.localization.message.TranslationMessage;
 
+/**
+ * Default implementation of {@link org.xwiki.localization.Translation}.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class DefaultTranslation extends AbstractTranslation
 {
-    public DefaultTranslation(BundleContext context, LocaleBundle localeBundle, String key, TranslationMessage message)
+    /**
+     * @param context used to resolve variables
+     * @param localeBundle the bundle containing the translation
+     * @param key the key associated to the translation
+     * @param message the actual translation message
+     */
+    public DefaultTranslation(BundleContext context, LocalizedBundle localeBundle, String key,
+        TranslationMessage message)
     {
         super(context, localeBundle, key, message);
     }

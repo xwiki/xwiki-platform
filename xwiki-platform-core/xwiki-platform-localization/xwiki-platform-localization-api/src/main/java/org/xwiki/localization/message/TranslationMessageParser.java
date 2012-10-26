@@ -21,8 +21,18 @@ package org.xwiki.localization.message;
 
 import org.xwiki.component.annotation.Role;
 
+/**
+ * Transform String into a {@link TranslationMessage}.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Role
 public interface TranslationMessageParser
 {
+    /**
+     * @param translationMessage the source message to convert
+     * @return the {@link TranslationMessage}
+     */
     TranslationMessage parse(String translationMessage);
 }

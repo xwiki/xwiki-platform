@@ -26,15 +26,34 @@ import java.util.Map;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 
-public class DefaultLocaleBundle implements LocaleBundle
+/**
+ * Default implementation of {@link LocalizedBundle}.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
+public class DefaultLocalizedBundle implements LocalizedBundle
 {
+    /**
+     * The {@link Bundle} containing this {@link LocalizedBundle}.
+     */
     private Bundle bundle;
 
+    /**
+     * The {@link Locale} associated to this bundle.
+     */
     private Locale locale;
 
+    /**
+     * The translations.
+     */
     private Map<String, Translation> translations = new HashMap<String, Translation>();
 
-    public DefaultLocaleBundle(Bundle bundle, Locale locale)
+    /**
+     * @param bundle the {@link Bundle} containing this {@link LocalizedBundle}
+     * @param locale the {@link Locale} associated to this bundle.
+     */
+    public DefaultLocalizedBundle(Bundle bundle, Locale locale)
     {
         this.locale = locale;
     }
@@ -57,6 +76,9 @@ public class DefaultLocaleBundle implements LocaleBundle
         return translations.get(key);
     }
 
+    /**
+     * @param translation the translation to add to the bundle
+     */
     public void addTranslation(Translation translation)
     {
         this.translations.put(translation.getKey(), translation);

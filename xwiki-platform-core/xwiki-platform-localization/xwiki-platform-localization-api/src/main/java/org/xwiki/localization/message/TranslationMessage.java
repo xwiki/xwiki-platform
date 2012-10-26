@@ -21,6 +21,12 @@ package org.xwiki.localization.message;
 
 import org.xwiki.localization.internal.message.TranslationMessageElement;
 
+/**
+ * Generate the final translation based or variables informations (parameters, etc.).
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public interface TranslationMessage extends TranslationMessageElement
 {
     /**

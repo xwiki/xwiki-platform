@@ -42,7 +42,7 @@ import org.xwiki.model.ModelContext;
  * Bundle corresponding to global (at the wiki level) localization documents.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 @Component(XWikiPreferencesBundle.ID)
 public class XWikiPreferencesBundle extends AbstractBundle implements Initializable

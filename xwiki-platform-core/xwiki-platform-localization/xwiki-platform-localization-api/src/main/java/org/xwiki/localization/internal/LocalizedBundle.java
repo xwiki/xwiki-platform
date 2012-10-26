@@ -24,9 +24,18 @@ import java.util.Locale;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 
-public interface LocaleBundle
+/**
+ * A translations bundle in a specific {@link Locale}.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
+public interface LocalizedBundle
 {
-    LocaleBundle EMPTY = new LocaleBundle()
+    /**
+     * An empty {@link LocalizedBundle}.
+     */
+    LocalizedBundle EMPTY = new LocalizedBundle()
     {
         @Override
         public Bundle getBundle()
@@ -47,9 +56,21 @@ public interface LocaleBundle
         }
     };
 
+    /**
+     * @return the {@link Bundle} containing this {@link LocalizedBundle}
+     */
     Bundle getBundle();
 
+    /**
+     * @return the {@link Locale} associated to this bundle
+     */
     Locale getLocale();
 
+    /**
+     * Get the translation associated to the passed key.
+     * 
+     * @param key the translation key
+     * @return the translation
+     */
     Translation getTranslation(String key);
 }

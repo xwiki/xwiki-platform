@@ -33,6 +33,11 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class MessageFormatTranslationMessage implements TranslationMessage
 {
     private static final ParserUtils PARSERUTILS = new ParserUtils();

@@ -25,23 +25,20 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Internationalization service based on key/property values. The key is the id of the message being looked for, and the
- * returned value is the message in the specified language. If no language is specified, then the language configured
- * for the current execution (generally a client request) is used.
- * <p>
- * Translations can be parameterized using the format accepted by {@link java.text.MessageFormat}.
+ * returned value is the message in the specified language.
  * <p>
  * Properties are looked for in several {@link Bundle bundles}, in the order of their {@link Bundle#getPriority()
  * priority}. The first translation found in one of these bundles is the one returned. If the property is not found in
- * any of these sources, then the key is returned unchanged in place of the value.
+ * any of these sources, then null is returned.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 @Role
 public interface LocalizationManager
 {
     /**
-     * Find a translation in the specified language
+     * Find a translation in the specified language.
      * 
      * @param key the key identifying the message to look for
      * @param locale the locale of the target language
@@ -59,6 +56,8 @@ public interface LocalizationManager
      * @param type a hint identifying the bundle type.
      * @param bundleId the identifier of the bindle, for example a wiki document name, or the name of a
      *            <tt>.properties</tt> resource bundle.
+     * @throws BundleDoesNotExistsException when no bundle could be found for the passed identifier
+     * @throws BundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
      */
     void use(String type, String bundleId) throws BundleDoesNotExistsException, BundleFactoryDoesNotExistsException;
 }

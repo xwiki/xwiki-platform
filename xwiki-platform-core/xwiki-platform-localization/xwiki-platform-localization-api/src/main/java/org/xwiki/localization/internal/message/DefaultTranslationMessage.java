@@ -29,12 +29,28 @@ import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 
+/**
+ * Default implementation of {@link TranslationMessage}.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 public class DefaultTranslationMessage implements TranslationMessage
 {
+    /**
+     * The source of the translation message.
+     */
     private String rawSource;
 
+    /**
+     * The elements in the message.
+     */
     private List<TranslationMessageElement> elements;
 
+    /**
+     * @param rawSource the source of the translation message
+     * @param elements the elements in the message
+     */
     public DefaultTranslationMessage(String rawSource, List<TranslationMessageElement> elements)
     {
         this.rawSource = rawSource;

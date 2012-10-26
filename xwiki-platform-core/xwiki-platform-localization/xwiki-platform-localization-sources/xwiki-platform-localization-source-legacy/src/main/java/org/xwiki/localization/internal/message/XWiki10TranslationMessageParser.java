@@ -35,6 +35,11 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Component
 @Singleton
 @Named("xwikil10n/1.0")

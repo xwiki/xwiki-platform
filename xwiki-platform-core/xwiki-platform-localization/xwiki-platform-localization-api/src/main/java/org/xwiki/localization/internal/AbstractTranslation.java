@@ -28,17 +28,42 @@ import org.xwiki.localization.Translation;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 
-public class AbstractTranslation implements Translation
+/**
+ * Base class for all {@link Translation} implementations.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
+public abstract class AbstractTranslation implements Translation
 {
+    /**
+     * Used to resolve variables.
+     */
     private BundleContext context;
 
-    private LocaleBundle localeBundle;
+    /**
+     * The bundle containing the translation.
+     */
+    private LocalizedBundle localeBundle;
 
+    /**
+     * The key associated to the translation.
+     */
     private String key;
 
+    /**
+     * The actual translation message.
+     */
     private TranslationMessage message;
 
-    public AbstractTranslation(BundleContext context, LocaleBundle localeBundle, String key, TranslationMessage message)
+    /**
+     * @param context used to resolve variables
+     * @param localeBundle the bundle containing the translation
+     * @param key the key associated to the translation
+     * @param message the actual translation message
+     */
+    public AbstractTranslation(BundleContext context, LocalizedBundle localeBundle, String key,
+        TranslationMessage message)
     {
         this.context = context;
         this.localeBundle = localeBundle;
@@ -72,6 +97,9 @@ public class AbstractTranslation implements Translation
 
     // Render
 
+    /**
+     * @return the bundle to search other translations
+     */
     private Collection<Bundle> getCurrentBundles()
     {
         return this.context != null ? this.context.getBundles() : null;

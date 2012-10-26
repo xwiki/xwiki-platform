@@ -67,10 +67,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
     private ContentAuthorResolver contentAuthorResolver;
 
-
     private Execution execution;
-
-    public static Class<ExecutionContextInitializer> type = ExecutionContextInitializer.class;
 
     @Before
     @Override

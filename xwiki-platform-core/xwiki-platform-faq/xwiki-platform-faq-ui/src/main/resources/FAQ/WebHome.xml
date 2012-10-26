@@ -24,12 +24,12 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
   <content>{{velocity output="false"}}
-$xwiki.jsx.use("FAQCode.SkinExtension")
-$xwiki.ssx.use("FAQCode.SkinExtension")
+$xwiki.jsx.use('FAQCode.SkinExtension')
+$xwiki.ssx.use('FAQCode.SkinExtension')
 ## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
-#if ($request.createFAQ == "true")
-  #set ($newFAQReference = $services.model.createDocumentReference('', 'FAQ', "${request.question}"))
-  $response.sendRedirect($xwiki.getURL($newFAQReference, "inline", "$!{request.queryString}&amp;title=${request.question}"))
+#if ($request.createFAQ == 'true')
+  #set ($newFAQReference = $services.model.createDocumentReference('', 'FAQ', "$!{request.question}"))
+  $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{request.queryString}&amp;title=$!{request.question}"))
 #end
 {{/velocity}}
 
@@ -44,12 +44,14 @@ Search FAQ...
 (((
 {{velocity}}
 {{html}}
-&lt;form action="$xwiki.getURL("FAQCode.FAQSearch")"&gt;
+&lt;form action="$xwiki.getURL('FAQCode.FAQSearch')"&gt;
+  &lt;div&gt;
   &lt;input type="hidden" name="space" value="FAQ" /&gt;
   &lt;input type="text" name="text" value="question text..." size="25" class="withTip" /&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Search" /&gt;
   &lt;/span&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
 {{/velocity}}
@@ -63,16 +65,18 @@ Contribute FAQ...
 {{velocity}}
 {{html}}
 #if ($isGuest)
-  You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+  You need first to &lt;a href="${escapetool.xml($doc.getURL('login', "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL('xwiki:Main.WebHome', 'register', "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
 #else
 &lt;form action="" id="newfaq"&gt;
+  &lt;div&gt;
   &lt;input type="hidden" name="parent" value="FAQ.WebHome" /&gt;
   &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
   &lt;input type="hidden" name="createFAQ" value="true" /&gt;
-  &lt;input class="withTip" type="text" name="question" value="question text..."  size="25"/&gt;
+  &lt;input class="withTip" type="text" name="question" value="question text..." size="25"/&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Add" /&gt;
   &lt;/span&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
 #end

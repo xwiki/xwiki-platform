@@ -28,7 +28,8 @@ $xwiki.jsx.use("FAQCode.SkinExtension")
 $xwiki.ssx.use("FAQCode.SkinExtension")
 ## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
 #if ($request.createFAQ == "true")
-  $response.sendRedirect($xwiki.getURL("FAQ.${request.question}", "inline", "$!{request.queryString}&amp;title=${request.question}"))
+  #set ($newFAQReference = $services.model.createDocumentReference('', 'FAQ', "${request.question}"))
+  $response.sendRedirect($xwiki.getURL($newFAQReference, "inline", "$!{request.queryString}&amp;title=${request.question}"))
 #end
 {{/velocity}}
 

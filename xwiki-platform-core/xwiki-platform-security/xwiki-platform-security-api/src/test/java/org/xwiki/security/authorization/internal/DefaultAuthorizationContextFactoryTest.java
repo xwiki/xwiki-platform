@@ -22,6 +22,7 @@ package org.xwiki.security.authorization.internal;
 import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.PrivilegedModeController;
 
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -33,10 +34,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
+
+import javax.inject.Provider;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -108,6 +113,8 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
 
+        Assert.assertTrue(authorizationContext.isPrivileged());
+
     }
 
     @Test
@@ -164,5 +171,50 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         Assert.assertTrue(document == document1);
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
         
+    }
+
+    @Test
+    public void privilegedModeControl() throws Exception
+    {
+        final AuthorizationContext authorizationContext = getAuthorizationContext();
+
+        final Provider<PrivilegedModeController> provider = getComponentManager()
+            .getInstance(new DefaultParameterizedType(null, Provider.class, PrivilegedModeController.class));
+
+        final PrivilegedModeController pmc1 = provider.get();
+
+        final PrivilegedModeController pmc2 = provider.get();
+
+        Assert.assertTrue(pmc1 != pmc2);
+
+        Assert.assertTrue(authorizationContext.isPrivileged());
+
+        pmc1.disablePrivilegedMode();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+
+        pmc1. restorePrivilegedMode();
+
+        Assert.assertTrue(authorizationContext.isPrivileged());
+
+        pmc1.disablePrivilegedMode();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+
+        pmc2.disablePrivilegedMode();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+
+        pmc2.restorePrivilegedMode();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+
+        pmc2.disablePrivilegedMode();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+
+        pmc1.restorePrivilegedMode();
+
+        Assert.assertTrue(authorizationContext.isPrivileged());
     }
 }

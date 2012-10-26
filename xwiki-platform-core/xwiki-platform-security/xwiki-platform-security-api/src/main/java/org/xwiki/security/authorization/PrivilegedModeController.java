@@ -19,31 +19,30 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.Role;
 
 /**
- * AuthorizationContext encapsulates the authorization information that is used for granting access to various
- * resources.  The athorization context cannot be modified directly, so it is safe to make it available to unprivileged
- * code.
+ * Interface for disabling the privileged mode in the authorization context.
  *
  * @version $Id$
  * @since 4.3M1
  */
-public interface AuthorizationContext
+@Role
+public interface PrivilegedModeController
 {
-    /** The execution context key where the authorization context must be stored. */
-    String EXECUTION_CONTEXT_KEY = "authorization_context";
-
-    /** @return The effective user name that is executing the request. */
-    DocumentReference getEffectiveUser();
-
-    /** @return The user name of the content author.  {@literal null} if there is no known content author.  */
-    DocumentReference getContentAuthor();
 
     /**
-     * @return {@literal true} if the authorization context is <em>privileged</em> mode.  Only in this mode may the
-     * programming rights privilege be enabled.
+     * Disable the privileged mode. (I.e., programming rights may not be granted.)  This method does nothing if the
+     * privileged mode is already disabled.
      */
-    boolean isPrivileged();
+    void disablePrivilegedMode();
+
+
+    /**
+     * Restore a privileged mode that have been disabled by this particular privileged mode controller.  This method
+     * does nothing if the privileged mode is already enabled or have been disabled by another privileged mode
+     * controller.
+     */
+    void restorePrivilegedMode();
 
 }

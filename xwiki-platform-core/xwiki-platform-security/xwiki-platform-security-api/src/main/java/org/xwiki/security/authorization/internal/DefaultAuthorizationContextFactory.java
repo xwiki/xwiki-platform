@@ -22,20 +22,24 @@ package org.xwiki.security.authorization.internal;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.lang.reflect.Type;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.PrivilegedModeController;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.context.ExecutionContext;
@@ -73,7 +77,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         if (!executionContext.hasProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY)) {
             ExecutionContextProperty property
                 = new ExecutionContextProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
-            property.setReadonly(true);
+            property.setFinal(true);
             property.setInherited(true);
             property.setValue(new PrivateAuthorizationContext());
             executionContext.declareProperty(property);
@@ -82,12 +86,16 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
 
     /**
      * Add a singleton component instance to the component manager.
+     *
+     * We want to keep the constructors private of the controller components to enforce going through the component
+     * manager, so we instantiate the singletons here.
+     * 
      * @param type The role type.
      * @param instance The instance.
      * @param <T> The role type.
      * @throws ComponentRepositoryException {@see ComponentManager#registerComponent}
      */
-    private <T> void addSingleton(Class<T> type, T instance) throws ComponentRepositoryException
+    private <T> void addSingleton(Type type, T instance) throws ComponentRepositoryException
     {
         DefaultComponentDescriptor<T> descriptor = new DefaultComponentDescriptor<T>();
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
@@ -102,6 +110,8 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         try {
             addSingleton(EffectiveUserController.class, new PrivateEffectiveUserController());
             addSingleton(ContentAuthorController.class, new PrivateContentAuthorController());
+            addSingleton(new DefaultParameterizedType(null, Provider.class, PrivilegedModeController.class),
+                         new PrivatePrivilegedModeControllerProvider());
         } catch (ComponentRepositoryException e) {
             throw new InitializationException("Failed to register authorization context controller components.", e);
         }
@@ -144,6 +154,9 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         /** @see AuthorizationContext#getContentAuthor() */
         private final Deque<DocumentModelBridge> contentDocuments = new LinkedList<DocumentModelBridge>();
 
+        /** @see AuthorizationContext#isPrivileged(). */
+        private PrivilegedModeController privilegedModeDisabled;
+
         @Override
         public DocumentReference getEffectiveUser()
         {
@@ -154,6 +167,12 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         public DocumentReference getContentAuthor()
         {
             return contentAuthorResolver.resolveContentAuthor(contentDocuments.peekFirst());
+        }
+
+        @Override
+        public boolean isPrivileged()
+        {
+            return privilegedModeDisabled == null;
         }
 
     }
@@ -203,6 +222,54 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
             return ctx.contentDocuments.removeFirst();
+        }
+    }
+
+
+    /**
+     * Control the privileged mode of the authorization context.
+     */
+    private final class PrivatePrivilegedModeController implements PrivilegedModeController
+    {
+
+        /** Make the constructor private. */
+        private PrivatePrivilegedModeController() 
+        {
+        }
+
+        @Override
+        public void disablePrivilegedMode()
+        {
+            PrivateAuthorizationContext ctx = currentAuthorizationContext();
+
+            if (ctx.privilegedModeDisabled == null) {
+                ctx.privilegedModeDisabled = this;
+            }
+        }
+
+        @Override
+        public void restorePrivilegedMode()
+        {
+            PrivateAuthorizationContext ctx = currentAuthorizationContext();
+
+            if (ctx.privilegedModeDisabled == this) {
+                ctx.privilegedModeDisabled = null;
+            }
+        }
+    }
+
+    /**
+     * We want to keep the constructors private for the controller classes to enforce going through the component
+     * manager to get an instance.  So, we have to use a provider for the privileged mode controller, as it is not a
+     * singleton.
+     */
+    public final class PrivatePrivilegedModeControllerProvider implements Provider<PrivilegedModeController>
+    {
+
+        @Override
+        public PrivilegedModeController get()
+        {
+            return new PrivatePrivilegedModeController();
         }
     }
 }

@@ -79,7 +79,7 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- The Panels application is an optional since the FAQ application can work even if it's not present but if it's
+    <!-- The Panels application is an optional dependency since the FAQ application can work even if it's not present but if it's
          there then it'll register in it. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

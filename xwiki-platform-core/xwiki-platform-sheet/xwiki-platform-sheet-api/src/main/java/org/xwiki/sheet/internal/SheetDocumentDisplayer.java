@@ -203,37 +203,15 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
             return null;
         }
 
-        if (modelBridge.hasProgrammingRights(document) ^ modelBridge.hasProgrammingRights(sheet)) {
-            // FIXME: If the displayed document and the sheet don't have the same programming rights then we preserve
-            // the programming rights of the sheet by rendering it as if the author of the displayed document is the
-            // author of the sheet.
-            return displayAsSheetAuthor(document, sheet, parameters);
+        if (modelBridge.hasProgrammingRights(sheet)) {
+            // Make the content author of the sheet document responsible for rendering the contents with programming
+            // rights.
+            parameters.setContentDocument(sheet);
         } else {
-            return display(document, sheet, parameters);
+            // Set the content document to null in order to not delegate any programming rights to the sheet document.
+            parameters.setContentDocument(null);
         }
-    }
-
-    /**
-     * Displays a document with a sheet, changing the document content author to match the sheet content author in order
-     * to preserve the programming rights of the sheet.
-     * 
-     * @param document the displayed document
-     * @param sheet the applied sheet
-     * @param parameters the display parameters
-     * @return the result of displaying the sheet in the context of the given document
-     */
-    private XDOM displayAsSheetAuthor(DocumentModelBridge document, DocumentModelBridge sheet,
-        DocumentDisplayerParameters parameters)
-    {
-        DocumentReference documentContentAuthorReference = modelBridge.getContentAuthorReference(document);
-        try {
-            // This is a hack. We need a better way to preserve the programming rights level of the sheet.
-            modelBridge.setContentAuthorReference(document, modelBridge.getContentAuthorReference(sheet));
-            return display(document, sheet, parameters);
-        } finally {
-            // Restore the content author of the target document.
-            modelBridge.setContentAuthorReference(document, documentContentAuthorReference);
-        }
+        return display(document, sheet, parameters);
     }
 
     /**

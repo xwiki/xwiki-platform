@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -164,6 +165,7 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     @Test
     public void testPreserveSheetPRWhenDocumentIsOnContext() throws Exception
     {
+
         final DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE, ALICE, false);
         final DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE, BOB, true);
 
@@ -172,6 +174,9 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
         final SheetManager sheetManager = getComponentManager().getInstance(SheetManager.class);
         final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
         final Sequence displaySequence = getMockery().sequence("displayInCurrentContext");
+
+        final Mark mark = getMockery().mock(Mark.class);
+
         getMockery().checking(new Expectations()
         {
             {
@@ -180,20 +185,29 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
 
                 // Required in order to preserve the programming rights of the sheet.
-                oneOf(modelBridge).setContentAuthorReference(document, BOB);
+                oneOf(mark).mark();
                 inSequence(displaySequence);
 
                 oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
                 inSequence(displaySequence);
                 will(returnValue(new XDOM(Collections.<Block> emptyList())));
-
-                // Document author must be reverted.
-                oneOf(modelBridge).setContentAuthorReference(document, ALICE);
-                inSequence(displaySequence);
             }
         });
 
-        getMockedComponent().display(document, new DocumentDisplayerParameters());
+        getMockedComponent().display(document, new DocumentDisplayerParameters() {
+                @Override
+                public void setContentDocument(DocumentModelBridge doc)
+                {
+                    Assert.assertTrue(doc == sheet);
+                    mark.mark();
+                }
+
+                @Override
+                public DocumentDisplayerParameters clone()
+                {
+                    return this;
+                }
+            });
     }
 
     /**
@@ -215,6 +229,9 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
         final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
         final Map<String, Object> backupObjects = new HashMap<String, Object>();
         final Sequence displaySequence = getMockery().sequence("displayInNewContext");
+
+        final Mark mark = getMockery().mock(Mark.class);
+
         getMockery().checking(new Expectations()
         {
             {
@@ -228,8 +245,8 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 inSequence(displaySequence);
                 will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
 
-                // Required in order to preserve the programming rights of the sheet.
-                oneOf(modelBridge).setContentAuthorReference(document, BOB);
+                // Required in order to disable the programming rights.
+                oneOf(mark).mark();
                 inSequence(displaySequence);
             }
         });
@@ -240,16 +257,41 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 inSequence(displaySequence);
                 will(returnValue(new XDOM(Collections.<Block> emptyList())));
 
-                // Document content author must be restored.
-                oneOf(modelBridge).setContentAuthorReference(document, ALICE);
-                inSequence(displaySequence);
-
                 // The previous execution context must be restored.
                 oneOf(documentAccessBridge).popDocumentFromContext(backupObjects);
                 inSequence(displaySequence);
             }
         });
 
-        getMockedComponent().display(document, new DocumentDisplayerParameters());
+        final DocumentDisplayerParameters parameters = new DocumentDisplayerParameters() {
+                @Override
+                public void setContentDocument(DocumentModelBridge doc)
+                {
+                    if (doc == null) {
+                        mark.mark();
+                    }
+                    super.setContentDocument(doc);
+                }
+
+                @Override
+                public DocumentDisplayerParameters clone()
+                {
+                    return this;
+                }
+                
+            };
+
+        parameters.setContentDocument(document);
+
+        getMockedComponent().display(document, parameters);
+    }
+
+    /**
+     * Interface for mocking and "marking" a spot in a sequence.
+     */
+    private interface Mark
+    {
+        /** Call an invocation expectation. */
+        void mark();
     }
 }

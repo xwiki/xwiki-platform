@@ -47,7 +47,7 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 3.2M3
  */
-public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplayer
+public abstract class AbstractDocumentTitleDisplayer extends AbstractDocumentDisplayer
 {
     /**
      * The key used to store on the XWiki context map the stack trace for the
@@ -99,7 +99,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     private ParserUtils parserUtils = new ParserUtils();
 
     @Override
-    public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    protected XDOM doDisplay(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         // 1. Try to use the title provided by the user.
         if (!StringUtils.isEmpty(document.getTitle())) {

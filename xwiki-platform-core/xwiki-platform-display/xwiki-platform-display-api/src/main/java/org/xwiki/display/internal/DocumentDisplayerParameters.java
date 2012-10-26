@@ -19,6 +19,8 @@
  */
 package org.xwiki.display.internal;
 
+import org.xwiki.bridge.DocumentModelBridge;
+
 /**
  * {@link DocumentDisplayer} parameters.
  * 
@@ -68,6 +70,13 @@ public class DocumentDisplayerParameters implements Cloneable
      * execution context. Otherwise the displayer should simply display the content of the provided document.
      */
     private boolean contentTranslated;
+
+    /**
+     * A document used for obtaining a content author. It is very important that the content that is to be displayed is
+     * actually extracted from the content document. Default is {@literal null} and should remain so if it is not
+     * possible to associate any such document with the rendered content.
+     */
+    private DocumentModelBridge contentDocument;
 
     /**
      * @return the id of the document section to display
@@ -192,6 +201,26 @@ public class DocumentDisplayerParameters implements Cloneable
     }
 
     /**
+     * @return the content document, or {@literal null} if there is no content document.
+     * @since 4.3M2
+     */
+    public DocumentModelBridge getContentDocument()
+    {
+        return contentDocument;
+    }
+
+    /**
+     * Set the content document.  Pass {@literal null} to clear the content document.
+     * 
+     * @param contentDocument The content document.
+     * @since 4.3M2
+     */
+    public void setContentDocument(DocumentModelBridge contentDocument)
+    {
+        this.contentDocument = contentDocument;
+    }
+
+    /**
      * Sets whether the displayer should display the translated content or not.
      * 
      * @param contentTranslated {@code true} to force the display to look for a document translation matching the
@@ -219,6 +248,7 @@ public class DocumentDisplayerParameters implements Cloneable
         clone.setSectionId(sectionId);
         clone.setTitleDisplayed(titleDisplayed);
         clone.setTransformationContextIsolated(transformationContextIsolated);
+        clone.setContentDocument(contentDocument);
         return clone;
     }
 }

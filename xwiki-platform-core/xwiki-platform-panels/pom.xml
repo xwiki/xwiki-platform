@@ -41,7 +41,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>xwiki-platform-panels-test-pageobjects</module>
+        <module>xwiki-platform-panels-test</module>
       </modules>
     </profile>
   </profiles>

@@ -565,6 +565,12 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-gwt-api",
             this.project.getVersion(), null, "jar"));
 
+        // Needed by platform-web but since we don't have any dep in platform-web's pom.xml at the moment (duplication
+        // issue with XE/XEM and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
+        // with proper merge feature and then remove this...
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-uiextension-api", this.project.getVersion(), null, "jar"));
+
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",
             "xwiki-commons-logging-logback", this.getXWikiCommonsVersion(), null, "jar"));

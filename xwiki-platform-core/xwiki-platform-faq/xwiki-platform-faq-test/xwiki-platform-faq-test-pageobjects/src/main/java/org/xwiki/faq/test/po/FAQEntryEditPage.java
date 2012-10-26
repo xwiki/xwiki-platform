@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,29 +16,29 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.faq.test.po;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-faq</artifactId>
-  <name>XWiki Platform - FAQ</name>
-  <packaging>pom</packaging>
-  <description>FAQ application</description>
-  <modules>
-    <module>xwiki-platform-faq-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-faq-test</module>
-      </modules>
-    </profile>
-  </profiles>
-</project>
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.InlinePage;
+
+/**
+ * Represents a FAQ entry page being added.
+ *
+ * @version $Id$
+ * @since 4.3M2
+ */
+public class FAQEntryEditPage extends InlinePage
+{
+    @FindBy(id = "FAQCode.FAQClass_0_answer")
+    private WebElement answerElement;
+
+    /**
+     * @param answer the answer to type in the FAQ entry
+     */
+    public void setAnswer(String answer)
+    {
+        this.answerElement.sendKeys(answer);
+    }
+}

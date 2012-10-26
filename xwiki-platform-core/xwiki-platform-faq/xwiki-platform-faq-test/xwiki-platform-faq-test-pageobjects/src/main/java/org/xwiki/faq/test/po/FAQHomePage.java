@@ -43,8 +43,18 @@ public class FAQHomePage extends ViewPage
      */
     public static FAQHomePage gotoPage()
     {
-        getUtil().gotoPage("FAQ", "WebHome");
+        getUtil().gotoPage(getSpace(), getPage());
         return new FAQHomePage();
+    }
+
+    public static String getSpace()
+    {
+        return "FAQ";
+    }
+
+    public static String getPage()
+    {
+        return "WebHome";
     }
 
     /**

@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.xwiki.faq.test.po.FAQEntryEditPage;
 import org.xwiki.faq.test.po.FAQHomePage;
+import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -57,20 +58,33 @@ public class FAQTest extends AbstractTest
         // TODO: Remove this once we have the new l10n module since it won't be necessary anymore :)
         // We need to add an XWikiPreferences XObject since it's not created by default.
         ObjectEditPage oep = ObjectEditPage.gotoPage("XWiki", "XWikiPreferences");
+        // Remove all objects so that we can run this test several times in a row without failing
+        oep.removeAllObjects("XWiki.XWikiPreferences");
         FormElement fe = oep.addObject("XWiki.XWikiPreferences");
         fe.setFieldValue(By.id("XWiki.XWikiPreferences_0_documentBundles"), "FAQCode.Translations");
+
         oep.clickSaveAndContinue();
     }
 
     @Test
     public void testFAQ()
     {
-        FAQHomePage homePage = FAQHomePage.gotoPage();
+        // Verify that the FAQ app is registered in the Applications Panel
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
+        Assert.assertTrue(applicationPanel.containsApplication("FAQ"));
+
+        // Navigate to the FAQ app by clicking in the Application Panel
+        ViewPage vp = applicationPanel.clickApplication("FAQ");
+
+        // Verify we're on the right page!
+        Assert.assertEquals(FAQHomePage.getSpace(), vp.getMetaDataValue("space"));
+        Assert.assertEquals(FAQHomePage.getPage(), vp.getMetaDataValue("page"));
+        FAQHomePage homePage = new FAQHomePage();
 
         // Add FAQ entry
         FAQEntryEditPage entryPage = homePage.addFAQEntry(FAQ_TEST_PAGE);
         entryPage.setAnswer("content");
-        ViewPage vp = entryPage.clickSaveAndView();
+        vp = entryPage.clickSaveAndView();
 
         // Go back to the home page by clicking in the breadcrumb
         vp.clickBreadcrumbLink("FAQ");

@@ -40,7 +40,8 @@ import junit.framework.Assert;
  */
 public class FAQTest extends AbstractTest
 {
-    private static final String FAQ_TEST_PAGE = "TestFAQ";
+    // Note: we use a dot in the page name to verify it's supported by the FAQ application
+    private static final String FAQ_TEST_PAGE = "Test.FAQ";
 
     @Before
     public void setUp()

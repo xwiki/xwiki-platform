@@ -9,8 +9,12 @@
     <portlet-class>org.xwiki.portlet.XWikiDispatchPortlet</portlet-class>
     <supports>
       <mime-type>*/*</mime-type>
-      <portlet-mode>EDIT</portlet-mode>
+      <portlet-mode>edit</portlet-mode>
+      <portlet-mode>edit_defaults_compatibility</portlet-mode>
     </supports>
+    <custom-portlet-mode>
+      <portlet-mode>edit_defaults_compatibility</portlet-mode>
+    </custom-portlet-mode>
     <portlet-info>
       <title>XWiki Dispatch Portlet</title>
       <short-title>XWiki</short-title>

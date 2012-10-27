@@ -20,6 +20,10 @@
 package org.xwiki.security.authorization;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
+
+import javax.inject.Provider;
+import java.lang.reflect.Type;
 
 /**
  * Interface for disabling the privileged mode in the authorization context.
@@ -30,6 +34,9 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface PrivilegedModeController
 {
+
+    /** Type object for Provider<PrivilegedModeController>. */
+    Type PROVIDER_TYPE = new DefaultParameterizedType(null, Provider.class, PrivilegedModeController.class);
 
     /**
      * Disable the privileged mode. (I.e., programming rights may not be granted.)  This method does nothing if the

@@ -39,7 +39,6 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 
 import javax.inject.Provider;
 
@@ -176,7 +175,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         final AuthorizationContext authorizationContext = getAuthorizationContext();
 
         final Provider<PrivilegedModeController> provider = getComponentManager()
-            .getInstance(new DefaultParameterizedType(null, Provider.class, PrivilegedModeController.class));
+            .getInstance(PrivilegedModeController.PROVIDER_TYPE);
 
         final PrivilegedModeController pmc1 = provider.get();
 

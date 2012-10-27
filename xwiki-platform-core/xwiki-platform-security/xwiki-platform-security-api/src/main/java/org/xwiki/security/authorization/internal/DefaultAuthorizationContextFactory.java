@@ -33,7 +33,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.security.authorization.AuthorizationContext;
@@ -110,8 +109,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         try {
             addSingleton(EffectiveUserController.class, new PrivateEffectiveUserController());
             addSingleton(ContentAuthorController.class, new PrivateContentAuthorController());
-            addSingleton(new DefaultParameterizedType(null, Provider.class, PrivilegedModeController.class),
-                         new PrivatePrivilegedModeControllerProvider());
+            addSingleton(PrivilegedModeController.PROVIDER_TYPE, new PrivatePrivilegedModeControllerProvider());
         } catch (ComponentRepositoryException e) {
             throw new InitializationException("Failed to register authorization context controller components.", e);
         }

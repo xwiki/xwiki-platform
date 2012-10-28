@@ -31,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -724,9 +723,6 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void declareInExecutionContext(ExecutionContext executionContext)
     {
-        ExecutionContextProperty property = new ExecutionContextProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        property.setValue(this);
-        property.setInherited(true);
-        executionContext.declareProperty(property);
+        executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(this).inherited().declare();
     }
 }

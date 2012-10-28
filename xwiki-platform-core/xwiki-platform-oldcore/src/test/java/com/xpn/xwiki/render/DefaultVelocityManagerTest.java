@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -73,11 +72,7 @@ public class DefaultVelocityManagerTest extends AbstractMockingComponentTestCase
         final ScriptContext scriptContext = new SimpleScriptContext();
 
         final VelocityContext velocityContext = new VelocityContext();
-        ExecutionContextProperty velocityProperty = new ExecutionContextProperty("velocityContext");
-        velocityProperty.setValue(velocityContext);
-        velocityProperty.setInherited(true);
-        velocityProperty.setCloneValue(true);
-        executionContext.declareProperty(velocityProperty);
+        executionContext.newProperty("velocityContext").initial(velocityContext).inherited().cloneValue().declare();
 
         Map<String, Object> xwikiContext = new HashMap<String, Object>();
         executionContext.setProperty("xwikicontext", xwikiContext);

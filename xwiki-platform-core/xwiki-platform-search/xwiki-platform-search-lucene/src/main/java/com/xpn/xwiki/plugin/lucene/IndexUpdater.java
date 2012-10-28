@@ -42,7 +42,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContextProperty;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -116,12 +116,17 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private Analyzer analyzer;
 
+    private final XWikiContext xwikiContext;
+
+    @Override
+    protected void declareProperties(ExecutionContext executionContext)
+    {
+        xwikiContext.declareInExecutionContext(executionContext);
+    }
+
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
-        ExecutionContextProperty property = new ExecutionContextProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        property.setValue(context.clone());
-        property.setInherited(true);
-        addPropertyDeclaration(property);
+        this.xwikiContext = context;
 
         this.plugin = plugin;
 

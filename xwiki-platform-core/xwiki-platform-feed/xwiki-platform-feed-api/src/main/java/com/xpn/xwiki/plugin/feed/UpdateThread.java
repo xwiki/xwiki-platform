@@ -22,7 +22,7 @@ package com.xpn.xwiki.plugin.feed;
 import java.util.Date;
 
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContextProperty;
+import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,19 +57,25 @@ public class UpdateThread extends AbstractXWikiRunnable
 
     protected Exception exception;
 
+    private XWikiContext xwikiContext;
+
     public UpdateThread(String space, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
         XWikiContext context)
     {
-        ExecutionContextProperty property = new ExecutionContextProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        property.setValue(context);
-        property.setInherited(true);
-        addPropertyDeclaration(property);
-        
+        this.xwikiContext = context;
         this.fullContent = fullContent;
         this.space = space;
         this.feedPlugin = feedPlugin;
         this.scheduleTimer = scheduleTimer;
     }
+
+    @Override
+    protected void declareProperties(ExecutionContext executionContext)
+    {
+        xwikiContext.declareInExecutionContext(executionContext);
+        xwikiContext = null;
+    }
+
 
     public void update()
     {

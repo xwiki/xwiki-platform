@@ -21,14 +21,11 @@ package com.xpn.xwiki.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collection;
-import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
@@ -48,8 +45,6 @@ public abstract class AbstractXWikiRunnable implements Runnable
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiRunnable.class);
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
-
-    private final Collection<ExecutionContextProperty> declaredProperties = new ArrayList<ExecutionContextProperty>();
 
     protected AbstractXWikiRunnable()
     {
@@ -74,21 +69,12 @@ public abstract class AbstractXWikiRunnable implements Runnable
     }
 
     /**
-     * @param propertyDeclaration A property declaration to declare in the initialized context.
-     * @since 4.3M1
+     * Lets subclasses declare execution context properties.
+     *
+     * @param executionContext the execution context.
      */
-    protected void addPropertyDeclaration(ExecutionContextProperty propertyDeclaration)
+    protected void declareProperties(ExecutionContext executionContext)
     {
-        this.declaredProperties.add(propertyDeclaration);
-    }
-
-    /**
-     * @param propertyDeclarations A collection of property declarations to declare in the intialized context.
-     * @since 4.3M1
-     */
-    protected void addPropertyDeclarations(Collection<ExecutionContextProperty> propertyDeclarations)
-    {
-        this.declaredProperties.addAll(propertyDeclarations);
     }
 
     /**
@@ -102,9 +88,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         ExecutionContext context = new ExecutionContext();
 
-        for (ExecutionContextProperty declaredProperty : declaredProperties) {
-            context.declareProperty(declaredProperty);
-        }
+        declareProperties(context);
 
         ecim.initialize(context);
 

@@ -46,7 +46,6 @@ import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.url.InvalidURLException;
 import org.xwiki.url.XWikiURL;
@@ -108,10 +107,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         // 3) Bridge with old code to play well with new components. Old code relies on the
         // XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
-            ExecutionContextProperty property = new ExecutionContextProperty("xwikicontext");
-            property.setValue(xwikiContext);
-            property.setInherited(true);
-            execution.getContext().declareProperty(property);
+            execution.getContext().newProperty("xwikicontext").inherited().initial(xwikiContext).declare();
         }
 
         // 4) Extracts the XWiki URL from the original HTTP Request

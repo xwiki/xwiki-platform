@@ -26,6 +26,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
+
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationContext;
 
 /**
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from Velocity or Groovy in
@@ -43,6 +49,17 @@ public class Api
      *       better do it now rather than after the 1.0 release...
      */
     protected XWikiContext context;
+
+    /**
+     * The execution.
+     */
+    protected final Execution execution = Utils.getComponent(Execution.class);
+
+    /**
+     * An entity reference serializer for generating the effective script author user name.
+     */
+    protected final EntityReferenceSerializer<String> entityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * @param context the XWiki Context object
@@ -144,21 +161,24 @@ public class Api
     }
 
     /**
-     * Get the name of the content author of the current document for security checking. If
-     * {@link Context#dropPermissions()} has been called then this will return the guest user no matter who the real
-     * author is. If there is no current document then the guest user is returned because there is no reason for script
-     * to have any permission if does not exist in any document.
+     * Get the name of the content author of the currently rendered content.  If there is no content author currently,
+     * or if the 'privileged mode' have been disabled, return the username of the guest user.
      * 
-     * @return the name of the document author or guest.
+     * @return the name of the content author or guest.
      */
     String getEffectiveScriptAuthorName()
     {
-        if (!this.getXWikiContext().hasDroppedPermissions()) {
-            final XWikiDocument doc = this.getXWikiContext().getDoc();
-            if (doc != null) {
-                return doc.getContentAuthor();
-            }
+        AuthorizationContext authContext
+            = (AuthorizationContext) execution.getContext().getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
+
+        DocumentReference contentAuthor = authContext.getContentAuthor();
+
+        boolean isPrivileged = authContext.isPrivileged();
+
+        if (contentAuthor == null || !isPrivileged) {
+            return XWikiRightService.GUEST_USER;
         }
-        return XWikiRightService.GUEST_USER;
+
+        return entityReferenceSerializer.serialize(contentAuthor);
     }
 }

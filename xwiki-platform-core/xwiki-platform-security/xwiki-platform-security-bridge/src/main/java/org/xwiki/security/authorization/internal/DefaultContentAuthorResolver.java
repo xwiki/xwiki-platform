@@ -40,7 +40,8 @@ public class DefaultContentAuthorResolver implements ContentAuthorResolver
     {
         final XWikiDocument xwikiDocument = (XWikiDocument) document;
 
-        if (xwikiDocument == null || xwikiDocument.isNew() || xwikiDocument.isContentDirty()) {
+        if (xwikiDocument == null || xwikiDocument.isNew() || xwikiDocument.isContentDirty()
+            || xwikiDocument.isMetaDataDirty()) {
             return null;
         }
 

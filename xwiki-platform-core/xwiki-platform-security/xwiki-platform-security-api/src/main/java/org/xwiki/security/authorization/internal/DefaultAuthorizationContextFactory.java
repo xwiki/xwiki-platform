@@ -58,6 +58,10 @@ import org.xwiki.model.reference.DocumentReference;
 @Singleton
 public class DefaultAuthorizationContextFactory implements ExecutionContextInitializer, Initializable
 {
+
+    /** Execution context key for indicating that the privileged mode is disabled. */
+    private static final String PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY = "privileged_mode_disabled";
+
     /** The execution. */
     @Inject
     private Execution execution;
@@ -170,7 +174,8 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         @Override
         public boolean isPrivileged()
         {
-            return privilegedModeDisabled == null;
+            return privilegedModeDisabled == null
+                && !execution.getContext().hasProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY);
         }
 
     }
@@ -252,6 +257,18 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
 
             if (ctx.privilegedModeDisabled == this) {
                 ctx.privilegedModeDisabled = null;
+            }
+        }
+
+        @Override
+        public void disablePrivilegedModeInCurrentExecutionContext()
+        {
+            if (!execution.getContext().hasProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY)) {
+                ExecutionContextProperty p 
+                    = new ExecutionContextProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY);
+                p.setValue((Boolean) true);
+                p.setFinal(true);
+                execution.getContext().declareProperty(p);
             }
         }
     }

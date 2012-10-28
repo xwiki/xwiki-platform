@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.EffectiveUserController;
+import org.xwiki.security.authorization.PrivilegedModeController;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -150,7 +154,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
-    /** The Execution so that we can check if permissions were dropped there. */
+    /** The Execution. */
     private final Execution execution = Utils.getComponent(Execution.class);
 
     public XWikiContext()
@@ -360,6 +364,9 @@ public class XWikiContext extends Hashtable<Object, Object>
             put(USER_KEY, new XWikiUser(getUser(), ismain));
             put(USERREFERENCE_KEY, this.userReference);
         }
+
+        EffectiveUserController effectiveUserController = Utils.getComponent(EffectiveUserController.class);
+        effectiveUserController.setEffectiveUser(userReference);
     }
 
     private void setUserInternal(String user, boolean main)
@@ -704,28 +711,9 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void dropPermissions()
     {
-        this.put(XWikiConstant.DROPPED_PERMISSIONS, Boolean.TRUE);
-    }
-
-    /**
-     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context, or if the
-     *         {@link XWikiConstant.DROPPED_PERMISSIONS} key has been set in the
-     *         {@link org.xwiki.context.ExecutionContext} for this thread. This is done by calling
-     *         {@Document#dropPermissions()}
-     */
-    public boolean hasDroppedPermissions()
-    {
-        if (this.get(XWikiConstant.DROPPED_PERMISSIONS) != null) {
-            return true;
-        }
-
-        final Object dropped = this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
-
-        if (dropped == null || !(dropped instanceof Integer)) {
-            return false;
-        }
-
-        return ((Integer) dropped) == System.identityHashCode(this.execution.getContext());
+        PrivilegedModeController p = ((Provider<PrivilegedModeController>)
+            Utils.getComponent(PrivilegedModeController.PROVIDER_TYPE)).get();
+        p.disablePrivilegedMode();
     }
 
     // Object

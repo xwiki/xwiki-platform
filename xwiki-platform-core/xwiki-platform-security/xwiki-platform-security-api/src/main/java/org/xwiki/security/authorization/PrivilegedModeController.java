@@ -52,4 +52,11 @@ public interface PrivilegedModeController
      */
     void restorePrivilegedMode();
 
+    /**
+     * Disable the privileged mode in the current execution context.  This will not affect the privileged mode in any
+     * other execution context that might be activated in the request cycle.  Also note that 'restorePrivilegedMode'
+     * will not restore the privileged mode in the current execution context after this call.
+     */
+    void disablePrivilegedModeInCurrentExecutionContext();
+
 }

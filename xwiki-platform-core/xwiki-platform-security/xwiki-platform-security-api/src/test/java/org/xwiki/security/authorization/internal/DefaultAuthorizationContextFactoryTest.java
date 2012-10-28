@@ -213,4 +213,28 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         Assert.assertTrue(authorizationContext.isPrivileged());
     }
+
+    public void privilegedModeControlCurrentContext() throws Exception
+    {
+        final AuthorizationContext authorizationContext = getAuthorizationContext();
+
+        final Provider<PrivilegedModeController> provider = getComponentManager()
+            .getInstance(PrivilegedModeController.PROVIDER_TYPE);
+
+        final PrivilegedModeController pmc = provider.get();
+
+        Assert.assertTrue(authorizationContext.isPrivileged());
+
+        pmc.disablePrivilegedModeInCurrentExecutionContext();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+
+        execution.pushContext(new ExecutionContext());
+
+        Assert.assertTrue(authorizationContext.isPrivileged());
+
+        execution.popContext();
+
+        Assert.assertFalse(authorizationContext.isPrivileged());
+    }
 }

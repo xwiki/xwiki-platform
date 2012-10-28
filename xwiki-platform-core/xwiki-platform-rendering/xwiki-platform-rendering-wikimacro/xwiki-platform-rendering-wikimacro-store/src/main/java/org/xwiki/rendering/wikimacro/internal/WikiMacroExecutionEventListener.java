@@ -60,11 +60,6 @@ public class WikiMacroExecutionEventListener implements EventListener
     private static final String NAME = "WikiMacroExecutionEventListener";
 
     /**
-     * The context key which is used to store the property to signify that permissions have been dropped.
-     */
-    private static final String DROPPED_PERMISSIONS_BACKUP = "wikimacro.backup.hasDroppedPermissions";
-
-    /**
      * The events to match.
      */
     private static final List<Event> EVENTS = new ArrayList<Event>()
@@ -135,37 +130,13 @@ public class WikiMacroExecutionEventListener implements EventListener
             // Set context document content author as macro author so that programming right is tested on the right
             // user. It's cloned to make sure it not really modifying the real document but only do that for the
             // current context.
-            contextDoc = contextDoc.clone();
-            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference()); 
-            xwikiContext.setDoc(contextDoc);
+            XWikiDocument contextDocClone = contextDoc.clone();
+            contextDocClone.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference()); 
+            contextDocClone.setMetaDataDirty(contextDoc.isMetaDataDirty());
+            xwikiContext.setDoc(contextDocClone);
         } catch (Exception e) {
             Log.error("Failed to setup context before wiki macro execution");
         }
-
-        // Make sure to disable XWikiContext#dropPermission hack
-        Object droppedPermission = xwikiContext.remove(XWikiConstant.DROPPED_PERMISSIONS);
-
-        // Put it in an hidden context property to restore it later
-        // Use a stack in case a wiki macro calls another wiki macro
-        Stack<Object> permissionBackup = (Stack<Object>) xwikiContext.get(DROPPED_PERMISSIONS_BACKUP);
-        if (permissionBackup == null) {
-            permissionBackup = new Stack<Object>();
-            xwikiContext.put(DROPPED_PERMISSIONS_BACKUP, permissionBackup);
-        }
-        permissionBackup.push(droppedPermission);
-
-        // Make sure to disable Document#dropPermission hack
-        droppedPermission = context.getProperty(XWikiConstant.DROPPED_PERMISSIONS);
-        context.setProperty(XWikiConstant.DROPPED_PERMISSIONS, null);
-
-        // Put it in an hidden context property to restore it later
-        // Use a stack in case a wiki macro calls another wiki macro
-        permissionBackup = (Stack<Object>) context.getProperty(DROPPED_PERMISSIONS_BACKUP);
-        if (permissionBackup == null) {
-            permissionBackup = new Stack<Object>();
-            context.setProperty(DROPPED_PERMISSIONS_BACKUP, permissionBackup);
-        }
-        permissionBackup.push(droppedPermission);
     }
 
     /**
@@ -186,26 +157,5 @@ public class WikiMacroExecutionEventListener implements EventListener
             Log.error("Failed to setup context after wiki macro execution");
         }
 
-        // Restore XWikiContext#dropPermission hack
-        Stack<Object> permissionBackup = (Stack<Object>) xwikiContext.get(DROPPED_PERMISSIONS_BACKUP);
-        if (permissionBackup != null && !permissionBackup.isEmpty()) {
-            Object droppedPermission = permissionBackup.pop();
-            if (droppedPermission != null) {
-                xwikiContext.put(XWikiConstant.DROPPED_PERMISSIONS, droppedPermission);
-            }
-        } else {
-            this.logger.error("Can't find any backuped dropPersmission information in XWikiContext");
-        }
-
-        // Restore Document#dropPermission hack
-        permissionBackup = (Stack<Object>) context.getProperty(DROPPED_PERMISSIONS_BACKUP);
-        if (permissionBackup != null && !permissionBackup.isEmpty()) {
-            Object droppedPermission = permissionBackup.pop();
-            if (droppedPermission != null) {
-                context.setProperty(XWikiConstant.DROPPED_PERMISSIONS, droppedPermission);
-            }
-        } else {
-            this.logger.error("Can't find any backuped dropPersmission information in ExecutionContext");
-        }
     }
 }

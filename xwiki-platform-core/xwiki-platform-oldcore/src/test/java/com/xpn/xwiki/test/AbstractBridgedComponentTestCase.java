@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
@@ -101,6 +102,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getMockery().checking(new Expectations() {{
             allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue(Syntax.XWIKI_1_0));
         }});
+
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContentAuthorController;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -404,7 +405,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDatabase").will(returnValue("xwiki"));
         getContext().remove("doc");
         getContext().remove("sdoc");
-      
+
         getContext().setDatabase(getContext().getMainXWiki());
 
         // XWiki.Programmer should have PR, as per the global rights.
@@ -497,6 +498,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
     {
         // Nobody even superadmin gets PR after they have given it up.
         this.getContext().setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
+
+        this.mockXWiki.stubs().method("getDatabase").will(returnValue("xwiki"));
 
         assertTrue("User does not have programming right prior to calling dropPermissions()",
                    this.rightService.hasProgrammingRights(this.getContext()));

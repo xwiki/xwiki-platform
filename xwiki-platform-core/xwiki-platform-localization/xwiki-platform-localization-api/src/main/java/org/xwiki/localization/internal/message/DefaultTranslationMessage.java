@@ -74,4 +74,10 @@ public class DefaultTranslationMessage implements TranslationMessage
     {
         return this.rawSource;
     }
+    
+    @Override
+    public String toString()
+    {
+        return getRawSource().toString();
+    }
 }

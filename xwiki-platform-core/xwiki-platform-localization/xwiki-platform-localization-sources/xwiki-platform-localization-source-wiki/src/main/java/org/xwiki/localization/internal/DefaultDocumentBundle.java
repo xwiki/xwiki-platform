@@ -2,6 +2,7 @@ package org.xwiki.localization.internal;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -18,9 +19,9 @@ public class DefaultDocumentBundle extends AbstractDocumentBundle
      * @param componentManager used to lookup components needed to manipulate wiki documents
      * @throws ComponentLookupException failed to lookup some required components
      */
-    public DefaultDocumentBundle(DocumentReference documentReference, ComponentManager componentManager)
-        throws ComponentLookupException
+    public DefaultDocumentBundle(DocumentReference documentReference, ComponentManager componentManager,
+        TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
-        super(documentReference, componentManager);
+        super(documentReference, componentManager, translationMessageParser);
     }
 }

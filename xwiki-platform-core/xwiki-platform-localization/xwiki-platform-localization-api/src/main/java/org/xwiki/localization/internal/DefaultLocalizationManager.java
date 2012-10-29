@@ -56,6 +56,7 @@ public class DefaultLocalizationManager implements LocalizationManager
     /**
      * Used to access the current bundles.
      */
+    @Inject
     private BundleContext bundleContext;
 
     /**

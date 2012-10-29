@@ -75,14 +75,16 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
 
     }
 
-    public AbstractDocumentBundle(DocumentReference reference, ComponentManager componentManager)
-        throws ComponentLookupException
+    public AbstractDocumentBundle(DocumentReference reference, ComponentManager componentManager,
+        TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
         this.bundleContext = componentManager.getInstance(BundleContext.class);
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.contextProvider =
             componentManager.getInstance(new DefaultParameterizedType(null, Provider.class,
                 new Type[] {XWikiContext.class}));
+
+        this.translationMessageParser = translationMessageParser;
 
         this.logger = LoggerFactory.getLogger(getClass());
 
@@ -102,13 +104,16 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
 
         XWikiDocument document = context.getWiki().getDocument(this.reference, context);
 
-        if (StringUtils.isNotEmpty(document.getLanguage())) {
-            XWikiDocument tdocument = document.getTranslatedDocument(locale.toString(), context);
+        String localeString = locale.toString();
+        if (StringUtils.isNotEmpty(localeString)) {
+            XWikiDocument tdocument = document.getTranslatedDocument(localeString, context);
 
             if (tdocument == document) {
                 // No document found for this locale
                 return null;
             }
+
+            document = tdocument;
         }
 
         String content = document.getContent();

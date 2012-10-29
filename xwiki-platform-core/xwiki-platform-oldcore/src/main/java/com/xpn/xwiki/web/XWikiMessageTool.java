@@ -35,6 +35,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -148,7 +149,7 @@ public class XWikiMessageTool
         String translation;
         if (this.localization != null) {
             String language = this.context.getWiki().getLanguagePreference(this.context);
-            Locale locale = LocaleUtils.toLocale(language);
+            Locale locale = StringUtils.isEmpty(language) ? Locale.ROOT : LocaleUtils.toLocale(language);
             Translation translations = this.localization.getTranslation(key, locale);
             if (translations != null) {
                 Block block = translations.render(locale);

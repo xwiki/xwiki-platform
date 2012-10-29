@@ -36,15 +36,16 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
 
 /**
- * 
  * @version $Id$
  * @since 4.3M2
  */
 @Component
 @Singleton
-@Named("xwikil10n/1.0")
+@Named(XWiki10TranslationMessageParser.HINT)
 public class XWiki10TranslationMessageParser implements TranslationMessageParser
 {
+    public static final String HINT = "xwikil10n/1.0";
+
     private static final ParserUtils PARSERUTILS = new ParserUtils();
 
     @Inject

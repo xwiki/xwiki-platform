@@ -116,4 +116,10 @@ public abstract class AbstractTranslation implements Translation
     {
         return render(null, parameters);
     }
+
+    @Override
+    public String toString()
+    {
+        return getKey() + ':' + this.message.toString();
+    }
 }

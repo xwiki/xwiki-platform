@@ -97,6 +97,10 @@ public class DefaultBundleContext implements BundleContext
         ExecutionContext context = this.execution.getContext();
         if (context != null) {
             bundles = (PriorityQueue<Bundle>) context.getProperty(CKEY_BUNDLES);
+
+            if (bundles == null) {
+                bundles = initializeContextBundle();
+            }
         } else {
             bundles = initializeContextBundle();
         }

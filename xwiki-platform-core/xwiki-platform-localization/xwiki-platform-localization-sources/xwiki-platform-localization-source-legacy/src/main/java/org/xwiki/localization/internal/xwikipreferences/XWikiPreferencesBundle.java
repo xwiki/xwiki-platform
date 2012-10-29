@@ -22,6 +22,8 @@ package org.xwiki.localization.internal.xwikipreferences;
 import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -44,7 +46,9 @@ import org.xwiki.model.ModelContext;
  * @version $Id$
  * @since 4.3M2
  */
-@Component(XWikiPreferencesBundle.ID)
+@Component
+@Named(XWikiPreferencesBundle.ID)
+@Singleton
 public class XWikiPreferencesBundle extends AbstractBundle implements Initializable
 {
     protected final static String ID = "XWikiPreferences";

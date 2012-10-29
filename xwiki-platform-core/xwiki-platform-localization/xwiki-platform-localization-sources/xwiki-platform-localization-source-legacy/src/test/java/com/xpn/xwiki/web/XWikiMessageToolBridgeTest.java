@@ -1,0 +1,366 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.xpn.xwiki.web;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.Assert;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jmock.Expectations;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.CustomAction;
+import org.junit.Before;
+import org.junit.Test;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.localization.LocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+
+public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
+{
+    private XWiki mockXWiki;
+
+    private XWikiStoreInterface mockStore;
+
+    private Map<DocumentReference, Map<String, XWikiDocument>> documents =
+        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
+
+    private XWikiMessageTool tool;
+
+    private XWikiDocument preferencesDocument;
+
+    private BaseObject preferencesObject;
+
+    private XWikiDocument defaultWikiTranslation;
+
+    private ObservationManager observation;
+
+    @Override
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        this.mockXWiki = getMockery().mock(XWiki.class);
+        getContext().setWiki(this.mockXWiki);
+        getContext().setDatabase("xwiki");
+
+        this.mockStore = getMockery().mock(XWikiStoreInterface.class);
+
+        // checking
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockXWiki).getDocument(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
+                will(new CustomAction("getDocument")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        Map<String, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
+
+                        if (documentLanguages == null) {
+                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
+                        }
+
+                        XWikiDocument document = documentLanguages.get("");
+
+                        if (document == null) {
+                            document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
+                        }
+
+                        return document;
+                    }
+                });
+
+                allowing(mockStore).loadXWikiDoc(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
+                will(new CustomAction("loadXWikiDoc")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
+                        Map<String, XWikiDocument> documentLanguages =
+                            documents.get(providedDocument.getDocumentReference());
+
+                        if (documentLanguages == null) {
+                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
+                        }
+
+                        XWikiDocument document = documentLanguages.get(providedDocument.getLanguage());
+
+                        if (document == null) {
+                            document = new XWikiDocument(providedDocument.getDocumentReference());
+                            document.setLanguage(providedDocument.getLanguage());
+                            document.setDefaultLanguage(providedDocument.getDefaultLanguage());
+                            document.setTranslation(providedDocument.getTranslation());
+                        }
+
+                        return document;
+                    }
+                });
+
+                allowing(mockXWiki).saveDocument(with(any(XWikiDocument.class)), with(any(String.class)),
+                    with(any(XWikiContext.class)));
+                will(new CustomAction("saveDocument")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
+
+                        document.incrementVersion();
+                        document.setNew(false);
+
+                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+
+                        XWikiDocument previousDocument;
+                        if (documentLanguages == null) {
+                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documents.put(document.getDocumentReference(), documentLanguages);
+                            previousDocument = null;
+                        } else {
+                            previousDocument = documentLanguages.get(document.getLanguage());
+                        }
+
+                        for (XWikiAttachment attachment : document.getAttachmentList()) {
+                            if (!attachment.isContentDirty()) {
+                                attachment.setAttachment_content(previousDocument.getAttachment(
+                                    attachment.getFilename()).getAttachment_content());
+                            }
+                        }
+
+                        documentLanguages.put(document.getLanguage(), document);
+
+                        return null;
+                    }
+                });
+
+                allowing(mockXWiki).deleteDocument(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
+                will(new CustomAction("deleteDocument")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
+
+                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+
+                        if (documentLanguages != null) {
+                            documentLanguages.remove(document.getLanguage());
+                        }
+
+                        return null;
+                    }
+                });
+
+                allowing(mockXWiki).isVirtualMode();
+                will(returnValue(true));
+
+                allowing(mockXWiki).getStore();
+                will(returnValue(mockStore));
+
+                allowing(mockXWiki).prepareResources(with(any(XWikiContext.class)));
+
+                allowing(mockXWiki).getLanguagePreference(with(any(XWikiContext.class)));
+                will(new CustomAction("getLanguagePreference")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        return getContext().getLanguage();
+                    }
+                });
+
+                allowing(mockXWiki).getCurrentContentSyntaxId(with(any(String.class)), with(any(XWikiContext.class)));
+                will(returnValue("plain/1.0"));
+            }
+        });
+
+        this.preferencesDocument =
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"));
+        this.preferencesObject = new BaseObject();
+        this.preferencesObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
+            "XWikiPreferences"));
+        this.preferencesDocument.addXObject(this.preferencesObject);
+        this.mockXWiki.saveDocument(this.preferencesDocument, "", getContext());
+
+        this.defaultWikiTranslation =
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "Translations"));
+        this.defaultWikiTranslation.setSyntax(Syntax.PLAIN_1_0);
+        this.mockXWiki.saveDocument(this.defaultWikiTranslation, "", getContext());
+
+        this.observation = getComponentManager().getInstance(ObservationManager.class);
+
+        // MessageTool
+
+        this.tool =
+            new XWikiMessageTool(getComponentManager().<LocalizationManager> getInstance(LocalizationManager.class),
+                getComponentManager(), getContext());
+    }
+
+    private void setBundles(String bundles)
+    {
+        this.preferencesDocument.setOriginalDocument(this.preferencesDocument.clone());
+
+        if (!bundles.equals(this.preferencesObject.getStringValue("documentBundles"))) {
+            this.preferencesObject.setStringValue("documentBundles", bundles);
+
+            this.observation.notify(
+                new XObjectPropertyUpdatedEvent(new ObjectPropertyReference("documentBundles",
+                    new BaseObjectReference(this.preferencesDocument.getDocumentReference(), 0,
+                        this.preferencesDocument.getDocumentReference()))), this.preferencesDocument, getContext());
+        }
+    }
+
+    private void addWikiTranslation(String key, String message, String locale) throws XWikiException
+    {
+        XWikiDocument document = this.defaultWikiTranslation;
+
+        if (!StringUtils.isEmpty(locale)) {
+            XWikiDocument translatedDocument = document.getTranslatedDocument(locale, getContext());
+            if (translatedDocument == document) {
+                translatedDocument = new XWikiDocument(document.getDocumentReference());
+                translatedDocument.setDefaultLanguage(document.getDefaultLanguage());
+                translatedDocument.setLanguage(locale);
+                translatedDocument.setSyntax(document.getSyntax());
+            }
+            document = translatedDocument;
+        }
+
+        document.setOriginalDocument(document.clone());
+
+        StringBuilder builder = new StringBuilder(document.getContent());
+
+        builder.append('\n');
+        builder.append(key);
+        builder.append('=');
+        builder.append(message);
+
+        document.setContent(builder.toString());
+
+        boolean isNew = document.isNew();
+
+        this.mockXWiki.saveDocument(document, "", getContext());
+
+        if (isNew) {
+            observation.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, getContext());
+        } else {
+            observation.notify(new DocumentUpdatedEvent(document.getDocumentReference()), document, getContext());
+        }
+
+        setBundles(document.getFullName());
+    }
+
+    // tests
+
+    @Test
+    public void getInvalidTranslation()
+    {
+        Assert.assertEquals("doesnotexists.translation", this.tool.get("doesnotexists.translation"));
+    }
+
+    @Test
+    public void getResourceTranslation()
+    {
+        Assert.assertEquals("Language", this.tool.get("language"));
+    }
+
+    @Test
+    public void getWikiTranslation() throws XWikiException
+    {
+        addWikiTranslation("wiki.translation", "Wiki translation", "");
+
+        Assert.assertEquals("Wiki translation", this.tool.get("wiki.translation"));
+    }
+
+    @Test
+    public void getTranslatedWikiTranslation() throws XWikiException
+    {
+        addWikiTranslation("wiki.translation", "English translation", "en");
+        addWikiTranslation("wiki.translation", "French translation", "fr");
+
+        getContext().setLanguage("fr");
+
+        Assert.assertEquals("French translation", this.tool.get("wiki.translation"));
+
+        getContext().setLanguage("en");
+
+        Assert.assertEquals("English translation", this.tool.get("wiki.translation"));
+    }
+
+    @Test
+    public void fallackOnParentLocale() throws XWikiException
+    {
+        addWikiTranslation("wiki.defaulttranslation", "Default translation", "");
+
+        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+
+        getContext().setLanguage("en");
+
+        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+
+        getContext().setLanguage("en_US");
+
+        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+
+        getContext().setLanguage("fr");
+        addWikiTranslation("wiki.frenchtranslation", "French translation", "fr");
+
+        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        Assert.assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
+
+        getContext().setLanguage("fr_FR");
+
+        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+        Assert.assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
+    }
+
+    @Test
+    public void updateWikiTranslationCache() throws XWikiException
+    {
+        addWikiTranslation("wiki.defaulttranslation", "Default translation", "");
+
+        Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
+
+        addWikiTranslation("wiki.anothertranslation", "Another translation", "");
+
+        Assert.assertEquals("Another translation", this.tool.get("wiki.anothertranslation"));
+    }
+}

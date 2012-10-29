@@ -37,6 +37,8 @@ import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractBundle;
 import org.xwiki.localization.internal.DefaultDocumentBundle;
+import org.xwiki.localization.internal.message.XWiki10TranslationMessageParser;
+import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -49,7 +51,6 @@ import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
- * 
  * @version $Id$
  * @since 4.3M2
  */
@@ -75,11 +76,14 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
 
     private DocumentReferenceResolver<String> resolver;
 
+    private TranslationMessageParser translationMessageParser;
+
     private final List<Event> events;
 
     private final String wiki;
 
-    private Map<DocumentReference, Bundle> bundles = new ConcurrentHashMap<DocumentReference, Bundle>();
+    private Map<DocumentReference, DefaultDocumentBundle> bundles =
+        new ConcurrentHashMap<DocumentReference, DefaultDocumentBundle>();
 
     public XWikiPreferencesWikiBundle(String wiki, ComponentManager componentManager) throws ComponentLookupException
     {
@@ -91,6 +95,8 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
         this.observation = componentManager.getInstance(ObservationManager.class);
         this.documentAccessBridge = componentManager.getInstance(DocumentAccessBridge.class);
         this.resolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
+        this.translationMessageParser =
+            componentManager.getInstance(TranslationMessageParser.class, XWiki10TranslationMessageParser.HINT);
 
         intializeBundles();
 
@@ -130,18 +136,22 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
     {
         Set<DocumentReference> documents = getDocuments();
 
-        Map<DocumentReference, Bundle> bundles = new LinkedHashMap<DocumentReference, Bundle>(documents.size());
+        Map<DocumentReference, DefaultDocumentBundle> newBundles =
+            new LinkedHashMap<DocumentReference, DefaultDocumentBundle>(documents.size());
         for (DocumentReference document : documents) {
-            DefaultDocumentBundle documentBundle;
-            try {
-                documentBundle = new DefaultDocumentBundle(document, this.componentManager);
-
-                bundles.put(document, documentBundle);
-            } catch (ComponentLookupException e) {
-                // Should never happen
-                this.logger.error("Failed to create document bundle for document [{}]", document, e);
+            DefaultDocumentBundle documentBundle = this.bundles.get(document);
+            if (documentBundle == null) {
+                try {
+                    documentBundle =
+                        new DefaultDocumentBundle(document, this.componentManager, this.translationMessageParser);
+                } catch (ComponentLookupException e) {
+                    // Should never happen
+                    this.logger.error("Failed to create document bundle for document [{}]", document, e);
+                }
             }
+            newBundles.put(document, documentBundle);
         }
+        this.bundles = newBundles;
     }
 
     // EventListener
@@ -161,7 +171,7 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
     @Override
     public void onEvent(Event arg0, Object arg1, Object arg2)
     {
-
+        intializeBundles();
     }
 
     // Bundle

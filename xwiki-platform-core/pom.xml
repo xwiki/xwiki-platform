@@ -288,10 +288,27 @@
             </difference>
             <difference>
               <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.util.Map getDependencies()</method>
-              <differenceType>7012</differenceType>
-              <justification>WikiComponent is still a young API. Added a new method to handle XWIKI-8232, 
-                "Handle wiki components dependencies injection"</justification>
+              <method>java.util.Map getHandledMethods()</method>
+              <differenceType>7002</differenceType>
+              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
+              </justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.util.List getImplementedInterfaces()</method>
+              <differenceType>7002</differenceType>
+              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
+              </justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/MethodOutputHandler</className>
+              <differenceType>8001</differenceType>
+              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponentInvocationHandler</className>
+              <differenceType>8001</differenceType>
+              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
             </difference>
             <difference>
               <className>org/xwiki/uiextension/UIExtension</className>

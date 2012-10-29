@@ -42,7 +42,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.component.wiki.WikiComponentInvocationHandler;
 import org.xwiki.component.wiki.WikiComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -84,18 +83,14 @@ public class DefaultWikiComponentManager implements WikiComponentManager
         }
         
         try {
+            Object instance;
             // Get the component role interface
             Type roleType = component.getRoleType();
             Class<?> roleTypeClass = ReflectionUtils.getTypeClass(roleType);
-
-            // Create the method invocation handler of the proxy
-            InvocationHandler handler = new WikiComponentInvocationHandler(component, componentManager);
+            ComponentDescriptor componentDescriptor = this.createComponentDescriptor(roleType, component.getRoleHint());
 
             // Prepare a list containing the interfaces the component implements
             List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();
-
-            // Add all the interfaces declared through XObjects
-            implementedInterfaces.addAll(component.getImplementedInterfaces());
 
             // If the component is a Java classes extending the default WikiComponent interface, we add all the
             // interfaces it implements to the list, except the WikiComponent one of course.
@@ -105,17 +100,31 @@ public class DefaultWikiComponentManager implements WikiComponentManager
                 }
             }
 
-            // If the component is a pure XObject implementation, we need to add the role interface to the list, since
-            // it's not been added by the previous loops.
-            if (!implementedInterfaces.contains(roleType)) {
-                implementedInterfaces.add(roleTypeClass);
-            }
+            if (component instanceof DefaultWikiComponent) {
 
-            // Create the component instance and its descriptor
-            Class<?>[] implementedInterfacesArray = implementedInterfaces.toArray(new Class<?>[0]);
-            Object instance =
-                Proxy.newProxyInstance(roleTypeClass.getClassLoader(), implementedInterfacesArray, handler);
-            ComponentDescriptor componentDescriptor = this.createComponentDescriptor(roleType, component.getRoleHint());
+                // Create the method invocation handler of the proxy
+                InvocationHandler handler =
+                    new DefaultWikiComponentInvocationHandler((DefaultWikiComponent) component, componentManager);
+
+                // Add all the interfaces declared through XObjects
+                implementedInterfaces.addAll(((DefaultWikiComponent) component).getImplementedInterfaces());
+
+                // If the component is a pure XObject implementation, we need to add the role interface to the list,
+                // since it's not been added by the previous loops.
+                if (!implementedInterfaces.contains(roleType)) {
+                    implementedInterfaces.add(roleTypeClass);
+                }
+
+                // Create the component instance and its descriptor
+                Class<?>[] implementedInterfacesArray = implementedInterfaces.toArray(new Class<?>[0]);
+                instance = Proxy.newProxyInstance(roleTypeClass.getClassLoader(), implementedInterfacesArray, handler);
+
+                // Finally, register the component against the CM
+                componentManager.registerComponent(componentDescriptor, roleTypeClass.cast(instance));
+            } else {
+                instance = component;
+                componentManager.registerComponent(componentDescriptor, roleTypeClass.cast(component));
+            }
 
             // Since we are responsible to create the component instance,
             // we also are responsible of its initialization (if needed)
@@ -126,9 +135,6 @@ public class DefaultWikiComponentManager implements WikiComponentManager
                     this.logger.error("Failed to initialize wiki component", e);
                 }
             }
-
-            // Finally, register the component against the CM
-            componentManager.registerComponent(componentDescriptor, roleTypeClass.cast(instance));
             
             // And hold a reference to it.
             this.registeredComponents.add(component);

@@ -19,28 +19,34 @@
  */
 package org.xwiki.component.wiki.internal;
 
-import org.xwiki.component.wiki.MethodOutputHandler;
-
 /**
- * Default method output handler.
+ * Utility for wiki methods to return a value. An implementation of this interface is bound in the context of a
+ * wiki method execution, so that such method scripts can return a value using {@link #setValue(Object)}.
  * 
  * @version $Id$
  * @since 4.2M3
  */
-public class DefaultMethodOutputHandler implements MethodOutputHandler
+public class WikiMethodOutputHandler
 {
     /**
      * The stored return value.
      */
     private Object returnValue;
 
-    @Override
+    /**
+     * Stores a value in the method invocation context for further return.
+     * Note that if this method is called multiple times during the invocation, the last one wins.
+     *
+     * @param value the value to return
+     */
     public void setValue(Object value)
     {
         this.returnValue = value;
     }
 
-    @Override
+    /**
+    * @return the current stored return value (null if not set yet).
+    */
     public Object getValue()
     {
         return this.returnValue;

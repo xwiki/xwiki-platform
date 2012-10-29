@@ -22,14 +22,10 @@ package org.xwiki.uiextension.internal;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.context.Execution;
@@ -212,22 +208,5 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     public String getRoleHint()
     {
         return roleHint;
-    }
-
-    @Override
-    public Map<String, XDOM> getHandledMethods()
-    {
-        return MapUtils.EMPTY_MAP;
-    }
-
-    @Override public Map<String, ComponentDescriptor> getDependencies()
-    {
-        return MapUtils.EMPTY_MAP;
-    }
-
-    @Override
-    public List<Class< ? >> getImplementedInterfaces()
-    {
-        return ListUtils.EMPTY_LIST;
     }
 }

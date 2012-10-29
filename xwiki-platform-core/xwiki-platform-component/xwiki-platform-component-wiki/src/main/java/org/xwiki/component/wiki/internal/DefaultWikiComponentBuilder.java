@@ -134,6 +134,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             component.setHandledMethods(this.getHandledMethods(componentDocument));
             component.setImplementedInterfaces(this.getDeclaredInterfaces(componentDocument));
             component.setDependencies(this.getDependencies(componentDocument));
+            component.setSyntax(componentDocument.getSyntax());
 
             components.add(component);
         } catch (XWikiException e) {

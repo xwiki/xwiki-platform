@@ -98,8 +98,6 @@ public class DefaultWikiComponent implements WikiComponent
      * Get the implementations of all the methods the component handles. It allows to write method implementations in
      * wiki documents, using script macros. When a method has multiple signatures (different sets of parameters) the
      * same {@link org.xwiki.rendering.block.XDOM} will be executed.
-     * Classes extending this interface only need to return an empty list here since the methods they handle are native
-     * Java methods.
      *
      * @return the map of method name/wiki code this component implementation handles.
      */
@@ -124,8 +122,6 @@ public class DefaultWikiComponent implements WikiComponent
      * Get the list of interfaces the wiki component implements, apart from its main Role. When the component is
      * entirely written in a document, it allows the {@link org.xwiki.component.wiki.WikiComponentManager} to add those
      * Interfaces to the list of implemented interfaces of the {@link java.lang.reflect.Proxy} it will create.
-     * Classes extending this interface only need to return an empty list here since the list of interfaces they
-     * implement will be determined using Java reflection.
      *
      * @return the extra list of interfaces this component implementation implements.
      */
@@ -138,8 +134,6 @@ public class DefaultWikiComponent implements WikiComponent
      * Methods returned by {@link #getHandledMethods()} can require other components to be injected in their context.
      * Each entry in the map returned by this method will be injected in the rendering context when methods will be
      * executed. The name of the variable in the context is defined by the key in the returned Map.
-     *
-     * Classes extending this interface only need to return an empty list here since they can handle their dependencies.
      *
      * @return the map of dependencies of this component
      */

@@ -69,6 +69,7 @@ public class DefaultContentAuthorResolverTest
         mockery.checking(new Expectations() {{
             allowing(doc).getContentAuthorReference(); will(returnValue(user1));
             allowing(doc).isContentDirty();            will(returnValue(false));
+            allowing(doc).isMetaDataDirty();           will(returnValue(false));
             allowing(doc).isNew();                     will(returnValue(false));
         }});
 
@@ -86,6 +87,7 @@ public class DefaultContentAuthorResolverTest
         mockery.checking(new Expectations() {{
             allowing(doc).getContentAuthorReference(); will(returnValue(user1));
             allowing(doc).isContentDirty();            will(returnValue(true));
+            allowing(doc).isMetaDataDirty();           will(returnValue(false));
             allowing(doc).isNew();                     will(returnValue(false));
         }});
 
@@ -104,6 +106,7 @@ public class DefaultContentAuthorResolverTest
         mockery.checking(new Expectations() {{
             allowing(doc).getContentAuthorReference(); will(returnValue(user1));
             allowing(doc).isContentDirty();            will(returnValue(false));
+            allowing(doc).isMetaDataDirty();           will(returnValue(false));
             allowing(doc).isNew();                     will(returnValue(true));
         }});
 
@@ -122,6 +125,7 @@ public class DefaultContentAuthorResolverTest
         mockery.checking(new Expectations() {{
             allowing(doc).getContentAuthorReference(); will(returnValue(null));
             allowing(doc).isContentDirty();            will(returnValue(false));
+            allowing(doc).isMetaDataDirty();           will(returnValue(false));
             allowing(doc).isNew();                     will(returnValue(false));
         }});
 

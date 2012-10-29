@@ -25,13 +25,16 @@ import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import javax.inject.Singleton;
+
 /**
  * Bridge component for resolving content author on behalf of the AuthorizationContextFactory.
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 @Component
+@Singleton
 public class DefaultContentAuthorResolver implements ContentAuthorResolver
 {
 

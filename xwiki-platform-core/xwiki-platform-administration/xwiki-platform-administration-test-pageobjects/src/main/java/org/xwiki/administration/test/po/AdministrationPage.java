@@ -19,8 +19,10 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -54,6 +56,9 @@ public class AdministrationPage extends ViewPage
 
     @FindBy(xpath = "//a[contains(@href, 'section=WYSIWYG')]")
     WebElement wysiwygLink;
+
+    @FindBy(id = "goto-select")
+    WebElement spaceAdminSelect;
 
     public static AdministrationPage gotoPage()
     {
@@ -101,5 +106,31 @@ public class AdministrationPage extends ViewPage
     {
         this.wysiwygLink.click();
         return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
+    public boolean hasSection(String sectionName)
+    {
+        return getUtil().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
+            + sectionName + "')]"));
+    }
+
+    public boolean hasNotSection(String sectionName)
+    {
+        return getUtil().findElementsWithoutWaiting(getDriver(),
+            By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
+                + sectionName + "')]")).size() == 0;
+    }
+
+    /**
+     * Select the space to administer.
+     *
+     * Note that caller of the API need to wait for the page to be loaded since the selection of the page is done
+     * asynchronously with JS.
+     */
+    public AdministrationPage selectSpaceToAdminister(String spaceName)
+    {
+        Select select = new Select(this.spaceAdminSelect);
+        select.selectByVisibleText(spaceName);
+        return new AdministrationPage();
     }
 }

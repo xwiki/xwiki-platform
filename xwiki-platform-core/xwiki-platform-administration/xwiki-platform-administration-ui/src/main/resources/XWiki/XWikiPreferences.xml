@@ -1064,8 +1064,8 @@
       <prettyName>Timezone</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
-      <validationMessage></validationMessage>
-      <validationRegExp></validationRegExp>
+      <validationMessage/>
+      <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </timezone>
     <title>
@@ -2473,8 +2473,8 @@
         <prettyName>Timezone</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </timezone>
       <title>

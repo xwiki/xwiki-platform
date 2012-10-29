@@ -32,11 +32,7 @@
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - REST - Server</name>
-  <description>Service for accessing XWiki through a RESTful API</description>
-  <properties>
-    <!-- We have moved a lot of packages into internal voluntarily breaking compatibility. Remove this check on the next release. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <description>Service for accessing XWiki through a RESTful API</description>  
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

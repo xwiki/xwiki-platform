@@ -31,16 +31,17 @@ import java.lang.reflect.Type;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
 import org.xwiki.security.authorization.PrivilegedModeController;
 import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.context.ExecutionContextProperty;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
 
@@ -58,6 +59,15 @@ import org.xwiki.model.reference.DocumentReference;
 @Singleton
 public class DefaultAuthorizationContextFactory implements ExecutionContextInitializer, Initializable
 {
+    /** Default hint. */
+    static final String DEFAULT_HINT = "default";
+
+    /** Property name for content author resolver hint. */
+    static final String CONTENT_AUTHOR_RESOLVER_PROPERTY
+        = "security.authorization.contentAuthorResolverHint";
+
+    /** Default hint for the content author resolver. */
+    static final String DEFAULT_CONTENT_AUTHOR_RESOLVER = DEFAULT_HINT;
 
     /** Execution context key for indicating that the privileged mode is disabled. */
     private static final String PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY = "privileged_mode_disabled";
@@ -67,23 +77,23 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
     private Execution execution;
 
     /** Used by the content athor controller to set the active content author. */
-    @Inject
     private ContentAuthorResolver contentAuthorResolver;
 
     /** The component manater is only used during initialization. */
     @Inject
     private ComponentManager componentManager;
 
+    /** Obtain configuration from the xwiki.properties file. */
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configuration;
+
     @Override
     public void initialize(ExecutionContext executionContext)
     {
         if (!executionContext.hasProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY)) {
-            ExecutionContextProperty property
-                = new ExecutionContextProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
-            property.setFinal(true);
-            property.setInherited(true);
-            property.setValue(new PrivateAuthorizationContext());
-            executionContext.declareProperty(property);
+            executionContext.newProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY)
+                .makeFinal().inherited().initial(new PrivateAuthorizationContext()).declare();
         }
     }
 
@@ -103,13 +113,22 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         DefaultComponentDescriptor<T> descriptor = new DefaultComponentDescriptor<T>();
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
         descriptor.setRoleType(type);
-        descriptor.setRoleHint("default");
+        descriptor.setRoleHint(DEFAULT_HINT);
         componentManager.registerComponent(descriptor, instance);
     }
 
     @Override
     public void initialize() throws InitializationException
     {
+        String hint = configuration.getProperty(CONTENT_AUTHOR_RESOLVER_PROPERTY, DEFAULT_CONTENT_AUTHOR_RESOLVER);
+
+        try {
+            contentAuthorResolver = componentManager.getInstance(ContentAuthorResolver.class, hint);
+        } catch (ComponentLookupException e) {
+            throw new InitializationException(
+                String.format("Failed to obtain content author resolver for hint [{}].", hint), e);
+        }
+
         try {
             addSingleton(EffectiveUserController.class, new PrivateEffectiveUserController());
             addSingleton(ContentAuthorController.class, new PrivateContentAuthorController());
@@ -119,6 +138,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         }
         
         this.componentManager = null;
+        this.configuration = null;
     }
 
     /**
@@ -168,6 +188,9 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         @Override
         public DocumentReference getContentAuthor()
         {
+            if (contentDocuments.isEmpty()) {
+                return effectiveUser;
+            }
             return contentAuthorResolver.resolveContentAuthor(contentDocuments.peekFirst());
         }
 
@@ -236,7 +259,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
     {
 
         /** Make the constructor private. */
-        private PrivatePrivilegedModeController() 
+        private PrivatePrivilegedModeController()
         {
         }
 
@@ -256,6 +279,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
             if (ctx.privilegedModeDisabled == this) {
+
                 ctx.privilegedModeDisabled = null;
             }
         }
@@ -264,11 +288,8 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         public void disablePrivilegedModeInCurrentExecutionContext()
         {
             if (!execution.getContext().hasProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY)) {
-                ExecutionContextProperty p 
-                    = new ExecutionContextProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY);
-                p.setValue((Boolean) true);
-                p.setFinal(true);
-                execution.getContext().declareProperty(p);
+                execution.getContext().newProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY)
+                    .makeFinal().initial((Boolean) true).declare();
             }
         }
     }
@@ -278,8 +299,13 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
      * manager to get an instance.  So, we have to use a provider for the privileged mode controller, as it is not a
      * singleton.
      */
-    public final class PrivatePrivilegedModeControllerProvider implements Provider<PrivilegedModeController>
+    private final class PrivatePrivilegedModeControllerProvider implements Provider<PrivilegedModeController>
     {
+
+        /** Hide constructor. */
+        private PrivatePrivilegedModeControllerProvider()
+        {
+        }
 
         @Override
         public PrivilegedModeController get()

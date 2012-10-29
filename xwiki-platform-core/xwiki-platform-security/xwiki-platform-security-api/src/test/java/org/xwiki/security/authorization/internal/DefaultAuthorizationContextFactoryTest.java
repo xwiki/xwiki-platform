@@ -28,6 +28,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -73,6 +74,19 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
     public void setUp() throws Exception
     {
         super.setUp();
+
+        final ConfigurationSource configurationSource
+            = getComponentManager().getInstance(ConfigurationSource.class, "xwikiproperties");
+
+        registerMockComponent(ContentAuthorResolver.class, 
+            DefaultAuthorizationContextFactory.DEFAULT_CONTENT_AUTHOR_RESOLVER);
+
+        getMockery().checking(new Expectations() {{
+            allowing(configurationSource)
+                 .getProperty(DefaultAuthorizationContextFactory.CONTENT_AUTHOR_RESOLVER_PROPERTY, 
+                              DefaultAuthorizationContextFactory.DEFAULT_CONTENT_AUTHOR_RESOLVER);
+            will(returnValue(DefaultAuthorizationContextFactory.DEFAULT_CONTENT_AUTHOR_RESOLVER));
+        }});
 
         this.authorizationContextFactory = getComponentManager().getInstance(ExecutionContextInitializer.class,
                                                                              "defaultAuthorizationContextFactory");

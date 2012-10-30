@@ -34,6 +34,9 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of the {@link ServletContextListener}. Initializes component manager and application context.
  * 
@@ -43,6 +46,9 @@ public class XWikiServletContextListener implements ServletContextListener
 {
     /** The component manager used to lookup other components. */
     private ComponentManager componentManager;
+
+    /** A logger. */
+    private Logger logger = LoggerFactory.getLogger(XWikiServletContextListener.class);
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
@@ -120,7 +126,7 @@ public class XWikiServletContextListener implements ServletContextListener
             observationManager.notify(new ApplicationStoppedEvent(), this);
         } catch (ComponentLookupException e) {
             // Nothing to do here.
-            // TODO: Log a warning
+            logger.error("Failed to look up the observation manager!", e);
         }
 
         // Even though the notion of ApplicationContext has been deprecated in favor of the notion of Environment we
@@ -134,7 +140,7 @@ public class XWikiServletContextListener implements ServletContextListener
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         } catch (ComponentLookupException ex) {
             // Nothing to do here.
-            // TODO: Log a warning
+            logger.error("Failed to look up the application context listener manager!", ex);
         }
     }
 }

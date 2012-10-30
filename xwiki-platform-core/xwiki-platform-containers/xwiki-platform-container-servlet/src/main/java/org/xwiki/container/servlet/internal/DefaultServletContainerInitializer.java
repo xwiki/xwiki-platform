@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
@@ -89,6 +90,15 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     {
         ApplicationContext applicationContext = new ServletApplicationContext(servletContext, this.componentManager);
         this.container.setApplicationContext(applicationContext);
+
+        // The authorization context factory must be instantiated early because it will populate the component manager
+        // with controller instances that may be required by other components.
+        try {
+            componentManager.getInstance(ExecutionContextInitializer.class, "defaultAuthorizationContextFactory");
+        } catch (ComponentLookupException e) {
+            logger.error("Failed to look up the authorization context factory!", e);
+        }
+
         this.applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 

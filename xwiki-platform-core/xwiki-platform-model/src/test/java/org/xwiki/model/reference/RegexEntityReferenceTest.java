@@ -79,12 +79,22 @@ public class RegexEntityReferenceTest
 
         Assert.assertTrue(reference.equals(REFERENCETOMATCH));
     }
-    
+
     @Test
     public void testPatternNotMatching()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
 
         Assert.assertFalse(reference.equals(REFERENCETOMATCH));
+    }
+
+    @Test
+    public void testWithNonRegexParent()
+    {
+        EntityReference reference =
+            new RegexEntityReference(Pattern.compile("space"), EntityType.SPACE, new EntityReference("wiki",
+                EntityType.WIKI));
+
+        Assert.assertTrue(reference.equals(REFERENCETOMATCH));
     }
 }

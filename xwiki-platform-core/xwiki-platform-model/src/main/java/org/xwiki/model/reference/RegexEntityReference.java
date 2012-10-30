@@ -107,7 +107,7 @@ public class RegexEntityReference extends EntityReference
                 if (this.pattern != null && !this.pattern.matcher(entity.getName()).matches()) {
                     return false;
                 } else {
-                    return getParent() != null ? getParent().equals(entity) : true;
+                    return getParent() != null ? getParent().equals(entity.getParent()) : true;
                 }
             }
         }

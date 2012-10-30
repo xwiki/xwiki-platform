@@ -193,6 +193,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // to be executed at this stage since they should be executed by the currently running Macro Transformation.
         DocumentDisplayerParameters displayParameters = new DocumentDisplayerParameters();
         displayParameters.setContentTransformed(parametersContext == Context.NEW);
+        if (parametersContext == Context.NEW) {
+            // By setting a content document, the included document may obtain programming rights from its content
+            // author.
+            displayParameters.setContentDocument(documentBridge);
+        }
         displayParameters.setExecutionContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());

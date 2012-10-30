@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -55,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -243,7 +245,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference templateDocumentReference;
 
-    protected String language;
+    protected Locale locale;
 
     private String defaultLanguage;
 
@@ -552,16 +554,16 @@ public class XWikiDocument implements DocumentModelBridge
     {
         final String localUid = this.localUidStringEntityReferenceSerializer.serialize(getDocumentReference());
 
-        if (StringUtils.isEmpty(this.language)) {
+        if (StringUtils.isEmpty(getLanguage())) {
             return localUid;
         } else {
-            return appendLanguage(new StringBuilder(64).append(localUid)).toString();
+            return appendLocale(new StringBuilder(64).append(localUid)).toString();
         }
     }
 
     /**
-     * Temporary helper to produce a uid serialization of this document reference, including the language. Only
-     * translated document will have language appended. FIXME: when reference contains locale, this is no more needed.
+     * Temporary helper to produce a uid serialization of this document reference, including the locale. Only
+     * translated document will have locale appended. FIXME: when reference contains locale, this is no more needed.
      * 
      * @return a unique name (8:wikiname5:space4:name2:lg or 8:wikiname5:space4:name)
      * @since 4.0M1
@@ -570,10 +572,10 @@ public class XWikiDocument implements DocumentModelBridge
     {
         final String localUid = this.uidStringEntityReferenceSerializer.serialize(getDocumentReference());
 
-        if (StringUtils.isEmpty(this.language)) {
+        if (StringUtils.isEmpty(getLanguage())) {
             return localUid;
         } else {
-            return appendLanguage(new StringBuilder(64).append(localUid)).toString();
+            return appendLocale(new StringBuilder(64).append(localUid)).toString();
         }
     }
 
@@ -581,17 +583,19 @@ public class XWikiDocument implements DocumentModelBridge
      * Temporary helper that append the language of this document to the provide string buffer. FIXME: when reference
      * contains locale, this is no more needed.
      * 
-     * @param sb a StringBuilder where to append the language key
-     * @return the StringBuilder appended with the language of this document formatted like 2:lg
+     * @param sb a StringBuilder where to append the locale key
+     * @return the StringBuilder appended with the locale of this document formatted like 2:lg
      * @see #getLocalKey()
      */
-    private StringBuilder appendLanguage(StringBuilder sb)
+    private StringBuilder appendLocale(StringBuilder sb)
     {
-        if (StringUtils.isEmpty(this.language)) {
+        String localeString = getLanguage();
+
+        if (StringUtils.isEmpty(localeString)) {
             return sb;
         }
 
-        return sb.append(this.language.length()).append(':').append(this.language);
+        return sb.append(localeString.length()).append(':').append(localeString);
     }
 
     @Override
@@ -4631,13 +4635,16 @@ public class XWikiDocument implements DocumentModelBridge
         List<DocumentReference> children = new ArrayList<DocumentReference>();
 
         try {
-            Query query = getStore().getQueryManager()
-                .createQuery("select distinct doc.space, doc.name from XWikiDocument doc where "
-                    + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
-                Query.XWQL);
+            Query query =
+                getStore()
+                    .getQueryManager()
+                    .createQuery(
+                        "select distinct doc.space, doc.name from XWikiDocument doc where "
+                            + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
+                        Query.XWQL);
             query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden"));
-            query.bindValue("prefixedFullName",
-                this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+            query
+                .bindValue("prefixedFullName", this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
             query.bindValue("fullName", this.localEntityReferenceSerializer.serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
@@ -5247,18 +5254,55 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #getLocale()} instead
+     */
+    @Deprecated
     public String getLanguage()
     {
-        if (this.language == null) {
+        if (this.locale == null) {
             return "";
         } else {
-            return this.language.trim();
+            return this.locale.toString();
         }
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #setLocale(Locale)} instead
+     */
+    @Deprecated
     public void setLanguage(String language)
     {
-        this.language = Util.normalizeLanguage(language);
+        String cleanedLanguage = Util.normalizeLanguage(language);
+
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(cleanedLanguage);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        setLocale(locale);
+    }
+
+    /**
+     * @return the locale of the document
+     */
+    public Locale getLocale()
+    {
+        return locale;
+    }
+
+    /**
+     * @param locale the locale of the document
+     */
+    public void setLocale(Locale locale)
+    {
+        this.locale = locale;
     }
 
     public String getDefaultLanguage()
@@ -7516,7 +7560,7 @@ public class XWikiDocument implements DocumentModelBridge
             } catch (XWikiException e) {
                 if (StringUtils.isEmpty(getContent())) {
                     LOGGER.debug("Syntax [{}] cannot handle empty input. Returning empty XDOM.", getSyntax());
-                    return new XDOM(Collections.<Block>emptyList());
+                    return new XDOM(Collections.<Block> emptyList());
                 }
                 LOGGER.error("Failed to parse document content to XDOM", e);
             }
@@ -7559,7 +7603,7 @@ public class XWikiDocument implements DocumentModelBridge
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
         this.content = "";
         this.format = "";
-        this.language = "";
+        this.locale = Locale.ROOT;
         this.defaultLanguage = "";
         this.attachmentList = new ArrayList<XWikiAttachment>();
         this.customClass = "";

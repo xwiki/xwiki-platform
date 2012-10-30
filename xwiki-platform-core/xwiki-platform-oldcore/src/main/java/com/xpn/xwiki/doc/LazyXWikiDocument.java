@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.dom4j.Document;
@@ -93,7 +94,7 @@ public class LazyXWikiDocument extends XWikiDocument
                 (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
 
             XWikiDocument doc = new XWikiDocument(getDocumentReference());
-            doc.setLanguage(this.language);
+            doc.setLocale(getLocale());
 
             String currentWiki = context.getDatabase();
             try {
@@ -133,13 +134,9 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
-    public String getLanguage()
+    public Locale getLocale()
     {
-        if (this.language == null) {
-            return getDocument().getLanguage();
-        } else {
-            return this.language;
-        }
+        return this.locale;
     }
 
     @Override

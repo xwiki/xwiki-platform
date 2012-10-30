@@ -32,6 +32,8 @@ import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 
 /**
+ * Base class to use for resource based {@link org.xwiki.localization.Bundle}s.
+ * 
  * @version $Id$
  * @since 4.3M2
  */

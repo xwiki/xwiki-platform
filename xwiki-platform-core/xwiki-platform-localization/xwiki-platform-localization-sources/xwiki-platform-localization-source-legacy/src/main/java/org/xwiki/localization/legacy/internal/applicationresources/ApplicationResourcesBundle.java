@@ -38,10 +38,16 @@ import org.xwiki.localization.message.TranslationMessageParser;
 @Named("resource:ApplicationResources")
 public class ApplicationResourcesBundle extends AbstractResourceBundle
 {
+    /**
+     * The parser to use for each message.
+     */
     @Inject
     @Named("messagetool/1.0")
-    TranslationMessageParser parser;
+    private TranslationMessageParser parser;
 
+    /**
+     * Default constructor.
+     */
     public ApplicationResourcesBundle()
     {
         super("ApplicationResources", ApplicationResourcesBundle.class.getClassLoader());

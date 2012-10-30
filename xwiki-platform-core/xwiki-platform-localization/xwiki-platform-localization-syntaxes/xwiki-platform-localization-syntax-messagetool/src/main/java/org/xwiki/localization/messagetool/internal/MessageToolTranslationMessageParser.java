@@ -45,10 +45,19 @@ import org.xwiki.rendering.util.ParserUtils;
 @Named(MessageToolTranslationMessageParser.HINT)
 public class MessageToolTranslationMessageParser implements TranslationMessageParser
 {
+    /**
+     * The role hint of the component.
+     */
     public static final String HINT = "messagetool/1.0";
 
+    /**
+     * Used to "inline" the content parsed with plain text parser.
+     */
     private static final ParserUtils PARSERUTILS = new ParserUtils();
 
+    /**
+     * The plain text parser.
+     */
     @Inject
     @Named("plain/1.0")
     private Parser plainParser;

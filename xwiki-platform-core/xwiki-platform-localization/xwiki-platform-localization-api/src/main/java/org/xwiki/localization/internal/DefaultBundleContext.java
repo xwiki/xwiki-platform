@@ -37,6 +37,8 @@ import org.xwiki.localization.Bundle;
 import org.xwiki.localization.BundleContext;
 
 /**
+ * Default implementation of {@link BundleContext}.
+ * 
  * @version $Id$
  * @since 4.3M2
  */

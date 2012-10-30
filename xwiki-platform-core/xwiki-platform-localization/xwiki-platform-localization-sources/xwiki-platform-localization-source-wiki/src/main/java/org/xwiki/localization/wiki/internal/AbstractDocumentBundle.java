@@ -62,12 +62,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 4.3M2
  */
-public class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle, DisposableCacheValue, Disposable
+public abstract class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle, DisposableCacheValue, Disposable
 {
     /**
      * The prefix to use in all wiki document based translations.
      */
-    public final static String ID_PREFIX = "document:";
+    public static final String ID_PREFIX = "document:";
 
     @Inject
     protected BundleContext bundleContext;

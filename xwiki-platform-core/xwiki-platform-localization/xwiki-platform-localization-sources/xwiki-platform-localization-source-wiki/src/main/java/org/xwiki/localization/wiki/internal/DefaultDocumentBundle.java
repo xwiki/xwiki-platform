@@ -36,6 +36,7 @@ public class DefaultDocumentBundle extends AbstractDocumentBundle
     /**
      * @param documentReference the document reference
      * @param componentManager used to lookup components needed to manipulate wiki documents
+     * @param translationMessageParser the parser to use for each message
      * @throws ComponentLookupException failed to lookup some required components
      */
     public DefaultDocumentBundle(DocumentReference documentReference, ComponentManager componentManager,

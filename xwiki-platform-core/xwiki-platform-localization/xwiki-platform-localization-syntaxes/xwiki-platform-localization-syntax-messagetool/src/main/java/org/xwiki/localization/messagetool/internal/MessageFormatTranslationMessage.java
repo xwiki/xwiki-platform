@@ -34,18 +34,32 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
 
 /**
+ * {@link MessageFormat} based {@link TranslationMessage}.
  * 
  * @version $Id$
  * @since 4.3M2
  */
 public class MessageFormatTranslationMessage implements TranslationMessage
 {
+    /**
+     * Used to "inline" the content parsed with plain text parser.
+     */
     private static final ParserUtils PARSERUTILS = new ParserUtils();
 
+    /**
+     * The message.
+     */
     private String message;
 
+    /**
+     * The plain text parser.
+     */
     private Parser plainParser;
 
+    /**
+     * @param message the message
+     * @param plainParser the plain text parser
+     */
     public MessageFormatTranslationMessage(String message, Parser plainParser)
     {
         this.message = message;

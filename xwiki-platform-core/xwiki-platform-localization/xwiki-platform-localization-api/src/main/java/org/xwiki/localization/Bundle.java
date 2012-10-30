@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Role;
  * A collection of translations in various Locales.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 4.3M2
  */
 @Role
 public interface Bundle extends Comparable<Bundle>

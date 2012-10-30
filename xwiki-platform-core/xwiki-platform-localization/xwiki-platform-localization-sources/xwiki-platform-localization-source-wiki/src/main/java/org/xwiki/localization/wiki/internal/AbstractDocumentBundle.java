@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal;
+package org.xwiki.localization.wiki.internal;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -30,15 +32,25 @@ import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.BundleContext;
+import org.xwiki.localization.internal.AbstractCachedBundle;
+import org.xwiki.localization.internal.DefaultLocalizedBundle;
+import org.xwiki.localization.internal.DefaultTranslation;
+import org.xwiki.localization.internal.LocalizedBundle;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,7 +62,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 4.3M2
  */
-public class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle
+public class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle, DisposableCacheValue, Disposable
 {
     /**
      * The prefix to use in all wiki document based translations.
@@ -66,14 +78,37 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
     @Inject
     protected Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private ObservationManager observation;
+
     protected TranslationMessageParser translationMessageParser;
 
-    protected DocumentReference reference;
+    protected List<Event> events;
 
-    public AbstractDocumentBundle()
+    private EventListener listener = new EventListener()
     {
+        @Override
+        public void onEvent(Event arg0, Object arg1, Object arg2)
+        {
+            XWikiDocument document = (XWikiDocument) arg1;
 
-    }
+            bundleCache.remove(document.getLanguage());
+        }
+
+        @Override
+        public String getName()
+        {
+            return "WikiBundleFactory";
+        }
+
+        @Override
+        public List<Event> getEvents()
+        {
+            return events;
+        }
+    };
+
+    protected DocumentReference documentReference;
 
     public AbstractDocumentBundle(DocumentReference reference, ComponentManager componentManager,
         TranslationMessageParser translationMessageParser) throws ComponentLookupException
@@ -83,17 +118,27 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
         this.contextProvider =
             componentManager.getInstance(new DefaultParameterizedType(null, Provider.class,
                 new Type[] {XWikiContext.class}));
+        this.observation = componentManager.getInstance(ObservationManager.class);
 
         this.translationMessageParser = translationMessageParser;
 
         this.logger = LoggerFactory.getLogger(getClass());
 
         setReference(reference);
+
+        initialize();
+    }
+
+    private void initialize()
+    {
+        this.events = Arrays.<Event> asList(new DocumentUpdatedEvent(this.documentReference));
+
+        this.observation.addListener(this.listener);
     }
 
     protected void setReference(DocumentReference reference)
     {
-        this.reference = reference;
+        this.documentReference = reference;
 
         setId(ID_PREFIX + this.serializer.serialize(reference));
     }
@@ -102,7 +147,7 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
     {
         XWikiContext context = this.contextProvider.get();
 
-        XWikiDocument document = context.getWiki().getDocument(this.reference, context);
+        XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
         String localeString = locale.toString();
         if (StringUtils.isNotEmpty(localeString)) {
@@ -159,5 +204,11 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
         }
 
         return localeBundle;
+    }
+
+    @Override
+    public void dispose()
+    {
+        this.observation.removeListener(this.listener.getName());
     }
 }

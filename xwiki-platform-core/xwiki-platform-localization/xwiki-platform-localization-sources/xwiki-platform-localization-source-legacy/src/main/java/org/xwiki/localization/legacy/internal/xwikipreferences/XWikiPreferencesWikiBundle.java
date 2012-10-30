@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.xwikipreferences;
+package org.xwiki.localization.legacy.internal.xwikipreferences;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -36,12 +36,12 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractBundle;
-import org.xwiki.localization.internal.DefaultDocumentBundle;
-import org.xwiki.localization.internal.message.XWiki10TranslationMessageParser;
 import org.xwiki.localization.message.TranslationMessageParser;
+import org.xwiki.localization.wiki.internal.DefaultDocumentBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -95,8 +95,7 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
         this.observation = componentManager.getInstance(ObservationManager.class);
         this.documentAccessBridge = componentManager.getInstance(DocumentAccessBridge.class);
         this.resolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        this.translationMessageParser =
-            componentManager.getInstance(TranslationMessageParser.class, XWiki10TranslationMessageParser.HINT);
+        this.translationMessageParser = componentManager.getInstance(TranslationMessageParser.class, "messagetool/1.0");
 
         intializeBundles();
 
@@ -104,10 +103,9 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
 
         DocumentReference preferences = new DocumentReference(this.wiki, "XWiki", "XWikiPreferences");
 
-        RegexEntityReference documentBundlesProperty =
-            new RegexEntityReference(Pattern.compile(DOCUMENT_BUNDLE_PROPERTY), EntityType.OBJECT_PROPERTY,
-                new RegexEntityReference(Pattern.compile(this.wiki + ":XWiki.XWikiPreferences\\[\\d*\\]"),
-                    EntityType.OBJECT, preferences));
+        EntityReference documentBundlesProperty =
+            new EntityReference(DOCUMENT_BUNDLE_PROPERTY, EntityType.OBJECT_PROPERTY, new RegexEntityReference(
+                Pattern.compile(this.wiki + ":XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT, preferences));
 
         this.events = Arrays.<Event> asList(new XObjectPropertyUpdatedEvent(documentBundlesProperty));
 

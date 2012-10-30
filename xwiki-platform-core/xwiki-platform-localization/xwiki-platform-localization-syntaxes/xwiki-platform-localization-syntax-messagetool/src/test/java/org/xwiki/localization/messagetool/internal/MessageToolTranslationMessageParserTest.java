@@ -1,4 +1,4 @@
-package org.xwiki.localization.internal.message;
+package org.xwiki.localization.messagetool.internal;
 
 import java.util.Arrays;
 
@@ -18,9 +18,9 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 
-@MockingRequirement(value = XWiki10TranslationMessageParser.class, exceptions = Parser.class)
+@MockingRequirement(value = MessageToolTranslationMessageParser.class, exceptions = Parser.class)
 @ComponentList({PlainTextBlockParser.class, PlainTextStreamParser.class})
-public class XWiki10TranslationMessageParserTest extends AbstractMockingComponentTestCase<TranslationMessageParser>
+public class MessageToolTranslationMessageParserTest extends AbstractMockingComponentTestCase<TranslationMessageParser>
 {
     @Test
     public void messageSimple() throws ComponentLookupException

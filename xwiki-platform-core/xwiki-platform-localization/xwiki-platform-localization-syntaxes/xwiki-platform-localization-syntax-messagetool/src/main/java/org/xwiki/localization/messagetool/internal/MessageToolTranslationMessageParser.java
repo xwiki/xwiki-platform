@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.message;
+package org.xwiki.localization.messagetool.internal;
 
 import java.io.StringReader;
 import java.util.List;
@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.internal.message.BlockTranslationMessage;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.rendering.block.Block;
@@ -41,10 +42,10 @@ import org.xwiki.rendering.util.ParserUtils;
  */
 @Component
 @Singleton
-@Named(XWiki10TranslationMessageParser.HINT)
-public class XWiki10TranslationMessageParser implements TranslationMessageParser
+@Named(MessageToolTranslationMessageParser.HINT)
+public class MessageToolTranslationMessageParser implements TranslationMessageParser
 {
-    public static final String HINT = "xwikil10n/1.0";
+    public static final String HINT = "messagetool/1.0";
 
     private static final ParserUtils PARSERUTILS = new ParserUtils();
 

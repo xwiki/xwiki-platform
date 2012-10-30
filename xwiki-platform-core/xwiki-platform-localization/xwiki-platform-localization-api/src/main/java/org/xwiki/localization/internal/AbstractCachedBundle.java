@@ -89,23 +89,38 @@ public abstract class AbstractCachedBundle extends AbstractBundle
     }
 
     /**
-     * @param locale th Locale
+     * @param locale the Locale
      * @return the bundle containing translation for the passed Locale
      */
     private LocalizedBundle getLocalizedBundle(Locale locale)
     {
-        LocalizedBundle bundle = this.bundleCache.get(locale.toString());
-        if (bundle != null) {
-            return bundle;
+        String localeString = locale.toString();
+
+        LocalizedBundle bundle = this.bundleCache.get(localeString);
+        if (bundle == null) {
+            bundle = getSynchLocalizedBundle(locale);
         }
 
-        bundle = createBundle(locale);
+        return bundle;
+    }
+
+    /**
+     * @param locale the Locale
+     * @return the bundle containing translation for the passed Locale
+     */
+    private synchronized LocalizedBundle getSynchLocalizedBundle(Locale locale)
+    {
+        String localeString = locale.toString();
+
+        LocalizedBundle bundle = this.bundleCache.get(localeString);
 
         if (bundle == null) {
-            Locale parentLocale = getParentLocale(locale);
-            if (parentLocale != null) {
-                bundle = getLocalizedBundle(parentLocale);
+            bundle = createBundle(locale);
+            if (bundle == null) {
+                bundle = LocalizedBundle.EMPTY;
             }
+
+            this.bundleCache.put(localeString, bundle);
         }
 
         return bundle;

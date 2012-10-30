@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.context.Execution;
@@ -96,7 +98,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private DocumentReference userReference;
 
-    private String language;
+    private Locale locale;
 
     private static final String LANGUAGE_KEY = "language";
 
@@ -255,7 +257,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             setDatabase((String) value);
         } else {
             if (value != null) {
-                previous = super.put(key, value);    
+                previous = super.put(key, value);
             } else {
                 previous = super.remove(key);
             }
@@ -436,18 +438,43 @@ public class XWikiContext extends Hashtable<Object, Object>
         return (XWikiUser) get(USER_KEY);
     }
 
+    /**
+     * @deprecated since 4.3M1 use {@link #getLocale()} instead
+     */
     public String getLanguage()
     {
-        return this.language;
+        return this.locale != null ? this.locale.toString() : null;
     }
 
+    /**
+     * @deprecated since 4.3M1 use {@link #setLocale(Locale)} instead
+     */
+    @Deprecated
     public void setLanguage(String language)
     {
-        this.language = Util.normalizeLanguage(language);
-        if (language == null) {
+        setLocale(LocaleUtils.toLocale(Util.normalizeLanguage(language)));
+
+    }
+
+    /**
+     * @return the current locale
+     */
+    public Locale getLocale()
+    {
+        return this.locale;
+    }
+
+    /**
+     * @param locale the current locale
+     */
+    public void setLocale(Locale locale)
+    {
+        this.locale = locale;
+
+        if (locale == null) {
             remove(LANGUAGE_KEY);
         } else {
-            put(LANGUAGE_KEY, language);
+            put(LANGUAGE_KEY, locale.toString());
         }
     }
 

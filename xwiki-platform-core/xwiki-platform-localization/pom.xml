@@ -36,6 +36,7 @@
   <modules>
     <module>xwiki-platform-localization-api</module>
     <module>xwiki-platform-localization-sources</module>
+    <module>xwiki-platform-localization-syntaxes</module>
   </modules>
 </project>
 

@@ -1,3 +1,2 @@
-org.xwiki.localization.internal.applicationresources.ApplicationResourcesBundle
-org.xwiki.localization.internal.message.XWiki10TranslationMessageParser
-org.xwiki.localization.internal.xwikipreferences.XWikiPreferencesBundle
+org.xwiki.localization.legacy.internal.applicationresources.ApplicationResourcesBundle
+org.xwiki.localization.legacy.internal.xwikipreferences.XWikiPreferencesBundle

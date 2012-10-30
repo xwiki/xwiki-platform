@@ -26,44 +26,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-localization-sources</artifactId>
+    <artifactId>xwiki-platform-localization</artifactId>
     <version>4.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-localization-source-wiki</artifactId>
-  <name>XWiki Platform - Localization - Source - Wiki</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Localization - Source - Wiki</description>
+  <artifactId>xwiki-platform-localization-syntaxes</artifactId>
+  <name>XWiki Platform - Localization - Syntaxes Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Localization - Syntaxes Parent POM</description>
+  <modules>
+    <module>xwiki-platform-localization-syntaxe-messagetool</module>
+  </modules>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-observation-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-syntax-messagetool</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>
+

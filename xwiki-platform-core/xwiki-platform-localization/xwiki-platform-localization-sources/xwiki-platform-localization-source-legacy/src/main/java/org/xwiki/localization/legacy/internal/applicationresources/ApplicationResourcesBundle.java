@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.applicationresources;
+package org.xwiki.localization.legacy.internal.applicationresources;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +28,7 @@ import org.xwiki.localization.internal.AbstractResourceBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
 
 /**
+ * Translation bundle based on ApplicationResources*.properties files.
  * 
  * @version $Id$
  * @since 4.3M2
@@ -38,7 +39,7 @@ import org.xwiki.localization.message.TranslationMessageParser;
 public class ApplicationResourcesBundle extends AbstractResourceBundle
 {
     @Inject
-    @Named("xwikil10n/1.0")
+    @Named("messagetool/1.0")
     TranslationMessageParser parser;
 
     public ApplicationResourcesBundle()

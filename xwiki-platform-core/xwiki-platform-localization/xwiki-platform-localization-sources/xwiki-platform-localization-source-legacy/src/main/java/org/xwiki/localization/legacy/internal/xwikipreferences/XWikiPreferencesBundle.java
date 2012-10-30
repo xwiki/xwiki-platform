@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.xwikipreferences;
+package org.xwiki.localization.legacy.internal.xwikipreferences;
 
 import java.util.Locale;
 
@@ -73,13 +73,12 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
     public void initialize() throws InitializationException
     {
         // Setup cache
-        CacheConfiguration cacheConfiguration = new CacheConfiguration();
-        cacheConfiguration.setConfigurationId("localization." + getId());
+        CacheConfiguration cacheConfiguration = new CacheConfiguration("localization." + getId());
 
         try {
             this.bundlesCache = this.cacheManager.createNewCache(cacheConfiguration);
         } catch (CacheException e) {
-            this.logger.error("Failed to create cache [{}]", cacheConfiguration.getConfigurationId());
+            this.logger.error("Failed to create cache [{}]", cacheConfiguration.getConfigurationId(), e);
         }
     }
 

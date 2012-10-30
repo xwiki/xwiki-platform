@@ -128,7 +128,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
                         if (document == null) {
                             document = new XWikiDocument(providedDocument.getDocumentReference());
-                            document.setLanguage(providedDocument.getLanguage());
+                            document.setLocale(providedDocument.getLocale());
                             document.setDefaultLanguage(providedDocument.getDefaultLanguage());
                             document.setTranslation(providedDocument.getTranslation());
                         }

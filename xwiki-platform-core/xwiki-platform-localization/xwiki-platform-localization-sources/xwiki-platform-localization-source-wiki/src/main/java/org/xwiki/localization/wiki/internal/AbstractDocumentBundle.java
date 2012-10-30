@@ -92,7 +92,7 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
         {
             XWikiDocument document = (XWikiDocument) arg1;
 
-            bundleCache.remove(document.getLanguage());
+            bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
         }
 
         @Override

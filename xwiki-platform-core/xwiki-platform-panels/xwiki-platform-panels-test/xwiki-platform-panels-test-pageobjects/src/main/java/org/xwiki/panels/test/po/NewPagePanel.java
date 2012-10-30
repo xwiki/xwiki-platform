@@ -50,7 +50,7 @@ public class NewPagePanel extends ViewPage
 
     public static NewPagePanel gotoPage()
     {
-        getUtil().gotoPage("Panels", "NewPage", "view", "xpage=create");
+        getUtil().gotoPage("Panels", "NewPage");
         return new NewPagePanel();
     }
 
@@ -64,11 +64,11 @@ public class NewPagePanel extends ViewPage
     public WYSIWYGEditPage createPage(String spaceName, String pageName)
     {
         // Clean the default space name value.
-        spaceNameTextField.clear();
-        spaceNameTextField.sendKeys(spaceName);
-        pageNameTextField.clear();
-        pageNameTextField.sendKeys(pageName);
-        pageNameTextField.submit();
+        this.spaceNameTextField.clear();
+        this.spaceNameTextField.sendKeys(spaceName);
+        this.pageNameTextField.clear();
+        this.pageNameTextField.sendKeys(pageName);
+        this.pageNameTextField.submit();
         return new WYSIWYGEditPage();
     }
 }

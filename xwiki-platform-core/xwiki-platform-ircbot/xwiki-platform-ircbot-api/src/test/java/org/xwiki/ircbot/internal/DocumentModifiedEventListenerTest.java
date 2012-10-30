@@ -111,7 +111,54 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
         final DocumentModifiedEventListenerConfiguration configuration =
             getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
-        final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
+
+        // We simulate an EC without any XAR started information
+        final Execution execution = getComponentManager().getInstance(Execution.class);
+        final ExecutionContext ec = new ExecutionContext();
+
+        Utils.setComponentManager(getComponentManager());
+        final XWikiContext xwikiContext = new XWikiContext();
+        final XWikiURLFactory factory = getMockery().mock(XWikiURLFactory.class);
+        xwikiContext.setURLFactory(factory);
+        xwikiContext.setUserReference(userReference);
+
+        getMockery().checking(new Expectations()
+        {{
+            oneOf(bot).isConnected();
+            will(returnValue(true));
+            oneOf(serializer).serialize(reference);
+            will(returnValue("wiki:space.page"));
+            oneOf(execution).getContext();
+            will(returnValue(ec));
+            oneOf(configuration).getExclusionPatterns();
+            will(returnValue(Collections.emptyList()));
+            oneOf(serializer).serialize(userReference);
+            will(returnValue("userwiki:userspace.userpage"));
+            oneOf(factory).createExternalURL("space", "page", "view", null, null, "wiki", xwikiContext);
+            will(returnValue(new URL("http://someurl")));
+            oneOf(bot).getChannelsNames();
+            will(returnValue(Collections.singleton("channel")));
+
+            // The test is here!
+            oneOf(bot).sendMessage("channel", "wiki:space.page was created by userwiki:userspace.userpage (comment) - "
+                + "http://someurl");
+        }});
+
+        XWikiDocument document = new XWikiDocument(reference);
+        document.setComment("comment");
+
+        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
+    }
+
+    @Test
+    public void onEventWhenDocumentCreatedAndGuestUser() throws Exception
+    {
+        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
+        final EntityReferenceSerializer<String> serializer =
+                getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
+        final DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        final DocumentModifiedEventListenerConfiguration configuration =
+                getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
 
         // We simulate an EC without any XAR started information
         final Execution execution = getComponentManager().getInstance(Execution.class);
@@ -125,33 +172,28 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
         getMockery().checking(new Expectations()
         {{
             oneOf(bot).isConnected();
-                will(returnValue(true));
-            oneOf(bot).getChannelsNames();
-                will(returnValue(Collections.singleton("channel")));
+            will(returnValue(true));
             oneOf(serializer).serialize(reference);
-                will(returnValue("wiki:space.page"));
-            oneOf(configuration).getExclusionPatterns();
-                will(returnValue(Collections.emptyList()));
-            oneOf(serializer).serialize(userReference);
-                will(returnValue("userwiki:userspace.userpage"));
-            oneOf(ircModel).getXWikiContext();
-                will(returnValue(xwikiContext));
-            oneOf(factory).createExternalURL("space", "page", "view", null, null, "wiki", xwikiContext);
-                will(returnValue(new URL("http://someurl")));
+            will(returnValue("wiki:space.page"));
             oneOf(execution).getContext();
-                will(returnValue(ec));
+            will(returnValue(ec));
+            oneOf(configuration).getExclusionPatterns();
+            will(returnValue(Collections.emptyList()));
+            oneOf(factory).createExternalURL("space", "page", "view", null, null, "wiki", xwikiContext);
+            will(returnValue(new URL("http://someurl")));
+            oneOf(bot).getChannelsNames();
+            will(returnValue(Collections.singleton("channel")));
 
             // The test is here!
-            oneOf(bot).sendMessage("channel", "wiki:space.page was modified by userwiki:userspace.userpage (created) - "
-                + "http://someurl");
+            oneOf(bot).sendMessage("channel", "wiki:space.page was created by Guest (comment) - "
+                    + "http://someurl");
         }});
 
         XWikiDocument document = new XWikiDocument(reference);
-        document.setAuthorReference(userReference);
+        document.setComment("comment");
 
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, null);
+        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
     }
-
     @Test
     public void onEventWhenDocumentCreatedButExcluded() throws Exception
     {
@@ -161,11 +203,13 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
         final DocumentModifiedEventListenerConfiguration configuration =
             getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
-        final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
 
         // We simulate an EC without any XAR started information
         final Execution execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext ec = new ExecutionContext();
+
+        Utils.setComponentManager(getComponentManager());
+        final XWikiContext xwikiContext = new XWikiContext();
 
         getMockery().checking(new Expectations()
         {{
@@ -181,16 +225,14 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
 
         Utils.setComponentManager(getComponentManager());
         XWikiDocument document = new XWikiDocument(reference);
-        document.setAuthorReference(userReference);
 
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, null);
+        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
     }
 
     @Test
     public void onEventWhenXARImportStarted() throws Exception
     {
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
 
         final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
         final EntityReferenceSerializer<String> serializer =
@@ -200,6 +242,9 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
         final Execution execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext ec = new ExecutionContext();
         ec.setProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY, 0L);
+
+        Utils.setComponentManager(getComponentManager());
+        final XWikiContext xwikiContext = new XWikiContext();
 
         getMockery().checking(new Expectations()
         {{
@@ -215,9 +260,8 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
         }});
 
         XWikiDocument document = new XWikiDocument(reference);
-        document.setAuthorReference(userReference);
 
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, null);
+        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
 
         // We also verify that the XAR import counter is increased by one
         Assert.assertEquals(1L, ec.getProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY));

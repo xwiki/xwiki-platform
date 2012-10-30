@@ -45,6 +45,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -100,9 +101,9 @@ public class DocumentModifiedEventListener implements EventListener
     public List<Event> getEvents()
     {
         return Arrays.<Event>asList(
-                new DocumentUpdatedEvent(),
-                new DocumentDeletedEvent(),
-                new DocumentCreatedEvent());
+            new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent(),
+            new DocumentCreatedEvent());
     }
 
     @Override
@@ -115,19 +116,21 @@ public class DocumentModifiedEventListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // Only send an event if the bot is connected and the Event has a source being a XWikiDocument.
-        if (this.bot.isConnected() && source instanceof XWikiDocument) {
+        if (this.bot.isConnected() && source instanceof XWikiDocument && data instanceof XWikiContext) {
             XWikiDocument document = (XWikiDocument) source;
+            XWikiContext xcontext = (XWikiContext) data;
             DocumentReference reference = document.getDocumentReference();
             String referenceAsString = this.serializer.serialize(reference);
 
             try {
                 // Send notification to the IRC channel if we're allowed.
                 if (shouldSendNotification(referenceAsString)) {
-                    String message = String.format("%s was modified by %s %s - %s",
+                    String message = String.format("%s was %s by %s%s - %s",
                         referenceAsString,
-                        getNotificationAuthor(event, document),
-                        getNotificationComment(event, document),
-                        getNotificationURL(event, document));
+                        getNotificationAction(event),
+                        getNotificationAuthor(xcontext),
+                        getNotificationComment(document),
+                        getNotificationURL(event, document, xcontext));
 
                     // Get the channel to which to send to. If there's no channel name it means the Bot hasn't joined
                     // any channel yet so don't do anything!
@@ -136,9 +139,10 @@ public class DocumentModifiedEventListener implements EventListener
                         this.bot.sendMessage(channelNameItator.next(), message);
                     }
                 }
-            } catch (IRCBotException e) {
+            } catch (Exception e) {
                 // Failed to handle the event, log an error
-                this.logger.error("Failed to send IRC notification for document [{}]", reference, e);
+                this.logger.error("Failed to send IRC notification for document [{}], event [{}] and data [{}]",
+                    reference, event, data, e);
             }
         }
     }
@@ -182,47 +186,57 @@ public class DocumentModifiedEventListener implements EventListener
     /**
      * Get the author name that we want to print in the notification message we send to the IRC channel.
      *
-     * @param event the XWiki Document event
-     * @param source the source document from the Document event
+     * @param xcontext the XWiki Context from which we extract the current user
      * @return the author name
      * @throws IRCBotException if we cannot access the XWikiContext
      */
-    private String getNotificationAuthor(Event event, XWikiDocument source) throws IRCBotException
+    private String getNotificationAuthor(XWikiContext xcontext) throws IRCBotException
     {
-        DocumentReference authorReference;
+        String user;
 
-        // If the document has been deleted then the author is the author who's done the delete (i.e. the current
-        // author) and not the author of the document.
-        if (event instanceof DocumentDeletedEvent) {
-            authorReference = this.ircModel.getXWikiContext().getUserReference();
+        DocumentReference userReference = xcontext.getUserReference();
+        if (userReference != null) {
+            user = this.serializer.serialize(userReference);
         } else {
-            authorReference = source.getAuthorReference();
+            user = "Guest";
         }
 
-        return this.serializer.serialize(authorReference);
+        return user;
+    }
+
+    /**
+     * Get the action on the page (created, deleted, modified).
+     *
+     * @param event the XWiki Document event
+     * @return the action (e.g. "created")
+     */
+    private String getNotificationAction(Event event)
+    {
+        String action;
+        if (event instanceof DocumentDeletedEvent) {
+            action = "deleted";
+        } else if (event instanceof DocumentCreatedEvent) {
+            action = "created";
+        } else {
+            action = "modified";
+        }
+        return action;
     }
 
     /**
      * Get a comment part that we want to print in the notification message we send to the IRC channel.
      *
-     * @param event the XWiki Document event
      * @param source the source document from the Document event
      * @return the comment part
      */
-    private String getNotificationComment(Event event, XWikiDocument source)
+    private String getNotificationComment(XWikiDocument source)
     {
         String comment;
-        if (event instanceof DocumentDeletedEvent) {
-            comment = "(deleted)";
-        } else if (event instanceof DocumentCreatedEvent) {
-            comment = "(created)";
-            if (!StringUtils.isEmpty(source.getComment())) {
-                comment = comment + " " + source.getComment();
-            }
+        if (!StringUtils.isEmpty(source.getComment())) {
+            comment = String.format(" (%s)", source.getComment());
         } else {
-            comment = source.getComment();
+            comment = "";
         }
-
         return comment;
     }
 
@@ -231,16 +245,27 @@ public class DocumentModifiedEventListener implements EventListener
      *
      * @param event the XWiki Document event
      * @param source the source document from the Document event
+     * @param xcontext the XWiki Context that we use to compute the external URL
      * @return the notification URL
      * @throws IRCBotException if we cannot access the XWikiContext
      */
-    private String getNotificationURL(Event event, XWikiDocument source) throws IRCBotException
+    private String getNotificationURL(Event event, XWikiDocument source, XWikiContext xcontext) throws IRCBotException
     {
-        String queryString = null;
-        if (!(event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent)) {
-            // Return a diff URL since the action done was a modification
-            queryString = String.format("viewer=changes&amp;rev2=%s", source.getVersion());
+        String url;
+
+        try {
+            String queryString = null;
+            if (!(event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent)) {
+                // Return a diff URL since the action done was a modification
+                queryString = String.format("viewer=changes&amp;rev2=%s", source.getVersion());
+            }
+            url = source.getExternalURL("view", queryString, xcontext);
+        } catch (Exception e) {
+            // Ensures that an error in computing the URL won't prevent sending a message on the IRC channel
+            url = "Failed to compute URL";
+            this.logger.debug("Failed to compute URL for Document Modified Event Listener", e);
         }
-        return source.getExternalURL("view", queryString, this.ircModel.getXWikiContext());
+
+        return url;
     }
 }

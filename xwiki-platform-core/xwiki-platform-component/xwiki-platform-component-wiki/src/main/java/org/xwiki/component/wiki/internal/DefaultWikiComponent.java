@@ -29,6 +29,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of a wiki component definition.
@@ -69,6 +70,11 @@ public class DefaultWikiComponent implements WikiComponent
     private Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
 
     /**
+     * @see {@link #getSyntax()}
+     */
+    private Syntax syntax;
+
+    /**
      * Constructor of this component.
      * 
      * @param reference the document holding the component definition
@@ -88,7 +94,13 @@ public class DefaultWikiComponent implements WikiComponent
         return this.documentReference;
     }
 
-    @Override
+    /**
+     * Get the implementations of all the methods the component handles. It allows to write method implementations in
+     * wiki documents, using script macros. When a method has multiple signatures (different sets of parameters) the
+     * same {@link org.xwiki.rendering.block.XDOM} will be executed.
+     *
+     * @return the map of method name/wiki code this component implementation handles.
+     */
     public Map<String, XDOM> getHandledMethods()
     {
         return this.handledMethods;
@@ -106,16 +118,36 @@ public class DefaultWikiComponent implements WikiComponent
         return this.roleHint;
     }
 
-    @Override
+    /**
+     * Get the list of interfaces the wiki component implements, apart from its main Role. When the component is
+     * entirely written in a document, it allows the {@link org.xwiki.component.wiki.WikiComponentManager} to add those
+     * Interfaces to the list of implemented interfaces of the {@link java.lang.reflect.Proxy} it will create.
+     *
+     * @return the extra list of interfaces this component implementation implements.
+     */
     public List<Class< ? >> getImplementedInterfaces()
     {
         return this.implementedInterfaces;
     }
 
-    @Override
+    /**
+     * Methods returned by {@link #getHandledMethods()} can require other components to be injected in their context.
+     * Each entry in the map returned by this method will be injected in the rendering context when methods will be
+     * executed. The name of the variable in the context is defined by the key in the returned Map.
+     *
+     * @return the map of dependencies of this component
+     */
     public Map<String, ComponentDescriptor> getDependencies()
     {
         return this.dependencies;
+    }
+
+    /**
+      * @return The syntax in which the component document is written
+     */
+    public Syntax getSyntax()
+    {
+        return syntax;
     }
 
     /**
@@ -150,5 +182,15 @@ public class DefaultWikiComponent implements WikiComponent
     public void setDependencies(Map<String, ComponentDescriptor> dependencies)
     {
         this.dependencies = dependencies;
+    }
+
+    /**
+     * Set the syntax in which the component document is written.
+     *
+     * @param syntax the syntax to set
+     */
+    public void setSyntax(Syntax syntax)
+    {
+        this.syntax = syntax;
     }
 }

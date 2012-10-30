@@ -6,7 +6,7 @@
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FAQCode.WebHome</parent>
+  <parent>FAQ.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -22,9 +22,9 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{include document="XWiki.LiveTableResultsMacros" /}}
-{{velocity}}
+{{velocity wiki="false"}}
 #gridresultwithfilter($request.classname $request.collist.split(",") "" " and doc.fullName&lt;&gt;'FAQCode.FAQTemplate' and doc.space='$!request.space'")
 {{/velocity}}</content>
 </xwikidoc>

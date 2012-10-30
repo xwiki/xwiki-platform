@@ -157,22 +157,4 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     {
         return getId();
     }
-
-    @Override
-    public List<Class<?>> getImplementedInterfaces()
-    {
-        return ListUtils.EMPTY_LIST;
-    }
-
-    @Override
-    public Map<String, XDOM> getHandledMethods()
-    {
-        return MapUtils.EMPTY_MAP;
-    }
-
-    @Override
-    public Map<String, ComponentDescriptor> getDependencies()
-    {
-        return MapUtils.EMPTY_MAP;
-    }
 }

@@ -139,8 +139,6 @@ public class WikiUIExtensionTest
 
         Assert.assertEquals("name", wikiUIExtension.getId());
         Assert.assertEquals("epId", wikiUIExtension.getExtensionPointId());
-        Assert.assertEquals(MapUtils.EMPTY_MAP, wikiUIExtension.getHandledMethods());
-        Assert.assertEquals(ListUtils.EMPTY_LIST, wikiUIExtension.getImplementedInterfaces());
         Assert.assertEquals(DOC_REF, wikiUIExtension.getDocumentReference());
         Assert.assertEquals(UIExtension.class, wikiUIExtension.getRoleType());
         Assert.assertEquals("xwiki:XWiki.MyUIExtension^xwiki:XWiki.UIExtensionClass[1]",

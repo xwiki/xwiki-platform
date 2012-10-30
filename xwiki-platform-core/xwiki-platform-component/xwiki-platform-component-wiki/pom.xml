@@ -90,7 +90,7 @@
         <configuration>
           <excludes>
             <!-- Implements InvocationHandler and throwing 'Throwable' is not allowed. -->
-            **/WikiComponentInvocationHandler.java
+            **/DefaultWikiComponentProxy.java
           </excludes>
         </configuration>
       </plugin>

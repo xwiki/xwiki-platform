@@ -274,6 +274,10 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
                 vcontext.put("value", prop.getValue());
+            } else {
+                // The $value property can exist in the velocity context, we overwrite it to make sure we don't get a
+                // wrong value in the displayer when the property does not exist yet.
+                vcontext.put("value", null);
             }
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);

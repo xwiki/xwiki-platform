@@ -29,6 +29,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.internal.DefaultWikiComponent;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentBuilder;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.context.Execution;
@@ -292,8 +293,8 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
         List<WikiComponent> components = this.provider.buildComponents(DOC_REFERENCE);
 
         Assert.assertEquals(1, components.size());
-        Assert.assertEquals(1, components.get(0).getHandledMethods().size());
-        Assert.assertEquals(0, components.get(0).getImplementedInterfaces().size());
+        Assert.assertEquals(1, ((DefaultWikiComponent) components.get(0)).getHandledMethods().size());
+        Assert.assertEquals(0, ((DefaultWikiComponent) components.get(0)).getImplementedInterfaces().size());
     }
 
     @Test
@@ -350,7 +351,7 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
         List<WikiComponent> components = this.provider.buildComponents(DOC_REFERENCE);
 
         Assert.assertEquals(1, components.size());
-        Assert.assertEquals(1, components.get(0).getHandledMethods().size());
-        Assert.assertEquals(1, components.get(0).getImplementedInterfaces().size());
+        Assert.assertEquals(1, ((DefaultWikiComponent) components.get(0)).getHandledMethods().size());
+        Assert.assertEquals(1, ((DefaultWikiComponent) components.get(0)).getImplementedInterfaces().size());
     }
 }

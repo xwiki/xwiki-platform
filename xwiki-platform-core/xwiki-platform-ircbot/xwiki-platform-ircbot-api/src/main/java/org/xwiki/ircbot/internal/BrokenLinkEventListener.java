@@ -114,7 +114,12 @@ public class BrokenLinkEventListener implements EventListener
                 message = String.format("Invalid link %s on page %s (code = %s)", linkURL, linkSource, responseCode);
             }
 
-            this.bot.sendMessage(this.bot.getChannelsNames().iterator().next(), message);
+            // Get the channel to which to send to. If there's no channel name it means the Bot hasn't joined
+            // any channel yet so don't do anything!
+            Iterator<String> channelNameItator = this.bot.getChannelsNames().iterator();
+            if (channelNameItator.hasNext()) {
+                this.bot.sendMessage(channelNameItator.next(), message);
+            }
         }
     }
 

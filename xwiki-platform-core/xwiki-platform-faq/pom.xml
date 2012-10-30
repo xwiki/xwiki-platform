@@ -36,4 +36,12 @@
   <modules>
     <module>xwiki-platform-faq-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-faq-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

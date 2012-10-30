@@ -17,32 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.wiki.internal;
+package org.xwiki.faq.test.po;
 
-import org.xwiki.component.wiki.MethodOutputHandler;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.InlinePage;
 
 /**
- * Default method output handler.
- * 
+ * Represents a FAQ entry page being added.
+ *
  * @version $Id$
- * @since 4.2M3
+ * @since 4.3M2
  */
-public class DefaultMethodOutputHandler implements MethodOutputHandler
+public class FAQEntryEditPage extends InlinePage
 {
+    @FindBy(id = "FAQCode.FAQClass_0_answer")
+    private WebElement answerElement;
+
     /**
-     * The stored return value.
+     * @param answer the answer to type in the FAQ entry
      */
-    private Object returnValue;
-
-    @Override
-    public void setValue(Object value)
+    public void setAnswer(String answer)
     {
-        this.returnValue = value;
-    }
-
-    @Override
-    public Object getValue()
-    {
-        return this.returnValue;
+        this.answerElement.sendKeys(answer);
     }
 }

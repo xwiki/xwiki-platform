@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.wiki;
+package org.xwiki.component.wiki.internal;
 
 /**
  * Utility for wiki methods to return a value. An implementation of this interface is bound in the context of a
@@ -26,18 +26,29 @@ package org.xwiki.component.wiki;
  * @version $Id$
  * @since 4.2M3
  */
-public interface MethodOutputHandler
+public class WikiMethodOutputHandler
 {
+    /**
+     * The stored return value.
+     */
+    private Object returnValue;
+
     /**
      * Stores a value in the method invocation context for further return.
      * Note that if this method is called multiple times during the invocation, the last one wins.
-     * 
+     *
      * @param value the value to return
      */
-    void setValue(Object value);
- 
+    public void setValue(Object value)
+    {
+        this.returnValue = value;
+    }
+
     /**
-     * @return the current stored return value (null if not set yet).
-     */
-    Object getValue();
+    * @return the current stored return value (null if not set yet).
+    */
+    public Object getValue()
+    {
+        return this.returnValue;
+    }
 }

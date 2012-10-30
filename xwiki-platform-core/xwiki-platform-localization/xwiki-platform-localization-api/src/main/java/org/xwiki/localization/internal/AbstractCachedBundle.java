@@ -37,7 +37,7 @@ public abstract class AbstractCachedBundle extends AbstractBundle
     /**
      * The bundle cache.
      */
-    protected Map<String, LocalizedBundle> bundleCache = new ConcurrentHashMap<String, LocalizedBundle>();
+    protected Map<Locale, LocalizedBundle> bundleCache = new ConcurrentHashMap<Locale, LocalizedBundle>();
 
     /**
      * Default constructor.
@@ -110,9 +110,7 @@ public abstract class AbstractCachedBundle extends AbstractBundle
      */
     private synchronized LocalizedBundle getSynchLocalizedBundle(Locale locale)
     {
-        String localeString = locale.toString();
-
-        LocalizedBundle bundle = this.bundleCache.get(localeString);
+        LocalizedBundle bundle = this.bundleCache.get(locale);
 
         if (bundle == null) {
             bundle = createBundle(locale);
@@ -120,7 +118,7 @@ public abstract class AbstractCachedBundle extends AbstractBundle
                 bundle = LocalizedBundle.EMPTY;
             }
 
-            this.bundleCache.put(localeString, bundle);
+            this.bundleCache.put(locale, bundle);
         }
 
         return bundle;

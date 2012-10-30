@@ -42,7 +42,6 @@ import org.xwiki.localization.BundleContext;
  */
 @Component
 @Singleton
-// TODO: store directly a key/translation Map instead of an ordered list of bundles ?
 public class DefaultBundleContext implements BundleContext
 {
     /**

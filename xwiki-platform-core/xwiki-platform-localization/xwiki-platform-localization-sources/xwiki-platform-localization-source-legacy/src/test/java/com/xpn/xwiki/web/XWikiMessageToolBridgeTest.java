@@ -364,7 +364,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("Another translation", this.tool.get("wiki.anothertranslation"));
     }
-    
+
     @Test
     public void updateWikiPreferencesCache() throws XWikiException
     {

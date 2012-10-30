@@ -5,10 +5,14 @@ import org.xwiki.model.reference.EntityReference;
 
 public interface TranslationModel
 {
-    EntityReference TRANSLATIONCLASS_REFERENCE = new EntityReference("TranslationDocumentClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+    String TRANSLATIONCLASS_REFERENCE_SPACE = "XWiki";
 
-    String TRANSLATIONCLASS_REFERENCE_STRING = "XWiki.TranslationDocumentClass";
+    String TRANSLATIONCLASS_REFERENCE_NAME = "TranslationDocumentClass";
+
+    EntityReference TRANSLATIONCLASS_REFERENCE = new EntityReference(TRANSLATIONCLASS_REFERENCE_NAME,
+        EntityType.DOCUMENT, new EntityReference(TRANSLATIONCLASS_REFERENCE_SPACE, EntityType.SPACE));
+
+    String TRANSLATIONCLASS_REFERENCE_STRING = TRANSLATIONCLASS_REFERENCE_SPACE + '.' + TRANSLATIONCLASS_REFERENCE_NAME;
 
     String TRANSLATIONCLASS_PROP_SCOPE = "scope";
 

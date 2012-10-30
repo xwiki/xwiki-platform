@@ -1,2 +1,3 @@
 org.xwiki.localization.wiki.internal.DocumentBundleFactory
 org.xwiki.localization.wiki.internal.DocumentBundleInitializer
+org.xwiki.localization.wiki.internal.TranslationDocumentClassInitializer

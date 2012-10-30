@@ -87,6 +87,7 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
 
                         if (document == null) {
                             document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
+                            document.setSyntax(Syntax.PLAIN_1_0);
                             document.setOriginalDocument(document.clone());
                         }
 

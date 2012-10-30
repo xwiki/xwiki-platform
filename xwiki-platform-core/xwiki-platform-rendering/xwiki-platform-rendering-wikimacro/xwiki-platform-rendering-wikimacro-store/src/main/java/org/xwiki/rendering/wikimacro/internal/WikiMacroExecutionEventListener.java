@@ -21,27 +21,21 @@ package org.xwiki.rendering.wikimacro.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
-
-import com.xpn.xwiki.XWikiConstant;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.security.authorization.ContentAuthorController;
 
 /**
  * Make sure to execute wiki macro with a properly configured context and especially which user programming right is
@@ -71,22 +65,23 @@ public class WikiMacroExecutionEventListener implements EventListener
     };
 
     /**
-     * Used to extract the {@link XWikiContext}.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
      * Used to get wiki macro document and context document.
      */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * The content author controller.
+     */
+    @Inject
+    private ContentAuthorController contentAuthorController;
+
+    /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
+
 
     @Override
     public List<Event> getEvents()
@@ -117,25 +112,13 @@ public class WikiMacroExecutionEventListener implements EventListener
      */
     public void onWikiMacroExecutionStartsEvent(WikiMacro wikiMacro)
     {
-        ExecutionContext context = this.execution.getContext();
-        XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        XWikiDocument contextDoc = xwikiContext.getDoc();
-
-        // Set context document content author as macro author so that programming right is tested on the right
-        // user
-        XWikiDocument wikiMacroDocument;
         try {
-            wikiMacroDocument = (XWikiDocument) this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
-
-            // Set context document content author as macro author so that programming right is tested on the right
-            // user. It's cloned to make sure it not really modifying the real document but only do that for the
-            // current context.
-            XWikiDocument contextDocClone = contextDoc.clone();
-            contextDocClone.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference()); 
-            contextDocClone.setMetaDataDirty(contextDoc.isMetaDataDirty());
-            xwikiContext.setDoc(contextDocClone);
+            DocumentModelBridge wikiMacroDocument
+                = this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
+            contentAuthorController.pushContentDocument(wikiMacroDocument);
         } catch (Exception e) {
-            Log.error("Failed to setup context before wiki macro execution");
+            logger.error("Failed to set the wiki macro document as content document before macro exeuction.");
+            contentAuthorController.pushContentDocument(null);
         }
     }
 
@@ -144,18 +127,6 @@ public class WikiMacroExecutionEventListener implements EventListener
      */
     public void onWikiMacroExecutionFinishedEvent()
     {
-        ExecutionContext context = this.execution.getContext();
-        XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        XWikiDocument contextDoc = xwikiContext.getDoc();
-
-        // Restore context document
-        try {
-            contextDoc = (XWikiDocument) this.documentAccessBridge.getDocument(contextDoc.getDocumentReference());
-
-            xwikiContext.setDoc(contextDoc);
-        } catch (Exception e) {
-            Log.error("Failed to setup context after wiki macro execution");
-        }
-
+        contentAuthorController.popContentDocument();
     }
 }

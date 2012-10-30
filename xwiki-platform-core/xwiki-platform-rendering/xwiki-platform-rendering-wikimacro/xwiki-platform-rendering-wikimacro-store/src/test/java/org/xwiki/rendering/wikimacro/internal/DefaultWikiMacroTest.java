@@ -40,6 +40,10 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationContext;
+import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.internal.ContentAuthorResolver;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -74,6 +78,11 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
     private XWikiDocument user;
 
+    private final DocumentReference someUser = new DocumentReference("SomeUser", "XWiki", "xwiki");
+
+    private XWikiDocument someDocument;
+
+
     @Override
     protected void registerComponents() throws Exception
     {
@@ -84,6 +93,8 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     @Before
     public void setUp() throws Exception
     {
+        final ContentAuthorResolver contentAuthorResolver = registerMockComponent(ContentAuthorResolver.class);
+
         super.setUp();
 
         final XWiki mockXWiki = getMockery().mock(XWiki.class);
@@ -105,6 +116,8 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
         BaseObject userObject = new BaseObject();
         userObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiusers"));
         this.user.addXObject(userObject);
+
+        someDocument = new XWikiDocument();
 
         this.wikiMacroDocument.setCreatorReference(this.user.getAuthorReference());
         this.wikiMacroDocument.setAuthorReference(this.user.getAuthorReference());
@@ -147,6 +160,12 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                 allowing(mockGlobalRightObj).setNumber(with(any(int.class)));
                 allowing(mockGlobalRightObj).setDocumentReference(with(any(DocumentReference.class)));
                 allowing(mockGlobalRightObj).setOwnerDocument(with(any(XWikiDocument.class)));
+                allowing(contentAuthorResolver).resolveContentAuthor(user);
+                will(returnValue(user.getDocumentReference()));
+                allowing(contentAuthorResolver).resolveContentAuthor(someDocument);
+                will(returnValue(someUser));
+                allowing(contentAuthorResolver).resolveContentAuthor(wikiMacroDocument);
+                will(returnValue(wikiMacroDocument.getContentAuthorReference()));
             }
         });
 
@@ -171,7 +190,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testExecuteWhenWikiRequiringPRAfterDropPermission() throws Exception
+    public void testExecuteWithContentDocumentWithoutPR() throws Exception
     {
         registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
 
@@ -179,16 +198,24 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
 
-        getContext().dropPermissions();
-        this.wikiMacroDocument.newDocument(getContext()).dropPermissions();
+        ContentAuthorController contentAuthorController
+            = getComponentManager().getInstance(ContentAuthorController.class);
+
+        someDocument.setContentAuthorReference(someUser);
+        contentAuthorController.pushContentDocument(someDocument);
+
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        AuthorizationContext authorizationContext
+            = (AuthorizationContext) execution.getContext().getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
 
         converter.convert(new StringReader("{{wikimacrobindings param1=\"value2\" param2=\"value2\"/}}"),
             Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert.assertEquals("<p>" + this.wikiMacroDocument.toString() + "</p>", printer.toString());
-        Assert.assertTrue("Wiki macro did not properly restord persmission dropping", getContext()
-            .hasDroppedPermissions());
+
+        Assert.assertTrue("Content document was not popped after wiki macro execution.",
+                         someUser.equals(authorizationContext.getContentAuthor()));
     }
 
     private void registerWikiMacro(String macroId, String macroContent) throws Exception

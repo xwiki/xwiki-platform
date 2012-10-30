@@ -20,10 +20,13 @@
 package org.xwiki.display.internal;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.PrivilegedModeController;
 
 /**
  * Abstract class for performing common preparations before actually displaying.
@@ -31,20 +34,43 @@ import org.xwiki.security.authorization.ContentAuthorController;
  * @version $Id$
  * @since 4.3M2
  */
-public abstract class AbstractDocumentDisplayer implements DocumentDisplayer
+public abstract class AbstractDocumentDisplayer implements DocumentDisplayer, Initializable
 {
 
     /** This is used for setting the content author in the authorization context. */
     @Inject
     private ContentAuthorController contentAuthorController;
 
+    /** Provide a privileged mode controller. */
+    @Inject
+    private Provider<PrivilegedModeController> privilegedModeControllerProvider;
+
+    /** This is used for disabling privileged mode, if the restricted parameter is set. */
+    private PrivilegedModeController privilegedModeController;
+
+    @Override
+    public void initialize()
+    {
+        privilegedModeController = privilegedModeControllerProvider.get();
+        privilegedModeControllerProvider = null;
+    }
+
     @Override
     public final XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
+        final boolean restricted = parameters.isTransformationContextRestricted();
         contentAuthorController.pushContentDocument(parameters.getContentDocument());
+
+        if (restricted) {
+            privilegedModeController.disablePrivilegedMode();
+        }
+
         try {
             return doDisplay(document, parameters);
         } finally {
+            if (restricted) {
+                privilegedModeController.restorePrivilegedMode();
+            }
             contentAuthorController.popContentDocument();
         }
     }

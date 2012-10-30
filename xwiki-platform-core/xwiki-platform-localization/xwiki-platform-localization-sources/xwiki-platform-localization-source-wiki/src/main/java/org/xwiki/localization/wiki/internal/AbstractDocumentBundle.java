@@ -98,7 +98,7 @@ public class AbstractDocumentBundle extends AbstractCachedBundle implements Bund
         @Override
         public String getName()
         {
-            return "WikiBundleFactory";
+            return "localization.bundle." + getId();
         }
 
         @Override

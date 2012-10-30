@@ -1,1 +1,2 @@
 org.xwiki.localization.wiki.internal.DocumentBundleFactory
+org.xwiki.localization.wiki.internal.DocumentBundleInitializer

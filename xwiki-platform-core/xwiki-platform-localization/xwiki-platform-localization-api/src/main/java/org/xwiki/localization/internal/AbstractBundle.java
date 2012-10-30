@@ -128,4 +128,10 @@ public abstract class AbstractBundle implements Bundle
 
         return getClass().getSimpleName().compareTo(otherBundle.getClass().getSimpleName());
     }
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
 }

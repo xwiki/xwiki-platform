@@ -138,7 +138,7 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
                         if (document == null) {
                             document = new XWikiDocument(providedDocument.getDocumentReference());
                             document.setLocale(providedDocument.getLocale());
-                            document.setDefaultLanguage(providedDocument.getDefaultLanguage());
+                            document.setDefaultLocale(providedDocument.getDefaultLocale());
                             document.setTranslation(providedDocument.getTranslation());
                             document.setStore(mockStore);
                         }

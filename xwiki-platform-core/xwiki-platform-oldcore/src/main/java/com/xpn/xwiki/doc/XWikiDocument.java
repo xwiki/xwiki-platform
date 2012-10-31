@@ -3291,10 +3291,10 @@ public class XWikiDocument implements DocumentModelBridge
         setTemplateDocumentReference(document.getTemplateDocumentReference());
         setParent(document.getParent());
         setCreatorReference(document.getCreatorReference());
-        setDefaultLanguage(document.getDefaultLanguage());
+        setDefaultLocale(document.getDefaultLocale());
         setDefaultTemplate(document.getDefaultTemplate());
         setValidationScript(document.getValidationScript());
-        setLanguage(document.getLanguage());
+        setLocale(document.getLocale());
         setTranslation(document.getTranslation());
         setXClass(document.getXClass().clone());
         setXClassXML(document.getXClassXML());
@@ -3357,10 +3357,10 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
             doc.setParentReference(getRelativeParentReference());
             doc.setCreatorReference(getCreatorReference());
-            doc.setDefaultLanguage(getDefaultLanguage());
+            doc.setDefaultLocale(getDefaultLocale());
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());
-            doc.setLanguage(getLanguage());
+            doc.setLocale(getLocale());
             doc.setTranslation(getTranslation());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
@@ -3461,11 +3461,11 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getDefaultLanguage().equals(doc.getDefaultLanguage())) {
+        if (!getDefaultLocale().equals(doc.getDefaultLocale())) {
             return false;
         }
 
-        if (!getLanguage().equals(doc.getLanguage())) {
+        if (!getLocale().equals(doc.getLocale())) {
             return false;
         }
 
@@ -5578,11 +5578,11 @@ public class XWikiDocument implements DocumentModelBridge
             list.add(new MetaDataDiff("name", fromDoc.getName(), toDoc.getName()));
         }
 
-        if (!fromDoc.getLanguage().equals(toDoc.getLanguage())) {
+        if (!fromDoc.getLocale().equals(toDoc.getLocale())) {
             list.add(new MetaDataDiff("language", fromDoc.getLanguage(), toDoc.getLanguage()));
         }
 
-        if (!fromDoc.getDefaultLanguage().equals(toDoc.getDefaultLanguage())) {
+        if (!fromDoc.getDefaultLocale().equals(toDoc.getDefaultLocale())) {
             list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc.getDefaultLanguage()));
         }
 

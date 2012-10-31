@@ -228,9 +228,9 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
-    public String getDefaultLanguage()
+    public Locale getDefaultLocale()
     {
-        return getDocument().getDefaultLanguage();
+        return getDocument().getDefaultLocale();
     }
 
     @Override

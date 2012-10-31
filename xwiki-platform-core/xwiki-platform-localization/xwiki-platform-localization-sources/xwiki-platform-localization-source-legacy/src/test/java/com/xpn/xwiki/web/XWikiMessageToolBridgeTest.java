@@ -25,7 +25,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -56,8 +55,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
     private XWikiStoreInterface mockStore;
 
-    private Map<DocumentReference, Map<String, XWikiDocument>> documents =
-        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
+    private Map<DocumentReference, Map<Locale, XWikiDocument>> documents =
+        new HashMap<DocumentReference, Map<Locale, XWikiDocument>>();
 
     private XWikiMessageTool tool;
 
@@ -92,14 +91,14 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                     @Override
                     public Object invoke(Invocation invocation) throws Throwable
                     {
-                        Map<String, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
 
                         if (documentLanguages == null) {
-                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documentLanguages = new HashMap<Locale, XWikiDocument>();
                             documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get("");
+                        XWikiDocument document = documentLanguages.get(Locale.ROOT);
 
                         if (document == null) {
                             document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
@@ -116,20 +115,20 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                     public Object invoke(Invocation invocation) throws Throwable
                     {
                         XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
-                        Map<String, XWikiDocument> documentLanguages =
+                        Map<Locale, XWikiDocument> documentLanguages =
                             documents.get(providedDocument.getDocumentReference());
 
                         if (documentLanguages == null) {
-                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documentLanguages = new HashMap<Locale, XWikiDocument>();
                             documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get(providedDocument.getLanguage());
+                        XWikiDocument document = documentLanguages.get(providedDocument.getLocale());
 
                         if (document == null) {
                             document = new XWikiDocument(providedDocument.getDocumentReference());
                             document.setLocale(providedDocument.getLocale());
-                            document.setDefaultLanguage(providedDocument.getDefaultLanguage());
+                            document.setDefaultLocale(providedDocument.getDefaultLocale());
                             document.setTranslation(providedDocument.getTranslation());
                         }
 
@@ -149,15 +148,15 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                         document.incrementVersion();
                         document.setNew(false);
 
-                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
                         XWikiDocument previousDocument;
                         if (documentLanguages == null) {
-                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documentLanguages = new HashMap<Locale, XWikiDocument>();
                             documents.put(document.getDocumentReference(), documentLanguages);
                             previousDocument = null;
                         } else {
-                            previousDocument = documentLanguages.get(document.getLanguage());
+                            previousDocument = documentLanguages.get(document.getLocale());
                         }
 
                         for (XWikiAttachment attachment : document.getAttachmentList()) {
@@ -167,7 +166,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                             }
                         }
 
-                        documentLanguages.put(document.getLanguage(), document);
+                        documentLanguages.put(document.getLocale(), document);
 
                         return null;
                     }
@@ -181,10 +180,10 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
 
-                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
                         if (documentLanguages != null) {
-                            documentLanguages.remove(document.getLanguage());
+                            documentLanguages.remove(document.getLocale());
                         }
 
                         return null;
@@ -250,16 +249,16 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         }
     }
 
-    private void addWikiTranslation(String key, String message, String locale) throws XWikiException
+    private void addWikiTranslation(String key, String message, Locale locale) throws XWikiException
     {
         XWikiDocument document = this.defaultWikiTranslation;
 
-        if (!StringUtils.isEmpty(locale)) {
+        if (locale != null && !locale.equals(Locale.ROOT)) {
             XWikiDocument translatedDocument = document.getTranslatedDocument(locale, getContext());
             if (translatedDocument == document) {
                 translatedDocument = new XWikiDocument(document.getDocumentReference());
-                translatedDocument.setDefaultLanguage(document.getDefaultLanguage());
-                translatedDocument.setLanguage(locale);
+                translatedDocument.setDefaultLocale(document.getDefaultLocale());
+                translatedDocument.setLocale(locale);
                 translatedDocument.setSyntax(document.getSyntax());
             }
             document = translatedDocument;
@@ -306,7 +305,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void getWikiTranslation() throws XWikiException
     {
-        addWikiTranslation("wiki.translation", "Wiki translation", "");
+        addWikiTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
 
         Assert.assertEquals("Wiki translation", this.tool.get("wiki.translation"));
     }
@@ -314,8 +313,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void getTranslatedWikiTranslation() throws XWikiException
     {
-        addWikiTranslation("wiki.translation", "English translation", "en");
-        addWikiTranslation("wiki.translation", "French translation", "fr");
+        addWikiTranslation("wiki.translation", "English translation", Locale.ENGLISH);
+        addWikiTranslation("wiki.translation", "French translation", Locale.FRENCH);
 
         getContext().setLocale(Locale.FRENCH);
 
@@ -329,7 +328,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void fallackOnParentLocale() throws XWikiException
     {
-        addWikiTranslation("wiki.defaulttranslation", "Default translation", "");
+        addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
@@ -342,7 +341,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         getContext().setLocale(Locale.FRENCH);
-        addWikiTranslation("wiki.frenchtranslation", "French translation", "fr");
+        addWikiTranslation("wiki.frenchtranslation", "French translation", Locale.FRENCH);
 
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
         Assert.assertEquals("French translation", this.tool.get("wiki.frenchtranslation"));
@@ -356,11 +355,11 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void updateWikiTranslationCache() throws XWikiException
     {
-        addWikiTranslation("wiki.defaulttranslation", "Default translation", "");
+        addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
-        addWikiTranslation("wiki.anothertranslation", "Another translation", "");
+        addWikiTranslation("wiki.anothertranslation", "Another translation", Locale.ROOT);
 
         Assert.assertEquals("Another translation", this.tool.get("wiki.anothertranslation"));
     }
@@ -368,7 +367,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void updateWikiPreferencesCache() throws XWikiException
     {
-        addWikiTranslation("wiki.defaulttranslation", "Default translation", "");
+        addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 

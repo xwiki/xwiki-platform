@@ -52,7 +52,7 @@ import org.xwiki.localization.Bundle;
 import org.xwiki.localization.BundleDoesNotExistsException;
 import org.xwiki.localization.BundleFactory;
 import org.xwiki.localization.message.TranslationMessageParser;
-import org.xwiki.localization.wiki.internal.TranslationModel.Scope;
+import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -88,7 +88,7 @@ import com.xpn.xwiki.objects.StringProperty;
 public class DocumentBundleFactory implements BundleFactory, Initializable, Disposable
 {
     private static final RegexEntityReference TRANSLATIONOBJET = new RegexEntityReference(Pattern.compile("[^:]+:"
-        + TranslationModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
+        + TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
 
     private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectAddedEvent(TRANSLATIONOBJET),
         new XObjectUpdatedEvent(TRANSLATIONOBJET), new XObjectDeletedEvent(TRANSLATIONOBJET));
@@ -205,7 +205,7 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
             Query query =
                 this.queryManager.createQuery(String.format(
                     "select doc.space, doc.name from Document doc, doc.object(%s) as translation",
-                    TranslationModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
+                    TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
 
             query.setWiki(wiki);
 
@@ -280,7 +280,7 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
 
     private DefaultDocumentBundle createDocumentBundle(XWikiDocument document) throws BundleDoesNotExistsException
     {
-        BaseObject translationObject = document.getXObject(TranslationModel.TRANSLATIONCLASS_REFERENCE);
+        BaseObject translationObject = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
 
         if (translationObject == null) {
             throw new BundleDoesNotExistsException(String.format("[%s] is not a translation document", document));
@@ -340,7 +340,7 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
     private Scope getScope(BaseObject obj)
     {
         if (obj != null) {
-            StringProperty scopeProperty = (StringProperty) obj.getField(TranslationModel.TRANSLATIONCLASS_PROP_SCOPE);
+            StringProperty scopeProperty = (StringProperty) obj.getField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE);
 
             if (scopeProperty != null) {
                 String scopeString = scopeProperty.getValue();
@@ -357,7 +357,7 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
      */
     private void unregisterTranslationBundle(XWikiDocument document)
     {
-        Scope scope = getScope(document.getXObject(TranslationModel.TRANSLATIONCLASS_REFERENCE));
+        Scope scope = getScope(document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE));
 
         if (scope != null) {
             ComponentDescriptor<Bundle> descriptor = createComponentDescriptor(document.getDocumentReference());
@@ -376,7 +376,7 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
     private void registerTranslationBundle(XWikiDocument document) throws BundleDoesNotExistsException,
         ComponentRepositoryException, AccessDeniedException
     {
-        Scope scope = getScope(document.getXObject(TranslationModel.TRANSLATIONCLASS_REFERENCE));
+        Scope scope = getScope(document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE));
 
         if (scope != null) {
             checkRegistrationAuthorization(document, scope);

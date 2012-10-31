@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @since 4.3M2
  */
 @Component
-@Named(TranslationModel.TRANSLATIONCLASS_REFERENCE_STRING)
+@Named(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING)
 @Singleton
 public class TranslationDocumentClassInitializer extends AbstractMandatoryDocumentInitializer
 {
@@ -44,7 +44,8 @@ public class TranslationDocumentClassInitializer extends AbstractMandatoryDocume
      */
     public TranslationDocumentClassInitializer()
     {
-        super(TranslationModel.TRANSLATIONCLASS_REFERENCE_SPACE, TranslationModel.TRANSLATIONCLASS_REFERENCE_NAME);
+        super(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_SPACE,
+            TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_NAME);
     }
 
     @Override
@@ -55,7 +56,8 @@ public class TranslationDocumentClassInitializer extends AbstractMandatoryDocume
         BaseClass bclass = document.getXClass();
 
         needsUpdate |=
-            bclass.addStaticListField(TranslationModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope", "GLOBAL|WIKI|USER");
+            bclass
+                .addStaticListField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope", "GLOBAL|WIKI|USER");
 
         needsUpdate |= setClassDocumentFields(document, "Translation Document Class");
 

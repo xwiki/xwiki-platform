@@ -116,10 +116,21 @@ public class XWikiMessageTool
      */
     private Set<Long> docsToRefresh = new HashSet<Long>();
 
+    /**
+     * The localization manager.
+     */
     private LocalizationManager localization;
 
+    /**
+     * Used to get the proper renderer.
+     */
     private ComponentManager componentManager;
 
+    /**
+     * @param localization the localization manager
+     * @param componentManager used to get the proper renderer
+     * @param context the XWiki context
+     */
     public XWikiMessageTool(LocalizationManager localization, ComponentManager componentManager, XWikiContext context)
     {
         this.localization = localization;

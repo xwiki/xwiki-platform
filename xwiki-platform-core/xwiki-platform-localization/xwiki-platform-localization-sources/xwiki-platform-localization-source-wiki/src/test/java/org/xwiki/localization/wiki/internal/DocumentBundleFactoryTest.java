@@ -36,7 +36,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.localization.BundleFactory;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.wiki.internal.TranslationModel.Scope;
+import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
@@ -272,12 +272,12 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
     {
         XWikiDocument document = this.mockXWiki.getDocument(reference, getContext());
 
-        if (document.getXObject(TranslationModel.TRANSLATIONCLASS_REFERENCE) == null) {
+        if (document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE) == null) {
             BaseObject translationObject = new BaseObject();
             translationObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
                 "TranslationDocumentClass"));
             if (scope != null) {
-                translationObject.setStringValue(TranslationModel.TRANSLATIONCLASS_PROP_SCOPE, scope.toString());
+                translationObject.setStringValue(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, scope.toString());
             }
             document.addXObject(translationObject);
 

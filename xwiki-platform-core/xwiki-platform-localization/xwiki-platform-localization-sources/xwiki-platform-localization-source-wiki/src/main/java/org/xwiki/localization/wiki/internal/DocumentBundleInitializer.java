@@ -24,29 +24,48 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.BundleFactory;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+/**
+ * Trigger existing translations bundles initialization at startup.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
 @Component
 @Named(DocumentBundleInitializer.NAME)
 @Singleton
 public class DocumentBundleInitializer implements EventListener
 {
+    /**
+     * The name of the event listener.
+     */
     protected static final String NAME = "localization.bundle.DocumentBundleInitializer";
 
-    private static List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent());
+    /**
+     * The events to listen.
+     */
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent());
 
+    /**
+     * Lazily loaded to avoid dependency issue (default BundleFactory depends on
+     * {@link org.xwiki.observation.ObservationManager}).
+     */
     @Inject
-    private ComponentManager componentManager;
+    @Named("document")
+    private Provider<BundleFactory> bundleFactoryProvider;
 
+    /**
+     * Used to log issues.
+     */
     @Inject
     private Logger logger;
 
@@ -66,11 +85,7 @@ public class DocumentBundleInitializer implements EventListener
     public void onEvent(Event arg0, Object arg1, Object arg2)
     {
         // Start DocumentBundleFactory initialization
-        // TODO: do something cleaner
-        try {
-            this.componentManager.getInstance(BundleFactory.class, "document");
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to initialization [{}] component", DocumentBundleFactory.class);
-        }
+        // TODO: do something cleaner;
+        this.bundleFactoryProvider.get();
     }
 }

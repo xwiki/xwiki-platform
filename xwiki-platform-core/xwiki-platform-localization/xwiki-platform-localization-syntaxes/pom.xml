@@ -34,7 +34,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Localization - Syntaxes Parent POM</description>
   <modules>
-    <module>xwiki-platform-localization-syntaxe-messagetool</module>
+    <module>xwiki-platform-localization-syntax-messagetool</module>
   </modules>
   <dependencies>
     <dependency>

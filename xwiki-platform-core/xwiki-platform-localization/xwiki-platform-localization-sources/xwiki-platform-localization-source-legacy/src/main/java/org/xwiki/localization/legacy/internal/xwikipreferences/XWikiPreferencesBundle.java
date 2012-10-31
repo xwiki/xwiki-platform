@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractBundle;
 import org.xwiki.model.EntityType;
@@ -51,19 +50,37 @@ import org.xwiki.model.ModelContext;
 @Singleton
 public class XWikiPreferencesBundle extends AbstractBundle implements Initializable
 {
-    protected final static String ID = "XWikiPreferences";
+    /**
+     * The identifier of the bundle.
+     */
+    protected static final String ID = "XWikiPreferences";
 
+    /**
+     * Used to access current wiki.
+     */
     @Inject
     private ModelContext modelContext;
 
+    /**
+     * Used to create a cache.
+     */
     @Inject
     private CacheManager cacheManager;
 
+    /**
+     * Passed to {@link XWikiPreferencesWikiBundle}.
+     */
     @Inject
     private ComponentManager componentManager;
 
-    private Cache<Bundle> bundlesCache;
+    /**
+     * The cache of bundles by document reference.
+     */
+    private Cache<XWikiPreferencesWikiBundle> bundlesCache;
 
+    /**
+     * Default constructor.
+     */
     public XWikiPreferencesBundle()
     {
         super(ID, 300);
@@ -88,34 +105,41 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
         return getBundle().getTranslation(key, locale);
     }
 
-    private Bundle getBundle()
+    /**
+     * @return the {@link XWikiPreferencesBundle} for the current wiki
+     */
+    private XWikiPreferencesWikiBundle getBundle()
     {
         String currentWiki = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
 
         return getBundle(currentWiki);
     }
 
-    private Bundle getBundle(String wiki)
+    /**
+     * @param wiki the wiki
+     * @return the {@link XWikiPreferencesWikiBundle} for the provided wiki
+     */
+    private XWikiPreferencesWikiBundle getBundle(String wiki)
     {
-        Bundle bundle = this.bundlesCache.get(wiki);
+        XWikiPreferencesWikiBundle bundle = this.bundlesCache.get(wiki);
         if (bundle == null) {
-            synchronized (this.bundlesCache) {
-                bundle = this.bundlesCache.get(wiki);
-                if (bundle == null) {
-                    try {
-                        bundle = createWikiBundle(wiki);
-                        this.bundlesCache.set(wiki, bundle);
-                    } catch (ComponentLookupException e) {
-                        this.logger.error("Failed to create preferences bundle for wiki [{}]", wiki, e);
-                    }
-                }
+            try {
+                bundle = createWikiBundle(wiki);
+                this.bundlesCache.set(wiki, bundle);
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to create preferences bundle for wiki [{}]", wiki, e);
             }
         }
 
         return bundle;
     }
 
-    private Bundle createWikiBundle(String wiki) throws ComponentLookupException
+    /**
+     * @param wiki the wiki
+     * @return the XWikiPreferencesWikiBundle for the provided wiki
+     * @throws ComponentLookupException faleid to create the bundle
+     */
+    private XWikiPreferencesWikiBundle createWikiBundle(String wiki) throws ComponentLookupException
     {
         return new XWikiPreferencesWikiBundle(wiki, this.componentManager);
     }

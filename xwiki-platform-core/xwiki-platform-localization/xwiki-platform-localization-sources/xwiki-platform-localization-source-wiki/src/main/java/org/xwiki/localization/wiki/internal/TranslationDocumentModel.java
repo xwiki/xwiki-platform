@@ -22,23 +22,60 @@ package org.xwiki.localization.wiki.internal;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
-public interface TranslationModel
+/**
+ * Informations about the way to store translation documents.
+ * 
+ * @version $Id$
+ * @since 4.3M2
+ */
+public interface TranslationDocumentModel
 {
+    /**
+     * Name of the space where to store the xclass.
+     */
     String TRANSLATIONCLASS_REFERENCE_SPACE = "XWiki";
 
+    /**
+     * Name of the document where to store the xclass.
+     */
     String TRANSLATIONCLASS_REFERENCE_NAME = "TranslationDocumentClass";
 
+    /**
+     * The local reference of the xlcass.
+     */
     EntityReference TRANSLATIONCLASS_REFERENCE = new EntityReference(TRANSLATIONCLASS_REFERENCE_NAME,
         EntityType.DOCUMENT, new EntityReference(TRANSLATIONCLASS_REFERENCE_SPACE, EntityType.SPACE));
 
+    /**
+     * The local reference of the xclass as String.
+     */
     String TRANSLATIONCLASS_REFERENCE_STRING = TRANSLATIONCLASS_REFERENCE_SPACE + '.' + TRANSLATIONCLASS_REFERENCE_NAME;
 
+    /**
+     * The name of the property containing the scope information.
+     */
     String TRANSLATIONCLASS_PROP_SCOPE = "scope";
 
+    /**
+     * The possible values of the scope property.
+     * 
+     * @version $Id$
+     */
     enum Scope
     {
+        /**
+         * Register the translation bundle for the whole farm.
+         */
         GLOBAL,
+
+        /**
+         * Register the translation bundle for the document wiki.
+         */
         WIKI,
+
+        /**
+         * Register the translation bundle for the document author.
+         */
         USER
     }
 }

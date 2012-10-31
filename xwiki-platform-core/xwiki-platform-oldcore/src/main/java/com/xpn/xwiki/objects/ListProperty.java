@@ -31,6 +31,7 @@ import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.doc.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.web.Utils;
 
@@ -41,7 +42,13 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
 
-    protected List<String> list = new ArrayList<String>();
+    protected List<String> list = new AbstractNotifyOnUpdateList<String>() {
+        @Override
+        public void onUpdate()
+        {
+            setValueDirty(true);
+        }
+    };
 
     private String formStringSeparator = "|";
 

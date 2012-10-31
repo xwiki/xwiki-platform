@@ -40,6 +40,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
 {
@@ -52,6 +53,11 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+
+    /**
+     * The owner document, if this object was obtained from a document.
+     */
+    private XWikiDocument ownerDocument;
 
     /**
      * {@inheritDoc}
@@ -401,6 +407,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
 
         if (prop != null) {
+            prop.setOwnerDocument(ownerDocument);
             safeput(fieldname, prop);
         }
     }
@@ -413,5 +420,16 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     public void setGuid(String guid)
     {
         this.guid = guid;
+    }
+
+    /**
+     * Set the owner document of this base object.
+     *
+     * @param owner The owner document.
+     * @since 4.3M2
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        this.ownerDocument = ownerDocument;
     }
 }

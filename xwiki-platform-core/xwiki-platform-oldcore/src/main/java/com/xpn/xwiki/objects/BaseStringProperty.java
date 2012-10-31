@@ -39,6 +39,7 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public void setValue(Object value)
     {
+        setValueDirty(value);
         this.value = (String) value;
     }
 

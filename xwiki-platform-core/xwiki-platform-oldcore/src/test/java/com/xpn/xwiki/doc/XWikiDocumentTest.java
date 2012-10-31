@@ -1517,4 +1517,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Assert.assertFalse(document.equals(otherDocyment));
         Assert.assertTrue(document.equalsData(otherDocyment));
     }
+
+    public void testContentDirtyWhenAttachmenListChanges()
+    {
+        XWikiDocument document = new XWikiDocument();
+
+        document.setContentDirty(false);
+
+        List<XWikiAttachment> attachments = document.getAttachmentList();
+    }
 }

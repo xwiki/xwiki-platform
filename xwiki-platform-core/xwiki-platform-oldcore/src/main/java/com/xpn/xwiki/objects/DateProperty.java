@@ -56,6 +56,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public void setValue(Object value)
     {
+        setValueDirty(value);
         this.value = (Date) value;
     }
 

@@ -882,9 +882,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         }
 
-        doc.setContentDirty(false);
-        doc.setMetaDataDirty(false);
-
         LOGGER.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
 
         return doc;

@@ -30,7 +30,6 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.DisposableCacheValue;
@@ -62,7 +61,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 4.3M2
  */
-public abstract class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle, DisposableCacheValue, Disposable
+public abstract class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle, DisposableCacheValue,
+    Disposable
 {
     /**
      * The prefix to use in all wiki document based translations.
@@ -149,9 +149,8 @@ public abstract class AbstractDocumentBundle extends AbstractCachedBundle implem
 
         XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
-        String localeString = locale.toString();
-        if (StringUtils.isNotEmpty(localeString)) {
-            XWikiDocument tdocument = document.getTranslatedDocument(localeString, context);
+        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
+            XWikiDocument tdocument = document.getTranslatedDocument(locale, context);
 
             if (tdocument == document) {
                 // No document found for this locale

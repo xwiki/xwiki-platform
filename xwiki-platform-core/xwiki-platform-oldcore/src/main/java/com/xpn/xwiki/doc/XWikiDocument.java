@@ -247,7 +247,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     protected Locale locale;
 
-    private String defaultLanguage;
+    private Locale defaultLocale;
 
     private int translation;
 
@@ -562,8 +562,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Temporary helper to produce a uid serialization of this document reference, including the locale. Only
-     * translated document will have locale appended. FIXME: when reference contains locale, this is no more needed.
+     * Temporary helper to produce a uid serialization of this document reference, including the locale. Only translated
+     * document will have locale appended. FIXME: when reference contains locale, this is no more needed.
      * 
      * @return a unique name (8:wikiname5:space4:name2:lg or 8:wikiname5:space4:name)
      * @since 4.0M1
@@ -5262,11 +5262,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public String getLanguage()
     {
-        if (this.locale == null) {
-            return "";
-        } else {
-            return this.locale.toString();
-        }
+        return getLocale().toString();
     }
 
     /**
@@ -5294,7 +5290,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public Locale getLocale()
     {
-        return locale;
+        return this.locale != null ? this.locale : Locale.ROOT;
     }
 
     /**
@@ -5305,18 +5301,43 @@ public class XWikiDocument implements DocumentModelBridge
         this.locale = locale;
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #getDefaultLocale()} instead
+     */
+    @Deprecated
     public String getDefaultLanguage()
     {
-        if (this.defaultLanguage == null) {
-            return "";
-        } else {
-            return this.defaultLanguage.trim();
-        }
+        return getDefaultLocale().toString();
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #setDefaultLocale(Locale)} instead
+     */
+    @Deprecated
     public void setDefaultLanguage(String defaultLanguage)
     {
-        this.defaultLanguage = defaultLanguage;
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(defaultLanguage);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        setDefaultLocale(locale);
+    }
+
+    public Locale getDefaultLocale()
+    {
+        return this.defaultLocale != null ? this.defaultLocale : Locale.ROOT;
+    }
+
+    public void setDefaultLocale(Locale defaultLocale)
+    {
+        this.defaultLocale = defaultLocale;
 
         setMetaDataDirty(true);
     }
@@ -5357,18 +5378,35 @@ public class XWikiDocument implements DocumentModelBridge
      * <p>
      * This method return this if the provided language does not exists. See
      * 
-     * @param language the language of the documetn to return
+     * @param locale the locale of the document to return
+     * @param context the XWiki Context
+     * @return the document in the provided language or this if the provided language does not exists
+     * @throws XWikiException error when loading the document
+     * @deprecated since 4.3M2 use {@link #getTranslatedDocument(Locale, XWikiContext)} insead
+     */
+    @Deprecated
+    public XWikiDocument getTranslatedDocument(String locale, XWikiContext context) throws XWikiException
+    {
+        return getTranslatedDocument(locale != null ? LocaleUtils.toLocale(locale) : null, context);
+    }
+
+    /**
+     * Return the document in the provided language.
+     * <p>
+     * This method return this if the provided language does not exists. See
+     * 
+     * @param locale the locale of the document to return
      * @param context the XWiki Context
      * @return the document in the provided language or this if the provided language does not exists
      * @throws XWikiException error when loading the document
      */
-    public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
+    public XWikiDocument getTranslatedDocument(Locale locale, XWikiContext context) throws XWikiException
     {
         XWikiDocument tdoc = this;
 
-        if (!((language == null) || (language.equals("")) || language.equals(getDefaultLanguage()))) {
+        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(getDefaultLocale())) {
             tdoc = new XWikiDocument(getDocumentReference());
-            tdoc.setLanguage(language);
+            tdoc.setLocale(locale);
             String database = context.getDatabase();
             try {
                 // We might need to switch database to
@@ -5397,6 +5435,7 @@ public class XWikiDocument implements DocumentModelBridge
         return getRealLanguage();
     }
 
+    @Override
     public String getRealLanguage()
     {
         String lang = getLanguage();
@@ -7604,7 +7643,7 @@ public class XWikiDocument implements DocumentModelBridge
         this.content = "";
         this.format = "";
         this.locale = Locale.ROOT;
-        this.defaultLanguage = "";
+        this.defaultLocale = Locale.ROOT;
         this.attachmentList = new ArrayList<XWikiAttachment>();
         this.customClass = "";
         this.comment = "";

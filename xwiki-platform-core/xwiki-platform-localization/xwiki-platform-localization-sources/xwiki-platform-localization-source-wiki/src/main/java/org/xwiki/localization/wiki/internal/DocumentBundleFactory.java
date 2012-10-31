@@ -63,6 +63,9 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -125,6 +128,9 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
 
     @Inject
     private QueryManager queryManager;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     private Cache<Bundle> bundlesCache;
 
@@ -292,6 +298,9 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         return documentBundle;
     }
 
+    /**
+     * @param document the translation document
+     */
     private void translationObjectUpdated(XWikiDocument document)
     {
         unregisterTranslationBundle(document.getOriginalDocument());
@@ -303,11 +312,17 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         }
     }
 
+    /**
+     * @param document the translation document
+     */
     private void translationObjectDeleted(XWikiDocument document)
     {
         unregisterTranslationBundle(document.getOriginalDocument());
     }
 
+    /**
+     * @param document the translation document
+     */
     private void translationObjectAdded(XWikiDocument document)
     {
         try {
@@ -318,19 +333,28 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         }
     }
 
+    /**
+     * @param obj the translation object
+     * @return the {@link Scope} stored in the object, null not assigned or unknown
+     */
     private Scope getScope(BaseObject obj)
     {
-        StringProperty scopeProperty = (StringProperty) obj.getField(TranslationModel.TRANSLATIONCLASS_PROP_SCOPE);
+        if (obj != null) {
+            StringProperty scopeProperty = (StringProperty) obj.getField(TranslationModel.TRANSLATIONCLASS_PROP_SCOPE);
 
-        if (scopeProperty != null) {
-            String scopeString = scopeProperty.getValue();
+            if (scopeProperty != null) {
+                String scopeString = scopeProperty.getValue();
 
-            return EnumUtils.getEnum(Scope.class, scopeString.toUpperCase());
+                return EnumUtils.getEnum(Scope.class, scopeString.toUpperCase());
+            }
         }
 
         return null;
     }
 
+    /**
+     * @param document the translation document
+     */
     private void unregisterTranslationBundle(XWikiDocument document)
     {
         Scope scope = getScope(document.getXObject(TranslationModel.TRANSLATIONCLASS_REFERENCE));
@@ -342,12 +366,21 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         }
     }
 
+    /**
+     * @param document the translation document
+     * @throws BundleDoesNotExistsException when no translation bundle could be created from the provided document
+     * @throws ComponentRepositoryException when the actual registration of the document bundle failed
+     * @throws AccessDeniedException when the document author does not have enough right to register the translation
+     *             bundle
+     */
     private void registerTranslationBundle(XWikiDocument document) throws BundleDoesNotExistsException,
-        ComponentRepositoryException
+        ComponentRepositoryException, AccessDeniedException
     {
         Scope scope = getScope(document.getXObject(TranslationModel.TRANSLATIONCLASS_REFERENCE));
 
         if (scope != null) {
+            checkRegistrationAuthorization(document, scope);
+
             DefaultDocumentBundle bundle = createDocumentBundle(document);
 
             ComponentDescriptor<Bundle> descriptor = createComponentDescriptor(document.getDocumentReference());
@@ -356,6 +389,31 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         }
     }
 
+    /**
+     * @param document the translation document
+     * @param scope the scope
+     * @throws AccessDeniedException thrown when the document author does not have enough right for the provided
+     *             {@link Scope}
+     */
+    private void checkRegistrationAuthorization(XWikiDocument document, Scope scope) throws AccessDeniedException
+    {
+        switch (scope) {
+            case GLOBAL:
+                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
+                break;
+            case WIKI:
+                this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document
+                    .getDocumentReference().getWikiReference());
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * @param documentReference the translation document reference
+     * @return the component descriptor to use to register/unregister the translation bundle
+     */
     private ComponentDescriptor<Bundle> createComponentDescriptor(DocumentReference documentReference)
     {
         DefaultComponentDescriptor<Bundle> descriptor = new DefaultComponentDescriptor<Bundle>();
@@ -368,6 +426,14 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         return descriptor;
     }
 
+    /**
+     * Get the right component manager based on the scope.
+     * 
+     * @param document the translation document
+     * @param scope the translation scope
+     * @param create true if the component manager should be created if it does not exists
+     * @return the component manager corresponding to the provided {@link Scope}
+     */
     private ComponentManager getComponentManager(XWikiDocument document, Scope scope, boolean create)
     {
         String hint;

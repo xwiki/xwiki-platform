@@ -26,7 +26,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -39,10 +38,13 @@ import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.wiki.internal.TranslationModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -63,8 +65,10 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
 
     private Query mockQuery;
 
-    private Map<DocumentReference, Map<String, XWikiDocument>> documents =
-        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
+    private AuthorizationManager mockAuthorizationManager;
+
+    private Map<DocumentReference, Map<Locale, XWikiDocument>> documents =
+        new HashMap<DocumentReference, Map<Locale, XWikiDocument>>();
 
     private ObservationManager observation;
 
@@ -95,14 +99,14 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
                     @Override
                     public Object invoke(Invocation invocation) throws Throwable
                     {
-                        Map<String, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
 
                         if (documentLanguages == null) {
-                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documentLanguages = new HashMap<Locale, XWikiDocument>();
                             documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get("");
+                        XWikiDocument document = documentLanguages.get(Locale.ROOT);
 
                         if (document == null) {
                             document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
@@ -121,19 +125,19 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
                     public Object invoke(Invocation invocation) throws Throwable
                     {
                         XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
-                        Map<String, XWikiDocument> documentLanguages =
+                        Map<Locale, XWikiDocument> documentLanguages =
                             documents.get(providedDocument.getDocumentReference());
 
                         if (documentLanguages == null) {
-                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documentLanguages = new HashMap<Locale, XWikiDocument>();
                             documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get(providedDocument.getLanguage());
+                        XWikiDocument document = documentLanguages.get(providedDocument.getLocale());
 
                         if (document == null) {
                             document = new XWikiDocument(providedDocument.getDocumentReference());
-                            document.setLanguage(providedDocument.getLanguage());
+                            document.setLocale(providedDocument.getLocale());
                             document.setDefaultLanguage(providedDocument.getDefaultLanguage());
                             document.setTranslation(providedDocument.getTranslation());
                             document.setStore(mockStore);
@@ -157,15 +161,15 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
                         document.incrementVersion();
                         document.setNew(false);
 
-                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
                         XWikiDocument previousDocument;
                         if (documentLanguages == null) {
-                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documentLanguages = new HashMap<Locale, XWikiDocument>();
                             documents.put(document.getDocumentReference(), documentLanguages);
                             previousDocument = null;
                         } else {
-                            previousDocument = documentLanguages.get(document.getLanguage());
+                            previousDocument = documentLanguages.get(document.getLocale());
                         }
 
                         for (XWikiAttachment attachment : document.getAttachmentList()) {
@@ -175,7 +179,7 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
                             }
                         }
 
-                        documentLanguages.put(document.getLanguage(), document);
+                        documentLanguages.put(document.getLocale(), document);
 
                         if (isNew) {
                             observation.notify(new DocumentCreatedEvent(document.getDocumentReference()), document,
@@ -199,10 +203,10 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
 
-                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
                         if (documentLanguages != null) {
-                            documentLanguages.remove(document.getLanguage());
+                            documentLanguages.remove(document.getLocale());
                         }
 
                         return null;
@@ -240,6 +244,9 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockQuery).execute();
                 will(returnValue(Collections.EMPTY_LIST));
+
+                allowing(mockAuthorizationManager).checkAccess(with(any(Right.class)),
+                    with(any(DocumentReference.class)), with(any(EntityReference.class)));
             }
         });
 
@@ -257,9 +264,10 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
         super.registerComponents();
 
         this.mockQueryManager = registerMockComponent(QueryManager.class);
+        this.mockAuthorizationManager = registerMockComponent(AuthorizationManager.class);
     }
 
-    private void addTranslation(String key, String message, DocumentReference reference, String locale, Scope scope)
+    private void addTranslation(String key, String message, DocumentReference reference, Locale locale, Scope scope)
         throws XWikiException
     {
         XWikiDocument document = this.mockXWiki.getDocument(reference, getContext());
@@ -273,16 +281,16 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
             }
             document.addXObject(translationObject);
 
-            if (StringUtils.isNotEmpty(locale)) {
+            if (!locale.equals(Locale.ROOT)) {
                 this.mockXWiki.saveDocument(document, "", getContext());
             }
         }
 
-        if (StringUtils.isNotEmpty(locale)) {
+        if (!locale.equals(Locale.ROOT)) {
             XWikiDocument tdocument = document.getTranslatedDocument(locale, getContext());
             if (tdocument == document) {
                 tdocument = new XWikiDocument(document.getDocumentReference());
-                tdocument.setLanguage(locale);
+                tdocument.setLocale(locale);
                 tdocument.setTranslation(1);
                 tdocument.setStore(mockStore);
             }
@@ -323,7 +331,7 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
         addTranslation("wiki.translation", "Wiki translation", new DocumentReference(getContext().getDatabase(),
-            "space", "translation"), "", Scope.WIKI);
+            "space", "translation"), Locale.ROOT, Scope.WIKI);
 
         assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
     }

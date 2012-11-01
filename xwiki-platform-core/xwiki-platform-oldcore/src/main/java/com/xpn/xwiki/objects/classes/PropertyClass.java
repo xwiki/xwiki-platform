@@ -267,6 +267,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             VelocityContext vcontext = Utils.getComponent(VelocityManager.class).getVelocityContext();
             vcontext.put("name", fieldName);
             vcontext.put("prefix", prefix);
+            // The PropertyClass instance can be used to access meta properties in the custom displayer (e.g.
+            // dateFormat, multiSelect). It can be obtained from the XClass of the given object but only if the property
+            // has been added to the XClass. We need to have it in the Velocity context for the use case when an XClass
+            // property needs to be previewed before being added to the XClass.
+            vcontext.put("field", new com.xpn.xwiki.api.PropertyClass(this, context));
             vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
             vcontext.put("type", type);
             vcontext.put("context", new com.xpn.xwiki.api.Context(context));

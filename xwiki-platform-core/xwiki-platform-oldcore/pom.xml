@@ -566,12 +566,6 @@
       <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Used by XClass property displayers to pull required JS/CSS resources. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-skin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>

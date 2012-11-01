@@ -21,24 +21,17 @@ package com.xpn.xwiki.objects.classes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.skinx.SkinExtension;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Defines an XClass property type whose value is a Date.
@@ -239,57 +232,5 @@ public class DateClass extends PropertyClass
             }
         }
         return property;
-    }
-
-    @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
-    {
-        BaseProperty property = (BaseProperty) object.safeget(name);
-        if (property != null) {
-            buffer.append(toFormString(property));
-        }
-    }
-
-    @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
-    {
-        input input = new input();
-
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        String styleName = "datetime";
-        if (prop != null) {
-            input.setValue(toFormString(prop));
-            // This is useful if the client doesn't understand the date format.
-            styleName += " t" + ((Date) prop.getValue()).getTime();
-        }
-
-        input.setType("text");
-        input.setName(prefix + name);
-        input.setID(prefix + name);
-        input.setSize(getSize());
-        input.setDisabled(isDisabled());
-
-        if (getPicker() == 1) {
-            // Mark the date input so that it can be enhanced with a date picker.
-            input.setClass(styleName);
-            // Pass the date format to the client in the title attribute.
-            input.setTitle(getDateFormat());
-            // Pull the resources needed by the date picker.
-            String basePath = "uicomponents/widgets/datepicker/";
-            Map<String, Object> parameters = Collections.singletonMap("forceSkinAction", (Object) true);
-            SkinExtension ssfx = Utils.getComponent(SkinExtension.class, "ssfx");
-            ssfx.use(basePath + "calendarDateSelect.css", parameters);
-            SkinExtension jsfx = Utils.getComponent(SkinExtension.class, "jsfx");
-            // A simple date picker widget.
-            jsfx.use(basePath + "calendarDateSelect.js", parameters);
-            // Used to parse and serialize the selected date using the date format specified in the XClass.
-            jsfx.use(basePath + "simpleDateFormat.js", parameters);
-            // A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-            jsfx.use(basePath + "dateTimePicker.js");
-        }
-
-        buffer.append(input.toString());
     }
 }

@@ -723,6 +723,10 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void declareInExecutionContext(ExecutionContext executionContext)
     {
-        executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(this).inherited().declare();
+        if (!executionContext.hasProperty(XWikiContext.EXECUTIONCONTEXT_KEY)) {
+            executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(this).inherited().declare();
+        } else {
+            executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this);
+        }
     }
 }

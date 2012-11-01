@@ -1907,7 +1907,7 @@ ul.xlist li {
   float: right;
   height: 100%;
   list-style-type: none;
-  padding-top: .2em;
+  padding: .1em 0;
   width: 100% !important;
 }
 

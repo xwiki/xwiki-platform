@@ -1,0 +1,56 @@
+#if ($type == 'edit')
+  ##
+  ## Pull the required resources.
+  ##
+  #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
+  #if ($isMultiSelect)
+    ## Needed for sorting the selected values.
+    #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
+  #end
+  ## Needed for displaying a list of suggestions based on the user input.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
+  ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
+  ## overwrites the previously selected value.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
+  ## The actual user picker. Provides a custom display for the user suggestions and selected users.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+  ##
+  ## Display the text input.
+  ##
+  #set($id = $escapetool.xml("${prefix}${name}"))
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
+    class="suggestUsers#if ($isMultiSelect) multipleSelection#end" />
+#else
+  #set ($values = $value.split('\s*,\s*'))
+  #set ($selectedUsers = [])
+  #foreach ($value in $values)
+    #if ($value.length() > 0)
+      #set ($discard = $selectedUsers.add($value))
+    #end
+  #end
+  #if ($selectedUsers.size() > 0)
+    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+    <ul class="users">
+    #foreach ($user in $selectedUsers)
+      #set ($userReference = $services.model.resolveDocument($user))
+      <li class="user">
+       <div class="user-avatar-wrapper">
+         #getUserAvatarURL($userReference $avatarURL 30)
+         <img src="$escapetool.xml($avatarURL.url)" alt="$escapetool.xml($xwiki.getUserName($user, false))" class="icon" />
+       </div>
+       <div class="user-name">$xwiki.getUserName($user)</div>
+       <div>
+         <span class="user-alias">$userReference.name</span>
+         ## Display the wiki only for local users.
+         #if ($xwiki.isVirtualMode() && $userReference.wikiReference.name != $xcontext.getMainWikiName())
+           <span class="user-wiki">$userReference.wikiReference.name</span>
+         #end
+       </div>
+      </li>
+    #end
+    </ul>
+  #end
+#end

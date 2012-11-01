@@ -216,42 +216,50 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 ### @param username The name of the user whose avatar will be displayed
 ###
+#macro(getUserAvatarURL $userName $return $size)
+  #set ($specified = false)
+  #set ($profileDoc = $xwiki.getDocument($userName))
+  #if ($profileDoc.getObject('XWiki.XWikiGroups'))
+    #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatargroup.png', true))
+  #else
+    #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatar.png', true))
+  #end
+  #if (!$profileDoc.isNew() && $profileDoc.attachmentList.size() > 0)
+    #set ($profileObj = $profileDoc.getObject('XWiki.XWikiUsers', 0))
+    #set ($avatarFileName = $profileObj.getProperty('avatar').value)
+    #if ("$!avatarFileName" != '')
+      #set ($avatarAttachment = $profileDoc.getAttachment($avatarFileName))
+      #if ($avatarAttachment && $avatarAttachment.isImage())
+        #set ($queryString = '')
+        #if ($size > 0)
+          #set ($queryString = "width=$size&height=$size&keepAspectRatio=true")
+        #end
+        #set ($url = $profileDoc.getAttachmentURL($avatarAttachment.filename, 'download', $queryString))
+        #set ($specified = true)
+      #end
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable ("$return" {'url': $url, 'specified': $specified})
+#end
 #macro(resizedUserAvatar $username $size)
   #if(!$picturelist)
     #set($picturelist = {})
   #end
   #if(!$picturelist.containsKey("${username}--${size}"))
-    #set($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
-    #if ($xwiki.getDocument($username).getObject('XWiki.XWikiGroups'))
-      #set ($picture = $picture.concat($xwiki.getSkinFile('icons/xwiki/noavatargroup.png', true)))
+    #getUserAvatarURL($username $avatarURL $size)
+    #if ($avatarURL.specified)
+      #set ($picture = "<img src='")
+      #set ($picture = $picture.concat($escapetool.xml($avatarURL.url)))
+      #set ($picture = $picture.concat("' alt='"))
+      #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
+      #set ($picture = $picture.concat("' title='"))
+      #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
+      #set ($picture = $picture.concat("'/>"))
     #else
-      #set ($picture = $picture.concat($xwiki.getSkinFile('icons/xwiki/noavatar.png', true)))
-    #end
-    #set($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
-    #set($profiledoc = $xwiki.getDocument($username))
-    #if (!$profiledoc.isNew())
-      #if($profiledoc.attachmentList.size() != 0)
-        #set($profileobj = $profiledoc.getObject('XWiki.XWikiUsers', 0))
-        #set($avatarFileName = $profileobj.getProperty('avatar').value)
-        #if("$!avatarFileName" != "")
-          #foreach ($attach in $profiledoc.attachmentList)
-            #if($attach.filename == $avatarFileName)
-              #set($pictureurl = $profiledoc.getAttachmentURL($avatarFileName))
-              #set($picture = "<img src='")
-              #set($picture = $picture.concat($pictureurl))
-              #if ($size > 0)
-                #set($picture = $picture.concat("?width=${escapetool.xml(${size})}&amp;height=${escapetool.xml(${size})}&amp;keepAspectRatio=true"))
-              #end
-              #set($picture = $picture.concat("' alt='"))
-              #set($picture = $picture.concat(${xwiki.getUserName($username, false)}))
-              #set($picture = $picture.concat("' title='"))
-              #set($picture = $picture.concat(${xwiki.getUserName($username, false)}))
-              #set($picture = $picture.concat("'/>"))
-              #break
-            #end
-          #end
-        #end
-      #end
+      #set ($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
+      #set ($picture = $picture.concat($avatarURL.url))
+      #set ($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
     #end
     #set ($discard = $!picturelist.put("${username}--${size}", $picture))
   #end

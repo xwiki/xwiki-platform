@@ -51,7 +51,7 @@ public class UsersMetaClass extends ListMetaClass
         useListClass.setPrettyName("Uses List");
         useListClass.setDisplayType("yesno");
         useListClass.setDisplayFormType("checkbox");
-        useListClass.setDefaultValue(1);
+        useListClass.setDefaultValue(0);
         safeput(useListClass.getName(), useListClass);
     }
 

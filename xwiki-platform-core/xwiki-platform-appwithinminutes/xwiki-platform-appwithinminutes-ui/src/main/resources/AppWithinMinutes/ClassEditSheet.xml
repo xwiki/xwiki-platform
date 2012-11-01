@@ -552,6 +552,7 @@ XWiki.FormField = Class.create({
           preview.update(response.responseText);
           this.previewData = data;
           document.fire('xwiki:class:previewField', {field: this});
+          document.fire('xwiki:dom:updated', {elements: [preview]});
         }.bind(this)
       });
     }
@@ -1127,7 +1128,7 @@ return XWiki;
   margin: 0;
 }
 
-#fields li {
+#fields &gt; li {
   border: 1px dotted $theme.pageContentBackgroundColor;
   list-style: none;
   /* Make sure the loading animation is properly displayed. */
@@ -1135,7 +1136,7 @@ return XWiki;
   padding: 0 0.5em 0.5em;
 }
 
-#fields li .toolBox {
+#fields &gt; li .toolBox {
   display: none;
   position: absolute;
   right: 0.5em;
@@ -1147,11 +1148,11 @@ return XWiki;
   margin: 2px;
 }
 
-#fields li:hover {
+#fields &gt; li:hover {
   border: 1px dotted $theme.borderColor;
 }
 
-#fields li:hover .toolBox {
+#fields &gt; li:hover .toolBox {
   display: block;
 }
 

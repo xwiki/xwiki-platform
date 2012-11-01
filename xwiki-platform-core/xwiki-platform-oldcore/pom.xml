@@ -765,7 +765,6 @@
               **/objects/classes/StaticListClass.java,
               **/objects/classes/StringClass.java,
               **/objects/classes/TextAreaClass.java,
-              **/objects/classes/UsersClass.java,
               **/objects/DBStringListProperty.java,
               **/objects/DoubleProperty.java,
               **/objects/ElementComparator.java,

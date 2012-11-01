@@ -1343,14 +1343,8 @@ document.observe('xwiki:dom:loaded', function() {
             resultValue : "space",
             resultInfo : "space"
         },
-        "users" : {
-            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
-            varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/user.png')",
-            noresults: "User not found"
-        },
         "groups" : {
-            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiGroups&wiki=local&uorg=group&'),
+            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&wiki=local&uorg=group&'),
             varname: "input",
             icon: "$xwiki.getSkinFile('icons/silk/group.png')",
             noresults: "Group not found"

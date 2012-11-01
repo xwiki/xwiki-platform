@@ -25,7 +25,9 @@ var XWiki = (function (XWiki) {
     // Accept free text, i.e. text that was entered by the user but didn't match anything on the server (no suggestions)?
     'acceptFreeText' : false,
     // Optional callback method called whenever a new item has been added
-    'onItemAdded' : Prototype.emptyFunction
+    'onItemAdded' : Prototype.emptyFunction,
+    // The character used to separate the multiple values in the initial content of the target text input.
+    'separator' : ','
   },
   /**
    * Constructor method.
@@ -50,6 +52,7 @@ var XWiki = (function (XWiki) {
       this.input.addClassName("accept-value");
     }
     this.suggest.options.callback = this.acceptSuggestion.bind(this);
+
     // Create the list element which will hold the accepted elements
     this.list = new Element('ul', {'class' : 'accepted-suggestions'});
     var listInsertionElement;
@@ -66,11 +69,77 @@ var XWiki = (function (XWiki) {
     var insertion = {};
     insertion[this.options.listInsertionPosition] = this.list;
     listInsertionElement.insert(insertion);
+
     if (this.options.showClearTool) {
-      this.clearTool = new Element('span', {'class' : 'clear-tool delete-tool invisible', 'title' : "$msg.get('core.widgets.suggestPicker.deleteAll.tooltip')"}).update("$msg.get('core.widgets.suggestPicker.deleteAll')");
-      this.clearTool.observe('click', this.clearAcceptedList.bindAsEventListener(this));
+      this.clearTool = new Element('a', {
+        href: '#clearSelection',
+        'class' : 'clear-tool',
+        title : "$msg.get('core.widgets.suggestPicker.deleteAll.tooltip')"
+      }).update("$msg.get('core.widgets.suggestPicker.deleteAll')");
+      this.clearTool.hide().observe('click', this.clearAcceptedList.bindAsEventListener(this));
       this.list.insert({'after': this.clearTool});
     }
+
+    this.initializeSelection();
+  },
+
+  /**
+   * Splits the initial content of the target text input using the configured separator and adds all the values to the
+   * list of accepted suggestions.
+   */
+  initializeSelection: function() {
+    this.input.readonly = true;
+    this.loadSelectedValue(this.input.value.split(this.options.separator), 0);
+  },
+
+  /**
+   * Loads suggestions for the selected value in order to display it properly.
+   */
+  loadSelectedValue: function(values, index) {
+    if (index >= values.length) {
+      this.input.clear();
+      this.input.readonly = false;
+      return;
+    }
+    // Look for the selected value in all the sources.
+    var found = false;
+    var sourceIndex = 0;
+    this.input.value = values[index];
+    this.suggest.doAjaxRequests(-1, {
+      onSuccess: function(response) {
+        if (found) return;
+        var suggestions = this.suggest.parseResponse(response, this.suggest.sources[sourceIndex]) || [];
+        for (var i = 0; i < suggestions.length; i++) {
+          if (this.matchesSelectedValue(values[index], suggestions[i])) {
+            found = true;
+            this.addItem(suggestions[i]);
+            return;
+          }
+        }
+      }.bind(this),
+      onComplete: function(response) {
+        response.request.options.defaultValues.onComplete(response);
+        if (++sourceIndex >= this.suggest.sources.length) {
+          if (!found) this.addItem(this.getDefaultSuggestion(values[index]));
+          // Load the next selected value.
+          this.loadSelectedValue(values, index + 1);
+        }
+      }.bind(this)
+    });
+  },
+
+  /**
+   * @return {@code true} if the given suggestion matches perfectly the specified selected value, {@code false} otherwise
+   */
+  matchesSelectedValue: function(value, suggestion) {
+    return value == suggestion.value;
+  },
+
+  /**
+   * @return default suggestion data for when a selected value is not found in any of the configured sources
+   */
+  getDefaultSuggestion: function(value) {
+    return {id: value, value: value};
   },
 
   /**
@@ -83,7 +152,6 @@ var XWiki = (function (XWiki) {
       this.addItem(suggestion);
     }
     this.input.value = "";
-    return false;
   },
 
   /**
@@ -96,6 +164,7 @@ var XWiki = (function (XWiki) {
     item.remove();
     this.notifySelectionChange(item);
     this.updateListTools();
+    this.input.activate();
   },
 
   /**
@@ -105,6 +174,7 @@ var XWiki = (function (XWiki) {
     this.list.update("");
     this.notifySelectionChange();
     this.updateListTools();
+    this.input.activate();
   },
 
   /**
@@ -142,41 +212,66 @@ var XWiki = (function (XWiki) {
     if (!suggestion) {
       return;
     }
-    var key = suggestion.id || suggestion.value;
-    var id = this.getInputId(key);
+    var listItem = this.displayItem(suggestion);
+    this.list.insert(listItem);
+    this.options.onItemAdded(listItem.down('input'));
+    this.notifySelectionChange(listItem);
+    this.updateListTools();
+  },
+
+  /**
+   * Displays a selected item.
+   */
+  displayItem: function(suggestion) {
+    var itemInput = this.createItemInput(suggestion);
     var listItem = new Element("li");
-    var displayedValue = new Element("label", {"class": "accepted-suggestion", "for" : id});
-    // Insert input
-    var inputOptions = {"type" : this.options.inputType, "name" : this.inputName, "id" : id, "value" : key};
-    if (this.options.inputType == 'checkbox') {
-      inputOptions.checked = 'checked';
-    }
-    var newInput = new Element("input", inputOptions);
-    displayedValue.insert({'bottom' : newInput});
+    var displayedValue = new Element('label', {'for' : itemInput.id}).insert({'bottom' : itemInput});
     // If the key should be displayed, insert it
     if (this.options.showKey) {
-      displayedValue.insert({'bottom' : new Element("span", {"class": "key"}).update("[" + key.escapeHTML() + "]")});
+      displayedValue.insert({'bottom' : new Element("span", {"class": "key"}).update("[" + itemInput.value.escapeHTML() + "]")});
       displayedValue.insert({'bottom' : new Element("span", {"class": "sep"}).update(" ")});
     }
     // Insert the displayed value
     displayedValue.insert({'bottom' : new Element("span", {"class": "value"}).update(suggestion.value.escapeHTML())});
     listItem.insert(displayedValue);
     // Delete tool
-    if (this.options.showDeleteTool) {
-      var deleteTool = new Element("span", {'class': "delete-tool", "title" : "$msg.get('core.widgets.suggestPicker.delete.tooltip')"}).update("$msg.get('core.widgets.suggestPicker.delete')");
-      deleteTool.observe('click', this.removeItem);
-      listItem.appendChild(deleteTool);
-    }
+    this.options.showDeleteTool && listItem.insert(this.createDeleteTool());
     // Tooltip, if information exists and the options state there should be a tooltip
     if (this.options.showTooltip && suggestion.info) {
       listItem.appendChild(new Element("div", {'class' : "tooltip"}).update(suggestion.info));
     }
-    this.list.insert(listItem);
-    newInput.observe('change', this.checkboxChanged);
-    this.options.onItemAdded(newInput);
-    this.notifySelectionChange(listItem);
-    this.updateListTools();
-    return newInput;
+    return listItem;
+  },
+
+  /**
+   * Creates the input used to store the value of a selected item.
+   */
+  createItemInput: function(suggestion) {
+    var inputOptions = {
+      type : this.options.inputType,
+      name : this.inputName,
+      id : this.getInputId(suggestion.id || suggestion.value),
+      value : suggestion.value || suggestion.id
+    };
+    if (this.options.inputType == 'checkbox') {
+      inputOptions.checked = 'checked';
+    }
+    var input = new Element('input', inputOptions);
+    input.observe('change', this.checkboxChanged);
+    return input;
+  },
+
+  /**
+   * Creates the tool used to delete a selected item.
+   */
+  createDeleteTool: function() {
+    var deleteTool = new Element("span", {
+      'class': "delete-tool",
+      title : "$msg.get('core.widgets.suggestPicker.delete.tooltip')"
+    }).update('&times;').observe('click', this.removeItem);
+    deleteTool.insert({top: new Element('span', {'class': 'hidden'}).update('[')});
+    deleteTool.insert({bottom: new Element('span', {'class': 'hidden'}).update(']')});
+    return deleteTool;
   },
 
   /**
@@ -185,14 +280,14 @@ var XWiki = (function (XWiki) {
   updateListTools : function () {
     // Show/hide the "delete all" button
     if (this.clearTool) {
-      if (this.list.select('li .accepted-suggestion').length > 0) {
-        this.clearTool.removeClassName('invisible');
+      if (this.list.childElements().length > 1) {
+        this.clearTool.show();
       } else {
-        this.clearTool.addClassName('invisible');
+        this.clearTool.hide();
       }
     }
     // Refresh the Sortable behavior to take into account the new items
-    if (this.options.enableSort && this.list.select('li .accepted-suggestion').length > 0 && typeof(Sortable) != "undefined") {
+    if (this.options.enableSort && this.list.childElements().length > 1 && typeof(Sortable) != "undefined") {
       Sortable.create(this.list);
     }
   },

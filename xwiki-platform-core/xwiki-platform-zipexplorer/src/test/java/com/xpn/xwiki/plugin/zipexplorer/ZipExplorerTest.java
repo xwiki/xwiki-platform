@@ -100,9 +100,12 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
     public void testDownloadAttachment() throws Exception
     {
         String zipFileContent = "File.txt content";
+        Mock mockDocument = mock(XWikiDocument.class);
+        mockDocument.stubs().method("setContentDirty");
+        mockDocument.stubs().method("setMetaDataDirty");
         XWikiAttachment originalAttachment =
             createAttachment("zipfile.zip", createZipFile(zipFileContent),
-                (XWikiDocument) mock(XWikiDocument.class).proxy());
+                (XWikiDocument) mockDocument.proxy());
 
         XWikiContext context =
             createXWikiContext("http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt");

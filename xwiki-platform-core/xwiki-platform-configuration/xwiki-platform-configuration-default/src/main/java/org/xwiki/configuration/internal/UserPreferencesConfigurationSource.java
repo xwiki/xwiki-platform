@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
@@ -50,7 +51,11 @@ public class UserPreferencesConfigurationSource extends AbstractDocumentConfigur
     @Override
     protected DocumentReference getClassReference()
     {
-        return new DocumentReference(getCurrentWikiReference().getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
+        // The user can be from a different wiki, we need to get the class reference from the wiki of the user.
+        // Example: the user "xwiki:XWiki.Admin" is looking at "subwiki:Main.WebHome", we need to use the class
+        // reference "xwiki:XWiki.XWikiUsers" and not "subwiki:XWiki.XWikiUsers".
+        WikiReference wikiReference = getDocumentAccessBridge().getCurrentUserReference().getWikiReference();
+        return new DocumentReference(wikiReference.getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
     }
 
     @Override

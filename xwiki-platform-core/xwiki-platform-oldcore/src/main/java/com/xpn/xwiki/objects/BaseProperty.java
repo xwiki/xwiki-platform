@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -51,6 +52,16 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     private BaseCollection object;
 
     private long id;
+
+    /**
+     * Set to true if value is not the same as the database value.
+     */
+    private boolean isValueDirty = true;
+
+    /**
+     * The owner document, if this object was obtained from a document.
+     */
+    private XWikiDocument ownerDocument;
 
     @Override
     protected R createReference()
@@ -259,5 +270,68 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         // XXX: collision between current and new: don't know how to apply 3 way merge on unknown type
         mergeResult.error(new CollisionException("Collision found on property [" + getName() + "] between from value ["
             + getValue() + "] and to [" + newValue + "]"));
+    }
+
+    @Override
+    public boolean apply(ElementInterface newProperty, boolean clean)
+    {
+        boolean modified = super.apply(newProperty, clean);
+
+        BaseProperty<R> newBaseProperty = (BaseProperty<R>) newProperty;
+
+        // Value
+        if (ObjectUtils.equals(newBaseProperty.getValue(), getValue())) {
+            setValue(newBaseProperty.getValue());
+            modified = true;
+        }
+
+        return modified;
+    }
+
+    /**
+     * @return {@literal true} if the property value doesn't match the value in the database.
+     * @since 4.3M2
+     */
+    public boolean isValueDirty()
+    {
+        return isValueDirty;
+    }
+
+    /**
+     * Set the dirty flag if the new value isn't equal to the old value.
+     *
+     * @param newValue The new value.
+     */
+    protected void setValueDirty(Object newValue)
+    {
+        if (!isValueDirty && !ObjectUtils.equals(newValue, getValue())) {
+            isValueDirty = true;
+            if (ownerDocument != null) {
+                ownerDocument.setContentDirty(true);
+            }
+        }
+    }
+
+    /**
+     * @param valueDirty Indicate if the dirty flag should be set or cleared.
+     * @since 4.3M2
+     */
+    public void setValueDirty(boolean valueDirty)
+    {
+        isValueDirty = valueDirty;
+    }
+
+    /**
+     * Set the owner document of this base property.
+     *
+     * @param owner The owner document.
+     * @since 4.3M2
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        this.ownerDocument = ownerDocument;
+        if (ownerDocument != null && isValueDirty) {
+            ownerDocument.setContentDirty(true);
+        }
     }
 }

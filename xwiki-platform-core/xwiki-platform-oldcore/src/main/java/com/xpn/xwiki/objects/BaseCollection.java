@@ -47,7 +47,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -762,13 +761,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         this.xClassReferenceCache = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#merge(com.xpn.xwiki.objects.ElementInterface,
-     *      com.xpn.xwiki.objects.ElementInterface, com.xpn.xwiki.doc.merge.MergeConfiguration,
-     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.doc.merge.MergeResult)
-     */
+    @Override
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
@@ -832,5 +825,43 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
+    }
+
+    @Override
+    public boolean apply(ElementInterface newElement, boolean clean)
+    {
+        boolean modified = false;
+
+        BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
+
+        if (clean) {
+            // Delete fields that don't exist anymore
+            List<String> fieldsToDelete = new ArrayList<String>(this.fields.size());
+            for (String key : this.fields.keySet()) {
+                if (newCollection.safeget(key) == null) {
+                    fieldsToDelete.add(key);
+                }
+            }
+
+            for (String key : fieldsToDelete) {
+                removeField(key);
+                modified = true;
+            }
+        }
+
+        // Add new fields and update existing fields
+        for (Map.Entry<String, Object> entry : newCollection.fields.entrySet()) {
+            PropertyInterface field = (PropertyInterface) this.fields.get(entry.getKey());
+            PropertyInterface newField = (PropertyInterface) entry.getValue();
+
+            if (field == null) {
+                addField(entry.getKey(), newField);
+                modified = true;
+            } else {
+                modified |= field.apply(newField, clean);
+            }
+        }
+
+        return modified;
     }
 }

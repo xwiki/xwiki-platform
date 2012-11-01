@@ -37,6 +37,7 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AbstractAuthorizationTestCase;
+import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
@@ -61,21 +62,18 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2
  */
+@MockingRequirement(DefaultAuthorizationSettler.class)
 public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCase
 {
-    @MockingRequirement
-    private DefaultAuthorizationSettler authorizationSettler;
+    private AuthorizationSettler authorizationSettler;
 
     private XWikiSecurityAccess defaultAccess;
     private XWikiSecurityAccess denyAllAccess;
     private XWikiSecurityAccess initialImportAccess;
 
-    @Override
     @Before
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         final EntityBridge entityBridge= getComponentManager().getInstance(EntityBridge.class);
         final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
 
@@ -105,6 +103,8 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             }
         }
         initialImportAccess.allow(Right.ADMIN);
+
+        this.authorizationSettler = getComponentManager().getInstance(AuthorizationSettler.class);
     }
 
     private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(String name, final SecurityReference reference,

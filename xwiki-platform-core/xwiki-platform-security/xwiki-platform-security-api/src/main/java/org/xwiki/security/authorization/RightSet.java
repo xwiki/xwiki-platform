@@ -224,7 +224,19 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     @Override
     public int size()
     {
-        return Long.bitCount(rights);
+        // return Long.bitCount(rights);
+        //
+        // Would be easier and probably faster, but some versions of the Oracle/Sun implementation may have an issue
+        // with Long.bitCount(), see:
+        // [Java 6] Wrong results from basic comparisons after calls to Long.bitCount(long) (pmd : XPathRule_1339015068)
+        // See Bug ID : 7063674
+        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7063674
+        //
+        // So we have reimplemented it based on public domain code snippets published in Bit Twiddling Hacks
+        // by Sean Eron Anderson (see http://www-graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallelw)
+        long v = rights - ((rights >>> 1) & 0x5555555555555555L);
+        v = (v & 0x3333333333333333L) + ((v >>> 2) & 0x3333333333333333L);
+        return (int) (((v + (v >> 4) & 0x0F0F0F0F0F0F0F0FL) * 0x0101010101010101L) >>> 56);
     }
 
     @Override

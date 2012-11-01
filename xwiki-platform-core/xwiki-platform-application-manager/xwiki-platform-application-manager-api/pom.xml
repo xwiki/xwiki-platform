@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-application-manager</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-application-manager-api</artifactId>
   <name>XWiki Platform - Application Manager - API</name>
-  <description>XWiki Platform - Application Manager - API</description>
+  <description>API to manage application descriptors</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -38,6 +38,7 @@ import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -116,10 +117,19 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      */
     private boolean onlyNew = false;
 
+    private XWikiContext xwikiContext;
+
+    @Override
+    protected void declareProperties(ExecutionContext executionContext)
+    {
+        xwikiContext.declareInExecutionContext(executionContext);
+        xwikiContext = null;
+    }
+
+
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
-        super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
-
+        this.xwikiContext = context;
         this.indexUpdater = indexUpdater;
     }
 
@@ -309,8 +319,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
                 retval = indexDocuments(wikiName, documents, searcher, context);
             } catch (XWikiException e) {
-                LOGGER.warn("Error getting document names for wiki [{}] and filter [{}]: {}.",
-                    new Object[] {wikiName, this.hqlFilter, e.getMessage()});
+                LOGGER.warn("Error getting document names for wiki [{}] and filter [{}]: {}.", new Object[] {wikiName,
+                this.hqlFilter, e.getMessage()});
 
                 return -1;
             } finally {
@@ -343,8 +353,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 try {
                     retval += addTranslationOfDocument(documentReference, language, context);
                 } catch (XWikiException e) {
-                    LOGGER.error("Error fetching document [{}] for language [{}]",
-                        new Object[] {documentReference, language, e});
+                    LOGGER.error("Error fetching document [{}] for language [{}]", new Object[] {documentReference,
+                    language, e});
 
                     return retval;
                 }

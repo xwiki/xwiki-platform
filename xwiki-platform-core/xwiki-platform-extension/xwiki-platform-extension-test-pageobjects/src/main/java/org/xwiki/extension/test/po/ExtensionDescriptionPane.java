@@ -61,7 +61,7 @@ public class ExtensionDescriptionPane extends BaseElement
      */
     public WebElement getWebSite()
     {
-        By xpath = By.xpath(".//li[starts-with(., 'Website: ')]//a");
+        By xpath = By.xpath(".//li[starts-with(normalize-space(.), 'Website: ')]//a");
         return getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
     }
 }

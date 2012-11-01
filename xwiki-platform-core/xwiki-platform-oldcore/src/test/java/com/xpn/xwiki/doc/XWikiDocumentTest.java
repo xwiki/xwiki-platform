@@ -164,6 +164,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
+        this.mockXWiki.stubs().method("exists").will(returnValue(false));
+        this.mockXWiki.stubs().method("evaluateTemplate").will(returnValue(""));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().put("msg", this.mockXWikiMessageTool.proxy());
@@ -398,6 +401,16 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(1, copy.getXObjects().size());
         BaseObject bobject = copy.getXObjects().get(copy.getXObjects().keySet().iterator().next()).get(0);
         assertEquals(new DocumentReference("copywiki", DOCSPACE, DOCNAME), bobject.getXClassReference());
+    }
+
+    public void testCustomMappingAfterDocumentCopy() throws Exception
+    {
+        this.document.getXClass().setCustomMapping("internal");
+
+        XWikiDocument copy =
+            this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"), getContext());
+
+        assertEquals("",copy.getXClass().getCustomMapping());
     }
 
     public void testCloneNullObjects() throws XWikiException
@@ -1459,7 +1472,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             {
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    return execution.getContext().getProperty("velocityContext");
+                    VelocityContext velocityContext =
+                        (VelocityContext) execution.getContext().getProperty("velocityContext");
+                    // See DefaultVelocityManagerTest#testGetVelocityContextUpdatesXContext()
+                    getContext().put("vcontext", velocityContext);
+                    return velocityContext;
                 }
             });
 
@@ -1499,5 +1516,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Assert.assertFalse(document.equals(otherDocyment));
         Assert.assertTrue(document.equalsData(otherDocyment));
+    }
+
+    public void testContentDirtyWhenAttachmenListChanges()
+    {
+        XWikiDocument document = new XWikiDocument();
+
+        document.setContentDirty(false);
+
+        List<XWikiAttachment> attachments = document.getAttachmentList();
     }
 }

@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
@@ -182,13 +183,16 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Override
     public File getBackupFile(final File storageFile)
     {
-        return new File(storageFile.getAbsolutePath() + BACKUP_FILE_SUFFIX);
+        // We pad our file names with random alphanumeric characters so that multiple operations on the same
+        // file in the same transaction do not collide, the set of all capital and lower case letters
+        // and numbers has 62 possibilities and 62^8 = 218340105584896 between 2^47 and 2^48.
+        return new File(storageFile.getAbsolutePath() + BACKUP_FILE_SUFFIX + RandomStringUtils.randomAlphanumeric(8));
     }
 
     @Override
     public File getTempFile(final File storageFile)
     {
-        return new File(storageFile.getAbsolutePath() + TEMP_FILE_SUFFIX);
+        return new File(storageFile.getAbsolutePath() + TEMP_FILE_SUFFIX + RandomStringUtils.randomAlphanumeric(8));
     }
 
     @Override

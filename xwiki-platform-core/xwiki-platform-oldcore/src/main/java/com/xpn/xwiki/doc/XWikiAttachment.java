@@ -270,6 +270,13 @@ public class XWikiAttachment implements Cloneable
     {
         this.doc = doc;
         this.reference = null;
+        if (isMetaDataDirty && doc != null) {
+            doc.setMetaDataDirty(true);
+        }
+        if (getAttachment_content() != null)
+        {
+            getAttachment_content().setOwnerDocument(doc);
+        }
     }
 
     public Date getDate()
@@ -313,6 +320,10 @@ public class XWikiAttachment implements Cloneable
     public void setMetaDataDirty(boolean metaDataDirty)
     {
         this.isMetaDataDirty = metaDataDirty;
+        if (metaDataDirty && doc != null)
+        {
+            doc.setMetaDataDirty(true);
+        }
     }
 
     /**
@@ -507,6 +518,9 @@ public class XWikiAttachment implements Cloneable
     public void setAttachment_content(XWikiAttachmentContent attachment_content)
     {
         this.attachment_content = attachment_content;
+        if (attachment_content != null) {
+            attachment_content.setOwnerDocument(doc);
+        }
     }
 
     public XWikiAttachmentArchive getAttachment_archive()

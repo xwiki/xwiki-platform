@@ -94,8 +94,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         try {
             doc = xwikiContext.getWiki().getDocument(reference, xwikiContext);
         } catch (XWikiException e) {
-            throw new IRCBotException(String.format("Unable to load document [%s]",
-                this.defaultSerializer.serialize(reference)), e);
+            throw new IRCBotException(String.format("Unable to load document [%s]", reference), e);
         }
         return doc;
     }
@@ -111,7 +110,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     {
         XWikiContext xwikiContext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
         if (xwikiContext == null) {
-            throw new IRCBotException("The XWiki Context is not available in the Execution Contexte");
+            throw new IRCBotException("The XWiki Context is not available in the Execution Context");
         }
         return xwikiContext;
     }
@@ -194,7 +193,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         if (configurationObject == null) {
             // There's no Bot Configuration object
             throw new IRCBotException(String.format("Cannot find the IRC Configuration object in the [%s] document",
-                this.defaultSerializer.serialize(configurationDocument.getDocumentReference())));
+                configurationDocument.getDocumentReference()));
         }
         return configurationObject;
     }

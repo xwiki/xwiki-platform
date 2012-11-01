@@ -1064,8 +1064,8 @@
       <prettyName>Timezone</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
-      <validationMessage></validationMessage>
-      <validationRegExp></validationRegExp>
+      <validationMessage/>
+      <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </timezone>
     <title>
@@ -2473,8 +2473,8 @@
         <prettyName>Timezone</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </timezone>
       <title>
@@ -2683,7 +2683,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
       <registration_registered>---</registration_registered>
     </property>
     <property>
-      <rightPanels>Panels.QuickLinks,Panels.MyRecentModifications</rightPanels>
+      <rightPanels>Panels.Applications,Panels.QuickLinks,Panels.MyRecentModifications</rightPanels>
     </property>
     <property>
       <showLeftPanels>0</showLeftPanels>

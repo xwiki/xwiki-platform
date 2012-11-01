@@ -36,6 +36,7 @@ public abstract class NumberProperty extends BaseProperty
     @Override
     public void setValue(Object value)
     {
+        setValueDirty(value);
         this.value = (Number) value;
     }
 

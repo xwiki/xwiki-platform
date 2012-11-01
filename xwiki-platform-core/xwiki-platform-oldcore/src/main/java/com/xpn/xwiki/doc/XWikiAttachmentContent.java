@@ -23,12 +23,14 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
 import org.xwiki.store.UnexpectedException;
 
@@ -48,6 +50,9 @@ public class XWikiAttachmentContent implements Cloneable
 
     /** Storage which holds the actual content. */
     private FileItem file;
+
+    /** The owner document. */
+    private XWikiDocument ownerDocument;
 
     /**
      * Constructor which clones an existing XWikiAttachmentContent. Used by {@link #clone()}.
@@ -78,15 +83,14 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent()
     {
-        this.newFileItem();
+        this.file = this.getNewFileItem();
     }
 
     /**
-     * Set a new FileItem for storage.
-     * 
-     * @since 2.6M1
+     * @since 4.1M3
+     * @return a new FileItem for temporarily storing attachment content.
      */
-    private void newFileItem()
+    private static FileItem getNewFileItem()
     {
         final Environment env = Utils.getComponent(Environment.class);
         final File dir = new File(env.getTemporaryDirectory(), "attachment-cache");
@@ -99,7 +103,7 @@ public class XWikiAttachmentContent implements Cloneable
             dfi.getOutputStream();
             // Make sure this file is marked for deletion on VM exit because DiskFileItem does not.
             dfi.getStoreLocation().deleteOnExit();
-            this.file = dfi;
+            return dfi;
         } catch (IOException e) {
             throw new UnexpectedException("Failed to create new attachment temporary file.", e);
         }
@@ -198,6 +202,9 @@ public class XWikiAttachmentContent implements Cloneable
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
+        if (contentDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(contentDirty);
+        }
     }
 
     /**
@@ -211,6 +218,39 @@ public class XWikiAttachmentContent implements Cloneable
         } catch (IOException e) {
             throw new RuntimeException("Failed to get InputStream", e);
         }
+    }
+
+    /**
+     * Set the content of the attachment by writing to a provided OutputStream.
+     * Content is *not* appended, this method clears the content and creates new content.
+     * If you want to append content, you can call {@link #getContentInputStream()} and copy
+     * the content of that into the provided OutputStream. Before closing this OutputStream
+     * the content will remain the old content prior to the change.
+     *
+     * @return an OutputStream into which the caller can set the content of the attachments.
+     * @since 4.2M3
+     */
+    public OutputStream getContentOutputStream()
+    {
+        final FileItem fi = getNewFileItem();
+        final XWikiAttachmentContent xac = this;
+        final OutputStream fios;
+        try {
+            fios = fi.getOutputStream();
+        } catch (IOException e) {
+            // DiskFileItem does not do anything which could cause an exception to be thrown.
+            // so unless it is modified, this should not happen.
+            throw new RuntimeException("Exception getting attachment OutputStream.", e);
+        }
+        return (new ProxyOutputStream(fios) {
+            @Override
+            public void close() throws IOException
+            {
+                super.close();
+                xac.file = fi;
+                xac.setContentDirty(true);
+            }
+        });
     }
 
     /**
@@ -237,7 +277,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is) throws IOException
     {
-        this.newFileItem();
+        this.file = this.getNewFileItem();
         IOUtils.copy(is, this.file.getOutputStream());
         this.setContentDirty(true);
 
@@ -251,5 +291,17 @@ public class XWikiAttachmentContent implements Cloneable
     public int getSize()
     {
         return (int) this.file.getSize();
+    }
+
+    /**
+     * Set the owner document in order to propagate the content dirty flag.
+     * 
+     * @param ownerDocument the owner document.
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument) {
+        this.ownerDocument = ownerDocument;
+        if (isContentDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(true);
+        }
     }
 }

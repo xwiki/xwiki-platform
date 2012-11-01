@@ -24,12 +24,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 
-import org.mozilla.javascript.ErrorReporter;
-import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
+import com.yahoo.platform.yui.compressor.javascript.ErrorReporter;
+import com.yahoo.platform.yui.compressor.javascript.EvaluatorException;
 
 /**
  * JavaScript extension.

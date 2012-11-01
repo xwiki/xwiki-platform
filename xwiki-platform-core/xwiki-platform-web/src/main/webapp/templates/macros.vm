@@ -722,6 +722,7 @@ $fn
 ###
 ### Extract and display the panel code from the panel object
 ###
+### @Deprecated
 #macro(displaypanel $name)
   #set ($paneldoc = $xwiki.getDocument($name))
   #if ($paneldoc)
@@ -1055,10 +1056,10 @@ $html
       #foreach($document in $documentList)
         #if ($document.getSpace() != $previousSpace && $displaySpaces)
           #if($velocityCount > 1) </ul></div></li> #end ## Close previous space item if needed
-          <li class="xitem space"><div class="xitemcontainer">$document.getSpace()<ul class="xlist"> ## Open new space item
+          <li class="xitem space"><div class="xitemcontainer">${escapetool.xml($document.getSpace())}<ul class="xlist"> ## Open new space item
           #set($previousSpace = $document.getSpace())
         #end
-        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">$escapetool.xml($document.getDisplayTitle())</a></div></li>
+        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">${escapetool.xml($document.getPlainTitle())}</a></div></li>
       #end
       #if($displaySpaces)
         </ul></div></li> ## Close last space item
@@ -1533,7 +1534,7 @@ function (row, i, table) {
             var tag = event.element().down("span");
             if (!tag)
              tag = event.element();
-            editProperty(row["doc_fullname"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+            editProperty(row["doc_fullName"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
           });
         ## Author
         #elseif($colprop.link == "author")
@@ -1598,7 +1599,7 @@ function (row, i, table) {
   #end
   }
   else {
-    var page = row["doc_fullname"];
+    var page = row["doc_fullName"];
     var dp = page.indexOf(':');
     var p = page.indexOf('.');
     var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
@@ -2254,12 +2255,22 @@ Wysiwyg.onModuleLoad(function() {
     #end
     #break($macro)
   #end
-  #set ($browserVariants = ['-moz-', '-webkit-', '-o-', '-ms-', ''])
+  #set ($browserVariants = ['-moz-', '-o-', ''])
+  #set ($browserVariantsWithLegacySyntax = ['-webkit-'])
   #set ($colors = '')
+  #set ($position = '')
+  #set ($legacyPosition = '')
   #if ($gradientData.angle)
-    #set ($position = "$!{gradientData.angle}")
+    #if ($stringtool.indexOfAny($gradientData.angle, 'top', 'right', 'bottom', 'left') != -1)
+      #set ($position = "to $!{gradientData.angle}")
+      #set ($legacyPosition = $stringtool.replaceEach($gradientData.angle, ['top', 'right', 'bottom', 'left'], ['bottom', 'left', 'top', 'right']))
+    #else
+      #set ($position = "$!{gradientData.angle}")
+      #set ($legacyPosition = "$!{gradientData.angle}")
+    #end
   #elseif ($gradientData.to)
-    #set ($position = "$!{gradientData.to}")
+    #set ($position = "to $!{gradientData.to}")
+    #set ($legacyPosition = $stringtool.replaceEach($gradientData.to, ['top', 'right', 'bottom', 'left'], ['bottom', 'left', 'top', 'right']))
   #end
   #foreach ($colorEntry in $gradientData.colors)
     #set ($colors = "$!{colors}, $!{colorEntry.color} $!{colorEntry.position}")
@@ -2267,10 +2278,15 @@ Wysiwyg.onModuleLoad(function() {
   #if ("$!{colors}" != '' && "$!{position}" == '')
     #set ($colors = $colors.substring(2))
   #end
+  #foreach ($bvar in $browserVariantsWithLegacySyntax)
+    background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{legacyPosition}$!{colors});
+  #end
   #foreach ($bvar in $browserVariants)
     background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{position}$!{colors});
   #end
 #end
+##
+##
 ##
 #macro (css3_backgroundLinearGradient $gradientData)
   #css3_backgroundIconAndLinearGradient ('' $gradientData)
@@ -2300,6 +2316,22 @@ Wysiwyg.onModuleLoad(function() {
     #foreach ($bvar in $browserVariants)
       ${bvar}box-sizing: $value;
     #end
+  #end
+#end
+
+#**
+ * Macro for text-shadow CSS property that adds shadows to text
+ *
+ *
+ * @param $offsetX shadow's horizontal offset value from the text
+ * @param $offsetY shadow's vertical offset value from the text
+ * @param $blurRadius the blur radius value of the text-shadow
+ * @param $color the color of the text-shadow
+ *#
+#macro (css_textShadow $offsetX $offsetY $blurRadius $color)
+  ## In order to ensure consistency across browsers and also to accommodate old ColorThemes that might not have gradientColor defined, we test the existence of $color param
+  #if (("$!{offsetX}" != '') && ("$!{offsetY}" != '') && ("$!{color}" != ''))
+    text-shadow: ${offsetX} ${offsetY} ${blurRadius} ${color};
   #end
 #end
 

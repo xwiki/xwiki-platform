@@ -398,6 +398,8 @@ public class XWikiLDAPUtils
                 while (values.hasMoreElements()) {
                     String member = values.nextElement();
 
+                    LOGGER.debug("  |- Member value [{}] found. Trying to resolve it.", member);
+
                     // we check for subgroups recursive call to scan all subgroups and identify members
                     // and their uid
                     getGroupMembers(member, memberMap, subgroups, context);
@@ -537,6 +539,8 @@ public class XWikiLDAPUtils
 
         int nbMembers = memberMap.size();
         if (LDAPDN.isValid(userOrGroup)) {
+            LOGGER.debug("[{}] is a valid DN, lets try to get corresponding entry.", userOrGroup);
+
             isGroup = getGroupMembersFromDN(userOrGroup, memberMap, subgroups, context);
         }
 
@@ -549,6 +553,8 @@ public class XWikiLDAPUtils
                 new RfcFilter(userOrGroup);
                 isGroup = getGroupMembersFromFilter(userOrGroup, memberMap, subgroups, context);
             } catch (LDAPException e) {
+                LOGGER.debug("[{}] is not a valid LDAP filter, lets try id", userOrGroup, e);
+
                 // Not a valid filter, try as uid
                 List<XWikiLDAPSearchAttribute> searchAttributeList =
                     searchUserAttributesByUid(userOrGroup, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
@@ -580,6 +586,8 @@ public class XWikiLDAPUtils
 
         // break out if there is a loop of groups
         if (subgroups != null && subgroups.contains(userOrGroupDN.toLowerCase())) {
+            LOGGER.debug("[{}] groups already resolved.", userOrGroupDN);
+
             return true;
         }
 
@@ -974,16 +982,16 @@ public class XWikiLDAPUtils
 
         // go through mapped groups to locate the user
         for (Map.Entry<String, Set<String>> entry : groupMappings.entrySet()) {
-            String xwikiGrouNamep = entry.getKey();
+            String xwikiGroupName = entry.getKey();
             Set<String> groupDNSet = entry.getValue();
 
-            if (xwikiUserGroupList.contains(xwikiGrouNamep)) {
+            if (xwikiUserGroupList.contains(xwikiGroupName)) {
                 if (!this.isMemberOfGroups(userDN, groupDNSet, context)) {
-                    removeUserFromXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
+                    removeUserFromXWikiGroup(xwikiUserName, xwikiGroupName, context);
                 }
             } else {
                 if (this.isMemberOfGroups(userDN, groupDNSet, context)) {
-                    addUserToXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
+                    addUserToXWikiGroup(xwikiUserName, xwikiGroupName, context);
                 }
             }
         }

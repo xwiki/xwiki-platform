@@ -24,17 +24,16 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerFactory;
+import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -46,11 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
-
-import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
 
 /**
  * Unit tests for {@link DefaultWikiIRCBotListenerManager}.
@@ -59,10 +54,10 @@ import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvide
  * @since 4.0M2
  */
 @AllComponents
+@MockingRequirement(value = DefaultWikiIRCBotListenerManager.class, exceptions = {EntityReferenceSerializer.class})
 public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = {EntityReferenceSerializer.class})
-    DefaultWikiIRCBotListenerManager manager;
+    private WikiIRCBotListenerManager manager;
 
     private DocumentReference wikiBotListenerReference1;
     private DocumentReference wikiBotListenerReference2;
@@ -74,7 +69,7 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
 
     private ComponentManager componentManager;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         final WikiIRCModel ircModel = getComponentManager().getInstance(WikiIRCModel.class);
@@ -120,6 +115,8 @@ public class DefaultWikiIRCBotListenerManagerTest extends AbstractMockingCompone
             allowing(bot).getListenerManager();
             will(returnValue(listenerManager));
         }});
+
+        this.manager = getComponentManager().getInstance(WikiIRCBotListenerManager.class);
     }
 
     @Test

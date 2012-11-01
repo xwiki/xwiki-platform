@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
@@ -48,7 +50,6 @@ import org.xwiki.extension.job.internal.InstallPlanJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.job.internal.UninstallPlanJob;
 import org.xwiki.extension.job.internal.UpgradePlanJob;
-import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -66,6 +67,9 @@ import org.xwiki.job.JobException;
 import org.xwiki.job.JobManager;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Entry point of extension manager from scripts.
@@ -100,6 +104,18 @@ public class ExtensionManagerScriptService implements ScriptService
      * The prefix put behind all job ids which are information gathering.
      */
     public static final String EXTENSIONPLAN_JOBID_PREFIX = "plan";
+
+    private static final String PROPERTY_USERREFERENCE = "user.reference";
+
+    private static final String PROPERTY_CALLERREFERENCE = "caller.reference";
+
+    private static final String PROPERTY_CHECKRIGHTS = "checkrights";
+
+    /**
+     * This property is set on requests to create an install or uninstall plan in order to specify which type of job
+     * generated the plan.
+     */
+    private static final String PROPERTY_JOB_TYPE = "job.type";
 
     /**
      * The real extension manager bridged by this script service.
@@ -149,9 +165,9 @@ public class ExtensionManagerScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    /**
-     * 
-     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Inject
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider scriptProvider;
@@ -379,6 +395,17 @@ public class ExtensionManagerScriptService implements ScriptService
 
     // Actions
 
+    private XWikiDocument getCallerDocument()
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        if (sdoc == null) {
+            sdoc = xcontext.getDoc();
+        }
+
+        return sdoc;
+    }
+
     private List<String> getJobId(String prefix, String extensionId, String namespace)
     {
         List<String> jobId;
@@ -393,6 +420,36 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
+     * Create an {@link InstallRequest} instance based on passed parameters.
+     * 
+     * @param id the identifier of the extension to install
+     * @param version the version to install
+     * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
+     *            will be installed globally
+     * @return the {@link InstallRequest}
+     */
+    public InstallRequest createInstallRequest(String id, String version, String namespace)
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
+        installRequest.setInteractive(true);
+        installRequest.addExtension(new ExtensionId(id, version));
+        if (StringUtils.isNotBlank(namespace)) {
+            installRequest.addNamespace(namespace);
+        }
+
+        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+
+        return installRequest;
+    }
+
+    /**
      * Start the asynchronous installation process for an extension if the context document has programming rights.
      * 
      * @param id the identifier of the extension to install
@@ -404,23 +461,24 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job install(String id, String version, String namespace)
     {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to install an extension"));
+        return install(createInstallRequest(id, version, namespace));
+    }
 
-            return null;
-        }
-
+    /**
+     * Start the asynchronous installation process for an extension if the context document has programming rights.
+     * 
+     * @param installRequest installation instructions
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public Job install(InstallRequest installRequest)
+    {
         setError(null);
 
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
-        installRequest.setInteractive(true);
-        installRequest.addExtension(new ExtensionId(id, version));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
+        if (installRequest.getProperty(PROPERTY_CHECKRIGHTS) != Boolean.TRUE
+            && !this.documentAccessBridge.hasProgrammingRights()) {
+            installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
         }
-
-        installRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
 
         Job job = null;
         try {
@@ -442,7 +500,7 @@ public class ExtensionManagerScriptService implements ScriptService
      * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
      *         {@code null} in case of failure
      */
-    public ExtensionPlan createInstallPlan(String id, String version, String namespace)
+    public Job createInstallPlan(String id, String version, String namespace)
     {
         setError(null);
 
@@ -453,17 +511,23 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(namespace);
         }
 
-        ExtensionPlan status;
-        try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(InstallPlanJob.JOBTYPE, installRequest).getStatus());
-        } catch (JobException e) {
-            setError(e);
-
-            status = null;
+        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
-        return status;
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
+
+        Job job = null;
+        try {
+            job = this.jobManager.addJob(InstallPlanJob.JOBTYPE, installRequest);
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
     }
 
     /**
@@ -510,12 +574,6 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     private Job uninstall(ExtensionId extensionId, String namespace)
     {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            setError(new JobException("Need programming right to uninstall an extension"));
-
-            return null;
-        }
-
         setError(null);
 
         UninstallRequest uninstallRequest = new UninstallRequest();
@@ -525,7 +583,13 @@ public class ExtensionManagerScriptService implements ScriptService
             uninstallRequest.addNamespace(namespace);
         }
 
-        uninstallRequest.setProperty("user.reference", this.documentAccessBridge.getCurrentUserReference());
+        uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
 
         Job job = null;
         try {
@@ -545,9 +609,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param id the identifier of the extension that is going to be removed
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
      *            extension will be removed from all namespaces
-     * @return the uninstall plan
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    public ExtensionPlan createUninstallPlan(String id, String namespace)
+    public Job createUninstallPlan(String id, String namespace)
     {
         return createUninstallPlan(new ExtensionId(id, (Version) null), namespace);
     }
@@ -559,9 +624,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * Uninstall from all namespaces.
      * 
      * @param extensionId the identifier of the extension that is going to be removed
-     * @return the uninstall plan
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    public ExtensionPlan createUninstallPlan(ExtensionId extensionId)
+    public Job createUninstallPlan(ExtensionId extensionId)
     {
         return createUninstallPlan(extensionId, null);
     }
@@ -575,9 +641,10 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param extensionId the id of the extension for which to create the uninstall plan
      * @param namespace the namespace from where the specified extension is going to be removed, {@code null} or blank
      *            string if the extension is supposed to be removed from all namespaces
-     * @return the uninstall plan
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
      */
-    private ExtensionPlan createUninstallPlan(ExtensionId extensionId, String namespace)
+    private Job createUninstallPlan(ExtensionId extensionId, String namespace)
     {
         setError(null);
 
@@ -588,48 +655,94 @@ public class ExtensionManagerScriptService implements ScriptService
             uninstallRequest.addNamespace(namespace);
         }
 
-        ExtensionPlan status;
-        try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest).getStatus());
-        } catch (JobException e) {
-            setError(e);
-
-            status = null;
+        uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
 
-        return status;
+        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallPlanJob.JOBTYPE);
+
+        Job job = null;
+        try {
+            job = this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest);
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    private InstallRequest createUpgradePlanRequest(String namespace)
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));
+        installRequest.addNamespace(namespace);
+
+        return installRequest;
+    }
+
+    private InstallRequest createUpgradePlanRequest()
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, null));
+
+        return installRequest;
     }
 
     /**
-     * Start the asynchronous upgrade plan creation process.
+     * Schedule the upgrade plan creation job.
      * 
-     * @param namespace the (optional) namespace where to upgrade the extensions; if {@code null} or empty, the
-     *            extension will be installed globally
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     * @param request the request to pass to pass to the upgrade plan job
+     * @return the {@link Job} object which can be used to monitor the progress of the upgrade plan creation process, or
      *         {@code null} in case of failure
      */
-    public ExtensionPlan createUpgradePlan(String namespace)
+    public Job createUpgradePlan(InstallRequest request)
+    {
+        request.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            request.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+
+        request.setProperty(PROPERTY_CHECKRIGHTS, true);
+
+        Job job = null;
+        try {
+            job = safe(this.jobManager.addJob(UpgradePlanJob.JOBTYPE, request));
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    /**
+     * Start the asynchronous upgrade plan creation process for the provided namespace.
+     * 
+     * @param namespace the namespace where to upgrade the extensions
+     * @return the {@link Job} object which can be used to monitor the progress of the plan creation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createUpgradePlan(String namespace)
     {
         setError(null);
 
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
-        }
+        return createUpgradePlan(createUpgradePlanRequest(namespace));
+    }
 
-        ExtensionPlan status;
-        try {
-            status =
-                safe((ExtensionPlan) this.jobManager.executeJob(UpgradePlanJob.JOBTYPE, installRequest).getStatus());
-        } catch (JobException e) {
-            setError(e);
+    /**
+     * Start the asynchronous upgrade plan creation process for all the namespaces.
+     * 
+     * @return the {@link Job} object which can be used to monitor the progress of the plan creation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createUpgradePlan()
+    {
+        setError(null);
 
-            status = null;
-        }
-
-        return status;
+        return createUpgradePlan(createUpgradePlanRequest());
     }
 
     // Jobs
@@ -768,6 +881,26 @@ public class ExtensionManagerScriptService implements ScriptService
 
         try {
             return new DefaultVersionConstraint(versionConstraint);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates an extension dependency object.
+     * 
+     * @param id the dependency identifier
+     * @param versionConstraint the dependency version constraint
+     * @return the extension dependency object
+     */
+    public ExtensionDependency createExtensionDependency(String id, String versionConstraint)
+    {
+        setError(null);
+
+        try {
+            return new DefaultExtensionDependency(id, new DefaultVersionConstraint(versionConstraint));
         } catch (Exception e) {
             setError(e);
         }

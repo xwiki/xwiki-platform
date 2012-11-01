@@ -90,7 +90,7 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         // 3) Bridge with old code to play well with new components. Old code relies on the
         // XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
-            this.execution.getContext().setProperty("xwikicontext", xwikiContext);
+            execution.getContext().newProperty("xwikicontext").inherited().initial(xwikiContext).declare();
         }
 
         // 4) Call the request initializers to populate the Request.

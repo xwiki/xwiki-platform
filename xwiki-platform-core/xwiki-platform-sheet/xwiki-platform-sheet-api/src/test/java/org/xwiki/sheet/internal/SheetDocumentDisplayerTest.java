@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -43,7 +44,8 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
-public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
+@MockingRequirement(SheetDocumentDisplayer.class)
+public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase<DocumentDisplayer>
 {
     /**
      * The reference to the displayed document.
@@ -66,12 +68,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     private static final DocumentReference BOB = new DocumentReference("wiki4", "Users2", "Bob");
 
     /**
-     * The component being tested.
-     */
-    @MockingRequirement
-    private SheetDocumentDisplayer sheetDocumentDisplayer;
-
-    /**
      * The component used to access the documents.
      */
     private DocumentAccessBridge documentAccessBridge;
@@ -81,13 +77,11 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
      */
     private ModelBridge modelBridge;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
-
-        modelBridge = getComponentManager().getInstance(ModelBridge.class);
-        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        this.modelBridge = getComponentManager().getInstance(ModelBridge.class);
+        this.documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -199,7 +193,7 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        sheetDocumentDisplayer.display(document, new DocumentDisplayerParameters());
+        getMockedComponent().display(document, new DocumentDisplayerParameters());
     }
 
     /**
@@ -256,6 +250,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        sheetDocumentDisplayer.display(document, new DocumentDisplayerParameters());
+        getMockedComponent().display(document, new DocumentDisplayerParameters());
     }
 }

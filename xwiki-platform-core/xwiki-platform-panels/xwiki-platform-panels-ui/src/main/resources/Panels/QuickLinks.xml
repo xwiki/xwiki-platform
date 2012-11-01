@@ -107,10 +107,6 @@
     <property>
       <content>{{velocity}}
 #panelheader($msg.get('xe.panels.quicklinks'))
-* [[$msg.get('xe.panels.quicklinks.dashboard')&gt;&gt;Dashboard.WebHome]] [[[[image:path:$xwiki.getSkinFile('icons/xwiki/rss-medium.png')||alt="(RSS)" title="RSS feed for wiki updates" class="icon rss"]]&gt;&gt;path:${xwiki.getURL('Main.WebRss', 'view', 'xpage=plain')}]]
-* [[$msg.get('xe.panels.quicklinks.index')&gt;&gt;Main.AllDocs]]
-* [[$msg.get('xe.panels.quicklinks.userdirectory')&gt;&gt;Main.UserDirectory]]
-* [[$msg.get('xe.panels.quicklinks.blog')&gt;&gt;Blog.WebHome]] [[[[image:path:$xwiki.getSkinFile('icons/xwiki/rss-medium.png')||alt="(RSS)" title="RSS feed for blog posts" class="icon rss"]]&gt;&gt;path:${xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')}]]
 * [[$msg.get('xe.panels.quicklinks.sandbox')&gt;&gt;Sandbox.WebHome]]
 #if ($xwiki.hasAdminRights())
 

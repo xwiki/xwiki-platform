@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1320329126000</creationDate>
-  <date>1326441647000</date>
-  <contentUpdateDate>1326441647000</contentUpdateDate>
+  <date>1343909393000</date>
+  <contentUpdateDate>1343909393000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -22,8 +22,11 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#set ($discard = $xwiki.ssx.use('ExtensionCode.SkinExtension'))
+#set ($discard = $xwiki.jsx.use('ExtensionCode.SkinExtension'))
+
 #set($repositoryConfigDoc = $xwiki.getDocument('ExtensionCode.RepositoryConfig'))
 #set($repositoryConfigClassName = 'ExtensionCode.RepositoryConfigClass')
 #set($repositoryConfigClass = $xwiki.getDocument($repositoryConfigClassName).xWikiClass)

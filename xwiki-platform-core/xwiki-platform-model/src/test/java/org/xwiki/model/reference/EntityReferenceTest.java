@@ -146,15 +146,15 @@ public class EntityReferenceTest
         Map<String, Serializable> map = getParamMap(3);
         EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)),map);
+                new EntityReference("wiki", EntityType.WIKI)), map);
 
         EntityReference reference8 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)),map);
+                new EntityReference("wiki", EntityType.WIKI)), map);
 
         EntityReference reference9 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI),map));
+                new EntityReference("wiki", EntityType.WIKI), map));
 
         EntityReference reference10 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -203,15 +203,15 @@ public class EntityReferenceTest
         Map<String, Serializable> map = getParamMap(3);
         EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)),map);
+                new EntityReference("wiki", EntityType.WIKI)), map);
 
         EntityReference reference8 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)),map);
+                new EntityReference("wiki", EntityType.WIKI)), map);
 
         EntityReference reference9 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI),map));
+                new EntityReference("wiki", EntityType.WIKI), map));
 
         EntityReference reference10 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -423,5 +423,32 @@ public class EntityReferenceTest
         EntityReference outRefs = (EntityReference) ois.readObject();
 
         Assert.assertEquals(reference, outRefs);
+    }
+
+    @Test
+    public void testToString()
+    {
+        EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals("Document wiki:space.page", reference1.toString());
+
+        EntityReference reference2 = new EntityReference("page", EntityType.DOCUMENT, null);
+        Assert.assertEquals("Document page", reference2.toString());
+
+        EntityReference reference3 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE));
+        Assert.assertEquals("Document space.page", reference3.toString());
+
+        // We don't handle parameters in Entity Reference because they're internal and not exposed and at the moment
+        // they can only be used in a restricted manner (only LOCALE) by a DocumentReference.
+        Map<String, Serializable> map  = new HashMap<String, Serializable>();
+        map.put("key1", "value1");
+        EntityReference reference4 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE), map);
+        Assert.assertEquals("Document space.page", reference4.toString());
+
+        EntityReference reference5 = new EntityReference("attachment", EntityType.ATTACHMENT, reference1);
+        Assert.assertEquals("Attachment wiki:space.page@attachment", reference5.toString());
     }
 }

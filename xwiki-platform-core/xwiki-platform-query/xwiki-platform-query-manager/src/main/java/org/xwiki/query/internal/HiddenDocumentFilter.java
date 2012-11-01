@@ -22,6 +22,9 @@ package org.xwiki.query.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -29,7 +32,6 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Query filter excluding 'hidden' documents from a {@link Query}. Hidden documents should not be returned in public
@@ -40,8 +42,8 @@ import javax.inject.Singleton;
  */
 @Component
 @Named("hidden")
-@Singleton
-public class HiddenDocumentFilter implements QueryFilter
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class HiddenDocumentFilter implements QueryFilter, Initializable
 {
     /**
      * Used to retrieve user preference regarding hidden documents.
@@ -57,12 +59,18 @@ public class HiddenDocumentFilter implements QueryFilter
     private Logger logger;
 
     /**
-     * @return true if the filter must be applied, depending on the user configuration, false otherwise.
+     * @see #initialize()
      */
-    private boolean isActive()
+    private boolean isActive;
+
+    /**
+     * Sets the #isActive property, based on the user configuration.
+     */
+    @Override
+    public void initialize()
     {
         Integer preference = userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class);
-        return preference == null || preference != 1;
+        isActive = preference == null || preference != 1;
     }
 
     /**
@@ -81,31 +89,35 @@ public class HiddenDocumentFilter implements QueryFilter
         String result = statement.trim();
         String lowerStatement = result.toLowerCase();
         String original = result;
+        String where = " where ";
 
-        if (Query.HQL.equals(language) && isActive() && isFilterable(lowerStatement)) {
+        if (Query.HQL.equals(language) && isActive && isFilterable(lowerStatement)) {
 
-            int idx = lowerStatement.indexOf("where ");
-            if (idx >= 0) {
+            int whereIdx = lowerStatement.indexOf(where);
+            int orderByIdx = Math.min(lowerStatement.indexOf(" order by "), Integer.MAX_VALUE);
+            int groupByIdx = Math.min(lowerStatement.indexOf(" group by "), Integer.MAX_VALUE);
+            // We need to handle the case where there's only one of them and not both (ie. avoid -1)
+            orderByIdx = orderByIdx < 0 ? Integer.MAX_VALUE : orderByIdx;
+            groupByIdx = groupByIdx < 0 ? Integer.MAX_VALUE : groupByIdx;
+            // Get the index of the first or only one
+            int orderOrGroupByIdx = Math.min(orderByIdx, groupByIdx);
+
+            if (whereIdx >= 0) {
                 // With 'WHERE'
-                idx = idx + 6;
+                // We need the index at the end of the " where " part
+                whereIdx = whereIdx + where.length();
+                int whereEndIdx = Math.min(orderOrGroupByIdx, lowerStatement.length());
+                result = result.substring(0, whereEndIdx) + ")" + result.substring(whereEndIdx);
                 result =
-                        result.substring(0, idx) + "(doc.hidden <> true or doc.hidden is null) and "
-                                + result.substring(idx);
+                    result.substring(0, whereIdx) + "(doc.hidden <> true or doc.hidden is null) and ("
+                                + result.substring(whereIdx);
             } else {
                 // Without 'WHERE', look for 'ORDER BY' or 'GROUP BY'
-                int oidx = Math.min(lowerStatement.indexOf("order by "), Integer.MAX_VALUE);
-                int gidx = Math.min(lowerStatement.indexOf("group by "), Integer.MAX_VALUE);
-                // We need to handle the case where there's only one of them and not both (ie. avoid -1)
-                oidx = oidx < 0 ? Integer.MAX_VALUE : oidx;
-                gidx = gidx < 0 ? Integer.MAX_VALUE : gidx;
-                // Get the index of the first or only one
-                idx = Math.min(oidx, gidx);
-
-                if (idx > 0 && idx < Integer.MAX_VALUE) {
+                if (orderOrGroupByIdx > 0 && orderOrGroupByIdx < Integer.MAX_VALUE) {
                     // Without 'WHERE', but with 'ORDER BY' and/or 'GROUP BY'
                     result =
-                            result.substring(0, idx) + "where doc.hidden <> true or doc.hidden is null "
-                                    + result.substring(idx);
+                            result.substring(0, orderOrGroupByIdx) + " where doc.hidden <> true or doc.hidden is null"
+                                    + result.substring(orderOrGroupByIdx);
                 } else {
                     // Without 'WHERE', 'ORDER BY' or 'GROUP BY'... This should not happen at all.
                     result = result + " where (doc.hidden <> true or doc.hidden is null)";

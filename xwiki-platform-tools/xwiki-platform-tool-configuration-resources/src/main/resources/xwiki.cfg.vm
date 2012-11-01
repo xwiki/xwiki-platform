@@ -35,7 +35,7 @@
 #-# [Since 1.6RC1] Defines the list of supported syntaxes
 #-# Available syntaxes are: 
 #-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
-#-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0
+#-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0, apt/1.0
 xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0, xwiki/2.1
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
@@ -408,7 +408,7 @@ xwiki.authentication.ldap.base_DN=
 #-# xwiki.authentication.ldap.bind_DN)
 #-# {0} is replaced with the user uid field name and {1} with the user name
 #-# The default is ({0}={1})
-# xwiki.authentication.ldap.ldap_user_search_fmt=({0}={1})
+# xwiki.authentication.ldap.user_search_fmt=({0}={1})
 
 #-# Only members of the following group will be verified in the LDAP
 #-# otherwise only users that are found after searching starting from the base_DN
@@ -498,6 +498,11 @@ xwiki.authentication.ldap.trylocal=1
 #-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password"
 #-# is set to 1
 # xwiki.authentication.ldap.password_field=userPassword
+
+#-# [Since 4.3M1, XWikiLDAPAuthServiceImpl]
+#-# The maximum number of milliseconds the client waits for any operation under these constraints to complete.
+#-# The default is 1000
+# xwiki.authentication.ldap.timeout=1000
 
 #---------------------------------------
 # WYSIWYG Editor configuration

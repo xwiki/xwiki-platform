@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.macro.chart.source;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Configurator interface.
+ * Abstract superclass for configurators that provides a common method handling for handling invalid parameter values.
  *
  * @version $Id$
  * @since 4.2M1

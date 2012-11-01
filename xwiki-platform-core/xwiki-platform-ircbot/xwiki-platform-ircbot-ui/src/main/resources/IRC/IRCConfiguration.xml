@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>IRC.BrokenLinkClass</name>
@@ -274,12 +274,17 @@
 #if ("$!irccontext" != "")
   #set ($channel = "$!irccontext.channel.name")
   #if ("$!channel" == "")
-    #set ($channel = "$!irccontext.bot.channelsNames.iterator().next()")
+    #set ($channelNameIterator = $!irccontext.bot.channelsNames.iterator())
+    #if ($channelNameIterator.hasNext())
+      #set ($channel = "$channelNameIterator.next()")
+    #else
+      #set ($channel = '')
+    #end
   #end
-  #set ($channel = $stringtool.stripStart($channel, '#'))
-  IRC.${channel}Archive${date}
-#else
-IRC.xwikiArchive${date}
+  #if ("$!channel" != '')
+    #set ($channel = $stringtool.stripStart($channel, '#'))
+    IRC.${channel}Archive${date}
+  #end
 #end
 {{/velocity}}</page>
     </property>

@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.WikiMacroClass</name>
@@ -148,51 +148,59 @@
 #set ($data = $configDoc.getObject("IRC.LoggingBotListener"))
 #set ($pageScript = $data.getProperty("page").getValue())
 #set ($pageName = $logListenerDoc.getRenderedContent($pageScript, $logListenerDoc.syntax.toIdString(), "plain/1.0"))
-#set ($logDoc = $xwiki.getDocument($pageName))
-## ============================================
-## If the Doc doesn't exist, create it
-## ============================================
-#if ($logDoc.isNew())
-  ## ===========================================
-  ## Set the title (find the channel)
-  ## ===========================================
-  #set ($irccontext = $services.ircbot.context)
-  #if ("$!irccontext" != "")
-    #set ($channel = "$!irccontext.channel.name")
-    #if ("$!channel" == "")
-      #set ($channel = "$!irccontext.bot.channelsNames.iterator().next()")
+#if ("$!pageName" != '')
+  #set ($logDoc = $xwiki.getDocument($pageName))
+  ## ============================================
+  ## If the Doc doesn't exist, create it
+  ## ============================================
+  #if ($logDoc.isNew())
+    ## ===========================================
+    ## Set the title (find the channel)
+    ## ===========================================
+    #set ($irccontext = $services.ircbot.context)
+    #if ("$!irccontext" != "")
+      #set ($channel = "$!irccontext.channel.name")
+      #if ("$!channel" == "")
+        #set ($channelNameIterator = $!irccontext.bot.channelsNames.iterator())
+        #if ($channelNameIterator.hasNext())
+          #set ($channel = "$channelNameIterator.next()")
+        #else
+          #set ($channel = '')
+        #end
+      #end
+      #set ($channel = $stringtool.stripStart($channel, '#'))
     #end
-    #set ($channel = $stringtool.stripStart($channel, '#'))
+    #if ("$!channel" == '')
+      #set ($channel = "&lt;unknown&gt;")
+    #end
+    #set ($titleDate = $datetool.get('dd MMMM yyyy'))
+    #set ($discard = $logDoc.setTitle("IRC Archive for channel #$channel on $titleDate"))
+    ## ===========================================
+    ## Set other metadata
+    ## ===========================================
+    #set ($discard = $logDoc.setSyntax('plain/1.0'))
+    #set ($discard = $logDoc.setParent('IRC.WebHome'))
+    #set ($discard = $logDoc.setCreator('IRCBot'))
+    #set ($archiveClassName = 'IRC.IRCBotArchiveClass')
+    #set ($archiveObject = $logDoc.getObject($archiveClassName, true))
+    #set ($discard = $archiveObject.set('channel', $channel))
   #end
-  #if ("$!channel" == "")
-    #set ($channel = "&lt;unknown&gt;")
+  ## ============================================
+  ## Add the new content to the logging doc
+  ## ============================================
+  #set ($currentContent = $logDoc.content)
+  #set ($newContent = $xcontext.macro.content)
+  #if ($currentContent &amp;&amp; $currentContent.length() &gt; 0)
+    #set ($logDate = $datetool.get('HH:mm'))
+    #set ($newContent = "$currentContent
+  $logDate $newContent")
   #end
-  #set ($titleDate = $datetool.get('dd MMMM yyyy'))
-  #set ($discard = $logDoc.setTitle("IRC Archive for channel #$channel on $titleDate"))
-  ## ===========================================
-  ## Set other metadata
-  ## ===========================================
-  #set ($discard = $logDoc.setParent('IRC.WebHome'))
-  #set ($discard = $logDoc.setCreator('IRCBot'))
-  #set ($archiveClassName = 'IRC.IRCBotArchiveClass')
-  #set ($archiveObject = $logDoc.getObject($archiveClassName, true))
-  #set ($discard = $archiveObject.set('channel', $channel))
+  #set ($discard = $logDoc.setContent($newContent))
+  ## ============================================
+  ## Save it!
+  ## ============================================
+  #set ($discard = $logDoc.save("Logging from IRC", true))
 #end
-## ============================================
-## Add the new content to the logging doc
-## ============================================
-#set ($currentContent = $logDoc.content)
-#set ($newContent = $xcontext.macro.content)
-#if ($currentContent &amp;&amp; $currentContent.length() &gt; 0)
-  #set ($logDate = $datetool.get('HH:mm'))
-  #set ($newContent = "$currentContent
-$logDate $newContent")
-#end
-#set ($discard = $logDoc.setContent($newContent))
-## ============================================
-## Save it!
-## ============================================
-#set ($discard = $logDoc.save("Logging from IRC", true))
 {{/velocity}}</code>
     </property>
     <property>

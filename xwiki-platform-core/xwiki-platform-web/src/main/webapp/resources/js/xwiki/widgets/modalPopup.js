@@ -102,7 +102,7 @@ widgets.ModalPopup = Class.create({
       break;
     }
     // Append to the end of the document body.
-    document.body.appendChild(this.dialog);
+    $('body').appendChild(this.dialog);
     this.dialog.hide();
   },
   /** Set a class name to the dialog box */

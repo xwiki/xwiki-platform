@@ -19,11 +19,15 @@
  */
 package org.xwiki.query.internal;
 
+import java.lang.reflect.Field;
+
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -34,41 +38,44 @@ import static org.junit.Assert.assertEquals;
  *
  * @version $Id$
  */
+@MockingRequirement(HiddenDocumentFilter.class)
 public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private HiddenDocumentFilter filter;
+    private QueryFilter filter;
 
     private ConfigurationSource userConfiguration;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
-        userConfiguration = getComponentManager().getInstance(ConfigurationSource.class, "user");
+        this.userConfiguration = getComponentManager().getInstance(ConfigurationSource.class, "user");
         getMockery().checking(new Expectations() {{
             ignoring(any(Logger.class)).method("debug");
+            // We need to set this expectation here because this call is made during the filter component initialization
+            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
+            will(returnValue(0));
         }});
+
+        this.filter = getComponentManager().getInstance(QueryFilter.class, "hidden");
     }
 
     @Test
     public void filterHQLStatementWithDoNotDisplayHiddenDocumentsInTheUserPreferences() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(0));
-        }});
         assertEquals(
-                "select doc.fullName from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and 1=1",
+                "select doc.fullName from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and (1=1)",
                 filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.HQL));
     }
 
     @Test
     public void filterHQLStatementWithDisplayHiddenDocumentsInTheUserPreferences() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(1));
-        }});
+        // We need to do it that way since the expectation must be set in #configure() and the expectation sets the
+        // isActive property to true
+        Class filterClass = filter.getClass();
+        Field field = filterClass.getDeclaredField("isActive");
+        field.setAccessible(true);
+        field.set(filter, false);
 
         // Insertions of distinct
         assertEquals("select doc.fullName from XWikiDocument doc where 1=1",
@@ -78,11 +85,6 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     @Test
     public void filterIncorrectHQLStatement() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(0));
-        }});
-
         // Insertions of distinct
         assertEquals("select doc.fullName from XWikiDocument mydoc where 1=1",
                 filter.filterStatement("select doc.fullName from XWikiDocument mydoc where 1=1", Query.HQL));
@@ -96,13 +98,38 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
+    public void filterHQLStatementWithWhereAndOrderBy()
+    {
+        // Insertions of distinct
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
+            + "(1=1) order by doc.name",
+                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name",
+                    Query.HQL));
+    }
+
+    @Test
+    public void filterHQLStatementWithWhereAndGroupBy()
+    {
+        // Insertions of distinct
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
+            + "(1=1) group by doc.name",
+                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 group by doc.name",
+                    Query.HQL));
+    }
+
+    @Test
+    public void filterHQLStatementWithWhereAndOrderByAndGroupBy()
+    {
+        // Insertions of distinct
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
+            + "(1=1) order by doc.name group by doc.name",
+                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name group by "
+                    + "doc.name", Query.HQL));
+    }
+
+    @Test
     public void filterHQLStatementWithoutWhere()
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(0));
-        }});
-
         // Insertions of distinct
         assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null)",
                 filter.filterStatement("select doc.name from XWikiDocument doc", Query.HQL));
@@ -111,11 +138,6 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     @Test
     public void filterHQLStatementWithoutWhereWithOrderBy()
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(0));
-        }});
-
         // Insertions of distinct
         assertEquals("select doc.name from XWikiDocument doc where doc.hidden <> true or doc.hidden is null order by "
                 + "doc.name asc",
@@ -125,11 +147,6 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     @Test
     public void filterHQLStatementWithoutWhereWithGroupBy()
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(0));
-        }});
-
         // Insertions of distinct
         assertEquals("select doc.web, doc.name from XWikiDocument doc where doc.hidden <> true or doc.hidden is null " +
                 "group by doc.web",

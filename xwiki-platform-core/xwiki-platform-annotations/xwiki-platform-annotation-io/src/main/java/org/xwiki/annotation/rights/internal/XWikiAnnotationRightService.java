@@ -163,7 +163,8 @@ public class XWikiAnnotationRightService implements AnnotationRightService
      */
     private void logException(Exception e, String target, String user)
     {
-        this.logger.warn("Couldn't get access rights for the target [" + target + "] for user [" + user + "]", e);
+        this.logger.warn("Couldn't get access rights for the target [{}] for user [{}]",
+            new Object[] {target, user, e});
     }
 
     /**

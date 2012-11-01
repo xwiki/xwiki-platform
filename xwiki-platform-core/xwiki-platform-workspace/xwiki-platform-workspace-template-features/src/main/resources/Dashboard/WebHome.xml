@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -302,11 +302,11 @@
 ##
 #set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
 #if (!$workspace)
-  {{error}}The current wiki is not a workspace.{{/error}}
+  {{error}}$msg.get('platform.workspace.wikiNotWorkspace'){{/error}}
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
   #set($prettyName = $wikiDescriptor.getValue('wikiprettyname'))
-  Welcome to the **$prettyName** workspace.
+  $msg.get('platform.workspace.gadgetWelcomeToWorkspace', $prettyName)
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
 
@@ -318,16 +318,16 @@
   #if (!$isGuest)
     #if ($hasOwner)
 
-      You are the owner of this workspace.
+      $msg.get('platform.workspace.currentUserIsOwner')
     #elseif ($hasAdmin)
 
-      You are an administrator of this workspace.
+      $msg.get('platform.workspace.currentUserIsAdministrator')
     #end
   #end
 
   ## Join/Leave
   #if ($isGuest)
-    To join this workspace you need to be logged in.
+    $msg.get('platform.workspace.joinNeedToLogIn')
   #else    
     #set ($workspaceGroupDocument = $workspace.groupDocument)
     #set ($groupsClass = "$currentWiki:XWiki.XWikiGroups")
@@ -336,11 +336,11 @@
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
       #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=$prettyName"))
-      You are not currently a member of this workspace. If you like, you can {{html}}&lt;a href="$joinUrl"&gt;join this workspace&lt;a/&gt;{{/html}}.
+      $msg.get('platform.workspace.currentUserNotMember') $msg.get('platform.workspace.currentUserCanJoin', $joinUrl)
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=$prettyName"))
-      You are currently a member of this workspace. If you like, you can {{html}}&lt;a href="$leaveUrl"&gt;leave this workspace&lt;a/&gt;{{/html}}.
+      $msg.get('platform.workspace.currentUserIsMember') $msg.get('platform.workspace.currentUserCanLeave', $leaveUrl)
     #end
   #end
 #end
@@ -350,7 +350,7 @@
       <position>1,1</position>
     </property>
     <property>
-      <title>Workspace Information</title>
+      <title>$msg.get('platform.workspace.gadgetWorkspaceInformationLabel')</title>
     </property>
   </object>
   <object>
@@ -442,14 +442,14 @@
   #end
 #end
 
-To see the full list of workspace members, you can use the [[User Directory&gt;&gt;Main.UserDirectory]] page.
+$msg.get('platform.workspace.gadgetTopActiveUsersAllMembers')
 {{/velocity}}</content>
     </property>
     <property>
       <position>1,2</position>
     </property>
     <property>
-      <title>Top Active Members</title>
+      <title>$msg.get('platform.workspace.gadgetTopActiveUsersLabel')</title>
     </property>
   </object>
   <content>{{dashboard/}}</content>

@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>#############################################################################
 ## Print the list of last modifications made on all wikis. Can be filtered by a provided user.
 ##

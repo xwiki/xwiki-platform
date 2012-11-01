@@ -54,17 +54,25 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
     private XWikiStubContextProvider stubContextProvider;
 
     /**
+     * @see #XWikiContextualizedThreadFactory(Execution, ExecutionContextManager, XWikiStubContextProvider, String)
+     */
+    private String currentWiki;
+
+    /**
      * @param execution the way to get the Execution Context
      * @param executionContextManager the way to create a new Execution Contexte from scratch
      * @param stubContextProvider the way to clone the XWiki Context
+     * @param currentWiki the current wiki to set in the Execution Context so that all Bot Listeners will execute in
+     *        that wiki context.
      */
     public XWikiContextualizedThreadFactory(Execution execution,
         ExecutionContextManager executionContextManager,
-        XWikiStubContextProvider stubContextProvider)
+        XWikiStubContextProvider stubContextProvider, String currentWiki)
     {
         this.execution = execution;
         this.executionContextManager = executionContextManager;
         this.stubContextProvider = stubContextProvider;
+        this.currentWiki = currentWiki;
     }
 
     /**
@@ -103,6 +111,9 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
                 XWikiURLFactory urlf = xwikiContext.getWiki().getURLFactoryService().createURLFactory(
                     XWikiContext.MODE_SERVLET, xwikiContext);
                 xwikiContext.setURLFactory(urlf);
+
+                // Set the current wiki
+                xwikiContext.setDatabase(currentWiki);
 
                 execution.pushContext(context);
             }

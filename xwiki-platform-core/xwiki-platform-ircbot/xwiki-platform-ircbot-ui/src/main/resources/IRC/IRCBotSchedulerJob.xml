@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.SchedulerJobClass</name>
@@ -123,10 +123,10 @@
     <className>XWiki.SchedulerJobClass</className>
     <guid>d7aee508-3f2a-459c-a215-f9cf2de831d7</guid>
     <property>
-      <contextDatabase>xwiki</contextDatabase>
+      <contextDatabase/>
     </property>
     <property>
-      <contextLang>en</contextLang>
+      <contextLang/>
     </property>
     <property>
       <contextUser/>
@@ -145,13 +145,13 @@
     </property>
     <property>
       <script>def botManager = services.get("ircbot")
-if (!botManager.isStarted()) {
+if (botmanager &amp;&amp; !botManager.isStarted()) {
   botManager.start(false)
 }
 </script>
     </property>
     <property>
-      <status>Normal</status>
+      <status>None</status>
     </property>
   </object>
   <content>{{include document="XWiki.SchedulerJobSheet"/}}</content>

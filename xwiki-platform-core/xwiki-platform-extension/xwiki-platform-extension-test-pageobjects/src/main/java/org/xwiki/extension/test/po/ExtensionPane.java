@@ -36,11 +36,6 @@ import org.xwiki.test.ui.po.BaseElement;
 public class ExtensionPane extends BaseElement
 {
     /**
-     * The extension name locator.
-     */
-    private static final By EXTENSION_NAME = By.className("extension-name");
-
-    /**
      * The element that wraps the extension display.
      */
     private final WebElement container;
@@ -91,8 +86,8 @@ public class ExtensionPane extends BaseElement
      */
     public String getName()
     {
-        String nameAndVersion = getUtil().findElementWithoutWaiting(getDriver(), container, EXTENSION_NAME).getText();
-        return nameAndVersion.substring(0, nameAndVersion.length() - getVersion().length() - 1);
+        By xpath = By.xpath("*[@class = 'extension-header']//*[@class = 'extension-name']");
+        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath).getText();
     }
 
     /**
@@ -107,11 +102,9 @@ public class ExtensionPane extends BaseElement
     /**
      * @return the extension authors
      */
-    public String getAuthors()
+    public List<WebElement> getAuthors()
     {
-        List<WebElement> found =
-            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-authors"));
-        return found.size() > 0 ? found.get(0).getText() : null;
+        return getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-author"));
     }
 
     /**
@@ -120,7 +113,7 @@ public class ExtensionPane extends BaseElement
     public String getSummary()
     {
         List<WebElement> found =
-            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-description"));
+            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-summary"));
         return found.size() > 0 ? found.get(0).getText() : null;
     }
 
@@ -152,15 +145,16 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitUntilElementIsVisible(WebElement button, String xpathSuffix)
     {
-        String nameAndVersion = getUtil().findElementWithoutWaiting(getDriver(), container, EXTENSION_NAME).getText();
+        String nameAndVersion =
+            getUtil().findElementWithoutWaiting(getDriver(), container, By.className("extension-title")).getText();
         button.click();
-        waitUntilElementIsVisible(By.xpath(String.format("//*[contains(@class, 'extension-item') and "
-            + "descendant::*[contains(@class, 'extension-name') and . = '%s']]%s", nameAndVersion, xpathSuffix)));
+        waitUntilElementIsVisible(By.xpath(String.format("//*[contains(@class, 'extension-item') and descendant::*"
+            + "[contains(@class, 'extension-title') and normalize-space(.) = '%s']]%s", nameAndVersion, xpathSuffix)));
         // We have to create a new extension pane because the DOM has changed.
         return new ExtensionPane(getUtil().findElementWithoutWaiting(
             getDriver(),
-            By.xpath(String.format("//*[contains(@class, 'extension-item') and"
-                + " descendant::*[contains(@class, 'extension-name') and . = '%s']]", nameAndVersion))));
+            By.xpath(String.format("//*[contains(@class, 'extension-item') and descendant::*["
+                + "contains(@class, 'extension-title') and normalize-space(.) = '%s']]", nameAndVersion))));
     }
 
     /**
@@ -186,7 +180,7 @@ public class ExtensionPane extends BaseElement
         return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']/*"
             + "[@class = 'extension-body-progress extension-body-section' and "
             + "(descendant::input[@name = 'confirm' and not(@disabled)] or "
-            + "count(descendant::div[contains(@class, 'extension-log-item-loading')]) = 0)]");
+            + "count(descendant::li[contains(@class, 'extension-log-item-loading')]) = 0)]");
     }
 
     /**
@@ -290,7 +284,7 @@ public class ExtensionPane extends BaseElement
      */
     private WebElement clickTab(String label)
     {
-        By tabXPath = By.xpath(".//*[@class = 'innerMenu']//a[. = '" + label + "']");
+        By tabXPath = By.xpath(".//*[@class = 'innerMenu']//a[normalize-space(.) = '" + label + "']");
         List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, tabXPath);
         if (found.size() == 0) {
             return null;

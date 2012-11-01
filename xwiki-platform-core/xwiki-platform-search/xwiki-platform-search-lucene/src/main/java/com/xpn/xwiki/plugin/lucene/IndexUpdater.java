@@ -42,6 +42,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -115,9 +116,17 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private Analyzer analyzer;
 
+    private final XWikiContext xwikiContext;
+
+    @Override
+    protected void declareProperties(ExecutionContext executionContext)
+    {
+        xwikiContext.declareInExecutionContext(executionContext);
+    }
+
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
-        super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
+        this.xwikiContext = context;
 
         this.plugin = plugin;
 
@@ -330,9 +339,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             this.queue.add(new AttachmentData(attachment, context, deleted));
         } else {
             LOGGER.error("Invalid parameters given to {} attachment [{}] of document [{}]", new Object[] {
-                deleted ? "deleted" : "added",
-                attachment == null ? null : attachment.getFilename(),
-                attachment == null || attachment.getDoc() == null ? null : attachment.getDoc().getDocumentReference()});
+            deleted ? "deleted" : "added", attachment == null ? null : attachment.getFilename(),
+            attachment == null || attachment.getDoc() == null ? null : attachment.getDoc().getDocumentReference()});
         }
     }
 
@@ -341,8 +349,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         if (document != null && attachmentName != null && context != null) {
             this.queue.add(new AttachmentData(document, attachmentName, context, deleted));
         } else {
-            LOGGER.error("Invalid parameters given to {} attachment [{}] of document [{}]",
-                new Object[] {(deleted ? "deleted" : "added"), attachmentName, document});
+            LOGGER.error("Invalid parameters given to {} attachment [{}] of document [{}]", new Object[] {
+            (deleted ? "deleted" : "added"), attachmentName, document});
         }
     }
 

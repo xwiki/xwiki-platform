@@ -12,7 +12,7 @@
   <context-param>
     <param-name>org.restlet.application</param-name>
     <param-value>
-      org.xwiki.rest.XWikiRestletJaxRsApplication  
+      org.xwiki.rest.internal.XWikiRestletJaxRsApplication
     </param-value>
   </context-param> 
   
@@ -234,7 +234,7 @@
   <servlet>
     <servlet-name>RestletServlet</servlet-name>
     <servlet-class>
-      org.xwiki.rest.XWikiRestletServlet  
+      org.xwiki.rest.internal.XWikiRestletServlet
     </servlet-class>
   </servlet>
 
@@ -359,10 +359,10 @@
 
   <!-- Uncomment if you wish to use a DataSource to define the Database connection
   <resource-ref>
-      <description>DB Connection</description>
-      <res-ref-name>jdbc/XWikiDS</res-ref-name>
-      <res-type>javax.sql.DataSource</res-type>
-      <res-auth>Container</res-auth>
+    <description>DB Connection</description>
+    <res-ref-name>jdbc/XWikiDS</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
   </resource-ref>
   -->
 

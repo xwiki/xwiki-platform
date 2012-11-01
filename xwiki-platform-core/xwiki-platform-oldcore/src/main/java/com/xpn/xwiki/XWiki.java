@@ -89,6 +89,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
+import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
@@ -130,6 +131,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -145,14 +147,8 @@ import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.LevelsClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -339,6 +335,9 @@ public class XWiki implements EventListener
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
@@ -751,16 +750,16 @@ public class XWiki implements EventListener
         // Prepare the store
         setConfig(config);
 
-        XWikiStoreInterface basestore =
+        XWikiStoreInterface mainStore =
             Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint", "hibernate"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
-            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(basestore, context);
+            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
             setStore(cachestore);
         } else {
-            setStore(basestore);
+            setStore(mainStore);
         }
 
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
@@ -814,20 +813,22 @@ public class XWiki implements EventListener
      */
     private void initializeMandatoryClasses(XWikiContext context) throws XWikiException
     {
-        getPrefsClass(context);
-        getUserClass(context);
-        getTagClass(context);
-        getGroupClass(context);
-        getRightsClass(context);
-        getCommentsClass(context);
-        getSkinClass(context);
-        getGlobalRightsClass(context);
-        getSheetClass(context);
-        getEditModeClass(context);
+        if (context.get("initdone") == null) {
+            List<MandatoryDocumentInitializer> initializers =
+                Utils.getComponentList(MandatoryDocumentInitializer.class);
 
-        if (context.getDatabase().equals(context.getMainXWiki())
-            && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
-            getRedirectClass(context);
+            for (MandatoryDocumentInitializer initializer : initializers) {
+                DocumentReference documentReference =
+                    this.currentReferenceDocumentReferenceResolver.resolve(initializer.getDocumentReference());
+
+                if (documentReference.getWikiReference().getName().equals(context.getDatabase())) {
+                    XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+
+                    if (initializer.updateDocument(document)) {
+                        saveDocument(document, context);
+                    }
+                }
+            }
         }
     }
 
@@ -1684,7 +1685,7 @@ public class XWiki implements EventListener
     {
         String parsedContent;
 
-        if ((content != null) && (!content.equals(""))) {
+        if (StringUtils.isNotEmpty(content)) {
             parsedContent = context.getWiki().getRenderingEngine().interpretText(content, context.getDoc(), context);
         } else {
             parsedContent = "";
@@ -2837,6 +2838,31 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Verify if the provided xclass page exists and that it contains all the required configuration properties to make
+     * the tag feature work properly. If some properties are missing they are created and saved in the database.
+     * 
+     * @param context the XWiki Context
+     * @param classReference the reference of the document containing the class
+     * @return the Base Class object containing the properties
+     * @throws XWikiException if an error happens during the save to the database
+     */
+    private BaseClass getMandatoryClass(XWikiContext context, DocumentReference classReference) throws XWikiException
+    {
+        XWikiDocument document = getDocument(classReference, context);
+
+        if (context.get("initdone") == null) {
+            MandatoryDocumentInitializer initializer =
+                Utils.getComponent(MandatoryDocumentInitializer.class, document.getFullName());
+
+            if (initializer.updateDocument(document)) {
+                saveDocument(document, context);
+            }
+        }
+
+        return document.getXClass();
+    }
+
+    /**
      * Verify if the <code>XWiki.TagClass</code> page exists and that it contains all the required configuration
      * properties to make the tag feature work properly. If some properties are missing they are created and saved in
      * the database.
@@ -2847,29 +2873,7 @@ public class XWiki implements EventListener
      */
     public BaseClass getTagClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "TagClass"), context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        needsUpdate |=
-            bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, true, "", "input", "|,");
-        StaticListClass tagClass = (StaticListClass) bclass.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
-        if (tagClass.isRelationalStorage() == false) {
-            tagClass.setRelationalStorage(true);
-            needsUpdate = true;
-        }
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Tag Class");
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "TagClass"));
     }
 
     /**
@@ -2888,29 +2892,7 @@ public class XWiki implements EventListener
     @Deprecated
     public BaseClass getSheetClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc =
-            getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "SheetClass"), context);
-        boolean needsUpdate = doc.isNew();
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        // Note: Ideally we don't want a special field in the sheet class but XWiki classes must have at
-        // least one field or they're not saved. Thus we are introducing a "defaultEditMode" which will
-        // tell what edit mode to use. If empty it'll default to "inline".
-        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
-
-        if (doc.isNew()) {
-            needsUpdate |= setClassDocumentFields(doc, "XWiki Sheet Class");
-            doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "SheetClass"));
     }
 
     /**
@@ -2929,29 +2911,8 @@ public class XWiki implements EventListener
      */
     public BaseClass getEditModeClass(XWikiContext context) throws XWikiException
     {
-        DocumentReference classReference =
-            new DocumentReference(context.getDatabase(), XWikiConstant.EDIT_MODE_CLASS.getParent().getName(),
-                XWikiConstant.EDIT_MODE_CLASS.getName());
-        XWikiDocument doc = getDocument(classReference, context);
-
-        boolean needsUpdate = doc.isNew();
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
-
-        if (doc.isNew()) {
-            needsUpdate |= setClassDocumentFields(doc, "XWiki Edit Mode Class");
-            doc.setContent("Class that should be used to specify the edit mode of a page.");
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), XWikiConstant.EDIT_MODE_CLASS
+            .getParent().getName(), XWikiConstant.EDIT_MODE_CLASS.getName()));
     }
 
     /**
@@ -2965,107 +2926,7 @@ public class XWiki implements EventListener
      */
     public BaseClass getUserClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiUsers"), context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        // Force the class document to use the 2.1 syntax default syntax, the same syntax used in the custom displayer.
-        if (!Syntax.XWIKI_2_1.equals(doc.getSyntax())) {
-            doc.setSyntax(Syntax.XWIKI_2_1);
-            needsUpdate = true;
-        }
-
-        needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
-        needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-        needsUpdate |= bclass.addTextField("email", "e-Mail", 30);
-        // Email field custom display (email obfuscation).
-        PropertyClass emailProperty = (PropertyClass) bclass.get("email");
-        if (!emailProperty.isCustomDisplayed(context)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
-            builder.append("#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n");
-            // Line broken in 2 because it was too long.
-            builder.append("  {{html}}<input id='$prefix$name' type='text'");
-            builder.append(" name='$prefix$name' value='$value' />{{/html}}\n");
-            builder.append("#else\n");
-            builder.append("  ## Allow $obfuscateEmail to be set in some other place.\n");
-            builder.append("  #if(\"$obfuscateEmail\" == 'false')\n");
-            builder.append("    $value\n");
-            builder.append("  #else\n");
-            builder.append("    $value.replaceAll('@.*', '@ xxxxxx')\n");
-            builder.append("  #end\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}");
-            emailProperty.setCustomDisplay(builder.toString());
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addPasswordField("password", "Password", 10);
-        needsUpdate |= bclass.addPasswordField("validkey", "Validation Key", 10);
-        needsUpdate |= bclass.addBooleanField("active", "Active", "active");
-        needsUpdate |= bclass.addTextField("default_language", "Default Language", 30);
-        needsUpdate |= bclass.addTextField("company", "Company", 30);
-        needsUpdate |= bclass.addTextField("blog", "Blog", 60);
-        needsUpdate |= bclass.addTextField("blogfeed", "Blog Feed", 60);
-        needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
-        needsUpdate |= bclass.addStaticListField("imtype", "IM Type", "---|AIM|Yahoo|Jabber|MSN|Skype|ICQ");
-        needsUpdate |= bclass.addTextField("imaccount", "imaccount", 30);
-        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-        needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
-        needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
-        needsUpdate |= bclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
-        needsUpdate |= bclass.addTextField("timezone", "Timezone", 30);
-        PropertyClass timezoneProperty = (PropertyClass) bclass.get("timezone");
-        if (!timezoneProperty.isCustomDisplayed(context)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
-            builder.append("#if ($xcontext.action == 'inline' || $xcontext.action == 'edit')\n");
-            builder.append("  {{html}}\n");
-            builder.append("    #if($xwiki.jodatime)\n");
-            builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
-            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
-            builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
-            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$tz</option>\n");
-            builder.append("        #end\n");
-            builder.append("      </select>\n");
-            builder.append("    #else\n");
-            builder.append("      <input id='$prefix$name' name='$prefix$name' type=\"text\" value=\"$!value\"/>\n");
-            builder.append("    #end\n");
-            builder.append("  {{/html}}\n");
-            builder.append("#else\n");
-            builder.append("  $value\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}\n");
-            timezoneProperty.setCustomDisplay(builder.toString());
-            needsUpdate = true;
-        }
-
-        // New fields for the XWiki 1.0 skin
-        needsUpdate |= bclass.addTextField("skin", "skin", 30);
-        needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
-        needsUpdate |= bclass.addTextField("phone", "Phone", 30);
-        needsUpdate |= bclass.addTextAreaField("address", "Address", 40, 3);
-        needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");
-
-        // Use XWikiUserSheet to display documents having XWikiUsers objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
-        if (classSheetBinder.getSheets(doc).isEmpty()) {
-            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiUserSheet");
-            needsUpdate |= classSheetBinder.bind(doc, sheet);
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiUsers"));
     }
 
     /**
@@ -3079,24 +2940,7 @@ public class XWiki implements EventListener
      */
     public BaseClass getRedirectClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "GlobalRedirect"), context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        needsUpdate |= bclass.addTextField("pattern", "Pattern", 30);
-        needsUpdate |= bclass.addTextField("destination", "Destination", 30);
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Global Redirect Class");
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "GlobalRedirect"));
     }
 
     /**
@@ -3110,241 +2954,18 @@ public class XWiki implements EventListener
      */
     public BaseClass getPrefsClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"), context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        if (!"internal".equals(bclass.getCustomMapping())) {
-            needsUpdate = true;
-            bclass.setCustomMapping("internal");
-        }
-
-        needsUpdate |= bclass.addTextField("parent", "Parent Space", 30);
-        needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
-        needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
-        needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
-        needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
-        needsUpdate |= bclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
-
-        needsUpdate |= bclass.addTextField("skin", "Skin", 30);
-        needsUpdate |=
-            bclass.addDBListField("colorTheme", "Color theme",
-                "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
-        // This one should not be in the prefs
-        PropertyInterface baseskinProp = bclass.get("baseskin");
-        if (baseskinProp != null) {
-            bclass.removeField("baseskin");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
-        needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
-        needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
-
-        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-
-        needsUpdate |= bclass.addTextField("webcopyright", "Copyright", 30);
-        needsUpdate |= bclass.addTextField("title", "Title", 30);
-        needsUpdate |= bclass.addTextField("version", "Version", 30);
-        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
-        needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
-
-        // mail
-        needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
-        needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
-        needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
-        needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
-        needsUpdate |= bclass.addTextField("smtp_server_username", "Server username (optional)", 30);
-        needsUpdate |= bclass.addTextField("smtp_server_password", "Server password (optional)", 30);
-        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6);
-        needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
-        needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
-        needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
-
-        needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
-
-        needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
-
-        // Captcha for guest comments
-        needsUpdate |=
-            bclass.addBooleanField("guest_comment_requires_captcha",
-                "Enable CAPTCHA in Comments for Unregistered Users", "select");
-
-        // Document editing
-        needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
-        needsUpdate |= bclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");
-
-        // for tags
-        needsUpdate |= bclass.addBooleanField("tags", "Activate the tagging", "yesno");
-
-        // for backlinks
-        needsUpdate |= bclass.addBooleanField("backlinks", "Activate the backlinks", "yesno");
-
-        // New fields for the XWiki 1.0 skin
-        needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
-        needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
-        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
-        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
-        needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
-
-        // Only used by LDAP authentication service
-
-        needsUpdate |= bclass.addBooleanField("ldap", "Ldap", "yesno");
-        needsUpdate |= bclass.addTextField("ldap_server", "Ldap server adress", 60);
-        needsUpdate |= bclass.addTextField("ldap_port", "Ldap server port", 60);
-        needsUpdate |= bclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
-        needsUpdate |= bclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
-        needsUpdate |= bclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
-        needsUpdate |= bclass.addTextField("ldap_user_group", "Ldap group filter", 60);
-        needsUpdate |= bclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);
-        needsUpdate |= bclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
-        needsUpdate |= bclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
-        needsUpdate |= bclass.addTextField("ldap_fields_mapping", "Ldap user fiels mapping", 60);
-        needsUpdate |= bclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
-        needsUpdate |= bclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5);
-        needsUpdate |= bclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
-        needsUpdate |= bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "|always|create");
-        needsUpdate |= bclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
-
-        if (((BooleanClass) bclass.get("showLeftPanels")).getDisplayType().equals("checkbox")) {
-            ((BooleanClass) bclass.get("showLeftPanels")).setDisplayType("yesno");
-            ((BooleanClass) bclass.get("showRightPanels")).setDisplayType("yesno");
-            needsUpdate = true;
-        }
-
-        needsUpdate |= bclass.addBooleanField("showannotations", "Show document annotations", "yesno");
-        needsUpdate |= bclass.addBooleanField("showcomments", "Show document comments", "yesno");
-        needsUpdate |= bclass.addBooleanField("showattachments", "Show document attachments", "yesno");
-        needsUpdate |= bclass.addBooleanField("showhistory", "Show document history", "yesno");
-        needsUpdate |= bclass.addBooleanField("showinformation", "Show document information", "yesno");
-        needsUpdate |= bclass.addBooleanField("editcomment", "Enable version summary", "yesno");
-        needsUpdate |= bclass.addBooleanField("editcomment_mandatory", "Make version summary mandatory", "yesno");
-        needsUpdate |= bclass.addBooleanField("minoredit", "Enable minor edits", "yesno");
-
-        SheetBinder documentSheetBinder = Utils.getComponent((Type) SheetBinder.class, "document");
-        boolean withoutDocumentSheets = documentSheetBinder.getSheets(doc).isEmpty();
-        if (withoutDocumentSheets) {
-            // Bind a document sheet to prevent the default class sheet from being used.
-            documentSheetBinder.bind(doc, doc.getDocumentReference());
-        }
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
-        if (withoutDocumentSheets) {
-            // Unbind the document sheet we bound earlier.
-            documentSheetBinder.unbind(doc, doc.getDocumentReference());
-        }
-
-        // Use AdminSheet to display documents having XWikiPreferences objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
-        if (classSheetBinder.getSheets(doc).isEmpty()) {
-            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "AdminSheet");
-            needsUpdate |= classSheetBinder.bind(doc, sheet);
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context,
+            new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"));
     }
 
     public BaseClass getGroupClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        XWikiDocument template = null;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroups"), context);
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        needsUpdate |= bclass.addTextField("member", "Member", 30);
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Group Class");
-
-        // Use XWikiGroupSheet to display documents having XWikiGroups objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
-        if (classSheetBinder.getSheets(doc).isEmpty()) {
-            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroupSheet");
-            needsUpdate |= classSheetBinder.bind(doc, sheet);
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroups"));
     }
 
     public BaseClass getRightsClass(String pagename, XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, pagename), context);
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        PropertyInterface groupsProp = bclass.get("groups");
-        if ((groupsProp != null) && !(groupsProp instanceof GroupsClass)) {
-            bclass.removeField("groups");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addGroupsField("groups", "Groups");
-
-        PropertyInterface levelsProp = bclass.get("levels");
-        if ((levelsProp != null) && !(levelsProp instanceof LevelsClass)) {
-            bclass.removeField("levels");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addLevelsField("levels", "Levels");
-
-        PropertyInterface usersProp = bclass.get("users");
-        if ((usersProp != null) && !(usersProp instanceof UsersClass)) {
-            bclass.removeField("users");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addUsersField("users", "Users");
-
-        PropertyInterface allowProp = bclass.get("allow");
-        if ((allowProp != null) && (allowProp instanceof NumberClass)) {
-            bclass.removeField("allow");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addBooleanField("allow", "Allow/Deny", "allow");
-        BooleanClass afield = (BooleanClass) bclass.get("allow");
-        if (afield.getDefaultValue() != 1) {
-            afield.setDefaultValue(1);
-            needsUpdate = true;
-        }
-
-        String title;
-        if (pagename.equals("XWikiGlobalRights")) {
-            title = "XWiki Global Rights Class";
-        } else {
-            title = "XWiki Rights Class";
-        }
-
-        needsUpdate |= setClassDocumentFields(doc, title);
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, pagename));
     }
 
     public BaseClass getRightsClass(XWikiContext context) throws XWikiException
@@ -3359,64 +2980,12 @@ public class XWiki implements EventListener
 
     public BaseClass getCommentsClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiComments"), context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        needsUpdate |= bclass.addTextField("author", "Author", 30);
-        needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
-        needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
-        needsUpdate |= bclass.addDateField("date", "Date");
-        needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
-
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Comment Class");
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiComments"));
     }
 
     public BaseClass getSkinClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"), context);
-
-        BaseClass bclass = doc.getXClass();
-        if (context.get("initdone") != null) {
-            return bclass;
-        }
-
-        needsUpdate |= bclass.addTextField("name", "Name", 30);
-        needsUpdate |= bclass.addTextField("baseskin", "Base Skin", 30);
-        needsUpdate |= bclass.addTextField("logo", "Logo", 30);
-        needsUpdate |= bclass.addTemplateField("style.css", "Style");
-        needsUpdate |= bclass.addTemplateField("header.vm", "Header");
-        needsUpdate |= bclass.addTemplateField("footer.vm", "Footer");
-        needsUpdate |= bclass.addTemplateField("viewheader.vm", "View Header");
-        needsUpdate |= bclass.addTemplateField("view.vm", "View");
-        needsUpdate |= bclass.addTemplateField("edit.vm", "Edit");
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Skin Class");
-
-        // Use XWikiSkinsSheet to display documents having XWikiSkins objects if no other class sheet is specified.
-        SheetBinder classSheetBinder = Utils.getComponent((Type) SheetBinder.class, "class");
-        if (classSheetBinder.getSheets(doc).isEmpty()) {
-            DocumentReference sheet = new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkinsSheet");
-            needsUpdate |= classSheetBinder.bind(doc, sheet);
-        }
-
-        if (needsUpdate) {
-            saveDocument(doc, context);
-        }
-        return bclass;
+        return getMandatoryClass(context, new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"));
     }
 
     public int createUser(XWikiContext context) throws XWikiException
@@ -4278,39 +3847,54 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-
-        // Inform notification mechanisms that a document is about to be deleted
-        // Note that for the moment the event being send is a bridge event, as we are still passing around
-        // an XWikiDocument as source and an XWikiContext as data.
-        om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), new XWikiDocument(doc.getDocumentReference()),
-            context);
-
-        if (hasRecycleBin(context) && totrash) {
-            getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
-        }
-
-        getStore().deleteXWikiDoc(doc, context);
-
+        String server = null, database = null;
         try {
-            // Inform notification mecanisms that a document has been deleted
+            server = doc.getDocumentReference().getWikiReference().getName();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            ObservationManager om = Utils.getComponent(ObservationManager.class);
+
+            // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            // The source document is a new empty XWikiDocument to follow
-            // DocumentUpdatedEvent policy: source document in new document and the old version is available using
-            // doc.getOriginalDocument()
-            if (om != null) {
-                XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
-                // Again to follow general event policy, new document author is the user who modified the document (here
-                // the modification is delete)
-                blankDoc.setOriginalDocument(doc);
-                blankDoc.setAuthor(context.getUser());
-                blankDoc.setContentAuthor(context.getUser());
-                om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+            om.notify(new DocumentDeletingEvent(doc.getDocumentReference()),
+                new XWikiDocument(doc.getDocumentReference()), context);
+
+            if (hasRecycleBin(context) && totrash) {
+                getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
             }
-        } catch (Exception ex) {
-            LOGGER.error("Failed to send document delete notifications for document [" + doc.getPrefixedFullName()
-                + "]", ex);
+
+            getStore().deleteXWikiDoc(doc, context);
+
+            try {
+                // Inform notification mecanisms that a document has been deleted
+                // Note that for the moment the event being send is a bridge event, as we are still passing around
+                // an XWikiDocument as source and an XWikiContext as data.
+                // The source document is a new empty XWikiDocument to follow
+                // DocumentUpdatedEvent policy: source document in new document and the old version is available using
+                // doc.getOriginalDocument()
+                if (om != null) {
+                    XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
+                    // Again to follow general event policy, new document author is the user who modified the document
+                    // (here
+                    // the modification is delete)
+                    blankDoc.setOriginalDocument(doc);
+                    blankDoc.setAuthor(context.getUser());
+                    blankDoc.setContentAuthor(context.getUser());
+                    om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Failed to send document delete notifications for document [{}]",
+                    doc.getDocumentReference(), ex);
+            }
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
         }
     }
 
@@ -4690,7 +4274,15 @@ public class XWiki implements EventListener
     public int copyWiki(String sourceWiki, String targetWiki, String language, boolean clean, XWikiContext context)
         throws XWikiException
     {
-        return copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
+        int documents = copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
+
+        ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+
+        if (om != null) {
+            om.notify(new WikiCopiedEvent(sourceWiki, targetWiki), sourceWiki, context);
+        }
+
+        return documents;
     }
 
     public String getEncoding()

@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -51,7 +52,11 @@ public class XWikiExecutor
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
+    public static final String SKIP_STARTING_XWIKI_INSTANCE = System.getProperty("xwiki.test.skipStart", "false");
+    
     public static final String BASEDIR = System.getProperty("basedir");
+    
+    public static final String URL = System.getProperty("xwiki.test.baseURL", "http://localhost");
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
@@ -173,15 +178,19 @@ public class XWikiExecutor
 
     public void start() throws Exception
     {
-        System.out.println("Starting XWiki server start");
-
-        // First, verify if XWiki is started. If it is then don't start it again.
-        this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
-        if (!this.wasStarted) {
-            startXWikiInSeparateThread();
-            waitForXWikiToLoad();
-        } else {
-            System.out.println("XWiki server is already started!");
+        if (SKIP_STARTING_XWIKI_INSTANCE.equals("true")){
+            System.out.println(String.format("Using running instance at [%s:%s]", URL, getPort()));
+        }
+        else {
+            System.out.println(String.format("Starting XWiki server at [%s:%s]", URL, getPort()));
+            // First, verify if XWiki is started. If it is then don't start it again.
+            this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
+            if (!this.wasStarted) {
+                startXWikiInSeparateThread();
+                waitForXWikiToLoad();
+            } else {
+                System.out.println("XWiki server is already started!");
+            }
         }
     }
 
@@ -444,7 +453,7 @@ public class XWikiExecutor
         // We use "xpage=plain" for 2 reasons:
         // 1) the page loads faster since it doesn't need to display the skin
         // 2) if the page doesn't exist it won't return a 404 HTTP Response code
-        return "http://localhost:" + getPort() + "/xwiki/bin/view/Main?xpage=plain";
+        return URL + ":" + getPort() + "/xwiki/bin/view/Main?xpage=plain";
     }
 
     private String getDefaultStartCommand(int port, int stopPort, int rmiPort)

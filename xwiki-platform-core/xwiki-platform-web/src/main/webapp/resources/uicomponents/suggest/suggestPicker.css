@@ -1,0 +1,64 @@
+#template('colorThemeInit.vm')
+.accepted-suggestions {
+  margin: 0 0 1em !important;
+  list-style-type: none;
+  padding: 0;
+}
+
+.accepted-suggestions li {
+  position: relative;
+  line-height: 1.3em;
+}
+.accepted-suggestion {
+  padding: .05em 0;
+}
+.accepted-suggestions li .key {
+  font-size: 87%;
+  color: $theme.secondary;
+}
+.accepted-suggestions li .value {
+  margin-right: 1em;
+}
+.accepted-suggestions li .delete-tool,
+.clear-tool {
+  display: none;
+  color: #a00;
+  line-height: 1em;
+  font-size: 87%;
+  margin: 0 0.5em;
+  cursor: pointer;
+  float: right;
+}
+.clear-tool {
+  display: block;
+}
+.accepted-suggestions li:hover {
+  background: $theme.highlightColor;
+}
+.accepted-suggestions li:hover .delete-tool {
+  position: absolute;
+  top: .4em;
+  right: 0;
+  display: inline;
+}
+.accepted-suggestions li .tooltip {
+  display: none;
+  position: absolute;
+  top: 1.35em;
+  left: 12.5%;
+  width: 75%;
+  border: 0 none;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 0 12px 12px 12px;
+  box-shadow: 0 0 6px #777;
+  z-index: 20;
+}
+.accepted-suggestions li:hover .tooltip {
+  display: block;
+}
+.accepted-suggestions li .tooltip dt {
+  color: #000;
+  font-style: italic;
+  margin: .4em 0 0.2em;
+}

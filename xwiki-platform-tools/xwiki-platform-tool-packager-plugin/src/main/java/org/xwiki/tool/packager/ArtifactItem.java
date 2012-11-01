@@ -23,7 +23,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Represents an Artifact Item in the plugin configuration.
- *
+ * 
  * @version $Id$
  * @since 3.4M1
  */
@@ -31,7 +31,7 @@ public class ArtifactItem
 {
     /**
      * Group Id of Artifact.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -39,7 +39,7 @@ public class ArtifactItem
 
     /**
      * Name of Artifact.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -47,14 +47,14 @@ public class ArtifactItem
 
     /**
      * Version of Artifact.
-     *
+     * 
      * @parameter
      */
-    private String version = null;
+    private String version;
 
     /**
      * Type of Artifact (War, Jar, etc).
-     *
+     * 
      * @parameter
      * @required
      */
@@ -62,7 +62,7 @@ public class ArtifactItem
 
     /**
      * Classifier for Artifact (tests,sources,etc).
-     *
+     * 
      * @parameter
      */
     private String classifier;
@@ -147,21 +147,40 @@ public class ArtifactItem
         this.classifier = filterEmptyString(classifier);
     }
 
+    @Override
     public String toString()
     {
-        if (this.classifier == null) {
-            return groupId + ":" + artifactId + ":" + StringUtils.defaultString(version, "?") + ":" + type;
-        } else {
-            return groupId + ":" + artifactId + ":" + classifier + ":" + StringUtils.defaultString(version, "?")
-                + ":" + type;
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(this.groupId);
+        builder.append(':');
+        builder.append(this.artifactId);
+        builder.append(':');
+
+        if (this.classifier != null) {
+            builder.append(this.classifier);
+            builder.append(':');
         }
+
+        builder.append(StringUtils.defaultString(this.version, "?"));
+        builder.append(':');
+        builder.append(this.type);
+        
+        return builder.toString();
     }
 
+    /**
+     * Convert empty string into <code>null</code>.
+     * 
+     * @param in the value to filter
+     * @return null the passer value or null if it's empty
+     */
     private String filterEmptyString(String in)
     {
         if ("".equals(in)) {
             return null;
         }
+
         return in;
     }
 }

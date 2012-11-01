@@ -143,7 +143,7 @@ widgets.Notification.getContainer = function() {
   if (!widgets.Notification.container) {
     widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
     // Insert the container in the document body.
-    $(document.body).insert(widgets.Notification.container);
+    $('body').insert(widgets.Notification.container);
   }
   return widgets.Notification.container;
 };

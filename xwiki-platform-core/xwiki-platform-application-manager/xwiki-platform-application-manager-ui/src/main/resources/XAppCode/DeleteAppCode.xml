@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>#if($action &amp;&amp; $action == "delete")
   #if($confirm &amp;&amp; $confirm == 1)
     #set($result = $AppManager.deleteApplication($appname))

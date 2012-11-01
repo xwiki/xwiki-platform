@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-faq</artifactId>
   <name>XWiki Platform - FAQ</name>
@@ -36,4 +36,12 @@
   <modules>
     <module>xwiki-platform-faq-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-faq-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

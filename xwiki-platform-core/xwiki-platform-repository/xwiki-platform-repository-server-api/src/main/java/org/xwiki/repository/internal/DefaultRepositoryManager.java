@@ -203,6 +203,12 @@ public class DefaultRepositoryManager implements RepositoryManager
 
         boolean valid = isValid(document, extensionObject, xcontext);
 
+        if (valid) {
+            this.logger.debug("The extension in the document [{}] is not valid", document.getDocumentReference());
+        } else {
+            this.logger.debug("The extension in the document [{}] is valid", document.getDocumentReference());
+        }
+
         int currentValue = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
 
         if ((currentValue == 1) != valid) {
@@ -301,6 +307,9 @@ public class DefaultRepositoryManager implements RepositoryManager
                         String extensionVersion =
                             getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
                         if (StringUtils.isBlank(extensionVersion)) {
+                            this.logger.debug("No actual version provided for object [{}({})]",
+                                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
+                                extensionVersionObject.getNumber());
                             valid = false;
                             break;
                         }
@@ -321,16 +330,29 @@ public class DefaultRepositoryManager implements RepositoryManager
 
                                     valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
                                 } catch (XWikiException e) {
+                                    this.logger.error("Failed to get document [{}]",
+                                        attachmentReference.getDocumentReference(), e);
+
                                     valid = false;
+                                }
+
+                                if (!valid) {
+                                    this.logger.debug("Attachment [{}] does not exists", attachmentReference);
                                 }
                             } else if (ResourceType.URL.equals(resourceReference.getType())
                                 || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
                                 valid = true;
                             } else {
                                 valid = false;
+
+                                this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
                             }
                         } else {
                             valid = false;
+
+                            this.logger.debug("No actual download provided for object [{}({})]",
+                                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
+                                extensionVersionObject.getNumber());
                         }
 
                         ++nbVersions;

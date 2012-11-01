@@ -45,7 +45,9 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
+import org.hibernate.mapping.Index;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Table;
 import org.slf4j.Logger;
@@ -196,6 +198,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private abstract static class AbstractUpdateHibernateCallback implements HibernateCallback<Object>
     {
+        /** The current timer. */
+        public int timer;
+
         /** Place holder for new id. */
         protected static final String NEWID = "newid";
 
@@ -204,9 +209,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         /** The new identifier. */
         protected Session session;
-
-        /** The current timer. */
-        public int timer;
 
         @Override
         public Object doInHibernate(Session session)
@@ -505,9 +507,18 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public long executeSqlIdUpdate(String name, String field) {
             StringBuilder sb = new StringBuilder(128);
             if (isMySQL) {
+                // MySQL does not support multiple references to a temporary table in a single statement but support
+                // this non-standard SQL syntax with a single reference to the temporary table
                 sb.append("UPDATE ").append(name).append(" t, ").append(TEMPTABLE).append(" m")
                     .append(" SET t.").append(field).append('=').append("m.").append(NEWIDCOL)
                     .append(" WHERE t.").append(field).append('=').append("m.").append(OLDIDCOL);
+            } else if (isMSSQL) {
+                // MS-SQL does not support aliases on updated table, but support inner joins during updates
+                sb.append("UPDATE ").append(name)
+                    .append(" SET ").append(field).append('=').append("m.").append(NEWIDCOL)
+                    .append(" FROM ").append(name).append(" AS [t] INNER JOIN ")
+                    .append(TEMPTABLE).append(" AS [m] ON (t.")
+                    .append(field).append('=').append("m.").append(OLDIDCOL).append(')');
             } else {
                 sb.append("UPDATE ").append(name)
                     .append(" t SET ").append(field).append('=')
@@ -574,6 +585,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /** True if migrating Oracle database. */
     private boolean isOracle;
+
+    /** True if migrating Microsoft SQL server database. */
+    private boolean isMSSQL;
 
     /** Tables in which update of foreign keys will be cascade from primary keys by a constraints. */
     private Set<Table> fkTables = new HashSet<Table>();
@@ -718,7 +732,18 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private List<String[]> getCollectionProperties(PersistentClass pClass)
     {
-        return getCollectionProperties(pClass, false);
+        List<String[]> list = new ArrayList<String[]>();
+
+        if (pClass != null) {
+            for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
+                Table collTable = coll.getCollectionTable();
+                if (!this.fkTables.contains(collTable)) {
+                    list.add(new String[] {collTable.getName(), getKeyColumnName(coll)});
+                }
+            }
+        }
+
+        return list;
     }
 
     /**
@@ -734,17 +759,32 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         List<String[]> list = new ArrayList<String[]>();
 
         if (pClass != null) {
+            for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
+                Table collTable = coll.getCollectionTable();
+                if (all || !this.fkTables.contains(collTable)) {
+                    list.add(new String[] {collTable.getName(), getKeyColumnName(coll)});
+                }
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Retrieve the list of collection properties of the provided persisted class.
+     * @param pClass the persisted class to analyse
+     * @return a list of hibernate collections
+     */
+    private List<org.hibernate.mapping.Collection> getCollection(PersistentClass pClass) {
+        List<org.hibernate.mapping.Collection> list = new ArrayList<org.hibernate.mapping.Collection>();
+
+        if (pClass != null) {
             @SuppressWarnings("unchecked")
             Iterator<Property> it = pClass.getPropertyIterator();
             while (it.hasNext()) {
                 Property property = it.next();
                 if (property.getType().isCollectionType()) {
-                    org.hibernate.mapping.Collection coll = (org.hibernate.mapping.Collection) property.getValue();
-                    Table collTable = coll.getCollectionTable();
-                    if (all || !this.fkTables.contains(collTable)) {
-                        list.add(new String[] {collTable.getName(),
-                            ((Column) coll.getKey().getColumnIterator().next()).getName()});
-                    }
+                    list.add((org.hibernate.mapping.Collection) property.getValue());
                 }
             }
         }
@@ -754,19 +794,55 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get all table to process, including collections if needed.
-     * @param pClass the persistent class
+     * @param className the persistent class
      * @return a list of pair of table name and key field name.
      */
-    private List<String[]> getAllTableToProcess(PersistentClass pClass) {
-        return getAllTableToProcess(pClass, null);
+    private List<String[]> getAllTableToProcess(String className) throws DataMigrationException
+    {
+        return getAllTableToProcess(className, null);
+    }
+
+    /**
+     * get hibernate mapping of the given class or entity name
+     * @param className the class or entity name
+     * @return a list of pair of table name and the property field name.
+     */
+    private PersistentClass getClassMapping(String className) throws DataMigrationException
+    {
+        PersistentClass pClass = configuration.getClassMapping(className);
+
+        if (pClass == null) {
+            throw new DataMigrationException(
+                String.format("Could not migrate IDs for class [%s] : no hibernate mapping found. "
+                    + "For example, this error commonly happens if you have copied a document defining an internally "
+                    + "mapped class (like XWiki.XWikiPreferences) and never used the newly created class OR if you "
+                    + "have forgotten to customize the hibernate mapping while using your own internally custom mapped "
+                    + "class. In the first and most common case, to fix this issue and migrate your wiki, you should "
+                    + "delete the offending and useless class definition or the whole document defining that class "
+                    + "from your original wiki before the migration.",
+                    className));
+        }
+
+        return pClass;
     }
 
     /**
     * get all table to process, including collections if needed.
-    * @param pClass the persistent class
+    * @param className the class or entity name
     * @param propertyName the name of the property for which the column name is returned
     * @return a list of pair of table name and the property field name.
     */
+    private List<String[]> getAllTableToProcess(String className, String propertyName) throws DataMigrationException
+    {
+        return getAllTableToProcess(getClassMapping(className), propertyName);
+    }
+
+    /**
+        * get all table to process, including collections if needed.
+        * @param pClass the persistent class
+        * @param propertyName the name of the property for which the column name is returned
+        * @return a list of pair of table name and the property field name.
+        */
     private List<String[]> getAllTableToProcess(PersistentClass pClass, String propertyName) {
         List<String[]> list = new ArrayList<String[]>();
 
@@ -778,6 +854,16 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             list.add(new String[] {pClass.getTable().getName(), getColumnName(pClass, propertyName)});
         }
         return list;
+    }
+
+    /**
+     * get name of the first column of the key of a given collection property.
+     * @param coll the collection property
+     * @return the column name of the key
+     */
+    private String getKeyColumnName(org.hibernate.mapping.Collection coll)
+    {
+        return ((Column) coll.getKey().getColumnIterator().next()).getName();
     }
 
     /**
@@ -964,11 +1050,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 final List<String[]> tableToProcess = new ArrayList<String[]>();
 
                 for (Class< ? > docClass : DOC_CLASSES) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(docClass.getName())));
+                    tableToProcess.addAll(getAllTableToProcess(docClass.getName()));
                 }
                 for (Class< ? > docClass : DOCLINK_CLASSES) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(docClass.getName()),
-                        "docId"));
+                    tableToProcess.addAll(getAllTableToProcess(docClass.getName(), "docId"));
                 }
 
                 logProgress("Converting %d document IDs in %d tables...", docs.size(), tableToProcess.size());
@@ -1003,10 +1088,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             } else {
                 final List<String[]> docsColl = new ArrayList<String[]>();
                 for (Class< ? > docClass : DOC_CLASSES) {
-                    docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
+                    docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
                 for (Class< ? > docClass : DOCLINK_CLASSES) {
-                    docsColl.addAll(getCollectionProperties(configuration.getClassMapping(docClass.getName())));
+                    docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
 
                 logProgress("Converting %d document IDs in %d tables and %d collection tables...",
@@ -1056,14 +1141,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 // Pair table,key for table that need manual updates
                 final List<String[]> tableToProcess = new ArrayList<String[]>();
 
-                PersistentClass objklass = configuration.getClassMapping(BaseObject.class.getName());
+                PersistentClass objklass = getClassMapping(BaseObject.class.getName());
                 tableToProcess.addAll(getCollectionProperties(objklass));
 
                 for (Class< ? > propertyClass : PROPERTY_CLASS) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(propertyClass.getName())));
+                    tableToProcess.addAll(getAllTableToProcess(propertyClass.getName()));
                 }
                 for (String customClass : customMappedClasses) {
-                    tableToProcess.addAll(getAllTableToProcess(configuration.getClassMapping(customClass)));
+                    tableToProcess.addAll(getAllTableToProcess(customClass));
                 }
                 tableToProcess.add(new String[] {objklass.getTable().getName(), getKeyColumnName(objklass)});
 
@@ -1104,10 +1189,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 // Pair table,key for collection table that need manual updates
                 final List<String[]> objsColl = new ArrayList<String[]>();
 
-                objsColl.addAll(getCollectionProperties(configuration.getClassMapping(BaseObject.class.getName())));
+                objsColl.addAll(getCollectionProperties(getClassMapping(BaseObject.class.getName())));
                 for (Class< ? > propertyClass : PROPERTY_CLASS) {
                     String className = propertyClass.getName();
-                    PersistentClass klass = configuration.getClassMapping(className);
+                    PersistentClass klass = getClassMapping(className);
 
                     // Add collection table that will not be updated by cascaded updates
                     objsColl.addAll(getCollectionProperties(klass));
@@ -1118,7 +1203,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 }
                 for (String customClass : customMappedClasses) {
-                    PersistentClass klass = configuration.getClassMapping(customClass);
+                    PersistentClass klass = getClassMapping(customClass);
 
                     // Add collection table that will not be updated by cascaded updates
                     objsColl.addAll(getCollectionProperties(klass));
@@ -1189,7 +1274,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     final List<String[]> tableToProcess = new ArrayList<String[]>();
                     final Map<Long, Long> statids = map;
 
-                    PersistentClass statklass = configuration.getClassMapping(statsClass.getName());
+                    PersistentClass statklass = getClassMapping(statsClass.getName());
                     tableToProcess.addAll(getCollectionProperties(statklass));
                     tableToProcess.add(new String[] {statklass.getTable().getName(), getKeyColumnName(statklass)});
 
@@ -1227,7 +1312,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
                 } else {
                     final List<String[]> statsColl = new ArrayList<String[]>();
-                    statsColl.addAll(getCollectionProperties(configuration.getClassMapping(statsClass.getName())));
+                    statsColl.addAll(getCollectionProperties(getClassMapping(statsClass.getName())));
 
                     logProgress("Converting %d %s statistics IDs in 1 tables and %d collection tables...",
                         map.size(), klassName, statsColl.size());
@@ -1262,22 +1347,181 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Create liquibase change log to modify column type to BIGINT (except for Oracle).
-     * 
+     * Append a drop primary key constraint command for the given table.
+     *
+     * @param sb append the result into this string builder
+     * @param table the table
+     */
+    private void appendDropPrimaryKey(StringBuilder sb, Table table)
+    {
+        final String tableName = table.getName();
+        String pkName = table.getPrimaryKey().getName();
+
+        // MS-SQL require a constraints name, and the one provided from the mapping is necessarily appropriate
+        // since during database creation, that name has not been used, and a name has been assigned by the
+        // database itself. We need to retrieve that name from the schema.
+        if (this.isMSSQL) {
+            try {
+                pkName = getStore().failSafeExecuteRead(getXWikiContext(), new HibernateCallback<String>()
+                {
+                    @Override
+                    public String doInHibernate(Session session) throws HibernateException
+                    {
+                        // Retrieve the constraint name from the database
+                        return (String) session.createSQLQuery(
+                            "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS" +
+                                " WHERE TABLE_NAME = :tableName and CONSTRAINT_TYPE = 'PRIMARY KEY'")
+                            .setString("tableName", tableName)
+                            .uniqueResult();
+                    }
+                });
+            } catch (Exception e) {
+                // ignored since it is really unlikely to happen
+                logger.debug("Fail retrieving the primary key constraints name", e);
+            }
+        }
+
+        sb.append("    <dropPrimaryKey tableName=\"").append(tableName);
+
+        if (pkName != null) {
+            sb.append("\"  constraintName=\"").append(pkName);
+        }
+
+        sb.append("\"/>\n");
+    }
+
+    /**
+     * Append a add primary key constraint command for the given table.
+     *
+     * @param sb append the result into this string builder
+     * @param table the table name
+     */
+    private void appendAddPrimaryKey(StringBuilder sb, Table table)
+    {
+        PrimaryKey pk = table.getPrimaryKey();
+        String pkName = pk.getName();
+
+        sb.append("    <addPrimaryKey tableName=\"").append(table.getName())
+            .append("\"  columnNames=\"");
+
+        @SuppressWarnings("unchecked")
+        Iterator<Column> columns = pk.getColumnIterator();
+        while (columns.hasNext()) {
+            Column column = columns.next();
+            sb.append(column.getName());
+            if (columns.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        if (pkName != null) {
+            sb.append("\"  constraintName=\"").append(pkName);
+        }
+
+        sb.append("\"/>\n");
+    }
+
+    /**
+     * Append a drop index command for the given index.
+     *
+     * @param sb append the result into this string builder
+     * @param index the index
+     */
+    private void appendDropIndex(StringBuilder sb, Index index)
+    {
+        sb.append("    <dropIndex indexName=\"").append(index.getName())
+            .append("\"  tableName=\"").append(index.getTable().getName())
+            .append("\"/>\n");
+    }
+
+    /**
+     * Append a add index command for the given index.
+     *
+     * @param sb append the result into this string builder
+     * @param index the index
+     */
+    private void appendAddIndex(StringBuilder sb, Index index)
+    {
+        sb.append("    <createIndex tableName=\"").append(index.getTable().getName())
+            .append("\"  indexName=\"").append(index.getName()).append("\">\n");
+
+        @SuppressWarnings("unchecked")
+        Iterator<Column> columns = index.getColumnIterator();
+        while (columns.hasNext()) {
+            Column column = columns.next();
+            sb.append("      <column name=\"").append(column.getName()).append("\"/>\n");
+        }
+
+        sb.append("</createIndex>\n");
+    }
+
+    /**
+     * Append a modify data type to BIGINT command for the given column and table.
+     *
      * @param sb append the result into this string builder
      * @param table the table name
      * @param column the column name
      */
     private void appendModifyColumn(StringBuilder sb, String table, String column)
     {
+        sb.append("    <modifyDataType tableName=\"").append(table)
+            .append("\"  columnName=\"").append(column)
+            .append("\" newDataType=\"BIGINT\"/>\n");
+
+        // MS-SQL drop the NOT NULL constraints while modifying datatype, so we add it back
+        if (this.isMSSQL) {
+            sb.append("    <addNotNullConstraint tableName=\"").append(table)
+                .append("\"  columnName=\"").append(column)
+                .append("\" columnDataType=\"BIGINT\"/>\n");
+        }
+    }
+
+    /**
+     * Create liquibase change log to modify the column type to BIGINT.
+     * If the database is MSSQL, drop PK constraints and indexes during operation.
+     * 
+     * @param sb append the result into this string builder
+     * @param table the table name
+     * @param column the column name
+     */
+    private void appendDataTypeChangeLog(StringBuilder sb, Table table, String column)
+    {
+        String tableName = table.getName();
+
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
             .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"dgervalle\">\n")
-            .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(table)
-            .append("] to BIGINT type</comment >\n")
-            .append("    <modifyDataType tableName=\"").append(table)
-            .append("\"  columnName=\"").append(column)
-            .append("\" newDataType=\"BIGINT\"/>\n")
-            .append("  </changeSet>\n");
+            .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(tableName)
+            .append("] to BIGINT type</comment >\n");
+
+        // MS-SQL require that primary key constraints and all indexes related to the changed column be dropped before
+        // changing the column type.
+        if (this.isMSSQL) {
+            if (table.hasPrimaryKey()) {
+                appendDropPrimaryKey(sb, table);
+            }
+
+            // We drop all index related to the table, this is overkill, but does not hurt
+            for (@SuppressWarnings("unchecked") Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
+                Index index = it.next();
+                appendDropIndex(sb, index);
+            }
+        }
+
+        appendModifyColumn(sb, tableName, column);
+
+        // Add back dropped PK constraints and indexes for MS-SQL
+        if (this.isMSSQL) {
+            if (table.hasPrimaryKey()) {
+                appendAddPrimaryKey(sb, table);
+            }
+
+            for (@SuppressWarnings("unchecked") Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
+                Index index = it.next();
+                appendAddIndex(sb, index);
+            }
+        }
+
+        sb.append("  </changeSet>\n");
     }
 
     /**
@@ -1287,14 +1531,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @param sb the string builder to append to
      * @param pClass the persistent class to process
      */
-    private void appendClassChangeLog(StringBuilder sb, PersistentClass pClass)
+    private void appendDataTypeChangeLogs(StringBuilder sb, PersistentClass pClass)
     {
         if (pClass != null) {
-            appendModifyColumn(sb, pClass.getTable().getName(), getKeyColumnName(pClass));
+            appendDataTypeChangeLog(sb, pClass.getTable(), getKeyColumnName(pClass));
 
             // Update identifiers in ALL collection tables
-            for (String[] collProp : getCollectionProperties(pClass, true)) {
-                appendModifyColumn(sb, collProp[0], collProp[1]);
+            for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
+                appendDataTypeChangeLog(sb, coll.getCollectionTable(), getKeyColumnName(coll));
             }
         }
     }
@@ -1463,6 +1707,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         DatabaseProduct product = store.getDatabaseProductName();
         if (product != DatabaseProduct.MYSQL) {
             this.isOracle = (product == DatabaseProduct.ORACLE);
+            this.isMSSQL = (product == DatabaseProduct.MSSQL);
             return;
         }
 
@@ -1492,13 +1737,29 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         detectDatabaseProducts(store);
 
+        if (logger.isDebugEnabled()) {
+            if (this.isOracle) {
+                logger.debug("Oracle database detected, proceeding to all updates manually with deferred constraints.");
+            }
+            if (this.isMySQL && !this.isMySQLMyISAM) {
+                logger.debug("MySQL innoDB database detected, proceeding to simplified updates with cascaded updates.");
+            }
+            if (this.isMySQLMyISAM) {
+                logger.debug("MySQL MyISAM database detected, proceeding to all updates manually without constraints.");
+            }
+            if (this.isMSSQL) {
+                logger.debug("Microsoft SQL Server database detected, proceeding to simplified updates with cascaded u"
+                    + "pdates. During data type changes, Primary Key constraints and indexes are temporarily dropped.");
+            }
+        }
+
         // Build the list of classes to check for updates
-        classes.add(configuration.getClassMapping(BaseObject.class.getName()));
+        classes.add(getClassMapping(BaseObject.class.getName()));
         for (Class< ? > klass : PROPERTY_CLASS) {
-            classes.add(configuration.getClassMapping(klass.getName()));
+            classes.add(getClassMapping(klass.getName()));
         }
         for (Class< ? > klass : STATS_CLASSES) {
-            classes.add(configuration.getClassMapping(klass.getName()));
+            classes.add(getClassMapping(klass.getName()));
         }
 
         // Initialize the counter of Change Logs
@@ -1526,7 +1787,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             // The same table mapped for StringListProperty and LargeStringProperty
             if (klass.getMappedClass() != StringListProperty.class) {
                 // Update key types
-                appendClassChangeLog(sb, klass);
+                appendDataTypeChangeLogs(sb, klass);
             }
         }
 
@@ -1554,7 +1815,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         }
 
                         // Update key types for custom mapped class
-                        appendClassChangeLog(sb, klass);
+                        appendDataTypeChangeLogs(sb, klass);
                     }
                 }
             }, context);
@@ -1573,6 +1834,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         logProgress("%d schema updates required.", this.logCount);
+        if (logger.isDebugEnabled()) {
+            logger.debug("About to execute this Liquibase XML: {}", sb.toString());
+        }
         return sb.toString();
     }
 }

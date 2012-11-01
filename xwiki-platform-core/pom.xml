@@ -27,15 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.4.0</gwt.version>
-    <gwt.maven.plugin.version>2.4.0</gwt.maven.plugin.version>
+    <gwt.version>2.5.0-rc1</gwt.version>
+    <gwt.maven.plugin.version>2.5.0-rc1</gwt.maven.plugin.version>
     <smartgwt.version>3.0</smartgwt.version>
   </properties>
   <dependencies>
@@ -86,19 +86,62 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2</version>
-      </dependency>
-      <!-- JFreeChart -->
-      <dependency>
-        <groupId>org.jfree</groupId>
-        <artifactId>jfreechart</artifactId>
-        <version>1.0.14</version>
+        <version>2.5.3</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
         <version>3.1.0.Final</version>
+      </dependency>
+      <!-- Apache Tika used by Lucene and Office modules -->
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parsers</artifactId>
+        <version>1.2</version>
+        <exclusions>
+          <exclusion>
+            <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
+            <groupId>de.l3s.boilerpipe</groupId>
+            <artifactId>boilerpipe</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
+        <groupId>de.l3s.boilerpipe</groupId>
+        <artifactId>boilerpipe</artifactId>
+        <version>1.2.0-xwiki</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
+      <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>xalan</artifactId>
+        <version>2.7.1</version>
+      </dependency>
+      <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
+      <dependency>
+        <groupId>struts</groupId>
+        <artifactId>struts</artifactId>
+        <version>1.2.9</version>
+        <exclusions>
+          <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
+          <exclusion>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+          </exclusion>
+          <!-- We use a more recent version of Xalan (see above) -->
+          <exclusion>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
@@ -221,27 +264,117 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <ignored>
+            <difference>
+              <className>org/xwiki/ircbot/IRCBot</className>
+              <method>void initialize(java.lang.String)</method>
+              <differenceType>7012</differenceType>
+              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                IRC Bot application in a subwiki</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.lang.Class getRole()</method>
+              <differenceType>7002</differenceType>
+              <justification>WikiComponent is still a young API. Removed the method to implement XWIKI-8233, 
+                "Allow wiki components to implement parameterized types"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.lang.reflect.Type getRoleType()</method>
+              <differenceType>7012</differenceType>
+              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8233, 
+                "Allow wiki components to implement parameterized types"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.util.Map getHandledMethods()</method>
+              <differenceType>7002</differenceType>
+              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
+              </justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.util.List getImplementedInterfaces()</method>
+              <differenceType>7002</differenceType>
+              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
+              </justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/MethodOutputHandler</className>
+              <differenceType>8001</differenceType>
+              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponentInvocationHandler</className>
+              <differenceType>8001</differenceType>
+              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/uiextension/UIExtension</className>
+              <method>java.util.List execute()</method>
+              <differenceType>7006</differenceType>
+              <to>org.xwiki.rendering.block.Block</to>
+              <justification>UIExtension is still a young API. Replaced the List of Block by a Block since Block can
+                can now hold a list of Block</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/uiextension/UIExtension</className>
+              <method>java.lang.String getName()</method>
+              <differenceType>7002</differenceType>
+              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/uiextension/UIExtension</className>
+              <method>java.lang.String getId()</method>
+              <differenceType>7012</differenceType>
+              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/objects/ElementInterface</className>
+              <method>boolean apply(com.xpn.xwiki.objects.ElementInterface, boolean)</method>
+              <differenceType>7012</differenceType>
+              <justification>Added a common method to all elements to set all the data from another element.
+                Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
+            </difference>
+          </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
-            <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Add a method to the oldcore/wikimacro bridge -->
-            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroFactory</exclude>
-            <!-- Added method to get the author of the macro -->
-            <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacro</exclude>
-            <!-- Chart plugin has been moved from oldcore to its own module. There's no API breakage for the user -->
-            <exclude>com/xpn/xwiki/plugin/charts/**</exclude>
-            <!-- TODO Andreas: Explain why we have to break backward compatibility for the Chart module -->
-            <exclude>org/xwiki/chart/model/ChartModel</exclude>
-            <exclude>org/xwiki/rendering/macro/chart/ChartDataSource</exclude>
-            <exclude>org/xwiki/chart/model/DefaultChartModel</exclude>
-            <!-- Removed protected method (registerWikiMacros) that was not supposed to be used from outside
-                (was protected for unit tests hacks. -->
-            <exclude>com/xpn/xwiki/XWiki</exclude>
-            <!-- These classes below have never been used. It was supposed to be the start of the removal of Struts but
-                 since it hasn't progressed so far we're removing stray code from master. Experiments should be done
-                 on feature branches -->
-            <exclude>org/xwiki/container/servlet/XWikiServlet</exclude>
+            <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
+                 from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
+            <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
+            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
+            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
+            <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
+            <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
+            <exclude>org/xwiki/rest/resources/**</exclude>
+            <!-- Moved a lot of previously public API to internal packages. The initial implementation put everything in public
+                 packages which is wrong. This move is to correct the initial error, and leave in public packages only the
+                 classes that are really part of a public API. (See discussion: http://xwiki.markmail.org/thread/iqktyceut5bmw4rl)
+                 Remove this check on the next release (i.e. 4.3-M2) -->
+            <exclude>org/xwiki/rest/exceptions/**</exclude>
+            <exclude>org/xwiki/rest/representations/**</exclude>
+            <exclude>org/xwiki/rest/ComponentsObjectFactory</exclude>
+            <exclude>org/xwiki/rest/Constants</exclude>
+            <exclude>org/xwiki/rest/RangeIterable</exclude>
+            <exclude>org/xwiki/rest/Utils</exclude>
+            <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
+            <exclude>org/xwiki/rest/XWikiJaxRsApplication</exclude>
+            <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
+            <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
+            <exclude>org/xwiki/rest/XWikiSecretVerifier</exclude>
+            <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
+            <!-- Not a breakage! The plugin has been moved to its own module. -->
+            <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
+            <!-- Module has been retired as it was unmaintained. -->
+            <exclude>com/xpn/xwiki/plugin/userdirectory/**/*</exclude>
+            <!-- Module has been retired as it was unmaintained. -->
+            <exclude>com/xpn/xwiki/plugin/usertools/**/*</exclude>
+            <!-- Added methods for creating workspaces and retrieving workspace templates.
+                 Vote mail: http://markmail.org/thread/gtxoszztc5lt7o4f
+                 Remove this check on the next release (i.e., 4.3-M2) -->
+            <exclude>org/xwiki/workspace/WorkspaceManager</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -280,6 +413,7 @@
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
+    <module>xwiki-platform-feed</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
@@ -292,6 +426,7 @@
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
@@ -316,6 +451,7 @@
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-toucan</module>
     <module>xwiki-platform-user</module>
+    <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-watchlist</module>

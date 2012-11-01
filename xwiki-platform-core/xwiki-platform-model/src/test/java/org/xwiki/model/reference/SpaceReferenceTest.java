@@ -62,8 +62,8 @@ public class SpaceReferenceTest
                 new EntityReference("whatever", EntityType.DOCUMENT, null)));
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [name = [whatever], type = [DOCUMENT], parent = [null]] "
-                + "in a space reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [Document whatever] in a space reference",
+                expected.getMessage());
         }
     }
 }

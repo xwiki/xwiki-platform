@@ -13,7 +13,7 @@
 #end
   <div id="company">
   <div id="companylogo">
-    <a href="$!xwiki.getURL('Main.WebHome')" title="Home" rel="home">
+    <a href="$!xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))" title="Home" rel="home">
 #if("$!{themeDocFullName}" == '')
   #set($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
 #end

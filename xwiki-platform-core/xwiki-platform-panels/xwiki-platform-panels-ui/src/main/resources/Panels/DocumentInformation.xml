@@ -293,7 +293,7 @@ XWiki.SyntaxConverter = Class.create({
 });
 
 // Create the component when the HTML tree is fully loaded.
-document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</code>
+document.observe("xwiki:dom:loaded", function() { new XWiki.SyntaxConverter(); });</code>
     </property>
     <property>
       <name>SyntaxConverter</name>
@@ -399,34 +399,40 @@ $xwiki.ssx.use('Panels.DocumentInformation')##
 ## Display wiki syntax combo box if there's more than one configured syntax.
 ##--------------------------------------------------------------------------
 $xwiki.jsx.use($paneldoc.fullName)##
-#if ($xwiki.getConfiguredSyntaxes().size() &gt; 1)
-; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$msg.get('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
-: {{html}}&lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
-&lt;option value="xwiki/1.0"#if ($tdoc.getSyntax().toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
 #set ($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
-##
-## Starting with XE 2.3 the $syntaxFactory binding has been removed and the new $services binding added.
-## To make sure this Panel application still work with versions less than 2.3 we verify the availability of bindings.
-#set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
-#if (!$availableParserSyntaxes)
-  #set ($availableParserSyntaxes = $syntaxFactory.getAvailableSyntaxes())
-#end
-##
-#foreach ($syntax in $availableParserSyntaxes)
-  #if ($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
-    &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntax().toIdString().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
-  #end
-#end
-&lt;/select&gt;{{/html}}
+#if ($configuredSyntaxes.size() &gt; 1)
+  ; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$msg.get('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
+  : {{html}}
+    &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
+      #set ($docSyntax = $tdoc.getSyntax())
+      &lt;option value="xwiki/1.0"#if ($docSyntax.toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
+      ##
+      ## Starting with XE 2.3 the $syntaxFactory binding has been removed and the new $services binding added.
+      ## To make sure this Panel application still work with versions less than 2.3 we verify the availability of bindings.
+      #set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
+      #if (!$availableParserSyntaxes)
+        #set ($availableParserSyntaxes = $syntaxFactory.getAvailableSyntaxes())
+      #end
+      ##
+      #foreach ($syntax in $availableParserSyntaxes)
+        #if ($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
+          &lt;option value="$syntax.toIdString()"#if($docSyntax.toIdString().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
+        #end
+      #end
+      ## If the current document's syntax is not in the list of configured syntax, add it to the Select. Note that if we don't do this it causes a bug
+      ## since when saving the document its syntax will be set to XWiki Syntax 1.0 (which is the first syntax in the Select).
+      #if (!$configuredSyntaxes.contains($docSyntax.toIdString()))
+        &lt;option value="$docSyntax.toIdString()" selected="selected"&gt;$docSyntax.toString()&lt;/option&gt;
+      #end
+    &lt;/select&gt;
+  {{/html}}
 #end
 ##--------------------------------------------------------------------------
-#if($isAdvancedUser)
 
 {{html}}
 &lt;input id="xhidden" type="checkbox" name="xhidden" #if($doc.isHidden()) checked="checked"#end value="1"/&gt;&lt;label for="xhidden"&gt;$msg.get('panels.documentInformation.hiddenDocument')&lt;/label&gt;
 &lt;input name="xhidden" type="hidden" value="0" /&gt;
 {{/html}}
-#end
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)
   ; $msg.get('panels.documentInformation.includesCount', [$pages.size()])

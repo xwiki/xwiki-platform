@@ -262,6 +262,7 @@ function prettyNameChanged()
   #set ($documentBundlesValue = "${WORKSPACE_MANAGER_TRANSLATIONS_PAGE},${documentBundlesValue}")
   #set ($temp = $xwikiPreferencesDocument.set('documentBundles', $documentBundlesValue))
   ## Save the preferences page using programming rights of the current document.
+  ## The save comment can not be translated at this point, since the translations are not yet registered.
   #set ($temp = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
   {{info}}$msg.get('workspacemanager.install.translations'){{/info}}
 
@@ -288,7 +289,7 @@ function prettyNameChanged()
 #end
 ############################################################################################
 ## WORKSPACE INSTALLATION STATUS CHECK
-#set ($isInstallComplete = "$!{WikiManager.getWikiTemplateDocument('workspacetemplate')}" != '')
+#set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))
 #if (!$isInstallComplete)
   {{warning}}$msg.get('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
 
@@ -349,7 +350,8 @@ function prettyNameChanged()
 #############################################################################
 ##
 #if ($action &amp;&amp; $action == 'create')
-  #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument))
+  #set ($templateName = "$!request.template")
+  #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument, $templateName))
   ##
   #if ("$!WorkspaceManager.lastException" == '')
     ## Add members.
@@ -366,7 +368,7 @@ function prettyNameChanged()
         #set($temp = $memberObject.set('member', $member))
       #end
       ## Save the group document to preserve the member additions.
-      #set($temp = $workspaceGroupDocument.save('Added initial workspace members', true))
+      #set($temp = $workspaceGroupDocument.save($msg.get('platform.workspace.createInitialMembersSaveComment'), true))
     #end
     ## Redirect to the new workspace's homepage.
     #set($temp = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
@@ -382,7 +384,7 @@ function prettyNameChanged()
 &lt;form method='post' action='' id='wikicreationform' class='xform third'&gt;
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='wikiname'&gt;$msg.get('workspacemanager.prop.wiki.wikiname') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;label for='wikiname'&gt;$msg.get('workspacemanager.prop.wiki.wikiname') &lt;span class='xRequired'&gt;($msg.get('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.wikiname')&lt;/span&gt;
       &lt;span id='wikinamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
@@ -390,35 +392,53 @@ function prettyNameChanged()
     &lt;dd&gt;
       &lt;input size='60' id='wikiname' name='wikiname' type='text' onchange='wikiNameChanged();' onkeyup='wikiNameChanged();' #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
     &lt;/dd&gt;
-  &lt;/dl&gt;
   ##
   #############################################################################
   ##
-  &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wiki.wikiprettyname') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wiki.wikiprettyname') &lt;span class='xRequired'&gt;($msg.get('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.wikiprettyname')&lt;/span&gt;
       &lt;span id='wikiprettynamevalidation' class='xErrorMsg'&gt;&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;&lt;input size='60' id='XWiki.XWikiServerClass_0_wikiprettyname' name='XWiki.XWikiServerClass_0_wikiprettyname' type='text' onchange='prettyNameChanged();' onkeyup='prettyNameChanged();' #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;&lt;/dd&gt;
-  &lt;/dl&gt;
 
-  &lt;dl&gt;
+  #set ($templates = $WorkspaceManager.getWorkspaceTemplates())
+  #if ($templates.size() &gt; 1)
+    &lt;dt&gt;
+      &lt;label for='template'&gt;$msg.get('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('platform.workspace.newWorkspaceTemplateHint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;select name='template' id='template' #if(!$isInstallComplete)disabled='disabled'#{end}&gt;
+        #foreach ($template in $templates)
+          #set ($wikiDescriptor = $template.wikiDescriptor)
+          #set ($name = $wikiDescriptor.wikiName)
+          #if ($stringtool.isNotBlank("$!wikiDescriptor.wikiPrettyName"))
+            #set($name = "${wikiDescriptor.wikiPrettyName} (${name})")
+          #end
+          &lt;option value="${wikiDescriptor.wikiName}" #if($docName=='XWiki.XWikiServerWorkspacetemplate') selected='selected' #end &gt;$name&lt;/option&gt;
+        #end
+      &lt;/select&gt;
+    &lt;/dd&gt;
+  #else
+    &lt;div&gt;
+      &lt;input id='template' name='template' type='hidden' value="$templates[0].wikiDescriptor.wikiName" #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
+    &lt;/div&gt;
+  #end
+
     &lt;dt&gt;
       &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.wiki.description')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.description')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='7' cols='45' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;&lt;/textarea&gt;&lt;/dd&gt;
-  &lt;/dl&gt;
 
   #set ($rightsmanager = $xwiki.rightsmanager)
   #set ($users = $sorttool.sort($rightsmanager.usersApi.allGlobalUsersNames))
 
   ## Make this section available only to admins, so that only admins can create workspaces in the name of other users.
   #if ($hasAdmin)
-  &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.wiki.owner') &lt;span class='xRequired'&gt;(Required)&lt;/span&gt;&lt;/label&gt;
+      &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.wiki.owner') &lt;span class='xRequired'&gt;($msg.get('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
@@ -433,7 +453,6 @@ function prettyNameChanged()
         #end
       &lt;/select&gt;
     &lt;/dd&gt;
-  &lt;/dl&gt;
   #else
   &lt;div&gt;
     &lt;input id='XWiki.XWikiServerClass_0_owner' name='XWiki.XWikiServerClass_0_owner' type='hidden' value="${xcontext.mainWikiName}:${xcontext.user}" #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
@@ -442,7 +461,6 @@ function prettyNameChanged()
   ##
   #############################################################################
   ##
-  &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for='members'&gt;$msg.get('workspacemanager.members')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.members')&lt;/span&gt;
@@ -460,14 +478,12 @@ function prettyNameChanged()
         #end
       &lt;/select&gt;
     &lt;/dd&gt;
-  &lt;/dl&gt;
 
   #set($workspaceClass = $xwiki.getDocument('WorkspaceClass').getxWikiClass())
   #set($membershipTypeProperty = $workspaceClass.get('membershipType'))
   #set($membershipTypeValues = '')
   #set($membershipTypeValues = $membershipTypeProperty.getListValues())
   #set($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
-  &lt;dl&gt;
     &lt;dt&gt;
       &lt;label&gt;$msg.get('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.workspace.membershipType.hint')&lt;/span&gt;

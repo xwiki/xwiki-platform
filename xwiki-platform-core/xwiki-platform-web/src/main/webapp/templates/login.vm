@@ -2,7 +2,7 @@
   #if ($request.xredirect)
     $response.sendRedirect($request.xredirect)
   #else
-    $response.sendRedirect($xwiki.getURL('Main.WebHome'))
+    $response.sendRedirect($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
   #end
 #elseif($doc.fullName != 'XWiki.XWikiLogin')
   #set($qs = "$!{request.queryString}")

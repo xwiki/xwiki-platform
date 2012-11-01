@@ -10,7 +10,7 @@
 #set($i = $xcontext.user.indexOf(":")+1)
 #if($xcontext.user.substring($i) == $doc.fullName || $hasAdmin)
   <div id="document-title"><h1>$msg.get("platform.core.profile.passwd.title", [$escapetool.xml($xwiki.getUserName($doc.fullName, false))])</h1></div>
-  <form class="xform third" action="$doc.getURL("save")" method="post" onsubmit="if($('xwikipassword').value != $('xwikipassword2').value) {alert('$msg.get("platform.core.profile.passwd.passwordMissmatch")'); return false; } else if($('xwikipassword').value == '') {alert('$msg.get("platform.core.profile.passwd.passwordCannotBeEmpty")'); return false;}">
+  <form class="xform third" action="$doc.getURL("save")" method="post" autocomplete="off" onsubmit="if($('xwikipassword').value != $('xwikipassword2').value) {alert('$msg.get("platform.core.profile.passwd.passwordMissmatch")'); return false; } else if($('xwikipassword').value == '') {alert('$msg.get("platform.core.profile.passwd.passwordCannotBeEmpty")'); return false;}">
     ## CSRF prevention
     <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
     <dl>

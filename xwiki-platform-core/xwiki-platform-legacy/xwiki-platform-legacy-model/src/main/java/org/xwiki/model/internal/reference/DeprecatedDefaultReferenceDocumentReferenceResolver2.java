@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReference;
  * Same as DefaultReferenceDocumentReferenceResolver but with the extended type in both the role hint and the role type.
  * 
  * @version $Id$
- * @since 3.5.2, 4.1.4
+ * @since 2.2M1
  * @deprecated use {@link DefaultReferenceDocumentReferenceResolver} instead.
  */
 @Component
@@ -47,6 +47,6 @@ public class DeprecatedDefaultReferenceDocumentReferenceResolver2 implements Doc
     @Override
     public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
-        return this.resolver.resolve((EntityReference) documentReferenceRepresentation, parameters);
+        return this.resolver.resolve(documentReferenceRepresentation, parameters);
     }
 }

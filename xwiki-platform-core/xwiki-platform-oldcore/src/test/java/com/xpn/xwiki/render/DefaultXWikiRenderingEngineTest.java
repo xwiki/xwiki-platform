@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
+import org.junit.Assert;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -195,5 +196,12 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         }});
 
         assertEquals(velocityFirst, myEngine.renderText(text, document, getContext()));
+    }
+
+    public void testRenderWithoutContextDoc()
+    {
+        String result = getContext().getWiki().getRenderingEngine().interpretText("toto", null, getContext());
+        
+        Assert.assertEquals("toto", result);
     }
 }

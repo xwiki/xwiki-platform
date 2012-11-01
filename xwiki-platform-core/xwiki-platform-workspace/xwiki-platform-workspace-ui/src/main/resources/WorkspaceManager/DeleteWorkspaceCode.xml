@@ -26,7 +26,7 @@
   <content>{{velocity}}
 #macro (printException $exception)
   #if($exception.message)
-    {{error}}$exception.message{{/error}}
+    {{error}}$msg.get('platform.workspace.exceptionWithMessage', $exception.message){{/error}}
   #else
     {{error}}$exception.class{{/error}}
   #end
@@ -37,7 +37,7 @@
 #set ($confirm = $request.confirm)
 ##
 #if ("$!workspaceId" == '' || "$!workspaceName" == '')
-  {{error}}[workspaceId] and [workspaceName] parameters are not specified.{{/error}}
+  {{error}}$msg.get('platform.workspace.twoParametersNotSpecified', ['workspaceId', 'workspaceName']){{/error}}
 #else
   ## FIXME: add plugin dependency checks.
   ##
@@ -47,7 +47,7 @@
   ##
   #if (!$workspace)
     #if (!$WorkspaceManager.lastException)
-      {{error}}The workspace '$workspaceId' does not exist.{{/error}}
+      {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', $workspaceId){{/error}}
     #else
       #printException($WorkspaceManager.lastException)
     #end
@@ -63,9 +63,9 @@
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          Are you sure you want to delete the workspace [[$workspaceName&gt;&gt;$workspaceUrl]]?
+          $msg.get('platform.workspace.deleteWorkspaceConfirmation', [$workspaceName, $workspaceUrl])
           ((({{html}}
-            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;Yes&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;No&lt;/a&gt;&lt;/span&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$msg.get('platform.workspace.deleteWorkspaceYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$msg.get('platform.workspace.deleteWorkspaceNo')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
         {{/box}}
       #else
@@ -73,7 +73,7 @@
         #if ($WorkspaceManager.lastException)
           #printException($WorkspaceManager.lastException)
         #else
-          {{success}}The user [[$currentUser]] successfully deleted the workspace ${workspaceName}.{{/success}}
+          {{success}}$msg.get('platform.workspace.deleteWorkspaceSuccess', [$currentUser, $workspaceName]){{/success}}
         #end
       #end
     #end

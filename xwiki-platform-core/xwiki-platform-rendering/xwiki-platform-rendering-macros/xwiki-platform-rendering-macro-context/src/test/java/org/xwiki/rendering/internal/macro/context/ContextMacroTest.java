@@ -21,11 +21,11 @@ package org.xwiki.rendering.internal.macro.context;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -34,10 +34,14 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
@@ -55,10 +59,16 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @since 3.0M1
  */
 @AllComponents
+@MockingRequirement(value = ContextMacro.class, exceptions = { BeanManager.class, MacroContentParser.class })
 public class ContextMacroTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(exceptions = { BeanManager.class, MacroContentParser.class })
-    private ContextMacro macro;
+    private Macro macro;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.macro = getComponentManager().getInstance(Macro.class, "context");
+    }
 
     @Test
     public void testExecuteWhenNoDocumentSpecified() throws Exception
@@ -77,11 +87,12 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     @Test
     public void testExecuteWithReferencedDocumentHavingProgrammingRightsButNotCallingDocument() throws Exception
     {
+        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         final DocumentReferenceResolver<String> resolver =
-            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
-            oneOf(resolver).resolve("wiki:space.page");
+            oneOf(resolver).resolve("wiki:space.page", macroBlock);
             will(returnValue(new DocumentReference("wiki", "space", "page")));
             // First call to hasProgrammingRights is for the current document
             oneOf(dab).hasProgrammingRights();
@@ -96,8 +107,10 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         ContextMacroParameters parameters = new ContextMacroParameters();
         parameters.setDocument("wiki:space.page");
 
+        MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setCurrentMacroBlock(macroBlock);
         try {
-            this.macro.execute(parameters, "", new MacroTransformationContext());
+            this.macro.execute(parameters, "", macroContext);
             Assert.fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("Current document must have programming rights since the context document provided ["
@@ -108,14 +121,16 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     @Test
     public void testExecuteWithReferencedDocumentHavingProgrammingRightsAndCallingDocumentToo() throws Exception
     {
+        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         final MacroTransformationContext macroContext = new MacroTransformationContext();
         macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
 
         final DocumentReferenceResolver<String> drr =
-            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
-            oneOf(drr).resolve("wiki:space.page");
+            oneOf(drr).resolve("wiki:space.page", macroBlock);
             will(returnValue(new DocumentReference("wiki", "space", "page")));
             // First call to hasProgrammingRights is for the current document
             oneOf(dab).hasProgrammingRights();
@@ -136,8 +151,10 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     @Test
     public void testExecute() throws Exception
     {
+        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         final MacroTransformationContext macroContext = new MacroTransformationContext();
         macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
 
         // Register a mock implementation of WikiModel so that we're in wiki mode and so that link references are
         // resolved as document references and not URLs.
@@ -149,15 +166,14 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         // The XDOM returned by the Macro Content Parser
         XDOM xdom = new XDOM(Arrays.asList((Block) new ParagraphBlock(Arrays.asList((Block) new LinkBlock(
             Collections.<Block>emptyList(), new ResourceReference("", ResourceType.DOCUMENT), false)))));
-        final List<Block> blocks = xdom.getChildren();
 
         final DocumentReference docReference = new DocumentReference("wiki", "space", "page");
 
         final DocumentReferenceResolver<String> drr =
-            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
         final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations() {{
-            oneOf(drr).resolve("wiki:space.page");
+            oneOf(drr).resolve("wiki:space.page", macroBlock);
             will(returnValue(docReference));
             // First call to hasProgrammingRights is for the current document
             oneOf(dab).hasProgrammingRights();
@@ -174,6 +190,41 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
 
         // Note: we're not testing the returned value since we don't need to and is tested by the unit tests for both
         // the Macro Content Parser and the XDOM Resource Reference Resolver.
-        this.macro.execute(parameters, "[[]]", macroContext);
+        this.macro.execute(parameters, "", macroContext);
+    }
+
+    @Test
+    public void executeWhenBaseMetaDataInXDOM() throws Exception
+    {
+        final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metaData = new MetaData(
+            Collections.<String, Object> singletonMap(MetaData.BASE, "basewiki:basespace.basepage"));
+        new XDOM(Arrays.<Block>asList(new MetaDataBlock(Arrays.<Block>asList(macroBlock), metaData)));
+
+        final MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
+
+        final DocumentReferenceResolver<String> drr =
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
+        final DocumentReference docReference = new DocumentReference("basewiki", "basespace", "page");
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(drr).resolve("page", macroBlock);
+            will(returnValue(docReference));
+            // First call to hasProgrammingRights is for the current document
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(false));
+            oneOf(dab).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
+            oneOf(dab).popDocumentFromContext(with(any(Map.class)));
+            // Second call is for the passed document
+            oneOf(dab).hasProgrammingRights();
+            will(returnValue(false));
+        }});
+
+        ContextMacroParameters parameters = new ContextMacroParameters();
+        parameters.setDocument("page");
+
+        this.macro.execute(parameters, "", macroContext);
     }
 }

@@ -44,7 +44,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiRunnable.class);
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<String, Object>();
 
     protected AbstractXWikiRunnable()
     {
@@ -69,6 +69,15 @@ public abstract class AbstractXWikiRunnable implements Runnable
     }
 
     /**
+     * Lets subclasses declare execution context properties.
+     *
+     * @param executionContext the execution context.
+     */
+    protected void declareProperties(ExecutionContext executionContext)
+    {
+    }
+
+    /**
      * Initialize execution context for the current thread.
      * 
      * @return the new execution context
@@ -78,6 +87,8 @@ public abstract class AbstractXWikiRunnable implements Runnable
     {
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         ExecutionContext context = new ExecutionContext();
+
+        declareProperties(context);
 
         ecim.initialize(context);
 

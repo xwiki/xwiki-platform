@@ -43,9 +43,11 @@ import org.xwiki.script.service.ScriptService;
 public class ComponentScriptService implements ScriptService
 {
     /**
-     * Used to lookup parsers and renderers to discover available syntaxes.
+     * The Component Manager that we'll return to the user or use to return component instances to the user.
+     * Note that we use a Context Component Manager so that the user gets all components registered in its context.
      */
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     /**

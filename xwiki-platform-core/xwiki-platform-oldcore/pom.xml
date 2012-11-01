@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -74,11 +74,6 @@
       <version>4.3</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-    </dependency>
-
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
     <dependency>
       <groupId>info.informatica</groupId>
@@ -93,20 +88,10 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
-         http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
-         allow a release (this is for reproducibility). Thus we've had to upload JTidy into
-         our custom repository -->
     <dependency>
-      <groupId>jtidy</groupId>
+      <groupId>net.sf.jtidy</groupId>
       <artifactId>jtidy</artifactId>
-      <version>8.0-20060801.131059-3-dev</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>dom3-xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>r938</version>
     </dependency>
     
     <!-- Required by the XML-RPC implementation and tests.
@@ -174,12 +159,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
-    
+
     <!-- For extracting metadata from various document types -->
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>1.2</version>
     </dependency>
 
     <!-- XML processing -->
@@ -206,14 +190,6 @@
     <dependency>
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
-      <version>1.2.9</version>
-      <exclusions>
-        <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
-        <exclusion>
-          <groupId>antlr</groupId>
-          <artifactId>antlr</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Rendering -->
@@ -368,38 +344,13 @@
       <artifactId>yuicompressor</artifactId>
       <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
            yuicompressor -->
-      <version>2.4.2-xwiki</version>
+      <version>2.4.7-xwiki</version>
     </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>1.6</version>
-    </dependency>
-    <!-- RSS Feed processing -->
-    <dependency>
-      <groupId>net.java.dev.rome</groupId>
-      <artifactId>rome</artifactId>
-      <version>1.0.0</version>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.rome</groupId>
-      <artifactId>rome-fetcher</artifactId>
-      <version>1.0.0</version>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Mail sender -->
     <dependency>
@@ -457,6 +408,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other
@@ -575,6 +531,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -762,6 +723,9 @@
               **/i18n/i18n.java,
               **/internal/DefaultCoreConfiguration.java,
               **/internal/DefaultXWikiStubContextProvider.java,
+              **/internal/mandatory/AbstractRightsDocumentInitializer.java,
+              **/internal/mandatory/XWikiPreferencesDocumentInitializer.java,
+              **/internal/mandatory/XWikiUsersDocumentInitializer.java,
               **/internal/model/reference/CompactStringEntityReferenceSerializer.java,
               **/internal/model/reference/CompactWikiStringEntityReferenceSerializer.java,
               **/internal/model/reference/CurrentEntityReferenceValueProvider.java,
@@ -838,13 +802,6 @@
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
-              **/plugin/feed/FeedPluginApi.java,
-              **/plugin/feed/FeedPlugin.java,
-              **/plugin/feed/SyndEntryDocumentSource.java,
-              **/plugin/feed/SyndEntrySourceApi.java,
-              **/plugin/feed/SyndEntrySource.java,
-              **/plugin/feed/UpdateThread.java,
-              **/plugin/feed/XWikiFeedFetcher.java,
               **/plugin/google/GooglePluginApi.java,
               **/plugin/google/GooglePlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,
@@ -878,12 +835,6 @@
               **/plugin/svg/SVGMacro.java,
               **/plugin/svg/SVGPluginApi.java,
               **/plugin/svg/SVGPlugin.java,
-              **/plugin/userdirectory/Group.java,
-              **/plugin/userdirectory/UserDirectoryPluginAPI.java,
-              **/plugin/userdirectory/UserDirectoryPlugin.java,
-              **/plugin/usertools/XWikiUserManagementToolsAPI.java,
-              **/plugin/usertools/XWikiUserManagementToolsImpl.java,
-              **/plugin/usertools/XWikiUserManagementTools.java,
               **/plugin/XWikiPluginManager.java,
               **/pref/api/XWikiPrefService.java,
               **/pref/impl/xwiki/XWikiPrefServiceImpl.java,

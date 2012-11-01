@@ -60,8 +60,6 @@ public class AttachmentHandler extends AbstractHandler
             } catch (IOException e) {
                 // TODO: log error
             }
-        } else if (qName.equals("filesize")) {
-            getAttachment().setFilesize(Integer.valueOf(this.value.toString()));
         } else {
             super.endElementInternal(uri, localName, qName);
         }

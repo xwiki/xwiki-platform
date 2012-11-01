@@ -32,7 +32,7 @@
          http://platform.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
          database. You'll need to do 2 things:
          1) Copy your database driver JAR in WEB-INF/lib or in some shared lib directory
-         2) Uncomment the properties below for your specific DB (and comment the default 
+         2) Uncomment the properties below for your specific DB (and comment the default
             database configuration if it doesn't match your DB)
     -->
 
@@ -41,33 +41,58 @@
     <property name="show_sql">false</property>
     <property name="use_outer_join">true</property>
 
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+
+    <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
+    <property name="jdbc.use_scrollable_resultset">false</property>
+
+    <!-- DBCP Connection Pooling configuration
+    -->
     <property name="dbcp.defaultAutoCommit">false</property>
     <property name="dbcp.maxActive">50</property>
     <property name="dbcp.maxIdle">5</property>
     <property name="dbcp.maxWait">30000</property>
     <property name="dbcp.whenExhaustedAction">1</property>
     <property name="dbcp.ps.whenExhaustedAction">1</property>
-    <property name="dbcp.ps.maxActive">20</property>
     <property name="dbcp.ps.maxWait">120000</property>
     <property name="dbcp.ps.maxIdle">20</property>
-    <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
-    <property name="jdbc.use_scrollable_resultset">false</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+
+    <!-- Setting dbcp.ps.maxActive configuration tells DBCP whether to cache Prepared Statement or not.
+         Note that when using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
+         Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
+         schema if the same PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache
+         prepared statement there's no performance loss. see http://jira.xwiki.org/browse/XWIKI-1740.
+         Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :) -->
+
+    <!-- BoneCP Connection Pooling configuration.
+    <property name="bonecp.idleMaxAgeInMinutes">240</property>
+    <property name="bonecp.idleConnectionTestPeriodInMinutes">60</property>
+    <property name="bonecp.partitionCount">3</property>
+    <property name="bonecp.acquireIncrement">10</property>
+    <property name="bonecp.maxConnectionsPerPartition">60</property>
+    <property name="bonecp.minConnectionsPerPartition">20</property>
+    <property name="bonecp.statementsCacheSize">50</property>
+    <property name="bonecp.releaseHelperThreads">3</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    -->
+
+## DO NOT USE XML COMMENT IN BETWEEN DB SPECIFIC CONFIGURATION, IT RENDER COMMENTING/UNCOMMENTING THE RIGHT
+## CONFIGURATION A PAIN
 
     <!-- Configuration for the default database.
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
     -->
 ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
-## have preferred to use an empty value but I couldn't make that work with Maven. 
+## have preferred to use an empty value but I couldn't make that work with Maven.
 #if ($xwikiDbConnectionUrl != "none")
     <property name="connection.url">$xwikiDbConnectionUrl</property>
     <property name="connection.username">$!xwikiDbConnectionUsername</property>
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -87,9 +112,7 @@
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
     <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
+    <property name="dbcp.ps.maxActive">20</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -109,9 +132,6 @@
     <property name="connection.password"></property>
     <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
     <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -135,10 +155,8 @@
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">org.postgresql.Driver</property>
     <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
     <property name="jdbc.use_streams_for_binary">false</property>
+    <property name="dbcp.ps.maxActive">20</property>
     <mapping resource="xwiki.postgresql.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -164,12 +182,10 @@
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
     <property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
     <property name="connection.SetBigStringTryClob">true</property>
     <property name="jdbc.batch_size">0</property>
     <property name="jdbc.use_streams_for_binary">false</property>
+    <property name="dbcp.ps.maxActive">20</property>
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -187,9 +203,7 @@
     <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
     <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
     <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
+    <property name="dbcp.ps.maxActive">20</property>
     <mapping resource="xwiki.derby.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated

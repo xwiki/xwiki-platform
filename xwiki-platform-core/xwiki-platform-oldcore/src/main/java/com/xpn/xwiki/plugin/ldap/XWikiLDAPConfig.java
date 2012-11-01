@@ -191,6 +191,31 @@ public final class XWikiLDAPConfig
     }
 
     /**
+     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name* (for XWiki
+     * Preferences) will be changed to ldap.*name* for xwiki.cfg.
+     * 
+     * @param name the name of the property in XWikiPreferences.
+     * @param def default value.
+     * @param context the XWiki context.
+     * @return the value of the property.
+     */
+    public long getLDAPParamAsLong(String name, long def, XWikiContext context)
+    {
+        String paramStr =
+            getLDAPParam(name, name.replace(PREF_LDAP_SUFFIX, CFG_LDAP_SUFFIX), String.valueOf(def), context);
+
+        long value;
+
+        try {
+            value = Long.valueOf(paramStr);
+        } catch (Exception e) {
+            value = def;
+        }
+
+        return value;
+    }
+
+    /**
      * @param context the XWiki context.
      * @return the of the LDAP groups classes.
      * @since 1.5M1
@@ -466,5 +491,15 @@ public final class XWikiLDAPConfig
     public String getLDAPBindPassword(String login, String password, XWikiContext context)
     {
         return MessageFormat.format(getLDAPBindPassword(context), login, password);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the maximum number of milliseconds the client waits for any operation under these constraints to
+     *         complete.
+     */
+    public int getLDAPTimeout(XWikiContext context)
+    {
+        return (int) getLDAPParamAsLong("ldap_timeout", 1000, context);
     }
 }

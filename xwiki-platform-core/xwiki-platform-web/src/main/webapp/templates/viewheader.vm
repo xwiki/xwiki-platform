@@ -132,17 +132,17 @@
 ## Admin section
         #if($hasadmin && !$isReadOnly)
           <div class="xwikimenutitle">$msg.get("admin")</div>
-          #xwikiitem($xwiki.getURL("${doc.space}.WebHome", "view") "space")
-          #xwikiitem($xwiki.getURL("${doc.space}.WebPreferences", "edit", "xpage=editprefs") "webprefs")
-          #xwikiitem($xwiki.getURL("${doc.space}.WebPreferences", "edit" , "xpage=editrights&global=1") "webrights")
-          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editprefs") "xwikiprefs")
-          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editrights&global=1") "xwikirights")
+          #xwikiitem($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) 'space')
+          #xwikiitem($xwiki.getURL($services.model.resolveDocument('WebPreferences', 'default', $doc.documentReference.extractReference('SPACE')), 'edit', 'xpage=editprefs') 'webprefs')
+          #xwikiitem($xwiki.getURL($services.model.resolveDocument('WebPreferences', 'default', $doc.documentReference.extractReference('SPACE')), 'edit' , 'xpage=editrights&global=1') 'webrights')
+          #xwikiitem($xwiki.getURL($services.model.resolveDocument('XWiki.XWikiPreferences', 'default', $doc.documentReference.extractReference('WIKI')), 'edit', 'xpage=editprefs') 'xwikiprefs')
+          #xwikiitem($xwiki.getURL($services.model.resolveDocument('XWiki.XWikiPreferences', 'default', $doc.documentReference.extractReference('WIKI')), 'edit', 'xpage=editrights&global=1') 'xwikirights')
           #xwikiitem($doc.getURL("edit", "xpage=editclass") "classeditor")
         #end
 ## Help section
         <div class="xwikimenutitle">$msg.get("help")</div>
-        #xwikiitem($xwiki.getURL("Doc.WebHome", "view") "xwikidoc")
-        #xwikiitem($xwiki.getURL("Doc.XWikiSyntax", "view") "xwikisyntax")
+        #xwikiitem($xwiki.getURL($services.model.resolveDocument('Doc.', 'default', $doc.documentReference.extractReference('WIKI'))) 'xwikidoc')
+        #xwikiitem($xwiki.getURL($services.model.resolveDocument('Doc.XWikiSyntax', 'default', $doc.documentReference.extractReference('WIKI'))) 'xwikisyntax')
       </div>
 ## End the inner menu
     </div>

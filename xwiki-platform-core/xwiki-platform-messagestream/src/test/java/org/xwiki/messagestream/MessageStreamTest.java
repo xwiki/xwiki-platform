@@ -25,19 +25,18 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.messagestream.internal.DefaultMessageStream;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.query.Query;
@@ -52,16 +51,22 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
-public class MessageStreamTest extends AbstractMockingComponentTestCase
+@MockingRequirement(DefaultMessageStream.class)
+public class MessageStreamTest extends AbstractMockingComponentTestCase<MessageStream>
 {
-    @MockingRequirement
-    private DefaultMessageStream stream;
+    private MessageStream stream;
 
     private final DocumentReference currentUser = new DocumentReference("wiki", "XWiki", "JohnDoe");
 
     private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
 
     private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.stream = getComponentManager().getInstance(MessageStream.class);
+    }
 
     @Test
     public void testPostPublicMessage() throws Exception
@@ -169,6 +174,21 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testPostDirectMessageWithNonExistingTarget() throws Exception
+    {
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final DocumentReference targetUser = new DocumentReference("xwiki", "XWiki", "Nobody");
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockBridge).exists(targetUser);
+                will(returnValue(false));
+            }
+        });
+        this.stream.postDirectMessageToUser("Hello Nobody!", targetUser);
+    }
+
     @Test
     public void testPostGroupMessage() throws Exception
     {
@@ -180,6 +200,35 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         Assert.assertEquals("wiki:XWiki.MyFriends", postedMessage.getStream());
         Assert.assertEquals(new ObjectReference("XWiki.XWikiGroups", this.targetGroup), postedMessage
             .getRelatedEntity());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPostGroupMessageWithNonExistingTarget() throws Exception
+    {
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final DocumentReference targetGroup = new DocumentReference("xwiki", "XWiki", "Nobodies");
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(1).of(mockBridge).exists(targetGroup);
+                will(returnValue(false));
+            }
+        });
+        this.stream.postMessageToGroup("Hello Nobodies!", targetGroup);
+    }
+
+    @Test
+    public void testGetRecentPersonalMessages() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+        this.stream.getRecentPersonalMessages();
+    }
+
+    @Test
+    public void testGetRecentPersonalMessagesForAuthor() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+        this.stream.getRecentPersonalMessages(this.currentUser);
     }
 
     @Test
@@ -259,18 +308,12 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final QueryManager mockQueryManager = getComponentManager().getInstance(QueryManager.class);
         final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
         final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        @SuppressWarnings("unchecked")
-        final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
-        @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockBridge).getCurrentUser();
-                will(returnValue("XWiki.JohnDoe"));
-                allowing(mockResolver).resolve("XWiki.JohnDoe", EntityType.DOCUMENT);
+                allowing(mockBridge).getCurrentUserReference();
                 will(returnValue(MessageStreamTest.this.currentUser));
                 allowing(mockSerializer).serialize(MessageStreamTest.this.currentUser);
                 will(returnValue("wiki:XWiki.JohnDoe"));
@@ -314,18 +357,12 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     {
         final Event e = setupForNewMessage();
         final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        @SuppressWarnings("unchecked")
-        final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
-        @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
-                exactly(1).of(mockBridge).getCurrentUser();
-                will(returnValue("XWiki.JohnDoe"));
-                atLeast(1).of(mockResolver).resolve("XWiki.JohnDoe", EntityType.DOCUMENT);
+                exactly(1).of(mockBridge).getCurrentUserReference();
                 will(returnValue(MessageStreamTest.this.currentUser));
                 exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.currentUser);
                 will(returnValue("wiki:XWiki.JohnDoe"));
@@ -338,18 +375,12 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     {
         final Event e = setupForNewMessage();
         final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        @SuppressWarnings("unchecked")
-        final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
-        @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
-                exactly(1).of(mockBridge).getCurrentUser();
-                will(returnValue("XWiki.JohnDoe"));
-                atLeast(1).of(mockResolver).resolve("XWiki.JohnDoe", EntityType.DOCUMENT);
+                exactly(1).of(mockBridge).getCurrentUserReference();
                 will(returnValue(MessageStreamTest.this.currentUser));
                 exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.currentUser);
                 will(returnValue("wiki:XWiki.JohnDoe"));
@@ -361,12 +392,14 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     private Event setupForDirectMessage() throws ComponentLookupException, Exception
     {
         final Event e = setupForNewMessage();
-        @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
+                exactly(1).of(mockBridge).exists(MessageStreamTest.this.targetUser);
+                will(returnValue(true));
                 exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.targetUser);
                 will(returnValue("wiki:XWiki.JaneBuck"));
             }
@@ -377,12 +410,14 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
     private Event setupForGroupMessage() throws ComponentLookupException, Exception
     {
         final Event e = setupForNewMessage();
-        @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
+        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
         {
             {
+                exactly(1).of(mockBridge).exists(MessageStreamTest.this.targetGroup);
+                will(returnValue(true));
                 exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.targetGroup);
                 will(returnValue("wiki:XWiki.MyFriends"));
             }
@@ -397,17 +432,12 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase
         final QueryManager mockQueryManager = getComponentManager().getInstance(QueryManager.class);
         final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
         final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
-        @SuppressWarnings("unchecked")
         final EntityReferenceSerializer<String> mockSerializer =
             getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockBridge).getCurrentUser();
-                will(returnValue("XWiki.JohnDoe"));
-                allowing(mockResolver).resolve("XWiki.JohnDoe", EntityType.DOCUMENT);
+                allowing(mockBridge).getCurrentUserReference();
                 will(returnValue(MessageStreamTest.this.currentUser));
                 allowing(mockSerializer).serialize(MessageStreamTest.this.currentUser);
                 will(returnValue("wiki:XWiki.JohnDoe"));

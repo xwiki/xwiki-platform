@@ -100,9 +100,36 @@ public class ObjectEditPage extends EditPage
         return objects.get(objects.size() - 1);
     }
 
+    /**
+     * @since 4.3M2
+     */
+    public void removeAllObjects(String className)
+    {
+        List<WebElement> objectContainers = getUtil().findElementsWithoutWaiting(getDriver(),
+            By.xpath("//div[starts-with(@id, '" + "xobject_" + className + "_')]"));
+        // Exclude ids ending with _title and _content since we have 3 matches for each id...
+        List<WebElement> validElements = new ArrayList<WebElement>();
+        for (WebElement element : objectContainers) {
+            String id = element.getAttribute("id");
+            if (!id.endsWith("_content") && !id.endsWith("_title")) {
+            validElements.add(element);
+            }
+        }
+        for (WebElement element : validElements) {
+            deleteObject(By.id(element.getAttribute("id")));
+        }
+    }
+
     public void deleteObject(String className, int index)
     {
-        final By objectLocator = By.id("xobject_" + className + "_" + index);
+        deleteObject(By.id("xobject_" + className + "_" + index));
+    }
+
+    /**
+     * @since 4.3M2
+     */
+    public void deleteObject(By objectLocator)
+    {
         final WebElement objectContainer = getDriver().findElement(objectLocator);
         WebElement deleteLink = objectContainer.findElement(By.className("delete"));
         deleteLink.click();

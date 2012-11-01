@@ -27,6 +27,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Test;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.xwiki.component.manager.ComponentManager;
@@ -37,8 +38,10 @@ import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotListenerManager;
+import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -50,10 +53,16 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.0M2
  */
+@MockingRequirement(DefaultWikiIRCBotManager.class)
 public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    DefaultWikiIRCBotManager manager;
+    private WikiIRCBotManager manager;
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.manager = getComponentManager().getInstance(WikiIRCBotManager.class);
+    }
 
     private void prepareStartBotTests(boolean isBotActive) throws Exception
     {
@@ -67,11 +76,15 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
         final IRCBotListener componentBotListener = getMockery().mock(IRCBotListener.class);
         final WikiIRCBotListenerManager botListenerManager =
             getComponentManager().getInstance(WikiIRCBotListenerManager.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
 
         getMockery().checking(new Expectations()
         {{
+            oneOf(modelContext).getCurrentEntityReference();
+            will(returnValue(new WikiReference("currentwiki")));
             oneOf(bot).isConnected();
             will(returnValue(false));
+            oneOf(bot).initialize("currentwiki");
             oneOf(ircModel).loadBotData();
             will(returnValue(botData));
             allowing(bot).getListenerManager();

@@ -110,7 +110,7 @@
 #panelheader($msg.get('core.create.pageTitle'))
 #set ($panelId = $util.generateRandomString(4))
 {{html clean="false"}}
-&lt;form method="post" action="$doc.getURL('view', 'xpage=create')" onsubmit="cancelCancelEdit()"&gt;
+&lt;form method="post" action="$doc.getURL('create')" onsubmit="cancelCancelEdit()"&gt;
 {{/html}}
   (% class="padded centered" %)
   (((

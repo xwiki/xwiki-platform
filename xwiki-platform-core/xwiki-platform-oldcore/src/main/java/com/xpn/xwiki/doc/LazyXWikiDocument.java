@@ -134,12 +134,6 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
-    public Locale getLocale()
-    {
-        return this.locale;
-    }
-
-    @Override
     public Version getRCSVersion()
     {
         if (this.version == null) {

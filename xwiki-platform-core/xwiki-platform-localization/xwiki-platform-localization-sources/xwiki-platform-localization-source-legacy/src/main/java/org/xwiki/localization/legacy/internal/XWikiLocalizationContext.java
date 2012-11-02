@@ -17,38 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.message;
+package org.xwiki.localization.legacy.internal;
 
-import java.util.Collection;
 import java.util.Locale;
 
-import org.xwiki.localization.Bundle;
-import org.xwiki.rendering.block.Block;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.LocaleUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.LocalizationContext;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * A static {@link Block} returned as it is without any modification.
+ * Default implementation of {@link LocalizationContext}.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public class BlockTranslationMessageElement implements TranslationMessageElement
+@Component
+@Singleton
+public class XWikiLocalizationContext implements LocalizationContext
 {
     /**
-     * The {@link Block} to return.
+     * Used to access the configured locale.
      */
-    private Block block;
-
-    /**
-     * @param block the {@link Block} to return
-     */
-    public BlockTranslationMessageElement(Block block)
-    {
-        this.block = block;
-    }
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
-    public Block render(Locale locale, Collection<Bundle> bundles, Object... parameters)
+    public Locale getCurrentLocale()
     {
-        return this.block.clone();
+        Locale currentLocale = Locale.getDefault();
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (xcontext != null) {
+            String locale = xcontext.getWiki().getLanguagePreference(xcontext);
+            if (locale != null) {
+                currentLocale = LocaleUtils.toLocale(locale);
+            }
+        }
+
+        return currentLocale;
     }
 }

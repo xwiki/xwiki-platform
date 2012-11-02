@@ -245,7 +245,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference templateDocumentReference;
 
-    protected Locale locale;
+    private Locale locale;
 
     private Locale defaultLocale;
 

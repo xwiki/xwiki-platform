@@ -17,38 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.message;
+package org.xwiki.localization;
 
-import java.util.Collection;
 import java.util.Locale;
 
-import org.xwiki.localization.Bundle;
-import org.xwiki.rendering.block.Block;
-
 /**
- * A static {@link Block} returned as it is without any modification.
+ * Provide various localization related contextual informations (current Locale, etc.).
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public class BlockTranslationMessageElement implements TranslationMessageElement
+public interface LocalizationContext
 {
     /**
-     * The {@link Block} to return.
+     * @return the Locale to use by default in the current context
      */
-    private Block block;
-
-    /**
-     * @param block the {@link Block} to return
-     */
-    public BlockTranslationMessageElement(Block block)
-    {
-        this.block = block;
-    }
-
-    @Override
-    public Block render(Locale locale, Collection<Bundle> bundles, Object... parameters)
-    {
-        return this.block.clone();
-    }
+    Locale getCurrentLocale();
 }

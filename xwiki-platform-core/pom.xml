@@ -343,6 +343,12 @@
               <differenceType>6006</differenceType>
               <justification>Elemenents must be added to the wrapping NotifyOnList to ensure that the property is marked 'dirty' when updated. To avoid that this mechanism is circumvented, the field is made final.</justification>
             </difference>
+            <difference>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>language</field>
+              <differenceType>6006</differenceType>
+              <justification>Stored as Locale now and should have never been protected anyway.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

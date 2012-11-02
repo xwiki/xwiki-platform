@@ -573,6 +573,8 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-localization-script", this.project.getVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
             "xwiki-platform-localization-source-legacy", this.project.getVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-bridge", this.project.getVersion(), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",

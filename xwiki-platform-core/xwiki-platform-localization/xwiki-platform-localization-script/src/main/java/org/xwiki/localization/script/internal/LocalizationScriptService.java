@@ -46,7 +46,7 @@ import org.xwiki.script.service.ScriptService;
  * @since 4.3M2
  */
 @Component
-@Named("l10n")
+@Named("localization")
 @Singleton
 public class LocalizationScriptService implements ScriptService
 {

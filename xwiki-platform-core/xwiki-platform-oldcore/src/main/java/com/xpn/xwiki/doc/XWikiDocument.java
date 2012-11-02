@@ -5290,7 +5290,7 @@ public class XWikiDocument implements DocumentModelBridge
         String cleanedLanguage = Util.normalizeLanguage(language);
 
         Locale locale;
-        if (cleanedLanguage.equals("default")) {
+        if (cleanedLanguage.equals("default") || StringUtils.isEmpty(cleanedLanguage)) {
             locale = Locale.ROOT;
         } else {
             try {

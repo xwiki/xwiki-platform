@@ -7700,13 +7700,8 @@ public class XWikiDocument implements DocumentModelBridge
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
         this.content = "";
         this.format = "";
-<<<<<<< HEAD
         this.locale = Locale.ROOT;
         this.defaultLocale = Locale.ROOT;
-=======
-        this.language = "";
-        this.defaultLanguage = "";
->>>>>>> XWIKI-8398: Make sure content dirty flag is set when list is replaced.
         this.customClass = "";
         this.comment = "";
 

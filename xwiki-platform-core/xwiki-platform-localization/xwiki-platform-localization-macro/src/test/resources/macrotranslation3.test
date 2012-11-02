@@ -1,0 +1,15 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+{{translation key="some.translation" parameters="param1,param2"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [translation] [key=some.translation|parameters=param1,param2]
+beginGroup
+onWord [entranslationmessage[param1, param2]]
+endGroup
+endMacroMarkerStandalone [translation] [key=some.translation|parameters=param1,param2]
+endDocument

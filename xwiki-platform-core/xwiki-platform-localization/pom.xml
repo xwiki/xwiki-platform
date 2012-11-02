@@ -38,6 +38,7 @@
     <module>xwiki-platform-localization-sources</module>
     <module>xwiki-platform-localization-syntaxes</module>
     <module>xwiki-platform-localization-script</module>
+    <module>xwiki-platform-localization-macro</module>
   </modules>
 </project>
 

@@ -129,7 +129,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
-        this.xwikiContext = context;
+        this.xwikiContext = context.clone();
         this.indexUpdater = indexUpdater;
     }
 

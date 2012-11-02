@@ -602,7 +602,11 @@ public class XWikiHibernateBaseStore implements Initializable
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
         if (getSessionFactory() == null) {
-            initHibernate(context);
+            synchronized (this) {
+                if (getSessionFactory() == null) {
+                    initHibernate(context);
+                }
+            }
         }
     }
 

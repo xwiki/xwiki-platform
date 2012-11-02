@@ -60,7 +60,7 @@ public class LocalizationScriptService implements ScriptService
      * Used to access current {@link java.util.Locale}.
      */
     @Inject
-    private LocalizationContext locallizationContext;
+    private LocalizationContext localizationContext;
 
     /**
      * Used to lookup renderers.
@@ -75,7 +75,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public Translation get(String key)
     {
-        return this.localization.getTranslation(key, this.locallizationContext.getCurrentLocale());
+        return this.localization.getTranslation(key, this.localizationContext.getCurrentLocale());
     }
 
     // Helpers
@@ -109,7 +109,7 @@ public class LocalizationScriptService implements ScriptService
     {
         String result = null;
 
-        Translation translation = this.localization.getTranslation(key, this.locallizationContext.getCurrentLocale());
+        Translation translation = this.localization.getTranslation(key, this.localizationContext.getCurrentLocale());
 
         if (translation != null) {
             Block block = translation.render(parameters);

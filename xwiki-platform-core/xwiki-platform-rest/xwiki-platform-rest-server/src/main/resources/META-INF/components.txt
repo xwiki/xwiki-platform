@@ -1,6 +1,7 @@
 org.xwiki.rest.internal.resources.RootResource
 org.xwiki.rest.internal.resources.SyntaxesResource
 org.xwiki.rest.internal.resources.wikis.WikisResource
+org.xwiki.rest.internal.resources.wikis.WikiResource
 org.xwiki.rest.internal.resources.wikis.WikiPagesResource
 org.xwiki.rest.internal.resources.wikis.WikiAttachmentsResource
 org.xwiki.rest.internal.resources.spaces.SpacesResource

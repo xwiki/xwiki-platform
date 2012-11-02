@@ -5448,12 +5448,23 @@ public class XWikiDocument implements DocumentModelBridge
         return tdoc;
     }
 
+    /**
+     * @deprecated since 4.3M1 use {@link #getRealLocale()} instead
+     */
+    @Deprecated
     public String getRealLanguage(XWikiContext context) throws XWikiException
     {
         return getRealLanguage();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentModelBridge#getRealLanguage()
+     * @deprecated since 4.3M1 use {@link #getRealLocale()} instead
+     */
     @Override
+    @Deprecated
     public String getRealLanguage()
     {
         String lang = getLanguage();
@@ -5462,6 +5473,19 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             return lang;
         }
+    }
+
+    /**
+     * @return the actual locale of the document
+     */
+    public Locale getRealLocale()
+    {
+        Locale locale = getLocale();
+        if (locale.equals(Locale.ROOT)) {
+            locale = getDefaultLocale();
+        }
+
+        return locale;
     }
 
     public List<String> getTranslationList(XWikiContext context) throws XWikiException

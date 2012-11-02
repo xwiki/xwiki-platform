@@ -383,4 +383,12 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
     }
+    
+    @Test
+    public void getTranslationWithParameters() throws XWikiException
+    {
+        addWikiTranslation("wiki.translation", "{1} {0}", Locale.ROOT);
+
+        Assert.assertEquals("Parameter translation", this.tool.get("wiki.translation", "translation", "Parameter"));
+    }
 }

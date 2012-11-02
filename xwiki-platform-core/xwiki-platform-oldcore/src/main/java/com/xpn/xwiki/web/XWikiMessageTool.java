@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -159,30 +160,7 @@ public class XWikiMessageTool
     {
         String translation;
         if (this.localization != null) {
-            String language = this.context.getWiki().getLanguagePreference(this.context);
-            Locale locale = StringUtils.isEmpty(language) ? Locale.ROOT : LocaleUtils.toLocale(language);
-            Translation translations = this.localization.getTranslation(key, locale);
-            if (translations != null) {
-                Block block = translations.render(locale);
-
-                String currentSyntax =
-                    this.context.getWiki().getCurrentContentSyntaxId(Syntax.PLAIN_1_0.toIdString(), this.context);
-                try {
-                    BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, currentSyntax);
-
-                    DefaultWikiPrinter wikiprinter = new DefaultWikiPrinter();
-                    renderer.render(block, wikiprinter);
-
-                    translation = wikiprinter.toString();
-                } catch (ComponentLookupException e) {
-                    LOGGER.error("Failed to find a proper Block serializer for syntax [{}]", currentSyntax, e);
-
-                    translation = key;
-                }
-
-            } else {
-                translation = key;
-            }
+            translation = get(key, ArrayUtils.EMPTY_OBJECT_ARRAY);
         } else {
             translation = getTranslation(key);
             if (translation == null) {
@@ -227,10 +205,40 @@ public class XWikiMessageTool
      */
     public String get(String key, Object... params)
     {
-        String translation = get(key);
-        if (params != null && translation != null) {
-            translation = MessageFormat.format(translation, params);
+        String translation;
+        if (this.localization != null) {
+            String language = this.context.getWiki().getLanguagePreference(this.context);
+            Locale locale = StringUtils.isEmpty(language) ? Locale.ROOT : LocaleUtils.toLocale(language);
+            Translation translations = this.localization.getTranslation(key, locale);
+            if (translations != null) {
+                Block block = translations.render(locale, params);
+
+                String currentSyntax =
+                    this.context.getWiki().getCurrentContentSyntaxId(Syntax.PLAIN_1_0.toIdString(), this.context);
+                try {
+                    BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, currentSyntax);
+
+                    DefaultWikiPrinter wikiprinter = new DefaultWikiPrinter();
+                    renderer.render(block, wikiprinter);
+
+                    translation = wikiprinter.toString();
+                } catch (ComponentLookupException e) {
+                    LOGGER.error("Failed to find a proper Block serializer for syntax [{}]", currentSyntax, e);
+
+                    translation = key;
+                }
+
+            } else {
+                translation = key;
+            }
+        } else {
+            translation = get(key);
+
+            if (params != null && translation != null) {
+                translation = MessageFormat.format(translation, params);
+            }
         }
+
         return translation;
     }
 

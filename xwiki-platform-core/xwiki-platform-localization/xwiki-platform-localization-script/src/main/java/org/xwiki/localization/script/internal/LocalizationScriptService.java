@@ -50,12 +50,21 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class LocalizationScriptService implements ScriptService
 {
+    /**
+     * Used to access translations.
+     */
     @Inject
     private LocalizationManager localization;
 
+    /**
+     * Used to access current {@link java.util.Locale}.
+     */
     @Inject
     private LocalizationContext locallizationContext;
 
+    /**
+     * Used to lookup renderers.
+     */
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManager;

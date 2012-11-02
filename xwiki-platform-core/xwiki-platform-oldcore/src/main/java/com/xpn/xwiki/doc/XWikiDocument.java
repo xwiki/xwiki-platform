@@ -316,7 +316,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private final List<XWikiAttachment> attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>() {
+    private final List<XWikiAttachment> attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>()
+    {
         @Override
         public void onUpdate()
         {
@@ -5289,10 +5290,14 @@ public class XWikiDocument implements DocumentModelBridge
         String cleanedLanguage = Util.normalizeLanguage(language);
 
         Locale locale;
-        try {
-            locale = LocaleUtils.toLocale(cleanedLanguage);
-        } catch (Exception e) {
+        if (cleanedLanguage.equals("default")) {
             locale = Locale.ROOT;
+        } else {
+            try {
+                locale = LocaleUtils.toLocale(cleanedLanguage);
+            } catch (Exception e) {
+                locale = Locale.ROOT;
+            }
         }
 
         setLocale(locale);
@@ -5452,7 +5457,7 @@ public class XWikiDocument implements DocumentModelBridge
     public String getRealLanguage()
     {
         String lang = getLanguage();
-        if ((lang.equals("") || lang.equals("default"))) {
+        if (lang.equals("")) {
             return getDefaultLanguage();
         } else {
             return lang;

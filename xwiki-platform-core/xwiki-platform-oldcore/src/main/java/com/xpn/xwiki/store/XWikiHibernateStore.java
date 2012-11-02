@@ -491,6 +491,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 } else {
                     doc.setXClassXML("");
                 }
+                bclass.setDirty(false);
             }
 
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
@@ -775,6 +776,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.fromXML(cxml);
                 bclass.setDocumentReference(doc.getDocumentReference());
                 doc.setXClass(bclass);
+                bclass.setDirty(false);
             }
 
             // Store this XWikiClass in the context so that we can use it in case of recursive usage
@@ -1360,6 +1362,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         stringProperty.setValue("");
                     }
                 }
+                ((BaseProperty) property).setValueDirty(false);
             } catch (ObjectNotFoundException e) {
                 // Let's accept that there is no data in property tables but log it
                 if (LOGGER.isErrorEnabled()) {
@@ -1420,6 +1423,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else {
                 session.update(property);
             }
+
+            ((BaseProperty) property).setValueDirty(false);
 
             if (bTransaction) {
                 endTransaction(context, true);

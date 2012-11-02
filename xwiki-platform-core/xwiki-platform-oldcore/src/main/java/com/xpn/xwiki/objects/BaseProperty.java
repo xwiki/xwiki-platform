@@ -153,6 +153,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
         property.setObject(getObject());
 
+        property.isValueDirty = isValueDirty;
+        property.ownerDocument = ownerDocument;
+
         return property;
     }
 

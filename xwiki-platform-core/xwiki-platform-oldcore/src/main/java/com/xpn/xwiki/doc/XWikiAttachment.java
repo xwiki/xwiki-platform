@@ -137,6 +137,7 @@ public class XWikiAttachment implements Cloneable
         attachment.setFilename(getFilename());
         attachment.setFilesize(getFilesize());
         attachment.setRCSVersion(getRCSVersion());
+        attachment.setMetaDataDirty(isMetaDataDirty());
         if (getAttachment_content() != null) {
             attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
             attachment.getAttachment_content().setAttachment(attachment);

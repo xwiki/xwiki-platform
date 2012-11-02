@@ -19,12 +19,14 @@
  */
 package org.xwiki.localization.script.internal;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -75,7 +77,7 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(String key)
     {
-        return render(key, ArrayUtils.EMPTY_OBJECT_ARRAY);
+        return render(key, Collections.EMPTY_LIST);
     }
 
     /**
@@ -83,7 +85,7 @@ public class LocalizationScriptService implements ScriptService
      * @param parameters the translation parameters
      * @return the rendered translation message
      */
-    public String render(String key, Object[] parameters)
+    public String render(String key, Collection< ? > parameters)
     {
         return render(key, Syntax.PLAIN_1_0, parameters);
     }
@@ -94,7 +96,7 @@ public class LocalizationScriptService implements ScriptService
      * @param parameters the translation parameters
      * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
      */
-    public String render(String key, Syntax syntax, Object[] parameters)
+    public String render(String key, Syntax syntax, Collection< ? > parameters)
     {
         String result = null;
 

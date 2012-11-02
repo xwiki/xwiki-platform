@@ -66,7 +66,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.tool.backup.Importer;
 
 /**
@@ -570,6 +569,10 @@ public class PackageMojo extends AbstractMojo
         // with proper merge feature and then remove this...
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
             "xwiki-platform-uiextension-api", this.project.getVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-localization-script", this.project.getVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-localization-source-legacy", this.project.getVersion(), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",

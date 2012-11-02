@@ -346,7 +346,7 @@
             <difference>
               <className>com/xpn/xwiki/doc/XWikiDocument</className>
               <field>language</field>
-              <differenceType>6006</differenceType>
+              <differenceType>6001</differenceType>
               <justification>Stored as Locale now and should have never been protected anyway.</justification>
             </difference>
           </ignored>

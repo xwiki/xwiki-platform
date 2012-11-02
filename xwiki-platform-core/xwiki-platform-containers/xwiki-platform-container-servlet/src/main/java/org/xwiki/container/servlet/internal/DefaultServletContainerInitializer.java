@@ -107,7 +107,13 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         // 3) Bridge with old code to play well with new components. Old code relies on the
         // XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
-            this.execution.getContext().setProperty("xwikicontext", xwikiContext);
+            ExecutionContext ec = execution.getContext();
+            String key = "xwikicontext";
+            if (ec.hasProperty(key)) {
+                ec.setProperty(key, xwikiContext);
+            } else {
+                ec.newProperty(key).inherited().initial(xwikiContext).declare();
+            }
         }
 
         // 4) Extracts the XWiki URL from the original HTTP Request

@@ -59,7 +59,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
         xcontext.setWiki((XWiki) this.mockXWiki.proxy());
 
         ExecutionContext context = new ExecutionContext();
-        context.setProperty("xwikicontext", xcontext);
+        xcontext.declareInExecutionContext(context);
 
         XWikiStubContextProvider stubContextProvider =
             getComponentManager().getInstance(XWikiStubContextProvider.class);
@@ -80,7 +80,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
             }
         });
 
-        thread.run();
+        thread.start();
         thread.join();
 
         XWikiContext daemonXcontext = (XWikiContext) daemonContext.getProperty("xwikicontext");

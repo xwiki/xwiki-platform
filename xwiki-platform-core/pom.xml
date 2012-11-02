@@ -337,6 +337,12 @@
               <justification>Added a common method to all elements to set all the data from another element.
                 Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
             </difference>
+            <difference>
+              <className>com/xpn/xwiki/objects/ListProperty</className>
+              <field>list</field>
+              <differenceType>6006</differenceType>
+              <justification>Elemenents must be added to the wrapping NotifyOnList to ensure that the property is marked 'dirty' when updated. To avoid that this mechanism is circumvented, the field is made final.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

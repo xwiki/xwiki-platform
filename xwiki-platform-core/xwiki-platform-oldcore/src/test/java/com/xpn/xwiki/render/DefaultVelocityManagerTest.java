@@ -72,7 +72,7 @@ public class DefaultVelocityManagerTest extends AbstractMockingComponentTestCase
         final ScriptContext scriptContext = new SimpleScriptContext();
 
         final VelocityContext velocityContext = new VelocityContext();
-        executionContext.setProperty("velocityContext", velocityContext);
+        executionContext.newProperty("velocityContext").initial(velocityContext).inherited().cloneValue().declare();
 
         Map<String, Object> xwikiContext = new HashMap<String, Object>();
         executionContext.setProperty("xwikicontext", xwikiContext);

@@ -102,7 +102,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
             xcontext = this.stubContextProvider.createStubContext();
 
             if (xcontext != null) {
-                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+                xcontext.declareInExecutionContext(context);
             }
         }
 

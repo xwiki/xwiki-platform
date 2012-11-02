@@ -146,6 +146,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                 will(returnValue(1));
                 allowing(mockGlobalRightObj).setNumber(with(any(int.class)));
                 allowing(mockGlobalRightObj).setDocumentReference(with(any(DocumentReference.class)));
+                allowing(mockGlobalRightObj).setOwnerDocument(with(any(XWikiDocument.class)));
             }
         });
 

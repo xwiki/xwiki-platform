@@ -53,16 +53,14 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        XWikiContext xcontext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-
-        if (xcontext == null) {
+        if (!context.hasProperty(XWikiContext.EXECUTIONCONTEXT_KEY)) {
             // if the XWikiContext is not provided in the Execution context it mean the Execution context is being
             // initialized by a daemon thread
             XWikiContext stubContext = this.stubContextProvider.createStubContext();
 
             if (stubContext != null) {
-                // the stub context has been properly initialized, we inject it in the Execution context
-                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, stubContext);
+                // the stub context has been properly initialized, we declare it in the Execution context
+                stubContext.declareInExecutionContext(context);
             }
         }
     }

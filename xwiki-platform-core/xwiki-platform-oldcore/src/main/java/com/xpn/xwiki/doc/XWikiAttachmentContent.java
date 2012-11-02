@@ -51,6 +51,9 @@ public class XWikiAttachmentContent implements Cloneable
     /** Storage which holds the actual content. */
     private FileItem file;
 
+    /** The owner document. */
+    private XWikiDocument ownerDocument;
+
     /**
      * Constructor which clones an existing XWikiAttachmentContent. Used by {@link #clone()}.
      * 
@@ -199,6 +202,9 @@ public class XWikiAttachmentContent implements Cloneable
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
+        if (contentDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(contentDirty);
+        }
     }
 
     /**
@@ -285,5 +291,17 @@ public class XWikiAttachmentContent implements Cloneable
     public int getSize()
     {
         return (int) this.file.getSize();
+    }
+
+    /**
+     * Set the owner document in order to propagate the content dirty flag.
+     * 
+     * @param ownerDocument the owner document.
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument) {
+        this.ownerDocument = ownerDocument;
+        if (isContentDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(true);
+        }
     }
 }

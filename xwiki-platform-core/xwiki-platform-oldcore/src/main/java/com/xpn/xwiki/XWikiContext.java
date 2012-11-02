@@ -32,6 +32,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -739,5 +740,20 @@ public class XWikiContext extends Hashtable<Object, Object>
         context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
         return context;
+    }
+
+    /**
+     * There are several places where the XWiki context needs to be declared in the execution, so we add a common method
+     * here.
+     *
+     * @param executionContext The execution context.
+     */
+    public void declareInExecutionContext(ExecutionContext executionContext)
+    {
+        if (!executionContext.hasProperty(XWikiContext.EXECUTIONCONTEXT_KEY)) {
+            executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(this).inherited().declare();
+        } else {
+            executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this);
+        }
     }
 }

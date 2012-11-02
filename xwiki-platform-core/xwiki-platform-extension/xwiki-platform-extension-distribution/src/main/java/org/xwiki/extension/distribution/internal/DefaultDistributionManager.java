@@ -162,8 +162,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                     throw new RuntimeException("Failed to initialize IRC Bot's execution context", e);
                 }
 
-                execution.pushContext(context);
-
                 distributionJob.start(request);
             }
         });

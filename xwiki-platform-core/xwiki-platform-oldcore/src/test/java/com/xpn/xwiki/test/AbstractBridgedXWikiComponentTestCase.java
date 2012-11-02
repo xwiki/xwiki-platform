@@ -67,7 +67,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
         // Bridge with old XWiki Context, required for old code.
         Execution execution = getComponentManager().getInstance(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.context);
+        this.context.declareInExecutionContext(execution.getContext());
         XWikiStubContextProvider stubContextProvider =
             getComponentManager().getInstance(XWikiStubContextProvider.class);
         stubContextProvider.initialize(this.context);

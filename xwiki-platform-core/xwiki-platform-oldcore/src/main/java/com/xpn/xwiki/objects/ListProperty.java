@@ -52,6 +52,9 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     private String formStringSeparator = "|";
 
+    /** Indicate that hibernate workaround for getList should be enabled. */
+    private boolean useHibernateWorkaround = false;
+
     public String getFormStringSeparator()
     {
         return this.formStringSeparator;
@@ -163,7 +166,17 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     public List<String> getList()
     {
-        return this.list;
+        if (useHibernateWorkaround) {
+            // FIXME: Hibernate does not like the
+            // AbstractNotifyOnUpdateList, so we must use a workaround
+            // when saving this property.  Try removing this
+            // workaround after we have upgraded hibernate.
+            List<String> arrayList = new ArrayList<String>();
+            arrayList.addAll(list);
+            return arrayList;
+        } else {
+            return this.list;
+        }
     }
 
     public void setList(List<String> list)
@@ -218,5 +231,14 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
         MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+    }
+
+    /**
+     * @param useHibernateWorkaround {@literal true} if hibernate workaround for getList should be enabled.
+     * @since 4.3M2
+     */
+    public void setUseHibernateWorkaround(boolean useHibernateWorkaround)
+    {
+        this.useHibernateWorkaround = useHibernateWorkaround;
     }
 }

@@ -30,45 +30,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.rest.internal.Constants;
 import org.xwiki.rest.Relations;
-import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.internal.resources.ModificationsResource;
-import org.xwiki.rest.internal.resources.SyntaxesResource;
-import org.xwiki.rest.internal.resources.attachments.AttachmentResource;
-import org.xwiki.rest.internal.resources.attachments.AttachmentVersionResource;
-import org.xwiki.rest.internal.resources.attachments.AttachmentsAtPageVersionResource;
-import org.xwiki.rest.internal.resources.attachments.AttachmentsResource;
-import org.xwiki.rest.internal.resources.classes.ClassPropertiesResource;
-import org.xwiki.rest.internal.resources.classes.ClassPropertyResource;
-import org.xwiki.rest.internal.resources.classes.ClassResource;
-import org.xwiki.rest.internal.resources.classes.ClassesResource;
-import org.xwiki.rest.internal.resources.comments.CommentsResource;
-import org.xwiki.rest.internal.resources.comments.CommentsVersionResource;
-import org.xwiki.rest.internal.resources.objects.AllObjectsForClassNameResource;
-import org.xwiki.rest.internal.resources.objects.ObjectAtPageVersionResource;
-import org.xwiki.rest.internal.resources.objects.ObjectPropertiesAtPageVersionResource;
-import org.xwiki.rest.internal.resources.objects.ObjectPropertiesResource;
-import org.xwiki.rest.internal.resources.objects.ObjectPropertyAtPageVersionResource;
-import org.xwiki.rest.internal.resources.objects.ObjectPropertyResource;
-import org.xwiki.rest.internal.resources.objects.ObjectResource;
-import org.xwiki.rest.internal.resources.objects.ObjectsAtPageVersionResource;
-import org.xwiki.rest.internal.resources.objects.ObjectsResource;
-import org.xwiki.rest.internal.resources.pages.PageChildrenResource;
-import org.xwiki.rest.internal.resources.pages.PageHistoryResource;
-import org.xwiki.rest.internal.resources.pages.PageResource;
-import org.xwiki.rest.internal.resources.pages.PageTagsResource;
-import org.xwiki.rest.internal.resources.pages.PageTranslationHistoryResource;
-import org.xwiki.rest.internal.resources.pages.PageTranslationResource;
-import org.xwiki.rest.internal.resources.pages.PageTranslationVersionResource;
-import org.xwiki.rest.internal.resources.pages.PageVersionResource;
-import org.xwiki.rest.internal.resources.pages.PagesResource;
-import org.xwiki.rest.internal.resources.spaces.SpaceResource;
-import org.xwiki.rest.internal.resources.spaces.SpaceSearchResource;
-import org.xwiki.rest.internal.resources.spaces.SpacesResource;
-import org.xwiki.rest.internal.resources.wikis.WikiSearchQueryResource;
-import org.xwiki.rest.internal.resources.wikis.WikiSearchResource;
-import org.xwiki.rest.internal.resources.wikis.WikisResource;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attribute;
 import org.xwiki.rest.model.jaxb.Class;
@@ -86,6 +48,42 @@ import org.xwiki.rest.model.jaxb.Translation;
 import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.rest.resources.ModificationsResource;
+import org.xwiki.rest.resources.SyntaxesResource;
+import org.xwiki.rest.resources.attachments.AttachmentResource;
+import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
+import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
+import org.xwiki.rest.resources.attachments.AttachmentsResource;
+import org.xwiki.rest.resources.classes.ClassPropertiesResource;
+import org.xwiki.rest.resources.classes.ClassPropertyResource;
+import org.xwiki.rest.resources.classes.ClassResource;
+import org.xwiki.rest.resources.classes.ClassesResource;
+import org.xwiki.rest.resources.comments.CommentsResource;
+import org.xwiki.rest.resources.comments.CommentsVersionResource;
+import org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
+import org.xwiki.rest.resources.objects.ObjectAtPageVersionResource;
+import org.xwiki.rest.resources.objects.ObjectPropertiesAtPageVersionResource;
+import org.xwiki.rest.resources.objects.ObjectPropertiesResource;
+import org.xwiki.rest.resources.objects.ObjectPropertyAtPageVersionResource;
+import org.xwiki.rest.resources.objects.ObjectPropertyResource;
+import org.xwiki.rest.resources.objects.ObjectResource;
+import org.xwiki.rest.resources.objects.ObjectsAtPageVersionResource;
+import org.xwiki.rest.resources.objects.ObjectsResource;
+import org.xwiki.rest.resources.pages.PageChildrenResource;
+import org.xwiki.rest.resources.pages.PageHistoryResource;
+import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTagsResource;
+import org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
+import org.xwiki.rest.resources.pages.PageTranslationResource;
+import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
+import org.xwiki.rest.resources.pages.PageVersionResource;
+import org.xwiki.rest.resources.pages.PagesResource;
+import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.rest.resources.spaces.SpaceSearchResource;
+import org.xwiki.rest.resources.spaces.SpacesResource;
+import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
+import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.rest.resources.wikis.WikisResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -98,10 +96,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
- * <p>
- * This class contains utility methods for building representations using model objects.
- * </p>
- * 
+ * <p> This class contains utility methods for building representations using model objects. </p>
+ *
  * @version $Id$
  */
 public class DomainObjectFactory
@@ -142,7 +138,7 @@ public class DomainObjectFactory
         wiki.getLinks().add(classesLink);
 
         String modificationsUri =
-            UriBuilder.fromUri(baseUri).path(ModificationsResource.class).build(wikiName).toString();
+                UriBuilder.fromUri(baseUri).path(ModificationsResource.class).build(wikiName).toString();
         Link modificationsLink = objectFactory.createLink();
         modificationsLink.setHref(modificationsUri);
         modificationsLink.setRel(Relations.MODIFICATIONS);
@@ -164,7 +160,7 @@ public class DomainObjectFactory
     }
 
     public static Space createSpace(ObjectFactory objectFactory, URI baseUri, String wikiName, String spaceName,
-        Document home)
+            Document home)
     {
         Space space = objectFactory.createSpace();
         space.setId(String.format("%s:%s", wikiName, spaceName));
@@ -184,8 +180,8 @@ public class DomainObjectFactory
 
         if (home != null) {
             String homeUri =
-                UriBuilder.fromUri(baseUri).path(PageResource.class).build(wikiName, spaceName, home.getName())
-                    .toString();
+                    UriBuilder.fromUri(baseUri).path(PageResource.class).build(wikiName, spaceName, home.getName())
+                            .toString();
             Link homeLink = objectFactory.createLink();
             homeLink.setHref(homeUri);
             homeLink.setRel(Relations.HOME);
@@ -193,7 +189,7 @@ public class DomainObjectFactory
         }
 
         String searchUri =
-            UriBuilder.fromUri(baseUri).path(SpaceSearchResource.class).build(wikiName, spaceName).toString();
+                UriBuilder.fromUri(baseUri).path(SpaceSearchResource.class).build(wikiName, spaceName).toString();
         Link searchLink = objectFactory.createLink();
         searchLink.setHref(searchUri);
         searchLink.setRel(Relations.SEARCH);
@@ -203,7 +199,7 @@ public class DomainObjectFactory
     }
 
     public static Translations createTranslations(ObjectFactory objectFactory, URI baseUri, Document doc)
-        throws XWikiException
+            throws XWikiException
     {
         Translations translations = objectFactory.createTranslations();
 
@@ -218,16 +214,16 @@ public class DomainObjectFactory
 
                 /* Add the default page with the default translation explicitely */
                 String pageTranslationUri =
-                    UriBuilder.fromUri(baseUri).path(PageResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                        UriBuilder.fromUri(baseUri).path(PageResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
                 Link pageTranslationLink = objectFactory.createLink();
                 pageTranslationLink.setHref(pageTranslationUri);
                 pageTranslationLink.setRel(Relations.PAGE);
                 translation.getLinks().add(pageTranslationLink);
 
                 String historyUri =
-                    UriBuilder.fromUri(baseUri).path(PageHistoryResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                        UriBuilder.fromUri(baseUri).path(PageHistoryResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
                 Link historyLink = objectFactory.createLink();
                 historyLink.setHref(historyUri);
                 historyLink.setRel(Relations.HISTORY);
@@ -242,16 +238,16 @@ public class DomainObjectFactory
             translation.setLanguage(language);
 
             String pageTranslationUri =
-                UriBuilder.fromUri(baseUri).path(PageTranslationResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName(), language).toString();
+                    UriBuilder.fromUri(baseUri).path(PageTranslationResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), language).toString();
             Link pageTranslationLink = objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
             String historyUri =
-                UriBuilder.fromUri(baseUri).path(PageTranslationHistoryResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName(), language).toString();
+                    UriBuilder.fromUri(baseUri).path(PageTranslationHistoryResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), language).toString();
             Link historyLink = objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -265,7 +261,7 @@ public class DomainObjectFactory
 
     /* This method is used to fill the "common part" of a Page and a PageSummary */
     private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri,
-        Document doc, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
+            Document doc, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
         pageSummary.setWiki(doc.getWiki());
         pageSummary.setFullName(doc.getFullName());
@@ -293,7 +289,7 @@ public class DomainObjectFactory
         }
 
         String spaceUri =
-            UriBuilder.fromUri(baseUri).path(SpaceResource.class).build(doc.getWiki(), doc.getSpace()).toString();
+                UriBuilder.fromUri(baseUri).path(SpaceResource.class).build(doc.getWiki(), doc.getSpace()).toString();
         Link spaceLink = objectFactory.createLink();
         spaceLink.setHref(spaceUri);
         spaceLink.setRel(Relations.SPACE);
@@ -301,8 +297,8 @@ public class DomainObjectFactory
 
         if (parent != null) {
             String parentUri =
-                UriBuilder.fromUri(baseUri).path(PageResource.class)
-                    .build(parent.getWiki(), parent.getSpace(), parent.getName()).toString();
+                    UriBuilder.fromUri(baseUri).path(PageResource.class)
+                            .build(parent.getWiki(), parent.getSpace(), parent.getName()).toString();
             Link parentLink = objectFactory.createLink();
             parentLink.setHref(parentUri);
             parentLink.setRel(Relations.PARENT);
@@ -310,8 +306,8 @@ public class DomainObjectFactory
         }
 
         String historyUri =
-            UriBuilder.fromUri(baseUri).path(PageHistoryResource.class)
-                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                UriBuilder.fromUri(baseUri).path(PageHistoryResource.class)
+                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
         Link historyLink = objectFactory.createLink();
         historyLink.setHref(historyUri);
         historyLink.setRel(Relations.HISTORY);
@@ -319,8 +315,8 @@ public class DomainObjectFactory
 
         if (!doc.getChildren().isEmpty()) {
             String pageChildrenUri =
-                UriBuilder.fromUri(baseUri).path(PageChildrenResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                    UriBuilder.fromUri(baseUri).path(PageChildrenResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
             Link pageChildrenLink = objectFactory.createLink();
             pageChildrenLink.setHref(pageChildrenUri);
             pageChildrenLink.setRel(Relations.CHILDREN);
@@ -331,12 +327,12 @@ public class DomainObjectFactory
             String commentsUri;
             if (useVersion) {
                 commentsUri =
-                    UriBuilder.fromUri(baseUri).path(CommentsVersionResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+                        UriBuilder.fromUri(baseUri).path(CommentsVersionResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion()).toString();
             } else {
                 commentsUri =
-                    UriBuilder.fromUri(baseUri).path(CommentsResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                        UriBuilder.fromUri(baseUri).path(CommentsResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
             }
 
             Link commentsLink = objectFactory.createLink();
@@ -349,12 +345,12 @@ public class DomainObjectFactory
             String attachmentsUri;
             if (useVersion) {
                 attachmentsUri =
-                    UriBuilder.fromUri(baseUri).path(AttachmentsAtPageVersionResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+                        UriBuilder.fromUri(baseUri).path(AttachmentsAtPageVersionResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion()).toString();
             } else {
                 attachmentsUri =
-                    UriBuilder.fromUri(baseUri).path(AttachmentsResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                        UriBuilder.fromUri(baseUri).path(AttachmentsResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
             }
 
             Link attachmentsLink = objectFactory.createLink();
@@ -368,12 +364,12 @@ public class DomainObjectFactory
 
             if (useVersion) {
                 objectsUri =
-                    UriBuilder.fromUri(baseUri).path(ObjectsAtPageVersionResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion()).toString();
+                        UriBuilder.fromUri(baseUri).path(ObjectsAtPageVersionResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion()).toString();
             } else {
                 objectsUri =
-                    UriBuilder.fromUri(baseUri).path(ObjectsResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                        UriBuilder.fromUri(baseUri).path(ObjectsResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
             }
             Link objectsLink = objectFactory.createLink();
             objectsLink.setHref(objectsUri);
@@ -385,8 +381,8 @@ public class DomainObjectFactory
         if (tagsObject != null) {
             if (tagsObject.getProperty("tags") != null) {
                 String tagsUri =
-                    UriBuilder.fromUri(baseUri).path(PageTagsResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
+                        UriBuilder.fromUri(baseUri).path(PageTagsResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName()).toString();
                 Link tagsLink = objectFactory.createLink();
                 tagsLink.setHref(tagsUri);
                 tagsLink.setRel(Relations.TAGS);
@@ -401,15 +397,16 @@ public class DomainObjectFactory
         pageSummary.getLinks().add(syntaxesLink);
     }
 
-    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi, Boolean withPrettyNames)
-        throws XWikiException
+    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi,
+            Boolean withPrettyNames)
+            throws XWikiException
     {
         PageSummary pageSummary = objectFactory.createPageSummary();
         fillPageSummary(pageSummary, objectFactory, baseUri, doc, false, xwikiApi, withPrettyNames);
 
         String pageUri =
-            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
-                .toString();
+                UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                        .toString();
         Link pageLink = objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -419,7 +416,7 @@ public class DomainObjectFactory
     }
 
     public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion,
-        XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
+            XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
         Page page = objectFactory.createPage();
         fillPageSummary(page, objectFactory, baseUri, doc, useVersion, xwikiApi, withPrettyNames);
@@ -441,7 +438,6 @@ public class DomainObjectFactory
         if (withPrettyNames) {
             page.setModifierName(xwikiApi.getUserName(doc.getContentAuthor(), false));
         }
-            
 
         calendar = Calendar.getInstance();
         calendar.setTime(doc.getContentUpdateDate());
@@ -459,8 +455,8 @@ public class DomainObjectFactory
         com.xpn.xwiki.api.Class xwikiClass = doc.getxWikiClass();
         if (xwikiClass != null) {
             String classUri =
-                UriBuilder.fromUri(baseUri).path(ClassResource.class).build(doc.getWiki(), xwikiClass.getName())
-                    .toString();
+                    UriBuilder.fromUri(baseUri).path(ClassResource.class).build(doc.getWiki(), xwikiClass.getName())
+                            .toString();
             Link classLink = objectFactory.createLink();
             classLink.setHref(classUri);
             classLink.setRel(Relations.CLASS);
@@ -471,7 +467,8 @@ public class DomainObjectFactory
     }
 
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
-        String spaceName, String pageName, String language, Version version, String modifier, Date modified, XWiki xwikiApi, Boolean withPrettyNames)
+            String spaceName, String pageName, String language, Version version, String modifier, Date modified,
+            XWiki xwikiApi, Boolean withPrettyNames)
     {
         HistorySummary historySummary = objectFactory.createHistorySummary();
 
@@ -497,16 +494,16 @@ public class DomainObjectFactory
 
         if (language == null) {
             String pageUri =
-                UriBuilder.fromUri(baseUri).path(PageVersionResource.class)
-                    .build(wikiName, spaceName, pageName, version).toString();
+                    UriBuilder.fromUri(baseUri).path(PageVersionResource.class)
+                            .build(wikiName, spaceName, pageName, version).toString();
             Link pageLink = objectFactory.createLink();
             pageLink.setHref(pageUri);
             pageLink.setRel(Relations.PAGE);
             historySummary.getLinks().add(pageLink);
         } else {
             String pageUri =
-                UriBuilder.fromUri(baseUri).path(PageTranslationVersionResource.class)
-                    .build(wikiName, spaceName, pageName, language, version).toString();
+                    UriBuilder.fromUri(baseUri).path(PageTranslationVersionResource.class)
+                            .build(wikiName, spaceName, pageName, language, version).toString();
             Link pageLink = objectFactory.createLink();
             pageLink.setHref(pageUri);
             pageLink.setRel(Relations.PAGE);
@@ -517,7 +514,8 @@ public class DomainObjectFactory
     }
 
     private static void fillAttachment(Attachment attachment, ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi, Boolean withPrettyNames)
+            com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl,
+            XWiki xwikiApi, Boolean withPrettyNames)
     {
         Document doc = xwikiAttachment.getDocument();
 
@@ -541,8 +539,8 @@ public class DomainObjectFactory
         attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
 
         String pageUri =
-            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
-                .toString();
+                UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                        .toString();
         Link pageLink = objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -551,16 +549,11 @@ public class DomainObjectFactory
 
     /**
      * Create attachment URI with correctly encoded path portions.
-     * 
-     * @param baseUri
-     * @param xwikiAttachment
-     * @param doc
+     *
      * @param useVersion Signal to generate a Uri at the attachment version number
-     * @return
-     * @throws IllegalArgumentException
      */
     protected static String createAttachmentUri(URI baseUri, com.xpn.xwiki.api.Attachment xwikiAttachment,
-        Document doc, boolean useVersion) throws IllegalArgumentException
+            Document doc, boolean useVersion) throws IllegalArgumentException
     {
         String attachmentUri = "";
 
@@ -571,18 +564,17 @@ public class DomainObjectFactory
             String eAttachName = URIUtil.encodePath(xwikiAttachment.getFilename());
             String eVersionNum = URIUtil.encodePath(xwikiAttachment.getVersion());
 
-            java.lang.Class< ? extends XWikiResource> pathClass =
-                (useVersion) ? AttachmentVersionResource.class : AttachmentResource.class;
+            java.lang.Class<?> pathClass =
+                    (useVersion) ? AttachmentVersionResource.class : AttachmentResource.class;
 
             UriBuilder uriBuilder = UriBuilder.fromUri(baseUri).path(pathClass);
 
             if (useVersion) {
                 attachmentUri =
-                    uriBuilder.buildFromEncoded(eWiki, eSpaceName, eDocName, eAttachName, eVersionNum).toString();
+                        uriBuilder.buildFromEncoded(eWiki, eSpaceName, eDocName, eAttachName, eVersionNum).toString();
             } else {
                 attachmentUri = uriBuilder.buildFromEncoded(eWiki, eSpaceName, eDocName, eAttachName).toString();
             }
-
         } catch (URIException ue) {
             throw new IllegalArgumentException("could not create attachmentUri", ue);
         }
@@ -590,11 +582,13 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi, Boolean withPrettyNames)
+            com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl,
+            XWiki xwikiApi, Boolean withPrettyNames)
     {
         Attachment attachment = objectFactory.createAttachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi, withPrettyNames);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl,
+                xwikiApi, withPrettyNames);
 
         String attachmentUri = createAttachmentUri(baseUri, xwikiAttachment, xwikiAttachment.getDocument(), false);
 
@@ -607,11 +601,13 @@ public class DomainObjectFactory
     }
 
     public static Attachment createAttachmentAtVersion(ObjectFactory objectFactory, URI baseUri,
-        com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi, Boolean withPrettyNames)
+            com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl,
+            XWiki xwikiApi, Boolean withPrettyNames)
     {
         Attachment attachment = new Attachment();
 
-        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl, xwikiApi, withPrettyNames);
+        fillAttachment(attachment, objectFactory, baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl,
+                xwikiApi, withPrettyNames);
 
         Document doc = xwikiAttachment.getDocument();
 
@@ -626,7 +622,7 @@ public class DomainObjectFactory
     }
 
     public static Comment createComment(ObjectFactory objectFactory, URI baseUri, Document doc,
-        com.xpn.xwiki.api.Object xwikiComment, XWiki xwikiApi, Boolean withPrettyNames)
+            com.xpn.xwiki.api.Object xwikiComment, XWiki xwikiApi, Boolean withPrettyNames)
     {
         Comment comment = objectFactory.createComment();
         comment.setId(xwikiComment.getNumber());
@@ -662,8 +658,8 @@ public class DomainObjectFactory
         }
 
         String pageUri =
-            UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
-                .toString();
+                UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
+                        .toString();
         Link pageLink = objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -673,15 +669,14 @@ public class DomainObjectFactory
     }
 
     private static void fillObjectSummary(ObjectSummary objectSummary, ObjectFactory objectFactory, URI baseUri,
-        Document doc, BaseObject xwikiObject, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
+            Document doc, BaseObject xwikiObject, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
-        
-        
+
         objectSummary.setId(String.format("%s:%s", doc.getPrefixedFullName(), xwikiObject.getGuid()));
         objectSummary.setGuid(xwikiObject.getGuid());
         objectSummary.setPageId(doc.getPrefixedFullName());
         objectSummary.setPageVersion(doc.getVersion());
-        objectSummary.setPageAuthor(doc.getAuthor());       
+        objectSummary.setPageAuthor(doc.getAuthor());
         if (withPrettyNames) {
             objectSummary.setPageAuthorName(xwikiApi.getUserName(doc.getAuthor(), false));
         }
@@ -695,11 +690,11 @@ public class DomainObjectFactory
         if (propertyNames.length > 0) {
             objectSummary.setHeadline(xwikiObject.get(propertyNames[0]).toFormString());
         }
-
     }
 
     public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri,
-        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
+            XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi,
+            Boolean withPrettyNames) throws XWikiException
     {
         ObjectSummary objectSummary = objectFactory.createObjectSummary();
         fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject, xwikiApi, withPrettyNames);
@@ -711,18 +706,19 @@ public class DomainObjectFactory
 
         if (useVersion) {
             propertiesUri =
-                UriBuilder
-                    .fromUri(baseUri)
-                    .path(ObjectPropertiesAtPageVersionResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
-                        xwikiObject.getNumber()).toString();
+                    UriBuilder
+                            .fromUri(baseUri)
+                            .path(ObjectPropertiesAtPageVersionResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion(),
+                                    xwikiObject.getClassName(),
+                                    xwikiObject.getNumber()).toString();
         } else {
             propertiesUri =
-                UriBuilder
-                    .fromUri(baseUri)
-                    .path(ObjectPropertiesResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName(), xwikiObject.getClassName(),
-                        xwikiObject.getNumber()).toString();
+                    UriBuilder
+                            .fromUri(baseUri)
+                            .path(ObjectPropertiesResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), xwikiObject.getClassName(),
+                                    xwikiObject.getNumber()).toString();
         }
 
         Link propertyLink = objectFactory.createLink();
@@ -734,7 +730,8 @@ public class DomainObjectFactory
     }
 
     public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
-        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
+            Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames)
+            throws XWikiException
     {
         Object object = objectFactory.createObject();
         fillObjectSummary(object, objectFactory, baseUri, doc, xwikiObject, xwikiApi, withPrettyNames);
@@ -743,7 +740,7 @@ public class DomainObjectFactory
 
         for (java.lang.Object propertyClassObject : xwikiClass.getProperties()) {
             com.xpn.xwiki.objects.classes.PropertyClass propertyClass =
-                (com.xpn.xwiki.objects.classes.PropertyClass) propertyClassObject;
+                    (com.xpn.xwiki.objects.classes.PropertyClass) propertyClassObject;
 
             Property property = objectFactory.createProperty();
 
@@ -796,18 +793,19 @@ public class DomainObjectFactory
 
             if (useVersion) {
                 propertyUri =
-                    UriBuilder
-                        .fromUri(baseUri)
-                        .path(ObjectPropertyAtPageVersionResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion(),
-                            xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
+                        UriBuilder
+                                .fromUri(baseUri)
+                                .path(ObjectPropertyAtPageVersionResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion(),
+                                        xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName())
+                                .toString();
             } else {
                 propertyUri =
-                    UriBuilder
-                        .fromUri(baseUri)
-                        .path(ObjectPropertyResource.class)
-                        .build(doc.getWiki(), doc.getSpace(), doc.getName(), xwikiObject.getClassName(),
-                            xwikiObject.getNumber(), propertyClass.getName()).toString();
+                        UriBuilder
+                                .fromUri(baseUri)
+                                .path(ObjectPropertyResource.class)
+                                .build(doc.getWiki(), doc.getSpace(), doc.getName(), xwikiObject.getClassName(),
+                                        xwikiObject.getNumber(), propertyClass.getName()).toString();
             }
             Link propertyLink = objectFactory.createLink();
             propertyLink.setHref(propertyUri);
@@ -815,7 +813,6 @@ public class DomainObjectFactory
             property.getLinks().add(propertyLink);
 
             object.getProperties().add(property);
-
         }
 
         Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.SELF);
@@ -825,24 +822,25 @@ public class DomainObjectFactory
     }
 
     private static Link getObjectLink(ObjectFactory objectFactory, URI baseUri, Document doc, BaseObject xwikiObject,
-        boolean useVersion, String relation)
+            boolean useVersion, String relation)
     {
         String objectUri;
 
         if (useVersion) {
             objectUri =
-                UriBuilder
-                    .fromUri(baseUri)
-                    .path(ObjectAtPageVersionResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
-                        xwikiObject.getNumber()).toString();
+                    UriBuilder
+                            .fromUri(baseUri)
+                            .path(ObjectAtPageVersionResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), doc.getVersion(),
+                                    xwikiObject.getClassName(),
+                                    xwikiObject.getNumber()).toString();
         } else {
             objectUri =
-                UriBuilder
-                    .fromUri(baseUri)
-                    .path(ObjectResource.class)
-                    .build(doc.getWiki(), doc.getSpace(), doc.getName(), xwikiObject.getClassName(),
-                        xwikiObject.getNumber()).toString();
+                    UriBuilder
+                            .fromUri(baseUri)
+                            .path(ObjectResource.class)
+                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), xwikiObject.getClassName(),
+                                    xwikiObject.getNumber()).toString();
         }
         Link objectLink = objectFactory.createLink();
         objectLink.setHref(objectUri);
@@ -852,7 +850,7 @@ public class DomainObjectFactory
     }
 
     public static Class createClass(ObjectFactory objectFactory, URI baseUri, String wikiName,
-        com.xpn.xwiki.api.Class xwikiClass)
+            com.xpn.xwiki.api.Class xwikiClass)
     {
         Class clazz = objectFactory.createClass();
         clazz.setId(xwikiClass.getName());
@@ -882,8 +880,8 @@ public class DomainObjectFactory
             }
 
             String propertyUri =
-                UriBuilder.fromUri(baseUri).path(ClassPropertyResource.class)
-                    .build(wikiName, xwikiClass.getName(), xwikiPropertyClass.getName()).toString();
+                    UriBuilder.fromUri(baseUri).path(ClassPropertyResource.class)
+                            .build(wikiName, xwikiClass.getName(), xwikiPropertyClass.getName()).toString();
             Link propertyLink = objectFactory.createLink();
             propertyLink.setHref(propertyUri);
             propertyLink.setRel(Relations.SELF);
@@ -893,23 +891,23 @@ public class DomainObjectFactory
         }
 
         String classUri =
-            UriBuilder.fromUri(baseUri).path(ClassResource.class).build(wikiName, xwikiClass.getName()).toString();
+                UriBuilder.fromUri(baseUri).path(ClassResource.class).build(wikiName, xwikiClass.getName()).toString();
         Link classLink = objectFactory.createLink();
         classLink.setHref(classUri);
         classLink.setRel(Relations.SELF);
         clazz.getLinks().add(classLink);
 
         String propertiesUri =
-            UriBuilder.fromUri(baseUri).path(ClassPropertiesResource.class).build(wikiName, xwikiClass.getName())
-                .toString();
+                UriBuilder.fromUri(baseUri).path(ClassPropertiesResource.class).build(wikiName, xwikiClass.getName())
+                        .toString();
         Link propertyLink = objectFactory.createLink();
         propertyLink.setHref(propertiesUri);
         propertyLink.setRel(Relations.PROPERTIES);
         clazz.getLinks().add(propertyLink);
 
         String objectsUri =
-            UriBuilder.fromUri(baseUri).path(AllObjectsForClassNameResource.class)
-                .build(wikiName, xwikiClass.getName()).toString();
+                UriBuilder.fromUri(baseUri).path(AllObjectsForClassNameResource.class)
+                        .build(wikiName, xwikiClass.getName()).toString();
         Link objectsLink = objectFactory.createLink();
         objectsLink.setHref(objectsUri);
         objectsLink.setRel(Relations.OBJECTS);

@@ -19,8 +19,6 @@
  */
 package org.xwiki.rest.internal;
 
-import org.xwiki.rest.internal.DomainObjectFactory;
-
 /**
  * @version $Id$
  */
@@ -39,9 +37,10 @@ public class Constants
 
     /**
      * The key used to store allowed values for an object property in an XWiki object representation.
-     * 
+     *
      * @see DomainObjectFactory#createObject(org.xwiki.rest.model.jaxb.ObjectFactory, java.net.URI,
-     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.api.Document, com.xpn.xwiki.objects.BaseObject, boolean)
+     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.api.Document, com.xpn.xwiki.objects.BaseObject, boolean,
+     *      com.xpn.xwiki.api.XWiki, Boolean)
      */
     public static final String ALLOWED_VALUES_ATTRIBUTE_NAME = "allowedValues";
 

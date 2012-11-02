@@ -213,21 +213,19 @@ public class XWikiMessageTool
             if (translations != null) {
                 Block block = translations.render(locale, params);
 
-                String currentSyntax =
-                    this.context.getWiki().getCurrentContentSyntaxId(Syntax.PLAIN_1_0.toIdString(), this.context);
+                BlockRenderer renderer;
                 try {
-                    BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, currentSyntax);
+                    renderer = this.componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
 
                     DefaultWikiPrinter wikiprinter = new DefaultWikiPrinter();
                     renderer.render(block, wikiprinter);
 
                     translation = wikiprinter.toString();
                 } catch (ComponentLookupException e) {
-                    LOGGER.error("Failed to find a proper Block serializer for syntax [{}]", currentSyntax, e);
+                    LOGGER.debug("Failed to find a plain text parser", e);
 
                     translation = key;
                 }
-
             } else {
                 translation = key;
             }

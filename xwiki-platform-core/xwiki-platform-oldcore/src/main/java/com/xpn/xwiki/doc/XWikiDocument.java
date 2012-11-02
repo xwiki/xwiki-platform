@@ -1902,6 +1902,12 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setXObjects(Map<DocumentReference, List<BaseObject>> objects)
     {
+        for (List<BaseObject> objList : objects.values()) {
+            for (BaseObject obj : objList) {
+                obj.setOwnerDocument(this);
+            }
+        }
+        setContentDirty(true);
         this.xObjects = objects;
     }
 
@@ -2057,6 +2063,10 @@ public class XWikiDocument implements DocumentModelBridge
             existingbjects.clear();
         }
 
+        for (BaseObject obj : objects) {
+            obj.setOwnerDocument(this);
+        }
+
         // Add new objects
         if (objects.isEmpty()) {
             // Pretty wrong but can't remove that for retro compatibility reasons...
@@ -2068,6 +2078,8 @@ public class XWikiDocument implements DocumentModelBridge
                 addXObject(classReference, baseObject);
             }
         }
+
+        setContentDirty(true);
     }
 
     /**
@@ -4735,6 +4747,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void addXObjectToRemove(BaseObject object)
     {
         getXObjectsToRemove().add(object);
+        object.setOwnerDocument(null);
         setContentDirty(true);
     }
 

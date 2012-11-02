@@ -168,9 +168,8 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     public void setList(List<String> list)
     {
-        if (list == null) {
-            this.list.clear();
-        } else {
+        this.list.clear();
+        if (list != null) {
             this.list.addAll(list);
             // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
             // safe to assume that a retrieved NULL value should actually be an empty string.

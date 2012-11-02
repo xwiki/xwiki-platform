@@ -161,9 +161,34 @@ public class ListProperty extends BaseProperty implements Cloneable
         return property;
     }
 
+    /**
+     * FIXME: Hibernate doesn't like the AbstractNotifyOnUpdateList,
+     * so we must copy the list to an ordinary array list.  Thus, we
+     * must have separate accessors for hibernate.  We should try
+     * removing these accessors after upgrading Hibernate.
+     *
+     * @return a copy of the list as an ArrayList.
+     * @since 4.3M2
+     */
+    public List<String> getListForHibernate()
+    {
+        List<String> arrayList = new ArrayList<String>();
+        arrayList.addAll(list);
+        return arrayList;
+    }
+
+    /**
+     * @param list The list to set.
+     * @since 4.3M2
+     */
+    public void setListForHibernate(List<String> list)
+    {
+        setList(list);
+    }
+
     public List<String> getList()
     {
-        return this.list;
+        return list;
     }
 
     public void setList(List<String> list)

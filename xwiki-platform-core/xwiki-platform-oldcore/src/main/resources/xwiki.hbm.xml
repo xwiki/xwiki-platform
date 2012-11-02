@@ -247,7 +247,7 @@
                 <column name="XWL_ID" />
                 <column name="XWL_NAME" index="XWLIST_NAME" />
             </key>
-            <list name="list" table="xwikilistitems" lazy="false">
+            <list name="listForHibernate" table="xwikilistitems" lazy="false">
                 <key>
                     <column name="XWL_ID" />
                     <column name="XWL_NAME" index="XWLI_NAME" />

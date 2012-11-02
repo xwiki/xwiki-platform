@@ -5290,14 +5290,10 @@ public class XWikiDocument implements DocumentModelBridge
         String cleanedLanguage = Util.normalizeLanguage(language);
 
         Locale locale;
-        if (cleanedLanguage.equals("default") || StringUtils.isEmpty(cleanedLanguage)) {
+        try {
+            locale = LocaleUtils.toLocale(cleanedLanguage);
+        } catch (Exception e) {
             locale = Locale.ROOT;
-        } else {
-            try {
-                locale = LocaleUtils.toLocale(cleanedLanguage);
-            } catch (Exception e) {
-                locale = Locale.ROOT;
-            }
         }
 
         setLocale(locale);
@@ -5396,16 +5392,23 @@ public class XWikiDocument implements DocumentModelBridge
      * <p>
      * This method return this if the provided language does not exists. See
      * 
-     * @param locale the locale of the document to return
+     * @param language the language of the document to return
      * @param context the XWiki Context
      * @return the document in the provided language or this if the provided language does not exists
      * @throws XWikiException error when loading the document
      * @deprecated since 4.3M2 use {@link #getTranslatedDocument(Locale, XWikiContext)} insead
      */
     @Deprecated
-    public XWikiDocument getTranslatedDocument(String locale, XWikiContext context) throws XWikiException
+    public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
     {
-        return getTranslatedDocument(locale != null ? LocaleUtils.toLocale(locale) : null, context);
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(language);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        return getTranslatedDocument(locale, context);
     }
 
     /**

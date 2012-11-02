@@ -305,10 +305,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     protected void setValueDirty(Object newValue)
     {
         if (!isValueDirty && !ObjectUtils.equals(newValue, getValue())) {
-            isValueDirty = true;
-            if (ownerDocument != null) {
-                ownerDocument.setContentDirty(true);
-            }
+            setValueDirty(true);
         }
     }
 
@@ -319,6 +316,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     public void setValueDirty(boolean valueDirty)
     {
         isValueDirty = valueDirty;
+        if (valueDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(true);
+        }
     }
 
     /**

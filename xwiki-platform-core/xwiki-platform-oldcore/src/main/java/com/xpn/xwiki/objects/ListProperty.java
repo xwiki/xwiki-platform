@@ -42,7 +42,7 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
 
-    protected List<String> list = new AbstractNotifyOnUpdateList<String>() {
+    protected final List<String> list = new AbstractNotifyOnUpdateList<String>() {
         @Override
         public void onUpdate()
         {
@@ -169,9 +169,9 @@ public class ListProperty extends BaseProperty implements Cloneable
     public void setList(List<String> list)
     {
         if (list == null) {
-            this.list = new ArrayList<String>();
+            this.list.clear();
         } else {
-            this.list = list;
+            this.list.addAll(list);
             // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
             // safe to assume that a retrieved NULL value should actually be an empty string.
             for (Iterator<String> it = this.list.iterator(); it.hasNext();) {

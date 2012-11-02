@@ -314,7 +314,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private List<XWikiAttachment> attachmentList;
+    private final List<XWikiAttachment> attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>() {
+        @Override
+        public void onUpdate()
+        {
+            setContentDirty(true);
+        }
+    };
 
     // Caching
     private boolean fromCache = false;
@@ -4256,7 +4262,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setAttachmentList(List<XWikiAttachment> list)
     {
-        this.attachmentList = list;
+        this.attachmentList.clear();
+        this.attachmentList.addAll(list);
     }
 
     public List<XWikiAttachment> getAttachmentList()
@@ -7567,13 +7574,6 @@ public class XWikiDocument implements DocumentModelBridge
         this.format = "";
         this.language = "";
         this.defaultLanguage = "";
-        this.attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>() {
-            @Override
-            public void onUpdate()
-            {
-                setContentDirty(true);
-            }
-        };
         this.customClass = "";
         this.comment = "";
 

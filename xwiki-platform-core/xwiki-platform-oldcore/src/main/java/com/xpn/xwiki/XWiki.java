@@ -340,6 +340,9 @@ public class XWiki implements EventListener
     private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
+    private EntityReferenceResolver<String> currentMixedEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.TYPE_STRING, "currentmixed");
+
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
 
@@ -2177,9 +2180,7 @@ public class XWiki implements EventListener
     public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
         try {
-            DocumentReference xwikiPreferencesReference =
-                new DocumentReference("XWikiPreferences", new SpaceReference(SYSTEM_SPACE, new WikiReference(
-                    context.getDatabase())));
+            DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
             XWikiDocument doc = getDocument(xwikiPreferencesReference, context);
             // First we try to get a translated preference object
             BaseObject object =
@@ -2236,9 +2237,7 @@ public class XWiki implements EventListener
                 XWikiDocument doc = getDocument(space + ".WebPreferences", context);
 
                 // First we try to get a translated preference object
-                DocumentReference xwikiPreferencesReference =
-                    new DocumentReference("XWikiPreferences", new SpaceReference(SYSTEM_SPACE, new WikiReference(
-                        context.getDatabase())));
+                DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
                 BaseObject object =
                     doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
                 String result = "";
@@ -2955,8 +2954,7 @@ public class XWiki implements EventListener
      */
     public BaseClass getPrefsClass(XWikiContext context) throws XWikiException
     {
-        return getMandatoryClass(context,
-            new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"));
+        return getMandatoryClass(context, getPreferencesDocumentReference(context));
     }
 
     public BaseClass getGroupClass(XWikiContext context) throws XWikiException
@@ -6652,5 +6650,23 @@ public class XWiki implements EventListener
         XWikiMessageTool msg = context.getMessageTool();
 
         return parseContent(msg.get(id), context);
+    }
+
+    /**
+     * Return the document reference to the wiki preferences.
+     *
+     * @param context The current xwiki context.
+     * @since 4.3M2
+     */
+    private DocumentReference getPreferencesDocumentReference(XWikiContext context)
+    {
+        String database = context.getDatabase();
+        EntityReference spaceReference;
+        if (database != null) {
+            spaceReference = new EntityReference(SYSTEM_SPACE, EntityType.SPACE, new WikiReference(database));
+        } else {
+            spaceReference = this.currentMixedEntityReferenceResolver.resolve(SYSTEM_SPACE, EntityType.SPACE);
+        }
+        return new DocumentReference("XWikiPreferences", new SpaceReference(spaceReference));
     }
 }

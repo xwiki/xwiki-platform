@@ -169,19 +169,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
-     * List of workaround handlers for list properties.  See ListPropertyWorkaroundHandler below.
-     */
-    private final ThreadLocal<Collection<ListPropertyWorkaroundHandler>> listPropertyWorkaroundHandlers =
-        new ThreadLocal<Collection<ListPropertyWorkaroundHandler>>()
-        {
-            @Override
-            protected Collection<ListPropertyWorkaroundHandler> initialValue()
-            {
-                return new ArrayList<ListPropertyWorkaroundHandler>();
-            }
-        };
-
-    /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
      * 
@@ -727,12 +714,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             try {
                 if (bTransaction) {
                     endTransaction(context, false);
-
-                    for (ListPropertyWorkaroundHandler h : listPropertyWorkaroundHandlers.get()) {
-                        h.restore();
-                    }
-
-                    listPropertyWorkaroundHandlers.get().clear();
                 }
             } catch (Exception e) {
             }
@@ -1438,8 +1419,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             query.setString("name", property.getName());
 
             if (property instanceof ListProperty) {
-                listPropertyWorkaroundHandlers.get()
-                    .add(new ListPropertyWorkaroundHandler(property));
+                addListPropertyWorkaroundHandler(property);
             }
 
             if (query.uniqueResult() == null) {
@@ -2904,33 +2884,5 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private String filterSQL(String sql)
     {
         return StringUtils.replace(sql, "\\", "\\\\");
-    }
-
-    /**
-     * We need to indicate that we want to the getList accessor to return a plain ArrayList for the
-     * duration of a transaction, so we register a special handler that enables and disables the
-     * workaround. {@see ListProperty#getList}.
-     * 
-     * @since 4.2M3
-     */
-    private static class ListPropertyWorkaroundHandler
-    {
-        /** The list property to manage. */
-        private final ListProperty listProperty;
-
-        /**
-         * @param The list property to manage.
-         */
-        public ListPropertyWorkaroundHandler(PropertyInterface listProperty)
-        {
-            this.listProperty = (ListProperty) listProperty;
-            this.listProperty.setUseHibernateWorkaround(true);
-        }
-
-        /** Restore the list property to its normal mode. */
-        public void restore()
-        {
-            this.listProperty.setUseHibernateWorkaround(false);
-        }
     }
 }

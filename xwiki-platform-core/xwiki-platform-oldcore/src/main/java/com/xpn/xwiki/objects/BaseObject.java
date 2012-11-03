@@ -431,5 +431,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         this.ownerDocument = ownerDocument;
+        for (String propertyName : getPropertyList()) {
+            BaseProperty property = (BaseProperty) getField(propertyName);
+            property.setOwnerDocument(ownerDocument);
+        }
     }
 }

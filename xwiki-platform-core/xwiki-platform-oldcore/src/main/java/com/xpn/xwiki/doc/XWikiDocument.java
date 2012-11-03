@@ -1874,8 +1874,7 @@ public class XWikiDocument implements DocumentModelBridge
     public BaseClass getXClass()
     {
         if (this.xClass == null) {
-            this.xClass = new BaseClass();
-            this.xClass.setDocumentReference(getDocumentReference());
+            this.setXClass(new BaseClass());
         }
         return this.xClass;
     }

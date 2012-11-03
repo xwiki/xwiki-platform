@@ -42,7 +42,11 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
 
-    protected final List<String> list = new AbstractNotifyOnUpdateList<String>() {
+    /**
+     * We make this a notifying list, because we must propagate any value updates to the owner document.
+     */
+    protected final List<String> list = new AbstractNotifyOnUpdateList<String>()
+    {
         @Override
         public void onUpdate()
         {

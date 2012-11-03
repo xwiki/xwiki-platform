@@ -27,11 +27,11 @@ import java.util.Random;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
@@ -249,14 +249,13 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 context.getWiki().getStore().cleanUp(context);
 
                 try {
-                    writer.optimize();
                     writer.close();
                 } catch (IOException e) {
                     LOGGER.warn("Failed to close writer.", e);
                 }
             }
 
-            this.plugin.openSearchers(context);
+            this.plugin.openIndexReaders(context);
         }
     }
 
@@ -292,7 +291,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         data.addDataToLuceneDocument(luceneDoc, context);
 
         // collecting all the fields for using up in search
-        for (Fieldable field : luceneDoc.getFields()) {
+        for (IndexableField field : luceneDoc.getFields()) {
             if (!fields.contains(field.name())) {
                 fields.add(field.name());
             }

@@ -22,8 +22,8 @@ package com.xpn.xwiki.plugin.lucene;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class SearchResults extends Api
 {
     private final XWiki xwiki;
 
-    private final Searcher searcher;
+    private final IndexSearcher searcher;
 
     private final TopDocsCollector< ? extends ScoreDoc> results;
 
@@ -60,7 +60,7 @@ public class SearchResults extends Api
      * @param results Lucene search results
      * @param xwiki xwiki instance for access rights checking
      */
-    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, Searcher searcher, XWiki xwiki, XWikiContext context)
+    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, IndexSearcher searcher, XWiki xwiki, XWikiContext context)
     {
         super(context);
 

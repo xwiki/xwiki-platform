@@ -33,7 +33,7 @@
   <name>XWiki Platform - Search - Lucene</name>
   <description>XWiki Platform - Search - Lucene</description>
   <properties>
-    <lucene.version>3.6.1</lucene.version>
+    <lucene.version>4.0.0</lucene.version>
   </properties>
   <dependencies>
     <dependency>
@@ -48,12 +48,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-analyzers</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-queryparser</artifactId>
+      <artifactId>lucene-analyzers-common</artifactId>
       <version>${lucene.version}</version>
     </dependency>
     <dependency>

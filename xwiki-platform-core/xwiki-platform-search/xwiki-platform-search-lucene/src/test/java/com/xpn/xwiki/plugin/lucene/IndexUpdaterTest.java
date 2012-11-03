@@ -26,9 +26,10 @@ import java.util.Date;
 import java.util.concurrent.Semaphore;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -156,7 +157,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("search").will(returnValue(Collections.EMPTY_LIST));
         // Since "xwikicontext" will be declared before running execution context initializers as a result of
         // implementing XWIKI-8322, the message tool velocity context initializer will be triggered to call
-        // the prepareResources method.  So, we will just allow it.
+        // the prepareResources method. So, we will just allow it.
         this.mockXWiki.stubs().method("prepareResources").with(ANYTHING);
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
@@ -180,7 +181,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         this.rebuildDone.acquireUninterruptibly();
 
-        assertTrue(IndexReader.indexExists(directory));
+        assertTrue(DirectoryReader.indexExists(directory));
     }
 
     public void testIndexUpdater() throws Exception
@@ -227,7 +228,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         }
 
         Query q = new TermQuery(new Term(IndexFields.DOCUMENT_ID, "wiki:Lorem.Ipsum.default"));
-        IndexSearcher searcher = new IndexSearcher(directory, true);
+        IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(directory));
         TopDocs t = searcher.search(q, null, 10);
 
         assertEquals(1, t.totalHits);
@@ -289,8 +290,10 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         try {
             if (!IndexWriter.isLocked(indexUpdater.getDirectory())) {
-                new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_36),
-                    MaxFieldLength.LIMITED);
+                IndexWriterConfig config =
+                    new IndexWriterConfig(Version.LUCENE_40, new StandardAnalyzer(Version.LUCENE_40));
+
+                new IndexWriter(indexUpdater.getDirectory(), config);
             } else {
                 wasActuallyLocked = true;
             }
@@ -318,9 +321,10 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         assertFalse(IndexWriter.isLocked(indexUpdater.getDirectory()));
 
+        IndexWriterConfig config =
+            new IndexWriterConfig(Version.LUCENE_40, new StandardAnalyzer(Version.LUCENE_40));
         IndexWriter w =
-            new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_36),
-                MaxFieldLength.LIMITED);
+            new IndexWriter(indexUpdater.getDirectory(), config);
         w.close();
     }
 }

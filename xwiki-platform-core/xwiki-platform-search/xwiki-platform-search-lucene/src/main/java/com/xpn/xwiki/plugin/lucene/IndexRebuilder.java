@@ -26,12 +26,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -303,7 +303,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             context.setDatabase(wikiName);
 
             // If only not already indexed document has to be indexed create a Searcher to find out
-            Searcher searcher = this.onlyNew ? createSearcher(this.indexUpdater.getDirectory(), context) : null;
+            IndexSearcher searcher = this.onlyNew ? createSearcher(this.indexUpdater.getDirectory(), context) : null;
 
             try {
                 String hql =
@@ -324,14 +324,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 this.hqlFilter, e.getMessage()});
 
                 return -1;
-            } finally {
-                if (searcher != null) {
-                    try {
-                        searcher.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Failed to close searcher", e);
-                    }
-                }
             }
         } finally {
             context.setDatabase(database);
@@ -340,7 +332,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         return retval;
     }
 
-    private int indexDocuments(String wikiName, List<Object[]> documents, Searcher searcher, XWikiContext context)
+    private int indexDocuments(String wikiName, List<Object[]> documents, IndexSearcher searcher, XWikiContext context)
         throws InterruptedException
     {
         int retval = 0;
@@ -418,12 +410,12 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         return retval;
     }
 
-    public boolean isIndexed(DocumentReference documentReference, Searcher searcher)
+    public boolean isIndexed(DocumentReference documentReference, IndexSearcher searcher)
     {
         return isIndexed(documentReference, null, null, searcher);
     }
 
-    public boolean isIndexed(DocumentReference documentReference, String version, String language, Searcher searcher)
+    public boolean isIndexed(DocumentReference documentReference, String version, String language, IndexSearcher searcher)
     {
         boolean exists = false;
 
@@ -456,12 +448,12 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         return exists;
     }
 
-    public Searcher createSearcher(Directory directory, XWikiContext context)
+    public IndexSearcher createSearcher(Directory directory, XWikiContext context)
     {
-        Searcher searcher = null;
-
+        IndexSearcher searcher = null;
+        
         try {
-            searcher = new IndexSearcher(directory, true);
+            searcher = new IndexSearcher(DirectoryReader.open(directory));
         } catch (Exception e) {
             LOGGER.error("Faild to create IndexSearcher for Lucene index [{}]", directory, e);
         }

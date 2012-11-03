@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.index.IndexableField;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.slf4j.Logger;
@@ -97,11 +97,17 @@ public class AttachmentData extends AbstractDocumentData
     {
         super.addDataToLuceneDocument(luceneDoc, context);
 
-        // Lower the importance of the fields inherited from the document
-        List<Fieldable> existingFields = luceneDoc.getFields();
-        for (Fieldable f : existingFields) {
-            if (!RELEVANT_DOCUMENT_FIELDS.contains(f.name())) {
-                f.setBoost(f.getBoost() * IRRELEVANT_DOCUMENT_FIELD_BOOST);
+        List<IndexableField> existingFields = luceneDoc.getFields();
+        for (IndexableField f : existingFields) {
+            if (Field.class.isAssignableFrom(f.getClass())) {
+                Field field = (Field) f;
+                if (!RELEVANT_DOCUMENT_FIELDS.contains(f.name())) {
+                    // Lower the importance of the fields inherited from the document
+                    field.setBoost(field.boost() * IRRELEVANT_DOCUMENT_FIELD_BOOST);
+                } else {
+                    // Decrease the global score of attachments
+                    field.setBoost(ATTACHMENT_GLOBAL_BOOST);
+                }
             }
         }
 
@@ -111,8 +117,6 @@ public class AttachmentData extends AbstractDocumentData
             addFieldToDocument(IndexFields.MIMETYPE, this.mimetype, Field.Store.YES, Field.Index.ANALYZED,
                 MIMETYPE_BOOST, luceneDoc);
         }
-        // Decrease the global score of attachments
-        luceneDoc.setBoost(ATTACHMENT_GLOBAL_BOOST);
     }
 
     /**

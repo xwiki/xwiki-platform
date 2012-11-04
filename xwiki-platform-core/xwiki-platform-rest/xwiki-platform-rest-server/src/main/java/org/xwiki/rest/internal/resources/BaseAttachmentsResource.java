@@ -34,14 +34,15 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
-import org.xwiki.rest.internal.resources.attachments.AttachmentResource;
-import org.xwiki.rest.internal.resources.pages.PageResource;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.resources.attachments.AttachmentResource;
+import org.xwiki.rest.resources.pages.PageResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -83,21 +84,18 @@ public class BaseAttachmentsResource extends XWikiResource
 
     /**
      * Retrieves the attachments by filtering them.
-     * 
+     *
      * @param wikiName The virtual wiki.
      * @param name Name filter (include only attachments that matches this name)
      * @param page Page filter (include only attachments are attached to a page matches this string)
      * @param space Space filter (include only attachments are attached to a page in a space matching this string)
      * @param author Author filter (include only attachments from an author who matches this string)
      * @param types A comma separated list of string that will be matched against the actual mime type of the
-     *            attachments.
-     * @param start
-     * @param number
+     * attachments.
      * @return The list of the retrieved attachments.
-     * @throws QueryException
      */
     public Attachments getAttachments(String wikiName, String name, String page, String space, String author,
-        String types, Integer start, Integer number, Boolean withPrettyNames) throws QueryException
+            String types, Integer start, Integer number, Boolean withPrettyNames) throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
@@ -123,7 +121,8 @@ public class BaseAttachmentsResource extends XWikiResource
 
             /* Build the query */
             Formatter f = new Formatter();
-            f.format("select doc.space, doc.name, doc.version, attachment from XWikiDocument as doc, XWikiAttachment as attachment where (attachment.docId=doc.id ");
+            f.format(
+                    "select doc.space, doc.name, doc.version, attachment from XWikiDocument as doc, XWikiAttachment as attachment where (attachment.docId=doc.id ");
 
             if (filters.keySet().size() > 0) {
                 for (String param : filters.keySet()) {
@@ -148,13 +147,17 @@ public class BaseAttachmentsResource extends XWikiResource
             String queryString = f.toString();
 
             /* Execute the query by filling the parameters */
-            Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
-            for (String param : filters.keySet()) {
-                query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
-            }
-
             List<Object> queryResult = null;
-            queryResult = query.execute();
+            try {
+                Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
+                for (String param : filters.keySet()) {
+                    query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
+                }
+
+                queryResult = query.execute();
+            } catch (QueryException e) {
+                throw new XWikiRestException(e);
+            }
 
             Set<String> acceptedMimeTypes = new HashSet<String>();
             if (!types.equals("")) {
@@ -202,7 +205,7 @@ public class BaseAttachmentsResource extends XWikiResource
                     if (withPrettyNames) {
                         attachment.setAuthorName(Utils.getAuthorName(xwikiAttachment.getAuthor(), componentManager));
                     }
-                    
+
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(xwikiAttachment.getDate());
                     attachment.setDate(calendar);
@@ -212,28 +215,29 @@ public class BaseAttachmentsResource extends XWikiResource
                     attachment.setVersion(xwikiAttachment.getVersion());
 
                     URL absoluteUrl =
-                        Utils
-                            .getXWikiContext(componentManager)
-                            .getURLFactory()
-                            .createAttachmentURL(xwikiAttachment.getFilename(), pageSpace, pageName, "download", null,
-                                wikiName, Utils.getXWikiContext(componentManager));
+                            Utils
+                                    .getXWikiContext(componentManager)
+                                    .getURLFactory()
+                                    .createAttachmentURL(xwikiAttachment.getFilename(), pageSpace, pageName, "download",
+                                            null,
+                                            wikiName, Utils.getXWikiContext(componentManager));
                     attachment.setXwikiAbsoluteUrl(absoluteUrl.toString());
                     attachment.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory()
-                        .getURL(absoluteUrl, Utils.getXWikiContext(componentManager)));
+                            .getURL(absoluteUrl, Utils.getXWikiContext(componentManager)));
 
                     String baseUri = uriInfo.getBaseUri().toString();
 
                     String pageUri =
-                        UriBuilder.fromUri(baseUri).path(PageResource.class).build(wikiName, pageSpace, pageName)
-                            .toString();
+                            UriBuilder.fromUri(baseUri).path(PageResource.class).build(wikiName, pageSpace, pageName)
+                                    .toString();
                     Link pageLink = objectFactory.createLink();
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     attachment.getLinks().add(pageLink);
 
                     String attachmentUri =
-                        UriBuilder.fromUri(baseUri).path(AttachmentResource.class)
-                            .build(wikiName, pageSpace, pageName, xwikiAttachment.getFilename()).toString();
+                            UriBuilder.fromUri(baseUri).path(AttachmentResource.class)
+                                    .build(wikiName, pageSpace, pageName, xwikiAttachment.getFilename()).toString();
                     Link attachmentLink = objectFactory.createLink();
                     attachmentLink.setHref(attachmentUri);
                     attachmentLink.setRel(Relations.ATTACHMENT_DATA);
@@ -249,30 +253,33 @@ public class BaseAttachmentsResource extends XWikiResource
         return attachments;
     }
 
-    protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames) throws XWikiException
+    protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames)
+            throws XWikiException
     {
         Attachments attachments = objectFactory.createAttachments();
 
         List<com.xpn.xwiki.api.Attachment> xwikiAttachments = doc.getAttachmentList();
 
         RangeIterable<com.xpn.xwiki.api.Attachment> ri =
-            new RangeIterable<com.xpn.xwiki.api.Attachment>(xwikiAttachments, start, number);
+                new RangeIterable<com.xpn.xwiki.api.Attachment>(xwikiAttachments, start, number);
 
         for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
             URL url =
-                Utils
-                    .getXWikiContext(componentManager)
-                    .getURLFactory()
-                    .createAttachmentURL(xwikiAttachment.getFilename(), doc.getSpace(), doc.getName(), "download",
-                        null, doc.getWiki(), Utils.getXWikiContext(componentManager));
+                    Utils
+                            .getXWikiContext(componentManager)
+                            .getURLFactory()
+                            .createAttachmentURL(xwikiAttachment.getFilename(), doc.getSpace(), doc.getName(),
+                                    "download",
+                                    null, doc.getWiki(), Utils.getXWikiContext(componentManager));
             String attachmentXWikiAbsoluteUrl = url.toString();
             String attachmentXWikiRelativeUrl =
-                Utils.getXWikiContext(componentManager).getURLFactory()
-                    .getURL(url, Utils.getXWikiContext(componentManager));
+                    Utils.getXWikiContext(componentManager).getURLFactory()
+                            .getURL(url, Utils.getXWikiContext(componentManager));
 
             attachments.getAttachments().add(
-                DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,
-                    attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager), withPrettyNames));
+                    DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,
+                            attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager),
+                            withPrettyNames));
         }
 
         return attachments;
@@ -283,8 +290,8 @@ public class BaseAttachmentsResource extends XWikiResource
         boolean alreadyExisting = false;
 
         XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
+                Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                        Utils.getXWikiContext(componentManager));
         XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
         if (xwikiAttachment == null) {
             xwikiAttachment = new XWikiAttachment();
@@ -301,20 +308,23 @@ public class BaseAttachmentsResource extends XWikiResource
         Utils.getXWiki(componentManager).saveDocument(xwikiDocument, Utils.getXWikiContext(componentManager));
 
         URL url =
-            Utils
-                .getXWikiContext(componentManager)
-                .getURLFactory()
-                .createAttachmentURL(attachmentName, doc.getSpace(), doc.getName(), "download", null, doc.getWiki(),
-                    Utils.getXWikiContext(componentManager));
+                Utils
+                        .getXWikiContext(componentManager)
+                        .getURLFactory()
+                        .createAttachmentURL(attachmentName, doc.getSpace(), doc.getName(), "download", null,
+                                doc.getWiki(),
+                                Utils.getXWikiContext(componentManager));
         String attachmentXWikiAbsoluteUrl = url.toString();
         String attachmentXWikiRelativeUrl =
-            Utils.getXWikiContext(componentManager).getURLFactory()
-                .getURL(url, Utils.getXWikiContext(componentManager));
+                Utils.getXWikiContext(componentManager).getURLFactory()
+                        .getURL(url, Utils.getXWikiContext(componentManager));
 
         Attachment attachment =
-            DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
-                doc, xwikiAttachment, Utils.getXWikiContext(componentManager)), attachmentXWikiRelativeUrl,
-                attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager), false);
+                DomainObjectFactory
+                        .createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
+                                doc, xwikiAttachment, Utils.getXWikiContext(componentManager)),
+                                attachmentXWikiRelativeUrl,
+                                attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager), false);
 
         return new AttachmentInfo(attachment, alreadyExisting);
     }

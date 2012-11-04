@@ -364,7 +364,7 @@
             <!-- Moved a lot of previously public API to internal packages. The initial implementation put everything in public
                  packages which is wrong. This move is to correct the initial error, and leave in public packages only the
                  classes that are really part of a public API. (See discussion: http://xwiki.markmail.org/thread/iqktyceut5bmw4rl)
-                 Remove this check on the next release (i.e. 4.3-M2) -->
+                 Remove this check on the next release (i.e. 4.3 final) -->
             <exclude>org/xwiki/rest/exceptions/**</exclude>
             <exclude>org/xwiki/rest/representations/**</exclude>
             <exclude>org/xwiki/rest/ComponentsObjectFactory</exclude>
@@ -377,6 +377,8 @@
             <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
             <exclude>org/xwiki/rest/XWikiSecretVerifier</exclude>
             <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
+            <!-- Not a breakage! This class has been moved to the xwiki-platform-rest-model where it logically belongs to -->
+            <exclude>org/xwiki/rest/Relations</exclude>
             <!-- Not a breakage! The plugin has been moved to its own module. -->
             <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
             <!-- Module has been retired as it was unmaintained. -->

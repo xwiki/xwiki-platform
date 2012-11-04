@@ -285,7 +285,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         try {
             if (!IndexWriter.isLocked(indexUpdater.getDirectory())) {
-                new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_34),
+                new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_36),
                     MaxFieldLength.LIMITED);
             } else {
                 wasActuallyLocked = true;
@@ -315,7 +315,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         assertFalse(IndexWriter.isLocked(indexUpdater.getDirectory()));
 
         IndexWriter w =
-            new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_34),
+            new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_36),
                 MaxFieldLength.LIMITED);
         w.close();
     }

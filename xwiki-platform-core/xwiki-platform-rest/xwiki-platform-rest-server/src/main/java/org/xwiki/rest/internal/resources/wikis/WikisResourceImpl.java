@@ -46,11 +46,15 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
     public Wikis getWikis() throws XWikiRestException
     {
         try {
+            String mainWiki = Utils.getXWikiContext(componentManager).getMainXWiki();
+
             List<String> databaseNames = Utils.getXWiki(componentManager).getVirtualWikisDatabaseNames(
                     Utils.getXWikiContext(componentManager));
 
-            if (databaseNames.isEmpty()) {
-                databaseNames.add("xwiki");
+            /* The main wiki, usually "xwiki", doesn't have a wiki descriptor. So if it's not in the list returned by
+             getVirtualWikisDatabaseNames add it. */
+            if (!databaseNames.contains(mainWiki)) {
+                databaseNames.add(mainWiki);
             }
 
             Wikis wikis = objectFactory.createWikis();

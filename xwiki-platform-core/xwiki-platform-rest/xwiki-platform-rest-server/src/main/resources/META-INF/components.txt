@@ -47,7 +47,6 @@ org.xwiki.rest.internal.resources.ModificationsResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikiSearchResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikiSearchQueryResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikisSearchQueryResourceImpl
-org.xwiki.rest.internal.exceptions.QueryExceptionMapper
 org.xwiki.rest.internal.representations.pages.TextPlainPageReader
 org.xwiki.rest.internal.representations.pages.FormUrlEncodedPageReader
 org.xwiki.rest.internal.representations.objects.TextPlainPropertyReader
@@ -57,4 +56,4 @@ org.xwiki.rest.internal.representations.comments.TextPlainCommentReader
 org.xwiki.rest.internal.representations.comments.FormUrlEncodedCommentReader
 org.xwiki.rest.internal.representations.tags.TextPlainTagsReader
 org.xwiki.rest.internal.representations.tags.FormUrlEncodedTagsReader
-org.xwiki.rest.internal.exceptions.XWikiExceptionMapper
+org.xwiki.rest.internal.exceptions.XWikiRestExceptionMapper

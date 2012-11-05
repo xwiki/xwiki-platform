@@ -26,26 +26,41 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.rest.XWikiRestException;
 
 import com.xpn.xwiki.XWikiException;
 
 /**
+ * Exception mapper for XWikiRestException, the exception raised by REST resources in case of failure.
+ *
  * @version $Id$
+ * @since 4.3M2
  */
-@Component("org.xwiki.rest.internal.exceptions.XWikiExceptionMapper")
+@Component("org.xwiki.rest.internal.exceptions.XWikiRestExceptionMapper")
 @Provider
-public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>, XWikiRestComponent
+public class XWikiRestExceptionMapper implements ExceptionMapper<XWikiRestException>, XWikiRestComponent
 {
     @Override
-    public Response toResponse(XWikiException exception)
+    public Response toResponse(XWikiRestException exception)
     {
-        if (exception.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-            return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN)
-                .build();
+        Throwable cause = exception.getCause();
+
+        if (cause instanceof XWikiException) {
+            XWikiException xwikiException = (XWikiException) cause;
+            if (xwikiException.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
+                return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN)
+                        .build();
+            }
+        } else if (cause instanceof QueryException) {
+            QueryException queryException = (QueryException) cause;
+
+            return Response.serverError()
+                    .entity(String.format("%s\n%s\n", exception.getMessage(), queryException.getCause().getMessage()))
+                    .type(MediaType.TEXT_PLAIN).build();
         }
 
         return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
-
 }

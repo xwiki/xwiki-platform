@@ -31,6 +31,7 @@
 #if (!$searchEngine || $searchEngine == '')
   #set($searchEngine = 'lucene')
 #end
-#set($searchPage = "Main.${searchEngine.substring(0, 1).toUpperCase()}${searchEngine.substring(1)}Search")
+#set($searchPageName = "${searchEngine.substring(0, 1).toUpperCase()}${searchEngine.substring(1)}Search")
+#set($searchPage = "Main.${searchPageName}")
 {{/velocity}}</content>
 </xwikidoc>

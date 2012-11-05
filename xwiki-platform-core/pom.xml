@@ -349,12 +349,6 @@
               <differenceType>6001</differenceType>
               <justification>Stored as Locale now and should have never been protected anyway.</justification>
             </difference>
-            <difference>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>void setUrlPatternMatcher(org.securityfilter.filter.URLPatternMatcher)</method>
-              <differenceType>7002</differenceType>
-              <justification>URLPatternMatcher instances cannot generally be reused (because the underlaying Perl5Matcher cannot be reused) on different strings and with different patterns and a new instance must be produced on demand.  It is, thus, meaningless to set an instance.  If there is any code relying on this method, it is broken already.  Thus, we should remove this without going through deprecation.  The only place where getUrlPatternMatcher is used in core appears to be in XWikiAuthServiceImpl in processLogout.  This method appears to fail occasionally because the urlPatternMatcher instance is reused.  See: http://ci.xwiki.org/job/xwiki-enterprise-test-ui/org.xwiki.enterprise$xwiki-enterprise-test-ui/1746/console.</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

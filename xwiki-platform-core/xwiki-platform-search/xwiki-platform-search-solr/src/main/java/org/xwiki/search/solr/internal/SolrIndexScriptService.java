@@ -30,8 +30,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.search.solr.SolrIndex;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndex;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
 

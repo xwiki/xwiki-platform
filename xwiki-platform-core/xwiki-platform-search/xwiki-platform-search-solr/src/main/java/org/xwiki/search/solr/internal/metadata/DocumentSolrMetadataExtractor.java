@@ -34,8 +34,8 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.search.solr.Fields;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;

@@ -28,9 +28,9 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.search.solr.SolrInstance;
 import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.search.solr.internal.SolrInstanceProvider;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**

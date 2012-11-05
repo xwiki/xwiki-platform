@@ -31,8 +31,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.Fields;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 /**
  * Extract the metadata to be indexed from attachments.

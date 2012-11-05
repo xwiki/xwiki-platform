@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 /**
  * Recursively retrieves the references for all the indexable entities contained by the given start entity.

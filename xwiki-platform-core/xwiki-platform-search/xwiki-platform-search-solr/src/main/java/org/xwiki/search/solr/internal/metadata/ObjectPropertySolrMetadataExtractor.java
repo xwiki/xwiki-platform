@@ -27,8 +27,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.search.solr.Fields;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;

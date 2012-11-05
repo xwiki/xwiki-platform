@@ -22,7 +22,7 @@ package org.xwiki.search.solr.internal.metadata;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 /**
  * Internal component interface for handling the extraction of metadata into a {@link SolrInputDocument} from XWiki

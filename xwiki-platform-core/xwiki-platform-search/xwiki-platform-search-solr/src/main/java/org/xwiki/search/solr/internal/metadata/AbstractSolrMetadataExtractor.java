@@ -33,8 +33,8 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.search.solr.Fields;
-import org.xwiki.search.solr.SolrIndexException;
+import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

@@ -31,7 +31,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
-import org.xwiki.search.solr.SolrInstance;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 
 /**
  * Basic implementation for the wrapped instance.

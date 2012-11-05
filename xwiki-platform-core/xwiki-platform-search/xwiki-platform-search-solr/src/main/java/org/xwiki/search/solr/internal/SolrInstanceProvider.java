@@ -29,7 +29,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.search.solr.SolrInstance;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 
 /**
  * Provider for {@link SolrInstance} that, based on the current configuration, returns the right component.

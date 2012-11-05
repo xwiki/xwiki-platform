@@ -32,7 +32,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
-import org.xwiki.search.solr.SolrInstance;
+import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**

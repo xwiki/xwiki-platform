@@ -2,7 +2,7 @@
 
 <xwikidoc>
   <web>AppWithinMinutes</web>
-  <name>Advanced</name>
+  <name>Document</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -11,18 +11,18 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1319403788000</creationDate>
-  <date>1319403836000</date>
-  <contentUpdateDate>1319403836000</contentUpdateDate>
+  <creationDate>1352133659000</creationDate>
+  <date>1352133857000</date>
+  <contentUpdateDate>1352133857000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.appwithinminutes.classEditorAdvancedCategoryName')</title>
+  <title>$msg.get('platform.appwithinminutes.classEditorDocumentCategoryName')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>true</hidden>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
   <object>
     <class>
       <name>AppWithinMinutes.FormFieldCategoryClass</name>
@@ -47,12 +47,12 @@
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </priority>
     </class>
-    <name>AppWithinMinutes.Advanced</name>
+    <name>AppWithinMinutes.Document</name>
     <number>0</number>
     <className>AppWithinMinutes.FormFieldCategoryClass</className>
-    <guid>5fe12242-beb3-4689-92aa-1c1daf6fbb4d</guid>
+    <guid>6e153afe-2668-4da3-94a0-4d3eea334417</guid>
     <property>
-      <priority>3</priority>
+      <priority>2</priority>
     </property>
   </object>
   <content/>

@@ -836,7 +836,7 @@ div.buttonwrapper {
   border: 1px solid $theme.borderColor;
 }
 
-#xwikieditcontent textarea#content {
+#xwikieditcontentinner textarea#content {
   border: 0;
   padding: 0;
   width: 100%;

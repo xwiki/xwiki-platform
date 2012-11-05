@@ -46,10 +46,7 @@ function escapeQuotes(text) {
 // use sampleText instead of selection if there is none
 // copied and adapted from phpBB
 function insertTags(tagOpen, tagClose, sampleText) {
-  var txtarea = document.forms.edit.content;
-  if (!txtarea) {
-    txtarea = document.getElementById("content");
-  }
+  var txtarea = ($('edit') && $('edit').content) || $('content');
 
   // IE
   if (document.selection && !is_gecko) {

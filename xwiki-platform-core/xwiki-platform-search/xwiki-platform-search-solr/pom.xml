@@ -34,7 +34,7 @@
   <name>XWiki Platform - Search - Solr</name>
   <description>Solr engine management: configuration, indexing, listeners, script service, etc. This module does not handle the search queries.</description>
   <properties>
-    <solr.version>4.0.0-BETA</solr.version>
+    <solr.version>3.6.1</solr.version>
   </properties>
   <dependencies>
     <!-- Solr -->

@@ -24,7 +24,6 @@ import javax.inject.Named;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -51,26 +50,20 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference(entityReference);
 
         try {
+            SolrInputDocument solrDocument = new SolrInputDocument();
+
             BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
             DocumentReference classReference = objectReference.getXClassReference();
             DocumentReference documentReference = new DocumentReference(objectReference.getParent());
 
             XWikiDocument document = getDocument(documentReference);
-
             BaseProperty<ObjectPropertyReference> objectProperty = document.getXObjectProperty(objectPropertyReference);
-
-            SolrInputDocument solrDocument = new SolrInputDocument();
 
             solrDocument.addField(Fields.ID, getId(objectPropertyReference));
             addDocumentReferenceFields(documentReference, solrDocument, getLanguage(documentReference));
-
-            ClassPropertyReference classPropertyReference =
-                new ClassPropertyReference(objectProperty.getName(), classReference);
-            String propertyName = compactSerializer.serialize(classPropertyReference);
-
-            // FIXME: Maybe we should use a property_name and property_value combination.
-            solrDocument.addField(Fields.PROPERTY_NAME, propertyName);
-            solrDocument.addField(propertyName, objectProperty.getValue());
+            solrDocument.addField(Fields.CLASS, compactSerializer.serialize(classReference));
+            solrDocument.addField(Fields.PROPERTY_NAME, objectProperty.getName());
+            solrDocument.addField(Fields.PROPERTY_VALUE, objectProperty.getValue());
             solrDocument.addField(Fields.TYPE, EntityType.OBJECT_PROPERTY.name());
 
             return solrDocument;

@@ -27,10 +27,13 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.SolrIndex;
 import org.xwiki.search.solr.SolrIndexException;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * TODO DOCUMENT ME!
@@ -144,7 +147,7 @@ public class SolrIndexScriptService implements ScriptService
 
         logger.error(errorMessageToLog, e);
 
-        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
+        getXWikiContext().put(CONTEXT_LASTEXCEPTION, e);
     }
 
     /**
@@ -163,7 +166,21 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void clearException()
     {
-        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, null);
+        getXWikiContext().remove(CONTEXT_LASTEXCEPTION);
     }
 
+    /**
+     * @return the XWikiContext
+     */
+    protected XWikiContext getXWikiContext()
+    {
+        ExecutionContext executionContext = this.execution.getContext();
+        XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        // FIXME: Do we need this? Maybe when running an index Thread?
+        // if (context == null) {
+        // context = this.contextProvider.createStubContext();
+        // executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+        // }
+        return context;
+    }
 }

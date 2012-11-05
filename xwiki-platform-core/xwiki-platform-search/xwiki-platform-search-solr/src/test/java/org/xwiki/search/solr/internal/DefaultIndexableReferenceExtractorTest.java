@@ -26,7 +26,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import javax.inject.Provider;
 
 import junit.framework.Assert;
 
@@ -36,6 +39,7 @@ import org.jmock.lib.action.CustomAction;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
@@ -49,10 +53,12 @@ import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.SolrInstance;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -106,6 +112,13 @@ public class DefaultIndexableReferenceExtractorTest extends
     DocumentReference document112 = new DocumentReference("SomeSheet", space11);
 
     XWikiDocument xwikiDocument11x = null;
+
+    DocumentReference document113 = new DocumentReference("SomeTranslatedDocument", space11);
+
+    DocumentReference document113Translated =
+        new DocumentReference("SomeTranslatedDocument", space11, new Locale("ro"));
+
+    XWikiDocument xwikiDocument113 = null;
 
     SpaceReference space12 = new SpaceReference("Main", wiki1);
 
@@ -171,6 +184,7 @@ public class DefaultIndexableReferenceExtractorTest extends
         // XWiki model data
         xwikiDocument11x = getMockery().mock(XWikiDocument.class, "document11x");
         xwikiClass111 = getMockery().mock(BaseClass.class);
+        xwikiDocument113 = getMockery().mock(XWikiDocument.class, "document113");
         xwikiDocument121 = getMockery().mock(XWikiDocument.class, "document121");
         xwikiDocument122 = getMockery().mock(XWikiDocument.class, "document122");
         xwikiObject1221 = getMockery().mock(BaseObject.class, "object1221");
@@ -178,12 +192,17 @@ public class DefaultIndexableReferenceExtractorTest extends
         xwikiPasswordProperty12222 = getMockery().mock(StringProperty.class, "passwordProperty12222");
         xwikiProperty12223 = getMockery().mock(IntegerProperty.class, "property12223");
         xwikiObject1222 = getMockery().mock(BaseObject.class, "object1222");
+        final EntityReferenceSerializer<String> serializer =
+            getComponentManager().getInstance(
+                new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
 
         getMockery().checking(new Expectations()
         {
             {
                 allowing(execution).getContext();
                 will(returnValue(executionContext));
+                
+                ignoring(serializer);
 
                 // ignoring(any(Logger.class));
 
@@ -209,7 +228,7 @@ public class DefaultIndexableReferenceExtractorTest extends
 
                 // space 11
                 allowing(xwiki).getSpaceDocsName(space11.getName(), xwikiContext);
-                will(returnValue(Arrays.asList(class111.getName(), document112.getName())));
+                will(returnValue(Arrays.asList(class111.getName(), document112.getName(), document113.getName())));
 
                 // document 111
                 allowing(xwiki).getDocument(class111, xwikiContext);
@@ -231,6 +250,22 @@ public class DefaultIndexableReferenceExtractorTest extends
                 allowing(xwikiDocument11x).getXObjects();
                 will(returnValue(Collections.emptyMap()));
 
+                allowing(xwikiDocument11x).getTranslationList(xwikiContext);
+                will(returnValue(Collections.emptyList()));
+
+                // document 113
+                allowing(xwiki).getDocument(document113, xwikiContext);
+                will(returnValue(xwikiDocument113));
+
+                allowing(referenceExtractor.documentAccessBridge).getAttachmentReferences(document113);
+                will(returnValue(Collections.emptyList()));
+
+                allowing(xwikiDocument113).getXObjects();
+                will(returnValue(Collections.emptyMap()));
+
+                allowing(xwikiDocument113).getTranslationList(xwikiContext);
+                will(returnValue(Arrays.asList("ro")));
+
                 // space 12
                 allowing(xwiki).getSpaceDocsName(space12.getName(), xwikiContext);
                 will(returnValue(Arrays.asList(document121.getName(), document122.getName())));
@@ -245,6 +280,9 @@ public class DefaultIndexableReferenceExtractorTest extends
                 allowing(xwikiDocument121).getXObjects();
                 will(returnValue(Collections.emptyMap()));
 
+                allowing(xwikiDocument121).getTranslationList(xwikiContext);
+                will(returnValue(Collections.emptyList()));
+
                 // document 122
                 allowing(xwiki).getDocument(document122, xwikiContext);
                 will(returnValue(xwikiDocument122));
@@ -254,8 +292,12 @@ public class DefaultIndexableReferenceExtractorTest extends
 
                 allowing(xwikiDocument122).getXObjects();
                 Map<DocumentReference, List<BaseObject>> xObjects = new HashMap<DocumentReference, List<BaseObject>>();
-                xObjects.put(class111, Arrays.asList(xwikiObject1221, xwikiObject1222));
+                // Yes, it seems that we can have null objects for some reason.
+                xObjects.put(class111, Arrays.asList(null, xwikiObject1221, xwikiObject1222));
                 will(returnValue(xObjects));
+
+                allowing(xwikiDocument122).getTranslationList(xwikiContext);
+                will(returnValue(Collections.emptyList()));
 
                 // object 1221
                 allowing(xwikiDocument122).getXObject(object1221);
@@ -331,12 +373,12 @@ public class DefaultIndexableReferenceExtractorTest extends
     {
         List<EntityReference> result = referenceExtractor.getReferences(wiki1);
         Assert.assertNotNull(result);
-        Assert.assertEquals(10, result.size());
+        Assert.assertEquals(12, result.size());
 
         assertThat(
             result,
-            containsInAnyOrder(class111, document112, document121, attachment1211, attachment1212, document122,
-                object1221, object1222, property12221, property12223));
+            containsInAnyOrder(class111, document112, document113, document113Translated, document121, attachment1211,
+                attachment1212, document122, object1221, object1222, property12221, property12223));
         Assert.assertFalse(result.contains(passwordProperty12222));
     }
 
@@ -354,9 +396,12 @@ public class DefaultIndexableReferenceExtractorTest extends
     {
         List<EntityReference> result = referenceExtractor.getReferences(space11);
         Assert.assertNotNull(result);
-        Assert.assertEquals(2, result.size());
+        Assert.assertEquals(4, result.size());
 
-        assertThat(result, containsInAnyOrder((EntityReference) class111, (EntityReference) document112));
+        assertThat(
+            result,
+            containsInAnyOrder((EntityReference) class111, (EntityReference) document112,
+                (EntityReference) document113, (EntityReference) document113Translated));
         Assert.assertFalse(result.contains(passwordProperty12222));
     }
 
@@ -370,24 +415,36 @@ public class DefaultIndexableReferenceExtractorTest extends
         Assert.assertTrue(result.contains(document112));
     }
 
+    @Test
+    public void testTranslatedDocument() throws Exception
+    {
+        List<EntityReference> result = referenceExtractor.getReferences(document113);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(2, result.size());
+
+        assertThat(result, containsInAnyOrder((EntityReference) document113, (EntityReference) document113Translated));
+    }
+
+    @Test
     public void testDocumentWithAttachments() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(document112);
+        List<EntityReference> result = referenceExtractor.getReferences(document121);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(3, result.size());
 
-        assertThat(result, containsInAnyOrder(document112, attachment1211, attachment1212));
+        assertThat(result, containsInAnyOrder(document121, attachment1211, attachment1212));
     }
 
+    @Test
     public void testDocumentWithObjects() throws Exception
     {
         List<EntityReference> result = referenceExtractor.getReferences(document122);
-
+        
         Assert.assertNotNull(result);
         Assert.assertEquals(5, result.size());
 
-        assertThat(result, containsInAnyOrder(document112, object1221, property12221, property12223, object1222));
+        assertThat(result, containsInAnyOrder(document122, object1221, property12221, property12223, object1222));
         Assert.assertFalse(result.contains(passwordProperty12222));
     }
 

@@ -39,6 +39,11 @@ import org.xwiki.search.solr.SolrIndexException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * TODO DOCUMENT ME!
@@ -51,11 +56,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * Underscore.
      */
     protected static final String USCORE = "_";
-
-    /**
-     * Wiki name seperator.
-     */
-    protected static final String DOT = ".";
 
     /**
      * Logging framework.
@@ -196,5 +196,37 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         }
 
         return language;
+    }
+
+    /**
+     * Adds the properties of a given object to a Solr document inside the multiValued field
+     * {@link Fields#OBJECT_CONTENT}.
+     * 
+     * @param solrDocument the document where to add the properties.
+     * @param object the object whose properties to add.
+     */
+    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object)
+    {
+        if (object == null) {
+            // Yes, the platform can return null objects.
+            return;
+        }
+
+        XWikiContext context = getXWikiContext();
+
+        BaseClass xClass = object.getXClass(context);
+
+        for (Object field : object.getFieldList()) {
+            BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;
+
+            // Avoid indexing empty properties.
+            if (property.getValue() != null) {
+                // Avoid indexing password.
+                PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
+                if (!(propertyClass instanceof PasswordClass)) {
+                    solrDocument.addField(Fields.OBJECT_CONTENT, property.getName() + ":" + property.getValue());
+                }
+            }
+        }
     }
 }

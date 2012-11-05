@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
@@ -144,9 +145,9 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
         DocumentReference classReference = objectReference.getXClassReference();
 
         // FIXME: The things we do to make checkstyle happy...
-        if (!(getDocument(classReference).getXClass().
-            get(objectPropertyReference.getName()) instanceof PasswordClass)) {
-            
+        if (!(getDocument(classReference).getXClass().get(objectPropertyReference.getName())
+            instanceof PasswordClass)) {
+
             result.add(objectPropertyReference);
         }
 
@@ -197,21 +198,40 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
             // Document itself
             result.add(documentReference);
 
-            // Attachments
-            List<AttachmentReference> attachmentReferences =
-                documentAccessBridge.getAttachmentReferences(documentReference);
-            // Directly add references since we`ve reached the bottom.
-            result.addAll(attachmentReferences);
+            // FIXME: Naive assumption that the original document does not have the locale set in the reference.
+            // http://jira.xwiki.org/browse/XWIKI-8349 should make things clearer at some point, but for now we are
+            // using what we have.
+            // FIXME: Second assumption - Only original documents contain objects and attachments, because objects are
+            // not translatable.
+            // http://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
+            if (documentReference.getLocale() == null) {
+                XWikiDocument document = getDocument(documentReference);
 
-            // Objects
-            XWikiDocument document = getDocument(documentReference);
-            for (Entry<DocumentReference, List<BaseObject>> entry : document.getXObjects().entrySet()) {
-                List<BaseObject> objects = entry.getValue();
-                for (BaseObject object : objects) {
-                    result.addAll(getReferences(object.getReference()));
+                // Document translations
+                List<String> translatedLanguages = document.getTranslationList(context);
+                for (String translatedLanguage : translatedLanguages) {
+                    // Using Locale static method instead of constructor to make checkstyle happy.
+                    DocumentReference translatedDocumentReference =
+                        new DocumentReference(documentReference, Locale.forLanguageTag(translatedLanguage));
+                    result.add(translatedDocumentReference);
+                }
+
+                // Attachments
+                List<AttachmentReference> attachmentReferences =
+                    documentAccessBridge.getAttachmentReferences(documentReference);
+                // Directly add references since we`ve reached the bottom.
+                result.addAll(attachmentReferences);
+
+                // Objects
+                for (Entry<DocumentReference, List<BaseObject>> entry : document.getXObjects().entrySet()) {
+                    List<BaseObject> objects = entry.getValue();
+                    for (BaseObject object : objects) {
+                        if (object != null) {
+                            result.addAll(getReferences(object.getReference()));
+                        }
+                    }
                 }
             }
-
         }
 
         return result;

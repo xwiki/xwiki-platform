@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr;
 
+
 /**
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of
  * special field values like dates.
@@ -34,19 +35,14 @@ public interface Fields
     String ID = "id";
 
     /**
+     * Language of the document.
+     */
+    String LANGUAGE = "lang";
+
+    /**
      * Keyword field, holds the name of the virtual wiki a document belongs to.
      */
     String WIKI = "wiki";
-
-    /**
-     * Title of the document.
-     */
-    String TITLE = "title";
-
-    /**
-     * Name of the document.
-     */
-    String NAME = "name";
 
     /**
      * Name of the space the document belongs to.
@@ -54,9 +50,19 @@ public interface Fields
     String SPACE = "space";
 
     /**
+     * Name of the document.
+     */
+    String NAME = "name";
+
+    /**
      * FullName of the document (example : Main.WebHome).
      */
     String FULLNAME = "fullname";
+
+    /**
+     * Title of the document.
+     */
+    String TITLE = "title";
 
     /**
      * Version of the document.
@@ -64,29 +70,19 @@ public interface Fields
     String VERSION = "version";
 
     /**
-     * Language of the document.
-     */
-    String LANGUAGE = "lang";
-
-    /**
-     * Type of a document, "attachment", "wikipage" or "objects", used to control presentation of searchresults. See
-     * {@link SearchResult}and xdocs/searchResult.vm.
+     * Type of a document. "DOCUMENT", "ATTACHMENT", "OBJECT" and "OBJECT_PROPERTY" are the used values corresponding to
+     * the values from {@link org.xwiki.model.EntityType}.
      */
     String TYPE = "type";
 
     /**
-     * Filename, only used for attachments.
+     * XWiki object class, only used for objects and properties.
      */
-    String FILENAME = "filename";
-
-    /**
-     * XWiki object class, only used for objects.
-     */
-    
     String CLASS = "class";
 
     /**
-     * XWiki object type, only used for objects.
+     * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
+     * the contained objects.
      */
     String OBJECT_CONTENT = "objcontent";
 
@@ -141,6 +137,11 @@ public interface Fields
     String MIME_TYPE = "mimetype";
 
     /**
+     * Filename, only used for attachments.
+     */
+    String FILENAME = "filename";
+
+    /**
      * For storing the doc reference . Used by attachments.
      */
     String DOC_REFERENCE = "docref";
@@ -149,9 +150,14 @@ public interface Fields
      * For storing the comments.
      */
     String COMMENT = "comment";
-    
+
     /**
      * For storing property name.
      */
     String PROPERTY_NAME = "propertyname";
+
+    /**
+     * For storing property value.
+     */
+    String PROPERTY_VALUE = "propertyvalue";
 }

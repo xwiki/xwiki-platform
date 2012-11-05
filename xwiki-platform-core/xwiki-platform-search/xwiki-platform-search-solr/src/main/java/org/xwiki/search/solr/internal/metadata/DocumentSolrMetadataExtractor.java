@@ -19,7 +19,9 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,17 +67,15 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiContext context = getXWikiContext();
 
         try {
-            SolrInputDocument sdoc = new SolrInputDocument();
+            SolrInputDocument solrDocument = new SolrInputDocument();
 
-            // FIXME: Shouldn't we iterate over all the available translations and index them?
-            // Or better yet, do this in the getContainedIdexableReferences method.
             XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
 
             String language = getLanguage(documentReference);
-            sdoc.addField(Fields.ID, getId(documentReference));
-            addDocumentReferenceFields(documentReference, sdoc, language);
-            sdoc.addField(Fields.TYPE, documentReference.getType().name());
-            sdoc.addField(Fields.FULLNAME, compactSerializer.serialize(documentReference));
+            solrDocument.addField(Fields.ID, getId(documentReference));
+            addDocumentReferenceFields(documentReference, solrDocument, language);
+            solrDocument.addField(Fields.TYPE, documentReference.getType().name());
+            solrDocument.addField(Fields.FULLNAME, compactSerializer.serialize(documentReference));
 
             // Convert the XWiki syntax of document to plain text.
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -85,38 +85,56 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, context);
 
             // Get the rendered plain text title.
-            sdoc.addField(Fields.TITLE + USCORE + language, plainTitle);
-            sdoc.addField(Fields.DOCUMENT_CONTENT + USCORE + language, printer.toString());
-            sdoc.addField(Fields.VERSION, translatedDocument.getVersion());
+            solrDocument.addField(Fields.TITLE/* + USCORE + language */, plainTitle);
+            solrDocument.addField(Fields.DOCUMENT_CONTENT/* + USCORE + language */, printer.toString());
+            solrDocument.addField(Fields.VERSION, translatedDocument.getVersion());
 
-            sdoc.addField(Fields.AUTHOR, serializer.serialize(translatedDocument.getAuthorReference()));
-            sdoc.addField(Fields.CREATOR, serializer.serialize(translatedDocument.getCreatorReference()));
-            sdoc.addField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
-            sdoc.addField(Fields.DATE, translatedDocument.getContentUpdateDate());
+            solrDocument.addField(Fields.AUTHOR, serializer.serialize(translatedDocument.getAuthorReference()));
+            solrDocument.addField(Fields.CREATOR, serializer.serialize(translatedDocument.getCreatorReference()));
+            solrDocument.addField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
+            solrDocument.addField(Fields.DATE, translatedDocument.getContentUpdateDate());
+            solrDocument.addField(Fields.HIDDEN, translatedDocument.isHidden());
 
-            // Index the Comments. Use the original document to get the comment objects since the translated document is
-            // just a lightweight object containing the translated content and title.
+            // Index the Comments and Objects in general. Use the original document to get the comment objects since the
+            // translated document is just a lightweight object containing the translated content and title.
 
-            // FIXME: Is it ok to do it like this (serializing all the comments into a field)? What about the other
-            // objects?
-            // What about the fact that all translations have the same comments? The field will get copied to each
-            // version. Maybe we should handle specially the original document.
+            // FIXME: What about the fact that all translations have the same comments? The field will get copied to
+            // each version. Maybe we should handle specially the original document.
+            XWikiDocument originalDocument = getDocument(documentReference);
 
-            List<BaseObject> comments = context.getWiki().getDocument(documentReference, context).getComments();
-            if (comments != null) {
-                StringBuffer buffer = new StringBuffer();
-                for (BaseObject comment : comments) {
-                    String commentString = comment.getStringValue("comment");
-                    String author = comment.getStringValue("author");
-                    buffer.append(commentString + " by " + author + " ");
+            // Comments. TODO: Is this particular handling of comments actually useful?
+            addComments(solrDocument, originalDocument);
+
+            // Objects
+            for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
+                for (BaseObject object : objects.getValue()) {
+                    this.addObjectContent(solrDocument, object);
                 }
-                sdoc.addField(Fields.COMMENT, buffer.toString());
             }
 
-            return sdoc;
+            return solrDocument;
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to get input document for '%s'",
                 serializer.serialize(documentReference)), e);
+        }
+    }
+
+    /**
+     * Adds the document comments using the multiValued field {@link Fields#COMMENT}.
+     * 
+     * @param solrDocument the Solr document where to add the comments.
+     * @param originalDocument the XWiki document from which to extract the comments.
+     */
+    protected void addComments(SolrInputDocument solrDocument, XWikiDocument originalDocument)
+    {
+        List<BaseObject> comments = originalDocument.getComments();
+        if (comments != null) {
+            for (BaseObject comment : comments) {
+                String commentString = comment.getStringValue("comment");
+                String author = comment.getStringValue("author");
+                Date date = comment.getDateValue("date");
+                solrDocument.addField(Fields.COMMENT, String.format("%s by %s on %s", commentString, author, date));
+            }
         }
     }
 
@@ -130,7 +148,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // Document IDs also contain the language code to differentiate between them.
         // Objects, attachments, etc. don`t need this because the only thing that is translated right now is the
         // document title and content.
-        result += getLanguage(documentReference);
+        result += USCORE + getLanguage(documentReference);
 
         return result;
     }

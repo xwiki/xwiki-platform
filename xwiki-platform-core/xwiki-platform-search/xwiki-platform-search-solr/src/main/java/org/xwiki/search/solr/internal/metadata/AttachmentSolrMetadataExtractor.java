@@ -50,20 +50,19 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
         try {
-            SolrInputDocument sdoc = new SolrInputDocument();
+            SolrInputDocument solrDocument = new SolrInputDocument();
 
             DocumentReference documentReference = attachmentReference.getDocumentReference();
 
             String lang = getLanguage(documentReference);
-            sdoc.addField(Fields.ID, getId(attachmentReference));
-            sdoc.addField(Fields.ATTACHMENT_CONTENT, getContentAsText(attachmentReference));
-            sdoc.addField(Fields.MIME_TYPE, getMimeType(attachmentReference));
-            sdoc.addField(Fields.FILENAME, attachmentReference.getName());
-            sdoc.addField(Fields.FULLNAME, compactSerializer.serialize(attachmentReference));
-            sdoc.addField(Fields.TYPE, attachmentReference.getType().name());
-            addDocumentReferenceFields(documentReference, sdoc, lang);
+            solrDocument.addField(Fields.ID, getId(attachmentReference));
+            solrDocument.addField(Fields.ATTACHMENT_CONTENT, getContentAsText(attachmentReference));
+            solrDocument.addField(Fields.MIME_TYPE, getMimeType(attachmentReference));
+            solrDocument.addField(Fields.FILENAME, attachmentReference.getName());
+            solrDocument.addField(Fields.TYPE, attachmentReference.getType().name());
+            addDocumentReferenceFields(documentReference, solrDocument, lang);
 
-            return sdoc;
+            return solrDocument;
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to get Solr document for '%s'",
                 serializer.serialize(attachmentReference)), e);

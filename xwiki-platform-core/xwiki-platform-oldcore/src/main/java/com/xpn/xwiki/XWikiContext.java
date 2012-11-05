@@ -365,8 +365,12 @@ public class XWikiContext extends Hashtable<Object, Object>
             put(USERREFERENCE_KEY, this.userReference);
         }
 
-        EffectiveUserController effectiveUserController = Utils.getComponent(EffectiveUserController.class);
-        effectiveUserController.setEffectiveUser(userReference);
+        try {
+            EffectiveUserController effectiveUserController = Utils.getComponent(EffectiveUserController.class);
+            effectiveUserController.setEffectiveUser(userReference);
+        } catch (RuntimeException e) {
+            // Allow unit tests use the XWikiContext without having to initiate the authorization context factory.
+        }
     }
 
     private void setUserInternal(String user, boolean main)

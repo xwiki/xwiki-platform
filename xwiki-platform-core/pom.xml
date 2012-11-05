@@ -80,7 +80,7 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>1.8.6</version>
+        <version>1.8.8</version>
       </dependency>
       <!-- Jython engine -->
       <dependency>
@@ -92,7 +92,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.1.0.Final</version>
+        <version>3.2.0.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>

@@ -48,7 +48,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>lucene|database</values>
+      <values>solr|lucene|database</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </engine>
   </class>

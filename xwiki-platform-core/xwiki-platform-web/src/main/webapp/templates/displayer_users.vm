@@ -23,7 +23,7 @@
   #set($id = $escapetool.xml("${prefix}${name}"))
   <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
     class="suggestUsers#if ($isMultiSelect) multipleSelection#end" />
-#else
+#elseif ("$!type" != '')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])
   #foreach ($value in $values)
@@ -39,7 +39,8 @@
       <li class="user">
        <div class="user-avatar-wrapper">
          #getUserAvatarURL($userReference $avatarURL 30)
-         <img src="$escapetool.xml($avatarURL.url)" alt="$escapetool.xml($xwiki.getUserName($user, false))" class="icon" />
+         <img src="$escapetool.xml($avatarURL.url)" class="icon"
+           alt="$escapetool.xml($xwiki.getUserName($user, false))" />
        </div>
        <div class="user-name">$xwiki.getUserName($user)</div>
        <div>
@@ -53,4 +54,8 @@
     #end
     </ul>
   #end
+#else
+  ## In order to be taken into account the result of evaluating the displayer without a display mode specified must not
+  ## be empty. Let's output something 
+  The display mode is not specified.
 #end

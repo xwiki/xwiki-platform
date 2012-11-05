@@ -15,6 +15,10 @@
   #set ($id = $escapetool.xml("${prefix}${name}"))
   <input type="text" id="$!id" name="$!id" value="$!formattedValue"#if ($picker)
     class="datetime t$!value.time" title="$!escapetool.xml($format)"#end />
-#else
+#elseif ("$!type" != '')
 $!formattedValue##
+#else
+  ## In order to be taken into account the result of evaluating the displayer without a display mode specified must not
+  ## be empty. Let's output something 
+  The display mode is not specified.
 #end

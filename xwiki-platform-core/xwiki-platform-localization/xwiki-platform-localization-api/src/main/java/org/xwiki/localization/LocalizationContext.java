@@ -21,12 +21,15 @@ package org.xwiki.localization;
 
 import java.util.Locale;
 
+import org.xwiki.component.annotation.Role;
+
 /**
  * Provide various localization related contextual informations (current Locale, etc.).
  * 
  * @version $Id$
  * @since 4.3M2
  */
+@Role
 public interface LocalizationContext
 {
     /**

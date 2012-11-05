@@ -566,6 +566,12 @@
       <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
 
     <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -981,8 +987,9 @@
               **/web/XWikiDefaultURLFactory.java,
               **/web/XWikiEngineContext.java,
               **/web/XWikiForm.java,
-              **/web/XWikiPortletContext.java,
+              **/web/XWikiMessageTool.java,
               **/web/XWikiPortlet.java,
+              **/web/XWikiPortletContext.java,
               **/web/XWikiPortletRequest.java,
               **/web/XWikiPortletResponse.java,
               **/web/XWikiPortletURLFactory.java,

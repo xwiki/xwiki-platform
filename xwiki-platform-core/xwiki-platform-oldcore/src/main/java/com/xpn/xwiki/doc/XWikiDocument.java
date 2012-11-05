@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -55,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -156,6 +158,7 @@ import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.util.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -243,9 +246,9 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference templateDocumentReference;
 
-    protected String language;
+    private Locale locale;
 
-    private String defaultLanguage;
+    private Locale defaultLocale;
 
     private int translation;
 
@@ -314,7 +317,14 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private List<XWikiAttachment> attachmentList;
+    private final List<XWikiAttachment> attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>()
+    {
+        @Override
+        public void onUpdate()
+        {
+            setContentDirty(true);
+        }
+    };
 
     // Caching
     private boolean fromCache = false;
@@ -552,16 +562,16 @@ public class XWikiDocument implements DocumentModelBridge
     {
         final String localUid = this.localUidStringEntityReferenceSerializer.serialize(getDocumentReference());
 
-        if (StringUtils.isEmpty(this.language)) {
+        if (StringUtils.isEmpty(getLanguage())) {
             return localUid;
         } else {
-            return appendLanguage(new StringBuilder(64).append(localUid)).toString();
+            return appendLocale(new StringBuilder(64).append(localUid)).toString();
         }
     }
 
     /**
-     * Temporary helper to produce a uid serialization of this document reference, including the language. Only
-     * translated document will have language appended. FIXME: when reference contains locale, this is no more needed.
+     * Temporary helper to produce a uid serialization of this document reference, including the locale. Only translated
+     * document will have locale appended. FIXME: when reference contains locale, this is no more needed.
      * 
      * @return a unique name (8:wikiname5:space4:name2:lg or 8:wikiname5:space4:name)
      * @since 4.0M1
@@ -570,10 +580,10 @@ public class XWikiDocument implements DocumentModelBridge
     {
         final String localUid = this.uidStringEntityReferenceSerializer.serialize(getDocumentReference());
 
-        if (StringUtils.isEmpty(this.language)) {
+        if (StringUtils.isEmpty(getLanguage())) {
             return localUid;
         } else {
-            return appendLanguage(new StringBuilder(64).append(localUid)).toString();
+            return appendLocale(new StringBuilder(64).append(localUid)).toString();
         }
     }
 
@@ -581,17 +591,19 @@ public class XWikiDocument implements DocumentModelBridge
      * Temporary helper that append the language of this document to the provide string buffer. FIXME: when reference
      * contains locale, this is no more needed.
      * 
-     * @param sb a StringBuilder where to append the language key
-     * @return the StringBuilder appended with the language of this document formatted like 2:lg
+     * @param sb a StringBuilder where to append the locale key
+     * @return the StringBuilder appended with the locale of this document formatted like 2:lg
      * @see #getLocalKey()
      */
-    private StringBuilder appendLanguage(StringBuilder sb)
+    private StringBuilder appendLocale(StringBuilder sb)
     {
-        if (StringUtils.isEmpty(this.language)) {
+        String localeString = getLanguage();
+
+        if (StringUtils.isEmpty(localeString)) {
             return sb;
         }
 
-        return sb.append(this.language.length()).append(':').append(this.language);
+        return sb.append(localeString.length()).append(':').append(localeString);
     }
 
     @Override
@@ -1862,8 +1874,7 @@ public class XWikiDocument implements DocumentModelBridge
     public BaseClass getXClass()
     {
         if (this.xClass == null) {
-            this.xClass = new BaseClass();
-            this.xClass.setDocumentReference(getDocumentReference());
+            this.setXClass(new BaseClass());
         }
         return this.xClass;
     }
@@ -1874,6 +1885,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void setXClass(BaseClass xwikiClass)
     {
         xwikiClass.setDocumentReference(getDocumentReference());
+        xwikiClass.setOwnerDocument(this);
 
         this.xClass = xwikiClass;
     }
@@ -1891,6 +1903,12 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setXObjects(Map<DocumentReference, List<BaseObject>> objects)
     {
+        for (List<BaseObject> objList : objects.values()) {
+            for (BaseObject obj : objList) {
+                obj.setOwnerDocument(this);
+            }
+        }
+        setContentDirty(true);
         this.xObjects = objects;
     }
 
@@ -2046,6 +2064,10 @@ public class XWikiDocument implements DocumentModelBridge
             existingbjects.clear();
         }
 
+        for (BaseObject obj : objects) {
+            obj.setOwnerDocument(this);
+        }
+
         // Add new objects
         if (objects.isEmpty()) {
             // Pretty wrong but can't remove that for retro compatibility reasons...
@@ -2057,6 +2079,8 @@ public class XWikiDocument implements DocumentModelBridge
                 addXObject(classReference, baseObject);
             }
         }
+
+        setContentDirty(true);
     }
 
     /**
@@ -3288,10 +3312,10 @@ public class XWikiDocument implements DocumentModelBridge
         setTemplateDocumentReference(document.getTemplateDocumentReference());
         setParent(document.getParent());
         setCreatorReference(document.getCreatorReference());
-        setDefaultLanguage(document.getDefaultLanguage());
+        setDefaultLocale(document.getDefaultLocale());
         setDefaultTemplate(document.getDefaultTemplate());
         setValidationScript(document.getValidationScript());
-        setLanguage(document.getLanguage());
+        setLocale(document.getLocale());
         setTranslation(document.getTranslation());
         setXClass(document.getXClass().clone());
         setXClassXML(document.getXClassXML());
@@ -3356,10 +3380,10 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
             doc.setParentReference(getRelativeParentReference());
             doc.setCreatorReference(getCreatorReference());
-            doc.setDefaultLanguage(getDefaultLanguage());
+            doc.setDefaultLocale(getDefaultLocale());
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());
-            doc.setLanguage(getLanguage());
+            doc.setLocale(getLocale());
             doc.setTranslation(getTranslation());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
@@ -3463,11 +3487,11 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getDefaultLanguage().equals(doc.getDefaultLanguage())) {
+        if (!getDefaultLocale().equals(doc.getDefaultLocale())) {
             return false;
         }
 
-        if (!getLanguage().equals(doc.getLanguage())) {
+        if (!getLocale().equals(doc.getLocale())) {
             return false;
         }
 
@@ -4256,7 +4280,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setAttachmentList(List<XWikiAttachment> list)
     {
-        this.attachmentList = list;
+        this.attachmentList.clear();
+        this.attachmentList.addAll(list);
     }
 
     public List<XWikiAttachment> getAttachmentList()
@@ -4637,13 +4662,16 @@ public class XWikiDocument implements DocumentModelBridge
         List<DocumentReference> children = new ArrayList<DocumentReference>();
 
         try {
-            Query query = getStore().getQueryManager()
-                .createQuery("select distinct doc.space, doc.name from XWikiDocument doc where "
-                    + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
-                Query.XWQL);
+            Query query =
+                getStore()
+                    .getQueryManager()
+                    .createQuery(
+                        "select distinct doc.space, doc.name from XWikiDocument doc where "
+                            + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
+                        Query.XWQL);
             query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden"));
-            query.bindValue("prefixedFullName",
-                this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+            query
+                .bindValue("prefixedFullName", this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
             query.bindValue("fullName", this.localEntityReferenceSerializer.serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
@@ -4720,6 +4748,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void addXObjectToRemove(BaseObject object)
     {
         getXObjectsToRemove().add(object);
+        object.setOwnerDocument(null);
         setContentDirty(true);
     }
 
@@ -5253,32 +5282,90 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #getLocale()} instead
+     */
+    @Deprecated
     public String getLanguage()
     {
-        if (this.language == null) {
-            return "";
-        } else {
-            return this.language.trim();
-        }
+        return getLocale().toString();
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #setLocale(Locale)} instead
+     */
+    @Deprecated
     public void setLanguage(String language)
     {
-        this.language = Util.normalizeLanguage(language);
+        String cleanedLanguage = Util.normalizeLanguage(language);
+
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(cleanedLanguage);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        setLocale(locale);
     }
 
+    /**
+     * @return the locale of the document
+     */
+    public Locale getLocale()
+    {
+        return this.locale != null ? this.locale : Locale.ROOT;
+    }
+
+    /**
+     * @param locale the locale of the document
+     */
+    public void setLocale(Locale locale)
+    {
+        this.locale = locale;
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #getDefaultLocale()} instead
+     */
+    @Deprecated
     public String getDefaultLanguage()
     {
-        if (this.defaultLanguage == null) {
-            return "";
-        } else {
-            return this.defaultLanguage.trim();
-        }
+        return getDefaultLocale().toString();
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 4.3M2 use {@link #setDefaultLocale(Locale)} instead
+     */
+    @Deprecated
     public void setDefaultLanguage(String defaultLanguage)
     {
-        this.defaultLanguage = defaultLanguage;
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(defaultLanguage);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        setDefaultLocale(locale);
+    }
+
+    public Locale getDefaultLocale()
+    {
+        return this.defaultLocale != null ? this.defaultLocale : Locale.ROOT;
+    }
+
+    public void setDefaultLocale(Locale defaultLocale)
+    {
+        this.defaultLocale = defaultLocale;
 
         setMetaDataDirty(true);
     }
@@ -5319,18 +5406,42 @@ public class XWikiDocument implements DocumentModelBridge
      * <p>
      * This method return this if the provided language does not exists. See
      * 
-     * @param language the language of the documetn to return
+     * @param language the language of the document to return
+     * @param context the XWiki Context
+     * @return the document in the provided language or this if the provided language does not exists
+     * @throws XWikiException error when loading the document
+     * @deprecated since 4.3M2 use {@link #getTranslatedDocument(Locale, XWikiContext)} insead
+     */
+    @Deprecated
+    public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
+    {
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(language);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        return getTranslatedDocument(locale, context);
+    }
+
+    /**
+     * Return the document in the provided language.
+     * <p>
+     * This method return this if the provided language does not exists. See
+     * 
+     * @param locale the locale of the document to return
      * @param context the XWiki Context
      * @return the document in the provided language or this if the provided language does not exists
      * @throws XWikiException error when loading the document
      */
-    public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
+    public XWikiDocument getTranslatedDocument(Locale locale, XWikiContext context) throws XWikiException
     {
         XWikiDocument tdoc = this;
 
-        if (!((language == null) || (language.equals("")) || language.equals(getDefaultLanguage()))) {
+        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(getDefaultLocale())) {
             tdoc = new XWikiDocument(getDocumentReference());
-            tdoc.setLanguage(language);
+            tdoc.setLocale(locale);
             String database = context.getDatabase();
             try {
                 // We might need to switch database to
@@ -5354,19 +5465,44 @@ public class XWikiDocument implements DocumentModelBridge
         return tdoc;
     }
 
+    /**
+     * @deprecated since 4.3M1 use {@link #getRealLocale()} instead
+     */
+    @Deprecated
     public String getRealLanguage(XWikiContext context) throws XWikiException
     {
         return getRealLanguage();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentModelBridge#getRealLanguage()
+     * @deprecated since 4.3M1 use {@link #getRealLocale()} instead
+     */
+    @Override
+    @Deprecated
     public String getRealLanguage()
     {
         String lang = getLanguage();
-        if ((lang.equals("") || lang.equals("default"))) {
+        if (lang.equals("")) {
             return getDefaultLanguage();
         } else {
             return lang;
         }
+    }
+
+    /**
+     * @return the actual locale of the document
+     */
+    public Locale getRealLocale()
+    {
+        Locale locale = getLocale();
+        if (locale.equals(Locale.ROOT)) {
+            locale = getDefaultLocale();
+        }
+
+        return locale;
     }
 
     public List<String> getTranslationList(XWikiContext context) throws XWikiException
@@ -5501,11 +5637,11 @@ public class XWikiDocument implements DocumentModelBridge
             list.add(new MetaDataDiff("name", fromDoc.getName(), toDoc.getName()));
         }
 
-        if (!fromDoc.getLanguage().equals(toDoc.getLanguage())) {
+        if (!fromDoc.getLocale().equals(toDoc.getLocale())) {
             list.add(new MetaDataDiff("language", fromDoc.getLanguage(), toDoc.getLanguage()));
         }
 
-        if (!fromDoc.getDefaultLanguage().equals(toDoc.getDefaultLanguage())) {
+        if (!fromDoc.getDefaultLocale().equals(toDoc.getDefaultLocale())) {
             list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc.getDefaultLanguage()));
         }
 
@@ -7522,7 +7658,7 @@ public class XWikiDocument implements DocumentModelBridge
             } catch (XWikiException e) {
                 if (StringUtils.isEmpty(getContent())) {
                     LOGGER.debug("Syntax [{}] cannot handle empty input. Returning empty XDOM.", getSyntax());
-                    return new XDOM(Collections.<Block>emptyList());
+                    return new XDOM(Collections.<Block> emptyList());
                 }
                 LOGGER.error("Failed to parse document content to XDOM", e);
             }
@@ -7565,15 +7701,8 @@ public class XWikiDocument implements DocumentModelBridge
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
         this.content = "";
         this.format = "";
-        this.language = "";
-        this.defaultLanguage = "";
-        this.attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>() {
-            @Override
-            public void onUpdate()
-            {
-                setContentDirty(true);
-            }
-        };
+        this.locale = Locale.ROOT;
+        this.defaultLocale = Locale.ROOT;
         this.customClass = "";
         this.comment = "";
 

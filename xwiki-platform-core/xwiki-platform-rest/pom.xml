@@ -36,5 +36,6 @@
   <modules>
     <module>xwiki-platform-rest-model</module>
     <module>xwiki-platform-rest-server</module>
+    <module>xwiki-platform-rest-api</module>
   </modules>
 </project>

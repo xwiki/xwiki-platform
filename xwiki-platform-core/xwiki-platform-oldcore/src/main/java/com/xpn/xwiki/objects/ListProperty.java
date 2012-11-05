@@ -31,7 +31,7 @@ import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.AbstractNotifyOnUpdateList;
+import com.xpn.xwiki.util.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.web.Utils;
 
@@ -42,7 +42,11 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
 
-    protected List<String> list = new AbstractNotifyOnUpdateList<String>() {
+    /**
+     * We make this a notifying list, because we must propagate any value updates to the owner document.
+     */
+    protected final List<String> list = new AbstractNotifyOnUpdateList<String>()
+    {
         @Override
         public void onUpdate()
         {
@@ -51,6 +55,9 @@ public class ListProperty extends BaseProperty implements Cloneable
     };
 
     private String formStringSeparator = "|";
+
+    /** Indicate that hibernate workaround for getList should be enabled. */
+    private boolean useHibernateWorkaround = false;
 
     public String getFormStringSeparator()
     {
@@ -163,15 +170,24 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     public List<String> getList()
     {
-        return this.list;
+        if (useHibernateWorkaround) {
+            // FIXME: Hibernate does not like the
+            // AbstractNotifyOnUpdateList, so we must use a workaround
+            // when saving this property.  Try removing this
+            // workaround after we have upgraded hibernate.
+            List<String> arrayList = new ArrayList<String>();
+            arrayList.addAll(list);
+            return arrayList;
+        } else {
+            return this.list;
+        }
     }
 
     public void setList(List<String> list)
     {
-        if (list == null) {
-            this.list = new ArrayList<String>();
-        } else {
-            this.list = list;
+        this.list.clear();
+        if (list != null) {
+            this.list.addAll(list);
             // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
             // safe to assume that a retrieved NULL value should actually be an empty string.
             for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
@@ -219,5 +235,14 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
         MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+    }
+
+    /**
+     * @param useHibernateWorkaround {@literal true} if hibernate workaround for getList should be enabled.
+     * @since 4.3M2
+     */
+    public void setUseHibernateWorkaround(boolean useHibernateWorkaround)
+    {
+        this.useHibernateWorkaround = useHibernateWorkaround;
     }
 }

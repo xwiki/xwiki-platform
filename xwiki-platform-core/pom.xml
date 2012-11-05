@@ -337,6 +337,18 @@
               <justification>Added a common method to all elements to set all the data from another element.
                 Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
             </difference>
+            <difference>
+              <className>com/xpn/xwiki/objects/ListProperty</className>
+              <field>list</field>
+              <differenceType>6006</differenceType>
+              <justification>Elemenents must be added to the wrapping NotifyOnList to ensure that the property is marked 'dirty' when updated. To avoid that this mechanism is circumvented, the field is made final.</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>language</field>
+              <differenceType>6001</differenceType>
+              <justification>Stored as Locale now and should have never been protected anyway.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -352,7 +364,7 @@
             <!-- Moved a lot of previously public API to internal packages. The initial implementation put everything in public
                  packages which is wrong. This move is to correct the initial error, and leave in public packages only the
                  classes that are really part of a public API. (See discussion: http://xwiki.markmail.org/thread/iqktyceut5bmw4rl)
-                 Remove this check on the next release (i.e. 4.3-M2) -->
+                 Remove this check on the next release (i.e. 4.3 final) -->
             <exclude>org/xwiki/rest/exceptions/**</exclude>
             <exclude>org/xwiki/rest/representations/**</exclude>
             <exclude>org/xwiki/rest/ComponentsObjectFactory</exclude>
@@ -365,6 +377,8 @@
             <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
             <exclude>org/xwiki/rest/XWikiSecretVerifier</exclude>
             <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
+            <!-- Not a breakage! This class has been moved to the xwiki-platform-rest-model where it logically belongs to -->
+            <exclude>org/xwiki/rest/Relations</exclude>
             <!-- Not a breakage! The plugin has been moved to its own module. -->
             <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
             <!-- Module has been retired as it was unmaintained. -->
@@ -426,6 +440,7 @@
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>

@@ -42,6 +42,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.merge.MergeUtils;
@@ -79,6 +80,16 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private String validationScript;
 
     private String nameField;
+
+    /**
+     * Set to true if the class is modified from the database version of it.
+     */
+    private boolean isDirty = true;
+
+    /**
+     * The owner document, if this object was obtained from a document.
+     */
+    private XWikiDocument ownerDocument;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -137,6 +148,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             }
             setDocumentReference(reference);
         }
+        setDirty(true);
     }
 
     /**
@@ -157,6 +169,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         super.addField(name, element);
+
+        setDirty(true);
     }
 
     /**
@@ -173,6 +187,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if (pclass != null) {
             pclass.setDisabled(true);
         }
+
+        setDirty(true);
     }
 
     /**
@@ -188,6 +204,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if (pclass != null) {
             pclass.setDisabled(false);
         }
+
+        setDirty(true);
     }
 
     @Override
@@ -200,6 +218,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void put(String name, PropertyInterface property)
     {
         safeput(name, property);
+        setDirty(true);
     }
 
     /**
@@ -405,6 +424,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setDefaultViewSheet(getDefaultViewSheet());
         bclass.setDefaultEditSheet(getDefaultEditSheet());
         bclass.setNameField(getNameField());
+        bclass.setDirty(this.isDirty);
+        bclass.setOwnerDocument(this.ownerDocument);
 
         return bclass;
     }
@@ -1316,5 +1337,31 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         return modified;
+    }
+
+    /**
+     * Set the owner document of this base property.
+     *
+     * @param owner The owner document.
+     * @since 4.3M2
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        this.ownerDocument = ownerDocument;
+        if (ownerDocument != null && isDirty) {
+            ownerDocument.setContentDirty(true);
+        }
+    }
+
+    /**
+     * @param valueDirty Indicate if the dirty flag should be set or cleared.
+     * @since 4.3M2
+     */
+    public void setDirty(boolean isDirty)
+    {
+        this.isDirty = isDirty;
+        if (isDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(true);
+        }
     }
 }

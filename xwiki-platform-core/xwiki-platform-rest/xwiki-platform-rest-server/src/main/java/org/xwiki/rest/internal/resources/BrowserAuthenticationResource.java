@@ -41,10 +41,8 @@ public class BrowserAuthenticationResource extends ServerResource
         getVariants().add(new Variant(MediaType.TEXT_PLAIN));
     }
 
-    
     public void handleGet()
     {
         getResponse().redirectSeeOther(String.format("%s/", getRequest().getRootRef()));
     }
-
 }

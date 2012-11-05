@@ -19,8 +19,6 @@
  */
 package org.xwiki.rest;
 
-import org.xwiki.rest.internal.DomainObjectFactory;
-
 /**
  * @version $Id$
  */

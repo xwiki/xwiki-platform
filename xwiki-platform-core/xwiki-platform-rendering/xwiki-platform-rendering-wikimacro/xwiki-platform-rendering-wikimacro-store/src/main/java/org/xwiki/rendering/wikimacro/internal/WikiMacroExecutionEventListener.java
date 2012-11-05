@@ -156,7 +156,7 @@ public class WikiMacroExecutionEventListener implements EventListener
 
         // Make sure to disable Document#dropPermission hack
         droppedPermission = context.getProperty(XWikiConstant.DROPPED_PERMISSIONS);
-        context.removeProperty(XWikiConstant.DROPPED_PERMISSIONS);
+        context.setProperty(XWikiConstant.DROPPED_PERMISSIONS, null);
 
         // Put it in an hidden context property to restore it later
         // Use a stack in case a wiki macro calls another wiki macro

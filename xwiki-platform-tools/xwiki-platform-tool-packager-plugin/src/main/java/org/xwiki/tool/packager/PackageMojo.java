@@ -58,12 +58,14 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
+import org.xwiki.velocity.internal.log.SLF4JLogChute;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.tool.backup.Importer;
@@ -260,6 +262,7 @@ public class PackageMojo extends AbstractMojo
             new WildcardFileFilter("start_xwiki*.*"), null);
 
         // Note: Init is done once even if this method is called several times...
+        Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
         Velocity.init();
         for (File startFile : startFiles) {
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));

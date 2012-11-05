@@ -56,14 +56,10 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <!-- Gson: Java to Json conversion. -->
-    <!-- TODO: Do we still need this? -->
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.2.2</version>
-      <scope>compile</scope>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-cell</artifactId>
+      <version>${solr.version}</version>
     </dependency>
 
     <dependency>
@@ -81,11 +77,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
-      <version>4.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

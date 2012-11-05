@@ -44,4 +44,11 @@ public class RemoteSolrInstance extends AbstractSolrInstance
 
     }
 
+    @Override
+    public void shutDown()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }

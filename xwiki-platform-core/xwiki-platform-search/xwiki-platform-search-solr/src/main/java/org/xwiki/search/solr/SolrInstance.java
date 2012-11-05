@@ -48,6 +48,11 @@ public interface SolrInstance extends Initializable
      * @throws InitializationException if problems occur.
      */
     void initialize() throws InitializationException;
+    
+    /**
+     * Shutdown the instance.
+     */
+    void shutDown();
 
     /**
      * Add a {@link SolrInputDocument} to the Solr index.

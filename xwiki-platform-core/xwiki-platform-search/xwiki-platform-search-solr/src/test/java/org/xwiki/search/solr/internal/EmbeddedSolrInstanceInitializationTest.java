@@ -24,13 +24,15 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;
 import org.jmock.Expectations;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.SolrInstance;
-import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -40,6 +42,8 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTestCase
 {
+    protected File PERMANENT_DIRECTORY = new File(System.getProperty("java.io.tmpdir"), "data");
+
     @Override
     protected void registerComponents() throws Exception
     {
@@ -50,9 +54,25 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
         {
             {
                 allowing(mockEnvironment).getPermanentDirectory();
-                will(returnValue(new File(".data")));
+                will(returnValue(PERMANENT_DIRECTORY));
             }
         });
+    }
+
+    @Before
+    public void setup() throws Exception
+    {
+        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
+        PERMANENT_DIRECTORY.mkdirs();
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        EmbeddedSolrInstance instance = getComponentManager().getInstance(SolrInstance.class, "embedded");
+        instance.shutDown();
+
+        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
     }
 
     @Test
@@ -67,8 +87,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
     @Test
     public void testInstantiationNewHome() throws Exception
     {
-        URL url = this.getClass().getClassLoader().getResource("solrhome");
-        String newHome = new File(url.getPath(), "doesNotExist").toString();
+        String newHome = new File(PERMANENT_DIRECTORY, "doesNotExist").getAbsolutePath();
         System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, newHome);
 
         getInstanceAndAssertHomeDirectory(newHome);
@@ -102,6 +121,10 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
             expected = implementation.getDefaultHomeDirectory();
         }
         Assert.assertEquals(expected + File.separator, container.getSolrHome());
+        Assert.assertTrue(new File(new File(container.getSolrHome(), EmbeddedSolrInstance.CONF_DIRECTORY),
+            EmbeddedSolrInstance.SCHEMA_XML).exists());
+        Assert.assertTrue(new File(new File(container.getSolrHome(), EmbeddedSolrInstance.CONF_DIRECTORY),
+            EmbeddedSolrInstance.SOLRCONFIG_XML).exists());
     }
 
 }

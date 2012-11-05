@@ -20,10 +20,13 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
@@ -45,14 +48,34 @@ import org.xwiki.environment.Environment;
 public class EmbeddedSolrInstance extends AbstractSolrInstance
 {
     /**
+     * Classpath location pattern for the default configuration files.
+     */
+    protected static final String CONF_FILE_LOCATION_PATTERN = "/%s/%s";
+
+    /**
+     * Name of the default Solr configuration file.
+     */
+    protected static final String SOLRCONFIG_XML = "solrconfig.xml";
+
+    /**
+     * Name of the classpath folder where the default configuration files are located.
+     */
+    protected static final String CONF_DIRECTORY = "conf";
+
+    /**
+     * Name of the default schema configuration file.
+     */
+    protected static final String SCHEMA_XML = "schema.xml";
+
+    /**
      * SOLR HOME KEY.
      */
-    public static final String SOLR_HOME_KEY = "solr.solr.home";
+    protected static final String SOLR_HOME_KEY = "solr.solr.home";
 
     /**
      * Default directory name for Solr's configuration and index files.
      */
-    public static final String DEFAULT_SOLR_DIRECTORY_NAME = "solr";
+    protected static final String DEFAULT_SOLR_DIRECTORY_NAME = "solr";
 
     /**
      * Properties.
@@ -72,6 +95,9 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
     {
         String solrHome = determineHomeDirectory();
         try {
+            // Validate and initialize the home directory if needed.
+            validateAndInitializeHomeDirectory(solrHome);
+
             // Start embedded Solr server.
             logger.info("Starting embedded Solr server...");
             System.setProperty(SOLR_HOME_KEY, solrHome);
@@ -88,6 +114,54 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
         } catch (Exception e) {
             throw new InitializationException(String.format(
                 "Failed to initialize the solr embedded server with home directory set to '%s'", solrHome), e);
+        }
+    }
+
+    /**
+     * Checks rights, creates paths and adds default config XML files if they don`t already exist.
+     * 
+     * @param solrHome the directory to use as Solr home.
+     * @throws IllegalArgumentException if the provided directory is not usable (is a file, is not writable, etc.).
+     * @throws IOException if the XML files are not copied successfully.
+     */
+    private void validateAndInitializeHomeDirectory(String solrHome) throws IllegalArgumentException, IOException
+    {
+        // Validate and create the directory if it does not already exist.
+        File solrHomeDir = new File(solrHome);
+        boolean existsButIsUnusable = (solrHomeDir.exists() && (!solrHomeDir.isDirectory() || !solrHomeDir.canWrite()));
+        if (existsButIsUnusable || (!solrHomeDir.exists() && !solrHomeDir.mkdirs())) {
+            throw new IllegalArgumentException(String.format("The given path '%s' must be a writable directory",
+                solrHomeDir));
+        }
+
+        // Initialize the Solr Home with the default schema.xml and solrconfig.xml if they don`t already exist.
+        File confDirectory = new File(solrHomeDir, CONF_DIRECTORY);
+        if (!confDirectory.exists()) {
+            confDirectory.mkdir();
+        }
+
+        String[] fileNames =
+        {SOLRCONFIG_XML, SCHEMA_XML, "protwords.txt", "stopwords.txt", "synonyms.txt", "elevate.xml"};
+        for (String fileName : fileNames) {
+            copyFileIfNotExists(confDirectory, fileName);
+        }
+    }
+
+    /**
+     * Copy a file from the set of default ones if it is not already present in the destination directory.
+     * 
+     * @param destinationDirectory directory where to copy the file.
+     * @param fileName the name of the file to copy from the default configuration files.
+     * @throws IOException if the copy operation fails.
+     */
+    private void copyFileIfNotExists(File destinationDirectory, String fileName) throws IOException
+    {
+        File destinationFile = new File(destinationDirectory, fileName);
+        if (!destinationFile.exists()) {
+            URL inputUrl = getClass().getResource(String.format(CONF_FILE_LOCATION_PATTERN, CONF_DIRECTORY, fileName));
+            if (inputUrl != null) {
+                FileUtils.copyURLToFile(inputUrl, destinationFile);
+            }
         }
     }
 
@@ -114,5 +188,13 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
         String result = new File(environment.getPermanentDirectory(), DEFAULT_SOLR_DIRECTORY_NAME).getPath();
 
         return result;
+    }
+
+    @Override
+    public void shutDown()
+    {
+        if (this.server != null) {
+            ((EmbeddedSolrServer) this.server).shutdown();
+        }
     }
 }

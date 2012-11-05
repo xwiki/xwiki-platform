@@ -121,6 +121,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.security.authorization.ContentAuthorController;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
@@ -5907,36 +5908,67 @@ public class XWiki implements EventListener
      * @return An object instantiating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext context) throws XWikiException
+    public Object parseGroovyFromString(String script, final String jarWikiPage, XWikiContext context) throws XWikiException
     {
+        final ContentAuthorController contentAuthorController = Utils.getComponent(ContentAuthorController.class);
+
         if (getRenderingEngine().getRenderer("groovy") == null) {
             return null;
         }
 
-        XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, context);
-        Object prevParentClassLoader = context.get("parentclassloader");
-        try {
-            context.put("parentclassloader", pcl);
+        if (jarWikiPage != null) {
+            XWikiDocument doc = context.getWiki().getDocument(jarWikiPage, context);
+            contentAuthorController.pushContentDocument(doc);
+        }
 
-            return parseGroovyFromString(script, context);
+        try {
+            if (!getRightService().hasProgrammingRights(context)) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI,
+                                         XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED,
+                                         String.format("No programming rights on jar wiki page [%s].", jarWikiPage));
+            }
+            XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, context);
+            Object prevParentClassLoader = context.get("parentclassloader");
+            try {
+                context.put("parentclassloader", pcl);
+
+                return parseGroovyFromString(script, context);
+            } finally {
+                if (prevParentClassLoader == null) {
+                    context.remove("parentclassloader");
+                } else {
+                    context.put("parentclassloader", prevParentClassLoader);
+                }
+            }
         } finally {
-            if (prevParentClassLoader == null) {
-                context.remove("parentclassloader");
-            } else {
-                context.put("parentclassloader", prevParentClassLoader);
+            if (jarWikiPage != null) {
+                contentAuthorController.popContentDocument();
             }
         }
     }
 
     public Object parseGroovyFromPage(String fullname, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullname, context).getContent(), context);
+        return parseGroovyFromPage(fullname, null, context);
     }
 
-    public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context) throws XWikiException
+    public Object parseGroovyFromPage(String fullname, String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), jarWikiPage,
-            context);
+        ContentAuthorController contentAuthorController = Utils.getComponent(ContentAuthorController.class);
+        XWikiDocument doc = context.getWiki().getDocument(fullname, context);
+        contentAuthorController.pushContentDocument(doc);
+        try {
+            if (getRightService().hasProgrammingRights(context))
+                return parseGroovyFromString(context.getWiki().getDocument(fullname, context).getContent(),
+                                             jarWikiPage, context);
+            else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI,
+                                         XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED,
+                                         String.format("No programming rights on groovy wiki page [%s].", fullname));
+            }
+        } finally {
+            contentAuthorController.popContentDocument();
+        }
     }
 
     public String getMacroList(XWikiContext context)

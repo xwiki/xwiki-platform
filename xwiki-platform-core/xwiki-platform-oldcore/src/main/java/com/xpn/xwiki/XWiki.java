@@ -282,8 +282,6 @@ public class XWiki implements EventListener
 
     private String fullNameSQL;
 
-    private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
-
     // These are caches in order to improve finding virtual wikis
     private List<String> virtualWikiList = new ArrayList<String>();
 
@@ -4774,12 +4772,7 @@ public class XWiki implements EventListener
 
     public URLPatternMatcher getUrlPatternMatcher()
     {
-        return this.urlPatternMatcher;
-    }
-
-    public void setUrlPatternMatcher(URLPatternMatcher urlPatternMatcher)
-    {
-        this.urlPatternMatcher = urlPatternMatcher;
+        return new URLPatternMatcher();
     }
 
     public void setAuthService(XWikiAuthService authService)

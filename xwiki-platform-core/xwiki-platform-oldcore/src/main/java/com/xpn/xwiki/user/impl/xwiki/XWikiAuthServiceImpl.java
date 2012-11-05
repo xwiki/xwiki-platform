@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +36,7 @@ import org.hibernate.Session;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,7 +246,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             // Process logout (this only works with Forms)
-            if (auth.processLogout(wrappedRequest, response, xwiki.getUrlPatternMatcher())) {
+            if (auth.processLogout(wrappedRequest, response, new URLPatternMatcher())) {
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("User " + context.getUser() + " has been logged-out");
                 }

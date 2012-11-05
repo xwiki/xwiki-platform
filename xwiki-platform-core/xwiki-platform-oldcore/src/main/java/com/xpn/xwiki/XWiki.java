@@ -79,7 +79,6 @@ import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
-import org.securityfilter.filter.URLPatternMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
@@ -281,8 +280,6 @@ public class XWiki implements EventListener
     private String database;
 
     private String fullNameSQL;
-
-    private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
 
     // These are caches in order to improve finding virtual wikis
     private List<String> virtualWikiList = new ArrayList<String>();
@@ -4770,16 +4767,6 @@ public class XWiki implements EventListener
     public void setEngineContext(XWikiEngineContext engine_context)
     {
         this.engine_context = engine_context;
-    }
-
-    public URLPatternMatcher getUrlPatternMatcher()
-    {
-        return this.urlPatternMatcher;
-    }
-
-    public void setUrlPatternMatcher(URLPatternMatcher urlPatternMatcher)
-    {
-        this.urlPatternMatcher = urlPatternMatcher;
     }
 
     public void setAuthService(XWikiAuthService authService)

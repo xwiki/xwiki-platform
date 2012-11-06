@@ -258,7 +258,6 @@ public abstract class ListClass extends PropertyClass
         }
 
         List<String> list = new ArrayList<String>();
-        ((ListProperty) prop).setList(list);
 
         if (strings.length == 0) {
             return prop;
@@ -276,6 +275,10 @@ public abstract class ListClass extends PropertyClass
                 list.add(item);
             }
         }
+
+        // setList will copy the list, so this call must be made last.
+        ((ListProperty) prop).setList(list);
+
         return prop;
     }
 

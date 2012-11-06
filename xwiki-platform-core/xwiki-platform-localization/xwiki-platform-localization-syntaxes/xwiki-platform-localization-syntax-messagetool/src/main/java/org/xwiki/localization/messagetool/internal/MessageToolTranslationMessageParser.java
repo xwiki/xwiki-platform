@@ -19,22 +19,14 @@
  */
 package org.xwiki.localization.messagetool.internal;
 
-import java.io.StringReader;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.internal.message.BlockTranslationMessage;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * @version $Id$
@@ -51,11 +43,6 @@ public class MessageToolTranslationMessageParser implements TranslationMessagePa
     public static final String HINT = "messagetool/1.0";
 
     /**
-     * Used to "inline" the content parsed with plain text parser.
-     */
-    private static final ParserUtils PARSERUTILS = new ParserUtils();
-
-    /**
      * The plain text parser.
      */
     @Inject
@@ -65,31 +52,6 @@ public class MessageToolTranslationMessageParser implements TranslationMessagePa
     @Override
     public TranslationMessage parse(String messsage)
     {
-        TranslationMessage translationMessage;
-        if (messsage.contains("{0}")) {
-            translationMessage = new MessageFormatTranslationMessage(messsage, this.plainParser);
-        } else {
-            Block block;
-            try {
-                List<Block> blocks = this.plainParser.parse(new StringReader(messsage)).getChildren();
-
-                PARSERUTILS.removeTopLevelParagraph(blocks);
-
-                if (blocks.size() == 0) {
-                    block = new CompositeBlock();
-                } else if (blocks.size() == 1) {
-                    block = blocks.get(0);
-                } else {
-                    block = new CompositeBlock(blocks);
-                }
-            } catch (ParseException e) {
-                // Should never happen since plain text parser cannot fail
-                block = new CompositeBlock();
-            }
-
-            translationMessage = new BlockTranslationMessage(messsage, block);
-        }
-
-        return translationMessage;
+        return new MessageFormatTranslationMessage(messsage, this.plainParser);
     }
 }

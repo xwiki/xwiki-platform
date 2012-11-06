@@ -6,32 +6,38 @@ $response.setContentType("text/xml")
   ## Resolve the input as a user/group reference and use only the document name for matching.
   #set ($input = $services.model.resolveDocument($input).name)
 #end
+#if ($request.wiki == 'local')
+  #set ($wikiReference = $doc.documentReference.wikiReference)
+#else
+  ## We need an API to create a wiki reference.
+  #set ($wikiReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Space', 'Page').wikiReference)
+#end
 #if ($request.uorg == 'user')
   #set ($statement = 'from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or lower(user.first_name) like :input or lower(user.last_name) like :input order by user.first_name, user.last_name')
-  #set ($query = $services.query.xwql($statement).setOffset(0).setLimit(10).bindValue('input', "%$input%"))
-  #if ($request.wiki == 'local')
-    #set ($wikiReference = $doc.documentReference.wikiReference)
-  #else
-    ## We need an API to create a wiki reference.
-    #set ($wikiReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Space', 'Page').wikiReference)
-  #end
-  #set ($discard = $query.setWiki($wikiReference.name))
+  #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name))
+  #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
   #foreach($user in $query.execute())
     #set ($userReference = $services.model.resolveDocument($user, $wikiReference))
     #set ($userStringReference = $services.model.serialize($userReference, 'default'))
     #getUserAvatarURL($userReference $avatarURL 30)
     #set ($userName = $xwiki.getUserName($userStringReference, false))
-    <rs id="$escapetool.xml($userReference.name)" info="$escapetool.xml($userName)" icon="$escapetool.xml($url)">$escapetool.xml($userStringReference)</rs>
+    <rs id="$escapetool.xml($userReference.name)" info="$escapetool.xml($userName)"
+      icon="$escapetool.xml($avatarURL.url)">$escapetool.xml($userStringReference)</rs>
   #end
 #else ## groups
-  #set ($filterMap = {'name': $input})
-  #if ($request.wiki == 'local')
-    #set ($allGroups = $xwiki.rightsmanager.groupsApi.getAllMatchedLocalGroupsNames($filterMap))
-  #else
-    #set ($allGroups = $xwiki.rightsmanager.groupsApi.getAllMatchedGlobalGroupsNames($filterMap))
-  #end
-  #foreach ($group in $allGroups)
-    <rs>$group</rs>
+  #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups where lower(doc.name) like :input order by doc.name')
+  #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter("unique"))
+  #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
+  #foreach($group in $query.execute())
+    #set ($groupReference = $services.model.resolveDocument($group, $wikiReference))
+    #set ($groupStringReference = $services.model.serialize($groupReference, 'default'))
+    #getUserAvatarURL($groupReference $avatarURL 30)
+    #set ($groupName = $xwiki.getDocument($groupReference).plainTitle)
+    #if ("$!groupName" == '')
+      #set ($groupName = $groupReference.name)
+    #end
+    <rs id="$escapetool.xml($groupReference.name)" info="$escapetool.xml($groupName)"
+      icon="$escapetool.xml($avatarURL.url)">$escapetool.xml($groupStringReference)</rs>
   #end
 #end
 </results>

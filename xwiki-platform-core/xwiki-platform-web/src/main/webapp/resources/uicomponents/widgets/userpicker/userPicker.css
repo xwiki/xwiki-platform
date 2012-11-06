@@ -1,9 +1,14 @@
 #template('colorThemeInit.vm')
-input.suggestUsers {
-  background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
+input.suggestUsers, input.suggestGroups {
   background-position: .3em center;
   background-repeat: no-repeat;
   padding-left: 2em;
+}
+input.suggestUsers {
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
+}
+input.suggestGroups {
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
 }
 ul.users {
   list-style-type: none;

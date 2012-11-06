@@ -760,7 +760,6 @@
               **/objects/classes/ClassInterface.java,
               **/objects/classes/DBListClass.java,
               **/objects/classes/DBTreeListClass.java,
-              **/objects/classes/GroupsClass.java,
               **/objects/classes/LevelsClass.java,
               **/objects/classes/ListClass.java,
               **/objects/classes/ListItem.java,

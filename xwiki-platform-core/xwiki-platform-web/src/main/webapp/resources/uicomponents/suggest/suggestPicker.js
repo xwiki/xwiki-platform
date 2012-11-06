@@ -170,7 +170,8 @@ var XWiki = (function (XWiki) {
   /**
    * Remove all the accepted items when the "remove all" button is clicked.
    */
-  clearAcceptedList : function () {
+  clearAcceptedList : function (event) {
+    event.stop();
     this.list.update("");
     this.notifySelectionChange();
     this.updateListTools();

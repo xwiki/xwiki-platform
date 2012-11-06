@@ -229,14 +229,22 @@ $xwiki.getUserName("xwiki:${username}")
     #set ($avatarFileName = $profileObj.getProperty('avatar').value)
     #if ("$!avatarFileName" != '')
       #set ($avatarAttachment = $profileDoc.getAttachment($avatarFileName))
-      #if ($avatarAttachment && $avatarAttachment.isImage())
-        #set ($queryString = '')
-        #if ($size > 0)
-          #set ($queryString = "width=$size&height=$size&keepAspectRatio=true")
+    #elseif ($profileDoc.getObject('XWiki.XWikiGroups'))
+      ## Look for the first image attachment.
+      #foreach ($attachment in $profileDoc.attachmentList)
+        #if ($attachment.isImage())
+          #set ($avatarAttachment = $attachment)
+          #break
         #end
-        #set ($url = $profileDoc.getAttachmentURL($avatarAttachment.filename, 'download', $queryString))
-        #set ($specified = true)
       #end
+    #end
+    #if ($avatarAttachment && $avatarAttachment.isImage())
+      #set ($queryString = '')
+      #if ($size > 0)
+        #set ($queryString = "width=$size&height=$size&keepAspectRatio=true")
+      #end
+      #set ($url = $profileDoc.getAttachmentURL($avatarAttachment.filename, 'download', $queryString))
+      #set ($specified = true)
     #end
   #end
   #set ($return = $NULL)

@@ -43,14 +43,12 @@ var SelectionManager = Class.create(widgets.SuggestPicker, {
  */
 widgets.UserPicker = Class.create(widgets.Suggest, {
   // @Override
-  initialize: function($super, input) {
-    $super(input, {
-      script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&wiki=local&uorg=user&'),
+  initialize: function($super, input, options) {
+    $super(input, Object.extend({
       varname: "input",
-      noresults: "$msg.get('core.widgets.userPicker.noResults')",
       enableHideButton: false,
       timeout: 30000
-    });
+    }, options || {}));
     this.suggestPicker = new SelectionManager(input, this, {
       listInsertionPosition : 'before',
       acceptFreeText : true
@@ -73,11 +71,23 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
 });
 
 var init = function() {
-  $('body').select('input.suggestUsers').each(function(input) {
-    if (!input.hasClassName('initialized')) {
-      new widgets.UserPicker(input);
-      input.addClassName('initialized');
+  var suggestionsMapping = {
+    users: {
+      script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&wiki=local&uorg=user&'),
+      noresults: "$msg.get('core.widgets.userPicker.noResults')"
+    },
+    groups: {
+      script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&wiki=local&uorg=group&'),
+      noresults: "$msg.get('core.widgets.groupPicker.noResults')"
     }
+  }
+  Object.keys(suggestionsMapping).each(function(key) {
+    $('body').select('input.suggest' + key.capitalize()).each(function(input) {
+      if (!input.hasClassName('initialized')) {
+        new widgets.UserPicker(input, suggestionsMapping[key]);
+        input.addClassName('initialized');
+      }
+    });
   });
   return true;
 };

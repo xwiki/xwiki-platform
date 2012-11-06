@@ -59,8 +59,10 @@ public class UsersClass extends ListClass
     public UsersClass(PropertyMetaClass metaClass)
     {
         super("userslist", "Users List", metaClass);
+
         setSize(20);
         setDisplayType("input");
+        setPicker(true);
     }
 
     /**
@@ -90,7 +92,8 @@ public class UsersClass extends ListClass
     }
 
     /**
-     * @return {@code true} if the value of this property is stored as a list, {@code false} otherwise
+     * @return {@code true} if the list box that is used to select the users should be filled with all the available
+     *         users, {@code false} otherwise
      * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
      */
     @Deprecated
@@ -100,9 +103,11 @@ public class UsersClass extends ListClass
     }
 
     /**
-     * Sets whether the value of this property is stored as a list.
+     * Sets whether to list all the available users in the list box used to select the users. This property should not
+     * be set when the number of users is very large.
      * 
-     * @param usesList {@code true} to store the value of this property as a list, {@code false} otherwise
+     * @param usesList {@code true} to fill the list box that is used to select the users with all the available users,
+     *            {@code false} otherwise
      * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
      */
     @Deprecated

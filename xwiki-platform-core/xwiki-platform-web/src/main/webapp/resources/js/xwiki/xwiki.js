@@ -1315,8 +1315,6 @@ document.observe('xwiki:dom:loading', function() {
  * <ul>
  * <li><tt>suggestDocuments</tt> to suggest from any available document</li>
  * <li><tt>suggestSpaces</tt> to suggest space names</li>
- * <li><tt>suggestUsers</tt> to suggest from documents that contains user objects</li>
- * <li><tt>suggestGroups</tt> to suggest from documents that contains group objects</li>
  * </ul>
  */
 document.observe('xwiki:dom:loaded', function() {
@@ -1342,12 +1340,6 @@ document.observe('xwiki:dom:loaded', function() {
             resultId : "id",
             resultValue : "space",
             resultInfo : "space"
-        },
-        "groups" : {
-            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&wiki=local&uorg=group&'),
-            varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/group.png')",
-            noresults: "Group not found"
         }
     };
     var addSuggests = function(elements) {

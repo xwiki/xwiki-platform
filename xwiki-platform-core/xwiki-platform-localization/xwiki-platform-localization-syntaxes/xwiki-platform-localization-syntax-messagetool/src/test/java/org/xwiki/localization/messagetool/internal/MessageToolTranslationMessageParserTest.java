@@ -89,4 +89,15 @@ public class MessageToolTranslationMessageParserTest extends AbstractMockingComp
             new CompositeBlock(Arrays.<Block> asList(new SpecialSymbolBlock('{'), new WordBlock("0"),
                 new SpecialSymbolBlock('}'))), translationMessage.render(null, null, "word"));
     }
+    
+    @Test
+    public void messageWithChoiceSyntax() throws ComponentLookupException
+    {
+        TranslationMessage translationMessage = getMockedComponent().parse("{0,choice,0#choice1|0<choice2}");
+
+        Assert.assertEquals("{0,choice,0#choice1|0<choice2}", translationMessage.getRawSource());
+        Assert.assertEquals(new WordBlock("choice1"), translationMessage.render(null, null, 0));
+        Assert.assertEquals(new WordBlock("choice2"), translationMessage.render(null, null, 42));
+    }
+
 }

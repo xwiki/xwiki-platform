@@ -1,2 +1,1 @@
-org.xwiki.localization.internal.DefaultBundleContext
-org.xwiki.localization.internal.DefaultLocalizationManager
+org.xwiki.localization.script.internal.LocalizationScriptService

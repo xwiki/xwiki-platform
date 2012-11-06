@@ -58,6 +58,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.RegexEntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -409,7 +410,8 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         switch (scope) {
             case GLOBAL:
-                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
+                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), new WikiReference(
+                    this.xcontextProvider.get().getMainXWiki()));
                 break;
             case WIKI:
                 this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document

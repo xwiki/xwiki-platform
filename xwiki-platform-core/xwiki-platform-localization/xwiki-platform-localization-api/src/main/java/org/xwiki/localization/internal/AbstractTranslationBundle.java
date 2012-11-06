@@ -24,21 +24,21 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.xwiki.localization.Bundle;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
 
 /**
- * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>.
+ * Base class for {@link TranslationBundle} implementations. Defines the bundle priority as an <code>integer</code>.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public abstract class AbstractBundle implements Bundle
+public abstract class AbstractTranslationBundle implements TranslationBundle
 {
     /**
      * An empty bundle.
      */
-    public static final Bundle EMPTY = new AbstractBundle(null)
+    public static final TranslationBundle EMPTY = new AbstractTranslationBundle(null)
     {
         @Override
         public Translation getTranslation(String key, Locale locale)
@@ -60,14 +60,14 @@ public abstract class AbstractBundle implements Bundle
 
     /**
      * @see #getPriority()
-     * @see #compareTo(Bundle)
+     * @see #compareTo(TranslationBundle)
      */
     private int priority = DEFAULTPRIORITY;
 
     /**
      * Default constructor.
      */
-    protected AbstractBundle()
+    protected AbstractTranslationBundle()
     {
 
     }
@@ -75,7 +75,7 @@ public abstract class AbstractBundle implements Bundle
     /**
      * @param id the identifier if the bundle
      */
-    public AbstractBundle(String id)
+    public AbstractTranslationBundle(String id)
     {
         this.id = id;
     }
@@ -84,7 +84,7 @@ public abstract class AbstractBundle implements Bundle
      * @param id the identifier of the bundle
      * @param priority the priority of the bundle
      */
-    public AbstractBundle(String id, int priority)
+    public AbstractTranslationBundle(String id, int priority)
     {
         this.id = id;
         this.priority = priority;
@@ -111,7 +111,7 @@ public abstract class AbstractBundle implements Bundle
     }
 
     /**
-     * Compares two {@link Bundle}s according to their priority. If they have the same priority, use their class names
+     * Compares two {@link TranslationBundle}s according to their priority. If they have the same priority, use their class names
      * as the comparison criterion.
      * 
      * @param otherBundle The Bundle to compare to.
@@ -120,7 +120,7 @@ public abstract class AbstractBundle implements Bundle
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(Bundle otherBundle)
+    public int compareTo(TranslationBundle otherBundle)
     {
         if (getPriority() != otherBundle.getPriority()) {
             return getPriority() - otherBundle.getPriority();

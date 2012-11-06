@@ -21,7 +21,7 @@ package org.xwiki.localization.internal;
 
 import java.util.Locale;
 
-import org.xwiki.localization.Bundle;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
 
 /**
@@ -38,7 +38,7 @@ public interface LocalizedBundle
     LocalizedBundle EMPTY = new LocalizedBundle()
     {
         @Override
-        public Bundle getBundle()
+        public TranslationBundle getBundle()
         {
             return null;
         }
@@ -57,9 +57,9 @@ public interface LocalizedBundle
     };
 
     /**
-     * @return the {@link Bundle} containing this {@link LocalizedBundle}
+     * @return the {@link TranslationBundle} containing this {@link LocalizedBundle}
      */
-    Bundle getBundle();
+    TranslationBundle getBundle();
 
     /**
      * @return the {@link Locale} associated to this bundle

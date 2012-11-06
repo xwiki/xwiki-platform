@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.xwiki.localization.Bundle;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
 
 /**
@@ -32,12 +32,12 @@ import org.xwiki.localization.Translation;
  * @version $Id$
  * @since 4.3M2
  */
-public class DefaultLocalizedBundle implements LocalizedBundle
+public class DefaultLocalizedTranslationBundle implements LocalizedBundle
 {
     /**
-     * The {@link Bundle} containing this {@link LocalizedBundle}.
+     * The {@link TranslationBundle} containing this {@link LocalizedBundle}.
      */
-    private Bundle bundle;
+    private TranslationBundle bundle;
 
     /**
      * The {@link Locale} associated to this bundle.
@@ -50,16 +50,16 @@ public class DefaultLocalizedBundle implements LocalizedBundle
     private Map<String, Translation> translations = new HashMap<String, Translation>();
 
     /**
-     * @param bundle the {@link Bundle} containing this {@link LocalizedBundle}
+     * @param bundle the {@link TranslationBundle} containing this {@link LocalizedBundle}
      * @param locale the {@link Locale} associated to this bundle.
      */
-    public DefaultLocalizedBundle(Bundle bundle, Locale locale)
+    public DefaultLocalizedTranslationBundle(TranslationBundle bundle, Locale locale)
     {
         this.locale = locale;
     }
 
     @Override
-    public Bundle getBundle()
+    public TranslationBundle getBundle()
     {
         return this.bundle;
     }

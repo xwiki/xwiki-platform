@@ -33,11 +33,11 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.localization.Bundle;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.internal.AbstractBundle;
+import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.internal.AbstractTranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
-import org.xwiki.localization.wiki.internal.DefaultDocumentBundle;
+import org.xwiki.localization.wiki.internal.DefaultDocumentTranslationBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -54,9 +54,10 @@ import com.xpn.xwiki.objects.classes.ListClass;
  * @version $Id$
  * @since 4.3M2
  */
-public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventListener, DisposableCacheValue
+public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBundle implements EventListener,
+    DisposableCacheValue
 {
-    public static final String ID = XWikiPreferencesBundle.ID + ".wiki";
+    public static final String ID = XWikiPreferencesTranslationBundle.ID + ".wiki";
 
     /**
      * The name of the property containing the list of global document bundles.
@@ -82,12 +83,13 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
 
     private final String wiki;
 
-    private Map<DocumentReference, DefaultDocumentBundle> bundles =
-        new ConcurrentHashMap<DocumentReference, DefaultDocumentBundle>();
+    private Map<DocumentReference, DefaultDocumentTranslationBundle> bundles =
+        new ConcurrentHashMap<DocumentReference, DefaultDocumentTranslationBundle>();
 
-    public XWikiPreferencesWikiBundle(String wiki, ComponentManager componentManager) throws ComponentLookupException
+    public XWikiPreferencesWikiTranslationBundle(String wiki, ComponentManager componentManager)
+        throws ComponentLookupException
     {
-        super(XWikiPreferencesWikiBundle.ID + '.' + wiki);
+        super(XWikiPreferencesWikiTranslationBundle.ID + '.' + wiki);
 
         this.wiki = wiki;
 
@@ -134,14 +136,15 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
     {
         Set<DocumentReference> documents = getDocuments();
 
-        Map<DocumentReference, DefaultDocumentBundle> newBundles =
-            new LinkedHashMap<DocumentReference, DefaultDocumentBundle>(documents.size());
+        Map<DocumentReference, DefaultDocumentTranslationBundle> newBundles =
+            new LinkedHashMap<DocumentReference, DefaultDocumentTranslationBundle>(documents.size());
         for (DocumentReference document : documents) {
-            DefaultDocumentBundle documentBundle = this.bundles.get(document);
+            DefaultDocumentTranslationBundle documentBundle = this.bundles.get(document);
             if (documentBundle == null) {
                 try {
                     documentBundle =
-                        new DefaultDocumentBundle(document, this.componentManager, this.translationMessageParser);
+                        new DefaultDocumentTranslationBundle(document, this.componentManager,
+                            this.translationMessageParser);
                 } catch (ComponentLookupException e) {
                     // Should never happen
                     this.logger.error("Failed to create document bundle for document [{}]", document, e);
@@ -177,7 +180,7 @@ public class XWikiPreferencesWikiBundle extends AbstractBundle implements EventL
     @Override
     public Translation getTranslation(String key, Locale locale)
     {
-        for (Bundle bundle : this.bundles.values()) {
+        for (TranslationBundle bundle : this.bundles.values()) {
             Translation translation = bundle.getTranslation(key, locale);
             if (translation != null) {
                 return translation;

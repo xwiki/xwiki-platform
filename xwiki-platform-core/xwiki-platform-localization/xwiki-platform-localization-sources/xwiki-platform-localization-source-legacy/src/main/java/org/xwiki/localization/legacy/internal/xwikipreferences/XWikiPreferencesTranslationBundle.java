@@ -35,7 +35,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.internal.AbstractBundle;
+import org.xwiki.localization.internal.AbstractTranslationBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 
@@ -46,9 +46,9 @@ import org.xwiki.model.ModelContext;
  * @since 4.3M2
  */
 @Component
-@Named(XWikiPreferencesBundle.ID)
+@Named(XWikiPreferencesTranslationBundle.ID)
 @Singleton
-public class XWikiPreferencesBundle extends AbstractBundle implements Initializable
+public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle implements Initializable
 {
     /**
      * The identifier of the bundle.
@@ -68,7 +68,7 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
     private CacheManager cacheManager;
 
     /**
-     * Passed to {@link XWikiPreferencesWikiBundle}.
+     * Passed to {@link XWikiPreferencesWikiTranslationBundle}.
      */
     @Inject
     private ComponentManager componentManager;
@@ -76,12 +76,12 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
     /**
      * The cache of bundles by document reference.
      */
-    private Cache<XWikiPreferencesWikiBundle> bundlesCache;
+    private Cache<XWikiPreferencesWikiTranslationBundle> bundlesCache;
 
     /**
      * Default constructor.
      */
-    public XWikiPreferencesBundle()
+    public XWikiPreferencesTranslationBundle()
     {
         super(ID, 300);
     }
@@ -106,9 +106,9 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
     }
 
     /**
-     * @return the {@link XWikiPreferencesBundle} for the current wiki
+     * @return the {@link XWikiPreferencesTranslationBundle} for the current wiki
      */
-    private XWikiPreferencesWikiBundle getBundle()
+    private XWikiPreferencesWikiTranslationBundle getBundle()
     {
         String currentWiki = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
 
@@ -117,11 +117,11 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
 
     /**
      * @param wiki the wiki
-     * @return the {@link XWikiPreferencesWikiBundle} for the provided wiki
+     * @return the {@link XWikiPreferencesWikiTranslationBundle} for the provided wiki
      */
-    private XWikiPreferencesWikiBundle getBundle(String wiki)
+    private XWikiPreferencesWikiTranslationBundle getBundle(String wiki)
     {
-        XWikiPreferencesWikiBundle bundle = this.bundlesCache.get(wiki);
+        XWikiPreferencesWikiTranslationBundle bundle = this.bundlesCache.get(wiki);
         if (bundle == null) {
             try {
                 bundle = createWikiBundle(wiki);
@@ -139,8 +139,8 @@ public class XWikiPreferencesBundle extends AbstractBundle implements Initializa
      * @return the XWikiPreferencesWikiBundle for the provided wiki
      * @throws ComponentLookupException faleid to create the bundle
      */
-    private XWikiPreferencesWikiBundle createWikiBundle(String wiki) throws ComponentLookupException
+    private XWikiPreferencesWikiTranslationBundle createWikiBundle(String wiki) throws ComponentLookupException
     {
-        return new XWikiPreferencesWikiBundle(wiki, this.componentManager);
+        return new XWikiPreferencesWikiTranslationBundle(wiki, this.componentManager);
     }
 }

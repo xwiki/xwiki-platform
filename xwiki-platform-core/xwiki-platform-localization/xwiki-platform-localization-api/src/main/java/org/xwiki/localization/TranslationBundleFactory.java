@@ -19,28 +19,23 @@
  */
 package org.xwiki.localization;
 
-import java.util.Collection;
-
 import org.xwiki.component.annotation.Role;
 
 /**
- * The Bundles applying to the current context ordered by priority.
+ * Creates bundles.
  * 
  * @version $Id$
  * @since 4.3M2
  */
 @Role
-public interface BundleContext
+public interface TranslationBundleFactory
 {
     /**
-     * @return the bundles applying to the current context ordered by priority
-     */
-    Collection<Bundle> getBundles();
-
-    /**
-     * Add a new bundle to the collection. It will be automatically ordered.
+     * Get the {@link TranslationBundle} associated to the passed identifier.
      * 
-     * @param bundle the bundle
+     * @param bundleId the bundle identifier
+     * @return the {@link TranslationBundle}
+     * @throws TranslationBundleDoesNotExistsException could not create a Bundle for the passed bundle
      */
-    void addBundle(Bundle bundle);
+    TranslationBundle getBundle(String bundleId) throws TranslationBundleDoesNotExistsException;
 }

@@ -222,7 +222,7 @@ public class XWikiMessageTool
 
                     translation = wikiprinter.toString();
                 } catch (ComponentLookupException e) {
-                    LOGGER.debug("Failed to find a plain text parser", e);
+                    LOGGER.debug("Failed to find a plain text renderer", e);
 
                     translation = key;
                 }

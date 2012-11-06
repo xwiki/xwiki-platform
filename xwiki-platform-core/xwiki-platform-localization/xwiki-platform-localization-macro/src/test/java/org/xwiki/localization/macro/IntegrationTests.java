@@ -26,7 +26,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
-import org.xwiki.localization.Bundle;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -93,7 +93,7 @@ public class IntegrationTests
                     }
 
                     @Override
-                    public Bundle getBundle()
+                    public TranslationBundle getBundle()
                     {
                         return null;
                     }
@@ -134,7 +134,7 @@ public class IntegrationTests
                     }
 
                     @Override
-                    public Bundle getBundle()
+                    public TranslationBundle getBundle()
                     {
                         return null;
                     }

@@ -37,10 +37,10 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.localization.Bundle;
-import org.xwiki.localization.BundleContext;
-import org.xwiki.localization.internal.AbstractCachedBundle;
-import org.xwiki.localization.internal.DefaultLocalizedBundle;
+import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.TranslationBundleContext;
+import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
+import org.xwiki.localization.internal.DefaultLocalizedTranslationBundle;
 import org.xwiki.localization.internal.DefaultTranslation;
 import org.xwiki.localization.internal.LocalizedBundle;
 import org.xwiki.localization.message.TranslationMessage;
@@ -55,13 +55,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Base class for {@link Bundle}s using wiki documents as resources. Provides methods for loading properties from
+ * Base class for {@link TranslationBundle}s using wiki documents as resources. Provides methods for loading properties from
  * documents, watching loaded documents and invalidating cached translations.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public abstract class AbstractDocumentBundle extends AbstractCachedBundle implements Bundle, DisposableCacheValue,
+public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements TranslationBundle, DisposableCacheValue,
     Disposable
 {
     /**
@@ -70,7 +70,7 @@ public abstract class AbstractDocumentBundle extends AbstractCachedBundle implem
     public static final String ID_PREFIX = "document:";
 
     @Inject
-    protected BundleContext bundleContext;
+    protected TranslationBundleContext bundleContext;
 
     @Inject
     protected EntityReferenceSerializer<String> serializer;
@@ -110,10 +110,10 @@ public abstract class AbstractDocumentBundle extends AbstractCachedBundle implem
 
     protected DocumentReference documentReference;
 
-    public AbstractDocumentBundle(DocumentReference reference, ComponentManager componentManager,
+    public AbstractDocumentTranslationBundle(DocumentReference reference, ComponentManager componentManager,
         TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
-        this.bundleContext = componentManager.getInstance(BundleContext.class);
+        this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.contextProvider =
             componentManager.getInstance(new DefaultParameterizedType(null, Provider.class,
@@ -166,7 +166,7 @@ public abstract class AbstractDocumentBundle extends AbstractCachedBundle implem
         properties.load(new StringReader(content));
 
         // Convert to LocalBundle
-        DefaultLocalizedBundle localeBundle = new DefaultLocalizedBundle(this, locale);
+        DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);
 
         TranslationMessageParser parser = getTranslationMessageParser();
 

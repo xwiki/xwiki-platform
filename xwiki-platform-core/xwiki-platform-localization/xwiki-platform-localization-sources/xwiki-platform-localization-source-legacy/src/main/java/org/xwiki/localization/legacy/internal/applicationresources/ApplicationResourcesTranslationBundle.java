@@ -17,38 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal.message;
+package org.xwiki.localization.legacy.internal.applicationresources;
 
-import java.util.Collection;
-import java.util.Locale;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.localization.TranslationBundle;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.internal.AbstractResourceTranslationBundle;
+import org.xwiki.localization.message.TranslationMessageParser;
 
 /**
- * A static {@link Block} returned as it is without any modification.
+ * Translation bundle based on ApplicationResources*.properties files.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public class BlockTranslationMessageElement implements TranslationMessageElement
+@Component
+@Singleton
+@Named("resource:ApplicationResources")
+public class ApplicationResourcesTranslationBundle extends AbstractResourceTranslationBundle
 {
     /**
-     * The {@link Block} to return.
+     * The parser to use for each message.
      */
-    private Block block;
+    @Inject
+    @Named("messagetool/1.0")
+    private TranslationMessageParser parser;
 
     /**
-     * @param block the {@link Block} to return
+     * Default constructor.
      */
-    public BlockTranslationMessageElement(Block block)
+    public ApplicationResourcesTranslationBundle()
     {
-        this.block = block;
+        super("ApplicationResources", ApplicationResourcesTranslationBundle.class.getClassLoader());
     }
 
     @Override
-    public Block render(Locale locale, Collection<TranslationBundle> bundles, Object... parameters)
+    protected TranslationMessageParser getTranslationMessageParser()
     {
-        return this.block.clone();
+        return this.parser;
     }
 }

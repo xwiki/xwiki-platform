@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import org.xwiki.localization.Bundle;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -65,7 +65,7 @@ public class ParameterTranslationMessageElement implements TranslationMessageEle
     }
 
     @Override
-    public Block render(Locale locale, Collection<Bundle> bundles, Object... parameters)
+    public Block render(Locale locale, Collection<TranslationBundle> bundles, Object... parameters)
     {
         Object parameter = parameters[index];
 

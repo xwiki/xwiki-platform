@@ -27,11 +27,11 @@ import org.xwiki.model.reference.DocumentReference;
 /**
  * Wiki document based implementation of Bundle.
  * 
- * @see AbstractDocumentBundle
+ * @see AbstractDocumentTranslationBundle
  * @version $Id$
  * @since 4.3M2
  */
-public class DefaultDocumentBundle extends AbstractDocumentBundle
+public class DefaultDocumentTranslationBundle extends AbstractDocumentTranslationBundle
 {
     /**
      * @param documentReference the document reference
@@ -39,7 +39,7 @@ public class DefaultDocumentBundle extends AbstractDocumentBundle
      * @param translationMessageParser the parser to use for each message
      * @throws ComponentLookupException failed to lookup some required components
      */
-    public DefaultDocumentBundle(DocumentReference documentReference, ComponentManager componentManager,
+    public DefaultDocumentTranslationBundle(DocumentReference documentReference, ComponentManager componentManager,
         TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
         super(documentReference, componentManager, translationMessageParser);

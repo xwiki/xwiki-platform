@@ -21,6 +21,7 @@ package org.xwiki.localization.script.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -109,10 +110,12 @@ public class LocalizationScriptService implements ScriptService
     {
         String result = null;
 
-        Translation translation = this.localization.getTranslation(key, this.localizationContext.getCurrentLocale());
+        Locale currentLocale = this.localizationContext.getCurrentLocale();
+
+        Translation translation = this.localization.getTranslation(key, currentLocale);
 
         if (translation != null) {
-            Block block = translation.render(parameters);
+            Block block = translation.render(currentLocale, parameters.toArray());
 
             // Render the block
 
@@ -126,6 +129,7 @@ public class LocalizationScriptService implements ScriptService
                 result = wikiPrinter.toString();
             } catch (ComponentLookupException e) {
                 // TODO set current error
+                block = null;
             }
         } else {
             result = key;

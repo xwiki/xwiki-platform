@@ -95,8 +95,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            **/AbstractDocumentBundle.java,
-            **/DocumentBundleFactory.java
+            **/AbstractDocumentTranslationBundle.java,
+            **/DocumentTranslationBundleFactory.java
           </excludes>
         </configuration>
       </plugin>

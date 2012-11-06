@@ -17,45 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.legacy.internal.applicationresources;
+package org.xwiki.localization;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Collection;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.internal.AbstractResourceBundle;
-import org.xwiki.localization.message.TranslationMessageParser;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Translation bundle based on ApplicationResources*.properties files.
+ * The Bundles applying to the current context ordered by priority.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-@Component
-@Singleton
-@Named("resource:ApplicationResources")
-public class ApplicationResourcesBundle extends AbstractResourceBundle
+@Role
+public interface TranslationBundleContext
 {
     /**
-     * The parser to use for each message.
+     * @return the bundles applying to the current context ordered by priority
      */
-    @Inject
-    @Named("messagetool/1.0")
-    private TranslationMessageParser parser;
+    Collection<TranslationBundle> getBundles();
 
     /**
-     * Default constructor.
+     * Add a new bundle to the collection. It will be automatically ordered.
+     * 
+     * @param bundle the bundle
      */
-    public ApplicationResourcesBundle()
-    {
-        super("ApplicationResources", ApplicationResourcesBundle.class.getClassLoader());
-    }
-
-    @Override
-    protected TranslationMessageParser getTranslationMessageParser()
-    {
-        return this.parser;
-    }
+    void addBundle(TranslationBundle bundle);
 }

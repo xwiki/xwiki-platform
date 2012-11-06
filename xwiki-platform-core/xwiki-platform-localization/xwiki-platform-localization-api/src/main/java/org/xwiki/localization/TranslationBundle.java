@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
  * @since 4.3M2
  */
 @Role
-public interface Bundle extends Comparable<Bundle>
+public interface TranslationBundle extends Comparable<TranslationBundle>
 {
     /**
      * The default priority of a Bundle.
@@ -48,7 +48,7 @@ public interface Bundle extends Comparable<Bundle>
      * smaller priority value will be searched before a bundle with a higher value.
      * 
      * @return the priority
-     * @see #compareTo(Bundle)
+     * @see #compareTo(TranslationBundle)
      */
     int getPriority();
 

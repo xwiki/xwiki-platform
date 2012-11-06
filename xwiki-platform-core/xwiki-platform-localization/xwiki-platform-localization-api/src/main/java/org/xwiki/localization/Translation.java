@@ -24,7 +24,7 @@ import java.util.Locale;
 import org.xwiki.rendering.block.Block;
 
 /**
- * A translation is a specific {@link Locale} and {@link Bundle}.
+ * A translation is a specific {@link Locale} and {@link TranslationBundle}.
  * 
  * @version $Id$
  * @since 4.3M2
@@ -34,7 +34,7 @@ public interface Translation
     /**
      * @return the bundle from which this translation comes
      */
-    Bundle getBundle();
+    TranslationBundle getBundle();
 
     /**
      * @return the locale of the translation
@@ -55,7 +55,7 @@ public interface Translation
      * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an
      * XDOM or to render as it is.
      * <p>
-     * The variables are resolved using the current {@link BundleContext} bundles.
+     * The variables are resolved using the current {@link TranslationBundleContext} bundles.
      * 
      * @param parameters the parameters
      * @return the result translation
@@ -66,7 +66,7 @@ public interface Translation
      * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an
      * XDOM or to render as it is.
      * <p>
-     * The variables are resolved using the current {@link BundleContext} bundles.
+     * The variables are resolved using the current {@link TranslationBundleContext} bundles.
      * 
      * @param locale the locale for which this translation is rendered
      * @param parameters the parameters

@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.BundleFactory;
+import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -41,9 +41,9 @@ import org.xwiki.observation.event.Event;
  * @since 4.3M2
  */
 @Component
-@Named(DocumentBundleInitializer.NAME)
+@Named(DocumentTranslationBundleInitializer.NAME)
 @Singleton
-public class DocumentBundleInitializer implements EventListener
+public class DocumentTranslationBundleInitializer implements EventListener
 {
     /**
      * The name of the event listener.
@@ -61,7 +61,7 @@ public class DocumentBundleInitializer implements EventListener
      */
     @Inject
     @Named("document")
-    private Provider<BundleFactory> bundleFactoryProvider;
+    private Provider<TranslationBundleFactory> bundleFactoryProvider;
 
     /**
      * Used to log issues.

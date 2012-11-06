@@ -27,12 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.localization.Translation;
 
 /**
- * Extends {@link AbstractBundle} and add {@link Locale} based cache management.
+ * Extends {@link AbstractTranslationBundle} and add {@link Locale} based cache management.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public abstract class AbstractCachedBundle extends AbstractBundle
+public abstract class AbstractCachedTranslationBundle extends AbstractTranslationBundle
 {
     /**
      * The bundle cache.
@@ -42,14 +42,14 @@ public abstract class AbstractCachedBundle extends AbstractBundle
     /**
      * Default constructor.
      */
-    protected AbstractCachedBundle()
+    protected AbstractCachedTranslationBundle()
     {
     }
 
     /**
      * @param id the identifier of the bundle
      */
-    public AbstractCachedBundle(String id)
+    public AbstractCachedTranslationBundle(String id)
     {
         super(id);
     }
@@ -58,7 +58,7 @@ public abstract class AbstractCachedBundle extends AbstractBundle
      * @param id the identifier of the bundle
      * @param priority the priority of the bundle
      */
-    public AbstractCachedBundle(String id, int priority)
+    public AbstractCachedTranslationBundle(String id, int priority)
     {
         super(id, priority);
     }

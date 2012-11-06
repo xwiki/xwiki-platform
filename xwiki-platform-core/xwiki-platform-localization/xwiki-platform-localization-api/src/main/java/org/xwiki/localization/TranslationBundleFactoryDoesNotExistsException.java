@@ -25,7 +25,7 @@ package org.xwiki.localization;
  * @version $Id$
  * @since 4.3M2
  */
-public class BundleFactoryDoesNotExistsException extends LocalizationException
+public class TranslationBundleFactoryDoesNotExistsException extends LocalizationException
 {
     /**
      * Serialization identifier.
@@ -38,7 +38,7 @@ public class BundleFactoryDoesNotExistsException extends LocalizationException
      * 
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
-    public BundleFactoryDoesNotExistsException(String message)
+    public TranslationBundleFactoryDoesNotExistsException(String message)
     {
         super(message);
     }
@@ -50,7 +50,7 @@ public class BundleFactoryDoesNotExistsException extends LocalizationException
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
      *            permitted, and indicates that the cause is nonexistent or unknown
      */
-    public BundleFactoryDoesNotExistsException(String message, Throwable cause)
+    public TranslationBundleFactoryDoesNotExistsException(String message, Throwable cause)
     {
         super(message, cause);
     }

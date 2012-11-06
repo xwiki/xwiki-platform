@@ -19,7 +19,7 @@
  */
 package org.xwiki.localization.internal;
 
-import org.xwiki.localization.BundleContext;
+import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.message.TranslationMessage;
 
 /**
@@ -36,7 +36,7 @@ public class DefaultTranslation extends AbstractTranslation
      * @param key the key associated to the translation
      * @param message the actual translation message
      */
-    public DefaultTranslation(BundleContext context, LocalizedBundle localeBundle, String key,
+    public DefaultTranslation(TranslationBundleContext context, LocalizedBundle localeBundle, String key,
         TranslationMessage message)
     {
         super(context, localeBundle, key, message);

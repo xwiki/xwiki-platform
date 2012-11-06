@@ -22,8 +22,8 @@ package org.xwiki.localization.internal;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.xwiki.localization.Bundle;
-import org.xwiki.localization.BundleContext;
+import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
@@ -39,7 +39,7 @@ public abstract class AbstractTranslation implements Translation
     /**
      * Used to resolve variables.
      */
-    private BundleContext context;
+    private TranslationBundleContext context;
 
     /**
      * The bundle containing the translation.
@@ -62,7 +62,7 @@ public abstract class AbstractTranslation implements Translation
      * @param key the key associated to the translation
      * @param message the actual translation message
      */
-    public AbstractTranslation(BundleContext context, LocalizedBundle localeBundle, String key,
+    public AbstractTranslation(TranslationBundleContext context, LocalizedBundle localeBundle, String key,
         TranslationMessage message)
     {
         this.context = context;
@@ -72,7 +72,7 @@ public abstract class AbstractTranslation implements Translation
     }
 
     @Override
-    public Bundle getBundle()
+    public TranslationBundle getBundle()
     {
         return this.localeBundle.getBundle();
     }
@@ -100,7 +100,7 @@ public abstract class AbstractTranslation implements Translation
     /**
      * @return the bundle to search other translations
      */
-    private Collection<Bundle> getCurrentBundles()
+    private Collection<TranslationBundle> getCurrentBundles()
     {
         return this.context != null ? this.context.getBundles() : null;
     }

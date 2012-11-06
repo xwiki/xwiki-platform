@@ -89,7 +89,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            **/XWikiPreferencesWikiBundle.java
+            **/XWikiPreferencesWikiTranslationBundle.java
           </excludes>
         </configuration>
       </plugin>

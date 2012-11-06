@@ -22,7 +22,7 @@ package org.xwiki.localization.internal.message;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.xwiki.localization.Bundle;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.rendering.block.Block;
 
 /**
@@ -42,5 +42,5 @@ public interface TranslationMessageElement
      * @param parameters the parameters
      * @return the result translation
      */
-    Block render(Locale locale, Collection<Bundle> bundles, Object... parameters);
+    Block render(Locale locale, Collection<TranslationBundle> bundles, Object... parameters);
 }

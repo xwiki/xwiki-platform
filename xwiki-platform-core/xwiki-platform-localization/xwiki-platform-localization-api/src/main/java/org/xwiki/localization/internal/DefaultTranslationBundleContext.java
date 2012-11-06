@@ -33,18 +33,18 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.localization.Bundle;
-import org.xwiki.localization.BundleContext;
+import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.TranslationBundleContext;
 
 /**
- * Default implementation of {@link BundleContext}.
+ * Default implementation of {@link TranslationBundleContext}.
  * 
  * @version $Id$
  * @since 4.3M2
  */
 @Component
 @Singleton
-public class DefaultBundleContext implements BundleContext
+public class DefaultTranslationBundleContext implements TranslationBundleContext
 {
     /**
      * The key associated to the list of bundles in the {@link ExecutionContext}.
@@ -73,16 +73,18 @@ public class DefaultBundleContext implements BundleContext
     /**
      * @return the current bundles
      */
-    private PriorityQueue<Bundle> initializeContextBundle()
+    private PriorityQueue<TranslationBundle> initializeContextBundle()
     {
-        PriorityQueue<Bundle> bundles;
+        PriorityQueue<TranslationBundle> bundles;
 
         try {
-            bundles = new PriorityQueue<Bundle>(this.componentManager.get().<Bundle> getInstanceList(Bundle.class));
+            bundles =
+                new PriorityQueue<TranslationBundle>(this.componentManager.get().<TranslationBundle> getInstanceList(
+                    TranslationBundle.class));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to lookup Bundle components", e);
 
-            bundles = new PriorityQueue<Bundle>();
+            bundles = new PriorityQueue<TranslationBundle>();
         }
 
         return bundles;
@@ -91,13 +93,13 @@ public class DefaultBundleContext implements BundleContext
     /**
      * @return the current bundles
      */
-    private PriorityQueue<Bundle> getBundlesInternal()
+    private PriorityQueue<TranslationBundle> getBundlesInternal()
     {
-        PriorityQueue<Bundle> bundles;
+        PriorityQueue<TranslationBundle> bundles;
 
         ExecutionContext context = this.execution.getContext();
         if (context != null) {
-            bundles = (PriorityQueue<Bundle>) context.getProperty(CKEY_BUNDLES);
+            bundles = (PriorityQueue<TranslationBundle>) context.getProperty(CKEY_BUNDLES);
 
             if (bundles == null) {
                 bundles = initializeContextBundle();
@@ -110,13 +112,13 @@ public class DefaultBundleContext implements BundleContext
     }
 
     @Override
-    public Collection<Bundle> getBundles()
+    public Collection<TranslationBundle> getBundles()
     {
         return getBundlesInternal();
     }
 
     @Override
-    public void addBundle(Bundle bundle)
+    public void addBundle(TranslationBundle bundle)
     {
         getBundlesInternal().add(bundle);
     }

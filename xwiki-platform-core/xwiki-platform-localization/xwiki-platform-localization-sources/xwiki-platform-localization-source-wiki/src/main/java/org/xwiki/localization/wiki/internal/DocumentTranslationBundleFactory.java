@@ -48,9 +48,9 @@ import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.localization.Bundle;
-import org.xwiki.localization.BundleDoesNotExistsException;
-import org.xwiki.localization.BundleFactory;
+import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.TranslationBundleDoesNotExistsException;
+import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.EntityType;
@@ -85,7 +85,7 @@ import com.xpn.xwiki.objects.StringProperty;
 @Component
 @Named("document")
 @Singleton
-public class DocumentBundleFactory implements BundleFactory, Initializable, Disposable
+public class DocumentTranslationBundleFactory implements TranslationBundleFactory, Initializable, Disposable
 {
     private static final RegexEntityReference TRANSLATIONOBJET = new RegexEntityReference(Pattern.compile("[^:]+:"
         + TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
@@ -132,7 +132,7 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
     @Inject
     private AuthorizationManager authorizationManager;
 
-    private Cache<Bundle> bundlesCache;
+    private Cache<TranslationBundle> bundlesCache;
 
     private EventListener listener = new EventListener()
     {
@@ -224,29 +224,32 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
     }
 
     @Override
-    public Bundle getBundle(String bundleId) throws BundleDoesNotExistsException
+    public TranslationBundle getBundle(String bundleId) throws TranslationBundleDoesNotExistsException
     {
         try {
-            return this.componentManager.getInstance(Bundle.class, AbstractDocumentBundle.ID_PREFIX + bundleId);
+            return this.componentManager.getInstance(TranslationBundle.class,
+                AbstractDocumentTranslationBundle.ID_PREFIX + bundleId);
         } catch (ComponentLookupException e) {
-            this.logger.debug("Failed to lookup component [{}] with hint [{}].", Bundle.class, bundleId, e);
+            this.logger.debug("Failed to lookup component [{}] with hint [{}].", TranslationBundle.class, bundleId, e);
         }
 
-        if (bundleId.startsWith(AbstractDocumentBundle.ID_PREFIX)) {
-            String referenceString = bundleId.substring(AbstractDocumentBundle.ID_PREFIX.length());
+        if (bundleId.startsWith(AbstractDocumentTranslationBundle.ID_PREFIX)) {
+            String referenceString = bundleId.substring(AbstractDocumentTranslationBundle.ID_PREFIX.length());
 
             return getDocumentBundle(this.currentResolver.resolve(referenceString));
         }
 
-        throw new BundleDoesNotExistsException(String.format(
-            "Unsupported bundle identifier [%s]. Should start with [%s]", bundleId, AbstractDocumentBundle.ID_PREFIX));
+        throw new TranslationBundleDoesNotExistsException(String.format(
+            "Unsupported bundle identifier [%s]. Should start with [%s]", bundleId,
+            AbstractDocumentTranslationBundle.ID_PREFIX));
     }
 
-    private Bundle getDocumentBundle(DocumentReference documentReference) throws BundleDoesNotExistsException
+    private TranslationBundle getDocumentBundle(DocumentReference documentReference)
+        throws TranslationBundleDoesNotExistsException
     {
         String uid = this.uidSerializer.serialize(documentReference);
 
-        Bundle bundle = this.bundlesCache.get(uid);
+        TranslationBundle bundle = this.bundlesCache.get(uid);
         if (bundle == null) {
             synchronized (this.bundlesCache) {
                 bundle = this.bundlesCache.get(uid);
@@ -259,8 +262,8 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         return bundle;
     }
 
-    private DefaultDocumentBundle createDocumentBundle(DocumentReference documentReference)
-        throws BundleDoesNotExistsException
+    private DefaultDocumentTranslationBundle createDocumentBundle(DocumentReference documentReference)
+        throws TranslationBundleDoesNotExistsException
     {
         XWikiContext context = this.xcontextProvider.get();
 
@@ -268,31 +271,34 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         try {
             document = context.getWiki().getDocument(documentReference, context);
         } catch (XWikiException e) {
-            throw new BundleDoesNotExistsException("Failed to get translation document", e);
+            throw new TranslationBundleDoesNotExistsException("Failed to get translation document", e);
         }
 
         if (document.isNew()) {
-            throw new BundleDoesNotExistsException(String.format("Document [%s] does not exists", documentReference));
+            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exists",
+                documentReference));
         }
 
         return createDocumentBundle(document);
     }
 
-    private DefaultDocumentBundle createDocumentBundle(XWikiDocument document) throws BundleDoesNotExistsException
+    private DefaultDocumentTranslationBundle createDocumentBundle(XWikiDocument document)
+        throws TranslationBundleDoesNotExistsException
     {
         BaseObject translationObject = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
 
         if (translationObject == null) {
-            throw new BundleDoesNotExistsException(String.format("[%s] is not a translation document", document));
+            throw new TranslationBundleDoesNotExistsException(String.format("[%s] is not a translation document",
+                document));
         }
 
-        DefaultDocumentBundle documentBundle;
+        DefaultDocumentTranslationBundle documentBundle;
         try {
             documentBundle =
-                new DefaultDocumentBundle(document.getDocumentReference(), this.componentManager,
+                new DefaultDocumentTranslationBundle(document.getDocumentReference(), this.componentManager,
                     this.translationParser);
         } catch (ComponentLookupException e) {
-            throw new BundleDoesNotExistsException("Failed to create document bundle", e);
+            throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
         }
 
         return documentBundle;
@@ -340,7 +346,8 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
     private Scope getScope(BaseObject obj)
     {
         if (obj != null) {
-            StringProperty scopeProperty = (StringProperty) obj.getField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE);
+            StringProperty scopeProperty =
+                (StringProperty) obj.getField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE);
 
             if (scopeProperty != null) {
                 String scopeString = scopeProperty.getValue();
@@ -360,7 +367,8 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         Scope scope = getScope(document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE));
 
         if (scope != null) {
-            ComponentDescriptor<Bundle> descriptor = createComponentDescriptor(document.getDocumentReference());
+            ComponentDescriptor<TranslationBundle> descriptor =
+                createComponentDescriptor(document.getDocumentReference());
 
             getComponentManager(document, scope, true).unregisterComponent(descriptor);
         }
@@ -368,12 +376,13 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
 
     /**
      * @param document the translation document
-     * @throws BundleDoesNotExistsException when no translation bundle could be created from the provided document
+     * @throws TranslationBundleDoesNotExistsException when no translation bundle could be created from the provided
+     *             document
      * @throws ComponentRepositoryException when the actual registration of the document bundle failed
      * @throws AccessDeniedException when the document author does not have enough right to register the translation
      *             bundle
      */
-    private void registerTranslationBundle(XWikiDocument document) throws BundleDoesNotExistsException,
+    private void registerTranslationBundle(XWikiDocument document) throws TranslationBundleDoesNotExistsException,
         ComponentRepositoryException, AccessDeniedException
     {
         Scope scope = getScope(document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE));
@@ -381,9 +390,10 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
         if (scope != null) {
             checkRegistrationAuthorization(document, scope);
 
-            DefaultDocumentBundle bundle = createDocumentBundle(document);
+            DefaultDocumentTranslationBundle bundle = createDocumentBundle(document);
 
-            ComponentDescriptor<Bundle> descriptor = createComponentDescriptor(document.getDocumentReference());
+            ComponentDescriptor<TranslationBundle> descriptor =
+                createComponentDescriptor(document.getDocumentReference());
 
             getComponentManager(document, scope, true).registerComponent(descriptor, bundle);
         }
@@ -414,14 +424,15 @@ public class DocumentBundleFactory implements BundleFactory, Initializable, Disp
      * @param documentReference the translation document reference
      * @return the component descriptor to use to register/unregister the translation bundle
      */
-    private ComponentDescriptor<Bundle> createComponentDescriptor(DocumentReference documentReference)
+    private ComponentDescriptor<TranslationBundle> createComponentDescriptor(DocumentReference documentReference)
     {
-        DefaultComponentDescriptor<Bundle> descriptor = new DefaultComponentDescriptor<Bundle>();
+        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
 
-        descriptor.setImplementation(DefaultDocumentBundle.class);
+        descriptor.setImplementation(DefaultDocumentTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-        descriptor.setRoleHint(AbstractDocumentBundle.ID_PREFIX + this.serializer.serialize(documentReference));
-        descriptor.setRoleType(Bundle.class);
+        descriptor.setRoleHint(AbstractDocumentTranslationBundle.ID_PREFIX
+            + this.serializer.serialize(documentReference));
+        descriptor.setRoleType(TranslationBundle.class);
 
         return descriptor;
     }

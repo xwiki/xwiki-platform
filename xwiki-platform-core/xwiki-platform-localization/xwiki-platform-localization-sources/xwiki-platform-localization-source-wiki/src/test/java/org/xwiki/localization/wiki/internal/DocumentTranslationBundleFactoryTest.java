@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.localization.BundleFactory;
+import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
@@ -55,7 +55,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
-public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
+public class DocumentTranslationBundleFactoryTest extends AbstractBridgedComponentTestCase
 {
     private XWiki mockXWiki;
 
@@ -253,7 +253,7 @@ public class DocumentBundleFactoryTest extends AbstractBridgedComponentTestCase
         this.observation = getComponentManager().getInstance(ObservationManager.class);
 
         // Initialiaze document bundle factory
-        getComponentManager().getInstance(BundleFactory.class, "document");
+        getComponentManager().getInstance(TranslationBundleFactory.class, "document");
 
         this.localization = getComponentManager().getInstance(LocalizationManager.class);
     }

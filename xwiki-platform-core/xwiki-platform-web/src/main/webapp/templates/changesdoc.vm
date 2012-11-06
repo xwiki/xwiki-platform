@@ -50,7 +50,7 @@ $escapedChunk##
 
 #macro(displayPropertyChange $diff $propertyDisplay)
   <dt>$propertyDisplay</dt>
-  #if ("$!diff.propType" == 'TextAreaClass')
+  #if ("$!diff.propType" == 'TextArea')
     <dd>#unifiedDiff($diff.prevValue $diff.newValue)</dd>
   #else
     <dd>#inlineDiff($diff.prevValue $diff.newValue)</dd>

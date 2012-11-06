@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
@@ -209,11 +210,8 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
                 // Document translations
                 List<String> translatedLanguages = document.getTranslationList(context);
                 for (String translatedLanguage : translatedLanguages) {
-                    // Avoiding the Locale constructor because of the checkstyle bug that includes java.lang.* in the
-                    // class fan out complexity computation.
                     DocumentReference translatedDocumentReference =
-                        new DocumentReference(documentReference.getWikiReference().getName(), documentReference
-                            .getLastSpaceReference().getName(), documentReference.getName(), translatedLanguage);
+                        new DocumentReference(documentReference, new Locale(translatedLanguage));
                     result.add(translatedDocumentReference);
                 }
 

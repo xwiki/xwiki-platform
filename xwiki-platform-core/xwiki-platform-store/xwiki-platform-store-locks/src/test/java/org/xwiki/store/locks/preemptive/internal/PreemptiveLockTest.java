@@ -22,6 +22,7 @@ package org.xwiki.store.locks.preemptive.internal;
 import java.util.concurrent.locks.Lock;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -30,6 +31,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 3.1M2
  */
+@Ignore("See http://jira.xwiki.org/browse/XWIKI-8403")
 public class PreemptiveLockTest
 {
     private int aliceState;

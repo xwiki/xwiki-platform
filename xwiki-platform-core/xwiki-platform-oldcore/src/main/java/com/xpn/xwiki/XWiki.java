@@ -393,6 +393,8 @@ public class XWiki implements EventListener
                         InputStream xwikicfgis = XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);
                         xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                         econtext.setAttribute(xwikiname, xwiki);
+                    } else {
+                        return xwiki;
                     }
                 }
 

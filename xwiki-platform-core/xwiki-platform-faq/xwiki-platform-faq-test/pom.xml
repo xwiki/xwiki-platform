@@ -41,8 +41,6 @@
   </properties>
   <modules>
     <module>xwiki-platform-faq-test-pageobjects</module>
-    <!-- Temporarily removed
     <module>xwiki-platform-faq-test-tests</module>
-    -->
   </modules>
 </project>

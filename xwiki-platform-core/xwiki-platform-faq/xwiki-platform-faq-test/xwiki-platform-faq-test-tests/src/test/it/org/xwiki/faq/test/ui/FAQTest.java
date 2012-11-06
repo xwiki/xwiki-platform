@@ -21,15 +21,12 @@ package org.xwiki.faq.test.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.xwiki.faq.test.po.FAQEntryEditPage;
 import org.xwiki.faq.test.po.FAQHomePage;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import junit.framework.Assert;
 
@@ -53,17 +50,6 @@ public class FAQTest extends AbstractTest
 
         // Delete pages that we create in the test
         getUtil().deletePage(getTestClassName(), FAQ_TEST_PAGE);
-
-        // Register the FAQCode.Translations as a Document Resource Bundle
-        // TODO: Remove this once we have the new l10n module since it won't be necessary anymore :)
-        // We need to add an XWikiPreferences XObject since it's not created by default.
-        ObjectEditPage oep = ObjectEditPage.gotoPage("XWiki", "XWikiPreferences");
-        // Remove all objects so that we can run this test several times in a row without failing
-        oep.removeAllObjects("XWiki.XWikiPreferences");
-        FormElement fe = oep.addObject("XWiki.XWikiPreferences");
-        fe.setFieldValue(By.id("XWiki.XWikiPreferences_0_documentBundles"), "FAQCode.Translations");
-
-        oep.clickSaveAndContinue();
     }
 
     @Test

@@ -161,6 +161,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                         for (String wiki : wikis) {
                             writer.deleteDocuments(new Term(IndexFields.DOCUMENT_WIKI, wiki));
                         }
+                        writer.close();
                     } catch (IOException ex) {
                         LOGGER.warn("Failed to clean wiki index: {}", ex.getMessage());
                     }

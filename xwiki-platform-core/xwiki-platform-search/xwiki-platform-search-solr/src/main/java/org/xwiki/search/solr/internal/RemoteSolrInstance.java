@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,24 +16,39 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.search.solr.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-query</artifactId>
-  <name>XWiki Platform - Query - Parent POM</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-query-jpql-parser</module>
-    <module>xwiki-platform-query-manager</module>
-    <module>xwiki-platform-query-xwql</module>
-    <module>xwiki-platform-query-solr</module>
-  </modules>
-</project>
+import javax.inject.Named;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.InitializationException;
+
+/**
+ * Remote Solr instance communicating over HTTP.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("remote")
+@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+public class RemoteSolrInstance extends AbstractSolrInstance
+{
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void shutDown()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+}

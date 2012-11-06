@@ -139,7 +139,8 @@ VCqXewBi/BXOyufyViaTaZmcnKJ4vMMWM0dkY3XVZkTBT1lWFGroos9C2TUtR2Eg2IH7in7MKdpB
 +rFg7z+RSEssGo1uBcE5I0bsM8/rlgHcB1DUwQeHvrBr1+4hpyD/sbw8pzsKICYtKusiABiaVz2N
 pKyvSOgV+CUHeuUKBJ2ISgAyrvNSLPmQogRsywc6h7WjnuCbwJW4lCSTFZlf9Xi6gd8segC+Jey/
 hN2Ebwse0oxCJ34xxmzXg5g0ND29rkZ6XjEhicoIdAUeQAW+kPfGgtyUew22Eeg6/Ob8WoisBf+7
-q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC</content>
+q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
+</content>
   </attachment>
   <object>
     <class>
@@ -288,49 +289,54 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC</content>
       <propertiesToShow/>
     </property>
   </object>
-  <content>{{include document="XWiki.SearchCode"/}}
+  <content>{{include document='XWiki.SearchCode' /}}
 
-(% id="Hsearch.admin.configuration.title" %)
+(% id='Hsearch.admin.configuration.title' %)
 = {{velocity}}$msg.get('search.admin.configuration.title'){{/velocity}} =
 
-{{velocity output="false"}}
+{{velocity output='false'}}
 ## Create the configuration object if it does not exists
 #if (!$searchConfigObj)
-  #if ($searchConfigDoc.parent == "")
-    $searchConfigDoc.setParent("XWiki.SearchAdmin")
+  #if ($searchConfigDoc.parent == '')
+    $searchConfigDoc.setParent('XWiki.SearchAdmin')
   #end
   #set($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
   $searchConfigDoc.save()
 #end
 #set($searchEnginePropertyClass = $searchConfigClass.engine)
-
-## Form submission depends on this.
-$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 {{/velocity}}
 
 {{velocity}}
-{{html wiki="true"}}
-&lt;form id="search_XWiki.SearchConfig" method="post" action="${searchConfigDoc.getURL('save')}" onsubmit="cancelCancelEdit()"&gt;
-&lt;fieldset&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+{{html wiki='true'}}
+&lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform third'&gt;
+  &lt;dl&gt;
+    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type='hidden' name='xredirect' value="$doc.getURL($xcontext.action, $!{request.queryString})" /&gt;
 
-&lt;p&gt;
-&lt;label for="XWiki.SearchConfigClass_0_engine"&gt;$searchEnginePropertyClass.prettyName&lt;/label&gt;
-$searchConfigDoc.displayEdit($searchEnginePropertyClass, 'XWiki.SearchConfigClass_0_', $searchConfigObj)
-&lt;/p&gt;
+    &lt;dt&gt;
+      &lt;label for='XWiki.SearchConfigClass_0_engine'&gt;$searchEnginePropertyClass.prettyName&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('search.admin.configuration.seexwikicfg')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      $searchConfigDoc.displayEdit($searchEnginePropertyClass, 'XWiki.SearchConfigClass_0_', $searchConfigObj)
+    &lt;/dd&gt;
 
-&lt;span class="buttonwrapper"&gt;&lt;input name="action_saveandcontinue" value="$msg.get('search.admin.configuration.button')" class="button" type="submit"&gt;&lt;/span&gt;
-
-&lt;/fieldset&gt;
+    &lt;dt&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input value="$msg.get('search.admin.configuration.button')" class='button' type='submit'&gt;
+      &lt;/span&gt;
+    &lt;/dt&gt;
+  &lt;/dl&gt;
 &lt;/form&gt;
-
-&lt;p&gt;
-$msg.get('search.admin.configuration.seexwikicfg')
-&lt;/p&gt;
 {{/html}}
 {{/velocity}}
 
-= {{velocity}}$msg.get('search.admin.lucene.title'){{/velocity}} =
+{{velocity}}
+#set ($searchAdminPage = "XWiki.${searchPageName}Admin")
+#set ($searchAdminDoc = $xwiki.getDocument($searchAdminPage))
+= $searchAdminDoc.displayTitle =
 
-{{include document="XWiki.LuceneSearchAdmin"}}</content>
+## Use context='new' in the include so that we can use PR.
+{{include document="$searchAdminPage" context='new'}}
+{{/velocity}}</content>
 </xwikidoc>

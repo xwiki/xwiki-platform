@@ -1,0 +1,1 @@
+org.xwiki.query.solr.internal.SolrQueryExecutor

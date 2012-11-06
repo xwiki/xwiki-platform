@@ -59,7 +59,7 @@ import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.locks.preemptive.internal.PreemptiveLockProvider;
+import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
 
 /**
  * Tests for FilesystemAttachmentStore.
@@ -163,7 +163,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         this.fileTools =
             new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(),
                 storageLocation,
-                new PreemptiveLockProvider());
+                new DummyLockProvider());
 
         this.attachStore = new FilesystemAttachmentStore(fileTools);
         this.storeFile =

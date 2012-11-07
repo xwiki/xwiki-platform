@@ -1342,7 +1342,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Set the owner document of this base property.
      *
-     * @param owner The owner document.
+     * @param ownerDocument The owner document.
      * @since 4.3M2
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
@@ -1354,7 +1354,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @param valueDirty Indicate if the dirty flag should be set or cleared.
+     * @param isDirty Indicate if the dirty flag should be set or cleared.
      * @since 4.3M2
      */
     public void setDirty(boolean isDirty)

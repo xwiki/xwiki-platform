@@ -327,7 +327,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     /**
      * Set the owner document of this base property.
      *
-     * @param owner The owner document.
+     * @param ownerDocument The owner document.
      * @since 4.3M2
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)

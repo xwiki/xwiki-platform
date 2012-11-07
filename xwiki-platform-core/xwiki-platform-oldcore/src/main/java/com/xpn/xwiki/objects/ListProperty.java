@@ -244,6 +244,10 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     /**
+     * If getList returns a list of type AbstractNotifyOnUpdateList hibernate will for some reason always store an empty
+     * lits.  As a workaround, we let getList return an ordinary ArrayList when in hibernate.  This method is used for
+     * enabling/disabling this workaround.  FIXME: Try removing this workaround after we have upgraded hibernate.
+     * 
      * @param useHibernateWorkaround {@literal true} if hibernate workaround for getList should be enabled.
      * @since 4.3M2
      */

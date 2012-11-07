@@ -76,12 +76,6 @@
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
-      <!-- Groovy engine -->
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <version>1.8.8</version>
-      </dependency>
       <!-- Jython engine -->
       <dependency>
         <groupId>org.python</groupId>

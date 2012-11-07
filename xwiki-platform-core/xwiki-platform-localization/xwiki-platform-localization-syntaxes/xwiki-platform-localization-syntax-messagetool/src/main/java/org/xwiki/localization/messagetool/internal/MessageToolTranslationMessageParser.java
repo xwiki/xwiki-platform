@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
@@ -50,8 +51,16 @@ public class MessageToolTranslationMessageParser implements TranslationMessagePa
     private Parser plainParser;
 
     @Override
-    public TranslationMessage parse(String messsage)
+    public TranslationMessage parse(String message)
     {
-        return new MessageFormatTranslationMessage(messsage, this.plainParser);
+        TranslationMessage translationMessage;
+
+        if (StringUtils.isEmpty(message)) {
+            translationMessage = TranslationMessage.EMPTY;
+        } else {
+            translationMessage = new MessageFormatTranslationMessage(message, this.plainParser);
+        }
+
+        return translationMessage;
     }
 }

@@ -19,7 +19,13 @@
  */
 package org.xwiki.localization.message;
 
+import java.util.Collection;
+import java.util.Locale;
+
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.internal.message.TranslationMessageElement;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 
 /**
  * Generate the final translation based or variables informations (parameters, etc.).
@@ -29,6 +35,24 @@ import org.xwiki.localization.internal.message.TranslationMessageElement;
  */
 public interface TranslationMessage extends TranslationMessageElement
 {
+    /**
+     * An empty translation message.
+     */
+    TranslationMessage EMPTY = new TranslationMessage()
+    {
+        @Override
+        public Block render(Locale locale, Collection<TranslationBundle> bundles, Object... parameters)
+        {
+            return new CompositeBlock();
+        }
+
+        @Override
+        public String getRawSource()
+        {
+            return "";
+        }
+    };
+
     /**
      * @return the raw source of the translation as it is stored
      */

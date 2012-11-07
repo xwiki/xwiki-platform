@@ -90,7 +90,7 @@
 
 {{velocity}}
 #if ("$!exception" != '')
-  {{error}}$stringtool.capitalize($request.action) failed: $exception.message ($exception.class){{/error}}
+  {{error}}$escapetool.xml($stringtool.capitalize($request.action)) failed: $exception.message ($exception.class){{/error}}
 #elseif ($success)
   {{success}}$stringtool.capitalize($request.action) successfully complete.{{/success}}
   #if (!$stringtool.isBlank($request.customQuery))
@@ -108,7 +108,7 @@
   &lt;label&gt;Action&lt;/label&gt;
   &lt;span class='xHint'&gt;The action to perform on the index.&lt;/span&gt;
 &lt;dd&gt;
-  &lt;select name='action'&gt;
+  &lt;select name='action' size='1'&gt;
     &lt;option value='index'&gt;Add to index&lt;/option&gt;
     &lt;option value='delete'&gt;Delete from index&lt;/option&gt;
     &lt;option value='reindex'&gt;Reindex&lt;/option&gt;
@@ -120,7 +120,7 @@
   &lt;span class='xHint'&gt;The wiki for which all its documents will be affected by the selected action.&lt;/span&gt;
 &lt;/dt&gt;
 &lt;dd&gt;
-  &lt;select name='wiki'&gt;
+  &lt;select name='wiki' size='1'&gt;
     #if ($xwiki.isVirtualMode() &amp;&amp; ($xcontext.database == $xcontext.mainWikiName))
     &lt;option&gt;Entire farm&lt;/option&gt;
     #end
@@ -135,7 +135,7 @@
   &lt;span class='xHint'&gt;Optional HQL query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
 &lt;/dt&gt;
 &lt;dd&gt;
-  &lt;textarea name='customQuery'&gt;&lt;/textarea&gt;
+  &lt;textarea name='customQuery' rows='7' cols='45'&gt;&lt;/textarea&gt;
 &lt;/dd&gt;
 
 &lt;dt&gt;

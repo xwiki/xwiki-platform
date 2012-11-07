@@ -310,8 +310,10 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
 {{html wiki='true'}}
 &lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform third'&gt;
   &lt;dl&gt;
-    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type='hidden' name='xredirect' value="$doc.getURL($xcontext.action, $!{request.queryString})" /&gt;
+    &lt;dt&gt;
+      &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type='hidden' name='xredirect' value="$doc.getURL($xcontext.action, $!{request.queryString})" /&gt;
+    &lt;/dt&gt;
 
     &lt;dt&gt;
       &lt;label for='XWiki.SearchConfigClass_0_engine'&gt;$searchEnginePropertyClass.prettyName&lt;/label&gt;

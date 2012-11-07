@@ -931,7 +931,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 ## Space macros
 ## ---------------
 #macro(spaceselect $selectedSpace $spaces)
-&lt;select name='space' title="$msg.get('search.page.bar.spaces.title')"&gt;
+&lt;select id='space' name='space' title="$msg.get('search.page.bar.spaces.title')"&gt;
   &lt;option value='' #if($selectedSpace == '')selected='selected'#end&gt;$msg.get('search.page.bar.spaces.all')&lt;/option&gt;
   #foreach ($space in $spaces)
     #if (!$blacklistedSpaces.contains($space) &amp;&amp; $xwiki.hasAccessLevel('view', "${space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
@@ -965,7 +965,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   ##*************##
   ## Search Form ##
   ##*************##
-  &lt;form id='search-form'&gt;
+  &lt;form id='search-form' action=''&gt;
     &lt;div class='xformInline'&gt;
       &lt;div&gt;
         &lt;input type='text' id='text' name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
@@ -982,23 +982,21 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;dl id='filteredSearch' class="xform#if ($filter == '') hidden#end"&gt;
-      &lt;div #if (!$xwiki.virtualMode)class='hidden'#end&gt;
-        &lt;dt&gt;
-          &lt;label for='wiki'&gt;Wiki&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select name='wiki'&gt;
-            &lt;option value=''&gt;All wikis&lt;/option&gt;
-            #set ($wikis = $xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context))
-            #if (!$wikis.contains($xcontext.database))
-              #set ($discard = $wikis.add($xcontext.database))
-            #end
-            #foreach ($wiki in $sorttool.sort($wikis))
-              &lt;option value="$wiki" #if ($xcontext.database == "$!wiki")selected='selected'#end&gt;$wiki&lt;/option&gt;
-            #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      &lt;/div&gt;
+      &lt;dt #if (!$xwiki.virtualMode)class='hidden'#end&gt;
+        &lt;label for='wiki'&gt;Wiki&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd #if (!$xwiki.virtualMode)class='hidden'#end&gt;
+        &lt;select id='wiki' name='wiki'&gt;
+          &lt;option value=''&gt;All wikis&lt;/option&gt;
+          #set ($wikis = $xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context))
+          #if (!$wikis.contains($xcontext.database))
+            #set ($discard = $wikis.add($xcontext.database))
+          #end
+          #foreach ($wiki in $sorttool.sort($wikis))
+            &lt;option value="$wiki" #if ($xcontext.database == "$!wiki")selected='selected'#end&gt;$wiki&lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
 
       &lt;dt&gt;
         &lt;label for='space'&gt;Space&lt;/label&gt;
@@ -1007,25 +1005,23 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
         #spaceselect($space_f $xwiki.spaces)
       &lt;/dd&gt;
 
-      &lt;div #if (!$xwiki.isMultiLingual())class='hidden'#end&gt;
-        &lt;dt&gt;
-          &lt;label for='lang'&gt;Language&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select name='lang'&gt;
-            &lt;option value=''&gt;All languages&lt;/option&gt;
-            #foreach ($supportedLanguage in $supportedLanguages)
-            &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected='selected'#end&gt;$supportedLanguage&lt;/option&gt;
-            #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      &lt;/div&gt;
+      &lt;dt #if (!$xwiki.isMultiLingual())class='hidden'#end&gt;
+        &lt;label for='lang'&gt;Language&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd #if (!$xwiki.isMultiLingual())class='hidden'#end&gt;
+        &lt;select id='lang' name='lang'&gt;
+          &lt;option value=''&gt;All languages&lt;/option&gt;
+          #foreach ($supportedLanguage in $supportedLanguages)
+          &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected='selected'#end&gt;$supportedLanguage&lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
 
       &lt;dt&gt;
         &lt;label for='type'&gt;Type&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;select name='type'&gt;
+        &lt;select id='type' name='type'&gt;
           &lt;option value=''&gt;All types&lt;/option&gt;
           #set ($typeOptions = $collectionstool.orderedMap)
           #set ($discard = $typeOptions.put('DOCUMENT', 'Document'))
@@ -1043,7 +1039,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
         &lt;label for='fileType'&gt;Filetype&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;select name='fileType'&gt;
+        &lt;select id='fileType' name='fileType'&gt;
           &lt;option value=''&gt;All file types&lt;/option&gt;
           #set ($fileTypeOptions = $collectionstool.orderedMap)
           #set ($discard = $fileTypeOptions.put('image*', 'Image'))

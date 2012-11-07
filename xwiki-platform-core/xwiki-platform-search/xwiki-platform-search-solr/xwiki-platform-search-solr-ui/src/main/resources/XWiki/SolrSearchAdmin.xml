@@ -92,7 +92,7 @@
 #if ("$!exception" != '')
   {{error}}$escapetool.xml($stringtool.capitalize($request.action)) failed: $exception.message ($exception.class){{/error}}
 #elseif ($success)
-  {{success}}$stringtool.capitalize($request.action) successfully complete.{{/success}}
+  {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully complete.{{/success}}
   #if (!$stringtool.isBlank($request.customQuery))
 
     {{info}}Affected documents in the index: $targetReferences{{/info}}

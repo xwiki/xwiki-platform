@@ -25,13 +25,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-platform-query</artifactId>
+    <artifactId>xwiki-platform-search-solr</artifactId>
     <groupId>org.xwiki.platform</groupId>
     <version>4.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-query-solr</artifactId>
-  <name>XWiki Platform - Query - XWQL</name>
+  <artifactId>xwiki-platform-search-solr-query</artifactId>
   <packaging>jar</packaging>
+  <name>XWiki Platform - Search - Solr - Query</name>
+  <description>Query module for the Solr index. Allows performing Solr queries using XWiki's Query API.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -45,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr</artifactId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

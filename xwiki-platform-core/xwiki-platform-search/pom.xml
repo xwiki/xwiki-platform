@@ -36,7 +36,6 @@
   <modules>
     <module>xwiki-platform-search-lucene</module>
     <module>xwiki-platform-search-ui</module>
-    <module>xwiki-platform-search-solr-ui</module>
     <module>xwiki-platform-search-solr</module>
   </modules>
 </project>

@@ -129,6 +129,7 @@ public class NumberClass extends PropertyClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilterState(true);
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {

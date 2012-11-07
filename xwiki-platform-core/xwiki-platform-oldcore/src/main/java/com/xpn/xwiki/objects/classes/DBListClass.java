@@ -470,6 +470,7 @@ public class DBListClass extends ListClass
         // input display
         if (getDisplayType().equals("input")) {
             input input = new input();
+            input.setAttributeFilterState(true);
             input.setType("text");
             input.setSize(getSize());
             boolean changeInputName = false;
@@ -498,6 +499,7 @@ public class DBListClass extends ListClass
                     if (secondCol.compareTo("-") != 0) {
                         changeInputName = true;
                         input hidden = new input();
+                        hidden.setAttributeFilterState(true);
                         hidden.setID(prefix + name);
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
@@ -546,6 +548,7 @@ public class DBListClass extends ListClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setAttributeFilterState(true);
             buffer.append(hidden);
         }
     }

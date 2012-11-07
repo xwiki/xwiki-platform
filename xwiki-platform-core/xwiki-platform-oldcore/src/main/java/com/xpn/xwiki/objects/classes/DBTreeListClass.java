@@ -332,6 +332,7 @@ public class DBTreeListClass extends DBListClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilterState(true);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);

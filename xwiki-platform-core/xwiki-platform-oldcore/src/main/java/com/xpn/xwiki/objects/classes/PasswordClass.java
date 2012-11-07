@@ -99,6 +99,7 @@ public class PasswordClass extends StringClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilterState(true);
         ElementInterface prop = object.safeget(name);
         if (prop != null) {
             input.setValue(FORM_PASSWORD_PLACEHODLER);

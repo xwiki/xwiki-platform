@@ -158,6 +158,7 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilterState(true);
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
@@ -219,8 +220,11 @@ public class BooleanClass extends PropertyClass
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
+        radioNone.setAttributeFilterState(true);
         input radioTrue = new input(input.radio, prefix + name, "1");
+        radioTrue.setAttributeFilterState(true);
         input radioFalse = new input(input.radio, prefix + name, "0");
+        radioFalse.setAttributeFilterState(true);
         radioNone.setDisabled(isDisabled());
         radioTrue.setDisabled(isDisabled());
         radioFalse.setDisabled(isDisabled());
@@ -289,11 +293,13 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
+        check.setAttributeFilterState(true);
         check.setID(prefix + name);
         check.setDisabled(isDisabled());
         // If the (visible) checkbox is unchecked, it will not post anything back so the hidden input by the same
         // name will post back 0 and the save function will save the first entry it finds.
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
+        checkNo.setAttributeFilterState(true);
 
         try {
             IntegerProperty prop = (IntegerProperty) object.safeget(name);

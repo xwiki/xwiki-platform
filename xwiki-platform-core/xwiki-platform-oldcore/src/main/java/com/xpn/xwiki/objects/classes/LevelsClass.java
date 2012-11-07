@@ -125,6 +125,7 @@ public class LevelsClass extends ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilterState(true);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);
@@ -158,6 +159,7 @@ public class LevelsClass extends ListClass
 
         buffer.append(select.toString());
         input in = new input();
+        in.setAttributeFilterState(true);
         in.setType("hidden");
         in.setName(prefix + name);
         in.setDisabled(isDisabled());

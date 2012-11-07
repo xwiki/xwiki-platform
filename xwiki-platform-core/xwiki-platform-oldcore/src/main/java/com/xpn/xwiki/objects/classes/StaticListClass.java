@@ -95,6 +95,7 @@ public class StaticListClass extends ListClass
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
+            input.setAttributeFilterState(true);
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
                 input.setValue(prop.toFormString());
@@ -138,6 +139,7 @@ public class StaticListClass extends ListClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setAttributeFilterState(true);
             hidden.setDisabled(isDisabled());
             buffer.append(hidden);
         }

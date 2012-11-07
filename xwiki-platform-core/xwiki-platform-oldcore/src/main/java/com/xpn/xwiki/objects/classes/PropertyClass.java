@@ -181,6 +181,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilterState(true);
         PropertyInterface prop = object.safeget(name);
         if (prop != null) {
             input.setValue(prop.toFormString());
@@ -205,6 +206,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilterState(true);
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {

@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -83,7 +84,7 @@ public class WikiUIExtensionComponentBuilderEventListener implements EventListen
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event> asList(new ApplicationReadyEvent());
+        return Arrays.<Event> asList(new ApplicationReadyEvent(), new WikiReadyEvent());
     }
 
     @Override
@@ -164,6 +165,8 @@ public class WikiUIExtensionComponentBuilderEventListener implements EventListen
         needsUpdate |= bclass.addTextField(ID_PROPERTY, "Extension ID", 30);
         needsUpdate |= bclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10);
         needsUpdate |= bclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10);
+        needsUpdate |= bclass.addStaticListField(SCOPE_PROPERTY, "Extension Scope", 1, false,
+                    "wiki=Current Wiki|user=Current User|global=Global", "select");
         if (needsUpdate) {
             if (doc.isNew()) {
                 doc.setParent("XWiki.WebHome");

@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -45,6 +46,11 @@ public class DefaultWikiComponent implements WikiComponent
     private DocumentReference documentReference;
 
     /**
+     * @see {@link #getAuthorReference()}
+     */
+    private DocumentReference authorReference;
+
+    /**
      * @see {@link #getHandledMethods()}
      */
     private Map<String, XDOM> handledMethods = new HashMap<String, XDOM>();
@@ -58,6 +64,11 @@ public class DefaultWikiComponent implements WikiComponent
      * @see {@link #getRoleHint()}
      */
     private String roleHint;
+
+    /**
+     * @see {@link #getScope()}
+     */
+    private WikiComponentScope scope;
 
     /**
      * @see {@link #getImplementedInterfaces()}
@@ -77,21 +88,32 @@ public class DefaultWikiComponent implements WikiComponent
     /**
      * Constructor of this component.
      * 
-     * @param reference the document holding the component definition
+     * @param documentReference the document holding the component definition
+     * @param authorReference the author of the document holding the component definition
      * @param roleType the role Type implemented
      * @param roleHint the role hint for this role implementation
+     * @param scope the scope of this component
      */
-    public DefaultWikiComponent(DocumentReference reference, Type roleType, String roleHint)
+    public DefaultWikiComponent(DocumentReference documentReference, DocumentReference authorReference,
+        Type roleType, String roleHint, WikiComponentScope scope)
     {
-        this.documentReference = reference;
+        this.documentReference = documentReference;
+        this.authorReference = authorReference;
         this.roleType = roleType;
         this.roleHint = roleHint;
+        this.scope = scope;
     }
 
     @Override
     public DocumentReference getDocumentReference()
     {
         return this.documentReference;
+    }
+
+    @Override
+    public DocumentReference getAuthorReference()
+    {
+        return this.authorReference;
     }
 
     /**
@@ -116,6 +138,12 @@ public class DefaultWikiComponent implements WikiComponent
     public String getRoleHint()
     {
         return this.roleHint;
+    }
+
+    @Override
+    public WikiComponentScope getScope()
+    {
+        return this.scope;
     }
 
     /**

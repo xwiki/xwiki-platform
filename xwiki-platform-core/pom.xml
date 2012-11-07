@@ -316,6 +316,27 @@
               <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
             </difference>
             <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>java.lang.reflect.Type getRoleType()</method>
+              <differenceType>7012</differenceType>
+              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8233,
+                "Allow wiki components to implement parameterized types"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>org.xwiki.model.reference.DocumentReference getAuthorReference()</method>
+              <differenceType>7012</differenceType>
+              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8234,
+                "Allow wiki components to be registered at different levels (user / wiki / global)"</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/component/wiki/WikiComponent</className>
+              <method>org.xwiki.component.wiki.WikiComponentScope getScope()</method>
+              <differenceType>7012</differenceType>
+              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8234,
+                "Allow wiki components to be registered at different levels (user / wiki / global)"</justification>
+            </difference>
+            <difference>
               <className>org/xwiki/uiextension/UIExtension</className>
               <method>java.util.List execute()</method>
               <differenceType>7006</differenceType>

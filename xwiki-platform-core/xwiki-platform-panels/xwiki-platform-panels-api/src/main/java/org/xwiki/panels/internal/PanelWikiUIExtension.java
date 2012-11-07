@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
@@ -58,19 +59,29 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     private final EntityReferenceSerializer<String> compactWikiSerializer;
 
     /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
+     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
+     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
      *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
      */
     private final DocumentReference documentReference;
 
     /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
+     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
+     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
+     *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
+     */
+    private final DocumentReference authorReference;
+
+    /**
+     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
+     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
      *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
      */
     private final XDOM xdom;
 
     /**
-     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
+     * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
+     *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
      *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
      */
     private final Syntax syntax;
@@ -84,15 +95,17 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
      * Default constructor.
      *
      * @param documentReference The document in which the panel is defined
+     * @param authorReference The author of the document in which the panel is defined
      * @param xdom The content to display for this panel
      * @param syntax The syntax in which the content is written
      * @param componentManager The XWiki content manager
      * @throws ComponentLookupException If module dependencies are missing
      */
-    public PanelWikiUIExtension(DocumentReference documentReference, XDOM xdom, Syntax syntax,
-        ComponentManager componentManager) throws ComponentLookupException
+    public PanelWikiUIExtension(DocumentReference documentReference, DocumentReference authorReference, XDOM xdom,
+        Syntax syntax, ComponentManager componentManager) throws ComponentLookupException
     {
         this.documentReference = documentReference;
+        this.authorReference = authorReference;
         this.xdom = xdom;
         this.syntax = syntax;
         this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
@@ -115,6 +128,12 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     public DocumentReference getDocumentReference()
     {
         return documentReference;
+    }
+
+    @Override
+    public DocumentReference getAuthorReference()
+    {
+        return authorReference;
     }
 
     @Override
@@ -153,5 +172,11 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     public String getRoleHint()
     {
         return getId();
+    }
+
+    @Override
+    public WikiComponentScope getScope()
+    {
+        return WikiComponentScope.WIKI;
     }
 }

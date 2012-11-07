@@ -32,6 +32,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentRuntimeException;
 import org.xwiki.rendering.block.XDOM;
 
@@ -125,12 +126,11 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Exception
     {
-        WikiComponentMethodExecutor methodExecutor = componentManager.getInstance(WikiComponentMethodExecutor.class);
-
         // We look for the method in the XObjects.
         if (!this.wikiComponent.getHandledMethods().containsKey(method.getName())) {
-            if (method.getDeclaringClass() == Object.class) {
-                return ObjectMethodsProxy.invoke(proxy, method, args);
+            if (method.getDeclaringClass() == Object.class || method.getDeclaringClass() == WikiComponent.class) {
+                // return ObjectMethodsProxy.invoke(proxy, method, args);
+                return method.invoke(wikiComponent, args);
             } else {
                 // Note: We throw a runtime exception so that our exception doesn't get wrapped by a generic
                 // UndeclaredThrowableException which would not make much sense for the user.
@@ -143,6 +143,8 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
                         method.getName()));
             }
         } else {
+            WikiComponentMethodExecutor methodExecutor =
+                componentManager.getInstance(WikiComponentMethodExecutor.class);
             Map<String, Object> methodContext = new HashMap<String, Object>();
             XDOM xdom = this.wikiComponent.getHandledMethods().get(method.getName());
             methodContext.put(METHOD_CONTEXT_COMPONENT_KEY, proxy);

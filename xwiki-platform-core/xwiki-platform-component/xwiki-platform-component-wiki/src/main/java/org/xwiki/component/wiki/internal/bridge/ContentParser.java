@@ -17,48 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension.internal;
+package org.xwiki.component.wiki.internal.bridge;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.component.wiki.WikiComponentException;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * Constants for XClasses and XProperties.
+ * A bridge between Wiki Components and the rendering module.
  *
  * @version $Id$
- * @since 4.2M3
+ * @since 4.3M2
  */
-
-public interface WikiUIExtensionConstants
+@Role
+public interface ContentParser
 {
     /**
-     * Extension XClass reference.
+     * Parse content.
+     *
+     * @param content the content to parse
+     * @param syntax the syntax in which the content is written
+     * @return the XDOM corresponding to the parsed content
+     * @throws WikiComponentException if the content can't be parsed
      */
-    EntityReference UI_EXTENSION_CLASS = new EntityReference(new EntityReference("UIExtensionClass",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE)));
-
-    /**
-     * Extension Point ID property.
-     */
-    String EXTENSION_POINT_ID_PROPERTY = "extensionPointId";
-
-    /**
-     * Extension ID property.
-     */
-    String ID_PROPERTY = "name";
-
-    /**
-     * Extension content property.
-     */
-    String CONTENT_PROPERTY = "content";
-
-    /**
-     * Extension parameters property.
-     */
-    String PARAMETERS_PROPERTY = "parameters";
-
-    /**
-     * Extension scope property.
-     */
-    String SCOPE_PROPERTY = "scope";
+    XDOM parse(String content, Syntax syntax) throws WikiComponentException;
 }

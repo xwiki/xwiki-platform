@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -63,7 +64,12 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * @see #WikiUIExtension
      */
-    private final String name;
+    private final DocumentReference authorReference;
+
+    /**
+     * @see #WikiUIExtension
+     */
+    private final String id;
 
     /**
      * @see #WikiUIExtension
@@ -76,19 +82,24 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     private String roleHint;
 
     /**
-     * @see #WikiUIExtension
+     * @see #setXDOM(org.xwiki.rendering.block.XDOM)
      */
-    private final XDOM xdom;
+    private XDOM xdom;
 
     /**
-     * @see #WikiUIExtension
+     * @see #setSyntax(org.xwiki.rendering.syntax.Syntax)
      */
-    private final Syntax syntax;
+    private Syntax syntax;
 
     /**
-     * @see #WikiUIExtension
+     * @see #setParameters(java.util.Map)
      */
-    private final Map<String, String> parameters;
+    private Map<String, String> parameters;
+
+    /**
+     * @see #setScope(org.xwiki.component.wiki.WikiComponentScope)
+     */
+    private WikiComponentScope scope;
 
     /**
      * @see #WikiUIExtension
@@ -108,29 +119,24 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     /**
      * Default constructor.
      *
-     * @param objectReference the reference of the object holding this extension
-     * @param name the name of the extension
+     * @param id the id of the extension
      * @param extensionPointId ID of the extension point this extension is designed for
-     * @param xdom the XDOM to be rendered when this extension is displayed
-     * @param syntax the Syntax of the extension XDOM
-     * @param parameters the extension parameters map
-     * @param componentManager the XWiki component manager
+     * @param objectReference the reference of the object holding this extension
+     * @param authorReference the reference of the author of the document holding this extension
+     * @param cm the XWiki component manager
      */
-    public WikiUIExtension(ObjectReference objectReference, String name, String extensionPointId,
-        XDOM xdom, Syntax syntax, Map<String, String> parameters, ComponentManager componentManager)
+    public WikiUIExtension(String id, String extensionPointId, ObjectReference objectReference,
+        DocumentReference authorReference, ComponentManager cm)
     {
         this.documentReference = (DocumentReference) objectReference.getParent();
-        this.name = name;
+        this.authorReference = authorReference;
+        this.id = id;
         this.extensionPointId = extensionPointId;
-        this.xdom = xdom;
-        this.syntax = syntax;
-        this.parameters = parameters;
         try {
-            this.macroTransformation = componentManager.<Transformation>getInstance(Transformation.class, "macro");
-            this.execution = componentManager.getInstance(Execution.class);
-            this.velocityManager = componentManager.getInstance(VelocityManager.class);
-            EntityReferenceSerializer<String> serializer =
-                componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+            this.macroTransformation = cm.<Transformation>getInstance(Transformation.class, "macro");
+            this.execution = cm.getInstance(Execution.class);
+            this.velocityManager = cm.getInstance(VelocityManager.class);
+            EntityReferenceSerializer<String> serializer = cm.getInstance(EntityReferenceSerializer.TYPE_STRING);
             this.roleHint = serializer.serialize(objectReference);
         } catch (Exception e) {
             LOGGER.error(String.format("Failed to get an instance for a component role required by Wiki Components. "
@@ -138,10 +144,51 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         }
     }
 
+
+    /**
+     * Set the XDOM to be rendered when this extension is displayed.
+     *
+     * @param xdom the XDOM to be rendered when this extension is displayed
+     */
+    public void setXDOM(XDOM xdom)
+    {
+        this.xdom = xdom;
+    }
+
+    /**
+     * Set the Syntax in which the extension XDOM is written.
+     *
+     * @param syntax the Syntax in which the extension XDOM is written.
+     */
+    public void setSyntax(Syntax syntax)
+    {
+        this.syntax = syntax;
+    }
+
+    /**
+     * Set the extension parameters.
+     *
+     * @param parameters the extension parameters
+     */
+    public void setParameters(Map<String, String> parameters)
+    {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Set the scope of the extension.
+     *
+     * @param scope the scope of the extension
+     */
+    public void setScope(WikiComponentScope scope)
+    {
+        this.scope = scope;
+    }
+
     @Override
     public String getId()
     {
-        return this.name;
+        return this.id;
     }
 
     @Override
@@ -199,6 +246,12 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     }
 
     @Override
+    public DocumentReference getAuthorReference()
+    {
+        return authorReference;
+    }
+
+    @Override
     public Type getRoleType()
     {
         return UIExtension.class;
@@ -208,5 +261,11 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     public String getRoleHint()
     {
         return roleHint;
+    }
+
+    @Override
+    public WikiComponentScope getScope()
+    {
+        return scope;
     }
 }

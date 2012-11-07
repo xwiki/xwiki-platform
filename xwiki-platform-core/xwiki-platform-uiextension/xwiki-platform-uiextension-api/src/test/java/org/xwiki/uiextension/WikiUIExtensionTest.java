@@ -61,6 +61,8 @@ public class WikiUIExtensionTest
 
     private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
 
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
+
     private ObjectReference objectReference;
 
     private WikiUIExtension wikiUIExtension;
@@ -104,12 +106,15 @@ public class WikiUIExtensionTest
             }
         });
 
+        wikiUIExtension = new WikiUIExtension("name", "epId", objectReference, AUTHOR_REFERENCE, componentManager);
+
         xdom = new XDOM(new ArrayList<Block>());
         Map<String, String> parameters = new HashMap();
         parameters.put("key", "value=foo");
 
-        wikiUIExtension = new WikiUIExtension(objectReference, "name", "epId", xdom, Syntax.XWIKI_2_1, parameters,
-            componentManager);
+        wikiUIExtension.setXDOM(xdom);
+        wikiUIExtension.setSyntax(Syntax.XWIKI_2_1);
+        wikiUIExtension.setParameters(parameters);
     }
 
     @Test

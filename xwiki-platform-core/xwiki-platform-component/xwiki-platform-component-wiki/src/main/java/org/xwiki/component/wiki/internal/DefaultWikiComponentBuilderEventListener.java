@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -74,7 +75,7 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event> asList(new ApplicationReadyEvent());
+        return Arrays.<Event> asList(new ApplicationReadyEvent(), new WikiReadyEvent());
     }
 
     @Override
@@ -137,6 +138,8 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
         needsUpdate |= initializeXClassDocumentMetadata(doc, "Wiki Component XWiki Class");
         needsUpdate |= bclass.addTextField(COMPONENT_ROLE_TYPE_FIELD, "Component Role Type", 30);
         needsUpdate |= bclass.addTextField(COMPONENT_ROLE_HINT_FIELD, "Component Role Hint", 30);
+        needsUpdate |= bclass.addStaticListField(COMPONENT_SCOPE_FIELD, "Component Scope", 1, false,
+            "wiki=Current Wiki|user=Current User|global=Global", "select");
 
         if (needsUpdate) {
             this.update(doc);

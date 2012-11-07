@@ -28,8 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.internal.DefaultWikiComponent;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentManager;
+import org.xwiki.component.wiki.internal.WikiComponentManagerContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -39,28 +39,50 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
 {
     private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
 
-    private final DefaultWikiComponent component = new DefaultWikiComponent(DOC_REFERENCE, TestRole.class, "roleHint");
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
-    private WikiComponentManager manager;
+    private final WikiComponent component = new TestImplementation();
+
+    private ComponentManager rootComponentManager;
+
+    private ComponentManager componentManager;
+
+    private WikiComponentManager wikiComponentManager;
+
+    private WikiComponentManagerContext wikiComponentManagerContext;
 
     @Before
     public void configure() throws Exception
     {
-        this.manager = getComponentManager().getInstance(WikiComponentManager.class);
+        this.wikiComponentManager = getComponentManager().getInstance(WikiComponentManager.class);
+        this.rootComponentManager = getComponentManager().getInstance(ComponentManager.class);
+        this.componentManager =
+            getComponentManager().registerMockComponent(this.getMockery(), ComponentManager.class, "wiki");
+        this.wikiComponentManagerContext = getComponentManager().getInstance(WikiComponentManagerContext.class);
+
+        getMockery().checking(new Expectations()
+        {{
+            allowing(wikiComponentManagerContext).getCurrentUserReference();
+            will(returnValue(AUTHOR_REFERENCE));
+            allowing(wikiComponentManagerContext).getCurrentEntityReference();
+            will(returnValue(DOC_REFERENCE));
+            allowing(wikiComponentManagerContext).setCurrentEntityReference(DOC_REFERENCE);
+            allowing(wikiComponentManagerContext).setCurrentUserReference(AUTHOR_REFERENCE);
+        }});
     }
 
     @Test
     public void registerWikiComponent() throws Exception
     {
-        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
-
         getMockery().checking(new Expectations()
         {{
+            oneOf(rootComponentManager).getInstance(ComponentManager.class, "wiki");
+            will(returnValue(componentManager));
             // The test is here
             oneOf(componentManager).registerComponent(with(any(ComponentDescriptor.class)), with(any(Object.class)));
         }});
 
-        this.manager.registerWikiComponent(this.component);
+        this.wikiComponentManager.registerWikiComponent(this.component);
     }
 
     @Test
@@ -70,13 +92,15 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
 
         getMockery().checking(new Expectations()
         {{
+            oneOf(rootComponentManager).getInstance(ComponentManager.class, "wiki");
+            will(returnValue(componentManager));
             oneOf(componentManager).registerComponent(with(any(ComponentDescriptor.class)), with(any(Object.class)));
         }});
 
-        this.manager.registerWikiComponent(this.component);
+        this.wikiComponentManager.registerWikiComponent(this.component);
 
         try {
-            this.manager.registerWikiComponent(this.component);
+            this.wikiComponentManager.registerWikiComponent(this.component);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
             Assert.assertEquals("Component already registered. Try unregistering it first.", expected.getMessage());
@@ -90,20 +114,22 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
 
         getMockery().checking(new Expectations()
         {{
+            allowing(rootComponentManager).getInstance(ComponentManager.class, "wiki");
+            will(returnValue(componentManager));
             oneOf(componentManager).registerComponent(with(any(ComponentDescriptor.class)), with(any(Object.class)));
             oneOf(componentManager).unregisterComponent((Type) TestRole.class, "roleHint");
         }});
 
-        this.manager.registerWikiComponent(this.component);
+        this.wikiComponentManager.registerWikiComponent(this.component);
 
         // This call would throw an exception if the component had not been unregistered
-        this.manager.unregisterWikiComponents(DOC_REFERENCE);
+        this.wikiComponentManager.unregisterWikiComponents(DOC_REFERENCE);
     }
 
     @Test
     public void unregisterNotRegisteredWikiComponent() throws Exception
     {
         // We check that this doesn't do anything, silently
-        this.manager.unregisterWikiComponents(DOC_REFERENCE);
+        this.wikiComponentManager.unregisterWikiComponents(DOC_REFERENCE);
     }
 }

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Provider;
 
@@ -33,19 +32,15 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
@@ -65,6 +60,8 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
     private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
 
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
+
     private ObjectReference OBJ1_REF = new ObjectReference(CLASS_REF + "[1]", DOC_REF);
 
     private ObjectReference OBJ2_REF = new ObjectReference(CLASS_REF + "[2]", DOC_REF);
@@ -77,7 +74,7 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
     private UIExtensionScriptService service;
 
-    private List<UIExtension> uiExtensions = new ArrayList<UIExtension>();
+    private List<WikiUIExtension> uiExtensions = new ArrayList<WikiUIExtension>();
 
     private Transformation transformation;
 
@@ -106,8 +103,6 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         getMockery().checking(new Expectations()
         {
             {
-                //allowing(execution).getContext();
-                //will(returnValue(context));
                 allowing(serializer).serialize(with(any(EntityReference.class)), with(anything()));
                 will(returnValue("does not matter"));
                 allowing(componentManagerProvider).get();
@@ -115,14 +110,16 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
             }
         });
 
-        uiExtensions.add(new WikiUIExtension(OBJ1_REF, "1id3", "epId1", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.add(new WikiUIExtension(OBJ2_REF, "1id1", "epId1", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.add(new WikiUIExtension(OBJ3_REF, "1id2", "epId1", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
-        uiExtensions.add(new WikiUIExtension(OBJ4_REF, "2id1", "epId2", xdom, Syntax.XWIKI_2_0,
-            new HashMap<String, String>(), getComponentManager()));
+        uiExtensions.add(new WikiUIExtension("1id3", "epId1", OBJ1_REF, AUTHOR_REFERENCE, getComponentManager()));
+        uiExtensions.add(new WikiUIExtension("1id1", "epId1", OBJ2_REF, AUTHOR_REFERENCE, getComponentManager()));
+        uiExtensions.add(new WikiUIExtension("1id2", "epId1", OBJ3_REF, AUTHOR_REFERENCE, getComponentManager()));
+        uiExtensions.add(new WikiUIExtension("2id1", "epId2", OBJ4_REF, AUTHOR_REFERENCE, getComponentManager()));
+        for (WikiUIExtension uiExtension : uiExtensions) {
+            uiExtension.setXDOM(xdom);
+            uiExtension.setSyntax(Syntax.XWIKI_2_1);
+            uiExtension.setParameters(new HashMap<String, String>());
+            uiExtension.setScope(WikiComponentScope.WIKI);
+        }
     }
 
     @Test

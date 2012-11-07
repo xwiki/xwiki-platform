@@ -17,48 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension.internal;
+package org.xwiki.component.wiki.internal;
 
-import org.xwiki.model.EntityType;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Constants for XClasses and XProperties.
+ * Utility class allowing to manipulate context information.
  *
  * @version $Id$
- * @since 4.2M3
+ * @since 4.3M2
  */
-
-public interface WikiUIExtensionConstants
+@Role
+public interface WikiComponentManagerContext
 {
     /**
-     * Extension XClass reference.
+     * @return A reference to the context user.
      */
-    EntityReference UI_EXTENSION_CLASS = new EntityReference(new EntityReference("UIExtensionClass",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE)));
+    DocumentReference getCurrentUserReference();
 
     /**
-     * Extension Point ID property.
+     * @return A reference to the context document.
      */
-    String EXTENSION_POINT_ID_PROPERTY = "extensionPointId";
+    EntityReference getCurrentEntityReference();
 
     /**
-     * Extension ID property.
+     * Set the context user.
+     *
+     * @param reference A reference to the context user to set
      */
-    String ID_PROPERTY = "name";
+    void setCurrentUserReference(DocumentReference reference);
 
     /**
-     * Extension content property.
+     * Set the context document.
+     *
+     * @param reference A reference to the context document to set
      */
-    String CONTENT_PROPERTY = "content";
-
-    /**
-     * Extension parameters property.
-     */
-    String PARAMETERS_PROPERTY = "parameters";
-
-    /**
-     * Extension scope property.
-     */
-    String SCOPE_PROPERTY = "scope";
+    void setCurrentEntityReference(EntityReference reference);
 }

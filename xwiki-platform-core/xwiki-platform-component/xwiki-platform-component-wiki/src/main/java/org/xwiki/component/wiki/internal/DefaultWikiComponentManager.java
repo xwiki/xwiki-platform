@@ -19,22 +19,18 @@
  */
 package org.xwiki.component.wiki.internal;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
@@ -43,7 +39,9 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentManager;
+import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Default implementation of {@link WikiComponentManager}. Creates proxy objects which method invocation handler keeps a
@@ -63,11 +61,16 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     private Logger logger;
 
     /**
-     * Component manager against which wiki component will be registered.
+     * Component managers in which wiki component can be registered.
      */
     @Inject
-    @Named("wiki")
-    private ComponentManager componentManager;
+    private ComponentManager rootComponentManager;
+
+    /**
+     * Allows to get and set context user and reference.
+     */
+    @Inject
+    private WikiComponentManagerContext wikiComponentManagerContext;
 
     /**
      * Reference on all registered components.
@@ -81,79 +84,75 @@ public class DefaultWikiComponentManager implements WikiComponentManager
         if (registeredComponents.contains(component)) {
             throw new WikiComponentException("Component already registered. Try unregistering it first.");
         }
+
+        // Save current context information
+        DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
+        EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
         
         try {
-            Object instance;
             // Get the component role interface
             Type roleType = component.getRoleType();
             Class<?> roleTypeClass = ReflectionUtils.getTypeClass(roleType);
             ComponentDescriptor componentDescriptor = this.createComponentDescriptor(roleType, component.getRoleHint());
 
-            // Prepare a list containing the interfaces the component implements
-            List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();
+            // Set the proper information so the component manager use the proper keys to find components to register
+            this.wikiComponentManagerContext.setCurrentUserReference(component.getAuthorReference());
+            this.wikiComponentManagerContext.setCurrentEntityReference(component.getDocumentReference());
 
-            // If the component is a Java classes extending the default WikiComponent interface, we add all the
-            // interfaces it implements to the list, except the WikiComponent one of course.
-            for (Class<?> implementedInterface : component.getClass().getInterfaces()) {
-                if (implementedInterface != WikiComponent.class) {
-                    implementedInterfaces.add(implementedInterface);
-                }
-            }
-
-            if (component instanceof DefaultWikiComponent) {
-
-                // Create the method invocation handler of the proxy
-                InvocationHandler handler =
-                    new DefaultWikiComponentInvocationHandler((DefaultWikiComponent) component, componentManager);
-
-                // Add all the interfaces declared through XObjects
-                implementedInterfaces.addAll(((DefaultWikiComponent) component).getImplementedInterfaces());
-
-                // If the component is a pure XObject implementation, we need to add the role interface to the list,
-                // since it's not been added by the previous loops.
-                if (!implementedInterfaces.contains(roleType)) {
-                    implementedInterfaces.add(roleTypeClass);
-                }
-
-                // Create the component instance and its descriptor
-                Class<?>[] implementedInterfacesArray = implementedInterfaces.toArray(new Class<?>[0]);
-                instance = Proxy.newProxyInstance(roleTypeClass.getClassLoader(), implementedInterfacesArray, handler);
-
-                // Finally, register the component against the CM
-                componentManager.registerComponent(componentDescriptor, roleTypeClass.cast(instance));
-            } else {
-                instance = component;
-                componentManager.registerComponent(componentDescriptor, roleTypeClass.cast(component));
-            }
-
-            // Since we are responsible to create the component instance,
-            // we also are responsible of its initialization (if needed)
-            if (this.isInitializable(implementedInterfaces)) {
+            // Since we are responsible to create the component instance, we also are responsible of its initialization
+            if (this.isInitializable(component.getClass().getInterfaces())) {
                 try {
-                    ((Initializable) instance).initialize();
+                    ((Initializable) component).initialize();
                 } catch (InitializationException e) {
                     this.logger.error("Failed to initialize wiki component", e);
                 }
             }
-            
+
+            getComponentManager(component.getScope()).registerComponent(componentDescriptor,
+                roleTypeClass.cast(component));
+
             // And hold a reference to it.
             this.registeredComponents.add(component);
-            
+        } catch (ComponentLookupException e) {
+            throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s] wiki "
+                + "component registration failed",
+                component.getScope()), e);
         } catch (ComponentRepositoryException e) {
             throw new WikiComponentException("Failed to register wiki component against component repository", e);
+        }   finally {
+            this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
+            this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
         }
     }
 
     @Override
-    public void unregisterWikiComponents(DocumentReference reference)
+    public void unregisterWikiComponents(DocumentReference reference) throws WikiComponentException
     {
         WikiComponent unregisteredComponent = null;
+        // Save current context information
+        DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
+        EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
 
         for (WikiComponent registered : this.registeredComponents) {
             if (registered.getDocumentReference().equals(reference)) {
                 // Unregister component
                 unregisteredComponent = registered;
-                componentManager.unregisterComponent(registered.getRoleType(), registered.getRoleHint());
+                try {
+                    // Set the proper information so the component manager use the proper keys to find components to
+                    // unregister
+                    this.wikiComponentManagerContext.setCurrentUserReference(registered.getAuthorReference());
+                    this.wikiComponentManagerContext.setCurrentEntityReference(registered.getDocumentReference());
+
+                    getComponentManager(registered.getScope()).unregisterComponent(registered.getRoleType(),
+                        registered.getRoleHint());
+                } catch (ComponentLookupException e) {
+                    throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s]",
+                        registered.getScope()), e);
+                }  finally {
+                    this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
+                    this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
+                }
+
             }
         }
 
@@ -161,6 +160,32 @@ public class DefaultWikiComponentManager implements WikiComponentManager
         if (unregisteredComponent != null) {
             this.registeredComponents.remove(unregisteredComponent);
         }
+    }
+
+
+    /**
+     * @param scope the scope required
+     * @return the Component Manager to use to register/unregister the wiki macro. The Component Manager to use depends
+     *         on the macro scope. For example a macro that has the "current user" scope, it must be registered against
+     *         the User Component Manager.
+     * @throws ComponentLookupException if the Component Manager for the specified scope cannot be found
+     */
+    private ComponentManager getComponentManager(WikiComponentScope scope) throws ComponentLookupException
+    {
+        ComponentManager cm;
+
+        switch (scope) {
+            case USER:
+                cm = this.rootComponentManager.getInstance(ComponentManager.class, "user");
+                break;
+            case WIKI:
+                cm = this.rootComponentManager.getInstance(ComponentManager.class, "wiki");
+                break;
+            default:
+                cm = this.rootComponentManager;
+        }
+
+        return cm;
     }
     
     /**
@@ -181,11 +206,11 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
     /**
      * Helper method that checks if at least one of an array of interfaces is the {@link Initializable} class.
-     * 
+     *
      * @param interfaces the array of interfaces to test
      * @return true if at least one of the passed interfaces is the is the {@link Initializable} class.
      */
-    private boolean isInitializable(List<Class< ? >> interfaces)
+    private boolean isInitializable(Class< ? >[] interfaces)
     {
         for (Class< ? > iface : interfaces) {
             if (Initializable.class.equals(iface)) {

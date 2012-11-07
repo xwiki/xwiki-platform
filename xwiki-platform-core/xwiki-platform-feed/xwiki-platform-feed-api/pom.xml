@@ -40,9 +40,9 @@
     </dependency>
     <!-- RSS Feed processing -->
     <dependency>
-      <groupId>net.java.dev.rome</groupId>
+      <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <version>1.0.0</version>
+      <version>1.0</version>
       <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
       <exclusions>
         <exclusion>
@@ -52,9 +52,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>net.java.dev.rome</groupId>
+      <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
-      <version>1.0.0</version>
+      <version>1.0</version>
       <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
       <exclusions>
         <exclusion>

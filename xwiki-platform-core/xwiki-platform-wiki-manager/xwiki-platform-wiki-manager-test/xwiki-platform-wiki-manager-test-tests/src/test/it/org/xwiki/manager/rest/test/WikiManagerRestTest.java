@@ -53,7 +53,7 @@ import org.xwiki.test.ui.AbstractTest;
  * @version $Id$
  * @since 4.3M2
  */
-public class WikiManagerRestTest extends AbstractTest
+public class WikiManagerRestTest
 {
     protected Random random;
 

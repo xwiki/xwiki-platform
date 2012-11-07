@@ -55,7 +55,7 @@
     </ul>
   #end
 #else
-  ## In order to be taken into account the result of evaluating the displayer without a display mode specified must not
-  ## be empty. Let's output something 
-  The display mode is not specified.
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
 #end

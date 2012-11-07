@@ -95,7 +95,8 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         new XObjectUpdatedEvent(TRANSLATIONOBJET), new XObjectDeletedEvent(TRANSLATIONOBJET));
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     @Named("uid")
@@ -227,22 +228,18 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     @Override
     public TranslationBundle getBundle(String bundleId) throws TranslationBundleDoesNotExistsException
     {
-        try {
-            return this.componentManager.getInstance(TranslationBundle.class,
-                AbstractDocumentTranslationBundle.ID_PREFIX + bundleId);
-        } catch (ComponentLookupException e) {
-            this.logger.debug("Failed to lookup component [{}] with hint [{}].", TranslationBundle.class, bundleId, e);
+        String id = AbstractDocumentTranslationBundle.ID_PREFIX + bundleId;
+
+        if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, id)) {
+            try {
+                return this.componentManagerProvider.get().getInstance(TranslationBundle.class, id);
+            } catch (ComponentLookupException e) {
+                this.logger.debug("Failed to lookup component [{}] with hint [{}].", TranslationBundle.class, bundleId,
+                    e);
+            }
         }
 
-        if (bundleId.startsWith(AbstractDocumentTranslationBundle.ID_PREFIX)) {
-            String referenceString = bundleId.substring(AbstractDocumentTranslationBundle.ID_PREFIX.length());
-
-            return getDocumentBundle(this.currentResolver.resolve(referenceString));
-        }
-
-        throw new TranslationBundleDoesNotExistsException(String.format(
-            "Unsupported bundle identifier [%s]. Should start with [%s]", bundleId,
-            AbstractDocumentTranslationBundle.ID_PREFIX));
+        return getDocumentBundle(this.currentResolver.resolve(bundleId));
     }
 
     private TranslationBundle getDocumentBundle(DocumentReference documentReference)
@@ -296,8 +293,8 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         DefaultDocumentTranslationBundle documentBundle;
         try {
             documentBundle =
-                new DefaultDocumentTranslationBundle(document.getDocumentReference(), this.componentManager,
-                    this.translationParser);
+                new DefaultDocumentTranslationBundle(document.getDocumentReference(),
+                    this.componentManagerProvider.get(), this.translationParser);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
         }
@@ -367,12 +364,16 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         Scope scope = getScope(document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE));
 
-        if (scope != null) {
+        // Unregister component
+        if (scope != null && scope != Scope.ON_DEMAND) {
             ComponentDescriptor<TranslationBundle> descriptor =
                 createComponentDescriptor(document.getDocumentReference());
 
             getComponentManager(document, scope, true).unregisterComponent(descriptor);
         }
+
+        // Remove from cache
+        this.bundlesCache.remove(this.uidSerializer.serialize(document.getDocumentReference()));
     }
 
     /**
@@ -388,7 +389,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         Scope scope = getScope(document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE));
 
-        if (scope != null) {
+        if (scope != null && scope != Scope.ON_DEMAND) {
             checkRegistrationAuthorization(document, scope);
 
             DefaultDocumentTranslationBundle bundle = createDocumentBundle(document);

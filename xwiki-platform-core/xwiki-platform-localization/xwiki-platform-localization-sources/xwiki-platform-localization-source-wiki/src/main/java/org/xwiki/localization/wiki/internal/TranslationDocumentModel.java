@@ -76,6 +76,11 @@ public interface TranslationDocumentModel
         /**
          * Register the translation bundle for the document author.
          */
-        USER
+        USER,
+
+        /**
+         * Don't register the translation bundle automatically.
+         */
+        ON_DEMAND
     }
 }

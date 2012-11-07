@@ -29,13 +29,13 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.LocalizationManager;
+import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
-import org.xwiki.localization.LocalizationManager;
-import org.xwiki.localization.Translation;
 
 /**
  * Default implementation of the {@link LocalizationManager} component.
@@ -51,7 +51,7 @@ public class DefaultLocalizationManager implements LocalizationManager
      */
     @Inject
     @Named("context")
-    private Provider<ComponentManager> componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * Used to access the current bundles.
@@ -82,9 +82,21 @@ public class DefaultLocalizationManager implements LocalizationManager
     public void use(String bundleType, String bundleId) throws TranslationBundleDoesNotExistsException,
         TranslationBundleFactoryDoesNotExistsException
     {
+        if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, bundleType + ':' + bundleId)) {
+            try {
+                this.bundleContext.addBundle(this.componentManagerProvider.get().<TranslationBundle> getInstance(
+                    TranslationBundle.class, bundleType + ':' + bundleId));
+
+                return;
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to lookup translation bundle with hint [{}] and type [{}].", bundleId,
+                    bundleType, e);
+            }
+        }
+
         TranslationBundleFactory bundleFactory;
         try {
-            bundleFactory = this.componentManager.get().getInstance(TranslationBundleFactory.class, bundleType);
+            bundleFactory = this.componentManagerProvider.get().getInstance(TranslationBundleFactory.class, bundleType);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleFactoryDoesNotExistsException(String.format(
                 "Failed to lookup BundleFactory for type [%s]", bundleType), e);

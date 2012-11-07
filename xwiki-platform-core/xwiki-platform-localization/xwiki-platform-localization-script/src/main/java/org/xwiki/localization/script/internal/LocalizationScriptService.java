@@ -79,6 +79,25 @@ public class LocalizationScriptService implements ScriptService
         return this.localization.getTranslation(key, this.localizationContext.getCurrentLocale());
     }
 
+    /**
+     * @param bundleType the hint of the {@link org.xwiki.localization.TranslationBundleFactory} to use to get the
+     *            actual bundle
+     * @param bundleId the identifier of the bundle for the passed type
+     * @return true if the bundle has been found and properly added to the list of current translation bundles, false
+     *         otherwise
+     */
+    public boolean use(String bundleType, String bundleId)
+    {
+        try {
+            this.localization.use(bundleType, bundleId);
+        } catch (Exception e) {
+            // TODO set current error
+            return false;
+        }
+
+        return true;
+    }
+
     // Helpers
 
     /**

@@ -53,12 +53,12 @@ public interface LocalizationManager
      * in which they were pulled. Each execution (generally a client request) has its own list of pulled resources, and
      * at the end of an execution, its list of pulled resources is cleared.
      * 
-     * @param type a hint identifying the bundle type.
+     * @param bundleType a hint identifying the bundle type.
      * @param bundleId the identifier of the bindle, for example a wiki document name, or the name of a
      *            <tt>.properties</tt> resource bundle.
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
      */
-    void use(String type, String bundleId) throws TranslationBundleDoesNotExistsException,
+    void use(String bundleType, String bundleId) throws TranslationBundleDoesNotExistsException,
         TranslationBundleFactoryDoesNotExistsException;
 }

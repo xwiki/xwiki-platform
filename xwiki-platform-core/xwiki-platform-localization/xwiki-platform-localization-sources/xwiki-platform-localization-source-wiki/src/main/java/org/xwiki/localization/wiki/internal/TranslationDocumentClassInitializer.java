@@ -56,8 +56,8 @@ public class TranslationDocumentClassInitializer extends AbstractMandatoryDocume
         BaseClass bclass = document.getXClass();
 
         needsUpdate |=
-            bclass
-                .addStaticListField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope", "GLOBAL|WIKI|USER");
+            bclass.addStaticListField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope",
+                "GLOBAL|WIKI|USER|ON_DEMAND");
 
         needsUpdate |= setClassDocumentFields(document, "Translation Document Class");
 

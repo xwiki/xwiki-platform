@@ -1591,7 +1591,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(displayFieldProperty $property $prefix $field)
   #set($displayFormType = $property.getProperty('displayFormType'))
-  #if($property.type.indexOf('Boolean') != -1 &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
+  #if($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
     ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;#displayPropertyEditInput($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
   #else
     ; {{html}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}

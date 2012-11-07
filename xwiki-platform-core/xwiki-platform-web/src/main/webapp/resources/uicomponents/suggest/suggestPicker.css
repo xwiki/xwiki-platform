@@ -8,6 +8,9 @@ ul.accepted-suggestions {
   position: relative;
   line-height: 1.3em;
 }
+ul.accepted-suggestions.sortable li {
+  cursor: move;
+}
 .accepted-suggestions li .key {
   font-size: 87%;
   color: $theme.textSecondaryColor;

@@ -290,6 +290,7 @@ var XWiki = (function (XWiki) {
     // Refresh the Sortable behavior to take into account the new items
     if (this.options.enableSort && this.list.childElements().length > 1 && typeof(Sortable) != "undefined") {
       Sortable.create(this.list);
+      this.list.addClassName('sortable');
     }
   },
 

@@ -393,26 +393,22 @@ public class XWiki implements EventListener
                         InputStream xwikicfgis = XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);
                         xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                         econtext.setAttribute(xwikiname, xwiki);
-                    } else {
-                        return xwiki;
+
+                        // initialize stub context here instead of during Execution context initialization because
+                        // during Execution context initialization, the XWikiContext is not fully initialized (does not
+                        // contains XWiki object) which make it unusable
+                        Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
+                            .initialize(context);
+
+                        // Send Event to signal that the application is ready to service requests.
+                        Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
+                            new ApplicationReadyEvent(), xwiki, context);
+
                     }
                 }
-
-                context.setWiki(xwiki);
-
-                // initialize stub context here instead of during Execution context initialization because during
-                // Execution context initialization, the XWikiContext is not fully initialized (does not contains XWiki
-                // object) which make it unusable
-                Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
-                    .initialize(context);
-
-                // Send Event to signal that the application is ready to service requests.
-                Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
-                    new ApplicationReadyEvent(), xwiki, context);
-            } else {
-                context.setWiki(xwiki);
             }
 
+            context.setWiki(xwiki);
             return xwiki;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,

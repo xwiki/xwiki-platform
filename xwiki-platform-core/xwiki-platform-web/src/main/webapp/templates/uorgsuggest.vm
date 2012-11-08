@@ -6,11 +6,11 @@ $response.setContentType("text/xml")
   ## Resolve the input as a user/group reference and use only the document name for matching.
   #set ($input = $services.model.resolveDocument($input).name)
 #end
-#if ($request.wiki == 'local')
-  #set ($wikiReference = $doc.documentReference.wikiReference)
-#else
+#if ($request.wiki == 'global')
   ## We need an API to create a wiki reference.
   #set ($wikiReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Space', 'Page').wikiReference)
+#else
+  #set ($wikiReference = $doc.documentReference.wikiReference)
 #end
 #if ($request.uorg == 'user')
   #set ($statement = 'from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or lower(user.first_name) like :input or lower(user.last_name) like :input order by user.first_name, user.last_name')

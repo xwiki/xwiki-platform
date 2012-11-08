@@ -10,6 +10,16 @@ input.suggestUsers {
 input.suggestGroups {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
 }
+.scope {
+  /* Hide the focus border. */
+  color: transparent;
+  /* Display the scope icon over the left border of the text input. */
+  position: absolute;
+}
+.suggestUsers.withScope, .suggestGroups.withScope {
+  /* Leave space for the scope icon. */
+  border-left-width: 25px;
+}
 ul.users {
   list-style-type: none;
   margin: 0;

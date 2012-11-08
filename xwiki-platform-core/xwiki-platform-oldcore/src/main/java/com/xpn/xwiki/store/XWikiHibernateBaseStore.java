@@ -99,9 +99,6 @@ public class XWikiHibernateBaseStore implements Initializable
 
     private DatabaseProduct databaseProduct = DatabaseProduct.UNKNOWN;
 
-    /** True if hibernate have been initated. */
-    private static volatile boolean hibernateInitiated;
-
     /**
      * List of workaround handlers for list properties.  See ListPropertyWorkaroundHandler below.
      */
@@ -251,8 +248,6 @@ public class XWikiHibernateBaseStore implements Initializable
         }
 
         setSessionFactory(getConfiguration().buildSessionFactory());
-
-        hibernateInitiated = true;
     }
 
     /**
@@ -623,14 +618,8 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
-        boolean initiate = !hibernateInitiated;
-        if (initiate) {
-            synchronized (this) {
-                initiate = !hibernateInitiated;
-                if (initiate) {
-                    initHibernate(context);
-                }
-            }
+        if (getSessionFactory() == null) {
+            initHibernate(context);
         }
     }
 

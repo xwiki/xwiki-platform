@@ -5613,7 +5613,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         List<MetaDataDiff> list = new ArrayList<MetaDataDiff>();
 
-        if ((fromDoc == null) || (toDoc == null)) {
+        if (fromDoc == null || toDoc == null) {
             return list;
         }
 
@@ -5621,11 +5621,11 @@ public class XWikiDocument implements DocumentModelBridge
             list.add(new MetaDataDiff("title", fromDoc.getTitle(), toDoc.getTitle()));
         }
 
-        if (!fromDoc.getParent().equals(toDoc.getParent())) {
+        if (!fromDoc.getRelativeParentReference().equals(toDoc.getRelativeParentReference())) {
             list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }
 
-        if (!fromDoc.getAuthor().equals(toDoc.getAuthor())) {
+        if (!fromDoc.getAuthorReference().equals(toDoc.getAuthorReference())) {
             list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
         }
 
@@ -5643,6 +5643,10 @@ public class XWikiDocument implements DocumentModelBridge
 
         if (!fromDoc.getDefaultLocale().equals(toDoc.getDefaultLocale())) {
             list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc.getDefaultLanguage()));
+        }
+
+        if (fromDoc.isHidden() != toDoc.isHidden()) {
+            list.add(new MetaDataDiff("hidden", fromDoc.isHidden(), toDoc.isHidden()));
         }
 
         return list;

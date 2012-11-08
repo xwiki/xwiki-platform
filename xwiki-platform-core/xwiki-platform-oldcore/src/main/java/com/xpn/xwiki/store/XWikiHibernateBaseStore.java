@@ -100,7 +100,7 @@ public class XWikiHibernateBaseStore implements Initializable
     private DatabaseProduct databaseProduct = DatabaseProduct.UNKNOWN;
 
     /** True if hibernate have been initated. */
-    private volatile boolean hibernateInitiated;
+    private static volatile boolean hibernateInitiated;
 
     /**
      * List of workaround handlers for list properties.  See ListPropertyWorkaroundHandler below.

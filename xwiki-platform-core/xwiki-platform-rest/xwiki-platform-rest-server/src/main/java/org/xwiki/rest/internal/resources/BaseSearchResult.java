@@ -820,12 +820,12 @@ public class BaseSearchResult extends XWikiResource
                     String wikiName = luceneSearchResult.getWiki();
                     String spaceName = luceneSearchResult.getSpace();
                     String pageName = luceneSearchResult.getName();
+                    String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
                     String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
                     /* Check if the user has the right to see the found document */
                     if (xwikiApi.hasAccessLevel("view", pageId)) {
-                        String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
-                        Document doc = xwikiApi.getDocument(pageFullName);
+                        Document doc = xwikiApi.getDocument(pageId);
                         String title = doc.getDisplayTitle();
 
                         SearchResult searchResult = objectFactory.createSearchResult();

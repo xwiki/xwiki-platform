@@ -34,18 +34,24 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.manager.rest.resources.WikiManagerResource;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
+import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.SearchResult;
+import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
+import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
+import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 import org.xwiki.test.integration.XWikiExecutor;
-import org.xwiki.test.ui.AbstractTest;
 
 /**
  * Tests for the Wiki manager REST API.
@@ -98,8 +104,8 @@ public class WikiManagerRestTest
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         boolean found = false;
-        for(Wiki w : wikis.getWikis()) {
-            if(WIKI_ID.equals(w.getId())) {
+        for (Wiki w : wikis.getWikis()) {
+            if (WIKI_ID.equals(w.getId())) {
                 found = true;
                 break;
             }
@@ -108,9 +114,112 @@ public class WikiManagerRestTest
         Assert.assertTrue(found);
     }
 
+    //FIXME: Test is disabled for the moment. It works if tested against MySQL but with HSQLDB it seems that the
+    // Lucene plugin is not triggered. Anyway this should be better rewritte, if possible, as a unit test.
+    //@Test
+    public void testMultiwikiSearch() throws Exception
+    {
+        String WIKI1_ID = "w1";
+        String WIKI2_ID = "w2";
+        String PAGE_SPACE = "Main";
+        String PAGE_NAME = "Test";
+        String PAGE1_STRING = "foo";
+        String PAGE2_STRING = "bar";
+
+        Wiki wiki = objectFactory.createWiki();
+        wiki.setId(WIKI1_ID);
+
+        PostMethod postMethod = executePost(getFullUri(WikiManagerResource.class), "superadmin", "pass", wiki);
+        Assert.assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode());
+
+        wiki = objectFactory.createWiki();
+        wiki.setId(WIKI2_ID);
+
+        postMethod = executePost(getFullUri(WikiManagerResource.class), "superadmin", "pass", wiki);
+        Assert.assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode());
+
+        /* Store the page */
+        Page page1 = objectFactory.createPage();
+        page1.setTitle(PAGE1_STRING);
+        page1.setContent(PAGE1_STRING);
+        PutMethod putMethod =
+                executePut(getUriBuilder(PageResource.class).build(WIKI1_ID, PAGE_SPACE, PAGE_NAME).toString(),
+                        "superadmin",
+                        "pass", page1);
+        Assert.assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        page1 = (Page) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+
+        /* Retrieve the page to check that it exists */
+        GetMethod getMethod =
+                executeGet(getUriBuilder(PageResource.class).build(WIKI1_ID, PAGE_SPACE, PAGE_NAME).toString());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Assert.assertEquals(WIKI1_ID, page.getWiki());
+        Assert.assertEquals(PAGE_SPACE, page.getSpace());
+        Assert.assertEquals(PAGE_NAME, page.getName());
+        Assert.assertEquals(PAGE1_STRING, page.getTitle());
+        Assert.assertEquals(PAGE1_STRING, page.getContent());
+        Assert.assertEquals(page1.getCreated(), page.getCreated());
+        Assert.assertEquals(page1.getModified(), page.getModified());
+
+        /* Store the page */
+        Page page2 = objectFactory.createPage();
+        page2.setTitle(PAGE2_STRING);
+        page2.setContent(PAGE2_STRING);
+        putMethod =
+                executePut(getUriBuilder(PageResource.class).build(WIKI2_ID, PAGE_SPACE, PAGE_NAME).toString(),
+                        "superadmin",
+                        "pass", page2);
+        Assert.assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        page2 = (Page) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+
+        /* Retrieve the page to check that it exists */
+        getMethod = executeGet(getUriBuilder(PageResource.class).build(WIKI2_ID, PAGE_SPACE, PAGE_NAME).toString());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+        page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Assert.assertEquals(WIKI2_ID, page.getWiki());
+        Assert.assertEquals(PAGE_SPACE, page.getSpace());
+        Assert.assertEquals(PAGE_NAME, page.getName());
+        Assert.assertEquals(PAGE2_STRING, page.getTitle());
+        Assert.assertEquals(PAGE2_STRING, page.getContent());
+        Assert.assertEquals(page2.getCreated(), page.getCreated());
+        Assert.assertEquals(page2.getModified(), page.getModified());
+
+        /* Wait a bit that the Lucene Indexer indexes the pages. */
+        Thread.sleep(5000);
+
+        getMethod = executeGet(URIUtil.encodeQuery(
+                String.format("%s?q=\"%s\"&wikis=w1,w2", getFullUri(WikisSearchQueryResource.class), PAGE_NAME)));
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        Assert.assertEquals(2, searchResults.getSearchResults().size());
+
+        for (SearchResult searchResult : searchResults.getSearchResults()) {
+            Page pageToBeCheckedAgainst = null;
+            if (searchResult.getWiki().equals(WIKI1_ID)) {
+                pageToBeCheckedAgainst = page1;
+            } else {
+                pageToBeCheckedAgainst = page2;
+            }
+
+            Assert.assertEquals(pageToBeCheckedAgainst.getWiki(), searchResult.getWiki());
+            Assert.assertEquals(pageToBeCheckedAgainst.getTitle(), searchResult.getTitle());
+            Assert.assertEquals(pageToBeCheckedAgainst.getAuthor(), searchResult.getAuthor());
+            Assert.assertEquals(pageToBeCheckedAgainst.getModified(), searchResult.getModified());
+            Assert.assertEquals(pageToBeCheckedAgainst.getVersion(), searchResult.getVersion());
+        }
+    }
+
     protected String getBaseURL()
     {
         return String.format("http://localhost:%s%s", port, RELATIVE_REST_API_ENTRYPOINT);
+    }
+
+    protected UriBuilder getUriBuilder(Class<?> resource)
+    {
+        return UriBuilder.fromUri(getBaseURL()).path(resource);
     }
 
     protected String getFullUri(Class<?> resourceClass)
@@ -149,5 +258,27 @@ public class WikiManagerRestTest
         httpClient.executeMethod(postMethod);
 
         return postMethod;
+    }
+
+    protected PutMethod executePut(String uri, String userName, String password, Object object)
+            throws Exception
+    {
+        HttpClient httpClient = new HttpClient();
+        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
+        httpClient.getParams().setAuthenticationPreemptive(true);
+
+        PutMethod putMethod = new PutMethod(uri);
+        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(object, writer);
+        RequestEntity entity =
+                new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+
+        putMethod.setRequestEntity(entity);
+
+        httpClient.executeMethod(putMethod);
+
+        return putMethod;
     }
 }

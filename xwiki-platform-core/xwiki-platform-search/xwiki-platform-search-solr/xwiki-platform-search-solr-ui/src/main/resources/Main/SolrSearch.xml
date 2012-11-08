@@ -968,6 +968,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   &lt;form id='search-form' action=''&gt;
     &lt;div class='xformInline'&gt;
       &lt;div&gt;
+        &lt;label class='hidden' for='text'&gt;$msg.get('search.page.query.label')&lt;/label&gt;
         &lt;input type='text' id='text' name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
         &lt;input type='hidden' id='sort-hidden-field' value='' name='si'/&gt;
         &lt;span class='buttonwrapper'&gt;

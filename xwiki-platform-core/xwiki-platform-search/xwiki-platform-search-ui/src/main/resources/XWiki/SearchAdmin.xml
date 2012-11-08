@@ -300,10 +300,13 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
   #if ($searchConfigDoc.parent == '')
     $searchConfigDoc.setParent('XWiki.SearchAdmin')
   #end
-  #set($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
+  #set ($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
+  #if ("$!searchEngine" != '')
+    #set ($discard = $searchConfigObj.set('engine', $searchEngine))
+  #end
   $searchConfigDoc.save()
 #end
-#set($searchEnginePropertyClass = $searchConfigClass.engine)
+#set ($searchEnginePropertyClass = $searchConfigClass.engine)
 {{/velocity}}
 
 {{velocity}}

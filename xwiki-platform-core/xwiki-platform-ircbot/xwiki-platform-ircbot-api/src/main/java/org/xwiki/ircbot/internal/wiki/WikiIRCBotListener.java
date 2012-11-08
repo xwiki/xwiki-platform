@@ -186,6 +186,9 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
 
         final XDOM xdom = this.events.get(eventName);
         if (xdom != null) {
+            LOGGER.debug("Start processing Wiki IRC Bot Listener [{}] for Event [{}], for thread [{}]",
+                this.listenerData.getReference(), event, Thread.currentThread());
+
             // Note that if a Bot Listener script needs access to the IRC Bot (for example to send a message to the
             // IRC channel), it can access it through the "ircbot" Script Service.
 
@@ -206,6 +209,9 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
                 }
                 getLogger().warn(String.format("Failed to execute IRC Bot Listener script [%s]", eventName), e);
             }
+
+            LOGGER.debug("Stop processing Wiki IRC Bot Listener [{}] for Event [{}], for thread [{}]",
+                this.listenerData.getReference(), event, Thread.currentThread());
         }
     }
 

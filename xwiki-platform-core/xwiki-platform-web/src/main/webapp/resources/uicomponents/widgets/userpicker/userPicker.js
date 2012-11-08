@@ -56,7 +56,7 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
       this._createScope();
       listInsertionElement = input.up();
     }
-    this.suggestPicker = new SelectionManager(input, this, {
+    this._selectionManager = this._createSelectionManager({
       listInsertionElement: listInsertionElement,
       listInsertionPosition : 'before',
       acceptFreeText : true
@@ -86,7 +86,15 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
    */
   clear : function() {
     this.fld.clear();
-    this.suggestPicker.clearAcceptedList();
+    this._selectionManager.clearAcceptedList();
+  },
+
+  /**
+   * Determines the selection manager that is going to be used. Derived classes can override this method if they want
+   * to use a different selection manager.
+   */
+  _createSelectionManager: function(options) {
+    return new SelectionManager(this.fld, this, options);
   },
 
   _createScope: function() {

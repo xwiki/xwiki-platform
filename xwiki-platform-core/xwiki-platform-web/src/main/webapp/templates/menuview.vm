@@ -286,6 +286,7 @@
   #end
   #if ($canShare)
     #submenuitem($doc.getURL('view', 'viewer=share') $msg.get('core.menu.share') 'tmActionShare', '')
+    #userPicker_import()
     $xwiki.jsx.use('XWiki.SharePage')
     $xwiki.ssx.use('XWiki.SharePage')
   #end

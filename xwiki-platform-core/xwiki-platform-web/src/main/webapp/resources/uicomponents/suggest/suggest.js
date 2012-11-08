@@ -895,6 +895,7 @@ var XWiki = (function(XWiki){
    * Clear suggestions
    */
   clearSuggestions: function() {
+    this.clearHighlight();
     this.killTimeout();
     this.isActive = false;
     var ele = $(this.container);

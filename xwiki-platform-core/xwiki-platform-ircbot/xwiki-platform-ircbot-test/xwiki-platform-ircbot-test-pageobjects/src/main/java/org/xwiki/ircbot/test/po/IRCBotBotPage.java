@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 4.0M2
  */
-public class IRCBotPage extends ViewPage
+public class IRCBotBotPage extends ViewPage
 {
     @FindBy(xpath = "//input[@type='submit'][@name='botaction']")
     private WebElement actionButton;
@@ -40,10 +40,10 @@ public class IRCBotPage extends ViewPage
     /**
      * Opens the IRC Bot page.
      */
-    public static IRCBotPage gotoPage()
+    public static IRCBotBotPage gotoPage()
     {
         getUtil().gotoPage("IRC", "IRCBot");
-        return new IRCBotPage();
+        return new IRCBotBotPage();
     }
 
     /**

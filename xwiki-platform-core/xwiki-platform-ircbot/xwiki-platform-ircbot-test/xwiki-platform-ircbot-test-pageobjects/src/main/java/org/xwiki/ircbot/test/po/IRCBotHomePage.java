@@ -19,6 +19,8 @@
  */
 package org.xwiki.ircbot.test.po;
 
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -28,15 +30,34 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 4.0M2
  */
-public class WebHomePage extends ViewPage
+public class IRCBotHomePage extends ViewPage
 {
+    @FindBy(xpath = "//a[text() = 'Bot Command Center']")
+    private WebElement commandCenterLink;
+
     /**
-     * Opens the IRC Bot page.
+     * Opens the IRC Bot home page.
      */
-    public static WebHomePage gotoPage()
+    public static IRCBotHomePage gotoPage()
     {
-        getUtil().gotoPage("IRC", "WebHome");
-        return new WebHomePage();
+        getUtil().gotoPage(getSpace(), getPage());
+        return new IRCBotHomePage();
+    }
+
+    public static String getSpace()
+    {
+        return "IRC";
+    }
+
+    public static String getPage()
+    {
+        return "WebHome";
+    }
+
+    public IRCBotBotPage clickCommandCenterLink()
+    {
+        this.commandCenterLink.click();
+        return new IRCBotBotPage();
     }
 
     public LiveTableElement getArchiveLiveTable()

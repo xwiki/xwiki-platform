@@ -30,15 +30,15 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
  * @version $Id$
  * @since 4.0M2
  */
-public class IRCConfigurationPage extends ViewPage
+public class IRCBotConfigurationPage extends ViewPage
 {
     /**
      * Opens the page.
      */
-    public static IRCConfigurationPage gotoPage()
+    public static IRCBotConfigurationPage gotoPage()
     {
         getUtil().gotoPage("IRC", "IRCConfiguration");
-        return new IRCConfigurationPage();
+        return new IRCBotConfigurationPage();
     }
 
     public void setLoggingPage(String name)

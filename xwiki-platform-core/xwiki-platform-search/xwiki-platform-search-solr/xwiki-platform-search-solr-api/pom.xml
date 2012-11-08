@@ -43,18 +43,11 @@
       <artifactId>solr-solrj</artifactId>
       <version>${solr.version}</version>
     </dependency>
+    <!-- Embedded Solr instance. -->
     <dependency>
-      <!-- Embedded Solr instance. -->
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>${solr.version}</version>
-      <exclusions>
-        <!-- TODO: Do we need this exclude? Got it from the old solr code. -->
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -62,6 +55,7 @@
       <version>${solr.version}</version>
     </dependency>
 
+    <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>

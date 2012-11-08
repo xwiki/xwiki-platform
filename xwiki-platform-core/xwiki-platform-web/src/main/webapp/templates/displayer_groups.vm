@@ -1,25 +1,6 @@
 #if ($type == 'edit')
-  ##
-  ## Pull the required resources.
-  ##
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  #if ($isMultiSelect)
-    ## Needed for sorting the selected values.
-    #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
-  #end
-  ## Needed for displaying a list of suggestions based on the user input.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
-  ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
-  ## overwrites the previously selected value.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
-  ## The actual group picker. Provides a custom display for the group suggestions and selected groups.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
-  ##
-  ## Display the text input.
-  ##
+  #userPicker_import($isMultiSelect)
   #set($id = $escapetool.xml("${prefix}${name}"))
   <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
     class="suggestGroups#if ($isMultiSelect) multipleSelection#end" />

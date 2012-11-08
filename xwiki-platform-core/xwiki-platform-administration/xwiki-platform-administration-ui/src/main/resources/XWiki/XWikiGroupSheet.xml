@@ -197,12 +197,7 @@
     &lt;form class="xform" action="$doc.getURL('preview')"&gt;
       &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
   #else
-    #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
-    #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
-    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+    #userPicker_import()
     #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
     ## The form is generated in the edit template.
     &lt;div class="xform"&gt;

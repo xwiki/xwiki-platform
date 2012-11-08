@@ -44,6 +44,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+{{html}}
 ### Globally administrate the groups in a wiki.
 #set($formname = "update")
 #set($saveaction = "save")
@@ -55,13 +56,8 @@
 #set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
 #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
 #set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
-## The following are needed when editing a group (adding new members) by the user/group picker.
-#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+## The following are needed when editing a group (e.g. for adding new members).
+#userPicker_import()
 #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
 ##
 ## url to get the groups for displaying them in the ajax-based table
@@ -72,7 +68,6 @@
 #else
   #set($mainwk = true)
 #end
-{{html}}
 &lt;div id="xwikieditcontent"&gt;
   &lt;table id="groupstable" class="xwiki-livetable"&gt;
     &lt;tr&gt;

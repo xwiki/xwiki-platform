@@ -40,6 +40,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xwiki.manager.rest.resources.WikiManagerResource;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
@@ -115,8 +116,9 @@ public class WikiManagerRestTest
     }
 
     //FIXME: Test is disabled for the moment. It works if tested against MySQL but with HSQLDB it seems that the
-    // Lucene plugin is not triggered. Anyway this should be better rewritte, if possible, as a unit test.
-    //@Test
+    // Lucene plugin is not triggered. Anyway this should be better to rewrite it, if possible, as a unit test.
+    @Ignore("This test doesn't seem to work correctly with HSQLDB but it actually works if run against MySQL.")
+    @Test
     public void testMultiwikiSearch() throws Exception
     {
         String WIKI1_ID = "w1";

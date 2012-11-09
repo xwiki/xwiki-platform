@@ -182,9 +182,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     {
         input input = new input();
         input.setAttributeFilterState(true);
-        PropertyInterface prop = object.safeget(name);
+        BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("hidden");
@@ -210,7 +210,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("text");

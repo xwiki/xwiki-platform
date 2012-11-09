@@ -479,7 +479,7 @@ public class DBListClass extends ListClass
             BaseProperty prop = (BaseProperty) object.safeget(name);
             String val = "";
             if (prop != null) {
-                val = prop.toFormString();
+                val = prop.toText();
             }
 
             if (isPicker()) {

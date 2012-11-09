@@ -98,7 +98,7 @@ public class StaticListClass extends ListClass
             input.setAttributeFilterState(true);
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
-                input.setValue(prop.toFormString());
+                input.setValue(prop.toText());
             }
             input.setType("text");
             input.setSize(getSize());

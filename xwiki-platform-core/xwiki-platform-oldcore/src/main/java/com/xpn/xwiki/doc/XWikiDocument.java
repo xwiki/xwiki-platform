@@ -5621,11 +5621,15 @@ public class XWikiDocument implements DocumentModelBridge
             list.add(new MetaDataDiff("title", fromDoc.getTitle(), toDoc.getTitle()));
         }
 
-        if (!fromDoc.getRelativeParentReference().equals(toDoc.getRelativeParentReference())) {
+        EntityReference fromParent = fromDoc.getRelativeParentReference();
+        EntityReference toParent = toDoc.getRelativeParentReference();
+        if (fromParent != toParent && (fromParent == null || toParent == null || !fromParent.equals(toParent))) {
             list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }
 
-        if (!fromDoc.getAuthorReference().equals(toDoc.getAuthorReference())) {
+        DocumentReference fromAuthor = fromDoc.getAuthorReference();
+        DocumentReference toAuthor = toDoc.getAuthorReference();
+        if (fromAuthor != toAuthor && (fromAuthor == null || toAuthor == null || !fromAuthor.equals(toAuthor))) {
             list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
         }
 

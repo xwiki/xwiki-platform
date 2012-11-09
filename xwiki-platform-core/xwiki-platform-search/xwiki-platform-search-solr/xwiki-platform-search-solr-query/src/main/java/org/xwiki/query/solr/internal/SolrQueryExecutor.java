@@ -50,6 +50,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  * List that the {@link #execute(Query)} method allows.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named(SolrQueryExecutor.SOLR)

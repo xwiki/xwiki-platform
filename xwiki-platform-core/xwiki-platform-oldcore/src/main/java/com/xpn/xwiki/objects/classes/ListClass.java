@@ -34,6 +34,7 @@ import org.dom4j.Element;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
@@ -399,7 +400,7 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context)
     {
         input input = new input();
-        input.setAttributeFilterState(true);
+        input.setAttributeFilter(new XMLAttributeValueFilter());
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
             input.setValue(prop.toText());
@@ -441,7 +442,7 @@ public abstract class ListClass extends PropertyClass
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
-            input.setAttributeFilterState(true);
+            input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
                 input.setValue(prop.toText());
@@ -460,7 +461,7 @@ public abstract class ListClass extends PropertyClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
-            hidden.setAttributeFilterState(true);
+            hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
         }
     }
@@ -497,7 +498,7 @@ public abstract class ListClass extends PropertyClass
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
                 + name, value);
-            radio.setAttributeFilterState(true);
+            radio.setAttributeFilter(new XMLAttributeValueFilter());
             radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());
 
@@ -513,7 +514,7 @@ public abstract class ListClass extends PropertyClass
         }
 
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
-        hidden.setAttributeFilterState(true);
+        hidden.setAttributeFilter(new XMLAttributeValueFilter());
         buffer.append(hidden);
     }
 
@@ -551,7 +552,7 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
-        select.setAttributeFilterState(true);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);

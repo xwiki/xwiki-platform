@@ -29,6 +29,7 @@ import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
@@ -158,7 +159,7 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
-        select.setAttributeFilterState(true);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
@@ -220,11 +221,11 @@ public class BooleanClass extends PropertyClass
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
-        radioNone.setAttributeFilterState(true);
+        radioNone.setAttributeFilter(new XMLAttributeValueFilter());
         input radioTrue = new input(input.radio, prefix + name, "1");
-        radioTrue.setAttributeFilterState(true);
+        radioTrue.setAttributeFilter(new XMLAttributeValueFilter());
         input radioFalse = new input(input.radio, prefix + name, "0");
-        radioFalse.setAttributeFilterState(true);
+        radioFalse.setAttributeFilter(new XMLAttributeValueFilter());
         radioNone.setDisabled(isDisabled());
         radioTrue.setDisabled(isDisabled());
         radioFalse.setDisabled(isDisabled());
@@ -293,13 +294,13 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
-        check.setAttributeFilterState(true);
+        check.setAttributeFilter(new XMLAttributeValueFilter());
         check.setID(prefix + name);
         check.setDisabled(isDisabled());
         // If the (visible) checkbox is unchecked, it will not post anything back so the hidden input by the same
         // name will post back 0 and the save function will save the first entry it finds.
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
-        checkNo.setAttributeFilterState(true);
+        checkNo.setAttributeFilter(new XMLAttributeValueFilter());
 
         try {
             IntegerProperty prop = (IntegerProperty) object.safeget(name);

@@ -29,6 +29,7 @@ import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -95,7 +96,7 @@ public class StaticListClass extends ListClass
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
-            input.setAttributeFilterState(true);
+            input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
                 input.setValue(prop.toText());
@@ -139,7 +140,7 @@ public class StaticListClass extends ListClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
-            hidden.setAttributeFilterState(true);
+            hidden.setAttributeFilter(new XMLAttributeValueFilter());
             hidden.setDisabled(isDisabled());
             buffer.append(hidden);
         }

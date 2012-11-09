@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -332,7 +333,7 @@ public class DBTreeListClass extends DBListClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
-        select.setAttributeFilterState(true);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);

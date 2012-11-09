@@ -38,10 +38,10 @@ import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -181,7 +181,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         XWikiContext context)
     {
         input input = new input();
-        input.setAttributeFilterState(true);
+        input.setAttributeFilter(new XMLAttributeValueFilter());
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
             input.setValue(prop.toText());
@@ -206,7 +206,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
-        input.setAttributeFilterState(true);
+        input.setAttributeFilter(new XMLAttributeValueFilter());
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {

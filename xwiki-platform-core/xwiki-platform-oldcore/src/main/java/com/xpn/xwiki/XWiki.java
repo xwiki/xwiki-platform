@@ -121,7 +121,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
@@ -5910,7 +5910,7 @@ public class XWiki implements EventListener
      */
     public Object parseGroovyFromString(String script, final String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        final ContentAuthorController contentAuthorController = Utils.getComponent(ContentAuthorController.class);
+        final ContentDocumentController contentDocumentController = Utils.getComponent(ContentDocumentController.class);
 
         if (getRenderingEngine().getRenderer("groovy") == null) {
             return null;
@@ -5918,7 +5918,7 @@ public class XWiki implements EventListener
 
         if (jarWikiPage != null) {
             XWikiDocument doc = context.getWiki().getDocument(jarWikiPage, context);
-            contentAuthorController.pushContentDocument(doc);
+            contentDocumentController.pushContentDocument(doc);
         }
 
         try {
@@ -5942,7 +5942,7 @@ public class XWiki implements EventListener
             }
         } finally {
             if (jarWikiPage != null) {
-                contentAuthorController.popContentDocument();
+                contentDocumentController.popContentDocument();
             }
         }
     }
@@ -5954,9 +5954,9 @@ public class XWiki implements EventListener
 
     public Object parseGroovyFromPage(String fullname, String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        ContentAuthorController contentAuthorController = Utils.getComponent(ContentAuthorController.class);
+        ContentDocumentController contentDocumentController = Utils.getComponent(ContentDocumentController.class);
         XWikiDocument doc = context.getWiki().getDocument(fullname, context);
-        contentAuthorController.pushContentDocument(doc);
+        contentDocumentController.pushContentDocument(doc);
         try {
             if (getRightService().hasProgrammingRights(context))
                 return parseGroovyFromString(context.getWiki().getDocument(fullname, context).getContent(),
@@ -5967,7 +5967,7 @@ public class XWiki implements EventListener
                                          String.format("No programming rights on groovy wiki page [%s].", fullname));
             }
         } finally {
-            contentAuthorController.popContentDocument();
+            contentDocumentController.popContentDocument();
         }
     }
 

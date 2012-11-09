@@ -19,33 +19,30 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.model.reference.DocumentReference;
-
 import org.xwiki.component.annotation.Role;
 
 /**
- * Interface for changing the content author in the authorization context.
+ * Interface for temporarily granting all rights.
  *
- * The content author controller should always be used in a try-finally statement to ensure that the content author is
- * correctly popped of the stack.
+ * Pushing a "grant all" entry will not override any subsequent security entries pushed to the stack.
  *
+ * The grant all controller must always be used in a try-finally statement to ensure that the grant-all security stack
+ * entry is correctly popped of the stack.
  *
  * @version $Id$
  * @since 4.3M2
  */
 @Role
-public interface ContentAuthorController
+public interface GrantAllController
 {
     /**
-     * Set a new literal content author.
-     *
-     * @param userReference The new content author reference.
+     * Put a "grant all" entry on top of the security stack.
      */
-    void pushContentAuthor(DocumentReference userReference);
+    void pushGrantAll();
 
     /**
-     * Remove the current content author from the top of the security stack.
+     * Remove a "grant all" entry from the top of the security stack.
      */
-    void popContentAuthor();
+    void popGrantAll();
 
 }

@@ -33,7 +33,7 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -59,9 +59,9 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     private Cache<XWikiRenderingCache> cache;
 
-    /** We need to control the content author here. */
-    private final ContentAuthorController contentAuthorController = Utils.
-        getComponent(ContentAuthorController.class);
+    /** We need to control the content document here. */
+    private final ContentDocumentController contentDocumentController = Utils.
+        getComponent(ContentDocumentController.class);
 
     public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
@@ -287,7 +287,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             context.put("idoc", includingdoc);
             context.put("sdoc", contentdoc);
 
-            contentAuthorController.pushContentDocument(contentdoc);
+            contentDocumentController.pushContentDocument(contentdoc);
 
             // Let's call the beginRendering loop
             context.getWiki().getPluginManager().beginRendering(context);
@@ -328,7 +328,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                 } else {
                     context.put("sdoc", sdoc);
                 }
-                contentAuthorController.popContentDocument();
+                contentDocumentController.popContentDocument();
 
                 // Let's call the endRendering loop
                 context.getWiki().getPluginManager().endRendering(context);

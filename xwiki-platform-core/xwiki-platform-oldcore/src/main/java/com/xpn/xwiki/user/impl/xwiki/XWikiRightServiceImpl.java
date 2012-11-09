@@ -512,6 +512,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
     {
         LOGGER.debug("hasAccessLevel for [{}], [{}], [{}]", accessLevel, userOrGroupName, entityReference);
 
+        if (getAuth().grantAll()) {
+            LOGGER.debug("Granting access because grant all is enabled.");
+            return true;
+        }
+
         DocumentReference userOrGroupNameReference =
             this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
 
@@ -951,6 +956,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (!getAuth().isPrivileged()) {
             LOGGER.debug("Programming rights denied because privileged mode is disabled.");
             return false;
+        }
+
+        if (getAuth().grantAll()) {
+            LOGGER.debug("Programming rights granted because grant all is enabled.");
+            return true;
         }
 
         final String username = entityReferenceSerializer.serialize(user);

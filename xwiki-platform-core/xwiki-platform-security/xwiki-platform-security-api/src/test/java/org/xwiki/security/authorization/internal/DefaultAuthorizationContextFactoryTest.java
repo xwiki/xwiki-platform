@@ -22,6 +22,8 @@ package org.xwiki.security.authorization.internal;
 import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
+import org.xwiki.security.authorization.GrantAllController;
 import org.xwiki.security.authorization.PrivilegedModeController;
 
 import org.xwiki.context.Execution;
@@ -147,11 +149,11 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
     }
 
     @Test
-    public void contentAuthorControl() throws Exception
+    public void contextDocumentControl() throws Exception
     {
         final AuthorizationContext authorizationContext = getAuthorizationContext();
 
-        final ContentAuthorController cac = getComponentManager().getInstance(ContentAuthorController.class);
+        final ContentDocumentController cdc = getComponentManager().getInstance(ContentDocumentController.class);
 
         final DocumentModelBridge document1 = getMockery().mock(DocumentModelBridge.class, "document1");
         final DocumentModelBridge document2 = getMockery().mock(DocumentModelBridge.class, "document2");
@@ -163,24 +165,85 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
 
-        cac.pushContentDocument(document1);
+        cdc.pushContentDocument(document1);
 
         Assert.assertTrue(user1.equals(authorizationContext.getContentAuthor()));
 
-        cac.pushContentDocument(document2);
+        cdc.pushContentDocument(document2);
         
         Assert.assertTrue(user2.equals(authorizationContext.getContentAuthor()));
 
-        DocumentModelBridge document = cac.popContentDocument();
+        cdc.popContentDocument();
 
-        Assert.assertTrue(document == document2);
         Assert.assertTrue(user1.equals(authorizationContext.getContentAuthor()));
 
-        document = cac.popContentDocument();
+        cdc.popContentDocument();
 
-        Assert.assertTrue(document == document1);
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
         
+    }
+
+    @Test
+    public void contentAuthorControl() throws Exception
+    {
+        final AuthorizationContext authorizationContext = getAuthorizationContext();
+
+        final ContentAuthorController cac = getComponentManager().getInstance(ContentAuthorController.class);
+
+        Assert.assertTrue(authorizationContext.getContentAuthor() == null);
+
+        cac.pushContentAuthor(user1);
+
+        Assert.assertTrue(user1.equals(authorizationContext.getContentAuthor()));
+
+        cac.pushContentAuthor(user2);
+        
+        Assert.assertTrue(user2.equals(authorizationContext.getContentAuthor()));
+
+        cac.popContentAuthor();
+
+        Assert.assertTrue(user1.equals(authorizationContext.getContentAuthor()));
+
+        cac.popContentAuthor();
+
+        Assert.assertTrue(authorizationContext.getContentAuthor() == null);
+        
+    }
+
+    @Test
+    public void grantAllControl() throws Exception
+    {
+        final AuthorizationContext authorizationContext = getAuthorizationContext();
+
+        final GrantAllController gac = getComponentManager().getInstance(GrantAllController.class);
+        final ContentAuthorController cac = getComponentManager().getInstance(ContentAuthorController.class);
+        final ContentDocumentController cdc = getComponentManager().getInstance(ContentDocumentController.class);
+
+        final DocumentModelBridge document2 = getMockery().mock(DocumentModelBridge.class, "document2");
+
+        Assert.assertFalse(authorizationContext.grantAll());
+
+        cac.pushContentAuthor(user1);
+
+        Assert.assertFalse(authorizationContext.grantAll());
+
+        gac.pushGrantAll();
+
+        Assert.assertTrue(authorizationContext.grantAll());
+
+        cdc.pushContentDocument(document2);
+
+        Assert.assertFalse(authorizationContext.grantAll());
+
+        cdc.popContentDocument();
+
+        Assert.assertTrue(authorizationContext.grantAll());
+
+        gac.popGrantAll();
+
+        Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertEquals(user1, authorizationContext.getContentAuthor());
+
     }
 
     @Test

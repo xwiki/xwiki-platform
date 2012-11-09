@@ -25,7 +25,7 @@ import javax.inject.Provider;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.security.authorization.PrivilegedModeController;
 
 /**
@@ -39,7 +39,7 @@ public abstract class AbstractDocumentDisplayer implements DocumentDisplayer, In
 
     /** This is used for setting the content author in the authorization context. */
     @Inject
-    private ContentAuthorController contentAuthorController;
+    private ContentDocumentController contentDocumentController;
 
     /** Provide a privileged mode controller. */
     @Inject
@@ -59,7 +59,7 @@ public abstract class AbstractDocumentDisplayer implements DocumentDisplayer, In
     public final XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         final boolean restricted = parameters.isTransformationContextRestricted();
-        contentAuthorController.pushContentDocument(parameters.getContentDocument());
+        contentDocumentController.pushContentDocument(parameters.getContentDocument());
 
         if (restricted) {
             privilegedModeController.disablePrivilegedMode();
@@ -71,7 +71,7 @@ public abstract class AbstractDocumentDisplayer implements DocumentDisplayer, In
             if (restricted) {
                 privilegedModeController.restorePrivilegedMode();
             }
-            contentAuthorController.popContentDocument();
+            contentDocumentController.popContentDocument();
         }
     }
 

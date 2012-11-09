@@ -17,35 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.authorization.internal;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import org.xwiki.component.annotation.Role;
-
 /**
- * Interface for changing the content author in the authorization context.
- *
- * The content author controller should always be used in a try-finally statement to ensure that the content author is
- * correctly popped of the stack.
- *
+ * This is an entry that holds an explicit user reference.
  *
  * @version $Id$
  * @since 4.3M2
  */
-@Role
-public interface ContentAuthorController
+public class UserSecurityStackEntry implements SecurityStackEntry
 {
-    /**
-     * Set a new literal content author.
-     *
-     * @param userReference The new content author reference.
-     */
-    void pushContentAuthor(DocumentReference userReference);
 
     /**
-     * Remove the current content author from the top of the security stack.
+     * The literal user that will be considered "content author" while this entry is at the top of the security
+     * stack. 
      */
-    void popContentAuthor();
+    private final DocumentReference userReference;
+
+    /**
+     * @param userReference {@see userReference}
+     */
+    public UserSecurityStackEntry(DocumentReference userReference)
+    {
+        this.userReference = userReference;
+    }
+
+    @Override
+    public boolean grantAll()
+    {
+        return false;
+    }
+
+    @Override
+    public DocumentReference getContentAuthor()
+    {
+        return userReference;
+    }
 
 }

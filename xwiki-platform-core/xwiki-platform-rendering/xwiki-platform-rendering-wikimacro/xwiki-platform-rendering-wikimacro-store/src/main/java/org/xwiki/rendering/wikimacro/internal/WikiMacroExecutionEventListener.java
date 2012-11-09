@@ -35,7 +35,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
-import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
 
 /**
  * Make sure to execute wiki macro with a properly configured context and especially which user programming right is
@@ -74,7 +74,7 @@ public class WikiMacroExecutionEventListener implements EventListener
      * The content author controller.
      */
     @Inject
-    private ContentAuthorController contentAuthorController;
+    private ContentDocumentController contentDocumentController;
 
     /**
      * The logger to log.
@@ -115,10 +115,10 @@ public class WikiMacroExecutionEventListener implements EventListener
         try {
             DocumentModelBridge wikiMacroDocument
                 = this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
-            contentAuthorController.pushContentDocument(wikiMacroDocument);
+            contentDocumentController.pushContentDocument(wikiMacroDocument);
         } catch (Exception e) {
             logger.error("Failed to set the wiki macro document as content document before macro exeuction.");
-            contentAuthorController.pushContentDocument(null);
+            contentDocumentController.pushContentDocument(null);
         }
     }
 
@@ -127,6 +127,6 @@ public class WikiMacroExecutionEventListener implements EventListener
      */
     public void onWikiMacroExecutionFinishedEvent()
     {
-        contentAuthorController.popContentDocument();
+        contentDocumentController.popContentDocument();
     }
 }

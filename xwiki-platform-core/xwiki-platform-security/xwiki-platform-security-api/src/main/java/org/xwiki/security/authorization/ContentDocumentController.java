@@ -19,33 +19,35 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.bridge.DocumentModelBridge;
 
 import org.xwiki.component.annotation.Role;
 
 /**
- * Interface for changing the content author in the authorization context.
+ * Interface for changing the security context document from which the content author will be resolved in the
+ * authorization context.
  *
- * The content author controller should always be used in a try-finally statement to ensure that the content author is
- * correctly popped of the stack.
- *
+ * The contetn document controller must always be used with a try-finally statement to ensure that the document is
+ * correctly popped of the security stack.
  *
  * @version $Id$
  * @since 4.3M2
  */
 @Role
-public interface ContentAuthorController
+public interface ContentDocumentController
 {
-    /**
-     * Set a new literal content author.
-     *
-     * @param userReference The new content author reference.
-     */
-    void pushContentAuthor(DocumentReference userReference);
 
     /**
-     * Remove the current content author from the top of the security stack.
+     * Set a new document from where the content author will be extracted and set in the authorization context, while
+     * maintaing a stack of previous security context entries.
+     *
+     * @param document The new content document.
      */
-    void popContentAuthor();
+    void pushContentDocument(DocumentModelBridge document);
+
+    /**
+     * Remove the current content document in the authorization context and restore the previous security stack entry.
+     */
+    void popContentDocument();
 
 }

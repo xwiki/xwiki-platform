@@ -348,6 +348,10 @@ public class XWikiCachingRightService implements XWikiRightService
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
         throws XWikiException
     {
+        if (getAuth().grantAll()) {
+            return true;
+        }
+
         WikiReference wikiReference = new WikiReference(context.getDatabase());
         DocumentReference document = resolveDocumentName(docname, wikiReference);
         LOGGER.debug("Resolved '{}' into {}", docname, document);
@@ -359,11 +363,6 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-
-        if (!getAuth().isPrivileged()) {
-            return false;
-        }
-
         DocumentReference user = getAuth().getContentAuthor();
 
         return hasProgrammingRights(user, new WikiReference(context.getDatabase()));
@@ -393,12 +392,20 @@ public class XWikiCachingRightService implements XWikiRightService
             return false;
         }
 
+        if (getAuth().grantAll()) {
+            return true;
+        }
+
         return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);
     }
 
     @Override
     public boolean hasAdminRights(XWikiContext context)
     {
+        if (getAuth().grantAll()) {
+            return true;
+        }
+
         DocumentReference user = getAuth().getEffectiveUser();
         DocumentReference document = context.getDoc().getDocumentReference();
         return authorizationManager.hasAccess(Right.ADMIN, user, document);
@@ -407,6 +414,10 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasWikiAdminRights(XWikiContext context)
     {
+        if (getAuth().grantAll()) {
+            return true;
+        }
+
         DocumentReference user = context.getUserReference();
         WikiReference wiki = new WikiReference(context.getDatabase());
         return authorizationManager.hasAccess(Right.ADMIN, user, wiki);

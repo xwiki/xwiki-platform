@@ -40,7 +40,9 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.security.authorization.PrivilegedModeController;
+import org.xwiki.security.authorization.GrantAllController;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
@@ -132,6 +134,8 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         try {
             addSingleton(EffectiveUserController.class, new PrivateEffectiveUserController());
             addSingleton(ContentAuthorController.class, new PrivateContentAuthorController());
+            addSingleton(ContentDocumentController.class, new PrivateContentDocumentController());
+            addSingleton(GrantAllController.class, new PrivateGrantAllController());
             addSingleton(PrivilegedModeController.PROVIDER_TYPE, new PrivatePrivilegedModeControllerProvider());
         } catch (ComponentRepositoryException e) {
             throw new InitializationException("Failed to register authorization context controller components.", e);
@@ -174,7 +178,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         private DocumentReference effectiveUser;
 
         /** @see AuthorizationContext#getContentAuthor() */
-        private final Deque<DocumentModelBridge> contentDocuments = new LinkedList<DocumentModelBridge>();
+        private final Deque<SecurityStackEntry> securityStack = new LinkedList<SecurityStackEntry>();
 
         /** @see AuthorizationContext#isPrivileged(). */
         private PrivilegedModeController privilegedModeDisabled;
@@ -188,10 +192,10 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         @Override
         public DocumentReference getContentAuthor()
         {
-            if (contentDocuments.isEmpty()) {
+            if (securityStack.isEmpty()) {
                 return effectiveUser;
             }
-            return contentAuthorResolver.resolveContentAuthor(contentDocuments.peekFirst());
+            return securityStack.peek().getContentAuthor();
         }
 
         @Override
@@ -199,6 +203,12 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         {
             return privilegedModeDisabled == null
                 && !execution.getContext().hasProperty(PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY);
+        }
+
+        @Override
+        public boolean grantAll()
+        {
+            return !securityStack.isEmpty() && securityStack.peek().grantAll();
         }
 
     }
@@ -223,6 +233,35 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
     }
 
     /**
+     * The content document controller implementation used by this authorization context factory implementation.
+     */
+    private final class PrivateContentDocumentController implements ContentDocumentController
+    {
+
+        /** Make constructor private. */
+        private PrivateContentDocumentController()
+        {
+        }
+
+
+        @Override
+        public void pushContentDocument(DocumentModelBridge contentDocument)
+        {
+            PrivateAuthorizationContext ctx = currentAuthorizationContext();
+
+            ctx.securityStack.addFirst(new DocumentSecurityStackEntry(contentDocument, contentAuthorResolver));
+        }
+
+        @Override
+        public void popContentDocument()
+        {
+            PrivateAuthorizationContext ctx = currentAuthorizationContext();
+
+            ctx.securityStack.removeFirst();
+        }
+    }
+
+    /**
      * The content author controller implementation used by this authorization context factory implementation.
      */
     private final class PrivateContentAuthorController implements ContentAuthorController
@@ -235,19 +274,51 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
 
 
         @Override
-        public void pushContentDocument(DocumentModelBridge contentDocument)
+        public void pushContentAuthor(DocumentReference userReference)
         {
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
-            ctx.contentDocuments.addFirst(contentDocument);
+            ctx.securityStack.addFirst(new UserSecurityStackEntry(userReference));
         }
 
         @Override
-        public DocumentModelBridge popContentDocument()
+        public void popContentAuthor()
         {
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
-            return ctx.contentDocuments.removeFirst();
+            ctx.securityStack.removeFirst();
+        }
+    }
+
+    /**
+     * The grant all controller implementation used by this authorization context factory implementation.
+     */
+    private final class PrivateGrantAllController implements GrantAllController
+    {
+
+        /** There is no need to allocate multiple instances of the grant all entry. */
+        private final GrantAllSecurityStackEntry grantAllEntry = new GrantAllSecurityStackEntry();
+
+        /** Make constructor private. */
+        private PrivateGrantAllController()
+        {
+        }
+
+
+        @Override
+        public void pushGrantAll()
+        {
+            PrivateAuthorizationContext ctx = currentAuthorizationContext();
+
+            ctx.securityStack.addFirst(grantAllEntry);
+        }
+
+        @Override
+        public void popGrantAll()
+        {
+            PrivateAuthorizationContext ctx = currentAuthorizationContext();
+
+            ctx.securityStack.removeFirst();
         }
     }
 

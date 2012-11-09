@@ -41,7 +41,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationContext;
-import org.xwiki.security.authorization.ContentAuthorController;
+import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.security.authorization.internal.ContentAuthorResolver;
 import org.xwiki.context.Execution;
 
@@ -198,11 +198,11 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
 
-        ContentAuthorController contentAuthorController
-            = getComponentManager().getInstance(ContentAuthorController.class);
+        ContentDocumentController contentDocumentController
+            = getComponentManager().getInstance(ContentDocumentController.class);
 
         someDocument.setContentAuthorReference(someUser);
-        contentAuthorController.pushContentDocument(someDocument);
+        contentDocumentController.pushContentDocument(someDocument);
 
         Execution execution = getComponentManager().getInstance(Execution.class);
         AuthorizationContext authorizationContext

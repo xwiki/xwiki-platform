@@ -17,35 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.authorization.internal;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import org.xwiki.component.annotation.Role;
-
 /**
- * Interface for changing the content author in the authorization context.
- *
- * The content author controller should always be used in a try-finally statement to ensure that the content author is
- * correctly popped of the stack.
- *
+ * This is an entry that grants all rights while at the top of the security stack.
  *
  * @version $Id$
  * @since 4.3M2
  */
-@Role
-public interface ContentAuthorController
+public class GrantAllSecurityStackEntry implements SecurityStackEntry
 {
-    /**
-     * Set a new literal content author.
-     *
-     * @param userReference The new content author reference.
-     */
-    void pushContentAuthor(DocumentReference userReference);
+    @Override
+    public boolean grantAll()
+    {
+        return true;
+    }
 
-    /**
-     * Remove the current content author from the top of the security stack.
-     */
-    void popContentAuthor();
-
+    @Override
+    public DocumentReference getContentAuthor()
+    {
+        return null;
+    }
 }

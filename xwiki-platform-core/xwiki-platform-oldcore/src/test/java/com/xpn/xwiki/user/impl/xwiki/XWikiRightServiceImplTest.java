@@ -27,7 +27,6 @@ import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.ContentAuthorController;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

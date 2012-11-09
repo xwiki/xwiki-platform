@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiAction;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Action used to apply various distribution related actions. We create a special action to make sure to execute the
@@ -41,7 +42,7 @@ public class DistributionAction extends XWikiAction
      * 
      * @todo need an enumerated class for actions.
      */
-    public static final String DISTRIBUTON_ACTION = "distribution";
+    public static final String DISTRIBUTION_ACTION = "distribution";
 
     /**
      * The reference of the superadmin user document.
@@ -52,7 +53,14 @@ public class DistributionAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        context.put("action", DISTRIBUTON_ACTION);
+        context.put("action", DISTRIBUTION_ACTION);
+
+        // Disallow template override with xpage parameter.
+        if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                                     String.format("Template may not be overriden with 'xpage' in [%s] action.",
+                                                   DISTRIBUTION_ACTION));
+        }
 
         // Make sure to have programming rights
         // TODO: find something nicer
@@ -70,6 +78,6 @@ public class DistributionAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        return DISTRIBUTON_ACTION;
+        return DISTRIBUTION_ACTION;
     }
 }

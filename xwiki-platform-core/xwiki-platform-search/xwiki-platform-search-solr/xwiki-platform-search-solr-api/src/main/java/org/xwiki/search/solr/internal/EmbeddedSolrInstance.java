@@ -41,6 +41,7 @@ import org.xwiki.environment.Environment;
  * Embedded Solr instance running in the same JVM.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named("embedded")

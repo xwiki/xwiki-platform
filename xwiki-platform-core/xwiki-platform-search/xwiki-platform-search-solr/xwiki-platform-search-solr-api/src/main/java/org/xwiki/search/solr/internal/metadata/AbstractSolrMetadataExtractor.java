@@ -49,6 +49,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * TODO DOCUMENT ME!
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtractor
 {

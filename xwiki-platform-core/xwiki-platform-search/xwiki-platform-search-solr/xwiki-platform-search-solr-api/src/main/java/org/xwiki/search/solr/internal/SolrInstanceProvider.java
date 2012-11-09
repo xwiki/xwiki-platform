@@ -35,6 +35,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  * Provider for {@link SolrInstance} that, based on the current configuration, returns the right component.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)

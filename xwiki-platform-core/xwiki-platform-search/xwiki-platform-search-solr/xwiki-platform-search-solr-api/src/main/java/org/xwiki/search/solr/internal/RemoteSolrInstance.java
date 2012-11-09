@@ -30,6 +30,7 @@ import org.xwiki.component.phase.InitializationException;
  * Remote Solr instance communicating over HTTP.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named("remote")

@@ -52,6 +52,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
  * Default implementation.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)

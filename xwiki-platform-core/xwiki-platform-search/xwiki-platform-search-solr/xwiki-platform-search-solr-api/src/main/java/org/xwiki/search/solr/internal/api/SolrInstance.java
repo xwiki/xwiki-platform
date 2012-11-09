@@ -38,6 +38,7 @@ import org.xwiki.component.phase.InitializationException;
  * code.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Role
 public interface SolrInstance extends Initializable

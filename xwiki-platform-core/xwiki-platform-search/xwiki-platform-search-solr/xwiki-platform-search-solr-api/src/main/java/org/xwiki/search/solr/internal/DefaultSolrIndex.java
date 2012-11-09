@@ -49,6 +49,7 @@ import com.xpn.xwiki.XWikiContext;
  * Default implementation of the index.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)

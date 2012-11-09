@@ -25,6 +25,7 @@ package org.xwiki.search.solr.internal.api;
  * special field values like dates.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 public interface Fields
 {

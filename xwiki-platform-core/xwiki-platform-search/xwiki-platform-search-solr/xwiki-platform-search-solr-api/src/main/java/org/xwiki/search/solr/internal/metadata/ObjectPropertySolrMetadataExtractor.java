@@ -38,6 +38,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * Extract the metadata to be indexed from object properties.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named("object_property")

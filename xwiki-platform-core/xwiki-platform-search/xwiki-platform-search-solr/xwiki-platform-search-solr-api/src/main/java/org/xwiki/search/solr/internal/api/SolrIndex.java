@@ -30,6 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  * is done to try to ensure consistency of the index.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Role
 public interface SolrIndex

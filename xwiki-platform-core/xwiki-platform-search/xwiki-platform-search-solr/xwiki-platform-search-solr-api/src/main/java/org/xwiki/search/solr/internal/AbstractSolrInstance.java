@@ -38,6 +38,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  * 
  * @see SolrInstance
  * @version $Id$
+ * @since 4.3M2
  */
 public abstract class AbstractSolrInstance implements SolrInstance
 {

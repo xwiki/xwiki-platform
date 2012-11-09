@@ -29,6 +29,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexException;
  * Recursively retrieves the references for all the indexable entities contained by the given start entity.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Role
 public interface IndexableReferenceExtractor

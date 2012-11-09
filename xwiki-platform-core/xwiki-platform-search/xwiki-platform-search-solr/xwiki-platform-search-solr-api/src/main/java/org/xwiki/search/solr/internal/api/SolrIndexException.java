@@ -23,6 +23,7 @@ package org.xwiki.search.solr.internal.api;
  * Index component exception.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 public class SolrIndexException extends Exception
 {

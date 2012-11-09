@@ -37,6 +37,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * Extract the metadata to be indexed from attachments.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named("object")

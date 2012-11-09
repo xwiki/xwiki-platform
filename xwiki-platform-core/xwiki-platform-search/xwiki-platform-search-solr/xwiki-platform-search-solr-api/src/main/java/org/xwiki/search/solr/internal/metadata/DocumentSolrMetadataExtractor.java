@@ -45,6 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Extract the metadata to be indexed from document.
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named("document")

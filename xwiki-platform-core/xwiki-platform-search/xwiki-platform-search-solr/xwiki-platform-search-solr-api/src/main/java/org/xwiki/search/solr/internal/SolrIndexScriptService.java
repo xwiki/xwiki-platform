@@ -39,6 +39,7 @@ import com.xpn.xwiki.XWikiContext;
  * TODO DOCUMENT ME!
  * 
  * @version $Id$
+ * @since 4.3M2
  */
 @Component
 @Named("solr")

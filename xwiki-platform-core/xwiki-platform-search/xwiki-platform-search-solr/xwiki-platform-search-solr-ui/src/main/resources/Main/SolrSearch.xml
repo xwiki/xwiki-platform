@@ -1057,7 +1057,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;/dd&gt;
 
       &lt;dt&gt;
-        &lt;label&gt;Query boost&lt;/label&gt;
+        &lt;label for='boost'&gt;Query boost&lt;/label&gt;
         &lt;span class='xHint'&gt;e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;

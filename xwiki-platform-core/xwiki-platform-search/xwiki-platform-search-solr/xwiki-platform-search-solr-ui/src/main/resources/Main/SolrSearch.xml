@@ -801,7 +801,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 #set ($start_f = "$!request.getParameter('firstIndex')")
 #set ($end_f = "$!request.getParameter('end')")
 #set ($space_f = "$!request.getParameter('space')")
-## Can`t use 'language' as parameter since it's used by view mode to select the display language.
+## Can't use 'language' as parameter since it's used by view mode to select the display language.
 #set ($lang_f = "$!request.getParameter('lang')")
 #set ($filter = "$!request.getParameter('filter')")
 #set ($debug = "$!request.getParameter('debug')")

@@ -257,7 +257,7 @@
         #set ($currentUserIsMember = !("$!currentUserGroupObject" == ''))
         ## Determine available membership action and action URL.
         #if ($currentUserIsMember)
-          ## Don`t allow the owner to leave the workspace.
+          ## Don't allow the owner to leave the workspace.
           #if ($itemWikiDescriptor.owner != $currentUser)
             #set ($itemHasLeave = true)
             #set ($leaveUrl = $xwiki.getURL($leaveWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiName}&amp;workspaceName=${itemWikiDescriptor.wikiPrettyName}"))

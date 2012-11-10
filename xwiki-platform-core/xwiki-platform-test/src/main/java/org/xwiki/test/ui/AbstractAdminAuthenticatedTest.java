@@ -32,6 +32,14 @@ public abstract class AbstractAdminAuthenticatedTest extends AbstractTest
     @Before
     public void setUp() throws Exception
     {
+        loginAdminUser();
+    }
+
+    /**
+     * @since 4.3M2
+     */
+    public static void loginAdminUser()
+    {
         if (!"Admin".equals(getUtil().getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.

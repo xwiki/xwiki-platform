@@ -175,8 +175,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
         final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
         final Sequence displaySequence = getMockery().sequence("displayInCurrentContext");
 
-        final Mark mark = getMockery().mock(Mark.class);
-
         getMockery().checking(new Expectations()
         {
             {
@@ -184,30 +182,15 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 inSequence(displaySequence);
                 will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
 
+                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)),
                 // Required in order to preserve the programming rights of the sheet.
-                oneOf(mark).mark();
-                inSequence(displaySequence);
-
-                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
+                                                 with(sheet));
                 inSequence(displaySequence);
                 will(returnValue(new XDOM(Collections.<Block> emptyList())));
             }
         });
 
-        getMockedComponent().display(document, new DocumentDisplayerParameters() {
-                @Override
-                public void setContentDocument(DocumentModelBridge doc)
-                {
-                    Assert.assertTrue(doc == sheet);
-                    mark.mark();
-                }
-
-                @Override
-                public DocumentDisplayerParameters clone()
-                {
-                    return this;
-                }
-            });
+        getMockedComponent().display(document, new DocumentDisplayerParameters());
     }
 
     /**
@@ -230,8 +213,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
         final Map<String, Object> backupObjects = new HashMap<String, Object>();
         final Sequence displaySequence = getMockery().sequence("displayInNewContext");
 
-        final Mark mark = getMockery().mock(Mark.class);
-
         getMockery().checking(new Expectations()
         {
             {
@@ -244,16 +225,14 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 oneOf(sheetManager).getSheets(with(document), with(any(String.class)));
                 inSequence(displaySequence);
                 will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
-
-                // Required in order to disable the programming rights.
-                oneOf(mark).mark();
-                inSequence(displaySequence);
             }
         });
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
+                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)),
+                // Required in order to preserve the programming rights of the sheet.
+                                                 with(sheet));
                 inSequence(displaySequence);
                 will(returnValue(new XDOM(Collections.<Block> emptyList())));
 
@@ -263,35 +242,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
             }
         });
 
-        final DocumentDisplayerParameters parameters = new DocumentDisplayerParameters() {
-                @Override
-                public void setContentDocument(DocumentModelBridge doc)
-                {
-                    if (doc == null) {
-                        mark.mark();
-                    }
-                    super.setContentDocument(doc);
-                }
-
-                @Override
-                public DocumentDisplayerParameters clone()
-                {
-                    return this;
-                }
-                
-            };
-
-        parameters.setContentDocument(document);
-
-        getMockedComponent().display(document, parameters);
-    }
-
-    /**
-     * Interface for mocking and "marking" a spot in a sequence.
-     */
-    private interface Mark
-    {
-        /** Call an invocation expectation. */
-        void mark();
+        getMockedComponent().display(document, new DocumentDisplayerParameters());
     }
 }

@@ -127,6 +127,10 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         Assert.assertTrue(authorizationContext.isPrivileged());
 
+        Assert.assertTrue(authorizationContext.securityStackIsEmpty());
+
+        Assert.assertFalse(authorizationContext.grantAll());
+
     }
 
     @Test
@@ -168,6 +172,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         cdc.pushContentDocument(document1);
 
         Assert.assertTrue(user1.equals(authorizationContext.getContentAuthor()));
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cdc.pushContentDocument(document2);
         
@@ -180,7 +185,8 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         cdc.popContentDocument();
 
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
-        
+        Assert.assertTrue(authorizationContext.securityStackIsEmpty());
+
     }
 
     @Test
@@ -191,10 +197,12 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         final ContentAuthorController cac = getComponentManager().getInstance(ContentAuthorController.class);
 
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
+        Assert.assertTrue(authorizationContext.securityStackIsEmpty());
 
         cac.pushContentAuthor(user1);
 
         Assert.assertTrue(user1.equals(authorizationContext.getContentAuthor()));
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cac.pushContentAuthor(user2);
         
@@ -207,6 +215,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         cac.popContentAuthor();
 
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
+        Assert.assertTrue(authorizationContext.securityStackIsEmpty());
         
     }
 
@@ -222,28 +231,37 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         final DocumentModelBridge document2 = getMockery().mock(DocumentModelBridge.class, "document2");
 
         Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertTrue(authorizationContext.securityStackIsEmpty());
 
         cac.pushContentAuthor(user1);
 
         Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         gac.pushGrantAll();
 
         Assert.assertTrue(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cdc.pushContentDocument(document2);
 
         Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cdc.popContentDocument();
 
         Assert.assertTrue(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         gac.popGrantAll();
 
         Assert.assertFalse(authorizationContext.grantAll());
         Assert.assertEquals(user1, authorizationContext.getContentAuthor());
+        Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
+        cac.popContentAuthor();
+
+        Assert.assertTrue(authorizationContext.securityStackIsEmpty());
     }
 
     @Test

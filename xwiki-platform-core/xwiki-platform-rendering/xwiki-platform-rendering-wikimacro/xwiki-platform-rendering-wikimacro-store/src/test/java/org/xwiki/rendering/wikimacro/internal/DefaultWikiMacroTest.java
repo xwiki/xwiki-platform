@@ -42,6 +42,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.ContentDocumentController;
+import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.internal.ContentAuthorResolver;
 import org.xwiki.context.Execution;
 
@@ -119,14 +120,18 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
         someDocument = new XWikiDocument();
 
-        this.wikiMacroDocument.setCreatorReference(this.user.getAuthorReference());
-        this.wikiMacroDocument.setAuthorReference(this.user.getAuthorReference());
-        this.wikiMacroDocument.setContentAuthorReference(this.user.getAuthorReference());
+        this.wikiMacroDocument.setCreatorReference(this.user.getDocumentReference());
+        this.wikiMacroDocument.setAuthorReference(this.user.getDocumentReference());
+        this.wikiMacroDocument.setContentAuthorReference(this.user.getDocumentReference());
 
         // Setup an XWikiPreferences document granting programming rights to user
         final XWikiDocument prefs =
             new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"));
         final BaseObject mockGlobalRightObj = getMockery().mock(BaseObject.class);
+
+        final EffectiveUserController effectiveUserController
+            = getComponentManager().getInstance(EffectiveUserController.class);
+
 
         getMockery().checking(new Expectations()
         {
@@ -172,6 +177,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
         prefs.addObject("XWiki.XWikiGlobalRights", mockGlobalRightObj);
 
         getContext().setUserReference(this.user.getDocumentReference());
+        effectiveUserController.setEffectiveUser(user.getDocumentReference());
     }
 
     @Test

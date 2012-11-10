@@ -67,6 +67,13 @@ public class ConfiguredDocumentDisplayer implements DocumentDisplayer
         return getDocumentDisplayer().display(data, parameters);
     }
 
+    @Override
+    public XDOM display(DocumentModelBridge data, DocumentDisplayerParameters parameters,
+                        DocumentModelBridge contentDocument)
+    {
+        return getDocumentDisplayer().display(data, parameters, contentDocument);
+    }
+
     /**
      * Tries to lookup the document displayer with the configured hint, falling back on the default document displayer.
      * <p>

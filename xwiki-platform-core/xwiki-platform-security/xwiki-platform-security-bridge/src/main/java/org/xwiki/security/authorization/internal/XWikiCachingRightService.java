@@ -363,16 +363,23 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-        DocumentReference user = getAuth().getContentAuthor();
+        DocumentReference contentAuthor = getAuth().getContentAuthor();
 
-        return hasProgrammingRights(user, new WikiReference(context.getDatabase()));
+        WikiReference wikiReference = new WikiReference(context.getDatabase());
+
+        if (getAuth().securityStackIsEmpty()) {
+            return hasProgrammingRights(getAuth().getEffectiveUser(), wikiReference);
+        }
+
+        return hasProgrammingRights(contentAuthor, wikiReference);
     }
 
     @Override
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
         if (doc == null) {
-            return hasProgrammingRights(context);
+            return hasProgrammingRights(getAuth().getEffectiveUser(),
+                                        new WikiReference(context.getDatabase()));
         }
 
         DocumentReference user = doc.getContentAuthorReference();
@@ -394,6 +401,10 @@ public class XWikiCachingRightService implements XWikiRightService
 
         if (getAuth().grantAll()) {
             return true;
+        }
+
+        if (user == null) {
+            return false;
         }
 
         return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);

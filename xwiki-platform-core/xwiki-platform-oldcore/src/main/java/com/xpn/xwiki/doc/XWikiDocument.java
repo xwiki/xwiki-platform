@@ -119,7 +119,6 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.xml.XMLUtils;
 
@@ -915,13 +914,7 @@ public class XWikiDocument implements DocumentModelBridge
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
             parameters.setContentTranslated(tdoc != this);
-            XDOM contentXDOM;
-            getContentDocumentController().pushContentDocument(this);
-            try {
-                contentXDOM = getDocumentDisplayer().display(this, parameters);
-            } finally {
-                getContentDocumentController().popContentDocument();
-            }
+            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters, tdoc);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
             getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
         }
@@ -1192,13 +1185,7 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
-        XDOM titleXDOM;
-        getContentDocumentController().pushContentDocument(this);
-        try {
-            titleXDOM = getDocumentDisplayer().display(this, parameters);
-        } finally {
-            getContentDocumentController().popContentDocument();
-        }
+        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters, this);
         try {
             return renderXDOM(titleXDOM, outputSyntax);
         } catch (XWikiException e) {
@@ -8281,17 +8268,5 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         return modified;
-    }
-
-    /**
-     * We avoid initiating a private field with the content document controller, because its availability depends on
-     * whether an authorization context factory have been initiated or not.  Thus, lots of test-code that use
-     * XWikiDocument would break if we try to obain this when initiating an XWikiDocument object.
-     * 
-     * @return the content document controller.
-     */
-    private ContentDocumentController getContentDocumentController()
-    {
-        return Utils.getComponent(ContentDocumentController.class);
     }
 }

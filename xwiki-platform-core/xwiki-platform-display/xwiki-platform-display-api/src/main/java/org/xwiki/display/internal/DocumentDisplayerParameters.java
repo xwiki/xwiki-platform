@@ -19,8 +19,6 @@
  */
 package org.xwiki.display.internal;
 
-import org.xwiki.bridge.DocumentModelBridge;
-
 /**
  * {@link DocumentDisplayer} parameters.
  * 
@@ -221,7 +219,6 @@ public class DocumentDisplayerParameters implements Cloneable
         clone.setSectionId(sectionId);
         clone.setTitleDisplayed(titleDisplayed);
         clone.setTransformationContextIsolated(transformationContextIsolated);
-        clone.setContentDocument(contentDocument);
         return clone;
     }
 }

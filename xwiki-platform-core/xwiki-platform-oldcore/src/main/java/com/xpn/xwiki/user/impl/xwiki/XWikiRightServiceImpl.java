@@ -919,12 +919,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-
-        DocumentReference contentAuthor = getAuth().getContentAuthor();
-
-        if (contentAuthor == null) {
+        if (getAuth().securityStackIsEmpty()) {
             return hasProgrammingRights(getAuth().getEffectiveUser(), context);
         }
+
+        DocumentReference contentAuthor = getAuth().getContentAuthor();
 
         return hasProgrammingRights(contentAuthor, context);
     }
@@ -939,20 +938,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         final DocumentReference contentAuthor = doc.getContentAuthorReference();
 
-        if (contentAuthor == null) {
-            return false;
-        }
-
         return hasProgrammingRights(contentAuthor, context);
     }
 
     private boolean hasProgrammingRights(DocumentReference user, XWikiContext context)
     {
-        if (user == null) {
-            // For the guest user, the effective user will be null.
-            return false;
-        }
-
         if (!getAuth().isPrivileged()) {
             LOGGER.debug("Programming rights denied because privileged mode is disabled.");
             return false;
@@ -961,6 +951,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (getAuth().grantAll()) {
             LOGGER.debug("Programming rights granted because grant all is enabled.");
             return true;
+        }
+
+        if (user == null) {
+            // For the guest user, the effective user will be null.
+            LOGGER.debug("Programming rights denied because there is no content author.");
+            return false;
         }
 
         final String username = entityReferenceSerializer.serialize(user);
@@ -972,7 +968,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 return true;
             }
             LOGGER.debug("Programming rights denied because user [{}] is not a member of the main wiki.",
-                         user);
+                         username);
             return false;
         }
 

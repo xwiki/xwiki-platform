@@ -41,6 +41,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.security.authorization.GrantAllController;
 
 import com.xpn.xwiki.XWikiContext;
@@ -93,6 +94,12 @@ public class DisplayScriptService implements ScriptService
     private SyntaxFactory syntaxFactory;
 
     /**
+     * This is used for pushing the displayed document to the security stack.
+     */
+    @Inject
+    private ContentDocumentController contentDocumentController;
+
+    /**
      *  Used for bypassing programming rights check when obtaining the xwiki document.
      */
     @Inject
@@ -132,12 +139,16 @@ public class DisplayScriptService implements ScriptService
         if (displayerHint == null) {
             displayerHint = "configured";
         }
+        DocumentModelBridge documentModel = getDocument(document);
+        contentDocumentController.pushContentDocument(documentModel);
         try {
             DocumentDisplayer displayer = componentManager.getInstance(DocumentDisplayer.class, displayerHint);
             return renderXDOM(displayer.display(getDocument(document), displayerParameters), outputSyntax);
         } catch (Exception e) {
             logger.error("Failed to display document [{}].", document.getPrefixedFullName(), e);
             return null;
+        } finally {
+            contentDocumentController.popContentDocument();
         }
     }
 

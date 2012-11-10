@@ -26,10 +26,11 @@ import org.xwiki.rendering.block.XDOM;
  * 
  * @param <T> the type of data displayed by this class
  * @param <P> the type of the display parameters bean
+ * @param <S> the type of the security item
  * @version $Id$
  * @since 3.2M3
  */
-public interface Displayer<T, P>
+public interface Displayer<T, P, S>
 {
     /**
      * Displays the given data.
@@ -39,4 +40,14 @@ public interface Displayer<T, P>
      * @return the result of displaying the given data
      */
     XDOM display(T data, P parameters);
+
+    /**
+     * Displays the given data with a security item set, to enable privilege delegation.
+     *
+     * @param data the data to be displayed
+     * @param parameters display parameters
+     * @param securityItem the security item
+     * @return the result of displaying the given data
+     */
+    XDOM display(T data, P parameters, S securityItem);
 }

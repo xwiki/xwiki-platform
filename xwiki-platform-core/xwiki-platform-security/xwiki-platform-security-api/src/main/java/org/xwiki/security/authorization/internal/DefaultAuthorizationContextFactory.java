@@ -199,6 +199,12 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         }
 
         @Override
+        public boolean securityStackIsEmpty()
+        {
+            return securityStack.isEmpty();
+        }
+
+        @Override
         public boolean isPrivileged()
         {
             return privilegedModeDisabled == null

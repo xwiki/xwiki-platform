@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Role;
  * @since 3.2M3
  */
 @Role
-public interface DocumentDisplayer extends Displayer<DocumentModelBridge, DocumentDisplayerParameters>
+public interface DocumentDisplayer
+    extends Displayer<DocumentModelBridge, DocumentDisplayerParameters, DocumentModelBridge>
 {
 }

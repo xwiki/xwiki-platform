@@ -41,6 +41,12 @@ public interface AuthorizationContext
     DocumentReference getContentAuthor();
 
     /**
+     * @return {@literal true} if the security stack is empty, which means that we are not executing any user
+     * content.  
+     */
+    boolean securityStackIsEmpty();
+
+    /**
      * @return {@literal true} if the authorization context is <em>privileged</em> mode.  Only in this mode may the
      * programming rights privilege be enabled.
      */

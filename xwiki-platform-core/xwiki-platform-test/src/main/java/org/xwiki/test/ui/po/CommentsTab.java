@@ -117,7 +117,8 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
+        getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
         return getAddCommentForm();
     }
 
@@ -136,7 +137,8 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm editCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
+        getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
         waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
         return new CommentForm(getDriver().findElement(By.className("edit-xcomment")));
     }
@@ -151,22 +153,22 @@ public class CommentsTab extends ViewPage
 
     public String getCommentAuthorByID(int id)
     {
-        return getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//span[@class='commentauthor']"))
-            .getText();
+        return getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//span[@class='commentauthor']")).getText();
     }
 
     public String getCommentContentByID(int id)
     {
-        return getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//div[@class='commentcontent']"))
-            .getText();
+        return getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//div[@class='commentcontent']")).getText();
     }
 
     /**
      * @since 3.2M3
      */
-    public boolean hasEditbuttonForCommentByID(int commentId)
+    public boolean hasEditButtonForCommentByID(int commentId)
     {
-        return getDriver().findElements(
+        return getUtil().findElementsWithoutWaiting(getDriver(),
             By.xpath("//div[@id='xwikicomment_" + commentId + "']//a[@class='edit']")).size() > 0;
     }
 }

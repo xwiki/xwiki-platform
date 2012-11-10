@@ -27,7 +27,7 @@ import org.junit.Before;
  * @version $Id$
  * @since 3.2M3
  */
-public class AbstractAdminAuthenticatedTest extends AbstractTest
+public abstract class AbstractAdminAuthenticatedTest extends AbstractTest
 {
     @Before
     public void setUp() throws Exception

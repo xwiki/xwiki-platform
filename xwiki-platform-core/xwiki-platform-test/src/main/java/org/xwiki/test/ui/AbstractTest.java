@@ -45,7 +45,7 @@ import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
  * @since 3.2M3
  */
 @RunWith(IntermittentTestRunner.class)
-public class AbstractTest
+public abstract class AbstractTest
 {
     /**
      * The object used to access the name of the current test.

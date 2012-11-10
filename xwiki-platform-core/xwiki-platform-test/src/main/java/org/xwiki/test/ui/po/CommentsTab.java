@@ -79,7 +79,7 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm getAddCommentForm()
     {
-        return new CommentForm(getDriver().findElement(By.id("AddComment")));
+        return new CommentForm(By.id("AddComment"));
     }
 
     public int postComment(String content, boolean wait)
@@ -140,7 +140,7 @@ public class CommentsTab extends ViewPage
         getUtil().findElementWithoutWaiting(getDriver(),
             By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
         waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
-        return new CommentForm(getDriver().findElement(By.className("edit-xcomment")));
+        return new CommentForm(By.className("edit-xcomment"));
     }
 
     public void editCommentByID(int id, String content)

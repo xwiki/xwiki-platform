@@ -31,18 +31,23 @@ import org.openqa.selenium.WebElement;
 public class CommentForm extends BaseElement
 {
     /**
-     * The element that contains the form.
+     * The locator to the form.
      */
-    private final WebElement container;
+    private By containerLocator;
 
     /**
      * Creates a new form instance.
      * 
-     * @param container the element that contains the form
+     * @param containerLocator the locator to the form
      */
-    public CommentForm(WebElement container)
+    public CommentForm(By containerLocator)
     {
-        this.container = container;
+        this.containerLocator = containerLocator;
+    }
+
+    private WebElement getContainer()
+    {
+        return getDriver().findElement(this.containerLocator);
     }
 
     /**
@@ -50,7 +55,7 @@ public class CommentForm extends BaseElement
      */
     public WebElement getContentField()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.tagName("textarea"));
+        return getContainer().findElement(By.tagName("textarea"));
     }
 
     /**
@@ -60,11 +65,10 @@ public class CommentForm extends BaseElement
      */
     public WebElement clickPreview()
     {
-        getUtil().findElementWithoutWaiting(getDriver(), container,
-            By.xpath(".//input[@type = 'button' and @value = 'Preview']")).click();
+        getContainer().findElement(By.xpath(".//input[@type = 'button' and @value = 'Preview']")).click();
         By previewLocator = By.className("commentPreview");
         waitUntilElementIsVisible(previewLocator);
-        return getUtil().findElementWithoutWaiting(getDriver(), container, previewLocator);
+        return getContainer().findElement(previewLocator);
     }
 
     /**
@@ -72,8 +76,7 @@ public class CommentForm extends BaseElement
      */
     public void clickBack()
     {
-        getUtil().findElementWithoutWaiting(getDriver(), container,
-            By.xpath(".//input[@type = 'button' and @value = 'Back']")).click();
+        getContainer().findElement(By.xpath(".//input[@type = 'button' and @value = 'Back']")).click();
     }
 
     /**
@@ -95,7 +98,7 @@ public class CommentForm extends BaseElement
      */
     public void clickSubmit(boolean wait)
     {
-        getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(".//input[@type = 'submit']")).click();
+        getContainer().findElement(By.xpath(".//input[@type = 'submit']")).click();
         if (wait) {
             // The submit is done asynchronously so we have to wait for the success notification.
             waitForNotificationSuccessMessage("Comment posted");
@@ -107,6 +110,6 @@ public class CommentForm extends BaseElement
      */
     public void clickCancel()
     {
-        getUtil().findElementWithoutWaiting(getDriver(), container, By.className("cancel")).click();
+        getContainer().findElement(By.className("cancel")).click();
     }
 }

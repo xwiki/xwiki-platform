@@ -63,7 +63,7 @@ public class CommentsTab extends ViewPage
 
     public int getCommentID(String content)
     {
-        this.commentsList = getDriver().findElements(By.className("xwikicomment"));
+        this.commentsList = getUtil().findElementsWithoutWaiting(getDriver(), By.className("xwikicomment"));
 
         for (int i = 0; i < this.commentsList.size(); i++) {
             if (this.commentsList.get(i).findElement(By.className("commentcontent")).getText().equals(content)) {

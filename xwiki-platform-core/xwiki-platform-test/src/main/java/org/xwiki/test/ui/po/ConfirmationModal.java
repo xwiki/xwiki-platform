@@ -27,7 +27,7 @@ import org.openqa.selenium.support.FindBy;
  * @version $Id$
  * @since 3.2M3
  */
-public class CommentDeleteConfirmationModal extends ViewPage
+public class ConfirmationModal extends ViewPage
 {
     @FindBy(xpath = "//div[@class='buttons']//input[@value='Yes']")
     private WebElement buttonOk;

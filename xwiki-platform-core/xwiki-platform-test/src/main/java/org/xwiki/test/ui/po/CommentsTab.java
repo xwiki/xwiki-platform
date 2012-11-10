@@ -39,9 +39,9 @@ public class CommentsTab extends ViewPage
     @FindBy(id = "XWiki.XWikiComments_author")
     private WebElement anonymousCommentAuthor;
 
-    CommentDeleteConfirmationModal confirmDelete;
+    private ConfirmationModal confirmDelete;
 
-    List<WebElement> commentsList;
+    private List<WebElement> commentsList;
 
     public String getCurrentAuthor()
     {
@@ -102,7 +102,7 @@ public class CommentsTab extends ViewPage
     public void deleteCommentByID(int id)
     {
         getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='delete']")).click();
-        this.confirmDelete = new CommentDeleteConfirmationModal();
+        this.confirmDelete = new ConfirmationModal();
         this.confirmDelete.clickOk();
         waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
         getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"))

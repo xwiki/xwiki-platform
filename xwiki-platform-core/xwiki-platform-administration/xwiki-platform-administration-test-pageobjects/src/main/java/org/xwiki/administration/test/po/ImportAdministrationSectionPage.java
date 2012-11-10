@@ -26,6 +26,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.ConfirmationModal;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -84,10 +85,13 @@ public class ImportAdministrationSectionPage extends ViewPage
 
     public void deletePackage(String packageName)
     {
-        makeConfirmDialogSilent(true);
-
         String xpath = "//ul[@class='xlist']//a[@class='package' and contains(.,'%s')]/..//a[@class='deletelink']";
         this.packageList.findElement(By.xpath(String.format(xpath, packageName))).click();
+        // Click on ok button
+        ConfirmationModal confirmationModal = new ConfirmationModal();
+        confirmationModal.clickOk();
+        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']"));
+        getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']")).click();
     }
 
     public void importPackage()

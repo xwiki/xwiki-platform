@@ -32,4 +32,7 @@
   <artifactId>xwiki-platform-store-api</artifactId>
   <name>XWiki Platform - Store - Api</name>
   <description>Generic interfaces relating to storage.</description>
+  <properties>
+    <xwiki.clover.targetPercentage>0%</xwiki.clover.targetPercentage>
+  </properties>
 </project>

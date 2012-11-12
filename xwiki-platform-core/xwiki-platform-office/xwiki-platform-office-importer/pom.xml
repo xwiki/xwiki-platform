@@ -113,9 +113,15 @@
         <exclusion>
           <groupId>org.gagravarr</groupId>
           <artifactId>vorbis-java-core</artifactId>
-          <classifier>tests</classifier>
         </exclusion>
       </exclusions>
+    </dependency>
+    <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
+    <dependency>
+      <groupId>org.gagravarr</groupId>
+      <artifactId>vorbis-java-core</artifactId>
+      <version>0.1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->

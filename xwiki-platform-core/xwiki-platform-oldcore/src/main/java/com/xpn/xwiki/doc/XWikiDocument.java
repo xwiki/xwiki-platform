@@ -5621,15 +5621,11 @@ public class XWikiDocument implements DocumentModelBridge
             list.add(new MetaDataDiff("title", fromDoc.getTitle(), toDoc.getTitle()));
         }
 
-        EntityReference fromParent = fromDoc.getRelativeParentReference();
-        EntityReference toParent = toDoc.getRelativeParentReference();
-        if (fromParent != toParent && (fromParent == null || toParent == null || !fromParent.equals(toParent))) {
+        if (ObjectUtils.notEqual(fromDoc.getRelativeParentReference(), toDoc.getRelativeParentReference())) {
             list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }
 
-        DocumentReference fromAuthor = fromDoc.getAuthorReference();
-        DocumentReference toAuthor = toDoc.getAuthorReference();
-        if (fromAuthor != toAuthor && (fromAuthor == null || toAuthor == null || !fromAuthor.equals(toAuthor))) {
+        if (ObjectUtils.notEqual(fromDoc.getAuthorReference(), toDoc.getAuthorReference())) {
             list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
         }
 
@@ -5641,11 +5637,11 @@ public class XWikiDocument implements DocumentModelBridge
             list.add(new MetaDataDiff("name", fromDoc.getName(), toDoc.getName()));
         }
 
-        if (!fromDoc.getLocale().equals(toDoc.getLocale())) {
+        if (ObjectUtils.notEqual(fromDoc.getLocale(), toDoc.getLocale())) {
             list.add(new MetaDataDiff("language", fromDoc.getLanguage(), toDoc.getLanguage()));
         }
 
-        if (!fromDoc.getDefaultLocale().equals(toDoc.getDefaultLocale())) {
+        if (ObjectUtils.notEqual(fromDoc.getDefaultLocale(), toDoc.getDefaultLocale())) {
             list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc.getDefaultLanguage()));
         }
 

@@ -1470,6 +1470,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             List<XWikiAttachment> list = query.list();
             for (XWikiAttachment attachment : list) {
                 attachment.setDoc(doc);
+                attachment.setMetaDataDirty(false);
             }
             doc.setAttachmentList(list);
             if (bTransaction) {

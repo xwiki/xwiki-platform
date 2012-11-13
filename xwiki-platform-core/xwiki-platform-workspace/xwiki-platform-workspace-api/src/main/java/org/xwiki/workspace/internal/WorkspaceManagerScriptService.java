@@ -142,7 +142,8 @@ public class WorkspaceManagerScriptService implements ScriptService
 
         try {
             if (!canCreateWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                throw new WorkspaceException(String.format("Access denied to create the workspace [%s]", workspaceName));
+                throw new WorkspaceException(String.format("Access denied to create the workspace [%s]",
+                    workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */

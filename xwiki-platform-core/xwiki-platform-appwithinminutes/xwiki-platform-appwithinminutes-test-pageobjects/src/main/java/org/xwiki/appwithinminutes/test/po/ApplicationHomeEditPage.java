@@ -65,6 +65,9 @@ public class ApplicationHomeEditPage extends InlinePage
     @FindBy(xpath = "//div[@class = 'columnPicker']/input[@type = 'image' and @alt = 'Add']")
     private WebElement addColumnButton;
 
+    @FindBy(id = "applicationIcon")
+    private WebElement applicationIconInput;
+
     /**
      * The WYSIWYG editor used to input the application description.
      */
@@ -123,6 +126,25 @@ public class ApplicationHomeEditPage extends InlinePage
         RichTextAreaElement descriptionTextArea = descriptionEditor.getRichTextArea();
         descriptionTextArea.clear();
         descriptionTextArea.sendKeys(description);
+    }
+
+    /**
+     * Sets the application icon.
+     *
+     * @param icon the icon to set
+     */
+    public void setIcon(String icon)
+    {
+        applicationIconInput.clear();
+        applicationIconInput.sendKeys(icon);
+    }
+
+    /**
+     * @return the application icon
+     */
+    public String getIcon()
+    {
+        return applicationIconInput.getAttribute("value");
     }
 
     /**

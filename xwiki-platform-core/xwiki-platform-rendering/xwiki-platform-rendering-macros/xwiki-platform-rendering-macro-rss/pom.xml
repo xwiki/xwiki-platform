@@ -37,6 +37,11 @@
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
     </dependency>
+    <!-- Rome does not trigger version of jdom we want -->
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-box</artifactId>

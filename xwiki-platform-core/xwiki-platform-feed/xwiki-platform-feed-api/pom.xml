@@ -47,6 +47,11 @@
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
     </dependency>
+    <!-- Rome does not trigger version of jdom we want -->
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>

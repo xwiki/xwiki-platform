@@ -42,24 +42,10 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

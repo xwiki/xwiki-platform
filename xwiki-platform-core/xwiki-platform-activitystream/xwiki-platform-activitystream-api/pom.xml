@@ -26,24 +26,36 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-watchlist</artifactId>
+    <artifactId>xwiki-platform-activitystream</artifactId>
     <version>4.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-watchlist-api</artifactId>
-  <name>XWiki Platform - WatchList - API</name>
-  <description>XWiki Platform - WatchList - API</description>
+  <artifactId>xwiki-platform-activitystream-api</artifactId>
+  <name>XWiki Platform - Activity Stream - API</name>
+  <packaging>jar</packaging>
+  <description>API to get all activity in the wiki or farm</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream</xwiki.extension.features>
+  </properties>
   <dependencies>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -53,33 +65,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mailsender</artifactId>
+      <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-api</artifactId>
+      <artifactId>xwiki-platform-eventstream</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -88,6 +80,16 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <failsOnError>true</failsOnError>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <excludes>
+            <!-- Some methods in the APIs have more than 7 arguments, the 3 classes bellow can't pass our checkstyle -->
+            com/xpn/xwiki/plugin/activitystream/api/ActivityStream.java,
+            com/xpn/xwiki/plugin/activitystream/impl/ActivityStreamImpl.java,
+            com/xpn/xwiki/plugin/activitystream/plugin/ActivityStreamPluginApi.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

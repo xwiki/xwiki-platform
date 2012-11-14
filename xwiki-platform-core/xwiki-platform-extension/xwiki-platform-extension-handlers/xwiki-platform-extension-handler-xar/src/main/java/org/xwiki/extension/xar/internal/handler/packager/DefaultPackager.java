@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -173,7 +174,7 @@ public class DefaultPackager implements Packager, Initializable
 
                         if (configuration.isLogEnabled()) {
                             this.logger.info("Successfully imported document [{}] in language [{}]", documentHandler
-                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLocale());
                         }
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
@@ -183,7 +184,7 @@ public class DefaultPackager implements Packager, Initializable
 
                         if (configuration.isLogEnabled()) {
                             this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
-                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLanguage());
+                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLocale());
                         }
                     }
                 }
@@ -259,13 +260,13 @@ public class DefaultPackager implements Packager, Initializable
                 XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
                 if (!document.isNew()) {
-                    String language = xarEntry.getLanguage();
-                    if (language != null) {
-                        document = document.getTranslatedDocument(language, xcontext);
+                    Locale locale = xarEntry.getLocale();
+                    if (locale != null && !Locale.ROOT.equals(locale)) {
+                        document = document.getTranslatedDocument(locale, xcontext);
                         xcontext.getWiki().deleteDocument(document, xcontext);
 
                         this.logger.info("Successfully deleted document [{}] in language [{}]",
-                            document.getDocumentReference(), document.getRealLanguage());
+                            document.getDocumentReference(), document.getRealLocale());
                     } else {
                         xcontext.getWiki().deleteAllDocuments(document, xcontext);
 

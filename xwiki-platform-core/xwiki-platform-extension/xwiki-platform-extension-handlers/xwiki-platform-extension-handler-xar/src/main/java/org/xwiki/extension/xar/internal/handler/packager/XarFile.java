@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
@@ -68,8 +69,8 @@ public class XarFile
         return this.entries.values();
     }
 
-    public XarEntry getEntry(EntityReference reference, String language)
+    public XarEntry getEntry(EntityReference reference, Locale locale)
     {
-        return this.entries.get(new XarEntry(reference, language));
+        return this.entries.get(new XarEntry(reference, locale));
     }
 }

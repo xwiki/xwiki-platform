@@ -20,10 +20,10 @@
 package org.xwiki.extension.xar.internal.handler.packager.xml;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -137,15 +137,15 @@ public class DocumentImporterHandler extends DocumentHandler
 
         XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
 
-        if (StringUtils.isNotEmpty(document.getLanguage())) {
-            String defaultLanguage = existingDocument.getDefaultLanguage();
-            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+        if (!document.getLocale().equals(Locale.ROOT)) {
+            Locale defaultLocale = existingDocument.getDefaultLocale();
+            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLocale(), context);
 
             if (translatedDocument == existingDocument) {
                 translatedDocument = new XWikiDocument(document.getDocumentReference());
-                translatedDocument.setDefaultLanguage(defaultLanguage);
+                translatedDocument.setDefaultLocale(defaultLocale);
                 translatedDocument.setTranslation(1);
-                translatedDocument.setLanguage(document.getLanguage());
+                translatedDocument.setLocale(document.getLocale());
             }
 
             existingDocument = translatedDocument;
@@ -170,7 +170,7 @@ public class DocumentImporterHandler extends DocumentHandler
 
             XarEntry realEntry =
                 this.previousXarFile.getEntry(new EntityReference(document.getName(), EntityType.DOCUMENT,
-                    new EntityReference(document.getSpace(), EntityType.SPACE)), document.getRealLanguage());
+                    new EntityReference(document.getSpace(), EntityType.SPACE)), document.getRealLocale());
             if (realEntry != null) {
                 this.packager.parseDocument(this.previousXarFile.getInputStream(realEntry), documentHandler);
 

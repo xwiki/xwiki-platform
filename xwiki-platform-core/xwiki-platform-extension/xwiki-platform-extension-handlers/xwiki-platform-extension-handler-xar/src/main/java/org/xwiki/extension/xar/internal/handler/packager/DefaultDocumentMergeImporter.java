@@ -19,12 +19,13 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -76,7 +77,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
 
         if (configuration.isLogEnabled()) {
             this.logger.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
-                nextDocument.getRealLanguage());
+                nextDocument.getRealLocale());
         }
 
         // Merge and save
@@ -159,8 +160,8 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             }
         }
 
-        return new XarEntryMergeResult(
-            new XarEntry(mergedDocument.getDocumentReference(), mergedDocument.getLanguage()), documentMergeResult);
+        return new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(), mergedDocument.getLocale()),
+            documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
@@ -241,15 +242,15 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     {
         XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
 
-        if (StringUtils.isNotEmpty(document.getLanguage())) {
-            String defaultLanguage = existingDocument.getDefaultLanguage();
-            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+        if (!document.getLocale().equals(Locale.ROOT)) {
+            Locale defaultLocale = existingDocument.getDefaultLocale();
+            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLocale(), context);
 
             if (translatedDocument == existingDocument) {
                 translatedDocument = new XWikiDocument(document.getDocumentReference());
-                translatedDocument.setDefaultLanguage(defaultLanguage);
+                translatedDocument.setDefaultLocale(defaultLocale);
                 translatedDocument.setTranslation(1);
-                translatedDocument.setLanguage(document.getLanguage());
+                translatedDocument.setLocale(document.getLocale());
             }
 
             existingDocument = translatedDocument;

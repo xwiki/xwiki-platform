@@ -3201,7 +3201,6 @@ public class XWikiDocument implements DocumentModelBridge
             }
             getXObjects().put(reference, newObjects);
         }
-        setContentDirty(true);
     }
 
     public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException
@@ -3265,7 +3264,6 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         }
-        setContentDirty(true);
     }
 
     /**

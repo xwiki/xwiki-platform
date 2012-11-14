@@ -216,8 +216,9 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             this.fileTools.getAttachmentFileProvider(attachment).getAttachmentContentFile();
 
         if (attachFile.exists()) {
-            attachment.setAttachment_content(
-                new FilesystemAttachmentContent(attachFile, attachment));
+            FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
+            content.setContentDirty(false);
+            attachment.setAttachment_content(content);
             return;
         }
 

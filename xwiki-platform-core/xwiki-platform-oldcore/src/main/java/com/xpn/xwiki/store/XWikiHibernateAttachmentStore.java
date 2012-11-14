@@ -210,11 +210,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
                 XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
                 session.load(content, new Long(content.getId()));
-                attachment.setAttachment_content(content);
 
                 // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
                 content.setContentDirty(false);
 
+                attachment.setAttachment_content(content);
             } finally {
                 context.setDatabase(db);
             }

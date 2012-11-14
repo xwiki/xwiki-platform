@@ -283,7 +283,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         BaseProperty<R> newBaseProperty = (BaseProperty<R>) newProperty;
 
         // Value
-        if (ObjectUtils.equals(newBaseProperty.getValue(), getValue())) {
+        if (ObjectUtils.notEqual(newBaseProperty.getValue(), getValue())) {
             setValue(newBaseProperty.getValue());
             modified = true;
         }

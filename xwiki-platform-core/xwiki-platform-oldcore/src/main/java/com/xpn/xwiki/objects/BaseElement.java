@@ -287,7 +287,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         BaseElement<R> newBaseElement = (BaseElement<R>) newElement;
 
         // Pretty name
-        if (StringUtils.equals(newBaseElement.getPrettyName(), getPrettyName())) {
+        if (!StringUtils.equals(newBaseElement.getPrettyName(), getPrettyName())) {
             setPrettyName(newBaseElement.getPrettyName());
             modified = true;
         }

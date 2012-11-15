@@ -490,13 +490,8 @@ public class DefaultRepositoryManager implements RepositoryManager
                         xcontext);
             }
 
-            XWikiDocument template =
-                xcontext.getWiki().getDocument(
-                    this.currentResolver.resolve(XWikiRepositoryModel.EXTENSION_TEMPLATEREFERENCE), xcontext);
-
-            if (!template.isNew()) {
-                document.apply(template);
-            }
+            document.readFromTemplate(this.currentResolver.resolve(XWikiRepositoryModel.EXTENSION_TEMPLATEREFERENCE),
+                xcontext);
 
             needSave = true;
         }

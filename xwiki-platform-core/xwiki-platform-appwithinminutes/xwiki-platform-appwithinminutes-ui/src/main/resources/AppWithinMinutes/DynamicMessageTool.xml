@@ -89,18 +89,30 @@ public class XWikiDynamicMessageTool extends XWikiMessageTool
     this.msg = msg;
   }
 
+  // @Override
   public List&lt;XWikiDocument&gt; getDocumentBundles()
   {
     return this.msg.getDocumentBundles();
   }
 
+  // @Override
+  public String get(String key)
+  {
+    String result = super.get(key);
+    return result == key ? this.msg.get(key) : result;
+  }
+
+  // @Override
+  public String get(String key, Object... params)
+  {
+    String result = super.get(key, params);
+    return result == key ? this.msg.get(key, params) : result;
+  }
+
+  // @Override
   protected String getTranslation(String key)
   {
-    if (key == null) {
-      return null;
-    }
-    String value = this.overwrites.get(key);
-    return value != null ? value : this.msg.getTranslation(key);
+    return this.overwrites.get(key);
   }
 
   public String put(String key, String value)

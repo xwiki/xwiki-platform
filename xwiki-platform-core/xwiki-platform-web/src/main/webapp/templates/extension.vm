@@ -219,7 +219,7 @@
       #if ($extension.features.size() > 0)
         <li>$msg.get('extensions.info.features') $escapetool.xml($extension.features)</li>
       #end
-      #if ($xwiki.isVirtualMode())
+      #if ($xwiki.isVirtualMode() && $extension.isInstalled($xcontext.database))
         <li>#displayExtensionDetails_description_wikis($extension)</li>
       #end
     </ul>

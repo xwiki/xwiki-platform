@@ -20,6 +20,7 @@
 package org.xwiki.localization.legacy.internal.xwikipreferences;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -48,7 +49,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
-import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * @version $Id$
@@ -122,11 +122,16 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
             (String) this.documentAccessBridge.getProperty(preferencesReference, preferencesReference,
                 DOCUMENT_BUNDLE_PROPERTY);
 
-        List<String> documentNameList = ListClass.getListFromString(documentNameListString, JOIN_SEPARATOR, false);
+        Set<DocumentReference> documents;
+        if (documentNameListString != null) {
+            String[] documentNameList = documentNameListString.split(JOIN_SEPARATOR);
 
-        Set<DocumentReference> documents = new LinkedHashSet<DocumentReference>(documentNameList.size());
-        for (String documentName : documentNameList) {
-            documents.add(this.resolver.resolve(documentName, preferencesReference));
+            documents = new LinkedHashSet<DocumentReference>(documentNameList.length);
+            for (String documentName : documentNameList) {
+                documents.add(this.resolver.resolve(documentName.trim(), preferencesReference));
+            }
+        } else {
+            documents = Collections.emptySet();
         }
 
         return documents;

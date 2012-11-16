@@ -377,7 +377,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         otherWikiTranslation.setContent("wiki.othertranslation=Other translation");
         this.mockXWiki.saveDocument(otherWikiTranslation, "", getContext());
 
-        setBundles(otherWikiTranslation.getFullName());
+        setBundles(" " + otherWikiTranslation.getFullName());
 
         Assert.assertEquals("Other translation", this.tool.get("wiki.othertranslation"));
 

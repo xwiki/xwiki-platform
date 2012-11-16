@@ -22,6 +22,7 @@ package org.xwiki.test.ui;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 /**
@@ -35,7 +36,13 @@ public class WebDriverFactory
     public WebDriver createWebDriver(String browserName)
     {
         if (browserName.startsWith("*firefox")) {
-            return new FirefoxDriver();
+            // Native events are disabled by default for Firefox on Linux as it may cause tests which open many windows
+            // in parallel to be unreliable. However, native events work quite well otherwise and are essential for some
+            // of the new actions of the Advanced User Interaction. We need native events to be enable especially for
+            // testing the WYSIWYG editor. See http://code.google.com/p/selenium/issues/detail?id=2331 .
+            FirefoxProfile profile = new FirefoxProfile();
+            profile.setEnableNativeEvents(true);
+            return new FirefoxDriver(profile);
         } else if (browserName.startsWith("*iexplore")) {
             return new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {

@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor.wysiwyg;
 
-import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -52,12 +52,11 @@ public class RichTextAreaElement extends BaseElement
     public String getText()
     {
         String windowHandle = getDriver().getWindowHandle();
-        getDriver().switchTo().frame(iframe);
-
-        String content = getDriver().findElement(By.id("body")).getText();
-
-        getDriver().switchTo().window(windowHandle);
-        return content;
+        try {
+            return getDriver().switchTo().frame(iframe).switchTo().activeElement().getText();
+        } finally {
+            getDriver().switchTo().window(windowHandle);
+        }
     }
 
     /**
@@ -66,11 +65,24 @@ public class RichTextAreaElement extends BaseElement
     public void clear()
     {
         String windowHandle = getDriver().getWindowHandle();
-        getDriver().switchTo().frame(iframe);
+        try {
+            getDriver().switchTo().frame(iframe).switchTo().activeElement().clear();
+        } finally {
+            getDriver().switchTo().window(windowHandle);
+        }
+    }
 
-        executeJavascript("document.body.innerHTML = ''");
-
-        getDriver().switchTo().window(windowHandle);
+    /**
+     * Clicks on the rich text area.
+     */
+    public void click()
+    {
+        String windowHandle = getDriver().getWindowHandle();
+        try {
+            getDriver().switchTo().frame(iframe).switchTo().activeElement().click();
+        } finally {
+            getDriver().switchTo().window(windowHandle);
+        }
     }
 
     /**
@@ -80,62 +92,50 @@ public class RichTextAreaElement extends BaseElement
      */
     public void sendKeys(CharSequence... keysToSend)
     {
-        if (keysToSend.length == 0) {
-            return;
+        if (keysToSend.length > 0) {
+            String windowHandle = getDriver().getWindowHandle();
+            try {
+                getDriver().switchTo().frame(iframe).switchTo().activeElement().sendKeys(keysToSend);
+            } finally {
+                getDriver().switchTo().window(windowHandle);
+            }
         }
+    }
 
+    /**
+     * Executes the given script in the context of the rich text area.
+     * 
+     * @param script the script to be executed
+     * @param arguments the script arguments
+     * @return the result of the script execution
+     * @see JavascriptExecutor#executeScript(String, Object...)
+     */
+    public Object executeScript(String script, Object... arguments)
+    {
         String windowHandle = getDriver().getWindowHandle();
-        getDriver().switchTo().frame(iframe);
+        try {
+            getDriver().switchTo().frame(iframe).switchTo().activeElement();
+            return ((JavascriptExecutor) getDriver()).executeScript(script.toString(), arguments);
+        } finally {
+            getDriver().switchTo().window(windowHandle);
+        }
+    }
 
-        // FIXME: The following JavaScript code is a temporary workaround for
-        // http://code.google.com/p/selenium/issues/detail?id=2331 (sendKeys doesn't work on BODY element with
-        // contentEditable=true).
-        StringBuilder script = new StringBuilder();
+    /**
+     * @return the HTML content of the rich text area
+     */
+    public String getContent()
+    {
+        return (String) executeScript("return document.body.innerHTML");
+    }
 
-        // Save the selection.
-        script.append("window.__savedRange = window.getSelection().getRangeAt(0);\n");
-
-        // Make the BODY element read-only.
-        script.append("document.body.contentEditable = false;\n");
-
-        // Wrap all content with a contentEditable DIV.
-        script.append("var div = document.createElement('div');\n");
-        // Make sure the DIV is visible (this is for the case when the rich text area is empty).
-        script.append("div.style.minHeight = '20px';");
-        script.append("document.body.appendChild(div);\n");
-        script.append("var contentRange = document.createRange();\n");
-        script.append("contentRange.setStartBefore(document.body.firstChild);\n");
-        script.append("contentRange.setEndBefore(div);\n");
-        script.append("div.appendChild(contentRange.extractContents());\n");
-        script.append("div.contentEditable = true;\n");
-
-        // Restore the selection.
-        script.append("window.getSelection().removeAllRanges();\n");
-        script.append("window.getSelection().addRange(window.__savedRange);\n");
-        script.append("window.__savedRange = undefined;\n");
-        executeJavascript(script.toString());
-
-        getDriver().findElement(By.xpath("//body/div")).sendKeys(keysToSend);
-
-        // Save the selection.
-        script.delete(0, script.length());
-        script.append("window.__savedRange = window.getSelection().getRangeAt(0);\n");
-
-        // Unwrap the content.
-        script.append("var contentRange = document.createRange();\n");
-        script.append("contentRange.selectNodeContents(document.body.firstChild);\n");
-        script.append("document.body.appendChild(contentRange.extractContents());\n");
-        script.append("document.body.removeChild(document.body.firstChild);\n");
-
-        // Restore contentEditable on the BODY element.
-        script.append("document.body.contentEditable = true;\n");
-
-        // Restore the selection.
-        script.append("window.getSelection().removeAllRanges();\n");
-        script.append("window.getSelection().addRange(window.__savedRange);\n");
-        script.append("window.__savedRange = undefined;\n");
-        executeJavascript(script.toString());
-
-        getDriver().switchTo().window(windowHandle);
+    /**
+     * Sets the HTML content of the rich text area
+     * 
+     * @param content the new HTML content
+     */
+    public void setContent(String content)
+    {
+        executeScript("document.body.innerHTML = arguments[0];", content);
     }
 }

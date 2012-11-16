@@ -268,8 +268,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         try {
             xcontext.setDatabase(wiki != null ? wiki : xcontext.getMainXWiki());
 
-            String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
-            if (caller != null) {
+            if (request.getProperty(PROPERTY_CALLERREFERENCE) != null) {
+                String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
                 hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, caller, document, xcontext);
             }
 

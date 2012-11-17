@@ -71,10 +71,14 @@ public class ConservativeContentAuthorResolver extends DefaultContentAuthorResol
         DocumentReference requiredRightClass = new DocumentReference(XWikiConstants.REQUIRED_RIGHT_CLASSNAME,
             wikiSpace);
 
-        for (BaseObject obj : xwikiDocument.getXObjects(requiredRightClass)) {
-            String level = obj.getStringValue(XWikiConstants.REQUIRED_RIGHT_LEVEL_FIELD_NAME);
-            if (XWikiConstants.REQUIRED_RIGHT_PROGRAMMING.equals(level)) {
-                return true;
+        Iterable<BaseObject> objs = xwikiDocument.getXObjects(requiredRightClass);
+
+        if (objs != null) {
+            for (BaseObject obj : objs) {
+                String level = obj.getStringValue(XWikiConstants.REQUIRED_RIGHT_LEVEL_FIELD_NAME);
+                if (XWikiConstants.REQUIRED_RIGHT_PROGRAMMING.equals(level)) {
+                    return true;
+                }
             }
         }
 

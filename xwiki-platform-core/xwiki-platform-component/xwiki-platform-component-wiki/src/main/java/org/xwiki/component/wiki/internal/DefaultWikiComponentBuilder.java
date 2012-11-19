@@ -81,7 +81,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     {
         List<DocumentReference> results = new ArrayList<DocumentReference>();
         String query = ", BaseObject as obj, StringProperty as role where obj.className=? and obj.name=doc.fullName "
-                + "and role.id.id=obj.id and role.id.name=? and role.value <>''";
+            + "and role.id.id=obj.id and role.id.name=? "
+            + "and  (role.value <> '' or (role.value is not null and '' is null))";
         List<String> parameters = new ArrayList<String>();
         parameters.add(COMPONENT_CLASS);
         parameters.add(COMPONENT_ROLE_TYPE_FIELD);

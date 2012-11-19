@@ -100,19 +100,6 @@ public class XWikiHibernateBaseStore implements Initializable
     private DatabaseProduct databaseProduct = DatabaseProduct.UNKNOWN;
 
     /**
-     * List of workaround handlers for list properties.  See ListPropertyWorkaroundHandler below.
-     */
-    private final ThreadLocal<Collection<ListPropertyWorkaroundHandler>> listPropertyWorkaroundHandlers =
-        new ThreadLocal<Collection<ListPropertyWorkaroundHandler>>()
-        {
-            @Override
-            protected Collection<ListPropertyWorkaroundHandler> initialValue()
-            {
-                return new ArrayList<ListPropertyWorkaroundHandler>();
-            }
-        };
-
-    /**
      * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
      * 
@@ -965,12 +952,6 @@ public class XWikiHibernateBaseStore implements Initializable
                 + getExceptionMessage(e) + "]", e);
         } finally {
             closeSession(session);
-
-            for (ListPropertyWorkaroundHandler h : listPropertyWorkaroundHandlers.get()) {
-                h.restore();
-            }
-
-            listPropertyWorkaroundHandlers.get().clear();
         }
     }
 
@@ -1378,45 +1359,5 @@ public class XWikiHibernateBaseStore implements Initializable
     private void setCurrentDatabase(XWikiContext context, String database)
     {
         context.put(currentDatabaseKey, database);
-    }
-
-    protected void addListPropertyWorkaroundHandler(PropertyInterface listProperty)
-    {
-        listPropertyWorkaroundHandlers.get()
-            .add(new ListPropertyWorkaroundHandler(listProperty));
-    }
-
-    /**
-     * We need to indicate that we want to the getList accessor to return a plain ArrayList for the
-     * duration of a transaction, so we register a special handler that enables and disables the
-     * workaround. {@see ListProperty#getList}.
-     * 
-     * @since 4.2M3
-     */
-    private static class ListPropertyWorkaroundHandler
-    {
-        /** The list property to manage. */
-        private final ListProperty listProperty;
-
-        /**
-         * @param The list property to manage.
-         */
-        public ListPropertyWorkaroundHandler(PropertyInterface listProperty)
-        {
-            this.listProperty = (ListProperty) listProperty;
-            enable();
-        }
-
-        /** Enable the list property workaround. */
-        public void enable()
-        {
-            this.listProperty.setUseHibernateWorkaround(true);
-        }
-
-        /** Restore the list property to its normal mode. */
-        public void restore()
-        {
-            this.listProperty.setUseHibernateWorkaround(false);
-        }
     }
 }

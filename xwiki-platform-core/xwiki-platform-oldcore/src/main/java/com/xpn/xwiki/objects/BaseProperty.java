@@ -61,7 +61,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     /**
      * The owner document, if this object was obtained from a document.
      */
-    private XWikiDocument ownerDocument;
+    private transient XWikiDocument ownerDocument;
 
     @Override
     protected R createReference()

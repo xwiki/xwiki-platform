@@ -89,7 +89,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * The owner document, if this object was obtained from a document.
      */
-    private XWikiDocument ownerDocument;
+    private transient XWikiDocument ownerDocument;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the

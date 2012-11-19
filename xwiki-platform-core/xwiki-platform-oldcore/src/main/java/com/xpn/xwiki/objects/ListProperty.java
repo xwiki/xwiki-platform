@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.PersistentList;
 import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
@@ -47,6 +48,11 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     protected transient List<String> list;
 
+    /**
+     * The notify list wrapper.
+     */
+    private transient NotifyList notifyList;
+
     private String formStringSeparator = "|";
 
     /**
@@ -55,12 +61,9 @@ public class ListProperty extends BaseProperty implements Cloneable
     private List<String> actualList = new ArrayList<String>();
 
     {
-        list = new NotifyList(actualList);
+        notifyList = new NotifyList(actualList);
+        list = notifyList;
     }
-
-
-    /** Indicate that hibernate workaround for getList should be enabled. */
-    private boolean useHibernateWorkaround = false;
 
     public String getFormStringSeparator()
     {
@@ -171,15 +174,7 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     public List<String> getList()
     {
-        if (useHibernateWorkaround) {
-            // FIXME: Hibernate does not like the
-            // AbstractNotifyOnUpdateList, so we must use a workaround
-            // when saving this property.  Try removing this
-            // workaround after we have upgraded hibernate.
-            return actualList;
-        } else {
-            return this.list;
-        }
+        return this.list;
     }
 
     /**
@@ -190,15 +185,33 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     public void setList(List<String> list)
     {
-        this.list.clear();
-        if (list != null && list != this.list) {
-            this.list.addAll(list);
-            // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
-            // safe to assume that a retrieved NULL value should actually be an empty string.
-            for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
-                if (it.next() == null) {
-                    it.remove();
-                }
+        if (list == notifyList) {
+            return;
+        } 
+
+        if (list instanceof PersistentList) {
+            PersistentList persistentList = (PersistentList) list;
+            if (persistentList.isWrapper(notifyList)) {
+                // Accept hibernate setting the persistent list wrapper.
+                this.list = list;
+                return;
+            }
+        }
+
+        if (list == null) {
+            actualList = new ArrayList();
+        } else {
+            actualList = list;
+        }
+
+        notifyList = new NotifyList(actualList);
+        this.list = notifyList;
+
+        // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
+        // safe to assume that a retrieved NULL value should actually be an empty string.
+        for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
+            if (it.next() == null) {
+                it.remove();
             }
         }
     }
@@ -240,19 +253,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
         MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
-    }
-
-    /**
-     * If getList returns a list of type AbstractNotifyOnUpdateList hibernate will for some reason always store an empty
-     * lits.  As a workaround, we let getList return an ordinary ArrayList when in hibernate.  This method is used for
-     * enabling/disabling this workaround.  FIXME: Try removing this workaround after we have upgraded hibernate.
-     * 
-     * @param useHibernateWorkaround {@literal true} if hibernate workaround for getList should be enabled.
-     * @since 4.3M2
-     */
-    public void setUseHibernateWorkaround(boolean useHibernateWorkaround)
-    {
-        this.useHibernateWorkaround = useHibernateWorkaround;
     }
 
     /**

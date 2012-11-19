@@ -1419,10 +1419,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             query.setLong("id", property.getId());
             query.setString("name", property.getName());
 
-            if (property instanceof ListProperty) {
-                addListPropertyWorkaroundHandler(property);
-            }
-
             if (query.uniqueResult() == null) {
                 session.save(property);
             } else {

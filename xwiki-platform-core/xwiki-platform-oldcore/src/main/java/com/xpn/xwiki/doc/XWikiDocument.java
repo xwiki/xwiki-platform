@@ -4278,8 +4278,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setAttachmentList(List<XWikiAttachment> list)
     {
-        this.attachmentList.clear();
-        this.attachmentList.addAll(list);
+        // For backwards compatibility reasons (and in general), we need to allow callers to do something like
+        // setAttachmentList(getAttachmentList())
+        if (this.attachmentList != list) {
+            this.attachmentList.clear();
+            this.attachmentList.addAll(list);
+        }
     }
 
     public List<XWikiAttachment> getAttachmentList()

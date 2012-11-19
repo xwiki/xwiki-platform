@@ -188,14 +188,16 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 });
 
                 allowing(mockXWiki).saveDocument(with(any(XWikiDocument.class)), with(any(String.class)),
-                    with(any(XWikiContext.class)));
+                    with(any(boolean.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("saveDocument")
                 {
                     @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
+                        boolean minorEdit = (Boolean) invocation.getParameter(2);
 
+                        document.setMinorEdit(minorEdit);
                         document.incrementVersion();
                         document.setNew(false);
 
@@ -348,7 +350,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         object.setXClassReference(new DocumentReference("wiki", "space", "class"));
         existingDocument.addXObject(object);
         existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
-        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+        this.mockXWiki.saveDocument(existingDocument, "", true, getContext());
 
         // install
 
@@ -461,14 +463,14 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         object.setXClassReference(new DocumentReference("wiki", "space", "class"));
         existingDocument.addXObject(object);
         existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
-        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+        this.mockXWiki.saveDocument(existingDocument, "", true, getContext());
 
         // install
 
         install(this.localXarExtensiontId1, "wiki", null);
 
         // validate
-        
+
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "author");
         DocumentReference creatorReference = new DocumentReference("wiki", "XWiki", "creator");
         DocumentReference contentAuthorReference = new DocumentReference("wiki", "XWiki", "contentAuthor");
@@ -501,7 +503,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
         Assert.assertEquals("Wrong creator", creatorReference, pagewithattachment.getCreatorReference());
         Assert.assertEquals("Wrong author", authorReference, pagewithattachment.getAuthorReference());
-        Assert.assertEquals("Wrong content author", contentAuthorReference, pagewithattachment.getContentAuthorReference());
+        Assert.assertEquals("Wrong content author", contentAuthorReference,
+            pagewithattachment.getContentAuthorReference());
 
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);
@@ -528,7 +531,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong content", "default content", defaultTranslated.getContent());
         Assert.assertEquals("Wrong creator", creatorReference, defaultTranslated.getCreatorReference());
         Assert.assertEquals("Wrong author", authorReference, defaultTranslated.getAuthorReference());
-        Assert.assertEquals("Wrong content author", contentAuthorReference, defaultTranslated.getContentAuthorReference());
+        Assert.assertEquals("Wrong content author", contentAuthorReference,
+            defaultTranslated.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
@@ -591,10 +595,14 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // validate
 
+        // samespace.samepage
+
         XWikiDocument samepage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "samespace", "samepage"), getContext());
 
         Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+
+        // space.page
 
         XWikiDocument modifiedpage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
@@ -610,10 +618,20 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("property", baseClass.getField("property").getName());
         Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
+        XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
+        Assert.assertNotNull(attachment);
+        Assert.assertEquals("attachment.txt", attachment.getFilename());
+        Assert.assertEquals(18, attachment.getContentSize(getContext()));
+        Assert.assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getContext())));
+
+        // space2.page2
+
         XWikiDocument newPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space2", "page2"), getContext());
 
         Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", newPage.isNew());
+
+        // space1.page1
 
         XWikiDocument removedPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
@@ -741,7 +759,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     public void testImportDocumentWithDifferentExistingDocument() throws Throwable
     {
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+        this.mockXWiki.saveDocument(existingDocument, "", true, getContext());
 
         getMockery().checking(new Expectations()
         {
@@ -758,7 +776,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
     {
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        this.mockXWiki.saveDocument(existingDocument, "", getContext());
+        this.mockXWiki.saveDocument(existingDocument, "", true, getContext());
 
         // register a mandatory document initializer
         final MandatoryDocumentInitializer mandatoryInitializer =

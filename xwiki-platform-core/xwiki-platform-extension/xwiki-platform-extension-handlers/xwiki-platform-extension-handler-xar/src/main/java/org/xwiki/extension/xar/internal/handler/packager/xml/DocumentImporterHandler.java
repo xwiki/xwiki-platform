@@ -101,8 +101,8 @@ public class DocumentImporterHandler extends DocumentHandler
             .getDocumentReference());
     }
 
-    private void saveDocumentSetContextUser(XWikiDocument document, String comment, XWikiContext context)
-        throws Exception
+    private void saveDocumentSetContextUser(XWikiDocument document, String comment, boolean isMinorEdit,
+        XWikiContext context) throws Exception
     {
         DocumentReference userReference = context.getUserReference();
 
@@ -111,7 +111,7 @@ public class DocumentImporterHandler extends DocumentHandler
             // the document to actually be saved by context user
             context.setUserReference(document.getAuthorReference());
 
-            context.getWiki().saveDocument(document, comment, context);
+            context.getWiki().saveDocument(document, comment, isMinorEdit, context);
         } catch (Exception e) {
             context.setUserReference(userReference);
         }
@@ -208,7 +208,7 @@ public class DocumentImporterHandler extends DocumentHandler
                 dbAttachment.setAuthor(attachment.getAuthor());
             }
 
-            saveDocumentSetContextUser(dbDocument, comment, context);
+            saveDocumentSetContextUser(dbDocument, comment, true, context);
 
             // reset content since it could consume lots of memory and it's not used in diff for now
             attachment.setAttachment_content(null);

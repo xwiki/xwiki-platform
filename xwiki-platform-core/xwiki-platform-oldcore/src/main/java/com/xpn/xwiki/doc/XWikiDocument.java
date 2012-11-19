@@ -317,7 +317,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private final List<XWikiAttachment> attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>()
+    private final List<XWikiAttachment> attachmentList
+        = new AbstractNotifyOnUpdateList<XWikiAttachment>(new ArrayList<XWikiAttachment>())
     {
         @Override
         public void onUpdate()

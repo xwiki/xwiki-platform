@@ -45,16 +45,19 @@ public class ListProperty extends BaseProperty implements Cloneable
     /**
      * We make this a notifying list, because we must propagate any value updates to the owner document.
      */
-    protected final List<String> list = new AbstractNotifyOnUpdateList<String>()
-    {
-        @Override
-        public void onUpdate()
-        {
-            setValueDirty(true);
-        }
-    };
+    protected transient List<String> list;
 
     private String formStringSeparator = "|";
+
+    /**
+     * This is the actual list.  It will be used during serialization/deserialization.
+     */
+    private List<String> actualList = new ArrayList<String>();
+
+    {
+        list = new NotifyList(actualList);
+    }
+
 
     /** Indicate that hibernate workaround for getList should be enabled. */
     private boolean useHibernateWorkaround = false;
@@ -156,16 +159,14 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     @Override
-    public ListProperty clone()
+    protected void cloneInternal(BaseProperty clone)
     {
-        ListProperty property = (ListProperty) super.clone();
-        List<String> list = new ArrayList<String>();
+        ListProperty property = (ListProperty) clone;
+        property.actualList = new ArrayList<String>();
         for (String entry : getList()) {
-            list.add(entry);
+            property.actualList.add(entry);
         }
-        property.setValue(list);
-
-        return property;
+        property.list = new NotifyList(property.actualList);
     }
 
     public List<String> getList()
@@ -175,9 +176,7 @@ public class ListProperty extends BaseProperty implements Cloneable
             // AbstractNotifyOnUpdateList, so we must use a workaround
             // when saving this property.  Try removing this
             // workaround after we have upgraded hibernate.
-            List<String> arrayList = new ArrayList<String>();
-            arrayList.addAll(list);
-            return arrayList;
+            return actualList;
         } else {
             return this.list;
         }
@@ -192,7 +191,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     public void setList(List<String> list)
     {
         this.list.clear();
-        if (list != null) {
+        if (list != null && list != this.list) {
             this.list.addAll(list);
             // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
             // safe to assume that a retrieved NULL value should actually be an empty string.
@@ -254,5 +253,26 @@ public class ListProperty extends BaseProperty implements Cloneable
     public void setUseHibernateWorkaround(boolean useHibernateWorkaround)
     {
         this.useHibernateWorkaround = useHibernateWorkaround;
+    }
+
+    /**
+     * List implementation for updating dirty flag when updated.
+     */
+    private class NotifyList extends AbstractNotifyOnUpdateList<String>
+    {
+
+        /**
+         * @param list {@see AbstractNotifyOnUpdateList}.
+         */
+        private NotifyList(List<String> list)
+        {
+            super(list);
+        }
+
+        @Override
+        public void onUpdate()
+        {
+            setValueDirty(true);
+        }
     }
 }

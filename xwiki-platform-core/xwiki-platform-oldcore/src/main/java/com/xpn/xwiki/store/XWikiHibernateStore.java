@@ -859,6 +859,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
+
+            doc.setContentDirty(false);
+            doc.setMetaDataDirty(false);
+
             // We need to ensure that the loaded document becomes the original document
             doc.setOriginalDocument(doc.clone());
 
@@ -883,9 +887,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
-
-        doc.setContentDirty(false);
-        doc.setMetaDataDirty(false);
 
         LOGGER.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
 

@@ -202,7 +202,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     {
         List<DocumentReference> results = new ArrayList<DocumentReference>();
         String query = ", BaseObject as obj, StringProperty as epId where obj.className=? "
-            + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? and epId.value <>''";
+            + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? "
+            + "and  (epId.value <> '' or (epId.value is not null and '' is null))";
         List<String> parameters = new ArrayList<String>();
         parameters.add(this.compactWikiSerializer.serialize(UI_EXTENSION_CLASS));
         parameters.add(EXTENSION_POINT_ID_PROPERTY);

@@ -2859,6 +2859,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        // Note that the query is made to work with Oracle which treats empty strings as null.
         String hql = "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
             + "and (doc.language <> '' or (doc.language is not null and '' is null))";
         ArrayList<String> params = new ArrayList<String>();

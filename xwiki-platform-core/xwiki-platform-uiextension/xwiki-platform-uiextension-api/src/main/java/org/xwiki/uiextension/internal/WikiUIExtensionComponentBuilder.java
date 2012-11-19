@@ -201,6 +201,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     public List<DocumentReference> getDocumentReferences()
     {
         List<DocumentReference> results = new ArrayList<DocumentReference>();
+        // Note that the query is made to work with Oracle which treats empty strings as null.
         String query = ", BaseObject as obj, StringProperty as epId where obj.className=? "
             + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? "
             + "and  (epId.value <> '' or (epId.value is not null and '' is null))";

@@ -141,6 +141,7 @@ public class XWikiStatsReader
         String nameFilter;
 
         if (scope.getType() == Scope.SPACE_SCOPE && "".equals(scope.getName())) {
+            // Note that the query is made to work with Oracle which treats empty strings as null.
             nameFilter = "name not like '%.%' and (name <> '' or (name is not null and '' is null))";
         } else {
             nameFilter = "name like ?";

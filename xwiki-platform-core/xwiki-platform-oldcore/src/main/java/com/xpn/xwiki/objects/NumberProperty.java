@@ -67,7 +67,13 @@ public abstract class NumberProperty extends BaseProperty
     }
 
     @Override
-    public void cloneInternal(BaseProperty clone)
+    public NumberProperty clone()
+    {
+        return (NumberProperty) super.clone();
+    }
+
+    @Override
+    protected void cloneInternal(BaseProperty clone)
     {
         NumberProperty property = (NumberProperty) clone;
         property.setValue(getValue());

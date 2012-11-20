@@ -122,7 +122,7 @@
 &lt;dd&gt;
   &lt;select name='wiki' size='1'&gt;
     #if ($xwiki.isVirtualMode() &amp;&amp; ($xcontext.database == $xcontext.mainWikiName))
-    &lt;option&gt;Entire farm&lt;/option&gt;
+    &lt;option value=''&gt;Entire farm&lt;/option&gt;
     #end
     #foreach ($wiki in $allWikis)
     &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;

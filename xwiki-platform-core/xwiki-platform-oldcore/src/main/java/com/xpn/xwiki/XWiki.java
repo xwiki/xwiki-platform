@@ -4499,7 +4499,7 @@ public class XWiki implements EventListener
 
     public boolean isMultiLingual(XWikiContext context)
     {
-        return "1".equals(getXWikiPreference("multilingual", "1", context));
+        return "1".equals(getXWikiPreference("multilingual", "0", context));
     }
 
     /**

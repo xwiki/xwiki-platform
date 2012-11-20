@@ -186,8 +186,15 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      */
     public long getId()
     {
-        // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly synced.
-        return Util.getHash(getLocalKey());
+        String key = getLocalKey();
+
+        if (key != null) {
+            // The R40000XWIKI6990DataMigration use the same algorithm to compute object id. It should be properly
+            // synced.
+            return Util.getHash(key);
+        }
+
+        return 0;
     }
 
     /**

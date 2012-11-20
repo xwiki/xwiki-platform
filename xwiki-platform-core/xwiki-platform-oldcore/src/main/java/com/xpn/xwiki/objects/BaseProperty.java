@@ -254,7 +254,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
                 // XXX: collision between current and new
                 mergeResult.error(new CollisionException("Collision found on property [" + getName()
                     + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
-            } else if (ObjectUtils.equals(previousValue, getValue())) {
+            } else if (!ObjectUtils.equals(newValue, getValue())) {
                 mergeValue(previousValue, newValue, mergeResult);
             }
         }

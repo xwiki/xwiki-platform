@@ -101,7 +101,15 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     protected BaseObjectReference createReference()
     {
-        return new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
+        BaseObjectReference reference;
+    
+        if (getXClassReference() != null && getDocumentReference() != null) {
+            reference = new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
+        } else {
+            reference = null;
+        }
+        
+        return reference;
     }
 
     @Override

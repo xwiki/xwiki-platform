@@ -25,7 +25,7 @@
 <attachment>
 <filename>attachment.txt</filename>
 <filesize>19</filesize>
-<author>XWiki.author</author>
+<author>XWiki.attachmentauthor</author>
 <date>1342102850000</date>
 <version>1.1</version>
 <comment></comment>

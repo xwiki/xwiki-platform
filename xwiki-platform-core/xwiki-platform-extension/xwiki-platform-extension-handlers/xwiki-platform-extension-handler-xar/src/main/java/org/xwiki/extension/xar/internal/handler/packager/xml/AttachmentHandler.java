@@ -40,7 +40,6 @@ public class AttachmentHandler extends AbstractHandler
 
         // skip useless known elements
         this.skippedElements.add("version");
-        this.skippedElements.add("author");
         this.skippedElements.add("date");
         this.skippedElements.add("comment");
     }

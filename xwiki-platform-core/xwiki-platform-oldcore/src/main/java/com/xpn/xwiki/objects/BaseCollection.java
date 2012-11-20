@@ -768,7 +768,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         BaseCollection<R> previousCollection = (BaseCollection<R>) previousElement;
         BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
 
-        List<ObjectDiff> classDiff = previousCollection.getDiff(newCollection, context);
+        List<ObjectDiff> classDiff = newCollection.getDiff(previousCollection, context);
         for (ObjectDiff diff : classDiff) {
             PropertyInterface propertyResult = getField(diff.getPropName());
             PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());

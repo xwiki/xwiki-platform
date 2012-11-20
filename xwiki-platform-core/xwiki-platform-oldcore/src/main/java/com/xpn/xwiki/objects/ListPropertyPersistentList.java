@@ -35,9 +35,6 @@ import java.util.ArrayList;
 public class ListPropertyPersistentList extends PersistentList
 {
 
-    /** The list to wrap. */
-    private NotifyList list;
-
     /**
      * @param session The session implementor. {@see PersistentList}.
      * @param list The notify list to wrap with this list holder.
@@ -45,7 +42,6 @@ public class ListPropertyPersistentList extends PersistentList
     public ListPropertyPersistentList(SessionImplementor session, NotifyList list)
     {
         super(session, list);
-        this.list = list;
     }
 
     /**
@@ -59,17 +55,19 @@ public class ListPropertyPersistentList extends PersistentList
     /**
      * @param owner The owner list property.
      */
+    @SuppressWarnings("unchecked")
     public void setOwner(ListProperty owner)
     {
         if (list == null) {
             list = new NotifyList(new ArrayList<String>());
         }
-        list.setOwner(owner);
+        ((NotifyList) list).setOwner(owner);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean isWrapper(Object collection)
     {
-        return collection == list || list.isWrapper(collection);
+        return collection == list || ((NotifyList) list).isWrapper(collection);
     }
 }

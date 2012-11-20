@@ -55,10 +55,10 @@ public class ListPropertyCollectionType implements UserCollectionType
     {
         if (collection instanceof NotifyList) {
             return new ListPropertyPersistentList(session, (NotifyList) collection);
-        } else if (collection instanceof List) {
+        } else if (collection instanceof NotifyList) {
             return new ListPropertyPersistentList(session, new NotifyList((List<String>) collection));
         } else {
-            throw new IllegalArgumentException("Cannot wrap non-list.");
+            throw new IllegalArgumentException("Can only wrap ListProperty.NotifyList.");
         }
     }
 

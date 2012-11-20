@@ -168,11 +168,19 @@ public class ListProperty extends BaseProperty implements Cloneable
         for (String entry : getList()) {
             property.actualList.add(entry);
         }
-        property.list = new NotifyList(property.actualList, this);
+        property.list = new NotifyList(property.actualList, property);
     }
 
     public List<String> getList()
     {
+        // Hibernate will not set the owner of the notify list, so we must make sure this has been done before returning
+        // the list.
+        if (list instanceof NotifyList) {
+            ((NotifyList) list).setOwner(this);
+        } else if (list instanceof ListPropertyPersistentList) {
+            ((ListPropertyPersistentList) list).setOwner(this);
+        }
+
         return this.list;
     }
 

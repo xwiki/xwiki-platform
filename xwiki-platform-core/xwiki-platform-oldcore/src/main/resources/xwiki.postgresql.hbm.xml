@@ -255,7 +255,8 @@
                 <column name="XWL_ID" />
                 <column name="XWL_NAME" index="XWLIST_NAME" />
             </key>
-            <list name="list" table="xwikilistitems" lazy="false">
+            <list name="list" table="xwikilistitems" lazy="false"
+                  collection-type="com.xpn.xwiki.objects.ListPropertyCollectionType">
                 <key>
                     <column name="XWL_ID" />
                     <column name="XWL_NAME" index="XWLI_NAME" />

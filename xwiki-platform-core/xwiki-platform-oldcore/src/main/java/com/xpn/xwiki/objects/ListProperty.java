@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentList;
 import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
@@ -48,11 +47,6 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     protected transient List<String> list;
 
-    /**
-     * The notify list wrapper.
-     */
-    private transient NotifyList notifyList;
-
     private String formStringSeparator = "|";
 
     /**
@@ -61,8 +55,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     private List<String> actualList = new ArrayList<String>();
 
     {
-        notifyList = new NotifyList(actualList);
-        list = notifyList;
+        list = new NotifyList(actualList, this);
     }
 
     public String getFormStringSeparator()
@@ -175,7 +168,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         for (String entry : getList()) {
             property.actualList.add(entry);
         }
-        property.list = new NotifyList(property.actualList);
+        property.list = new NotifyList(property.actualList, this);
     }
 
     public List<String> getList()
@@ -191,24 +184,31 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     public void setList(List<String> list)
     {
-        if (list == notifyList) {
+        if (list == this.list || list == this.actualList) {
+            // Accept a caller that sets the already existing list instance.
             return;
         } 
 
-        if (list instanceof PersistentList) {
-            PersistentList persistentList = (PersistentList) list;
-            if (persistentList.isWrapper(notifyList)) {
-                // Accept hibernate setting the persistent list wrapper.
-                this.list = list;
+        if (this.list instanceof ListPropertyPersistentList) {
+            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) this.list;
+            if (persistentList.isWrapper(list)) {
+                // Accept a caller that sets the already existing list instance.
                 return;
             }
+        }
+
+        if (list instanceof ListPropertyPersistentList) {
+            // This is the list wrapper we are using for hibernate.
+            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) list;
+            this.list = persistentList;
+            persistentList.setOwner(this);
+            return;
         }
 
         if (list == null) {
             setValueDirty(true);
             actualList = new ArrayList();
-            notifyList = new NotifyList(actualList);
-            this.list = notifyList;
+            this.list = new NotifyList(actualList, this);
         } else {
             this.list.clear();
             this.list.addAll(list);
@@ -264,22 +264,71 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     /**
      * List implementation for updating dirty flag when updated.
+     *
+     * This will be accessed from ListPropertyUserType.
      */
-    private class NotifyList extends AbstractNotifyOnUpdateList<String>
+    static class NotifyList extends AbstractNotifyOnUpdateList<String>
     {
+
+        /** The owner list property. */
+        private ListProperty owner;
+
+        /** The dirty flag. */
+        private boolean dirty;
+
+        private List<String> actualList;
 
         /**
          * @param list {@see AbstractNotifyOnUpdateList}.
          */
-        private NotifyList(List<String> list)
+        public NotifyList(List<String> list)
         {
             super(list);
+            this.actualList = list;
+        }
+
+        private NotifyList(List<String>list, ListProperty owner)
+        {
+            this(list);
+
+            this.owner = owner;
         }
 
         @Override
         public void onUpdate()
         {
-            setValueDirty(true);
+            setDirty();
+        }
+
+        /**
+         * @param owner The owner list property.
+         */
+        public void setOwner(ListProperty owner)
+        {
+            if (dirty) {
+                owner.setValueDirty(true);
+            }
+            this.owner = owner;
+            owner.actualList = actualList;
+        }
+
+        /**
+         * @return {@literal true} if the given argument is the instance that this list wraps.
+         */
+        public boolean isWrapper(Object collection)
+        {
+            return actualList == collection;
+        }
+
+        /**
+         * Set the dirty flag.
+         */
+        private void setDirty()
+        {
+            if (owner != null) {
+                owner.setValueDirty(true);
+            }
+            dirty = true;
         }
     }
 }

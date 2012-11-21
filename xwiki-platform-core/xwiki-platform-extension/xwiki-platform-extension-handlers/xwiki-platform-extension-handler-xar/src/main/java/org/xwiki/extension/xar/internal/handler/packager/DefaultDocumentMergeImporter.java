@@ -70,7 +70,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     private Logger logger;
 
     @Override
-    public XarEntryMergeResult saveDocumen(String comment, XWikiDocument previousDocument,
+    public XarEntryMergeResult saveDocument(String comment, XWikiDocument previousDocument,
         XWikiDocument currentDocument, XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception
     {
         XarEntryMergeResult mergeResult = null;
@@ -136,28 +136,26 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         MergeResult documentMergeResult =
             mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
 
-        if (documentMergeResult.isModified()) {
-            if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
-                // Indicate future author to whoever is going to answer the question
-                nextDocument.setCreatorReference(currentDocument.getCreatorReference());
-                mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
-                DocumentReference userReference = configuration.getUserReference();
-                if (userReference != null) {
-                    nextDocument.setAuthorReference(userReference);
-                    nextDocument.setContentAuthorReference(userReference);
-                    mergedDocument.setAuthorReference(userReference);
-                    mergedDocument.setContentAuthorReference(userReference);
-                }
-
-                XWikiDocument documentToSave =
-                    askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration);
-
-                if (documentToSave != currentDocument) {
-                    saveDocument(documentToSave, comment, false, configuration);
-                }
-            } else {
-                saveDocument(mergedDocument, comment, false, configuration);
+        if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+            // Indicate future author to whoever is going to answer the question
+            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
+            DocumentReference userReference = configuration.getUserReference();
+            if (userReference != null) {
+                nextDocument.setAuthorReference(userReference);
+                nextDocument.setContentAuthorReference(userReference);
+                mergedDocument.setAuthorReference(userReference);
+                mergedDocument.setContentAuthorReference(userReference);
             }
+
+            XWikiDocument documentToSave =
+                askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration);
+
+            if (documentToSave != currentDocument) {
+                saveDocument(documentToSave, comment, false, configuration);
+            }
+        } else if (documentMergeResult.isModified()) {
+            saveDocument(mergedDocument, comment, false, configuration);
         }
 
         return new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(), mergedDocument.getLocale()),

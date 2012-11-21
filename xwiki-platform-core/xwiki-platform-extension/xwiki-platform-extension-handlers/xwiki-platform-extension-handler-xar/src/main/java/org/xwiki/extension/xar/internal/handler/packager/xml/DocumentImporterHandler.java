@@ -123,7 +123,7 @@ public class DocumentImporterHandler extends DocumentHandler
             XWikiDocument databaseDocument = getDatabaseDocument();
 
             this.mergeResult =
-                this.importer.saveDocumen(comment, getPreviousDocument(), this.hasCurrentDocument ? databaseDocument
+                this.importer.saveDocument(comment, getPreviousDocument(), this.hasCurrentDocument ? databaseDocument
                     : null, getDocument(), this.configuration);
         } catch (Exception e) {
             throw new SAXException("Failed to save document", e);

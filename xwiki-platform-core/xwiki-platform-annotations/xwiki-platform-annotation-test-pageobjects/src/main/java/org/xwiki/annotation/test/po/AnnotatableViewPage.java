@@ -161,7 +161,7 @@ public class AnnotatableViewPage extends BaseElement
     public void simulateCTRL_M()
     {
         WebElement body = getDriver().findElement(By.id("body"));
-        body.sendKeys(Keys.CONTROL, "m");
+        body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
     }
 
     /**

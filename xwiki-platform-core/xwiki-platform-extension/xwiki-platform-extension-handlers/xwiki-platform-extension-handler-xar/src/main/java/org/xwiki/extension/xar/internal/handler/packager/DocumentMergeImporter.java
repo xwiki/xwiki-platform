@@ -31,6 +31,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Role
 public interface DocumentMergeImporter
 {
-    XarEntryMergeResult saveDocumen(String comment, XWikiDocument previousDocument, XWikiDocument currentDocument,
+    XarEntryMergeResult saveDocument(String comment, XWikiDocument previousDocument, XWikiDocument currentDocument,
         XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception;
 }

@@ -19,8 +19,8 @@
  */
 package org.xwiki.linkchecker.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.index.test.po.AllDocsPage;
 import org.xwiki.test.ui.po.LiveTableElement;
 
@@ -33,9 +33,6 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class LinkCheckerAllDocsPage extends AllDocsPage
 {
-    @FindBy(xpath = "//li[@id='xwikiexternalLinks']/a")
-    private WebElement linkCheckerTab;
-
     public static LinkCheckerAllDocsPage gotoPage()
     {
         getUtil().gotoPage("Main", "AllDocs");
@@ -44,7 +41,8 @@ public class LinkCheckerAllDocsPage extends AllDocsPage
 
     public LiveTableElement clickLinkCheckerTab()
     {
-        this.linkCheckerTab.click();
+        WebElement linkCheckerTab = getDriver().findElement(By.xpath("//li[@id='xwikiexternalLinks']/a"));
+        linkCheckerTab.click();
 
         LiveTableElement lt = new LiveTableElement("links");
         lt.waitUntilReady();

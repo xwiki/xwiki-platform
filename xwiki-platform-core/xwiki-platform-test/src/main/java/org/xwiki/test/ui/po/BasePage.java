@@ -20,8 +20,8 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -42,6 +42,18 @@ public class BasePage extends BaseElement
      */
     @FindBy(id = "xwikimaincontainer")
     private WebElement mainContainerDiv;
+
+    /**
+     * The top floating content menu bar.
+     */
+    @FindBy(id = "contentmenu")
+    private WebElement contentMenuBar;
+
+    /**
+     * The entry on the content menu bar that allows us to edit the current page.
+     */
+    @FindBy(id = "tmEdit")
+    private WebElement editMenu;
 
     public String getPageTitle()
     {
@@ -80,53 +92,14 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Emulate mouse over on a top menu entry.
-     * 
-     * @param menuId Menu to emulate the mouse over on
-     */
-    protected void hoverOverMenu(String menuId)
-    {
-        // We need to hover over the Wiki menu so that the menu entry is visible before we can click on
-        // it. The normal way to implement it is to do something like this:
-        //
-        // @FindBy(id = "tmWiki")
-        // private WebElement spaceMenuDiv;
-        // ...
-        // ((RenderedWebElement) spaceMenuDiv).hover();
-        //
-        // However it seems that currently Native Events don't work in FF 3.5+ versions and it seems to be only working
-        // on Windows. Thus for now we have to simulate the hover using JavaScript.
-        //
-        // In addition there's a second bug where a WebElement retrieved using a @FindBy annotation cannot be used
-        // as a parameter to JavascriptExecutor.executeScript().
-        // See http://code.google.com/p/selenium/issues/detail?id=256
-        // Thus FTM we have to use getDriver().findElement().
-
-        // For some unknown reason sometimes the menuId cannot be found so wait for it to be visible before finding it.
-        waitUntilElementIsVisible(By.id(menuId));
-
-        WebElement menuDiv = getDriver().findElement(By.id(menuId));
-        getDriver().executeScript("showsubmenu(arguments[0])", menuDiv);
-
-        // We wait for the submenu to be visible before carrying on to ensure that after this method returns the
-        // calling code can access submenu items.
-        waitUntilElementIsVisible(By.xpath("//div[@id = '" + menuId + "']//span[contains(@class, 'submenu')]"));
-    }
-
-    /**
      * Perform a click on a "content menu" top entry.
      * 
      * @param id The id of the entry to follow
      */
     protected void clickContentMenuTopEntry(String id)
     {
-        // Starting with 3.4M1 the floating content/edit action menu is minimized to a thin line when scrolling down the
-        // page. The menu is maximized when the thin line at the top of the window (page view port) is hovered with the
-        // mouse. As a consequence, we can't click directly on the menu entries; we have to make them visible. Since
-        // WebDriver doesn't handle very well the hover action (it doesn't trigger the :hover CSS pseudo-class) a quick
-        // fix is to simply scroll the page to the top by pressing the Home key.
-        // See http://jira.xwiki.org/browse/XWIKI-6018
-        sendKeys(Keys.HOME);
+        // Hover the top (floating) content menu bar.
+        new Actions(getDriver().getWrappedDriver()).moveToElement(contentMenuBar).perform();
         getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
     }
 
@@ -137,7 +110,8 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        hoverOverMenu("tmEdit");
+        // Hover the top (floating) content menu bar then the edit menu.
+        new Actions(getDriver().getWrappedDriver()).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 

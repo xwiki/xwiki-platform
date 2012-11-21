@@ -228,7 +228,9 @@ var Accordion = Class.create({
 });
 
 document.observe("xwiki:dom:loaded", function(){
-	accordion = new Accordion("side_nav", 0);
+  if ($('side_nav')) {
+    accordion = new Accordion("side_nav", 0);
+  }
 })</code>
     </property>
     <property>
@@ -976,10 +978,10 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
         &lt;/span&gt;
       &lt;/div&gt;
       &lt;div&gt;
-        &lt;input id='filter' type='checkbox' #if($filter != '')checked='true'#end name='filter' onchange='filterChange(this)'/&gt;
+        &lt;input id='filter' type='checkbox' #if($filter != '')checked='true'#end name='filter' onclick='filterChange(this)'/&gt;
         &lt;label for='filter'&gt;Filtered Search&lt;/label&gt;
         &lt;span #if ($debug == '')class='hidden'#end&gt;
-          &lt;input id='debug' type='checkbox' #if($debug != '')checked='true'#end name='debug' onchange='debugChange(this)'/&gt;
+          &lt;input id='debug' type='checkbox' #if($debug != '')checked='true'#end name='debug' onclick='debugChange(this)'/&gt;
           &lt;label for='debug'&gt;Debug Query&lt;/label&gt;
         &lt;/span&gt;
       &lt;/div&gt;

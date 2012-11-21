@@ -317,8 +317,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private final List<XWikiAttachment> attachmentList
-        = new AbstractNotifyOnUpdateList<XWikiAttachment>(new ArrayList<XWikiAttachment>())
+    private final List<XWikiAttachment> attachmentList = new AbstractNotifyOnUpdateList<XWikiAttachment>(
+        new ArrayList<XWikiAttachment>())
     {
         @Override
         public void onUpdate()
@@ -8070,7 +8070,9 @@ public class XWikiDocument implements DocumentModelBridge
                                     objectResult.addField(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
                                 } else {
-                                    // TODO: try to apply a 3 ways merge on the property
+                                    // Try to apply a 3 ways merge on the property
+                                    propertyResult.merge(previousProperty, newProperty, configuration, context,
+                                        mergeResult);
                                 }
                             } else {
                                 // XXX: collision between DB and new: property to modify but does not exists in DB

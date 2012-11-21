@@ -112,7 +112,7 @@ public class PersistentTestContext
 
     public void shutdown() throws Exception
     {
-        this.driver.close();
+        this.driver.quit();
         this.executor.stop();
     }
 

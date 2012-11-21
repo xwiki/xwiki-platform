@@ -278,12 +278,7 @@ public class BaseElement
      */
     public void waitForNotificationErrorMessage(String message)
     {
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-error') " + "and contains(text(), '"
-            + message + "')]"));
-        // in order to improve test speed, clicking on the notification will make it disappear
-        getDriver().findElement(
-            By.xpath("//div[contains(@class,'xnotification-error') " + "and contains(text(), '" + message + "')]"))
-            .click();
+        waitForNotificationMessage("error", message);
     }
 
     /**
@@ -291,12 +286,7 @@ public class BaseElement
      */
     public void waitForNotificationWarningMessage(String message)
     {
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-warning') " + "and contains(text(), '"
-            + message + "')]"));
-        // in order to improve test speed, clicking on the notification will make it disappear
-        getDriver().findElement(
-            By.xpath("//div[contains(@class,'xnotification-warning') " + "and contains(text(), '" + message + "')]"))
-            .click();
+        waitForNotificationMessage("warning", message);
     }
 
     /**
@@ -304,11 +294,23 @@ public class BaseElement
      */
     public void waitForNotificationSuccessMessage(String message)
     {
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') " + "and contains(text(), '"
-            + message + "')]"));
-        // in order to improve test speed, clicking on the notification will make it disappear
-        getDriver().findElement(
-            By.xpath("//div[contains(@class,'xnotification-done') " + "and contains(text(), '" + message + "')]"))
-            .click();
+        waitForNotificationMessage("done", message);
+    }
+
+    /**
+     * Waits for a notification message of the specified type with the given message to be displayed.
+     * 
+     * @param level the notification type (one of error, warning, done)
+     * @param message the notification message
+     * @see 4.3
+     */
+    private void waitForNotificationMessage(String level, String message)
+    {
+        By notificationMessageLocator =
+            By.xpath(String.format("//div[contains(@class,'xnotification-%s') and contains(., '%s')]", level, message));
+        waitUntilElementIsVisible(notificationMessageLocator);
+        // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
+        // this method always waits for the last notification message of the specified level.
+        getDriver().findElement(notificationMessageLocator).click();
     }
 }

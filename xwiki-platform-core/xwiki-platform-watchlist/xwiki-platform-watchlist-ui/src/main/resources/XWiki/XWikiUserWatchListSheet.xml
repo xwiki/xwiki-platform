@@ -69,7 +69,10 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     &lt;/div&gt;
   &lt;/div&gt;
   #if ($xcontext.action == 'view')
-    &lt;div class="half column"&gt;
+    ## The live table display doesn't adapt when the available width is limited so we need to ensure this column takes
+    ## at least half of the container width (unlike the rest of the columns). The result is that this column will be
+    ## displayed below the previous one when the page width is reduced.
+    &lt;div class="min-half column"&gt;
       &lt;div class="watchlistRss"&gt;
         &lt;h1&gt;$msg.get('watchlist.staytuned.rss')&lt;/h1&gt;
         &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;

@@ -221,7 +221,7 @@ public class ClassFieldEditPane extends BaseElement
 
         WebElement dragHandler = toolBox.findElement(By.xpath("img[@alt = 'Move']"));
         new Actions(getDriver().getWrappedDriver()).clickAndHold(dragHandler).moveToElement(element, xOffset, yOffset)
-            .perform();
+            .release().perform();
 
         // Reset the tool box display. Remove this line when the :hover CSS class will be triggered by mouse over.
         hideToolBox();

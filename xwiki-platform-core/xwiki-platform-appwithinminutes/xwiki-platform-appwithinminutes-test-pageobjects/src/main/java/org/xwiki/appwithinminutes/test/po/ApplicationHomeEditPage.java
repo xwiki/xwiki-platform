@@ -130,7 +130,7 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Sets the application icon.
-     *
+     * 
      * @param icon the icon to set
      */
     public void setIcon(String icon)
@@ -182,7 +182,7 @@ public class ApplicationHomeEditPage extends InlinePage
     public void moveLiveTableColumnBefore(String columnToMove, String beforeColumn)
     {
         new Actions(getDriver().getWrappedDriver()).clickAndHold(getLiveTableColumn(columnToMove))
-            .moveToElement(getLiveTableColumn(beforeColumn), 0, 0).perform();
+            .moveToElement(getLiveTableColumn(beforeColumn), -3, 0).release().perform();
     }
 
     /**

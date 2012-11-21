@@ -15,21 +15,35 @@ var editors = XWiki.editors = XWiki.editors || {};
  * TODO Don't show in the class editor, if there is no class defined
  */
 editors.AutoSave = Class.create({
-  /** Is the autosave enabled ? */
-  enabled: false,
-  /** If enabled, how frequent are the savings */
-  frequency: 5, // minutes
-  /** Disabled text opacity **/
-  disabledOpacity: 0.2,
+  options : {
+    /** Is the autosave enabled ? */
+    enabled: false,
+    /** If enabled, how frequent are the savings */
+    frequency: 5, // minutes
+    /** Is the UI for configuring the autosave enabled or not? */
+    showConfigurationUI: true,
+    /** Disabled text opacity **/
+    disabledOpacity: 0.2,
+    /**
+     * Form to autosave, either a DOM element or its ID.
+     * By default the form containing the element with the "xwikieditcontent" ID is used.
+     * If no valid form is specified, then the autosave won't do anything at all.
+     */
+    form: undefined
+  },
   /** Initialization */
-  initialize : function() {
-    if(!(this.form = $("xwikieditcontent")) || !(this.form = this.form.up("form"))) {
+  initialize : function(options) {
+    this.options = Object.extend(Object.clone(this.options), options || { });
+    this.form = $(this.options.form) || ($("xwikieditcontent") && $("xwikieditcontent").up('form'));
+    if (!this.form) {
       return;
     }
     this.initVersionMetadataElements();
-    this.createUIElements();
-    this.addListeners();
-    if (this.enabled) {
+    if (this.options.showConfigurationUI) {
+      this.createUIElements();
+      this.addListeners();
+    }
+    if (this.options.enabled) {
       this.startTimer();
     }
   },
@@ -62,9 +76,9 @@ editors.AutoSave = Class.create({
    */
   createUIElements : function() {
     // Checkbox to enable/disable the autosave
-    this.autosaveCheckbox = new Element('input', {type: "checkbox", checked: this.enabled, name: "doAutosave", id: "doAutosave"});
+    this.autosaveCheckbox = new Element('input', {type: "checkbox", checked: this.options.enabled, name: "doAutosave", id: "doAutosave"});
     // Input for setting the autosave frequency
-    this.autosaveInput = new Element('input', {type: "text", value: this.frequency, size : "2", "class": "autosave-frequency"});
+    this.autosaveInput = new Element('input', {type: "text", value: this.options.frequency, size : "2", "class": "autosave-frequency"});
     // Labels
     var autosaveLabel = new Element('label', {'class': 'autosave', 'for' : "doAutosave"});
     autosaveLabel.appendChild(this.autosaveCheckbox);
@@ -76,8 +90,8 @@ editors.AutoSave = Class.create({
     this.setTimeUnit();
     frequencyLabel.appendChild(document.createTextNode(" "));
     frequencyLabel.appendChild(this.timeUnit);
-    if (!this.enabled) {
-      frequencyLabel.setOpacity(this.disabledOpacity);
+    if (!this.options.enabled) {
+      frequencyLabel.setOpacity(this.options.disabledOpacity);
     }
     // A paragraph containing the whole thing
     var container = new Element('div', {"id": "autosaveControl"});
@@ -118,13 +132,13 @@ editors.AutoSave = Class.create({
 
     // Enable/disable autosave
     Event.observe(this.autosaveCheckbox, "click", function() {
-      this.enabled = this.autosaveCheckbox.checked;
-      if (this.enabled) {
+      this.options.enabled = this.autosaveCheckbox.checked;
+      if (this.options.enabled) {
         this.startTimer();
         this.autosaveInput.up("label").setOpacity('1.0');
       } else {
         this.stopTimer();
-        this.autosaveInput.up("label").setOpacity(this.disabledOpacity);
+        this.autosaveInput.up("label").setOpacity(this.options.disabledOpacity);
       }
     }.bindAsEventListener(this));
     // Set autosave frequency
@@ -133,13 +147,13 @@ editors.AutoSave = Class.create({
       var newFrequency = new Number(this.autosaveInput.value);
       if (newFrequency > 0) {
         // yes: memorize it
-        this.frequency = newFrequency;
+        this.options.frequency = newFrequency;
         this.setTimeUnit();
         // reset autosave loop
         this.restartTimer();
       } else {
         // no: restore the previous value in the input
-        this.autosaveInput.value = this.frequency;
+        this.autosaveInput.value = this.options.frequency;
       }
       // The input element should look like plain text when not focused.
       // Since IE doesn't understand :focused, use a classname
@@ -157,7 +171,7 @@ editors.AutoSave = Class.create({
    * TODO This is bad, very difficult to internationalize.
    */
   setTimeUnit : function() {
-    if (this.frequency == 1) {
+    if (this.options.frequency == 1) {
       this.timeUnit.update("minute");
     } else {
       this.timeUnit.update("minutes");
@@ -166,10 +180,10 @@ editors.AutoSave = Class.create({
 
   /**
    * Start autosave timer when the autosave is enabled.
-   * Every (this.frequency * 60) seconds, the callback function doAutosave is called.
+   * Every (this.options.frequency * 60) seconds, the callback function doAutosave is called.
    */
   startTimer : function() {
-    this.timer = new PeriodicalExecuter(this.doAutosave.bind(this), this.frequency * 60 /* seconds in a minute */);
+    this.timer = new PeriodicalExecuter(this.doAutosave.bind(this), this.options.frequency * 60 /* seconds in a minute */);
   },
   /**
    * Stop the autosave loop when the autosave is disabled or when the autosave frequency is changed
@@ -182,7 +196,7 @@ editors.AutoSave = Class.create({
     }
   },
   /**
-   * Restart the timer  when the autosave frequency is changed, to take into account the nez set frequency.
+   * Restart the timer when the autosave frequency is changed, to take into account the new frequency.
    */
   restartTimer : function() {
     this.stopTimer();

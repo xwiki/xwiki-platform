@@ -129,8 +129,13 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected void addComments(SolrInputDocument solrDocument, XWikiDocument originalDocument)
     {
         List<BaseObject> comments = originalDocument.getComments();
-        if (comments != null) {
-            for (BaseObject comment : comments) {
+        if (comments == null) {
+            return;
+        }
+
+        for (BaseObject comment : comments) {
+            // Yes, objects can be null at this point...
+            if (comment != null) {
                 String commentString = comment.getStringValue("comment");
                 String author = comment.getStringValue("author");
                 Date date = comment.getDateValue("date");

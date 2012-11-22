@@ -97,6 +97,8 @@ platform.workspace.candidateReviewerPrivateComment=Private Comment:
 platform.workspace.candidateAcceptLabel=Accept
 platform.workspace.candidateRejectLabel=Reject
 platform.workspace.invitationCancelLabel=Cancel Invitation
+platform.workspace.workspaceUsersTitle=Workspace Users
+platform.workspace.manageWorkspaceTitle=Workspace
 
 # HINTS
 workspacemanager.prop.wikiprettyname.hint=The display name of the workspace.
@@ -109,6 +111,7 @@ platform.workspace.inviteMessageHint=The message to send to the user.
 platform.workspace.candidatesHint=Users which have requested or which have been invited to join the workspace.
 
 # DESCRIPTIONS
+admin.xwiki.manageworkspace.description=Manage settings such as workspace name, description, owner and membership type.
 admin.xwiki.workspaceusers.description=Manage workspace members: add, remove, invite, accept or reject workspace members.
 </content>
 </xwikidoc>

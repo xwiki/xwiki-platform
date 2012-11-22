@@ -420,7 +420,7 @@ function prettyNameChanged()
         #end
       &lt;/select&gt;
     &lt;/dd&gt;
-  #else
+  #elseif ($templates.size() == 1)
     &lt;div&gt;
       &lt;input id='template' name='template' type='hidden' value="$templates[0].wikiDescriptor.wikiName" #if(!$isInstallComplete)disabled='disabled'#{end} /&gt;
     &lt;/div&gt;

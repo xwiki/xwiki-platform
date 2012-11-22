@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
@@ -311,6 +312,11 @@ public class BaseElement
         waitUntilElementIsVisible(notificationMessageLocator);
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
-        getDriver().findElement(notificationMessageLocator).click();
+        try {
+            // The notification message may disappear before we get to click on it.
+            getUtil().findElementWithoutWaiting(getDriver(), notificationMessageLocator).click();
+        } catch (WebDriverException e) {
+            // Ignore.
+        }
     }
 }

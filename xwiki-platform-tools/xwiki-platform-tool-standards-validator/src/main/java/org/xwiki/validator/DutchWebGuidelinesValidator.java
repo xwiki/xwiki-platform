@@ -308,30 +308,14 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         NodeListIterable formElements = getElements("form");
 
         for (Node formElement : formElements) {
-            boolean validForm = false;
-
-            if (hasChildElement(formElement, "submit")) {
-                // Form contains a <submit> element.
-                validForm = true;
-            }
-
-            for (Node input : getChildren(formElement, ELEM_INPUT)) {
-                if (hasAttribute(input, ATTR_TYPE)) {
-                    if (getAttributeValue(input, ATTR_TYPE).equals(SUBMIT)) {
-                        // Form contains an <input type="submit" /> element.
-                        validForm = true;
-                    } else if (getAttributeValue(input, ATTR_TYPE).equals("image")) {
-                        if (hasAttribute(input, ATTR_ALT)
-                            && StringUtils.isNotEmpty(getAttributeValue(input, ATTR_ALT))) {
-                            // Form contains an <input type="image" alt="action" /> element.
-                            // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
-                            validForm = true;
-                        }
-                    }
-                }
-            }
-
-            assertTrue(Type.ERROR, "rpd1s3.formSubmit", validForm);
+            // Look for either a submit input or an image input with the 'alt' attribute specified.
+            // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
+            String inputSubmitOrImage = "//input[@type = 'submit' or (@type = 'image' and @alt != '')]";
+            // The default value of the type attribute of a button element is 'submit'.
+            // See http://www.w3.org/TR/xhtml1/dtds.html#dtdentry_xhtml1-strict.dtd_button
+            String buttonSubmit = "//button[not(@type) or @type = 'submit']";
+            assertTrue(Type.ERROR, "rpd1s3.formSubmit",
+                (Boolean) evaluate(formElement, inputSubmitOrImage + " | " + buttonSubmit, XPathConstants.BOOLEAN));
         }
     }
 

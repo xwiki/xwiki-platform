@@ -15,7 +15,7 @@
   <date>1307710513000</date>
   <contentUpdateDate>1307710513000</contentUpdateDate>
   <version>1.1</version>
-  <title>Workspace Users</title>
+  <title>$msg.get('platform.workspace.workspaceUsersTitle')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

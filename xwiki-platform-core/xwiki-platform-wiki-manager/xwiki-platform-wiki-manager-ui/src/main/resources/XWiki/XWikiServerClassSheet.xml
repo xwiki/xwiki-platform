@@ -86,8 +86,8 @@
           &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.owner"):&lt;/dt&gt;
           &lt;dd&gt;
+            $doc.display("owner", $firstalias.objectApi)
             &lt;p&gt;
-              $doc.display("owner", $firstalias.objectApi)\\
               $msg.get("wikimanager.doc.createwiki.desc.owner")
             &lt;/p&gt;
           &lt;/dd&gt;

@@ -22,9 +22,9 @@ package org.xwiki.validator;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.xwiki.validator.ValidationError.Type;
-
 import junit.framework.TestCase;
+
+import org.xwiki.validator.ValidationError.Type;
 
 public class DutchWebGuidelinesValidatorTest extends TestCase
 {
@@ -120,16 +120,20 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
-    public void testRpd1s3FormValidSubmit() throws Exception
+    public void testRpd1s3FormValidInput() throws Exception
     {
-        setValidatorDocument("<form><fieldset><submit/></fieldset></form>");
+        setValidatorDocument("<form><fieldset><input type='submit' /></fieldset></form>");
         this.validator.validateRpd1s3();
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
-    public void testRpd1s3FormValidInput() throws Exception
+    public void testRpd1s3FormValidSubmitButton() throws Exception
     {
-        setValidatorDocument("<form><fieldset><input type='submit' /></fieldset></form>");
+        setValidatorDocument("<form><fieldset><button type='submit'>Go</button></fieldset></form>");
+        this.validator.validateRpd1s3();
+        assertTrue(getErrors(this.validator), isValid(this.validator));
+
+        setValidatorDocument("<form><fieldset><button>Go</button></fieldset></form>");
         this.validator.validateRpd1s3();
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
@@ -151,6 +155,14 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
     public void testRpd1s3FormNoSubmit() throws Exception
     {
         setValidatorDocument("<form></form>");
+        this.validator.validateRpd1s3();
+        assertFalse(getErrors(this.validator), isValid(this.validator));
+
+        setValidatorDocument("<form><fieldset><input type='text' /></fieldset></form>");
+        this.validator.validateRpd1s3();
+        assertFalse(getErrors(this.validator), isValid(this.validator));
+
+        setValidatorDocument("<form><fieldset><button type='reset'>Reset</button></fieldset></form>");
         this.validator.validateRpd1s3();
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }

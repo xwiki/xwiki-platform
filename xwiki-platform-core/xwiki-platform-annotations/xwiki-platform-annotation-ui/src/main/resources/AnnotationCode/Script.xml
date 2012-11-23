@@ -997,7 +997,10 @@ XWiki.Annotation = Class.create({
   },
 
   addEditListenersInTab : function() {
-    $$(".annotation a.edit").each(function(item) {
+    // This applies only to the annotations tab because merged annotations are currently displayed and edited by the Comments system.
+    // NOTE: don't forget to change this too if, in the future, annotations are no longer edited by the Comments system from the Comments tab.
+    // NOTE: Doing this does not allow us to see any extra properties that may be added to the XWikiComments class. These properties will still be displayed and editable in the annotation bubble, but not in the tab, because the bubble is handled by the Annotations system, while the tab is handled by the Comments system.
+    $$('#Annotationspane .annotation a.edit').each(function(item) {
       var container = item.up('.annotation');
       // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
       var annotationId = container.id.substring(16);
@@ -1374,11 +1377,16 @@ XWiki.Annotation = Class.create({
       if (!replyButtonInTab) {
         replyButton.hide();
       } else {
-        // Get the click handlers for the reply button from the comments tab.
-        var clickEventHandlers = replyButtonInTab.getStorage().get('prototype_event_registry').get('click');
-        // Register the same event handlers for the bubble reply button.
-        clickEventHandlers.each(function(wrapper){
-          replyButton.observe('click', wrapper.handler);
+        // When the reply button from the bubble is clicked, also click the reply button from the comments tab.
+        replyButton.observe('click', function(event) {
+          // Stop the bubble click event.
+          event.stop();
+
+          // Click the reply button from the comments tab button instead.
+          replyButtonInTab.click();
+
+          // Lose the focus on the bubble so that it can go away.
+          container.blur();
         });
       }
     }

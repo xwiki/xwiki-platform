@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 admin.xwiki.manageworkspace.description=Gestion des réglages de l'espace de travail comme le nom, la description, le propriétaire et le type d’adhésion. 
 admin.xwiki.workspaceusers.description=Gérer les membres de l'espace de travail\: ajouter, supprimer, inviter, accepter ou rejeter des membres de l'espace de travail. 

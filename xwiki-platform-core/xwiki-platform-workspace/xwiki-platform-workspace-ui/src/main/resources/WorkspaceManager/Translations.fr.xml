@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 WorkspaceManager.WorkspaceClass_membershipType_invite=Uniquement un administrateur peut inviter un utilisateur
 WorkspaceManager.WorkspaceClass_membershipType_open=Tout utilisateur peut rejoindre

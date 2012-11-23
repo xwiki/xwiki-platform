@@ -81,7 +81,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
 
         DistributionStepStatus step2 = new DistributionStepStatus("extension.outdatedextensions");
         steps.add(step2);
-        step1.setUpdateState(UpdateState.COMPLETED);
+        step2.setUpdateState(UpdateState.COMPLETED);
         // Upgrade outdated extensions only when there is outdated extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
             Collection<String> namespaces = extension.getNamespaces();

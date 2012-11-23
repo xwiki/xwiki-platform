@@ -46,15 +46,15 @@
   (% class="centered" %) (((
 
   (% class="faq-link search-faq" %)(((
-    Search FAQ...
+    $msg.get('platform.faq.search.title')
     (((
     {{html}}
     &lt;form action="$xwiki.getURL('FAQCode.FAQSearch')"&gt;
       &lt;div&gt;
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;
-      &lt;input type="text" name="text" value="question text..." size="25" class="withTip" /&gt;
+      &lt;input type="text" name="text" value="$msg.get('platform.faq.search.questionHint')" size="25" class="withTip" /&gt;
       &lt;span class="buttonwrapper"&gt;
-        &lt;input class="button" type="submit" value="Search" /&gt;
+        &lt;input class="button" type="submit" value="$msg.get('platform.faq.search.submit')" /&gt;
       &lt;/span&gt;
       &lt;/div&gt;
     &lt;/form&gt;
@@ -63,21 +63,23 @@
   )))
 
   (% class="faq-link add-faq" %)(((
-    Contribute FAQ...
+    $msg.get('platform.faq.create.title')
 
     (((
     {{html}}
     #if ($isGuest)
-      You need first to &lt;a href="${escapetool.xml($doc.getURL('login', "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL('xwiki:Main.WebHome', 'register', "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+      #set($login = ${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))})
+      #set($register = ${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))})
+      $msg.get("platform.faq.need", ["&lt;a href=$login&gt;","&lt;/a&gt;","&lt;a href=$register&gt;","&lt;/a&gt;"])
     #else
       &lt;form action="" id="newfaq"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
           &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
           &lt;input type="hidden" name="createFAQ" value="true" /&gt;
-          &lt;input class="withTip" type="text" name="question" value="question text..." size="25"/&gt;
+          &lt;input class="withTip" type="text" name="question" value="$msg.get('platform.faq.create.questionHint')" size="25"/&gt;
           &lt;span class="buttonwrapper"&gt;
-            &lt;input class="button" type="submit" value="Add" /&gt;
+            &lt;input class="button" type="submit" value="$msg.get('platform.faq.create.submit')" /&gt;
           &lt;/span&gt;
         &lt;/div&gt;
       &lt;/form&gt;

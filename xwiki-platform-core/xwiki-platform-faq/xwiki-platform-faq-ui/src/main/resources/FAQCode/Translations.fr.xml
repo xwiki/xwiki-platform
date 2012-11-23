@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>FAQCode</web>
+  <name>Translations</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>FAQCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1353578574000</creationDate>
+  <date>1353675316000</date>
+  <contentUpdateDate>1353675316000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>faq.doc.title=Question
+faq.doc.creationDate=Créé le
+faq.doc.date=Dernière modification
+faq.applicationsPanelEntryLabel=FAQ
+
+platform.faq.about=La Foire Aux Questions(FAQ) est une manière simple de trouver des réponses à la plupart de vos questions.
+platform.faq.search.title=Chercher dans la FAQ...
+platform.faq.create.title=Contribuer à la FAQ...
+platform.faq.search.questionHint=Texte de la question...
+platform.faq.create.questionHint=Texte de la question...
+platform.faq.search.submit=Chercher
+platform.faq.create.submit=Ajouter
+
+platform.faq.need=Vous devez vous {0} identifier {1} ou vous {2} enregister {3}
+
+platform.faq.noAnswer=Aucune réponse n'a encore été donnée à cette question. Soyez le premier à en donner une! Inscrivez vous sur ce wiki et éditez cette page pour ajouter une réponse.
+platform.faq.sheet=Cette feuille de classe doit être appliquée à un document contenant un FAQCode.FAQClass object
+
+platform.faq.technical=Contient les pages techniques de l'application FAQ.
+platform.faq.list=Documents dans cet espace</content>
+</xwikidoc>

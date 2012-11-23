@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>Updates the wiki document of a workspace by using values from the request.
 
 The 'workspaceId' parameter is used to identify the wiki document and the request values update the objects of classes [[XWiki.XWikiServerClass]] and [[WorkspaceManager.WorkspaceClass]], objects which are already stored in the wiki document.

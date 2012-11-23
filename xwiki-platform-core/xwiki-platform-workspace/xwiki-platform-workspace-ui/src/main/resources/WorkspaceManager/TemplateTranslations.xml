@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content># Various translations that are used in the workspace template and, implicitly, in the created workspaces.
 
 # Rebrand the term 'Wiki' to 'Workspace' in the menu of a workspace. To be used by the workspace template and in all created workspaces.

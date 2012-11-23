@@ -394,6 +394,13 @@
               <differenceType>7002</differenceType>
               <justification>We might as well remove the getter.  See above.</justification>
             </difference>
+            <difference>
+              <className>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration</className>
+              <method>java.lang.String getPreHibernateLiquibaseChangeLog()</method>
+              <differenceType>7012</differenceType>
+              <justification>Added a method to allow schema update through liquibase before hibernate schema updates.
+                This should not really break anything because all hibernate migration extends AbstractHibernateDataMigration which now implement a stub for this method.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

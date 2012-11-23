@@ -1272,37 +1272,52 @@ document.observe('xwiki:dom:loading', function() {
 /**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
  *
- * To activate this behavior on an input element, add the "withTip" classname to it or pass it as the 'element' value
- * of the memo of a 'xwiki:addBehavior:withTip' event.
+ * To activate this behavior on an input element, set a "placeholder" attribute, or add the "withTip" classname to it,
+ * or pass it as the 'element' value of the memo of a 'xwiki:addBehavior:withTip' event.
  */
 (function(){
-  var onFocus = function() {
-    if (this.value==this.defaultValue) {
-      this.value="";
-    } else {
-      this.select();
+  var placeholderPolyfill;
+  if ('placeholder' in document.createElement('input')) {
+    // For browsers that do support the 'placeholder' attribute, we just add support for the older way of supporting this through the 'withTip' classname and the default input value.
+    placeholderPolyfill = function(event) {
+      var item = event.memo.element;
+      if (item.placeholder === '') {
+        item.placeholder = item.defaultValue;
+        item.value = '';
+      }
     }
-  }
-  var onBlur = function() {
-    if (this.value=="") {
-      this.value=this.defaultValue;
+  } else {
+    // For browsers that don't support the 'placeholder' attribute, we simulate it with 'focus' and 'blur' event handlers.
+    var onFocus = function() {
+      if (this.value == this.defaultValue) {
+        this.value = '';
+      } else {
+        this.select();
+      }
     }
-  }
-  document.observe('xwiki:addBehavior:withTip', function(event) {
-    var item = event.memo.element;
-    if (item) {
+    var onBlur = function() {
+      if (this.value == '') {
+        this.value = this.defaultValue;
+      }
+    }
+    placeholderPolyfill = function(event) {
+      var item = event.memo.element;
+      if (item.readAttribute('placeholder')) {
+        item.defaultValue = item.readAttribute('placeholder');
+      }
       item.observe('focus', onFocus.bindAsEventListener(item));
       item.observe('blur', onBlur.bindAsEventListener(item));
     }
-  });
+  }
+  document.observe('xwiki:addBehavior:withTip', placeholderPolyfill);
   document.observe('xwiki:dom:loaded', function() {
-    $$("input.withTip", "textarea.withTip").each(function(item) {
+    $$("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
       document.fire("xwiki:addBehavior:withTip", {'element' : item});
     });
   });
   document.observe('xwiki:dom:updated', function(event) {
     event.memo.elements.each(function(element) {
-      element.select("input.withTip", "textarea.withTip").each(function(item) {
+      element.select("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
         document.fire("xwiki:addBehavior:withTip", {'element' : item});
       });
     });

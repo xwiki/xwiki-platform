@@ -25,13 +25,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.junit.internal.AssumptionViolatedException;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.xwiki.test.ui.XWikiWrappingDriver;
 
 /**
  * Allows ignoring some tests for a given browser.
@@ -40,7 +39,7 @@ import org.xwiki.test.ui.XWikiWrappingDriver;
  * public class MyTestClass
  * {
  *  &#064;Rule
- *  public BrowserMethodRule browseMethodRule = new BrowserMethodRule(getDriver());
+ *  public BrowserTestRule browseTestRule = new BrowserTestRule(getDriver());
  *
  * 	&#064;Test
  *  &#064;IgnoreBrowser(value = {"firefox"}, reason="some reason for ignoring the test...")
@@ -54,19 +53,14 @@ import org.xwiki.test.ui.XWikiWrappingDriver;
  * @version $Id$
  * @since 3.5M1
  */
-public class BrowserMethodRule implements MethodRule
+public class BrowserTestRule implements TestRule
 {
     private String currentBrowserName;
     private String currentBrowserVersion;
 
-    public BrowserMethodRule(WebDriver driver)
+    public BrowserTestRule(WebDriver driver)
     {
-        WebDriver nativeDriver = driver;
-        if (driver instanceof XWikiWrappingDriver) {
-            nativeDriver = ((XWikiWrappingDriver) driver).getWrappedDriver();
-        }
-
-        Capabilities capability = ((RemoteWebDriver) nativeDriver).getCapabilities();
+        Capabilities capability = ((RemoteWebDriver) driver).getCapabilities();
         // We get the name of the current user Browser
         this.currentBrowserName = capability.getBrowserName();
         // We get the version of the current used Browser
@@ -75,7 +69,7 @@ public class BrowserMethodRule implements MethodRule
     }
 
     @Override
-    public Statement apply(final Statement statement, final FrameworkMethod method, Object target)
+    public Statement apply(final Statement base, final Description description)
     {
         return new Statement() {
             @Override
@@ -85,13 +79,13 @@ public class BrowserMethodRule implements MethodRule
                 List<IgnoreBrowser> ignoredBrowsersList = new ArrayList<IgnoreBrowser>();
 
                 // We check if there is a IgnoreBrowser annotation
-                IgnoreBrowser ignoreBrowser = method.getAnnotation(IgnoreBrowser.class);
+                IgnoreBrowser ignoreBrowser = description.getAnnotation(IgnoreBrowser.class);
                 if (ignoreBrowser != null) {
                     ignoredBrowsersList.add(ignoreBrowser);
                 }
 
                 // We check if there is a IgnoreBrowsers annotation compound
-                IgnoreBrowsers ignoreBrowsers = method.getAnnotation(IgnoreBrowsers.class);
+                IgnoreBrowsers ignoreBrowsers = description.getAnnotation(IgnoreBrowsers.class);
                 if (ignoreBrowsers != null) {
                     ignoredBrowsersList.addAll(Arrays.asList(ignoreBrowsers.value()));
                 }
@@ -108,7 +102,7 @@ public class BrowserMethodRule implements MethodRule
                         throw new AssumptionViolatedException(ignoredBrowser.reason());
                     }
                 }
-                statement.evaluate();
+                base.evaluate();
             }
         };
     }

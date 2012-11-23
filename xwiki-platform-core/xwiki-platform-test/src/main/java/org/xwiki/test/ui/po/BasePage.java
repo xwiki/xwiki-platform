@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -88,7 +89,7 @@ public class BasePage extends BaseElement
      */
     public boolean isNewDocument()
     {
-        return (Boolean) getDriver().executeScript("return XWiki.docisnew");
+        return (Boolean) ((JavascriptExecutor) getDriver()).executeScript("return XWiki.docisnew");
     }
 
     /**
@@ -99,7 +100,7 @@ public class BasePage extends BaseElement
     protected void clickContentMenuTopEntry(String id)
     {
         // Hover the top (floating) content menu bar.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(contentMenuBar).perform();
+        new Actions(getDriver()).moveToElement(contentMenuBar).perform();
         getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
     }
 
@@ -111,7 +112,7 @@ public class BasePage extends BaseElement
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
         // Hover the top (floating) content menu bar then the edit menu.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
+        new Actions(getDriver()).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 
@@ -157,7 +158,7 @@ public class BasePage extends BaseElement
         clickContentMenuEditSubMenuEntry("tmEditInline");
         return createInlinePage();
     }
-    
+
     /**
      * Can be overridden to return extended {@link InlinePage}.
      */

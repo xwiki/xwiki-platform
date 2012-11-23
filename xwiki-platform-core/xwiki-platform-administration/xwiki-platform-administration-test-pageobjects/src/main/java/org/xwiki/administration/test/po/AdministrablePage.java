@@ -43,7 +43,7 @@ public class AdministrablePage extends ViewPage
      */
     public AdministrationPage clickAdministerWiki()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(wikiMenu).perform();
+        new Actions(getDriver()).moveToElement(wikiMenu).perform();
         this.administerWikiLink.click();
         return new AdministrationPage();
     }

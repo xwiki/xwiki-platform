@@ -181,8 +181,7 @@ public class EditPage extends BasePage
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
         // Hover the top (floating) edit menu bar then the current editor menu.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(editMenuBar).moveToElement(currentEditorMenu)
-            .perform();
+        new Actions(getDriver()).moveToElement(editMenuBar).moveToElement(currentEditorMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 }

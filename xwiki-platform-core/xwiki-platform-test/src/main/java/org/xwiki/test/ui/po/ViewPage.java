@@ -118,14 +118,14 @@ public class ViewPage extends BasePage
 
     public CreatePagePage createPage()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(createMenu).perform();
+        new Actions(getDriver()).moveToElement(createMenu).perform();
         this.createPageMenuLink.click();
         return new CreatePagePage();
     }
 
     public CreateSpacePage createSpace()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(createMenu).perform();
+        new Actions(getDriver()).moveToElement(createMenu).perform();
         this.createSpaceMenuLink.click();
         return new CreateSpacePage();
     }
@@ -212,14 +212,14 @@ public class ViewPage extends BasePage
 
     public CopyPage copy()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(pageMenu).perform();
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
         this.copyPageLink.click();
         return new CopyPage();
     }
 
     public ConfirmationPage delete()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(pageMenu).perform();
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
         this.deletePageLink.click();
         return new ConfirmationPage();
     }
@@ -227,7 +227,7 @@ public class ViewPage extends BasePage
     public boolean canDelete()
     {
         if (getUtil().hasElement(By.xpath("//div[@id='tmPage']//span[@class='menuarrow']"))) {
-            new Actions(getDriver().getWrappedDriver()).moveToElement(pageMenu).perform();
+            new Actions(getDriver()).moveToElement(pageMenu).perform();
             return getUtil().hasElement(By.id("tmActionDelete"));
         } else {
             return false;
@@ -284,13 +284,13 @@ public class ViewPage extends BasePage
 
     public void watchDocument()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(pageMenu).perform();
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
         this.watchDocumentLink.click();
     }
 
     public void watchSpace()
     {
-        new Actions(getDriver().getWrappedDriver()).moveToElement(spaceMenu).perform();
+        new Actions(getDriver()).moveToElement(spaceMenu).perform();
         this.watchSpaceLink.click();
     }
 

@@ -20,18 +20,12 @@
 package org.xwiki.test.ui;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.rules.MethodRule;
 import org.junit.rules.TestName;
-import org.junit.rules.TestWatchman;
 import org.junit.runner.RunWith;
-import org.junit.runners.model.FrameworkMethod;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.test.ui.browser.BrowserMethodRule;
+import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.BaseElement;
@@ -57,47 +51,15 @@ public abstract class AbstractTest
      * Used for ignoring tests that use {@link IgnoreBrowser} and {@link IgnoreBrowsers} annotations.
      */
     @Rule
-    public BrowserMethodRule browseMethodRule = new BrowserMethodRule(getDriver());
+    public BrowserTestRule browseMethodRule = new BrowserTestRule(getDriver());
 
     /**
-     * The object used to watch tests and log when they start and succeed/fail.
-     * <p>
-     * The reason we need this is simply to overcome a deficiency in error reporting in Jenkins. The reason is that
-     * Jenkins bases its test reporting on the Maven Surefire plugin reporting which itself is using a file to report
-     * test status. Since ui-tests are using a test suite, {@link PageObjectSuite}, there's only a single file generated
-     * and it's only generated when all tests have finished executing. Thus if a test hangs there won't be any file
-     * generated and looking at the Jenkins UI it won't be possible to see which tests have executed.
-     * <p>
-     * Normally each JUnit Test Runner knows what test is executing and when it's finished and thus can report them in
-     * its own console (as this is the case for IDEs for example). Again the issue here is that Jenkins doesn't have any
-     * JUnit Test Runner but instead is calling JUnit by delegation to the Maven Surefire plugin.
+     * Generates debugging information on test failure.
      */
     @Rule
-    public final MethodRule watchman = new TestWatchman()
-    {
-        @Override
-        public void starting(FrameworkMethod method)
-        {
-            logger.info("{} started", method.getName());
-        }
-
-        @Override
-        public void succeeded(FrameworkMethod method)
-        {
-            logger.info("{} succeeded", method.getName());
-        }
-
-        @Override
-        public void failed(Throwable e, FrameworkMethod method)
-        {
-            logger.info("{} failed", method.getName());
-        }
-    };
+    public TestDebugger testDebugger = new TestDebugger(getDriver());
 
     protected static PersistentTestContext context;
-
-    /** The object used to log an info message when the test starts and ends. */
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /** Used so that AllTests can set the persistent test context. */
     public static void setContext(PersistentTestContext context)
@@ -109,12 +71,6 @@ public abstract class AbstractTest
         // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
         // in TestUtils), including the login form. Whenever a new user logs in we need to recache
         getUtil().recacheSecretToken();
-    }
-
-    @Before
-    public void setTestName()
-    {
-        context.setCurrentTestName(getClass().getSimpleName() + "-" + getTestMethodName());
     }
 
     @BeforeClass

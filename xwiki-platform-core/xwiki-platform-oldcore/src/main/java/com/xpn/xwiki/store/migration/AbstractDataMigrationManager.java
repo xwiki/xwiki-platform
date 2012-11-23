@@ -106,7 +106,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      * Logger.
      */
     @Inject
-    private Logger logger;
+    protected Logger logger;
 
     /**
      * Execution context used to access XWikiContext.
@@ -542,6 +542,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     {
         try {
             Collection<XWikiMigration> neededMigrations = getNeededMigrations();
+            logger.info("Updating database schema:");
             updateSchema(neededMigrations);
             startMigrations(neededMigrations);
         } catch (Exception e) {

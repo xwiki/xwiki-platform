@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -31,7 +32,6 @@ import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.XWikiWrappingDriver;
 
 /**
  * Represents all elements which include web pages as well as parts of web pages.
@@ -52,11 +52,11 @@ public class BaseElement
     public BaseElement()
     {
         ElementLocatorFactory finder =
-            new AjaxElementLocatorFactory(getDriver().getWrappedDriver(), getUtil().getTimeout());
+            new AjaxElementLocatorFactory(getDriver(), getUtil().getTimeout());
         PageFactory.initElements(finder, this);
     }
 
-    protected XWikiWrappingDriver getDriver()
+    protected WebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -245,7 +245,7 @@ public class BaseElement
 
     public Object executeJavascript(String javascript, Object... arguments)
     {
-        return getDriver().executeScript(javascript, arguments);
+        return ((JavascriptExecutor) getDriver()).executeScript(javascript, arguments);
     }
 
     /**
@@ -262,7 +262,7 @@ public class BaseElement
     public void makeConfirmDialogSilent(boolean accept)
     {
         String script = String.format("window.confirm = function() { return %s; }", accept);
-        getDriver().executeScript(script);
+        ((JavascriptExecutor) getDriver()).executeScript(script);
     }
 
     /**
@@ -271,7 +271,7 @@ public class BaseElement
      */
     public void makeAlertDialogSilent()
     {
-        getDriver().executeScript("window.alert = function() { return true; }");
+        ((JavascriptExecutor) getDriver()).executeScript("window.alert = function() { return true; }");
     }
 
     /**

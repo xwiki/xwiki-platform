@@ -169,7 +169,7 @@ public class ApplicationHomeEditPage extends InlinePage
         WebElement column = getLiveTableColumn(columnLabel);
         // FIXME: This doesn't trigger the :hover CSS pseudo class. The click still works because the delete X (text) is
         // not really hidden: it is displayed with white color (the page background-color).
-        new Actions(getDriver().getWrappedDriver()).moveToElement(column).perform();
+        new Actions(getDriver()).moveToElement(column).perform();
         column.findElement(By.className("delete")).click();
     }
 
@@ -181,7 +181,7 @@ public class ApplicationHomeEditPage extends InlinePage
      */
     public void moveLiveTableColumnBefore(String columnToMove, String beforeColumn)
     {
-        new Actions(getDriver().getWrappedDriver()).clickAndHold(getLiveTableColumn(columnToMove))
+        new Actions(getDriver()).clickAndHold(getLiveTableColumn(columnToMove))
             .moveToElement(getLiveTableColumn(beforeColumn), -3, 0).release().perform();
     }
 

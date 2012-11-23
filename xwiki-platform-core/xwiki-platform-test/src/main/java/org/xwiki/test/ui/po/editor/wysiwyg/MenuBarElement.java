@@ -120,7 +120,7 @@ public class MenuBarElement extends BaseElement
         // instance, when you return from preview after clicking the "Back to edit" button, if the mouse is not moved it
         // can end up over the edit menu after the page is loaded. This opens the edit menu which hides part of the
         // WYSIWYG editor menu bar.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(container).perform();
+        new Actions(getDriver()).moveToElement(container).perform();
         clickMenuWithLabel(label);
     }
 

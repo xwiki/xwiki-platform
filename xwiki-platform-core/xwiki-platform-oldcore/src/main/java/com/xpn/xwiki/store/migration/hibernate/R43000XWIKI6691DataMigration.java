@@ -57,14 +57,18 @@ public class R43000XWIKI6691DataMigration extends AbstractHibernateDataMigration
     }
 
     @Override
-    public String getLiquibaseChangeLog() throws DataMigrationException
+    public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
     {
         StringBuilder result = new StringBuilder();
         result.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append("\" author=\"xwikiorg\">\n")
-            .append("    <comment>Reduce the size of the ASE_REQUESTID column to 48-chars</comment>\n");
-        result.append("    <modifyDataType tableName=\"activitystream_events\"")
-            .append(" columnName=\"ase_requestid\" newDataType=\"varchar(48)\"/>\n");
-        result.append("  </changeSet>\n");
+            .append("        <preConditions onFail=\"CONTINUE\">\n")
+            .append("            <tableExists tableName=\"activitystream_events\"/>\n")
+            .append("            <columnExists tableName=\"activitystream_events\" columnName=\"ase_requestid\"/>\n")
+            .append("        </preConditions>")
+            .append("    <comment>Reduce the size of the ASE_REQUESTID column to 48-chars</comment>\n")
+            .append("    <modifyDataType tableName=\"activitystream_events\"")
+            .append(" columnName=\"ase_requestid\" newDataType=\"varchar(48)\"/>\n")
+            .append("  </changeSet>\n");
         return result.toString();
     }
 }

@@ -113,6 +113,12 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     }
 
     @Override
+    public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
+    {
+        return null;
+    }
+
+    @Override
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
         return null;

@@ -38,6 +38,8 @@ public class LinkCheckerTest extends AbstractTest
     public void testLinkChecker()
     {
         getUtil().deletePage(getClass().getSimpleName(), getTestMethodName());
+
+        // Create a page with a URL so that it appears in the Link Checker livetable.
         getUtil().createPage(getClass().getSimpleName(), getTestMethodName(), "http://doesntexist", getTestClassName());
 
         // Navigate to the Index page and click on the "External Links" tab

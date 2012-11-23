@@ -27,7 +27,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 
 /**
  * Create specific {@link WebDriver} instances for various Browsers.
- *
+ * 
  * @version $Id$
  * @since 3.5M1
  */
@@ -35,6 +35,7 @@ public class WebDriverFactory
 {
     public WebDriver createWebDriver(String browserName)
     {
+        WebDriver driver;
         if (browserName.startsWith("*firefox")) {
             // Native events are disabled by default for Firefox on Linux as it may cause tests which open many windows
             // in parallel to be unreliable. However, native events work quite well otherwise and are essential for some
@@ -42,13 +43,21 @@ public class WebDriverFactory
             // testing the WYSIWYG editor. See http://code.google.com/p/selenium/issues/detail?id=2331 .
             FirefoxProfile profile = new FirefoxProfile();
             profile.setEnableNativeEvents(true);
-            return new FirefoxDriver(profile);
+            driver = new FirefoxDriver(profile);
         } else if (browserName.startsWith("*iexplore")) {
-            return new InternetExplorerDriver();
+            driver = new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {
-            return new ChromeDriver();
+            driver = new ChromeDriver();
         } else {
             throw new RuntimeException("Unsupported browser name [" + browserName + "]");
         }
+
+        // Maximize the browser window by default so that the page has a standard layout. Individual tests can resize
+        // the browser window if they want to test how the page layout adapts to limited space. This reduces the
+        // probability of a test failure caused by an unexpected layout (nested scroll bars, floating menu over links
+        // and buttons and so on).
+        driver.manage().window().maximize();
+
+        return driver;
     }
 }

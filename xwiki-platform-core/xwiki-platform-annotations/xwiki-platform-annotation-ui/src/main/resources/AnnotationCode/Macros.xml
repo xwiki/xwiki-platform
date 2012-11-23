@@ -211,13 +211,12 @@
         ## Comment reply button only for default annotations.
         #if ("$!annotationClassDocName" == 'XWiki.XWikiComments')
           #set($annDocReference = $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
-          #set($annoDoc = $xwiki.getDocument($annDocReference))
           #set($xredirect = $!escapetool.xml($request.get('xredirect')))
           #if("$!xredirect" == '')
-            #set($xredirect = "$annoDoc.getURL('view')?$!request.getQueryString()")
+            #set($xredirect = "$xwiki.getURL($annDocReference, 'view', $!{request.queryString})")
           #end
           ## add "comment reply" button
-          &lt;span class="tool annotationReply commenttool commentreply"&gt;&lt;a class="commentreply" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;amp;replyto=${ann.id}#xwikicomment_${ann.id}" title="$msg.get('core.viewers.comments.reply')"&gt;$msg.get('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;
+          &lt;span class="tool annotationReply commenttool commentreply"&gt;&lt;a class="commentreply" href="${xredirect}#xwikicomment_${ann.id}" title="$msg.get('core.viewers.comments.reply')"&gt;$msg.get('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;
         #end
         ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
         &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$msg.get('annotations.action.edit.tooltip')"&gt;$msg.get('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;

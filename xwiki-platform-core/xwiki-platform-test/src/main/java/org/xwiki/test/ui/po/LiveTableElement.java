@@ -70,8 +70,7 @@ public class LiveTableElement extends BaseElement
                 break;
             }
         }
-        throw new TimeoutException("Livetable isn't ready after the timeout has expired. Source ["
-            + getDriver().getPageSource() + "]");
+        throw new TimeoutException("Livetable isn't ready after the timeout has expired.");
     }
 
     public boolean hasColumn(String columnTitle)

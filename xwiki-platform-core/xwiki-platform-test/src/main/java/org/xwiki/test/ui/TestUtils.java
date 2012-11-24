@@ -54,7 +54,6 @@ import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -250,9 +249,6 @@ public class TestUtils
         Wait<WebDriver> wait = new WebDriverWait(getDriver(), getTimeout());
         try {
             wait.until(condition);
-        } catch (TimeoutException e) {
-            System.out.println("Page source = [" + getDriver().getPageSource() + "]");
-            throw e;
         } finally {
             // Reset timeout
             setDriverImplicitWait(getDriver());

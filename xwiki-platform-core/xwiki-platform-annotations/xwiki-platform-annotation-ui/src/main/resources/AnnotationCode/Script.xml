@@ -421,7 +421,7 @@ XWiki.Selection = Class.create({
     if (node == this.container) {
       text = this.getLeftDocument(node.parentNode);
     }
-    parent = node.parentNode;
+    var parent = node.parentNode;
     if (parent.childNodes) {
       for (var i = 0; i &lt; parent.childNodes.length &amp;&amp; parent.childNodes[i] != node; ++i) {
         text += parent.childNodes[i].textContent;

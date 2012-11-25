@@ -145,16 +145,22 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitUntilElementIsVisible(WebElement button, String xpathSuffix)
     {
+        String xpath = getXPath();
+        button.click();
+        waitUntilElementIsVisible(By.xpath(xpath + xpathSuffix));
+        // We have to create a new extension pane because the DOM has changed.
+        return new ExtensionPane(getUtil().findElementWithoutWaiting(getDriver(), By.xpath(xpath)));
+    }
+
+    /**
+     * @return the XPath used to locate this extension
+     */
+    private String getXPath()
+    {
         String nameAndVersion =
             getUtil().findElementWithoutWaiting(getDriver(), container, By.className("extension-title")).getText();
-        button.click();
-        waitUntilElementIsVisible(By.xpath(String.format("//*[contains(@class, 'extension-item') and descendant::*"
-            + "[contains(@class, 'extension-title') and normalize-space(.) = '%s']]%s", nameAndVersion, xpathSuffix)));
-        // We have to create a new extension pane because the DOM has changed.
-        return new ExtensionPane(getUtil().findElementWithoutWaiting(
-            getDriver(),
-            By.xpath(String.format("//*[contains(@class, 'extension-item') and descendant::*["
-                + "contains(@class, 'extension-title') and normalize-space(.) = '%s']]", nameAndVersion))));
+        return String.format("//*[contains(@class, 'extension-item') and descendant::*["
+            + "contains(@class, 'extension-title') and normalize-space(.) = '%s']]", nameAndVersion);
     }
 
     /**
@@ -176,11 +182,11 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitForConfirmationOrJobDone(WebElement button)
     {
-        // Wait until the progress section contains a confirmation button or no loading log items.
+        // Wait until the extension is not loading or the progress section contains a confirmation button.
         return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']/*"
             + "[@class = 'extension-body-progress extension-body-section' and "
-            + "(descendant::input[@name = 'confirm' and not(@disabled)] or "
-            + "count(descendant::li[contains(@class, 'extension-log-item-loading')]) = 0)]");
+            + "(not(ancestor::*[contains(@class, 'loading')]) or "
+            + "descendant::input[@name = 'confirm' and not(@disabled)])]");
     }
 
     /**
@@ -289,8 +295,8 @@ public class ExtensionPane extends BaseElement
         if (found.size() == 0) {
             return null;
         }
-        found.get(0).click();
         String sectionAnchor = StringUtils.substringAfterLast(found.get(0).getAttribute("href"), "#");
+        found.get(0).click();
         By sectionXPath =
             By.xpath(".//div[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
                 + sectionAnchor + "']]");

@@ -276,171 +276,23 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <!-- List of specific CLIRR excludes. Example:
+
+               <difference>
+                 <className>org/xwiki/ircbot/IRCBot</className>
+                 <method>void initialize(java.lang.String)</method>
+                 <differenceType>7012</differenceType>
+                 <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                 IRC Bot application in a subwiki</justification>
+               </difference>
+          -->
           <ignored>
-            <difference>
-              <className>org/xwiki/ircbot/IRCBot</className>
-              <method>void initialize(java.lang.String)</method>
-              <differenceType>7012</differenceType>
-              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
-                IRC Bot application in a subwiki</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.lang.Class getRole()</method>
-              <differenceType>7002</differenceType>
-              <justification>WikiComponent is still a young API. Removed the method to implement XWIKI-8233, 
-                "Allow wiki components to implement parameterized types"</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.lang.reflect.Type getRoleType()</method>
-              <differenceType>7012</differenceType>
-              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8233, 
-                "Allow wiki components to implement parameterized types"</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.util.Map getHandledMethods()</method>
-              <differenceType>7002</differenceType>
-              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
-              </justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.util.List getImplementedInterfaces()</method>
-              <differenceType>7002</differenceType>
-              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
-              </justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/MethodOutputHandler</className>
-              <differenceType>8001</differenceType>
-              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponentInvocationHandler</className>
-              <differenceType>8001</differenceType>
-              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.lang.reflect.Type getRoleType()</method>
-              <differenceType>7012</differenceType>
-              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8233,
-                "Allow wiki components to implement parameterized types"</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>org.xwiki.model.reference.DocumentReference getAuthorReference()</method>
-              <differenceType>7012</differenceType>
-              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8234,
-                "Allow wiki components to be registered at different levels (user / wiki / global)"</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>org.xwiki.component.wiki.WikiComponentScope getScope()</method>
-              <differenceType>7012</differenceType>
-              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8234,
-                "Allow wiki components to be registered at different levels (user / wiki / global)"</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/uiextension/UIExtension</className>
-              <method>java.util.List execute()</method>
-              <differenceType>7006</differenceType>
-              <to>org.xwiki.rendering.block.Block</to>
-              <justification>UIExtension is still a young API. Replaced the List of Block by a Block since Block can
-                can now hold a list of Block</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/uiextension/UIExtension</className>
-              <method>java.lang.String getName()</method>
-              <differenceType>7002</differenceType>
-              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/uiextension/UIExtension</className>
-              <method>java.lang.String getId()</method>
-              <differenceType>7012</differenceType>
-              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/objects/ElementInterface</className>
-              <method>boolean apply(com.xpn.xwiki.objects.ElementInterface, boolean)</method>
-              <differenceType>7012</differenceType>
-              <justification>Added a common method to all elements to set all the data from another element.
-                Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/objects/ListProperty</className>
-              <field>list</field>
-              <differenceType>6006</differenceType>
-              <justification>Elemenents must be added to the wrapping NotifyOnList to ensure that the property is marked 'dirty' when updated. To avoid that this mechanism is circumvented, the field is made final.</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>language</field>
-              <differenceType>6001</differenceType>
-              <justification>Stored as Locale now and should have never been protected anyway.</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>void setUrlPatternMatcher(org.securityfilter.filter.URLPatternMatcher)</method>
-              <differenceType>7002</differenceType>
-              <justification>URLPatternMatcher instances cannot generally be reused (because the underlaying Perl5Matcher cannot be reused) on different strings and with different patterns and a new instance must be produced on demand.  It is, thus, meaningless to set an instance.  If there is any code relying on this method, it is broken already.  Thus, we should remove this without going through deprecation.  The only place where getUrlPatternMatcher is used in core appears to be in XWikiAuthServiceImpl in processLogout.  This method appears to fail occasionally because the urlPatternMatcher instance is reused.  See: http://ci.xwiki.org/job/xwiki-enterprise-test-ui/org.xwiki.enterprise$xwiki-enterprise-test-ui/1746/console.</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>org.securityfilter.filter.URLPatternMatcher getUrlPatternMatcher()</method>
-              <differenceType>7002</differenceType>
-              <justification>We might as well remove the getter.  See above.</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/store/migration/hibernate/HibernateDataMigration</className>
-              <method>java.lang.String getPreHibernateLiquibaseChangeLog()</method>
-              <differenceType>7012</differenceType>
-              <justification>Added a method to allow schema update through liquibase before hibernate schema updates.
-                This should not really break anything because all hibernate migration extends AbstractHibernateDataMigration which now implement a stub for this method.</justification>
-            </difference>
+            <!-- Remove the following ignores after we release the current version as final -->
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
-            <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
-                 from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
-            <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
-            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
-            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
-            <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
-            <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
-            <exclude>org/xwiki/rest/resources/**</exclude>
-            <!-- Moved a lot of previously public API to internal packages. The initial implementation put everything in public
-                 packages which is wrong. This move is to correct the initial error, and leave in public packages only the
-                 classes that are really part of a public API. (See discussion: http://xwiki.markmail.org/thread/iqktyceut5bmw4rl)
-                 Remove this check on the next release (i.e. 4.3 final) -->
-            <exclude>org/xwiki/rest/exceptions/**</exclude>
-            <exclude>org/xwiki/rest/representations/**</exclude>
-            <exclude>org/xwiki/rest/ComponentsObjectFactory</exclude>
-            <exclude>org/xwiki/rest/Constants</exclude>
-            <exclude>org/xwiki/rest/RangeIterable</exclude>
-            <exclude>org/xwiki/rest/Utils</exclude>
-            <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
-            <exclude>org/xwiki/rest/XWikiJaxRsApplication</exclude>
-            <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
-            <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
-            <exclude>org/xwiki/rest/XWikiSecretVerifier</exclude>
-            <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
-            <!-- Not a breakage! This class has been moved to the xwiki-platform-rest-model where it logically belongs to -->
-            <exclude>org/xwiki/rest/Relations</exclude>
-            <!-- Not a breakage! The plugin has been moved to its own module. -->
-            <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
-            <!-- Module has been retired as it was unmaintained. -->
-            <exclude>com/xpn/xwiki/plugin/userdirectory/**/*</exclude>
-            <!-- Module has been retired as it was unmaintained. -->
-            <exclude>com/xpn/xwiki/plugin/usertools/**/*</exclude>
-            <!-- Added methods for creating workspaces and retrieving workspace templates.
-                 Vote mail: http://markmail.org/thread/gtxoszztc5lt7o4f
-                 Remove this check on the next release (i.e., 4.3-M2) -->
-            <exclude>org/xwiki/workspace/WorkspaceManager</exclude>
+            <!-- Remove the following excludes after we release the current version as final -->
           </excludes>
         </configuration>
       </plugin>

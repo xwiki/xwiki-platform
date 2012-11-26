@@ -805,6 +805,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 #set ($space_f = "$!request.getParameter('space')")
 ## Can't use 'language' as parameter since it's used by view mode to select the display language.
 #set ($lang_f = "$!request.getParameter('lang')")
+#set ($wiki_f = "$!request.getParameter('wiki')")
 #set ($filter = "$!request.getParameter('filter')")
 #set ($debug = "$!request.getParameter('debug')")
 #set ($fileType = "$!request.getParameter('fileType')")
@@ -857,6 +858,12 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   #set ($type = 'DOCUMENT')
 #end
 
+## Subwikis search by default in their content only.
+#set ($wiki = $wiki_f)
+#if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
+  #set ($wiki = $xcontext.database)
+#end
+
 ##*****************************************************##
 ## Search Results
 ##*****************************************************##
@@ -888,6 +895,10 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 
   #if ($language != '')
     #set ($filterQuery = "$filterQuery lang:""$language""")
+  #end
+
+  #if ($wiki != '')
+    #set ($filterQuery = "$filterQuery wiki:""$wiki""")
   #end
 
   #if ($space_f != '' &amp;&amp; !$blacklistedSpaces.contains($space_f))
@@ -959,6 +970,15 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   #set ($discard = $supportedLanguages.add($defaultLanguage))
 #end
 #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
+
+##
+## Get the sorted list of existing wikis
+##
+#set ($wikis = $xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context))
+#if (!$wikis.contains($xcontext.database))
+  #set ($discard = $wikis.add($xcontext.database))
+#end
+#set ($wikis = $sorttool.sort($wikis))
 {{/velocity}}
 
 {{velocity}}
@@ -987,18 +1007,16 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;dl id='filteredSearch' class="xform#if ($filter == '') hidden#end"&gt;
-      &lt;dt #if (!$xwiki.virtualMode)class='hidden'#end&gt;
+      &lt;dt #if (!$xwiki.isVirtualMode())class='hidden'#end&gt;
         &lt;label for='wiki'&gt;Wiki&lt;/label&gt;
       &lt;/dt&gt;
-      &lt;dd #if (!$xwiki.virtualMode)class='hidden'#end&gt;
+      &lt;dd #if (!$xwiki.isVirtualMode())class='hidden'#end&gt;
         &lt;select id='wiki' name='wiki'&gt;
+          ## The main wiki searches by default in all wikis.
           &lt;option value=''&gt;All wikis&lt;/option&gt;
-          #set ($wikis = $xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context))
-          #if (!$wikis.contains($xcontext.database))
-            #set ($discard = $wikis.add($xcontext.database))
-          #end
-          #foreach ($wiki in $sorttool.sort($wikis))
-            &lt;option value="$wiki" #if ($xcontext.database == "$!wiki")selected='selected'#end&gt;$wiki&lt;/option&gt;
+
+          #foreach ($aWiki in $wikis)
+          &lt;option value="$aWiki" #if ($wiki == "$!aWiki")selected='selected'#end&gt;$aWiki&lt;/option&gt;
           #end
         &lt;/select&gt;
       &lt;/dd&gt;

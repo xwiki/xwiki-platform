@@ -416,7 +416,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                     if ("1".equals(config.getProperty("xwiki.store.migration", "0"))
                         && !"0".equals(config.getProperty("xwiki.store.hibernate.updateschema"))) {
                         // Run migrations
-                        logger.info("Running storage schema updates and migrations");
+                        logger.info("Running storage schema updates and data migrations");
 
                         startMigrations();
 
@@ -580,7 +580,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                         (migration.isForced ? " (forced)" : "")});
                 }
             } else {
-                logger.info("No storage migration required since current version is [{}]", curversion);
+                logger.info("No data migration required since current version is [{}]", curversion);
             }
         }
 

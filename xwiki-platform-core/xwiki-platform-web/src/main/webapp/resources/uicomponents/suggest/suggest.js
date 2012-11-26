@@ -56,7 +56,10 @@ var XWiki = (function(XWiki){
     // Fade the suggestion container on clear
     fadeOnClear: true,
     // Show a 'hide suggestions' button
-    enableHideButton: true,
+    hideButton: {
+      positions: [ "top" ],
+      text: "$escapetool.javascript($msg.get('core.widgets.suggest.hide'))"
+    },
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
@@ -307,7 +310,7 @@ var XWiki = (function(XWiki){
         headers.Accept = "application/xml";
       }
 
-      // Allow the default request parameters to be overwritten. 
+      // Allow the default request parameters to be overwritten.
       var defaultAjaxRequestParameters = {
         method: method,
         requestHeaders: headers,
@@ -514,14 +517,18 @@ var XWiki = (function(XWiki){
       }
     }
 
-    if (this.options.enableHideButton && !this.container.down('.hide-button')) {
-      var hideButton = new Element('span', {'class' : 'hide-button'}).update("$msg.get('core.widgets.suggest.hide')");
-      hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
-      this.container.insert({top : new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton)});
-
-      hideButton = new Element('span', {'class' : 'hide-button'}).update("$msg.get('core.widgets.suggest.hide')");
-      hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
-      this.container.insert({bottom : new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton)});
+    var withEnableButton = typeof this.options.hideButton !== "undefined"
+                        && typeof this.options.hideButton.positions === "object"
+                        && this.options.hideButton.positions.length > 0;
+    if (withEnableButton && !this.container.down('.hide-button')) {
+      var positions = this.options.hideButton.positions;
+      for (var i=0; i< positions.length; i++) {
+        var hideButton = new Element('span', {'class' : 'hide-button'}).update(this.options.hideButton.text),
+            toInsert = {};
+        toInsert[positions[i]] = new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton);
+        hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
+        this.container.insert(toInsert);
+      }
     }
 
     var ev = this.container.fire("xwiki:suggest:containerPrepared", {

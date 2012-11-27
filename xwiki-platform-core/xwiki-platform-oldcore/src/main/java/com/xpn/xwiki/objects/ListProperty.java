@@ -31,8 +31,9 @@ import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.util.AbstractNotifyOnUpdateList;
+import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
@@ -275,7 +276,7 @@ public class ListProperty extends BaseProperty implements Cloneable
      *
      * This will be accessed from ListPropertyUserType.
      */
-    static class NotifyList extends AbstractNotifyOnUpdateList<String>
+    public static class NotifyList extends AbstractNotifyOnUpdateList<String>
     {
 
         /** The owner list property. */

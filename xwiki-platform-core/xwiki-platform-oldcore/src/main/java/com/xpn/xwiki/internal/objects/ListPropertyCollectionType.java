@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.internal.objects;
 
 import java.util.Iterator;
 import java.util.Map;

@@ -288,6 +288,23 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <className>com/xpn/xwiki/objects/ListProperty</className>
+              <method>void setUseHibernateWorkaround(boolean)</method>
+              <differenceType>7002</differenceType>
+              <justification>The hibernate workaround added in 4.3M2 have been replaced with a cleaner solution.</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
+              <method>void addListPropertyWorkaroundHandler(com.xpn.xwiki.objects.PropertyInterface)</method>
+              <differenceType>7002</differenceType>
+              <justification>The hibernate workaround added in 4.3M2 have been replaced with a cleaner solution.</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/util/AbstractNotifyOnUpdateList</className>
+              <differenceType>8001</differenceType>
+              <justification>The AbtractNotifyOnUpdateList wrapper class no longer inherits ArrayList, because it is used as a non-static enclosed class in XWikiDocument, which is non-serializable, so the list wrapper cannot be serializeble.  Let's move the entire class to an internal package while we are at it.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

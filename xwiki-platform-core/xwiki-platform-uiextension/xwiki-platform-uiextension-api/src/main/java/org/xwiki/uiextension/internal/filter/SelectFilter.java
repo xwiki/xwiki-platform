@@ -53,9 +53,11 @@ public class SelectFilter implements UIExtensionFilter
         List<String> extensionIds = Arrays.asList(ids);
         List<UIExtension> results = new ArrayList<UIExtension>();
 
-        for (UIExtension extension : extensions) {
-            if (extensionIds.contains(extension.getId())) {
-                results.add(extension);
+        for (String id : extensionIds) {
+            for (UIExtension extension : extensions) {
+                if (id.equals(extension.getId())) {
+                    results.add(extension);
+                }
             }
         }
 

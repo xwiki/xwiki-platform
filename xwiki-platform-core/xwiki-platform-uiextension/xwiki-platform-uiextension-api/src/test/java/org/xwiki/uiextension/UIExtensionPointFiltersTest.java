@@ -52,7 +52,6 @@ public class UIExtensionPointFiltersTest
         extensions.add(testUix4valueW);
         extensions.add(testUix7value2);
         extensions.add(testUix2valueY);
-
     }
 
     @Test
@@ -74,10 +73,12 @@ public class UIExtensionPointFiltersTest
     @Test
     public void selectFilter()
     {
-        String[] list = new String[] {"platform.testuix2", "platform.testuix3"};
+        String[] list = new String[] {"platform.testuix2", "platform.testuix3", "platform.testuix4"};
         List<UIExtension> expected = new ArrayList<UIExtension>();
-        expected.add(testUix3valueX);
+        // The extensions must be ordered as in the select clause above
         expected.add(testUix2valueY);
+        expected.add(testUix3valueX);
+        expected.add(testUix4valueW);
 
         UIExtensionFilter filter = new SelectFilter();
 
@@ -90,8 +91,10 @@ public class UIExtensionPointFiltersTest
         String[] list = new String[] {"platform.testuix2", "platform.testuix3"};
 
         List<UIExtension> expected = new ArrayList<UIExtension>();
+        // The first 2 are placed at the beginning, in the correct order
         expected.add(testUix2valueY);
         expected.add(testUix3valueX);
+        // The order of the others is preserved
         expected.add(testUix6value11);
         expected.add(testUix1valueZ);
         expected.add(testUix5value1);

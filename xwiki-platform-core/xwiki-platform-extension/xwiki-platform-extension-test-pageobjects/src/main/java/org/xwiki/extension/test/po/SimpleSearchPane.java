@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.test.po;
 
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -102,7 +101,7 @@ public class SimpleSearchPane extends BaseElement
     {
         searchInput.clear();
         searchInput.sendKeys(keywords);
-        searchInput.sendKeys(Keys.RETURN);
+        searchInput.submit();
         return new SearchResultsPane();
     }
 }

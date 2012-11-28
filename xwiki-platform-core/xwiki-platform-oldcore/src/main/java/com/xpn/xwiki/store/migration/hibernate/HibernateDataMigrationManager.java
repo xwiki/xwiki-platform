@@ -164,8 +164,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                 }
             });
         } catch (Exception e) {
-            throw new DataMigrationException(String.format("Unable to store data version into database %s",
-                context.getDatabase()), e);
+            throw new DataMigrationException(String.format("Unable to store new data version %d into database %s",
+                version.getVersion(), context.getDatabase()), e);
         }
     }
 
@@ -188,7 +188,10 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      */
     private void hibernateShemaUpdate() throws DataMigrationException
     {
-        logger.info("[schema] - Running hibernate updates");
+        if (logger.isInfoEnabled()) {
+            logger.info("Checking Hibernate mapping and updating schema if needed for database [{}]",
+                getXWikiContext().getDatabase());
+        }
         getStore().updateSchema(getXWikiContext(), true);
     }
 
@@ -250,11 +253,13 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             return;
         }
 
+        final String database = getXWikiContext().getDatabase();
+
         if (logger.isInfoEnabled()) {
             if( preHibernate ) {
-                logger.info("[schema] - Running pre-hibernate liquibase change logs");
+                logger.info("Running early schema updates (using liquibase) for database [{}]", database);
             } else {
-                logger.info("[schema] - Running post-hibernate liquibase change logs");
+                logger.info("Running additional schema updates (using liquibase) for database [{}]", database);
             }
         }
 
@@ -280,7 +285,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                         String.format("Unable to launch liquibase for database %s, schema update failed.",
-                            getXWikiContext().getDatabase()), e);
+                            database), e);
                 }
 
                 try {
@@ -289,7 +294,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                         String.format("Unable to update schema of database %s.",
-                            getXWikiContext().getDatabase()), e);
+                            database), e);
                 }
 
                 return null;

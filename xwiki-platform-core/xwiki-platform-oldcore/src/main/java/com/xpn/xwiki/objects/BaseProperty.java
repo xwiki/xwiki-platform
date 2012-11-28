@@ -151,12 +151,25 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
         BaseProperty<R> property = (BaseProperty<R>) super.clone();
 
-        property.setObject(getObject());
+        property.ownerDocument = null;
+
+        cloneInternal(property);
 
         property.isValueDirty = isValueDirty;
         property.ownerDocument = ownerDocument;
 
+        property.setObject(getObject());
+
         return property;
+    }
+
+    /**
+     * Subclasses override this to copy values during cloning.
+     *
+     * @param clone The cloned value.
+     */
+    protected void cloneInternal(BaseProperty clone)
+    {
     }
 
     public Object getValue()

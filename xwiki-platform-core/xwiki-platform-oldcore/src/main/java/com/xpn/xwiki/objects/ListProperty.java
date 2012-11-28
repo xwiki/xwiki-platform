@@ -45,14 +45,8 @@ public class ListProperty extends BaseProperty implements Cloneable
     /**
      * We make this a notifying list, because we must propagate any value updates to the owner document.
      */
-    protected final List<String> list = new AbstractNotifyOnUpdateList<String>()
-    {
-        @Override
-        public void onUpdate()
-        {
-            setValueDirty(true);
-        }
-    };
+    protected List<String> list = new NotifyList(this);
+
 
     private String formStringSeparator = "|";
 
@@ -158,14 +152,17 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public ListProperty clone()
     {
-        ListProperty property = (ListProperty) super.clone();
-        List<String> list = new ArrayList<String>();
-        for (String entry : getList()) {
-            list.add(entry);
-        }
-        property.setValue(list);
+        return (ListProperty) super.clone();
+    }
 
-        return property;
+    @Override
+    protected void cloneInternal(BaseProperty clone)
+    {
+        ListProperty property = (ListProperty) clone;
+
+        property.list = new NotifyList(property);
+
+        property.list.addAll(list);
     }
 
     public List<String> getList()
@@ -254,5 +251,28 @@ public class ListProperty extends BaseProperty implements Cloneable
     public void setUseHibernateWorkaround(boolean useHibernateWorkaround)
     {
         this.useHibernateWorkaround = useHibernateWorkaround;
+    }
+
+    private static class NotifyList extends AbstractNotifyOnUpdateList<String>
+    {
+
+        /** The owning list property. */
+        private final ListProperty owner;
+
+        /**
+         * Construct a wrapper list for a list property.
+         *
+         * @param owner The owning list property.
+         */
+        public NotifyList(ListProperty owner)
+        {
+            this.owner = owner;
+        }
+
+        @Override
+        public void onUpdate()
+        {
+            owner.setValueDirty(true);
+        }
     }
 }

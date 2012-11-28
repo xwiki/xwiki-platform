@@ -39,8 +39,8 @@ public class SearchResultsPane extends BaseElement
      */
     public PaginationFilterPane getPagination()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.className("paginationFilter")).size() > 0
-            ? new PaginationFilterPane() : null;
+        return getDriver().findElements(By.className("paginationFilter")).size() > 0 ? new PaginationFilterPane()
+            : null;
     }
 
     /**
@@ -48,7 +48,7 @@ public class SearchResultsPane extends BaseElement
      */
     public int getDisplayedResultsCount()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.className("extension-item")).size();
+        return getDriver().findElements(By.className("extension-item")).size();
     }
 
     /**
@@ -58,7 +58,7 @@ public class SearchResultsPane extends BaseElement
     {
         String xpath =
             "//div[contains(@class, 'infomessage') and preceding-sibling::div[1][@class = 'extension-search-bar']]";
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), By.xpath(xpath));
+        List<WebElement> found = getDriver().findElements(By.xpath(xpath));
         return found.size() > 0 ? found.get(0).getText() : null;
     }
 
@@ -75,7 +75,7 @@ public class SearchResultsPane extends BaseElement
         By xpath =
             By.xpath("//div[contains(@class, 'extension-item') and descendant::*[contains(@class, "
                 + "'extension-title') and normalize-space(.) = '" + nameAndVersion + "']]");
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), xpath);
+        List<WebElement> found = getDriver().findElements(xpath);
         return found.size() == 1 ? new ExtensionPane(found.get(0)) : null;
     }
 
@@ -100,6 +100,6 @@ public class SearchResultsPane extends BaseElement
     {
         int position = index + 1;
         By xpath = By.xpath("//div[contains(@class, 'extension-item')][" + position + "]");
-        return new ExtensionPane(getUtil().findElementWithoutWaiting(getDriver(), xpath));
+        return new ExtensionPane(getDriver().findElement(xpath));
     }
 }

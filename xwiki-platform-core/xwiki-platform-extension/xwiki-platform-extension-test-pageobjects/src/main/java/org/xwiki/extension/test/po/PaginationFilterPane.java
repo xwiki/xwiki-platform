@@ -126,7 +126,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public boolean hasNextPage()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.className(NEXT_PAGE_CLASS_NAME)).size() > 0;
+        return getDriver().findElements(By.className(NEXT_PAGE_CLASS_NAME)).size() > 0;
     }
 
     /**
@@ -145,7 +145,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public boolean hasPreviousPage()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.className(PREVIOUS_PAGE_CLASS_NAME)).size() > 0;
+        return getDriver().findElements(By.className(PREVIOUS_PAGE_CLASS_NAME)).size() > 0;
     }
 
     /**
@@ -156,8 +156,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public PaginationFilterPane gotoPage(int index)
     {
-        getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//span[@class = 'pagination']/a[. = '" + index + "']")).click();
+        getDriver().findElement(By.xpath("//span[@class = 'pagination']/a[. = '" + index + "']")).click();
         return new PaginationFilterPane();
     }
 }

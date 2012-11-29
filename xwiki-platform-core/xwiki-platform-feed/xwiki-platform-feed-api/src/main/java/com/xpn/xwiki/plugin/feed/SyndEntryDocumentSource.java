@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.feed;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.output.NullWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -616,7 +618,10 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     {
         Tidy tidy = new Tidy();
         tidy.setConfigurationFromProps(config);
+        // We capture the logs and redirect them to the XWiki logging subsystem. Since we do this we don't want
+        // JTidy warnings and errors to be sent to stderr/stdout
         tidy.setMessageListener(TIDY_LOGGER);
+        tidy.setErrout(new PrintWriter(new NullWriter()));
         // Even if we add a message listener we still have to redirect the output. Otherwise all the messages will be
         // written to the standard output (besides being logged by TIDY_LOGGER).
         ByteArrayOutputStream out = new ByteArrayOutputStream();

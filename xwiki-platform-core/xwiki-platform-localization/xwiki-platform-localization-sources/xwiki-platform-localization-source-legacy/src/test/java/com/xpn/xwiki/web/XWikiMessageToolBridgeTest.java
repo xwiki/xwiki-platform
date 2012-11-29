@@ -186,6 +186,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                             documentLanguages.remove(document.getLocale());
                         }
 
+                        observation.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, getContext());
+
                         return null;
                     }
                 });
@@ -355,6 +357,10 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void updateWikiTranslationCache() throws XWikiException
     {
+        setBundles(this.defaultWikiTranslation.getFullName());
+
+        Assert.assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
+
         addWikiTranslation("wiki.defaulttranslation", "Default translation", Locale.ROOT);
 
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
@@ -362,6 +368,11 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         addWikiTranslation("wiki.anothertranslation", "Another translation", Locale.ROOT);
 
         Assert.assertEquals("Another translation", this.tool.get("wiki.anothertranslation"));
+
+        this.mockXWiki.deleteDocument(this.defaultWikiTranslation, getContext());
+
+        Assert.assertEquals("wiki.defaulttranslation", this.tool.get("wiki.defaulttranslation"));
+        Assert.assertEquals("wiki.anothertranslation", this.tool.get("wiki.anothertranslation"));
     }
 
     @Test

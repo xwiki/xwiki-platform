@@ -31,6 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -55,14 +57,14 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Base class for {@link TranslationBundle}s using wiki documents as resources. Provides methods for loading properties from
- * documents, watching loaded documents and invalidating cached translations.
+ * Base class for {@link TranslationBundle}s using wiki documents as resources. Provides methods for loading properties
+ * from documents, watching loaded documents and invalidating cached translations.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements TranslationBundle, DisposableCacheValue,
-    Disposable
+public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements
+    TranslationBundle, DisposableCacheValue, Disposable
 {
     /**
      * The prefix to use in all wiki document based translations.
@@ -131,7 +133,9 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
     private void initialize()
     {
-        this.events = Arrays.<Event> asList(new DocumentUpdatedEvent(this.documentReference));
+        this.events =
+            Arrays.<Event> asList(new DocumentUpdatedEvent(this.documentReference), new DocumentCreatedEvent(
+                this.documentReference), new DocumentDeletedEvent(this.documentReference));
 
         this.observation.addListener(this.listener);
     }

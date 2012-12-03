@@ -55,13 +55,12 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 
             DocumentReference documentReference = attachmentReference.getDocumentReference();
 
-            String lang = getLanguage(documentReference);
             solrDocument.addField(Fields.ID, getId(attachmentReference));
+            addDocumentFields(documentReference, solrDocument);
+            solrDocument.addField(Fields.TYPE, attachmentReference.getType().name());
+            solrDocument.addField(Fields.FILENAME, attachmentReference.getName());
             solrDocument.addField(Fields.ATTACHMENT_CONTENT, getContentAsText(attachmentReference));
             solrDocument.addField(Fields.MIME_TYPE, getMimeType(attachmentReference));
-            solrDocument.addField(Fields.FILENAME, attachmentReference.getName());
-            solrDocument.addField(Fields.TYPE, attachmentReference.getType().name());
-            addDocumentReferenceFields(documentReference, solrDocument, lang);
 
             return solrDocument;
         } catch (Exception e) {

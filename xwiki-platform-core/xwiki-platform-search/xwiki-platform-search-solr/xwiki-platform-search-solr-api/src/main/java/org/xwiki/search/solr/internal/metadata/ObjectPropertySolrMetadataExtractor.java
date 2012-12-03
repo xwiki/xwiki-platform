@@ -23,7 +23,6 @@ import javax.inject.Named;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -61,11 +60,11 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
             BaseProperty<ObjectPropertyReference> objectProperty = document.getXObjectProperty(objectPropertyReference);
 
             solrDocument.addField(Fields.ID, getId(objectPropertyReference));
-            addDocumentReferenceFields(documentReference, solrDocument, getLanguage(documentReference));
+            addDocumentFields(documentReference, solrDocument);
+            solrDocument.addField(Fields.TYPE, objectPropertyReference.getType().name());
             solrDocument.addField(Fields.CLASS, compactSerializer.serialize(classReference));
             solrDocument.addField(Fields.PROPERTY_NAME, objectProperty.getName());
             solrDocument.addField(Fields.PROPERTY_VALUE, objectProperty.getValue());
-            solrDocument.addField(Fields.TYPE, EntityType.OBJECT_PROPERTY.name());
 
             return solrDocument;
         } catch (Exception e) {

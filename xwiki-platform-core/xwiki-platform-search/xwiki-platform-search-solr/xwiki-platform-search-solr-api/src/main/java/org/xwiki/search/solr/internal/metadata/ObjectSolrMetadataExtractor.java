@@ -23,7 +23,6 @@ import javax.inject.Named;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.Fields;
@@ -53,18 +52,17 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             SolrInputDocument solrDocument = new SolrInputDocument();
 
             DocumentReference classReference = objectReference.getXClassReference();
-
             DocumentReference documentReference = new DocumentReference(objectReference.getParent());
             XWikiDocument document = getDocument(documentReference);
 
             BaseObject object = document.getXObject(objectReference);
 
-            this.addObjectContent(solrDocument, object);
-
             solrDocument.addField(Fields.ID, getId(object.getReference()));
-            addDocumentReferenceFields(documentReference, solrDocument, getLanguage(documentReference));
+            addDocumentFields(documentReference, solrDocument);
+            solrDocument.addField(Fields.TYPE, objectReference.getType().name());
             solrDocument.addField(Fields.CLASS, compactSerializer.serialize(classReference));
-            solrDocument.addField(Fields.TYPE, EntityType.OBJECT.name());
+
+            this.addObjectContent(solrDocument, object);
 
             return solrDocument;
         } catch (Exception e) {

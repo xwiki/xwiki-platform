@@ -157,19 +157,26 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     /**
-     * Adds fields extracted from a document reference to a Solr document that is being prepared to be indexed.
+     * Adds to a Solr document the fields that are specific to the XWiki document that contains the entity to be
+     * indexed. These fields required to identify the owning document and to also reflect some properties of the owning
+     * document towards the indexed entity (like language and hidden flag).
      * 
      * @param documentReference reference to document.
      * @param solrDocument the Solr document to which to add the fields.
-     * @param language language of the document.
+     * @throws Exception if problems occur.
      */
-    protected void addDocumentReferenceFields(DocumentReference documentReference, SolrInputDocument solrDocument,
-        String language)
+    protected void addDocumentFields(DocumentReference documentReference, SolrInputDocument solrDocument)
+        throws Exception
     {
         solrDocument.addField(Fields.WIKI, documentReference.getWikiReference().getName());
         solrDocument.addField(Fields.SPACE, documentReference.getLastSpaceReference().getName());
         solrDocument.addField(Fields.NAME, documentReference.getName());
+
+        String language = getLanguage(documentReference);
         solrDocument.addField(Fields.LANGUAGE, language);
+
+        XWikiDocument document = getDocument(documentReference);
+        solrDocument.addField(Fields.HIDDEN, document.isHidden());
     }
 
     /**

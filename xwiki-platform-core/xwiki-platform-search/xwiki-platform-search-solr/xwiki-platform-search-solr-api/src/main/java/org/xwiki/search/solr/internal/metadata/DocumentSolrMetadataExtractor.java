@@ -72,9 +72,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
 
-            String language = getLanguage(documentReference);
             solrDocument.addField(Fields.ID, getId(documentReference));
-            addDocumentReferenceFields(documentReference, solrDocument, language);
+            addDocumentFields(documentReference, solrDocument);
             solrDocument.addField(Fields.TYPE, documentReference.getType().name());
             solrDocument.addField(Fields.FULLNAME, compactSerializer.serialize(documentReference));
 
@@ -94,7 +93,9 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             solrDocument.addField(Fields.CREATOR, serializer.serialize(translatedDocument.getCreatorReference()));
             solrDocument.addField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
             solrDocument.addField(Fields.DATE, translatedDocument.getContentUpdateDate());
-            solrDocument.addField(Fields.HIDDEN, translatedDocument.isHidden());
+
+            // Document translations have their own hidden fields
+            solrDocument.setField(Fields.HIDDEN, translatedDocument.isHidden());
 
             // Index the Comments and Objects in general. Use the original document to get the comment objects since the
             // translated document is just a lightweight object containing the translated content and title.

@@ -190,13 +190,11 @@ public class EditRightsPane extends BaseElement
         return getUtil().getURL(space, page, "edit", "editor=rights");
     }
 
-    protected LiveTableElement getRightsTable()
+    public LiveTableElement getRightsTable()
     {
         if (this.rightsTable == null) {
             this.rightsTable = new LiveTableElement("usersandgroupstable");
-            this.rightsTable.waitUntilReady();
         }
-
         return this.rightsTable;
     }
 }

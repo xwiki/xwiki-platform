@@ -87,7 +87,11 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public boolean containsKey(String key)
     {
-        return getPropertyObject(key) != null;
+        // Since a single XObject holds all the properties we need to be careful here, overriding one property will put
+        // all the default keys in the source. To determine that the source contains the given key we check that the
+        // value is both not-null and not empty.
+        Object value = getPropertyObject(key);
+        return value != null && !"".equals(value);
     }
 
     @Override

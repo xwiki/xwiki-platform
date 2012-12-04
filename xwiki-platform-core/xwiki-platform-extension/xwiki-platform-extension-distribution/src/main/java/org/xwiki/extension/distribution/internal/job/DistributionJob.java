@@ -73,7 +73,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         DistributionStepStatus step1 = new DistributionStepStatus("extension.mainui");
         steps.add(step1);
         // Only if the UI is not already installed
-        if (this.installedRepository.getInstalledExtension(extensionUI) != null) {
+        if (extensionUI == null || this.installedRepository.getInstalledExtension(extensionUI) != null) {
             step1.setUpdateState(UpdateState.COMPLETED);
         }
 

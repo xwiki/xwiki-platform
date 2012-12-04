@@ -130,7 +130,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
             String uiId = mavenModel.getProperties().getProperty("xwiki.extension.distribution.ui");
 
-            this.uiExtensionId = new ExtensionId(uiId, this.distributionExtension.getId().getVersion());
+            if (uiId != null) {
+                this.uiExtensionId = new ExtensionId(uiId, this.distributionExtension.getId().getVersion());
+            }
         } else {
             this.distributionState = DistributionState.NONE;
         }

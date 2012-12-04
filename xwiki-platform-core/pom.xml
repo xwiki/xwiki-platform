@@ -285,6 +285,8 @@
                  <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
                  IRC Bot application in a subwiki</justification>
                </difference>
+               
+               See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->

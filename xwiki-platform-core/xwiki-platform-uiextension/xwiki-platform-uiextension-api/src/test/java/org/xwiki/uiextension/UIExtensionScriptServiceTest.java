@@ -74,82 +74,40 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
 
     private UIExtensionScriptService service;
 
-    private List<WikiUIExtension> uiExtensions = new ArrayList<WikiUIExtension>();
+    private List<WikiUIExtension> ep1Extensions = new ArrayList<WikiUIExtension>();
 
-    private Transformation transformation;
-
-    //private Execution execution;
-
-    private EntityReferenceSerializer<String> serializer;
+    private UIExtensionManager uiExtensionManager;
 
     XDOM xdom = new XDOM(new ArrayList<Block>());
 
     @Before
     public void configure() throws Exception
     {
-        //execution = getComponentManager().getInstance(Execution.class);
-        //final ExecutionContext context = new ExecutionContext();
-
         contextComponentManager =
             getComponentManager().registerMockComponent(getMockery(), ComponentManager.class, "context", "context");
         final Provider<ComponentManager> componentManagerProvider =
             getComponentManager().getInstance(
                 new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        getComponentManager().registerMockComponent(getMockery(), VelocityManager.class);
-        serializer = registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        transformation = getComponentManager().registerMockComponent(getMockery(), Transformation.class, "macro");
         this.service = getComponentManager().getInstance(ScriptService.class, "uix");
+        this.uiExtensionManager = getComponentManager().getInstance(UIExtensionManager.class);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(serializer).serialize(with(any(EntityReference.class)), with(anything()));
-                will(returnValue("does not matter"));
-                allowing(componentManagerProvider).get();
-                will(returnValue(contextComponentManager));
-            }
-        });
-
-        uiExtensions.add(new WikiUIExtension("1id3", "epId1", OBJ1_REF, AUTHOR_REFERENCE, getComponentManager()));
-        uiExtensions.add(new WikiUIExtension("1id1", "epId1", OBJ2_REF, AUTHOR_REFERENCE, getComponentManager()));
-        uiExtensions.add(new WikiUIExtension("1id2", "epId1", OBJ3_REF, AUTHOR_REFERENCE, getComponentManager()));
-        uiExtensions.add(new WikiUIExtension("2id1", "epId2", OBJ4_REF, AUTHOR_REFERENCE, getComponentManager()));
-        for (WikiUIExtension uiExtension : uiExtensions) {
+        ep1Extensions.add(new WikiUIExtension("1id3", "epId1", OBJ1_REF, AUTHOR_REFERENCE, getComponentManager()));
+        ep1Extensions.add(new WikiUIExtension("1id1", "epId1", OBJ2_REF, AUTHOR_REFERENCE, getComponentManager()));
+        ep1Extensions.add(new WikiUIExtension("1id2", "epId1", OBJ3_REF, AUTHOR_REFERENCE, getComponentManager()));
+        for (WikiUIExtension uiExtension : ep1Extensions) {
             uiExtension.setXDOM(xdom);
             uiExtension.setSyntax(Syntax.XWIKI_2_1);
             uiExtension.setParameters(new HashMap<String, String>());
             uiExtension.setScope(WikiComponentScope.WIKI);
         }
-    }
 
-    @Test
-    public void getExtensionsWhenExtensionsExistForTheExtensionPoint() throws Exception
-    {
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
-                will(returnValue(uiExtensions));
+                allowing(componentManagerProvider).get();
+                will(returnValue(contextComponentManager));
             }
         });
-
-        Collection<UIExtension> extensions = this.service.getExtensions("epId1");
-        Assert.assertEquals(3, extensions.size());
-    }
-
-    @Test
-    public void getExtensionsWhenNoExtensionsForTheExtensionPoint() throws Exception
-    {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
-                will(returnValue(uiExtensions));
-            }
-        });
-
-        Collection<UIExtension> extensions = this.service.getExtensions("epId3");
-        Assert.assertEquals(0, extensions.size());
     }
 
     @Test
@@ -158,10 +116,12 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
-                will(returnValue(uiExtensions));
+                oneOf(contextComponentManager).getInstance(UIExtensionManager.class, "epId1");
+                will(throwException(new ComponentLookupException("doesn't matter")));
                 oneOf(contextComponentManager).getInstance(UIExtensionFilter.class, "sortById");
                 will(returnValue(new SortByIdFilter()));
+                oneOf(uiExtensionManager).get("epId1");
+                will(returnValue(ep1Extensions));
             }
         });
 
@@ -173,22 +133,5 @@ public class UIExtensionScriptServiceTest extends AbstractMockingComponentTestCa
         Assert.assertEquals("1id1", extensions.get(0).getId());
         Assert.assertEquals("1id2", extensions.get(1).getId());
         Assert.assertEquals("1id3", extensions.get(2).getId());
-    }
-
-    @Test
-    public void getExtensionsWhenLookupFails() throws Exception
-    {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(contextComponentManager).getInstanceList(UIExtension.class);
-                will(throwException(new ComponentLookupException("")));
-                // Make sure it prints an error in the log
-                oneOf(getMockLogger()).error(with(any(String.class)), with(any(ComponentLookupException.class)));
-            }
-        });
-
-        Collection<UIExtension> extensions = this.service.getExtensions("doesn'tMatter");
-        Assert.assertEquals(0, extensions.size());
     }
 }

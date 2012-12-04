@@ -6596,11 +6596,13 @@ public class XWiki implements EventListener
         }
     };
 
+    @Override
     public List<Event> getEvents()
     {
         return LISTENER_EVENTS;
     }
 
+    @Override
     public String getName()
     {
         return "xwiki-core";

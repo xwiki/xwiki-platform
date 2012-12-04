@@ -48,6 +48,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 
 /**
@@ -109,7 +110,9 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
             new EntityReference(DOCUMENT_BUNDLE_PROPERTY, EntityType.OBJECT_PROPERTY, new RegexEntityReference(
                 Pattern.compile(this.wiki + ":XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT, preferences));
 
-        this.events = Arrays.<Event> asList(new XObjectPropertyUpdatedEvent(documentBundlesProperty));
+        this.events =
+            Arrays.<Event> asList(new XObjectPropertyAddedEvent(documentBundlesProperty),
+                new XObjectPropertyUpdatedEvent(documentBundlesProperty));
 
         this.observation.addListener(this);
     }

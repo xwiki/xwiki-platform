@@ -56,7 +56,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     /**
      * Serializer used to transform the panel document reference into the panel ID, for example 'Panels.Quicklinks'.
      */
-    private final EntityReferenceSerializer<String> compactWikiSerializer;
+    private final EntityReferenceSerializer<String> serializer;
 
     /**
      * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
@@ -109,13 +109,13 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         this.xdom = xdom;
         this.syntax = syntax;
         this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
-        this.compactWikiSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
     }
 
     @Override
     public String getId()
     {
-        return compactWikiSerializer.serialize(documentReference);
+        return serializer.serialize(documentReference);
     }
 
     @Override
@@ -177,6 +177,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     @Override
     public WikiComponentScope getScope()
     {
-        return WikiComponentScope.WIKI;
+        // TODO: handle scope dynamically, in the meantime it's hardcoded to "global" for backward compatibility
+        return WikiComponentScope.GLOBAL;
     }
 }

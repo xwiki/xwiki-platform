@@ -439,13 +439,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     {
         ExtensionSummary extension;
         ExtensionVersionSummary extensionVersion;
-        if (entry.length == EPROPERTIES_SUMMARY.length) {
+        int versionIndex = EPROPERTIES_INDEX.get(EPROPERTIES_SUMMARY[EPROPERTIES_SUMMARY.length - 1]) + 1;
+        if (entry.length == versionIndex) {
             // It's a extension summary without version
             extension = this.extensionObjectFactory.createExtensionSummary();
             extensionVersion = null;
         } else {
             extension = extensionVersion = this.extensionObjectFactory.createExtensionVersionSummary();
-            extensionVersion.setVersion((String) entry[EPROPERTIES_SUMMARY.length]);
+            extensionVersion.setVersion((String) entry[versionIndex]);
         }
 
         extension.setId(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ID));

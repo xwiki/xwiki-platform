@@ -80,6 +80,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Make sure we have the Simple binding for SLF4J for client side logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

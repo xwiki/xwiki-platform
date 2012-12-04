@@ -79,6 +79,13 @@
       <groupId>info.informatica</groupId>
       <artifactId>css4j</artifactId>
       <version>0.13</version>
+      <!-- We don't want to use Log4J when logging. -->
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

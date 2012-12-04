@@ -71,7 +71,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         // Step 1: Install/upgrade main wiki UI
 
         // Only if the UI is not already installed
-        if (this.installedRepository.getInstalledExtension(extensionUI) == null) {
+        if (extensionUI != null && this.installedRepository.getInstalledExtension(extensionUI) == null) {
             steps.add(new DistributionStepStatus("extension.mainui"));
         }
 

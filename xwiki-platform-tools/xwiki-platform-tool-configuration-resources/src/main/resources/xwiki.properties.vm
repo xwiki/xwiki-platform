@@ -41,6 +41,7 @@
 #-# A list of Java regex patterns matching full documents reference.
 # core.renderingcache.documents=wiki:Space\.Page
 # core.renderingcache.documents=wiki:Space\..*
+# core.renderingcache.documents=Space\.PageOnWhateverWiki
 
 #-# [Since 2.4M1]
 #-# The time (in seconds) after which data should be removed from the cache when not used.

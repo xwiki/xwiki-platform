@@ -114,6 +114,11 @@
           <groupId>org.gagravarr</groupId>
           <artifactId>vorbis-java-core</artifactId>
         </exclusion>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->

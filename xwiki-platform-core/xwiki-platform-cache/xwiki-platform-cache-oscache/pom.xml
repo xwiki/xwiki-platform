@@ -60,6 +60,11 @@
           <groupId>javax.jms</groupId>
           <artifactId>jms</artifactId>
         </exclusion>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!--  Test Dependencies -->

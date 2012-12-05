@@ -96,6 +96,11 @@
           <groupId>net.sf.saxon</groupId>
           <artifactId>saxon9-dom</artifactId>
         </exclusion>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- JEuclid needs a XPath implementation. Since we're already using xalan, we should just list it here instead of Saxon -->

@@ -153,6 +153,11 @@
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
           </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->

@@ -52,6 +52,13 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-cell</artifactId>
       <version>${solr.version}</version>
+      <exclusions>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Apache Commons -->

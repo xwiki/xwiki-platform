@@ -24,11 +24,15 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -571,6 +575,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
                 throw new RuntimeException("Instantiation of default analyzer " + DEFAULT_ANALYZER + " failed", e1);
             }
         }
+        Map<String, Analyzer> specialAnalyzers = new HashMap<String, Analyzer>();
+        Analyzer preserve = new KeywordAnalyzer();
+        specialAnalyzers.put(IndexFields.DOCUMENT_EXACTSPACE, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_WIKI, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_TYPE, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_LANGUAGE, preserve);
+        this.analyzer = new PerFieldAnalyzerWrapper(this.analyzer, specialAnalyzers);
 
         LOGGER.debug("Assigning index updater: {}", indexUpdater);
 

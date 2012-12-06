@@ -65,6 +65,11 @@ public abstract class IndexFields
     public static final String DOCUMENT_SPACE = "space";
 
     /**
+     * Name of the space the document belongs to, untokenized for exact matches.
+     */
+    public static final String DOCUMENT_EXACTSPACE = "exactspace";
+
+    /**
      * FullName of the document (example : Main.WebHome)
      */
     public static final String DOCUMENT_FULLNAME = "fullname";

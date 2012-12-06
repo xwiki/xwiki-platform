@@ -1041,75 +1041,40 @@ isc.XWETreeGrid.addMethods({
      * like Main.Dashboard for example, will be opened in the tree.
      */
     drawInput : function() {
-
-        // Add input to the document
-        var type = (this.displaySuggest == false) ? "hidden" : "text";
-
         var widthWithoutBorders = this.width - 6;
-        var input = document.createElement("input");
-        input.setAttribute("id", this.getID() + "_Input");
-        input.setAttribute("name", this.getID() + "_Input");
-        input.setAttribute("style", "width:" + widthWithoutBorders + "px;clear:both");
-        input.setAttribute("type", type);
-        if (this.defaultValue) {
-            input.setAttribute("value", this.defaultValue);
-        }
+        var input = new Element('input', {
+            id: this.getID() + "_Input",
+            name: this.getID() + "_Input",
+            type: this.displaySuggest == false ? "hidden" : "text",
+            style: "width:" + widthWithoutBorders + "px;clear:both"
+        });
+        this.defaultValue && input.setAttribute("value", this.defaultValue);
         this.htmlElement.appendChild(input);
         this.input = input;
 
-
         // Prepare suggest feature.
         if (this.displaySuggest) {
-            var inputFocus = function() {
-                var suggest = new XWiki.widgets.Suggest(this, {
-                    script: '/xwiki/rest/wikis/' + XWiki.currentWiki + '/search?scope=name&',
-                    varname:'q'
-                });
-                // We override XWiki's ajax suggest setSuggestions method to adapt it to XWiki REST search results.
-                suggest.setSuggestions = function (req) {
-                    this.aSuggestions = [];
-                    var xml = req.responseXML;
-                    var results = xml.getElementsByTagName('searchResult');
-                    for (var i = 0; i < results.length; i++) {
-                        var id = results[i].getElementsByTagName('id')[0].firstChild.nodeValue;
-                        var space = results[i].getElementsByTagName('space')[0].firstChild.nodeValue;
-                        var pageName = results[i].getElementsByTagName('pageName')[0].firstChild.nodeValue;
-                        if (results[i].hasChildNodes()) {
-                            this.aSuggestions.push({
-                                "id": id,
-                                "value": space + XWiki.constants.spacePageSeparator + pageName,
-                                "info": ""
-                            });
-                        }
-                    }
-                    this.idAs = "as_" + this.fld.id;
-                    this.createList(this.aSuggestions);
-                };
-            };
-            Event.observe(input, "focus", inputFocus);
-
+            input.className = "suggestDocuments";
+            if (XWiki.domIsLoaded) {
+                // Activate the suggest input manually if the page has already been loaded 
+                document.fire('xwiki:dom:updated', {elements: [this.htmlElement]});
+            }
             // Call inputObserver for the first time when the first set of data arrives.
             // The method will be called every 2s after that.
-            var daCallback = {
-                treeId : this.getID(),
-                callback : function() {
-                    window[this.treeId].inputObserver();
-                }
+            var daCallback = function() {
+                window[this.treeId].inputObserver();
             };
-
-            this.getData().callbacks.dataArrived.push(daCallback);
         } else {
             // If the suggest is not displayed, call openNodesFromInput once to take defaultValue into account
             // by scrolling to the correct node in the tree.
-            var daCallback = {
-                treeId : this.getID(),
-                callback : function() {
-                    window[this.treeId].openNodesFromInput();
-                }
+            var daCallback = function() {
+                window[this.treeId].openNodesFromInput();
             };
-
-            this.getData().callbacks.dataArrived.push(daCallback);
         }
+        this.getData().callbacks.dataArrived.push({
+            treeId : this.getID(),
+            callback : daCallback
+        });
     },
 
     /**

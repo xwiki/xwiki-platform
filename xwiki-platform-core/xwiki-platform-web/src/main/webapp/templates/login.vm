@@ -50,7 +50,7 @@
 <div class="buttons"><span class="buttonwrapper"><input type="submit" class="button" value="$msg.get('login')"/></span></div>
 ## TODO: Replace this with an interface extension once IX are implemented
 #if($xwiki.exists('XWiki.ResetPassword'))
-  <div style="font-size: 70%; margin-top: 2em;">Forgot your <a href="$xwiki.getURL('XWiki.ForgotUsername')">username</a> or <a href="$xwiki.getURL('XWiki.ResetPassword')">password</a>?</div>
+  <div style="font-size: 70%; margin-top: 2em;">$msg.get('plaform.web.login.forgotUserNameOrPassword', ["<a href='$xwiki.getURL('XWiki.ForgotUsername')'>", '</a>', "<a href='$xwiki.getURL('XWiki.ResetPassword')'>", '</a>'])</div>
 #end
 #xwikimessageboxend()
 </form>

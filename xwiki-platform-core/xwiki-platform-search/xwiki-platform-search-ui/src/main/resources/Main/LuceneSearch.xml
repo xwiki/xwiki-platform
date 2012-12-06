@@ -266,6 +266,9 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
           &lt;a href="${rssURL}" class='hasIcon iconRSS'&gt;$msg.get("search.rss", ["[$escapetool.xml($query)]"])&lt;/a&gt;
         {{/html}}
       #end
+    #else
+
+      {{info}}$msg.get('search.page.results.noResults'){{/info}}
     #end
   #else
 

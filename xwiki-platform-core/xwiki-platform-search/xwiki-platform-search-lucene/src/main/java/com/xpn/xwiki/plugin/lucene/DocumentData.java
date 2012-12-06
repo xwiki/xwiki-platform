@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -158,6 +160,11 @@ public class DocumentData extends AbstractDocumentData
             // Do not index passwords
         } else if (prop instanceof StaticListClass && ((StaticListClass) prop).isMultiSelect()) {
             indexStaticList(luceneDoc, baseObject, (StaticListClass) prop, propertyName, context);
+        } else if (prop instanceof DateClass) {
+            // Date properties are indexed the same as document dates: formatted through IndexFields.dateToString() and
+            // untokenized, to be able to sort by their values.
+            addFieldToDocument(fieldFullName, getContentAsDate(baseObject, propertyName), Field.Store.YES,
+                Field.Index.NOT_ANALYZED, OBJECT_PROPERTY_BOOST, luceneDoc);
         } else {
             StringBuilder sb = new StringBuilder();
             getObjectContentAsText(sb, baseObject, propertyName, context);
@@ -195,5 +202,14 @@ public class DocumentData extends AbstractDocumentData
             addFieldToDocument(fieldFullName, value, Field.Store.YES, Field.Index.ANALYZED, OBJECT_PROPERTY_BOOST,
                 luceneDoc);
         }
+    }
+
+    private String getContentAsDate(BaseObject baseObject, String propertyName)
+    {
+        Date date = baseObject.getDateValue(propertyName);
+        if (date != null) {
+            return IndexFields.dateToString(date);
+        }
+        return "";
     }
 }

@@ -237,7 +237,7 @@
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
     #set ($hasPreviousMenuSection = true)
   #end
-  #if ($hasSpaceAdmin)
+  #if ($hasSpaceAdmin && $isAdminAppInstalled)
     #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))
     #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
     #set ($hasPreviousMenuSection = true)

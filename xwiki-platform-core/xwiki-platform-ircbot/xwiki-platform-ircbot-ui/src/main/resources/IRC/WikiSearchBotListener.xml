@@ -145,6 +145,7 @@
     <property>
       <script>{{groovy}}
 import com.xpn.xwiki.*
+import org.apache.commons.lang3.*
 
 def irccontext = services.get("ircbot").getContext() 
 def message = irccontext.get("message")
@@ -156,24 +157,36 @@ if (message.startsWith("!search")) {
     // Number of search results to display
     int maxResults = 4
 
-    // Remove the prefix "search " from the message to extract the query
-    String query = message[8..-1]
+    if (StringUtils.trim(message).length() &gt; "!search".length()) {
+      // Remove the prefix "search " from the message to extract the query
+      String query = message[8..-1]
 
-    println "Results for [${query}] (${maxResults} results only)"
+      println "Results for [${query}] (${maxResults} results only)"
 
-    try {
-      def results = lucenePlugin.getSearchResults(query, (String) null,  null, null, xwikiContext)
-      if (results.hitcount &gt; 0) {
-        for (result in results.getResults(1, maxResults)) {
-          def itemDoc = xwiki.getXWiki().getDocument("${result.wiki}:${result.web}.${result.name}", xwikiContext)
-          println "  * ${itemDoc.database}:${itemDoc.fullName} - ${itemDoc.getExternalURL("view", xwikiContext)}"
+      try {
+        // Since Lucene doesn't support '*' or '?' as the first character we just remove it for now. Note that the SOLR
+        // search doesn't have this limitation
+        query = StringUtils.removeStart(query, '*')
+        query = StringUtils.removeStart(query, '?')
+        if (!StringUtils.isEmpty(query)) {
+          def results = lucenePlugin.getSearchResults(query, (String) null,  null, null, xwikiContext)
+          if (results.hitcount &gt; 0) {
+            for (result in results.getResults(1, maxResults)) {
+              def itemDoc = xwiki.getXWiki().getDocument("${result.wiki}:${result.web}.${result.name}", xwikiContext)
+              println "  * ${itemDoc.database}:${itemDoc.fullName} - ${itemDoc.getExternalURL("view", xwikiContext)}"
+            }
+          } else {
+            println "No match found"
+          }
+        } else {
+          println "Search cannot start with '*' or '?'"
         }
-      } else {
-        println "No match found"
+      } catch (e) {
+        e.printStackTrace();
+        println "Error: ${e.message}"
       }
-    } catch (e) {
-      e.printStackTrace();
-      println "Error: ${e.message}"
+    } else {
+      println "Empty search query!"
     }
   } else {
     println "Lucene plugin is not installed!"

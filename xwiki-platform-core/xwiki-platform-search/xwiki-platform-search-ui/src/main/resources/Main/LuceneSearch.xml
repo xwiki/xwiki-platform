@@ -186,6 +186,10 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## ---------------
 ## Results processing
 ## ---------------
+## Since Lucene doesn't support '*' or '?' as the first character we just remove it for now. Note that the SOLR
+## search doesn't have this limitation
+#set ($query = $stringtool.removeStart($query, '*'))
+#set ($query = $stringtool.removeStart($query, '?'))
 #if($query != '')
   #set($lucene = $xwiki.getPlugin("lucene"))
   #if($lucene)    

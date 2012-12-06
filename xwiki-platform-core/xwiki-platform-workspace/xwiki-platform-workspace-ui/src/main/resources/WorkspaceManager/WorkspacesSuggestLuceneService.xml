@@ -32,6 +32,10 @@
 #else
   #set($nb = 6)
 #end
+## Since Lucene doesn't support '*' or '?' as the first character we just remove it for now. Note that the SOLR
+## search doesn't have this limitation
+#set ($input = $stringtool.removeStart($input, '*'))
+#set ($input = $stringtool.removeStart($input, '?'))
 #if($query != '' &amp;&amp; $input != '')
   #set($query = $query.replaceAll('__INPUT__', $input))
   #set($discard = $response.setContentType("text/xml"))

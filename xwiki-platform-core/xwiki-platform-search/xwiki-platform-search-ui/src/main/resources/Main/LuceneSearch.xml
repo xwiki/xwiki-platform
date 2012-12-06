@@ -48,7 +48,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## --------------------------
 ## Hidden documents filtering
 ## --------------------------
-#set($hiddenClause = ' AND hidden:false')
+#set($hiddenClause = ' +hidden:false')
 ## TODO: rewrite this when we'll have a user configuration script service
 #if($xwiki.getDocument($xcontext.user).getValue('displayHiddenDocuments') == 1)
   #set($hiddenClause = '')
@@ -67,10 +67,10 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Also exclude WebPreferences.
 ## ----------------------------------------------------------------------
 #foreach ($blacklistedSpace in $blacklistedSpaces)
-  #set ($extraClause = " AND NOT space:${blacklistedSpace}${extraClause}")
+  #set ($extraClause = " -exactspace:${blacklistedSpace}${extraClause}")
 #end
 #if(!$hasAdmin &amp;&amp; !$isAdvancedUser)
-  #set ($extraClause = " AND NOT name:WebPreferences${extraClause}")
+  #set ($extraClause = " -name:WebPreferences${extraClause}")
 #end
 ## ---------------
 ## Space macros
@@ -196,7 +196,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     ## ---------------
     ## Lucene search
     ## ---------------
-    #set($searchresults = $lucene.getSearchResults("(${query}${extraClause})${hiddenClause}", '', $wikinames, $!languages))
+    #set($searchresults = $lucene.getSearchResults("+(${query})${extraClause}${hiddenClause}", '', $wikinames, $!languages))
     #if($searchresults &amp;&amp; $searchresults.getHitcount() &gt; 0)
       ## -----------------
       ## Pagination (top)

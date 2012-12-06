@@ -190,6 +190,8 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## search doesn't have this limitation
 #set ($query = $stringtool.removeStart($query, '*'))
 #set ($query = $stringtool.removeStart($query, '?'))
+## '!' is also an operator, and if it's not at the start of a word, it will cause a query parsing exception
+#set ($query = $query.replaceAll('(?&lt;!^| )!++|!++(?=$| )', ''))
 #if($query != '')
   #set($lucene = $xwiki.getPlugin("lucene"))
   #if($lucene)    

@@ -111,7 +111,7 @@ public class XWikiExecutor
     {
         this.project = new Project();
         this.project.init();
-        this.project.addBuildListener(new AntBuildListener(DEBUG));
+        this.project.addBuildListener(new AntBuildListener(DEBUG ? Project.MSG_DEBUG : Project.MSG_WARN));
 
         // resolve ports
         String portString = System.getProperty("xwikiPort" + index);

@@ -20,11 +20,10 @@
 package org.xwiki.url;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
 
 /**
  * Base XWikiURL implementation common to all extending classes. Manages XWiki URL parameters.
@@ -32,13 +31,13 @@ import java.util.Collections;
  * @version $Id$
  * @since 2.0M1
  */
-public class AbstractXWikiURL implements XWikiURL
+public abstract class AbstractXWikiURL implements XWikiURL
 {
     /**
      * @see #getType()
      */
     private XWikiURLType type;
-    
+
     /**
      * @see #getParameters()
      */
@@ -54,12 +53,13 @@ public class AbstractXWikiURL implements XWikiURL
     {
         return this.type;
     }
-    
+
     public void setType(XWikiURLType type)
     {
         this.type = type;
     }
 
+    @Override
     public void addParameter(String name, String value)
     {
         List<String> list = this.parameters.get(name);

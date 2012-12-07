@@ -33,8 +33,13 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 
+
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.cache.DocumentCache;
+import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 
 /**
  * Default implementation of {@link RenderingCache}.
@@ -66,7 +71,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      * Actually cache object.
      */
     @Inject
-    private DocumentCache<String> cache;
+    private DocumentCache<CachedItem> cache;
 
     @Override
     public void initialize() throws InitializationException
@@ -99,9 +104,12 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
                 context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
-                renderedContent =
-                    this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
-                        getRequestParameters(context));
+                CachedItem cachedItem =
+                        this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
+                            getRequestParameters(context));
+                    if (cachedItem!=null){
+                    	return restoreCachedItem(context,cachedItem);
+                    }
             }
         }
 
@@ -113,11 +121,49 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         XWikiContext context)
     {
         if (this.configuration.isCached(documentReference)) {
-            this.cache.set(renderedContent, documentReference, source, getAction(context), context.getLanguage(),
+            this.cache.set(buildCachedItem(context,renderedContent), documentReference, source, getAction(context), context.getLanguage(),
                 getRequestParameters(context));
         }
     }
 
+
+    /**
+     * Create a cache entry for the given document.
+     * Cache entry contains rendered text + SkniExtensions plugins
+     * @param context
+     * @param renderedContent
+     * @return
+     */
+    private CachedItem buildCachedItem(XWikiContext context,
+			String renderedContent) {
+		CachedItem  cachedItem= new CachedItem();
+		XWikiPluginManager pluginManager = context.getWiki().getPluginManager();
+		for (String pluginName : new String[] {"jsx","ssx","jsfx","ssfx","jsrx","ssrx"}){
+			XWikiPluginInterface plug = pluginManager.getPlugin(pluginName);
+			if (plug instanceof RenderingCacheAware){
+			RenderingCacheAware plugin = (RenderingCacheAware) plug;
+				cachedItem.extensions.put(
+						pluginName,
+						plugin.getAdditionalCacheInfos(context));
+		}
+		}
+		cachedItem.rendered = renderedContent;
+		return cachedItem;
+	}
+    /**
+     * Restore skinextension state from a cache entry and return cached text
+     * @param context the current xwiki context
+     * @param cachedItem The cache item to return
+     * @return the rendered text
+     */
+    private String restoreCachedItem(XWikiContext context,
+    		CachedItem  cachedItem) {
+		
+		XWikiPluginManager pluginManager = context.getWiki().getPluginManager();
+		for (Map.Entry<String,UsedExtension> item : cachedItem.extensions.entrySet())
+			((RenderingCacheAware) pluginManager.getPlugin(item.getKey())).restoreCachedInfos(context, item.getValue());
+		return cachedItem.rendered;
+	}    
     /**
      * Extract action information from the context.
      * 

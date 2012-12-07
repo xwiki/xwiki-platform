@@ -102,13 +102,13 @@
   <content>{{velocity}}
 ## WatchList RSS.
 ## This page must be called with the following query string: "?xpage=plain&amp;outputSyntax=plain"
-#if("$!request.xpage" != "plain" &amp;&amp; "$!request.outputSyntax" != "plain")
+#if("$!request.xpage" != 'plain' &amp;&amp; "$!request.outputSyntax" != 'plain')
 WatchList RSS feed
 #else
-$!response.setContentType("application/text+xml")##
+$!response.setContentType('application/text+xml')##
 #set($feed = $xwiki.watchlist.getFeed(20))##
 #set($discard = $feed.setPublishedDate($util.date))
-$xwiki.feed.getFeedOutput($feed, "rss_2.0")##
+$xwiki.feed.getFeedOutput($feed, 'rss_2.0')##
 #end
 {{/velocity}}</content>
 </xwikidoc>

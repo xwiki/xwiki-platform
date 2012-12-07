@@ -238,7 +238,7 @@ $msg.get('platform.workspace.candidateHandledComment') ${request.reviewerComment
     #if ($request.acceptUser)
       {{info}}$msg.get('platform.workspace.candidateAcceptedSuccess'){{/info}}
     #else
-      {{info}}$ms.get('platform.workspace.candidateRejectedSuccess'){{/info}}
+      {{info}}$msg.get('platform.workspace.candidateRejectedSuccess'){{/info}}
     #end
   #end
 #elseif($hasAdmin &amp;&amp; $request.inviteUser)

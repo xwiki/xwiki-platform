@@ -6632,7 +6632,16 @@ public class XWiki implements EventListener
     {
         XWikiMessageTool msg = context.getMessageTool();
 
-        return parseContent(msg.get(id), context);
+        List< ? > parameters = (List< ? >) context.get("messageParameters");
+
+        String translatedMessage;
+        if (parameters != null) {
+            translatedMessage = msg.get(id, parameters);
+        } else {
+            translatedMessage = msg.get(id);
+        }
+
+        return parseContent(translatedMessage, context);
     }
 
     /**

@@ -23,21 +23,15 @@ import static org.junit.Assert.fail;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.xwql.internal.hql.XWQLtoHQLTranslator;
+import org.xwiki.test.AbstractTestCase;
 
-@RunWith(JMock.class)
-public class XWQLtoHQLTranslatorTest
+public class XWQLtoHQLTranslatorTest extends AbstractTestCase
 {
-    private Mockery context = new JUnit4Mockery();
-
-    private DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
+    private DocumentAccessBridge dab = getMockery().mock(DocumentAccessBridge.class);
 
     private XWQLtoHQLTranslator translator = new XWQLtoHQLTranslator()
     {
@@ -51,7 +45,7 @@ public class XWQLtoHQLTranslatorTest
     @Before
     public void setUp() throws Exception
     {
-        context.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {{
                 allowing(dab).getPropertyType(with(any(String.class)), with(equal("number")));
                 will(returnValue(null));

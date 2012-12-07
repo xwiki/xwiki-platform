@@ -42,6 +42,14 @@
     <module>xwiki-platform-tool-standards-validator</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
   </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <pluginManagement>
       <plugins>

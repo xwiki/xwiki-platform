@@ -52,7 +52,7 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
 
     private XWikiServletRequestStub mockRequest;
 
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String[]> parameters = new HashMap<String, String[]>();
 
     private String refresh;
 
@@ -103,8 +103,8 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("renderedContent",
             this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
 
-        this.parameters.put("param", "value");
-        
+        this.parameters.put("param", new String[] {"value1", "value2"});
+
         Assert.assertNull(this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source",
             getContext()));
 
@@ -114,8 +114,8 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
             this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source", getContext()));
 
         ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
-        observationManager.notify(
-            new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
+        observationManager.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
+            getContext());
 
         Assert.assertNull(this.renderingCache.getRenderedContent(this.document.getDocumentReference(), "source",
             getContext()));

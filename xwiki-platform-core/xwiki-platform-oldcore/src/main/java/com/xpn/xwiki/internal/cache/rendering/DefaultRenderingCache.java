@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.internal.cache.rendering;
 
-import java.util.HashMap;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -95,8 +98,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         String renderedContent = null;
 
         if (this.configuration.isCached(documentReference)) {
-            String refresh =
-                context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
+            String refresh = context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
                 renderedContent =
@@ -138,16 +140,30 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     private String getRequestParameters(XWikiContext context)
     {
         if (context.getRequest() != null) {
-            Map<String, String> parameters = context.getRequest().getParameterMap();
+            Map<String, String[]> parameters = context.getRequest().getParameterMap();
 
             if (parameters != null) {
-                if (parameters.containsKey(PARAMETER_REFRESH)) {
-                    parameters = new HashMap<String, String>(parameters);
+                SortedMap<String, String[]> sortedMap = new TreeMap<String, String[]>(parameters);
 
-                    parameters.remove(PARAMETER_REFRESH);
+                StringBuilder sb = new StringBuilder();
+                for (Map.Entry<String, String[]> entry : sortedMap.entrySet()) {
+                    if (!parameters.containsKey(PARAMETER_REFRESH)) {
+                        for (String value : entry.getValue()) {
+                            if (sb.length() > 0) {
+                                sb.append('&');
+                            }
+
+                            try {
+                                sb.append(URLEncoder.encode(entry.getKey(), "UTF-8")).append('=')
+                                    .append(URLEncoder.encode(value, "UTF-8"));
+                            } catch (UnsupportedEncodingException e) {
+                                // That should never happen
+                            }
+                        }
+                    }
+
+                    return sb.toString();
                 }
-
-                return parameters.toString();
             }
         }
 

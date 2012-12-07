@@ -285,6 +285,11 @@
               <differenceType>8001</differenceType>
               <justification>The AbtractNotifyOnUpdateList wrapper class no longer inherits ArrayList, because it is used as a non-static enclosed class in XWikiDocument, which is non-serializable, so the list wrapper cannot be serializeble.  Let's move the entire class to an internal package while we are at it.</justification>
             </difference>
+            <difference>
+              <className>org/xwiki/url/AbstractXWikiURL</className>
+              <differenceType>3005</differenceType>
+              <justification>The AbstractXWikiURL should have been abstract from the beginning, as the name implies.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

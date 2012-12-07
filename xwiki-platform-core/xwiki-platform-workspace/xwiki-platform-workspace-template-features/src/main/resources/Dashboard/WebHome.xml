@@ -412,30 +412,24 @@
 #set ($MAX_CONTRIBUTORS = 5)
 ## We fetch a bit more contributors than needed to include some users that might be ignored.
 #set ($FETCHED_CONTRIBUTORS = $MAX_CONTRIBUTORS + 5)
-## Whether to ignore the main global admin or not.
-#set ($IGNORE_GLOBAL_ADMIN = true)
+## Whether to display the main global admin (xwiki:XWiki.Admin) or not. This is useful because a lot of initial actions (wiki creation, import, etc.) are attributed to this used and it should not be counted.
+#set ($DISPLAY_GLOBAL_ADMIN = true)
 ##
 #set ($contributors = $xcontext.xWiki.store.search("select ase.user from ActivityEventImpl ase GROUP BY ase.user ORDER BY count(*) DESC", $FETCHED_CONTRIBUTORS, 0, $xcontext.context))
 #set ($validContributors = 0)
 #foreach ($contributor in $contributors)
   ## It seems that we can have empty users in the table.
-  ## We also ignore superadmin since he 'should not exist'.
-  ## We also ignore the workspace template admin since it's a side-effect of bug http://jira.xwiki.org/jira/browse/XWIKI-6261
-  ## We also ignore a 'ghost' local admin for workspaces since it should no longer exist.
+  ## Ignore superadmin since he 'should not exist'.
+  ## Ignore the workspace template admin since it's a side-effect of bug http://jira.xwiki.org/jira/browse/XWIKI-6261
+  ## Ignore a 'ghost' local admin for workspaces since it should no longer exist.
+  ## Ignore guest users.
   #if ("$!contributor" != '' &amp;&amp; !$contributor.endsWith('superadmin') &amp;&amp; "$!contributor" != 'workspacetemplate:XWiki.Admin' &amp;&amp;
-       ( !$IGNORE_GLOBAL_ADMIN || ($IGNORE_GLOBAL_ADMIN &amp;&amp; "$!contributor" != 'xwiki:XWiki.Admin' ) ) &amp;&amp;
-       ( $xcontext.mainWiki || (!$xcontext.mainWiki &amp;&amp; "$!contributor" != 'XWiki.Admin') )
+       ( $DISPLAY_GLOBAL_ADMIN || "$!contributor" != 'xwiki:XWiki.Admin' ) &amp;&amp;
+       ( $xcontext.mainWiki || "$!contributor" != 'XWiki.Admin' ) &amp;&amp;
+       ( "$!contributor" != 'XWiki.XWikiGuest' )
       )
     #set ($validContributors = $validContributors + 1)
-    #set ($userDocumentReference = $services.model.resolveDocument($contributor))
-    #set ($userDocument = $xwiki.getDocument($userDocumentReference))
-    #set ($userObject = $userDocument.getObject('XWiki.XWikiUser'))
-    #set ($displayName = "$!{userDocument.getValue('first_name')} $!{userDocument.getValue('last_name')}")
-    #set ($displayName = $displayName.trim())
-    #if ("$!displayName" == '')
-      #set ($displayName = $userDocumentReference.name)
-    #end
-    1. [[$displayName&gt;&gt;$!{contributor}]]
+    1. [[$xwiki.getUserName($!{contributor}, false)&gt;&gt;$!{contributor}]]
   #end
   #if ($validContributors == $MAX_CONTRIBUTORS)
     #break

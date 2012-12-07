@@ -22,7 +22,6 @@ package org.xwiki.observation.remote;
 import java.util.Arrays;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +33,6 @@ public class TCPROMTest extends AbstractROMTestCase
 {
     static class Unserializable { }
     
-    private Mockery context = new Mockery();
-
     @Override
     @Before
     public void setUp() throws Exception
@@ -52,7 +49,7 @@ public class TCPROMTest extends AbstractROMTestCase
     @After
     public void tearDown() throws Exception
     {
-        this.context.assertIsSatisfied();
+        getMockery().assertIsSatisfied();
     }
 
     /**
@@ -61,18 +58,23 @@ public class TCPROMTest extends AbstractROMTestCase
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener localListener = this.context.mock(EventListener.class, "local");
-        final EventListener remoteListener = this.context.mock(EventListener.class, "remote");
+        final EventListener localListener = getMockery().mock(EventListener.class, "local");
+        final EventListener remoteListener = getMockery().mock(EventListener.class, "remote");
 
         final TestEvent event = new TestEvent();
 
         final Unserializable unserializable = new Unserializable();
 
-        this.context.checking(new Expectations() {{
-                allowing(localListener).getName(); will(returnValue("mylistener"));
-                allowing(remoteListener).getName(); will(returnValue("mylistener"));
-                allowing(localListener).getEvents(); will(returnValue(Arrays.asList(event)));
-                allowing(remoteListener).getEvents(); will(returnValue(Arrays.asList(event)));
+        getMockery().checking(new Expectations()
+        {{
+                allowing(localListener).getName();
+                will(returnValue("mylistener"));
+                allowing(remoteListener).getName();
+                will(returnValue("mylistener"));
+                allowing(localListener).getEvents();
+                will(returnValue(Arrays.asList(event)));
+                allowing(remoteListener).getEvents();
+                will(returnValue(Arrays.asList(event)));
                 oneOf(localListener).onEvent(with(same(event)), with(equal("some source")), with(equal("some data")));
                 oneOf(localListener).onEvent(with(same(event)), with(same(unserializable)), with(same(unserializable)));
                 oneOf(remoteListener).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));

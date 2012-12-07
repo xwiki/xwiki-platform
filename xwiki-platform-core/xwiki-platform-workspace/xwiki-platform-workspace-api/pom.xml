@@ -45,12 +45,6 @@
       <artifactId>commons-lang3</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

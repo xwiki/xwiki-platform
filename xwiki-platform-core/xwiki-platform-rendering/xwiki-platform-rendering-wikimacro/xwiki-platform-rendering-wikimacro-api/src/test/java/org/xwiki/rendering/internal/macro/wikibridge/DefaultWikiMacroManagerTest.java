@@ -96,7 +96,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
                 allowing(mockDocumentAccessBridge).getCurrentUser();
                 will(returnValue("dummy"));
                 allowing(mockDocumentAccessBridge).setCurrentUser("dummy");
-                allowing(mockDocumentAccessBridge).setCurrentUser(with(any(String.class)));
+                allowing(mockDocumentAccessBridge).setCurrentUser((String) with(anything()));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "dummy")));
             }

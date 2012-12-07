@@ -246,7 +246,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                 will(returnValue(Collections.EMPTY_LIST));
 
                 allowing(mockAuthorizationManager).checkAccess(with(any(Right.class)),
-                    with(any(DocumentReference.class)), with(any(EntityReference.class)));
+                    (DocumentReference) with(anything()), with(any(EntityReference.class)));
             }
         });
 

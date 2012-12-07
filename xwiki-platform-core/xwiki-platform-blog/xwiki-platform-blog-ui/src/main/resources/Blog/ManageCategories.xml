@@ -332,13 +332,13 @@ XWiki.blog.Categories = Class.create({
     var select = form.down('select');
     select.selectedIndex = 0;
     if (item.hasClassName('tool')) {
-      item.up('.blog-category-tools').insert({after : form});
       var selector = 'option[value=\'' + decodeURIComponent(item.href.substring(item.href.indexOf('parentCategory=') + 15).replace(/\+/g, ' ')).replace(/\\/g, "\\\\").replace(/'/g, "\\'") + '\']';
       var option = select.down(selector);
       if (option) {
         select.selectedIndex = option.index;
       }
       select.up('label').hide();
+      item.up('.blog-category-tools').insert({after : form});
     } else {
       item.up('ul').insert({after : form});
       select.up('label').show();

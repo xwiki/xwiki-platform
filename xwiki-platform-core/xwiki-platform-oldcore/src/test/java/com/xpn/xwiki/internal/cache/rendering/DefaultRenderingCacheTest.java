@@ -21,7 +21,9 @@ package com.xpn.xwiki.internal.cache.rendering;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -31,8 +33,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.MockConfigurationSource;
 
+import antlr.collections.List;
+
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -44,6 +52,33 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  */
 public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
 {
+	private static class TestRenderingCacheAware extends XWikiDefaultPlugin implements RenderingCacheAware {
+
+		public TestRenderingCacheAware(String name, String className,
+				XWikiContext context) {
+			super(name, className, context);
+			// TODO Auto-generated constructor stub
+		}
+
+		private static Map<String,Map<String,Object>> markerMap = new HashMap<String, Map<String,Object>>(){{put("Hello",new HashMap<String, Object>(){{put("a","A");}});}};
+		private static Set<String> markerSet = new HashSet<String>(){{add("Hello");}};
+		@Override
+		public UsedExtension getAdditionalCacheInfos(XWikiContext context) {
+			Assert.assertNotNull(context);
+			return new UsedExtension(markerSet,markerMap);
+		}
+
+		@Override
+		public void restoreCachedInfos(XWikiContext context, UsedExtension infos) {
+			Assert.assertNotNull(infos);
+			Assert.assertNotNull(context);
+			Assert.assertEquals(markerMap, infos.parameters);
+			Assert.assertEquals(markerSet, infos.resource);
+		}
+		
+	}
+	private TestRenderingCacheAware testRenderingCacheAware;
+	
     private XWiki mockXWiki;
 
     private XWikiDocument document;
@@ -51,6 +86,8 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
     private RenderingCache renderingCache;
 
     private XWikiServletRequestStub mockRequest;
+    
+    private XWikiPluginManager mockPluginManager;
 
     private Map<String, String[]> parameters = new HashMap<String, String[]>();
 
@@ -60,6 +97,8 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
+        
+        testRenderingCacheAware  = new TestRenderingCacheAware("Test","Test",getContext());
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.document.setOriginalDocument(this.document.clone());
@@ -71,10 +110,19 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         getContext().setRequest(this.mockRequest);
 
         this.renderingCache = getComponentManager().getInstance(RenderingCache.class);
+        
+        this.mockPluginManager = getMockery().mock(XWikiPluginManager.class);
 
         // @formatter:off
         getMockery().checking(new Expectations() {{
             allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
+            allowing(mockXWiki).getPluginManager(); will(returnValue(mockPluginManager));
+            allowing(mockPluginManager).getPlugin("jsx"); will(returnValue(testRenderingCacheAware));
+            allowing(mockPluginManager).getPlugin("ssx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("jsfx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("ssfx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("jsrx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("ssrx"); will(returnValue(null));
             allowing(mockRequest).getParameterMap(); will(returnValue(parameters));
             allowing(mockRequest).getParameter("refresh"); will(returnValue(refresh));
         }});

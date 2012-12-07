@@ -740,10 +740,17 @@ $ie .colorthemewizard-trigger {
   top: 18px;
 }
 .colorthemewizard-picker .close-button {
-  float: right;
   cursor: pointer;
   font-weight: bold;
-  margin-top: -4px;
+  position:absolute;
+  right: 4px;
+  top: 4px;
+}
+.colorthemewizard-picker input {
+    width: 160px;
+}
+.colorthemewizard-picker .procolor {
+    width: 92px;
 }
 /* A picker displays selectors for several properties, each one placed in it's own section. */
 .colorthemewizard-picker-section {

@@ -68,9 +68,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.event.Event;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.store.UnexpectedException;
@@ -858,7 +858,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             }
-
 
             doc.setContentDirty(false);
             doc.setMetaDataDirty(false);
@@ -1696,7 +1695,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void registerLogoutListener()
     {
-        this.observationManager.addListener(new EventListener() {
+        this.observationManager.addListener(new EventListener()
+        {
             private final Event ev = new ActionExecutingEvent();
 
             public String getName()
@@ -2465,7 +2465,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             XWikiDocument doc =
                 new XWikiDocument(new DocumentReference(context.getDatabase(), (String) result[0], (String) result[1]));
             if (checkRight) {
-                if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {
+                if (!context.getWiki().getRightService()
+                    .hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {
                     continue;
                 }
             }

@@ -99,6 +99,11 @@ platform.workspace.candidateRejectLabel=Reject
 platform.workspace.invitationCancelLabel=Cancel Invitation
 platform.workspace.workspaceUsersTitle=Workspace Users
 platform.workspace.manageWorkspaceTitle=Workspace
+XWiki.WorkspaceCandidateMemberClass_status_pending=Pending
+XWiki.WorkspaceCandidateMemberClass_status_accepted=Accepted
+XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejected
+XWiki.WorkspaceCandidateMemberClass_type_request=Request
+XWiki.WorkspaceCandidateMemberClass_type_invitation=Invitation
 
 # HINTS
 workspacemanager.prop.wikiprettyname.hint=The display name of the workspace.

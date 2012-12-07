@@ -105,7 +105,7 @@
 #if("$!request.xpage" != 'plain' &amp;&amp; "$!request.outputSyntax" != 'plain')
 WatchList RSS feed
 #else
-$!response.setContentType('application/text+xml')##
+$!response.setContentType('application/rss+xml')##
 #set($feed = $xwiki.watchlist.getFeed(20))##
 #set($discard = $feed.setPublishedDate($util.date))
 $xwiki.feed.getFeedOutput($feed, 'rss_2.0')##

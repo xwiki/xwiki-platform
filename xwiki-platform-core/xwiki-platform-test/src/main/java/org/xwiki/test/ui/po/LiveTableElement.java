@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -69,9 +70,7 @@ public class LiveTableElement extends BaseElement
                 break;
             }
         }
-        getUtil().takeScreenshot();
-        throw new TimeoutException("Livetable isn't ready after the timeout has expired. Source ["
-            + getDriver().getPageSource() + "]");
+        throw new TimeoutException("Livetable isn't ready after the timeout has expired.");
     }
 
     public boolean hasColumn(String columnTitle)
@@ -116,7 +115,8 @@ public class LiveTableElement extends BaseElement
         String columnXPath = "//thead[@class = 'xwiki-livetable-display-header']//th[normalize-space(.) = '%s']";
         WebElement column = liveTable.findElement(By.xpath(String.format(columnXPath, escapedColumnTitle)));
 
-        return ((Long) getDriver().executeScript("return arguments[0].cellIndex;", column)).intValue();
+        return ((Long) ((JavascriptExecutor) getDriver()).executeScript("return arguments[0].cellIndex;", column))
+            .intValue();
     }
 
     /**

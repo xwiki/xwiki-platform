@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Locale;
+
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
@@ -30,7 +32,7 @@ public class XarEntry
 {
     private EntityReference documentReference;
 
-    private String language;
+    private Locale locale;
 
     private String entryName;
 
@@ -38,17 +40,17 @@ public class XarEntry
     {
     }
 
-    public XarEntry(String space, String page, String language)
+    public XarEntry(String space, String page, Locale locale)
     {
         this.documentReference =
             new EntityReference(page, EntityType.DOCUMENT, new EntityReference(space, EntityType.SPACE));
-        this.language = language;
+        this.locale = locale;
     }
 
-    public XarEntry(EntityReference documentReference, String language)
+    public XarEntry(EntityReference documentReference, Locale locale)
     {
         this.documentReference = documentReference;
-        this.language = language;
+        this.locale = locale;
     }
 
     public EntityReference getDocumentReference()
@@ -61,14 +63,14 @@ public class XarEntry
         this.documentReference = documentReference;
     }
 
-    public String getLanguage()
+    public Locale getLocale()
     {
-        return this.language;
+        return this.locale;
     }
 
-    public void setLanguage(String language)
+    public void setLocale(Locale locale)
     {
-        this.language = language;
+        this.locale = locale;
     }
 
     public String getEntryName()
@@ -86,7 +88,7 @@ public class XarEntry
     @Override
     public String toString()
     {
-        return this.documentReference + ", language = [" + getLanguage() + "]";
+        return this.documentReference + ", language = [" + getLocale() + "]";
     }
 
     @Override
@@ -107,7 +109,7 @@ public class XarEntry
 
             equals =
                 getDocumentReference().equals(xarEntry.getDocumentReference())
-                    && getLanguage().equals(xarEntry.getLanguage());
+                    && getLocale().equals(xarEntry.getLocale());
         }
 
         return equals;

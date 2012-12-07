@@ -19,18 +19,25 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.ComputedFieldClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Computed Field Class allows to create a field without storage that will display computed values based on other data
  * in the object or wiki.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
+@Component
+@Named("ComputedField")
+@Singleton
 public class ComputedFieldMetaClass extends PropertyMetaClass
 {
     /**
@@ -38,9 +45,8 @@ public class ComputedFieldMetaClass extends PropertyMetaClass
      */
     public ComputedFieldMetaClass()
     {
-        super();
         setPrettyName("Computed Field");
-        setName(ComputedFieldClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
         TextAreaClass scriptClass = new TextAreaClass(this);
         scriptClass.setName("script");
@@ -51,7 +57,7 @@ public class ComputedFieldMetaClass extends PropertyMetaClass
     }
 
     @Override
-    public BaseCollection newObject(XWikiContext context)
+    public PropertyClassInterface getInstance()
     {
         return new ComputedFieldClass();
     }

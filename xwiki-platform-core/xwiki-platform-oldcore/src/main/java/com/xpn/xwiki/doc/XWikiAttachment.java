@@ -133,10 +133,10 @@ public class XWikiAttachment implements Cloneable
         attachment.setAuthor(getAuthor());
         attachment.setComment(getComment());
         attachment.setDate(getDate());
-        attachment.setDoc(getDoc());
         attachment.setFilename(getFilename());
         attachment.setFilesize(getFilesize());
         attachment.setRCSVersion(getRCSVersion());
+        attachment.setMetaDataDirty(isMetaDataDirty());
         if (getAttachment_content() != null) {
             attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
             attachment.getAttachment_content().setAttachment(attachment);
@@ -145,6 +145,8 @@ public class XWikiAttachment implements Cloneable
             attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
             attachment.getAttachment_archive().setAttachment(attachment);
         }
+
+        attachment.setDoc(getDoc());
 
         return attachment;
     }

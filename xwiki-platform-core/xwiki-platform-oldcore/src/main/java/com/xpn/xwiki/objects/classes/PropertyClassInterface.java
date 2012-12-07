@@ -24,8 +24,17 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectInterface;
+import com.xpn.xwiki.objects.PropertyInterface;
 
-public interface PropertyClassInterface extends ObjectInterface
+/**
+ * The interface implemented by all XClass properties. An XClass property is at the same time a property (implements
+ * {@link PropertyInterface}) and an instance (object) of a meta class (implements {@link ObjectInterface}), where the
+ * meta class defines the meta properties of an XClass property (e.g. "relational storage", "display type", "separator",
+ * "multiple selection", etc.)
+ * 
+ * @version $Id$
+ */
+public interface PropertyClassInterface extends ObjectInterface, PropertyInterface
 {
     public String toString(BaseProperty property);
 

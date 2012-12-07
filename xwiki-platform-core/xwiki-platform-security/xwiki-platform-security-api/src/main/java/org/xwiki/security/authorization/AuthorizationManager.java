@@ -24,10 +24,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * This is a new experimental API for checking the access rights of users on xwiki entities. It is aims to replace
+ * This is a new experimental API for checking the access rights of users on XWiki entities. It is aims to replace
  * the current com.xpn.xwiki.user.api.XWikiRightService. It should provide better extensibility and improved
  * performance while being almost fully compatible with the existing implementation.
- * See org.xwiki.security.authorization.internal.XWikiCachingRightService for a bridge to this new authorisation
+ * See org.xwiki.security.authorization.internal.XWikiCachingRightService for a bridge to this new authorization
  * manager for legacy code.
  *
  * The AuthorisationManager does not provide any help for authentication. Authentication should be provided by

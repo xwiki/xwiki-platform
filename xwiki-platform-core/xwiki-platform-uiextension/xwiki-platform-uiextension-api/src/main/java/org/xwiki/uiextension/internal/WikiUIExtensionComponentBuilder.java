@@ -19,7 +19,6 @@
  */
 package org.xwiki.uiextension.internal;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,18 +30,16 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentBuilder;
+import org.xwiki.component.wiki.WikiComponentScope;
+import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -87,6 +84,12 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private ComponentManager componentManager;
 
     /**
+     * Allow to parse wiki syntax.
+     */
+    @Inject
+    private ContentParser contentParser;
+
+    /**
      * Parse the parameters provided by the extension.
      * The parameters are provided in a LargeString property of the extension object. In the future it would be better
      * to have a Map<String, String> XClass property.
@@ -107,6 +110,51 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
         return parameters;
     }
 
+    /**
+     * Checks if the last author of the document holding the extension(s) has the rights required to register extensions
+     * for the given scope. If the document author doesn't have the required rights a {@link WikiComponentException} is
+     * thrown.
+     *
+     * @param extensionsDoc the document holding the extension(s)
+     * @param scope the scope to check the rights for
+     * @throws WikiComponentException if the document author doesn't have the required rights to register extensions
+     */
+    private void checkRights(XWikiDocument extensionsDoc, WikiComponentScope scope) throws WikiComponentException
+    {
+        try {
+            if (scope == WikiComponentScope.GLOBAL
+                && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(extensionsDoc,
+                    getXWikiContext())) {
+                throw new WikiComponentException("Registering global UI extensions requires programming rights");
+            } else if (!getXWikiContext().getWiki().getRightService().hasAccessLevel("admin",
+                extensionsDoc.getContentAuthor(), "XWiki.XWikiPreferences", getXWikiContext())) {
+                throw new WikiComponentException("Registering UI extensions requires admin rights");
+            }
+        } catch (XWikiException e) {
+            throw new WikiComponentException("Failed to check rights required to register UI Extension(s)", e);
+        }
+    }
+
+    /**
+     * Retrieve the list of {@link BaseObject} defining UI extensions.
+     *
+     * @param extensionsDoc the document to retrieve the definitions from
+     * @return the list of {@link BaseObject} defining UI extensions in the given document
+     * @throws WikiComponentException if no extension definition can be found in the document
+     */
+    private List<BaseObject> getExtensionDefinitions(XWikiDocument extensionsDoc) throws WikiComponentException
+    {
+        // Check whether this document contains a listener definition.
+        List<BaseObject> extensionDefinitions = extensionsDoc.getXObjects(UI_EXTENSION_CLASS);
+
+        if (extensionDefinitions.size() == 0) {
+            throw new WikiComponentException(String.format("No UI extension object could be found in document [%s]",
+                extensionsDoc.getPrefixedFullName()));
+        }
+
+        return extensionDefinitions;
+    }
+
     @Override
     public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
     {
@@ -115,47 +163,32 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
         try {
             doc = getXWikiContext().getWiki().getDocument(reference, getXWikiContext());
-
-            if (!getXWikiContext().getWiki().getRightService().hasAccessLevel("admin", doc.getContentAuthor(),
-                "XWiki.XWikiPreferences", getXWikiContext())) {
-                throw new WikiComponentException("Registering UI extensions requires admin rights at the wiki level");
-            }
         } catch (XWikiException e) {
-            throw new WikiComponentException("Failed to create UI Extension(s)", e);
+            throw new WikiComponentException(
+                String.format("Failed to create UI Extension(s) document [%s]", reference), e);
         }
 
-        // Check whether this document contains a listener definition.
-        List<BaseObject> extensionDefinitions = doc.getXObjects(UI_EXTENSION_CLASS);
-
-        if (extensionDefinitions.size() == 0) {
-            throw new WikiComponentException(String.format("No UI extension object could be found in document [%s]",
-                doc.getPrefixedFullName()));
-        }
-
-        for (BaseObject extensionDefinition : extensionDefinitions) {
+        for (BaseObject extensionDefinition : this.getExtensionDefinitions(doc)) {
             // Extract extension definition.
             String id = extensionDefinition.getStringValue(ID_PROPERTY);
             String extensionPointId = extensionDefinition.getStringValue(EXTENSION_POINT_ID_PROPERTY);
             String content = extensionDefinition.getStringValue(CONTENT_PROPERTY);
             Map<String, String> parameters = parseParameters(extensionDefinition.getStringValue(PARAMETERS_PROPERTY));
+            WikiComponentScope scope =
+                WikiComponentScope.fromString(extensionDefinition.getStringValue(SCOPE_PROPERTY));
 
-            try {
-                Parser parser = componentManager.getInstance(Parser.class, doc.getSyntax().toIdString());
+            // Before going further we need to check the document author is authorized to register the extension
+            this.checkRights(doc, scope);
 
-                try {
-                    XDOM xdom = parser.parse(new StringReader(content));
-                    WikiUIExtension extension =
-                        new WikiUIExtension(extensionDefinition.getReference(), id, extensionPointId, xdom,
-                            doc.getSyntax(), parameters, componentManager);
-                    extensions.add(extension);
-                } catch (ParseException e) {
-                    throw new WikiComponentException(
-                        String.format("Failed to find parse content of extension [{}]", id));
-                }
-            } catch (ComponentLookupException e) {
-                throw new WikiComponentException(String.format("Failed to find a parser for syntax [{}]",
-                    doc.getSyntax().toIdString()));
-            }
+            XDOM xdom = contentParser.parse(content, doc.getSyntax());
+            WikiUIExtension extension =
+                new WikiUIExtension(id, extensionPointId, extensionDefinition.getReference(),
+                    doc.getAuthorReference(),  componentManager);
+            extension.setXDOM(xdom);
+            extension.setSyntax(doc.getSyntax());
+            extension.setParameters(parameters);
+            extension.setScope(scope);
+            extensions.add(extension);
         }
 
         return extensions;
@@ -168,8 +201,10 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     public List<DocumentReference> getDocumentReferences()
     {
         List<DocumentReference> results = new ArrayList<DocumentReference>();
+        // Note that the query is made to work with Oracle which treats empty strings as null.
         String query = ", BaseObject as obj, StringProperty as epId where obj.className=? "
-            + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? and epId.value <>''";
+            + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? "
+            + "and  (epId.value <> '' or (epId.value is not null and '' is null))";
         List<String> parameters = new ArrayList<String>();
         parameters.add(this.compactWikiSerializer.serialize(UI_EXTENSION_CLASS));
         parameters.add(EXTENSION_POINT_ID_PROPERTY);

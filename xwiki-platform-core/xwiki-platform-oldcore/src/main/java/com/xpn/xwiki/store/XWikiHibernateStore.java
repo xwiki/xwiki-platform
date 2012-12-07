@@ -491,6 +491,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 } else {
                     doc.setXClassXML("");
                 }
+                bclass.setDirty(false);
             }
 
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
@@ -775,6 +776,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.fromXML(cxml);
                 bclass.setDocumentReference(doc.getDocumentReference());
                 doc.setXClass(bclass);
+                bclass.setDirty(false);
             }
 
             // Store this XWikiClass in the context so that we can use it in case of recursive usage
@@ -857,6 +859,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
+
+            doc.setContentDirty(false);
+            doc.setMetaDataDirty(false);
+
             // We need to ensure that the loaded document becomes the original document
             doc.setOriginalDocument(doc.clone());
 
@@ -881,9 +887,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
-
-        doc.setContentDirty(false);
-        doc.setMetaDataDirty(false);
 
         LOGGER.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
 
@@ -1360,6 +1363,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         stringProperty.setValue("");
                     }
                 }
+                ((BaseProperty) property).setValueDirty(false);
             } catch (ObjectNotFoundException e) {
                 // Let's accept that there is no data in property tables but log it
                 if (LOGGER.isErrorEnabled()) {
@@ -1421,6 +1425,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 session.update(property);
             }
 
+            ((BaseProperty) property).setValueDirty(false);
+
             if (bTransaction) {
                 endTransaction(context, true);
             }
@@ -1461,6 +1467,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             List<XWikiAttachment> list = query.list();
             for (XWikiAttachment attachment : list) {
                 attachment.setDoc(doc);
+                attachment.setMetaDataDirty(false);
             }
             doc.setAttachmentList(list);
             if (bTransaction) {
@@ -2849,6 +2856,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        // Note that the query is made to work with Oracle which treats empty strings as null.
         String hql = "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
             + "and (doc.language <> '' or (doc.language is not null and '' is null))";
         ArrayList<String> params = new ArrayList<String>();

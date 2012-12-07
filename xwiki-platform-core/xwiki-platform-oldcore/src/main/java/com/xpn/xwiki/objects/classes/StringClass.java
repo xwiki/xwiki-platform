@@ -23,6 +23,7 @@ import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -88,9 +89,10 @@ public class StringClass extends PropertyClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilter(new XMLAttributeValueFilter());
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("text");

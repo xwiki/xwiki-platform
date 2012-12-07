@@ -33,7 +33,15 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 public interface HibernateDataMigration extends DataMigration
 {
     /**
-     * @return a changelog file for the liquibase database refactoring
+     * @return some liquibase changelogs for refactoring the database before the hibernate schema update is processed
+     * @throws com.xpn.xwiki.store.migration.DataMigrationException on error
+     * @since 4.3
+     */
+    String getPreHibernateLiquibaseChangeLog() throws DataMigrationException;
+
+    /**
+     * @return some liquibase changelogs for refactoring the database after the hibernate schema update has been
+     *         processed
      * @throws com.xpn.xwiki.store.migration.DataMigrationException on error
      * @since 4.0M1
      */

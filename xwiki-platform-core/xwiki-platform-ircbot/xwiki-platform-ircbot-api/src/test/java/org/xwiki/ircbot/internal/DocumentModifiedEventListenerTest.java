@@ -60,10 +60,8 @@ public class DocumentModifiedEventListenerTest extends AbstractMockingComponentT
     private EventListener listener;
 
     @Before
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         Utils.setComponentManager(getComponentManager());
 
         this.listener = getComponentManager().getInstance(EventListener.class, "ircdocumentmodified");

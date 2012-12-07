@@ -19,15 +19,19 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+
 /**
- * Unit tests for the {@link BaseElement} class.
+ * Unit tests for the {@link BaseObject} class.
  * 
  * @version $Id$
  */
@@ -127,5 +131,28 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals(new DocumentReference("wiki", "space", "class"), baseObject.getXClassReference());
         Assert.assertEquals(new EntityReference("class", EntityType.DOCUMENT, new EntityReference("space",
             EntityType.SPACE)), baseObject.getRelativeXClassReference());
+    }
+
+    @Test
+    public void testMerge()
+    {
+        BaseObject previousObject = new BaseObject();
+        previousObject.setStringValue("str", "");
+        BaseObject nextObject = new BaseObject();
+        nextObject.setStringValue("str", "Panels.Applications,Panels.QuickLinks,Panels.RecentModifications");
+        BaseObject currentObject = new BaseObject();
+        currentObject.setStringValue("str", "Panels.QuickLinks,Panels.RecentModifications");
+
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+        MergeResult mergeResult = new MergeResult();
+
+        currentObject.merge(previousObject, nextObject, mergeConfiguration, getContext(), mergeResult);
+
+        if (mergeResult.getLog().getLogsFrom(LogLevel.WARN).size() > 0) {
+            Assert.fail("Found error or warning during the merge");
+        }
+
+        Assert.assertEquals("Panels.Applications,Panels.QuickLinks,Panels.RecentModifications",
+            currentObject.getStringValue("str"));
     }
 }

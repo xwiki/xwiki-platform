@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-uiextension</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-uiextension-test</artifactId>
   <name>XWiki Platform - User Interface Extension - Functional Tests</name>
@@ -67,6 +67,23 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
+         systems go through SLF4J -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

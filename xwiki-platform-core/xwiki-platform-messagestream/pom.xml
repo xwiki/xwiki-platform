@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-messagestream</artifactId>
   <name>XWiki Platform - Message Stream</name>
@@ -63,19 +63,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

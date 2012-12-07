@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-code</artifactId>
   <name>XWiki Platform - Rendering - Macro - Code</name>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.4-xwiki</version>
+      <version>1.5-xwiki</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

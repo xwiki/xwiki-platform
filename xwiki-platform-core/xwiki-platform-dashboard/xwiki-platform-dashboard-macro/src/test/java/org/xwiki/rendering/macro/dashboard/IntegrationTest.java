@@ -99,12 +99,12 @@ public class IntegrationTest
                         "someVelocityCodeHere", true)), "1,1"))));
 
                 // Mock gadget for macrodashboard1.test
-                allowing(mockGadgetSource).getGadgets(with(any(String.class)),
+                allowing(mockGadgetSource).getGadgets((String) with(anything()),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
                     .<Block> asList(new WordBlock("content")), "1,1"))));
 
-                allowing(mockGadgetSource).getDashboardSourceMetadata(with(any(String.class)),
+                allowing(mockGadgetSource).getDashboardSourceMetadata((String) with(anything()),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Collections.<Block> emptyList()));
 

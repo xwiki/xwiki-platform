@@ -51,7 +51,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
-        
+
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
 
         this.tool = new XWikiMessageTool(new TestResources(), getContext());
@@ -303,8 +303,8 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
             .method("getDocument")
             .with(eq("Space1.Doc1"), ANYTHING)
             .will(
-                returnValue(createDocumentWithTrans(111111L, "Space1.Doc1", "somekey=some\u00E9value\nsomekey2=some\\u00E9value2",
-                    "somekey=somevaluetrans", false)));
+                returnValue(createDocumentWithTrans(111111L, "Space1.Doc1",
+                    "somekey=some\u00E9value\nsomekey2=some\\u00E9value2", "somekey=somevaluetrans", false)));
 
         assertEquals("some\u00E9value", this.tool.get("somekey"));
         assertEquals("some\u00E9value2", this.tool.get("somekey2"));

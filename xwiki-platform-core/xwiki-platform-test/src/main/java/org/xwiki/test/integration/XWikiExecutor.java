@@ -32,7 +32,6 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -179,17 +178,17 @@ public class XWikiExecutor
     public void start() throws Exception
     {
         if (SKIP_STARTING_XWIKI_INSTANCE.equals("true")){
-            System.out.println(String.format("Using running instance at [%s:%s]", URL, getPort()));
+            LOGGER.info("Using running instance at [{}:{}]", URL, getPort());
         }
         else {
-            System.out.println(String.format("Starting XWiki server at [%s:%s]", URL, getPort()));
+            LOGGER.info("Starting XWiki server at [{}:{}]", URL, getPort());
             // First, verify if XWiki is started. If it is then don't start it again.
             this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
             if (!this.wasStarted) {
                 startXWikiInSeparateThread();
                 waitForXWikiToLoad();
             } else {
-                System.out.println("XWiki server is already started!");
+                LOGGER.info("XWiki server is already started!");
             }
         }
     }
@@ -259,18 +258,17 @@ public class XWikiExecutor
     private void waitForXWikiToLoad() throws Exception
     {
         // Wait till the main page becomes available which means the server is started fine
-        System.out.println("Checking that XWiki is up and running...");
+        LOGGER.info("Checking that XWiki is up and running...");
 
         Response response = isXWikiStarted(getURL(), TIMEOUT_SECONDS);
         if (response.timedOut) {
-            String message =
-                "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code [" + response.responseCode
-                    + ", message [" + new String(response.responseBody) + "]";
-            System.out.println(message);
+            String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
+                TIMEOUT_SECONDS, response.responseCode, new String(response.responseBody));
+            LOGGER.info(message);
             stop();
             throw new RuntimeException(message);
         } else {
-            System.out.println("Server is answering to [" + getURL() + "]... cool");
+            LOGGER.info("Server is answering to [{}]... cool", getURL());
         }
     }
 
@@ -301,8 +299,8 @@ public class XWikiExecutor
                 response.responseBody = method.getResponseBody();
 
                 if (DEBUG) {
-                    System.out.println(String.format("Result of pinging [%s] = [%s], Message = [%s]", url,
-                        response.responseCode, new String(response.responseBody)));
+                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url,
+                        response.responseCode, new String(response.responseBody));
                 }
 
                 // check the http response code is either not an error, either "unauthorized"
@@ -326,7 +324,7 @@ public class XWikiExecutor
         if (!this.wasStarted) {
             createStopTask().execute();
         }
-        System.out.println("XWiki server stopped");
+        LOGGER.info("XWiki server stopped");
     }
 
     public String getWebInfDirectory()
@@ -377,7 +375,7 @@ public class XWikiExecutor
                 fis.close();
             }
         } catch (FileNotFoundException e) {
-            LOGGER.debug("Failed to load properties [" + path + "]", e);
+            LOGGER.debug("Failed to load properties [{}]", path, e);
         }
 
         return properties;

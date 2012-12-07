@@ -41,6 +41,7 @@
 #-# A list of Java regex patterns matching full documents reference.
 # core.renderingcache.documents=wiki:Space\.Page
 # core.renderingcache.documents=wiki:Space\..*
+# core.renderingcache.documents=Space\.PageOnWhateverWiki
 
 #-# [Since 2.4M1]
 #-# The time (in seconds) after which data should be removed from the cache when not used.
@@ -430,6 +431,16 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# * id can be anything as long as there is only one
 #-# * type is the type of the repository (maven, xwiki, etc.)
 #-# * url is the URL or the root of the repository
+#-# 
+#-# [Since 4.3] It's also possible to associate various properties to each repository.
+#-# Here are the standard properties:
+#-# * user: the user to use to authenticate to the repository
+#-# * password: the password to use to authenticate to the repository
+#-# 
+#-# Here is an example:
+# extension.repositories=privatemavenid:maven:http://host.com/private/maven/
+# extension.repositories.privatemavenid.auth.user=someuser
+# extension.repositories.privatemavenid.auth.password=thepassword
 #-# 
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public

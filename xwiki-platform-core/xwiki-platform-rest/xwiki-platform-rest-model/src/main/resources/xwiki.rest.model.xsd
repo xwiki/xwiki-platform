@@ -73,6 +73,8 @@
         <sequence>
           <element name="id" type="string"></element>
           <element name="name" type="string"></element>
+          <element name="description" type="string"></element>
+          <element name="owner" type="string"></element>
         </sequence>
       </extension>
     </complexContent>

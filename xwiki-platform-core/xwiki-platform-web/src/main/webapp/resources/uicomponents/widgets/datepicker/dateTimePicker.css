@@ -1,0 +1,6 @@
+input[type="text"].datetime {
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/calendar.png')");
+  background-position: .3em center;
+  background-repeat: no-repeat;
+  padding-left: 2em;
+}

@@ -67,7 +67,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * Cache for already served images.
      */
-    private Cache<byte[]> imageCache;
+    private Cache<XWikiAttachment> imageCache;
 
     /**
      * The size of the cache. This parameter can be configured using the key {@code xwiki.plugin.image.cache.capacity}.
@@ -260,9 +260,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
         initCache(context);
 
         boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
-        XWikiAttachment thumbnail =
-            this.imageCache == null ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
+
+        XWikiAttachment thumbnail = (this.imageCache == null)
+                ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
                 : downloadImageFromCache(image, width, height, keepAspectRatio, quality, context);
+
         // If the image has been transformed, update the file name extension to match the image format.
         String fileName = thumbnail.getFilename();
         String extension = StringUtils.lowerCase(StringUtils.substringAfterLast(fileName, String.valueOf('.')));
@@ -293,14 +295,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String key =
             String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
                 quality);
-        byte[] data = this.imageCache.get(key);
-        XWikiAttachment thumbnail;
-        if (data != null) {
-            thumbnail = (XWikiAttachment) image.clone();
-            thumbnail.setContent(new ByteArrayInputStream(data), data.length);
-        } else {
+
+        XWikiAttachment thumbnail = this.imageCache.get(key);
+        if (thumbnail == null) {
             thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
-            this.imageCache.set(key, thumbnail.getContent(context));
+            this.imageCache.set(key, thumbnail);
         }
         return thumbnail;
     }
@@ -345,13 +344,14 @@ public class ImagePlugin extends XWikiDefaultPlugin
         // Scale the image to the new dimensions.
         RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
 
-        // Write the shrunk image to a byte array output stream.
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        this.imageProcessor.writeImage(shrunkImage, attachment.getMimeType(context), quality, bout);
-
         // Create an image attachment for the shrunk image.
         XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
-        thumbnail.setContent(new ByteArrayInputStream(bout.toByteArray()), bout.size());
+        thumbnail.loadContent(context);
+
+        this.imageProcessor.writeImage(shrunkImage,
+                                       attachment.getMimeType(context),
+                                       quality,
+                                       thumbnail.getAttachment_content().getContentOutputStream());
 
         return thumbnail;
     }

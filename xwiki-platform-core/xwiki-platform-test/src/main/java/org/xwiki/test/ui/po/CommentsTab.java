@@ -39,9 +39,9 @@ public class CommentsTab extends ViewPage
     @FindBy(id = "XWiki.XWikiComments_author")
     private WebElement anonymousCommentAuthor;
 
-    CommentDeleteConfirmationModal confirmDelete;
+    private ConfirmationModal confirmDelete;
 
-    List<WebElement> commentsList;
+    private List<WebElement> commentsList;
 
     public String getCurrentAuthor()
     {
@@ -63,7 +63,7 @@ public class CommentsTab extends ViewPage
 
     public int getCommentID(String content)
     {
-        this.commentsList = getDriver().findElements(By.className("xwikicomment"));
+        this.commentsList = getUtil().findElementsWithoutWaiting(getDriver(), By.className("xwikicomment"));
 
         for (int i = 0; i < this.commentsList.size(); i++) {
             if (this.commentsList.get(i).findElement(By.className("commentcontent")).getText().equals(content)) {
@@ -79,7 +79,7 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm getAddCommentForm()
     {
-        return new CommentForm(getDriver().findElement(By.id("AddComment")));
+        return new CommentForm(By.id("AddComment"));
     }
 
     public int postComment(String content, boolean wait)
@@ -102,7 +102,7 @@ public class CommentsTab extends ViewPage
     public void deleteCommentByID(int id)
     {
         getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='delete']")).click();
-        this.confirmDelete = new CommentDeleteConfirmationModal();
+        this.confirmDelete = new ConfirmationModal();
         this.confirmDelete.clickOk();
         waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
         getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"))
@@ -117,7 +117,8 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
+        getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
         return getAddCommentForm();
     }
 
@@ -136,9 +137,10 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm editCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
+        getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
         waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
-        return new CommentForm(getDriver().findElement(By.className("edit-xcomment")));
+        return new CommentForm(By.className("edit-xcomment"));
     }
 
     public void editCommentByID(int id, String content)
@@ -151,22 +153,22 @@ public class CommentsTab extends ViewPage
 
     public String getCommentAuthorByID(int id)
     {
-        return getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//span[@class='commentauthor']"))
-            .getText();
+        return getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//span[@class='commentauthor']")).getText();
     }
 
     public String getCommentContentByID(int id)
     {
-        return getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//div[@class='commentcontent']"))
-            .getText();
+        return getUtil().findElementWithoutWaiting(getDriver(),
+            By.xpath("//div[@id='xwikicomment_" + id + "']//div[@class='commentcontent']")).getText();
     }
 
     /**
      * @since 3.2M3
      */
-    public boolean hasEditbuttonForCommentByID(int commentId)
+    public boolean hasEditButtonForCommentByID(int commentId)
     {
-        return getDriver().findElements(
+        return getUtil().findElementsWithoutWaiting(getDriver(),
             By.xpath("//div[@id='xwikicomment_" + commentId + "']//a[@class='edit']")).size() > 0;
     }
 }

@@ -126,7 +126,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
-        this.xwikiContext = context;
+        this.xwikiContext = context.clone();
 
         this.plugin = plugin;
 
@@ -264,7 +264,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     {
         while (true) {
             try {
-                IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_34, this.analyzer);
+                IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_36, this.analyzer);
                 if (create) {
                     cfg.setOpenMode(OpenMode.CREATE);
                 }

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
@@ -51,6 +52,18 @@ public class EditPage extends BasePage
 
     @FindBy(id = "xwikidocsyntaxinput2")
     protected WebElement syntaxIdSelect;
+
+    /**
+     * The top floating edit menu bar.
+     */
+    @FindBy(id = "editmenu")
+    private WebElement editMenuBar;
+
+    /**
+     * The entry on the edit menu bar that displays the current editor and allows us to switch the editor.
+     */
+    @FindBy(id = "tmCurrentEditor")
+    private WebElement currentEditorMenu;
 
     /**
      * Enumerates the available editors.
@@ -115,7 +128,7 @@ public class EditPage extends BasePage
         this.saveandcontinue.click();
 
         // Wait until the page is really saved
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Saved']"));
+        waitForNotificationSuccessMessage("Saved");
     }
 
     public ViewPage clickSaveAndView()
@@ -167,7 +180,8 @@ public class EditPage extends BasePage
     @Override
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        hoverOverMenu("tmCurrentEditor");
+        // Hover the top (floating) edit menu bar then the current editor menu.
+        new Actions(getDriver()).moveToElement(editMenuBar).moveToElement(currentEditorMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 }

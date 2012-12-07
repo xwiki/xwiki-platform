@@ -61,7 +61,9 @@
   #end
   <a href='$doc.getURL()' class='share-backlink'>$msg.get('core.viewers.share.send.back', ["<em>${doc.displayTitle}</em>"])</a>
 #else ## Form not sent, display the UI
-$xwiki.jsx.use('XWiki.SharePage')
+#userPicker_import()
+#set ($discard = $xwiki.ssx.use('XWiki.SharePage'))
+#set ($discard = $xwiki.jsx.use('XWiki.SharePage'))
 <form class="xform" action="$doc.getURL('view', 'viewer=share')" method="post">
   <div class="hidden">
     <input type="hidden" name="form_token" value="$services.csrf.token" />
@@ -69,10 +71,10 @@ $xwiki.jsx.use('XWiki.SharePage')
   </div>
   <dl>
     <dt>
-      <label for="target">$msg.get('core.viewers.share.target')</label>
+      <label for="shareTarget">$msg.get('core.viewers.share.target')</label>
       <span class="xHint">$msg.get('core.viewers.share.target.hint')</span>
     </dt>
-    <dd><input type="text" name="target" id="target" value="" class="suggestUsers"/></dd>
+    <dd><input type="text" name="target" id="shareTarget" value="" /></dd>
     #set ($ownEmail = "$!{xwiki.getDocument($context.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
     #if ($ownEmail != '')
       <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($context.user, false)} $escapetool.xml("<${ownEmail}>")" /> $msg.get('core.viewers.share.target.ccMe')</label></dd>

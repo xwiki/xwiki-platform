@@ -63,7 +63,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 {
     /**
      * Name of the liquibase resource used to include additional change logs XMLs.
-     * If it exists, this ressource should contains at least one valid liquibase XML definition.
+     * If it exists, this resource should contains at least one valid liquibase XML definition.
      */
     private static final String LIQUIBASE_RESOURCE = "liquibase-xwiki/";
 
@@ -164,8 +164,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                 }
             });
         } catch (Exception e) {
-            throw new DataMigrationException(String.format("Unable to store data version into database %s",
-                context.getDatabase()), e);
+            throw new DataMigrationException(String.format("Unable to store new data version %d into database %s",
+                version.getVersion(), context.getDatabase()), e);
         }
     }
 
@@ -173,8 +173,9 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     @Override
     protected void updateSchema(Collection<XWikiMigration> migrations) throws DataMigrationException {
         try {
-            getStore().updateSchema(getXWikiContext(), true);
-            invokeLiquibase(migrations);
+            liquibaseUpdate(migrations, true);
+            hibernateShemaUpdate();
+            liquibaseUpdate(migrations, false);
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Unable to update schema of database %s",
                 getXWikiContext().getDatabase()), e);
@@ -182,32 +183,40 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     }
 
     /**
-     * Invoke liquibase to update the database schema if needed.
-     * @param migrations the list of migration that should be executed
-     * @throws XWikiException
-     * @throws DataMigrationException
-     * @since 4.0M1
+     * Run hibernate schema updates
+     * @throws DataMigrationException if the store is not accessible
      */
-    private void invokeLiquibase(Collection<XWikiMigration> migrations) throws XWikiException, DataMigrationException
+    private void hibernateShemaUpdate() throws DataMigrationException
     {
-        final StringBuilder changeLogs = new StringBuilder(10000);
-        boolean hasLiquibaseResource = false;
-
-        try {
-            hasLiquibaseResource = getClass().getClassLoader().getResources(LIQUIBASE_RESOURCE).hasMoreElements();
-        } catch (IOException ignored) {
-            // ignored
+        if (logger.isInfoEnabled()) {
+            logger.info("Checking Hibernate mapping and updating schema if needed for database [{}]",
+                getXWikiContext().getDatabase());
         }
+        getStore().updateSchema(getXWikiContext(), true);
+    }
 
-        if ((migrations == null || migrations.isEmpty()) && !hasLiquibaseResource) {
-            return;
-        }
-
-        changeLogs.append(getLiquibaseChangeLogHeader());
+    /**
+     * Get agregated liquibase change logs from a set of migration.
+     * @param migrations    the set of migration to visit
+     * @param preHibernate  if true, get pre-hibernate schema update changelogs.
+     * @return retrieved change logs
+     * @throws DataMigrationException if an issue occurs in a migrator during retrieval of a change log
+     * @since 4.3
+     */
+    private String getLiquibaseChangeLogs(Collection<XWikiMigration> migrations, boolean preHibernate)
+        throws DataMigrationException
+    {
+        StringBuilder changeLogs = new StringBuilder(10000);
         if (migrations != null) {
             for (XWikiMigration migration : migrations) {
                 if (migration.dataMigration instanceof HibernateDataMigration) {
-                    String changeLog = ((HibernateDataMigration)migration.dataMigration).getLiquibaseChangeLog();
+                    String changeLog;
+                    if (preHibernate) {
+                        changeLog =
+                            ((HibernateDataMigration)migration.dataMigration).getPreHibernateLiquibaseChangeLog();
+                    } else {
+                        changeLog = ((HibernateDataMigration)migration.dataMigration).getLiquibaseChangeLog();
+                    }
                     if (changeLog != null) {
                         changeLogs.append(changeLog);
                     }
@@ -215,22 +224,60 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             }
         }
 
-        if (hasLiquibaseResource) {
-            changeLogs.append("<includeAll path=\"" + LIQUIBASE_RESOURCE + "\"/>");
+        if (!preHibernate) {
+            // Add liquibase changes from resources if any
+            try {
+                if (getClass().getClassLoader().getResources(LIQUIBASE_RESOURCE).hasMoreElements()) {
+                    changeLogs.append("<includeAll path=\"" + LIQUIBASE_RESOURCE + "\"/>");
+                }
+            } catch (IOException ignored) {
+                // ignored
+            }
         }
+
+        return changeLogs.toString();
+    }
+
+    /**
+     * Run liquibase for a given set of change logs
+     * @param migrations    the set of migration to visit
+     * @param preHibernate  if true, use pre-hibernate schema update changelogs.
+     * @throws XWikiException
+     * @throws DataMigrationException
+     * @since 4.3
+     */
+    private void liquibaseUpdate(Collection<XWikiMigration> migrations, boolean preHibernate) throws XWikiException, DataMigrationException
+    {
+        String liquibaseChangeLogs = getLiquibaseChangeLogs(migrations, preHibernate);
+        if (liquibaseChangeLogs == null || liquibaseChangeLogs.length() == 0) {
+            return;
+        }
+
+        final String database = getXWikiContext().getDatabase();
+
+        if (logger.isInfoEnabled()) {
+            if( preHibernate ) {
+                logger.info("Running early schema updates (using liquibase) for database [{}]", database);
+            } else {
+                logger.info("Running additional schema updates (using liquibase) for database [{}]", database);
+            }
+        }
+
+        final StringBuilder changeLogs = new StringBuilder(10000);
+        changeLogs.append(getLiquibaseChangeLogHeader());
+        changeLogs.append(liquibaseChangeLogs);
         changeLogs.append(getLiquibaseChangeLogFooter());
 
-        // Get ids conversion list
-        getStore().executeRead(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeRead(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             @SuppressWarnings("unchecked")
             public Object doInHibernate(Session session) throws XWikiException
             {
-                
+
                 Liquibase lb;
                 try {
-                    lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME, 
+                    lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
                         new MigrationResourceAccessor(changeLogs.toString()),
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
                             new JdbcConnection(session.connection())));
@@ -238,7 +285,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                         String.format("Unable to launch liquibase for database %s, schema update failed.",
-                            getXWikiContext().getDatabase()), e);
+                            database), e);
                 }
 
                 try {
@@ -247,7 +294,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                         String.format("Unable to update schema of database %s.",
-                            getXWikiContext().getDatabase()), e);
+                            database), e);
                 }
 
                 return null;

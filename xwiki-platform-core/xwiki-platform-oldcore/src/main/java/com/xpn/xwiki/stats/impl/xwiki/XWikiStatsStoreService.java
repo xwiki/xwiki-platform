@@ -75,7 +75,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
      */
     public XWikiStatsStoreService(XWikiContext context)
     {
-        this.xwikiContext = context;
+        this.xwikiContext = context.clone();
         long queueSize = context.getWiki().ParamAsLong("stats.queue.size", 200);
         this.queue = new ArrayBlockingQueue<XWikiStatsStoreItem>((int) queueSize);
     }

@@ -31,8 +31,9 @@ import org.xwiki.diff.DiffManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.AbstractNotifyOnUpdateList;
+import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
@@ -42,15 +43,21 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
 
-    protected List<String> list = new AbstractNotifyOnUpdateList<String>() {
-        @Override
-        public void onUpdate()
-        {
-            setValueDirty(true);
-        }
-    };
+    /**
+     * We make this a notifying list, because we must propagate any value updates to the owner document.
+     */
+    protected transient List<String> list;
 
     private String formStringSeparator = "|";
+
+    /**
+     * This is the actual list.  It will be used during serialization/deserialization.
+     */
+    private List<String> actualList = new ArrayList<String>();
+
+    {
+        list = new NotifyList(actualList, this);
+    }
 
     public String getFormStringSeparator()
     {
@@ -151,33 +158,76 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public ListProperty clone()
     {
-        ListProperty property = (ListProperty) super.clone();
-        List<String> list = new ArrayList<String>();
-        for (String entry : getList()) {
-            list.add(entry);
-        }
-        property.setValue(list);
+        return (ListProperty) super.clone();
+    }
 
-        return property;
+    @Override
+    protected void cloneInternal(BaseProperty clone)
+    {
+        ListProperty property = (ListProperty) clone;
+        property.actualList = new ArrayList<String>();
+        for (String entry : getList()) {
+            property.actualList.add(entry);
+        }
+        property.list = new NotifyList(property.actualList, property);
     }
 
     public List<String> getList()
     {
+        // Hibernate will not set the owner of the notify list, so we must make sure this has been done before returning
+        // the list.
+        if (list instanceof NotifyList) {
+            ((NotifyList) list).setOwner(this);
+        } else if (list instanceof ListPropertyPersistentList) {
+            ((ListPropertyPersistentList) list).setOwner(this);
+        }
+
         return this.list;
     }
 
+    /**
+     * Starting from 4.3M2, this method will copy the list passed as parameter.  Due to XWIKI-8398 we must be able to
+     * detect when the values in the list changes, so we cannot store the values in any type of list.
+     * 
+     * @param list The list to copy.
+     */
     public void setList(List<String> list)
     {
+        if (list == this.list || list == this.actualList) {
+            // Accept a caller that sets the already existing list instance.
+            return;
+        } 
+
+        if (this.list instanceof ListPropertyPersistentList) {
+            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) this.list;
+            if (persistentList.isWrapper(list)) {
+                // Accept a caller that sets the already existing list instance.
+                return;
+            }
+        }
+
+        if (list instanceof ListPropertyPersistentList) {
+            // This is the list wrapper we are using for hibernate.
+            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) list;
+            this.list = persistentList;
+            persistentList.setOwner(this);
+            return;
+        }
+
         if (list == null) {
-            this.list = new ArrayList<String>();
+            setValueDirty(true);
+            actualList = new ArrayList();
+            this.list = new NotifyList(actualList, this);
         } else {
-            this.list = list;
-            // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
-            // safe to assume that a retrieved NULL value should actually be an empty string.
-            for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
-                if (it.next() == null) {
-                    it.remove();
-                }
+            this.list.clear();
+            this.list.addAll(list);
+        }
+
+        // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
+        // safe to assume that a retrieved NULL value should actually be an empty string.
+        for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
+            if (it.next() == null) {
+                it.remove();
             }
         }
     }
@@ -219,5 +269,75 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
         MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+    }
+
+    /**
+     * List implementation for updating dirty flag when updated.
+     *
+     * This will be accessed from ListPropertyUserType.
+     */
+    public static class NotifyList extends AbstractNotifyOnUpdateList<String>
+    {
+
+        /** The owner list property. */
+        private ListProperty owner;
+
+        /** The dirty flag. */
+        private boolean dirty;
+
+        private List<String> actualList;
+
+        /**
+         * @param list {@see AbstractNotifyOnUpdateList}.
+         */
+        public NotifyList(List<String> list)
+        {
+            super(list);
+            this.actualList = list;
+        }
+
+        private NotifyList(List<String>list, ListProperty owner)
+        {
+            this(list);
+
+            this.owner = owner;
+        }
+
+        @Override
+        public void onUpdate()
+        {
+            setDirty();
+        }
+
+        /**
+         * @param owner The owner list property.
+         */
+        public void setOwner(ListProperty owner)
+        {
+            if (dirty) {
+                owner.setValueDirty(true);
+            }
+            this.owner = owner;
+            owner.actualList = actualList;
+        }
+
+        /**
+         * @return {@literal true} if the given argument is the instance that this list wraps.
+         */
+        public boolean isWrapper(Object collection)
+        {
+            return actualList == collection;
+        }
+
+        /**
+         * Set the dirty flag.
+         */
+        private void setDirty()
+        {
+            if (owner != null) {
+                owner.setValueDirty(true);
+            }
+            dirty = true;
+        }
     }
 }

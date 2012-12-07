@@ -59,6 +59,21 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         this.storageFile = storage;
     }
 
+    /**
+     * Constructor that doesn't set the attachment.  This is necessary for loading attachment content without touching
+     * the dirty bit of the owner document.
+     *
+     * @param storage the file where the data is stored.
+     * @since 4.4M1
+     */
+    public FilesystemAttachmentContent(final File storage)
+    {
+        // TODO This will cause a new FileItem to be created in XWikiAttachmentContent
+        // but it is the only constructor available. This should be fixed in XAC.
+        super();
+        this.storageFile = storage;
+    }
+
     @Override
     public FilesystemAttachmentContent clone()
     {

@@ -66,6 +66,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("imagecaptcha", Right.LOGIN)
             .putAction("view", Right.VIEW)
             .putAction(DELETE_ACTION, Right.DELETE)
+            .putAction("distribution", Right.ADMIN)
             .putAction("admin", Right.ADMIN)
             .putAction("programing", Right.PROGRAM)
             .putAction("edit", Right.EDIT)

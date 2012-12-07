@@ -28,6 +28,9 @@
 #set ($discard = $xwiki.jsx.use('ExtensionCode.SkinExtension'))
 
 #set($repositoryConfigDoc = $xwiki.getDocument('ExtensionCode.RepositoryConfig'))
+#if ($repositoryConfigDoc.isNew())
+  $repositoryConfigDoc.setHidden(true)
+#end
 #set($repositoryConfigClassName = 'ExtensionCode.RepositoryConfigClass')
 #set($repositoryConfigClass = $xwiki.getDocument($repositoryConfigClassName).xWikiClass)
 #set($repositoryConfigObj = $repositoryConfigDoc.getObject($repositoryConfigClass.name))

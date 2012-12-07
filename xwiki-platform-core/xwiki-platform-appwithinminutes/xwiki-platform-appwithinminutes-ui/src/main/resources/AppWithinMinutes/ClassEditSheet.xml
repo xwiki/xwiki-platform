@@ -552,6 +552,7 @@ XWiki.FormField = Class.create({
           preview.update(response.responseText);
           this.previewData = data;
           document.fire('xwiki:class:previewField', {field: this});
+          document.fire('xwiki:dom:updated', {elements: [preview]});
         }.bind(this)
       });
     }
@@ -1127,7 +1128,7 @@ return XWiki;
   margin: 0;
 }
 
-#fields li {
+#fields &gt; li {
   border: 1px dotted $theme.pageContentBackgroundColor;
   list-style: none;
   /* Make sure the loading animation is properly displayed. */
@@ -1135,7 +1136,7 @@ return XWiki;
   padding: 0 0.5em 0.5em;
 }
 
-#fields li .toolBox {
+#fields &gt; li .toolBox {
   display: none;
   position: absolute;
   right: 0.5em;
@@ -1147,11 +1148,11 @@ return XWiki;
   margin: 2px;
 }
 
-#fields li:hover {
+#fields &gt; li:hover {
   border: 1px dotted $theme.borderColor;
 }
 
-#fields li:hover .toolBox {
+#fields &gt; li:hover .toolBox {
   display: block;
 }
 
@@ -1590,7 +1591,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(displayFieldProperty $property $prefix $field)
   #set($displayFormType = $property.getProperty('displayFormType'))
-  #if($property.type.indexOf('Boolean') != -1 &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
+  #if($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
     ; {{html clean="false"}}&lt;label for="$!{prefix}$property.name"&gt;#displayPropertyEditInput($property, $prefix, $field)$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
   #else
     ; {{html}}&lt;label for="${prefix}$property.name"&gt;$escapetool.xml($property.prettyName)&lt;/label&gt;{{/html}}
@@ -1605,7 +1606,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(displayPropertyEditInput $property $prefix $object)
   #set($wrappedProperty = $property.propertyClass)
-  #if("$!wrappedProperty.customDisplay" != '')
+  #if($wrappedProperty.isCustomDisplayed($xcontext.context))
     $xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object)
   #else
     $doc.displayEdit($property, $prefix, $object)
@@ -1616,8 +1617,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Called when a new form field is added via AJAX.
  *#
 #macro(displayNewField)
+  ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
+  ## The class editor moves this resource includes in the HTML page head.
   {{html}}
+  &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin --&gt;
   &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;
+  &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin --&gt;
   &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin --&gt;
   {{/html}}
 

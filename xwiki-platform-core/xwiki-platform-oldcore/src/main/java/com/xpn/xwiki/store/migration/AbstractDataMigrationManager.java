@@ -106,7 +106,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      * Logger.
      */
     @Inject
-    private Logger logger;
+    protected Logger logger;
 
     /**
      * Execution context used to access XWikiContext.
@@ -416,10 +416,11 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                     if ("1".equals(config.getProperty("xwiki.store.migration", "0"))
                         && !"0".equals(config.getProperty("xwiki.store.hibernate.updateschema"))) {
                         // Run migrations
-                        logger.info("Running storage schema updates and migrations");
+                        logger.info("Storage schema updates and data migrations are enabled");
 
                         startMigrations();
 
+                        // TODO: Improve or remove this which is inappropriate in a container environment
                         if ("1".equals(config.getProperty("xwiki.store.migration.exitAfterEnd", "0"))) {
                             logger.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
                             System.exit(0);
@@ -466,7 +467,6 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             int errorCount = 0;
             try {
                 for (String database : getDatabasesToMigrate()) {
-                    logger.info("Starting migration for database  [{}]...", database);
                     // Set up the context so that it points to the virtual wiki corresponding to the
                     // database.
                     context.setDatabase(database);
@@ -560,6 +560,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     {
         XWikiDBVersion curversion = getDBVersion();
         Collection<XWikiMigration> neededMigrations = new ArrayList<XWikiMigration>();
+        String database = null;
+        if (logger.isInfoEnabled()) {
+            database = getXWikiContext().getDatabase();
+        }
 
         for (XWikiMigration migration : this.migrations) {
             if (migration.isForced || (migration.dataMigration.getVersion().compareTo(curversion) > 0
@@ -571,15 +575,22 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         if (logger.isInfoEnabled()) {
             if (!neededMigrations.isEmpty()) {
-                logger.info("Current storage version = [{}]", curversion.toString());
-                logger.info("List of migrations that will be executed:");
+                logger.info(
+                    "The following data migration(s) will be applied for database [{}] currently in version [{}]:",
+                    database, curversion);
                 for (XWikiMigration migration : neededMigrations) {
                     logger.info("  {} - {}{}", new String[] {migration.dataMigration.getName(),
                         migration.dataMigration.getDescription(),
                         (migration.isForced ? " (forced)" : "")});
                 }
             } else {
-                logger.info("No storage migration required since current version is [{}]", curversion);
+                if (curversion != null) {
+                    logger.info("No data migration to apply for database [{}] currently in version [{}]",
+                        database, curversion);
+                } else {
+                    logger.info("No data migration to apply for empty database [{}]",
+                        database);
+                }
             }
         }
 
@@ -611,11 +622,15 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     protected void startMigrations(Collection<XWikiMigration> migrations) throws DataMigrationException
     {
         XWikiDBVersion curversion = getDBVersion();
+        String database = null;
+        if (logger.isInfoEnabled()) {
+            database = getXWikiContext().getDatabase();
+        }
 
         for (XWikiMigration migration : migrations) {
             if (logger.isInfoEnabled()) {
-                logger.info("Running migration [{}] with version [{}]", migration.dataMigration.getName(),
-                    migration.dataMigration.getVersion());
+                logger.info("Starting data migration [{}] with version [{}] on database [{}]",
+                    migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
             }
 
             migration.dataMigration.migrate();
@@ -624,17 +639,21 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 curversion = migration.dataMigration.getVersion();
                 setDBVersion(curversion);
                 if (logger.isInfoEnabled()) {
-                    logger.info("New storage version is now [{}]", getDBVersion());
+                    logger.info("Data migration [{}] applied successfully, database [{}] upgraded to version [{}]",
+                        migration.dataMigration.getName(), database, getDBVersion());
                 }
+            } else if (logger.isInfoEnabled()) {
+                logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
+                    migration.dataMigration.getName(), database, getDBVersion());
             }
         }
 
-        // If migration is launch on an empty DB, properly set the latest DB version
+        // If migration is launch on an empty DB or latest migration was unneeded, properly set the latest DB version
         if (curversion == null || getLatestVersion().compareTo(curversion) > 0) {
             setDBVersion(getLatestVersion());
             if (logger.isInfoEnabled() && curversion != null) {
-                logger.info("Latest migration(s) was unneeded, storage now forced to latest version [{}]",
-                    getDBVersion());
+                logger.info("Database [{}] upgraded to latest version [{}] without needing{} data migration",
+                    database, getDBVersion(), (migrations.size() > 0) ? " further" : "");
             }
         }
     }

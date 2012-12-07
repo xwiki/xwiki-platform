@@ -27,12 +27,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-api</artifactId>
-  <name>XWiki Platform - Repository - Server api</name>
+  <name>XWiki Platform - Repository - Server API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Repository - Server api</description>
+  <description>XWiki Platform - Repository - Server API</description>
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-server-api</xwiki.extension.features>

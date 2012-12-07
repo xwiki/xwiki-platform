@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -79,13 +79,13 @@
       <groupId>info.informatica</groupId>
       <artifactId>css4j</artifactId>
       <version>0.13</version>
-    </dependency>
-    <!-- TODO: Check if this dependency is really required at runtime -->
-    <dependency>
-      <groupId>info.informatica</groupId>
-      <artifactId>jclf</artifactId>
-      <version>2.3.0</version>
-      <scope>runtime</scope>
+      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -170,7 +170,6 @@
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
-      <version>2.8.1</version>
     </dependency>
 
     <!-- The platform -->
@@ -214,7 +213,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>4.2.0.Final</version>
+      <version>4.3.0.Final</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -240,6 +239,13 @@
       <groupId>securityfilter</groupId>
       <artifactId>securityfilter</artifactId>
       <version>2.0</version>
+      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- XML processing -->
@@ -250,18 +256,8 @@
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
-      <version>1.3.04</version>
     </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xmlParserAPIs</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-    <dependency>
-      <groupId>xpp3</groupId>
-      <artifactId>xpp3</artifactId>
-      <version>1.1.3.4-RC8</version>
-    </dependency>
+    <!-- Used to generate XHTML in Java (generally in object property displayer) -->
     <!-- TODO: We should drop ECS -->
     <dependency>
       <groupId>ecs</groupId>
@@ -310,6 +306,11 @@
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
         </exclusion>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -318,6 +319,13 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>fop</artifactId>
       <version>1.0</version>
+      <exclusions>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.avalon.framework</groupId>
@@ -356,7 +364,7 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <version>1.4</version>
+      <version>1.4.5</version>
     </dependency>
     <!-- Used by another tool, it should be removed some time -->
     <dependency>
@@ -566,8 +574,13 @@
       <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- User by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-logging-api</artifactId>
@@ -627,13 +640,6 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-xwiki10</artifactId>
       <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -752,10 +758,8 @@
               **/objects/classes/BaseClass.java,
               **/objects/classes/BooleanClass.java,
               **/objects/classes/ClassInterface.java,
-              **/objects/classes/DateClass.java,
               **/objects/classes/DBListClass.java,
               **/objects/classes/DBTreeListClass.java,
-              **/objects/classes/GroupsClass.java,
               **/objects/classes/LevelsClass.java,
               **/objects/classes/ListClass.java,
               **/objects/classes/ListItem.java,
@@ -766,8 +770,6 @@
               **/objects/classes/StaticListClass.java,
               **/objects/classes/StringClass.java,
               **/objects/classes/TextAreaClass.java,
-              **/objects/classes/UsersClass.java,
-              **/objects/DateProperty.java,
               **/objects/DBStringListProperty.java,
               **/objects/DoubleProperty.java,
               **/objects/ElementComparator.java,
@@ -777,21 +779,6 @@
               **/objects/LargeStringProperty.java,
               **/objects/ListProperty.java,
               **/objects/LongProperty.java,
-              **/objects/meta/BooleanMetaClass.java,
-              **/objects/meta/DateMetaClass.java,
-              **/objects/meta/DBListMetaClass.java,
-              **/objects/meta/DBTreeListMetaClass.java,
-              **/objects/meta/GroupsMetaClass.java,
-              **/objects/meta/LevelsMetaClass.java,
-              **/objects/meta/ListMetaClass.java,
-              **/objects/meta/MetaClass.java,
-              **/objects/meta/NumberMetaClass.java,
-              **/objects/meta/PasswordMetaClass.java,
-              **/objects/meta/PropertyMetaClass.java,
-              **/objects/meta/StaticListMetaClass.java,
-              **/objects/meta/StringMetaClass.java,
-              **/objects/meta/TextAreaMetaClass.java,
-              **/objects/meta/UsersMetaClass.java,
               **/objects/NumberProperty.java,
               **/objects/ObjectDiff.java,
               **/objects/ObjectInterface.java,
@@ -999,8 +986,9 @@
               **/web/XWikiDefaultURLFactory.java,
               **/web/XWikiEngineContext.java,
               **/web/XWikiForm.java,
-              **/web/XWikiPortletContext.java,
+              **/web/XWikiMessageTool.java,
               **/web/XWikiPortlet.java,
+              **/web/XWikiPortletContext.java,
               **/web/XWikiPortletRequest.java,
               **/web/XWikiPortletResponse.java,
               **/web/XWikiPortletURLFactory.java,
@@ -1073,54 +1061,4 @@
       </plugins>
     </pluginManagement>
   </build>
-  <profiles>
-    <profile>
-      <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for
-           debugging XWiki, especially in the case when you cannot debug the application (for
-           example when you cannot reproduce the problem on your machine you can send an
-           aspectified XWiki JAR and ask the user to run it and send you the logs). As this logs
-           everything you'll need to control what is logged by tuning the Log4J configuration file
-           to log only what you want. -->
-      <id>debug</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>aspectj-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>debug</id>
-                <goals>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <configuration>
-                    <aspectDirectory>src/main/aspect/debug</aspectDirectory>
-                  </configuration>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>clover</id>
-      <build>
-        <plugins>
-          <!-- We need to skip AspectJ execution when Clover is executed since AspectJ doesn't like
-               clovered code -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>aspectj-maven-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/*.*</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

@@ -19,17 +19,24 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.EmailClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
 /**
  * Email Field Class allows to create a field for email values. This will allow using a custom displayer assigned to
  * that field by default. The field also includes a default regexp for validation.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
+@Component
+@Named("Email")
+@Singleton
 public class EmailMetaClass extends StringMetaClass
 {
     /**
@@ -37,13 +44,12 @@ public class EmailMetaClass extends StringMetaClass
      */
     public EmailMetaClass()
     {
-        super();
         setPrettyName("Email");
-        setName(EmailClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
     }
 
     @Override
-    public BaseCollection newObject(XWikiContext context)
+    public PropertyClassInterface getInstance()
     {
         return new EmailClass();
     }

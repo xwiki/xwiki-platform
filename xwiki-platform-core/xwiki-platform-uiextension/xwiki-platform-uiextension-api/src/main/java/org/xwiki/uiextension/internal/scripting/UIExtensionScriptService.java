@@ -19,7 +19,6 @@
  */
 package org.xwiki.uiextension.internal.scripting;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionFilter;
+import org.xwiki.uiextension.UIExtensionManager;
 
 /**
  * Allows scripts to easily access Interface Extensions APIs.
@@ -63,6 +63,12 @@ public class UIExtensionScriptService implements ScriptService
     private Provider<ComponentManager> contextComponentManagerProvider;
 
     /**
+     * The default UIExtensionManager.
+     */
+    @Inject
+    private UIExtensionManager uiExtensionManager;
+
+    /**
      * Utility method to split a list of extension names, for example {code}"Panels.Apps,Panels.QuickLinks"{code} to get
      * a List containing those names.
      *
@@ -82,20 +88,16 @@ public class UIExtensionScriptService implements ScriptService
      */
     public List<UIExtension> getExtensions(String extensionPointId)
     {
-        List<UIExtension> extensions = new ArrayList<UIExtension>();
+        UIExtensionManager manager;
 
         try {
-            List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
-            for (UIExtension extension : allExtensions) {
-                if (extension.getExtensionPointId().equals(extensionPointId)) {
-                    extensions.add(extension);
-                }
-            }
+            // Look for a specific UI extension manager for the given extension point
+            manager = contextComponentManagerProvider.get().getInstance(UIExtensionManager.class, extensionPointId);
         } catch (ComponentLookupException e) {
-            logger.error("Failed to lookup UIExtension instances, error: [{}]", e);
+            manager = uiExtensionManager;
         }
 
-        return extensions;
+        return manager.get(extensionPointId);
     }
 
     /**

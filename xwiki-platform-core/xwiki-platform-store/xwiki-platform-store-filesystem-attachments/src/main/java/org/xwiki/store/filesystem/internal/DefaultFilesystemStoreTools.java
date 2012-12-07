@@ -110,8 +110,11 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
 
     /**
      * A means of acquiring locks for attachments.
+     * Because the attachments temp files are randomly named and rename is atomic, locks are not needed.
+     * DummyLockProvider provides fake locks.
      */
     @Inject
+    @Named("dummy")
     private LockProvider lockProvider;
 
     /**

@@ -76,10 +76,14 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public BaseStringProperty clone()
     {
-        BaseStringProperty property = (BaseStringProperty) super.clone();
-        property.setValue(getValue());
+        return (BaseStringProperty) super.clone();
+    }
 
-        return property;
+    @Override
+    protected void cloneInternal(BaseProperty clone)
+    {
+        BaseStringProperty property = (BaseStringProperty) clone;
+        property.setValue(getValue());
     }
 
     @Override

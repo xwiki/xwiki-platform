@@ -27,10 +27,10 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration</artifactId>
-  <name>XWiki Platform - Administration</name>
+  <name>XWiki Platform - Administration - Parent POM</name>
   <packaging>pom</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
   <modules>

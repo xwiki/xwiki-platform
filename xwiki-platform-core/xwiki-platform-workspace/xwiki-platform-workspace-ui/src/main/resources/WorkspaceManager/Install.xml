@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{velocity}}
 #set ($needsAdminRights = false)
 ##
@@ -326,7 +326,7 @@
         #if ($xwiki.exists($documentReferenceToRemove))
           #set ($documentToRemove = $xwiki.getDocument($documentReferenceToRemove))
           #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-          ## Make sure not to leave anything in the recycle bin so don`t send to trash.
+          ## Make sure not to leave anything in the recycle bin so don't send to trash.
           #set ($discard = $xwiki.xWiki.deleteDocument($documentToRemove.document, false, $xcontext.context))
           #set ($discard = $xcontext.setDatabase($currentDatabase))
         #end

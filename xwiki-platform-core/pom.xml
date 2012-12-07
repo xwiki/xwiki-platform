@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -40,48 +40,15 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
-      <!-- Groovy engine -->
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <version>1.8.6</version>
-      </dependency>
       <!-- Jython engine -->
       <dependency>
         <groupId>org.python</groupId>
@@ -92,7 +59,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.1.0.Final</version>
+        <version>3.2.0.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
@@ -111,6 +78,24 @@
             <artifactId>boilerpipe</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <!-- Rome is used in rss macro and feed api modules and in Tika -->
+      <dependency>
+        <groupId>rome</groupId>
+        <artifactId>rome</artifactId>
+        <version>1.0</version>
+        <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
+        <exclusions>
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>rome</groupId>
+        <artifactId>rome-fetcher</artifactId>
+        <version>1.0</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -140,6 +125,11 @@
           <exclusion>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
+          </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -264,117 +254,42 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <!-- List of specific CLIRR excludes. Example:
+
+               <difference>
+                 <className>org/xwiki/ircbot/IRCBot</className>
+                 <method>void initialize(java.lang.String)</method>
+                 <differenceType>7012</differenceType>
+                 <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                 IRC Bot application in a subwiki</justification>
+               </difference>
+               
+               See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
+          -->
           <ignored>
+            <!-- Remove the following ignores after we release the current version as final -->
             <difference>
-              <className>org/xwiki/ircbot/IRCBot</className>
-              <method>void initialize(java.lang.String)</method>
-              <differenceType>7012</differenceType>
-              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
-                IRC Bot application in a subwiki</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.lang.Class getRole()</method>
+              <className>com/xpn/xwiki/objects/ListProperty</className>
+              <method>void setUseHibernateWorkaround(boolean)</method>
               <differenceType>7002</differenceType>
-              <justification>WikiComponent is still a young API. Removed the method to implement XWIKI-8233, 
-                "Allow wiki components to implement parameterized types"</justification>
+              <justification>The hibernate workaround added in 4.3M2 have been replaced with a cleaner solution.</justification>
             </difference>
             <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.lang.reflect.Type getRoleType()</method>
-              <differenceType>7012</differenceType>
-              <justification>WikiComponent is still a young API. Added this method to implement XWIKI-8233, 
-                "Allow wiki components to implement parameterized types"</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.util.Map getHandledMethods()</method>
+              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
+              <method>void addListPropertyWorkaroundHandler(com.xpn.xwiki.objects.PropertyInterface)</method>
               <differenceType>7002</differenceType>
-              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
-              </justification>
+              <justification>The hibernate workaround added in 4.3M2 have been replaced with a cleaner solution.</justification>
             </difference>
             <difference>
-              <className>org/xwiki/component/wiki/WikiComponent</className>
-              <method>java.util.List getImplementedInterfaces()</method>
-              <differenceType>7002</differenceType>
-              <justification>WikiComponent is still a young API. Removed the method since it wasn't useful here
-              </justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/MethodOutputHandler</className>
+              <className>com/xpn/xwiki/util/AbstractNotifyOnUpdateList</className>
               <differenceType>8001</differenceType>
-              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/component/wiki/WikiComponentInvocationHandler</className>
-              <differenceType>8001</differenceType>
-              <justification>WikiComponent is still a young API. Moved the class to the internal package</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/uiextension/UIExtension</className>
-              <method>java.util.List execute()</method>
-              <differenceType>7006</differenceType>
-              <to>org.xwiki.rendering.block.Block</to>
-              <justification>UIExtension is still a young API. Replaced the List of Block by a Block since Block can
-                can now hold a list of Block</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/uiextension/UIExtension</className>
-              <method>java.lang.String getName()</method>
-              <differenceType>7002</differenceType>
-              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/uiextension/UIExtension</className>
-              <method>java.lang.String getId()</method>
-              <differenceType>7012</differenceType>
-              <justification>UIExtension is still a young API. getName() has been renamed to getId()</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/objects/ElementInterface</className>
-              <method>boolean apply(com.xpn.xwiki.objects.ElementInterface, boolean)</method>
-              <differenceType>7012</differenceType>
-              <justification>Added a common method to all elements to set all the data from another element.
-                Technically this does not really break anything because all elements are supposed to extends BaseElement</justification>
+              <justification>The AbtractNotifyOnUpdateList wrapper class no longer inherits ArrayList, because it is used as a non-static enclosed class in XWikiDocument, which is non-serializable, so the list wrapper cannot be serializeble.  Let's move the entire class to an internal package while we are at it.</justification>
             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
-            <!-- FIXME: A new 'sendMessageFromTemplate' method was added before the 4.2 release and then removed only
-                 from master (4.3-SNAPSHOT). We need to decide what we do with this method. -->
-            <exclude>com/xpn/xwiki/plugin/mailsender/MailSender</exclude>
-            <!-- Ignoring error on field version which has been moved from Page to PageSummary which is the superclass of Page -->
-            <exclude>org/xwiki/rest/model/jaxb/Page</exclude>
-            <!-- Ignoring error on rest DomainObjectFactory as it is internal code -->
-            <exclude>org/xwiki/rest/DomainObjectFactory</exclude>
-            <exclude>org/xwiki/rest/resources/**</exclude>
-            <!-- Moved a lot of previously public API to internal packages. The initial implementation put everything in public
-                 packages which is wrong. This move is to correct the initial error, and leave in public packages only the
-                 classes that are really part of a public API. (See discussion: http://xwiki.markmail.org/thread/iqktyceut5bmw4rl)
-                 Remove this check on the next release (i.e. 4.3-M2) -->
-            <exclude>org/xwiki/rest/exceptions/**</exclude>
-            <exclude>org/xwiki/rest/representations/**</exclude>
-            <exclude>org/xwiki/rest/ComponentsObjectFactory</exclude>
-            <exclude>org/xwiki/rest/Constants</exclude>
-            <exclude>org/xwiki/rest/RangeIterable</exclude>
-            <exclude>org/xwiki/rest/Utils</exclude>
-            <exclude>org/xwiki/rest/XWikiAuthentication</exclude>
-            <exclude>org/xwiki/rest/XWikiJaxRsApplication</exclude>
-            <exclude>org/xwiki/rest/XWikiRestletJaxRsApplication</exclude>
-            <exclude>org/xwiki/rest/XWikiRestletServlet</exclude>
-            <exclude>org/xwiki/rest/XWikiSecretVerifier</exclude>
-            <exclude>org/xwiki/rest/XWikiSetupCleanupFilter</exclude>
-            <!-- Not a breakage! The plugin has been moved to its own module. -->
-            <exclude>com/xpn/xwiki/plugin/feed/**/*</exclude>
-            <!-- Module has been retired as it was unmaintained. -->
-            <exclude>com/xpn/xwiki/plugin/userdirectory/**/*</exclude>
-            <!-- Module has been retired as it was unmaintained. -->
-            <exclude>com/xpn/xwiki/plugin/usertools/**/*</exclude>
-            <!-- Added methods for creating workspaces and retrieving workspace templates.
-                 Vote mail: http://markmail.org/thread/gtxoszztc5lt7o4f
-                 Remove this check on the next release (i.e., 4.3-M2) -->
-            <exclude>org/xwiki/workspace/WorkspaceManager</exclude>
+            <!-- Remove the following excludes after we release the current version as final -->
           </excludes>
         </configuration>
       </plugin>
@@ -403,6 +318,7 @@
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-colibri</module>
+    <module>xwiki-platform-colorthemes</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>
@@ -426,6 +342,7 @@
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-messagestream</module>

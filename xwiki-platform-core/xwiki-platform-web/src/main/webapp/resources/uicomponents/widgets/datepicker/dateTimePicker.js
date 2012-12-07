@@ -1,0 +1,130 @@
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+
+/**
+ * Enhances a date-time field with the ability to pick the date and time from a Gregorian calendar widget.
+ */
+XWiki.DateTimePicker = Class.create({
+  timeStampClassNamePattern : /^t\d+$/,
+  initialize : function(input, format) {
+    this.input = $(input);
+    this.input.writeAttribute('autocomplete', 'off');
+    var trigger = this._trigger.bindAsEventListener(this);
+    this.input.observe('focus', trigger).observe('click', trigger);
+
+    this.formatter = new Externals.SimpleDateFormat(format);
+    this.timePickerEnabled = this._isTimePickerEnabled();
+  },
+  _isTimePickerEnabled : function() {
+    var formattedDate = this.formatter.format(new Date(1876, 1, 1, 23, 59, 0, 0));
+    return formattedDate.indexOf('23') >= 0 && formattedDate.indexOf('59') >= 0;
+  },
+  _getDate : function() {
+    if (!this.input._timestamp) {
+      var classNames = $w(this.input.className);
+      this.input._timestamp = new Date().getTime();
+      for(var i = 0; i < classNames.length; i++) {
+        if (this.timeStampClassNamePattern.test(classNames[i])) {
+          this.input._timestamp = parseInt(classNames[i].substring(1));
+        }
+      }
+    }
+    return new Date(this.input._timestamp);
+  },
+  _trigger : function(event) {
+    if (!this.input.calendar_date_select && !this.input.calendar_date_select_closing) {
+      new Externals.CalendarDateSelect(this.input, {
+        time: this.timePickerEnabled,
+        date: this._getDate(),
+        clear_button: false,
+        formatter: this,
+        before_close: function() {
+          this.calendar_date_select_closing = true;
+          if (this.calendar_date_select.selection_made) {
+            // Store the timestamp of the selected date so that we don't have to parse the input value when the picker is redisplayed.
+            event.element()._timestamp = this.calendar_date_select.selected_date.getTime();
+          }
+        },
+        after_close: function() {
+          this.calendar_date_select_closing = undefined;
+        }
+      });
+    }
+  },
+  format : function(date) {
+    return this.formatter.format(date);
+  },
+  parse : function(string) {
+    return new Date(string);
+  }
+});
+
+function enhanceEmptyIsToday(field) {
+  var emptyIsToday = $(field.getPropertyId('emptyIsToday'));
+  if (emptyIsToday.type == 'text') {
+    emptyIsToday.type = 'checkbox';
+    emptyIsToday.checked = emptyIsToday.value == '1';
+    emptyIsToday.value = '1';
+    var dd = emptyIsToday.up('dd');
+    dd.previous('dt').down('label').insert({top: emptyIsToday});
+    dd.remove();
+    emptyIsToday.insert({after: new Element('input', {type: 'hidden', value: '0', name: emptyIsToday.name})});
+  }
+}
+function enhanceDateFormat(field) {
+  var dateFormatInput = $(field.getPropertyId('dateFormat'));
+  if (dateFormatInput.type == 'text') {
+    // TODO
+  }
+}
+function enhanceDefaultValue(field) {
+  field.getViewer().select('input[type=text]').each(function(input) {
+    if (input.name.endsWith('_0_' + field.getName())) {
+      new XWiki.DateTimePicker(input, $(field.getPropertyId('dateFormat')).value);
+    }
+  });
+}
+function isDateField(field) {
+  return $('type-' + field.getName()).value == 'Date';
+}
+function maybeEnhanceField(field) {
+  if (isDateField(field)) {
+    enhanceEmptyIsToday(field);
+    enhanceDateFormat(field);
+    enhanceDefaultValue(field);
+  }
+}
+function init() {
+  document.observe('xwiki:class:displayField', function(event) {
+    maybeEnhanceField(event.memo.field);
+  });
+  document.observe('xwiki:class:previewField', function(event) {
+    var field = event.memo.field;
+    if (isDateField(field)) {
+      enhanceDefaultValue(field);
+    }
+  });
+  // This is needed in case this script is loaded asynchronously.
+  var fields = $('fields');
+  if (fields) {
+    // AppWithinMinutes Class Editor.
+    fields.childElements().each(function(item) {
+      var field = new XWiki.FormField(item);
+      if (field.getConfig()) {
+        maybeEnhanceField(field);
+      }
+    });
+  } else {
+    $('body').select('input.datetime').each(function(dateTimeInput) {
+      // The input title holds the date format.
+      new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
+    });
+  }
+
+  return true;
+}
+(XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

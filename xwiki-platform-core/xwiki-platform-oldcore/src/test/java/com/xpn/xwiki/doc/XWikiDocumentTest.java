@@ -124,7 +124,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.defaultEntityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
+        this.defaultEntityReferenceSerializer =
+            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.document.setSyntax(Syntax.XWIKI_1_0);
@@ -410,7 +411,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument copy =
             this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"), getContext());
 
-        assertEquals("",copy.getXClass().getCustomMapping());
+        assertEquals("", copy.getXClass().getCustomMapping());
     }
 
     public void testCloneNullObjects() throws XWikiException
@@ -1525,5 +1526,37 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         document.setContentDirty(false);
 
         List<XWikiAttachment> attachments = document.getAttachmentList();
+    }
+
+    /**
+     * XWIKI-8463: Backwards compatibility issue with setting the same attachment list to a document
+     */
+    public void testSetGetAttachmentList() throws Exception
+    {
+        String attachmentName1 = "someFile.txt";
+        String attachmentName2 = "someOtherFile.txt";
+        this.document.addAttachment(attachmentName1, new byte[0], this.getContext());
+        this.document.addAttachment(attachmentName2, new byte[0], this.getContext());
+
+        List<String> attachmentNames = new ArrayList<String>();
+
+        Assert.assertEquals(2, this.document.getAttachmentList().size());
+        for (XWikiAttachment attachment : this.document.getAttachmentList()) {
+            attachmentNames.add(attachment.getFilename());
+        }
+        Assert.assertTrue(attachmentNames.contains(attachmentName1));
+        Assert.assertTrue(attachmentNames.contains(attachmentName2));
+
+        // Set back the same list returned by the getter.
+        this.document.setAttachmentList(this.document.getAttachmentList());
+
+        // The result needs to stay the same.
+        Assert.assertEquals(2, this.document.getAttachmentList().size());
+        attachmentNames.clear();
+        for (XWikiAttachment attachment : this.document.getAttachmentList()) {
+            attachmentNames.add(attachment.getFilename());
+        }
+        Assert.assertTrue(attachmentNames.contains(attachmentName1));
+        Assert.assertTrue(attachmentNames.contains(attachmentName2));
     }
 }

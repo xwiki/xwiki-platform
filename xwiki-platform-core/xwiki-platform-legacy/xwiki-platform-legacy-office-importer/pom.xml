@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-office-importer</artifactId>
   <name>XWiki Platform - Legacy - Office Importer</name>
@@ -56,13 +56,6 @@
       <!-- Needed for backward compatibility Aspects -->
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
-    </dependency>
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

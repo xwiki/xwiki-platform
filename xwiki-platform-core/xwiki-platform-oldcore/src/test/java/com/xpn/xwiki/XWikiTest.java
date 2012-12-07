@@ -361,7 +361,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.deleteDocument(document, false, getContext());
     }
 
-    public void testLanguageSelection()
+    public void testLanguageSelection() throws Exception
     {
         getContext().setRequest(new XWikiServletRequest(null)
         {
@@ -392,7 +392,29 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                 return null;
             }
         });
+
+        // Set the wiki to multilingual mode.
+        XWikiDocument preferences = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences")) {
+            @Override
+            public BaseObject getXObject()
+            {
+                BaseObject preferencesObject = new BaseObject();
+                preferencesObject.setIntValue("multilingual", 1);
+
+                return preferencesObject;
+            }
+        };
+        this.xwiki.saveDocument(preferences, getContext());
+
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
+    }
+
+    /**
+     * XWIKI-8469: Bad default of 1 in XWiki.isMultilingual instead of 0 (when no XWikiPreferences object exists)
+     */
+    public void testIsMultilingualDefaultFalse() throws Exception
+    {
+        assertFalse(this.xwiki.isMultiLingual(getContext()));
     }
 
     public void testGetCurrentContentSyntaxId()

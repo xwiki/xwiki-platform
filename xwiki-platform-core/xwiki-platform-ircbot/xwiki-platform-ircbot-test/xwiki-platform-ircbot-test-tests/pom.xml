@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ircbot-test</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot-test-tests</artifactId>
   <name>XWiki Platform - IRC Bot - Tests - Functional Tests</name>
@@ -70,6 +70,13 @@
       <artifactId>xwiki-platform-search-lucene</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Add Panel dep which is optional in xwiki-platform-ircbot-ui in order to test registration in the App panel -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -81,6 +88,29 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-ircbot-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
+         systems go through SLF4J -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -44,6 +44,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+{{html}}
 ### Globally administrate the groups in a wiki.
 #set($formname = "update")
 #set($saveaction = "save")
@@ -55,6 +56,9 @@
 #set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
 #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
 #set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
+## The following are needed when editing a group (e.g. for adding new members).
+#userPicker_import()
+#set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
 ##
 ## url to get the groups for displaying them in the ajax-based table
 ##
@@ -64,7 +68,6 @@
 #else
   #set($mainwk = true)
 #end
-{{html}}
 &lt;div id="xwikieditcontent"&gt;
   &lt;table id="groupstable" class="xwiki-livetable"&gt;
     &lt;tr&gt;

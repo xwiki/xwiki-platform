@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -687,10 +688,8 @@ public class Package
             try {
                 LocalExtensionRepository localRepository = Utils.getComponent(LocalExtensionRepository.class);
 
-                LocalExtension localExtension;
-                try {
-                    localExtension = Utils.getComponent(LocalExtensionRepository.class).resolve(extensionId);
-                } catch (ResolveException e1) {
+                LocalExtension localExtension = localRepository.getLocalExtension(extensionId);
+                if (localExtension == null) {
                     Extension extension;
                     try {
                         // Try to find and download the extension from a repository
@@ -706,8 +705,14 @@ public class Package
                 }
 
                 // Register the extension as installed
-                Utils.getComponent(InstalledExtensionRepository.class).installExtension(localExtension,
-                    "wiki:" + context.getDatabase(), false);
+                InstalledExtensionRepository installedRepository =
+                    Utils.getComponent(InstalledExtensionRepository.class);
+                String namespace = "wiki:" + context.getDatabase();
+                InstalledExtension installedExtension =
+                    installedRepository.getInstalledExtension(localExtension.getId());
+                if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
+                    installedRepository.installExtension(localExtension, namespace, false);
+                }
             } catch (Exception e) {
                 LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
             }

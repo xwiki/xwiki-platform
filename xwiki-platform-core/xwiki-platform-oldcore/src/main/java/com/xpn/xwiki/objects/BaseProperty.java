@@ -61,7 +61,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     /**
      * The owner document, if this object was obtained from a document.
      */
-    private XWikiDocument ownerDocument;
+    private transient XWikiDocument ownerDocument;
 
     @Override
     protected R createReference()
@@ -151,9 +151,25 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
         BaseProperty<R> property = (BaseProperty<R>) super.clone();
 
+        property.ownerDocument = null;
+
+        cloneInternal(property);
+
+        property.isValueDirty = isValueDirty;
+        property.ownerDocument = ownerDocument;
+
         property.setObject(getObject());
 
         return property;
+    }
+
+    /**
+     * Subclasses override this to copy values during cloning.
+     *
+     * @param clone The cloned value.
+     */
+    protected void cloneInternal(BaseProperty clone)
+    {
     }
 
     public Object getValue()
@@ -251,7 +267,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
                 // XXX: collision between current and new
                 mergeResult.error(new CollisionException("Collision found on property [" + getName()
                     + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
-            } else if (ObjectUtils.equals(previousValue, getValue())) {
+            } else if (!ObjectUtils.equals(newValue, getValue())) {
                 mergeValue(previousValue, newValue, mergeResult);
             }
         }
@@ -280,7 +296,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         BaseProperty<R> newBaseProperty = (BaseProperty<R>) newProperty;
 
         // Value
-        if (ObjectUtils.equals(newBaseProperty.getValue(), getValue())) {
+        if (ObjectUtils.notEqual(newBaseProperty.getValue(), getValue())) {
             setValue(newBaseProperty.getValue());
             modified = true;
         }
@@ -305,10 +321,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     protected void setValueDirty(Object newValue)
     {
         if (!isValueDirty && !ObjectUtils.equals(newValue, getValue())) {
-            isValueDirty = true;
-            if (ownerDocument != null) {
-                ownerDocument.setContentDirty(true);
-            }
+            setValueDirty(true);
         }
     }
 
@@ -319,12 +332,15 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     public void setValueDirty(boolean valueDirty)
     {
         isValueDirty = valueDirty;
+        if (valueDirty && ownerDocument != null) {
+            ownerDocument.setContentDirty(true);
+        }
     }
 
     /**
      * Set the owner document of this base property.
      *
-     * @param owner The owner document.
+     * @param ownerDocument The owner document.
      * @since 4.3M2
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)

@@ -526,6 +526,11 @@ span#avatarUpload {
   overflow: hidden;
 }
 
+/* For columns that don't adapt well to limited width. */
+.vertical-pane .column.min-half {
+  min-width: 49.9%;
+}
+
 ## --------------------------------------
 ## Network sections style
 #networkPane .following ul {

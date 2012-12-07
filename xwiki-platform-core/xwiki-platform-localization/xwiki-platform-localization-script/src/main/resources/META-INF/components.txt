@@ -1,0 +1,1 @@
+org.xwiki.localization.script.internal.LocalizationScriptService

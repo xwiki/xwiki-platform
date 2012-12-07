@@ -23,11 +23,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-api</artifactId>
   <name>XWiki Platform - Security - API</name>
-  <version>4.3-SNAPSHOT</version>
+  <version>4.4-SNAPSHOT</version>
   <description>XWiki Platform - Security - API - a new security API. Currently only a replacement for the old RightService (experimental)</description>
   <packaging>jar</packaging>
   <dependencies>
@@ -46,13 +46,6 @@
       <artifactId>commons-collections</artifactId>
     </dependency>
     <!-- Test Dependencies -->
-    <!-- TODO: Modify tests in the this module to work with Hamcrest 1.2+ -->
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

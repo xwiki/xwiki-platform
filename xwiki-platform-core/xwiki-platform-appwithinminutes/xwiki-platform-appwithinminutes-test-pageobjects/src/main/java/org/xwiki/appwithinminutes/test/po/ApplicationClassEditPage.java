@@ -124,7 +124,7 @@ public class ApplicationClassEditPage extends InlinePage
         // NOTE: We scroll the page up because the drag&drop fails sometimes if the dragged field and the canvas (drop
         // target) are not fully visible. See https://code.google.com/p/selenium/issues/detail?id=3075 .
         palette.sendKeys(Keys.HOME);
-        new Actions(getDriver().getWrappedDriver()).dragAndDrop(field, fields).perform();
+        new Actions(getDriver()).dragAndDrop(field, fields).perform();
         final WebElement addedField = fields.findElement(By.xpath("li[" + (fieldCount + 1) + "]"));
 
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
@@ -154,7 +154,8 @@ public class ApplicationClassEditPage extends InlinePage
      */
     public void moveFieldBefore(String fieldToMove, String beforeField)
     {
-        new ClassFieldEditPane(fieldToMove).dragTo(fields.findElement(By.id("field-" + beforeField)), 0, 0);
+        // Drag the field slightly before the target field (vertically). For some reason it doesn't work if we use x=0.
+        new ClassFieldEditPane(fieldToMove).dragTo(fields.findElement(By.id("field-" + beforeField)), 1, -3);
     }
 
     /**

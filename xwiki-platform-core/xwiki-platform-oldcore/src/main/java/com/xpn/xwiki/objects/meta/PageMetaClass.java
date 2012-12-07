@@ -19,16 +19,23 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.PageClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
 /**
  * Page Field Class allows to create a field for storing page references.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
+@Component
+@Named("Page")
+@Singleton
 public class PageMetaClass extends DBListMetaClass
 {
     /**
@@ -36,13 +43,12 @@ public class PageMetaClass extends DBListMetaClass
      */
     public PageMetaClass()
     {
-        super();
         setPrettyName("Page");
-        setName(PageClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
     }
 
     @Override
-    public BaseCollection newObject(XWikiContext context)
+    public PropertyClassInterface getInstance()
     {
         return new PageClass();
     }

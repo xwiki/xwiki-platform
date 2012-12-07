@@ -219,7 +219,7 @@
       #if ($extension.features.size() > 0)
         <li>$msg.get('extensions.info.features') $escapetool.xml($extension.features)</li>
       #end
-      #if ($xwiki.isVirtualMode())
+      #if ($xwiki.isVirtualMode() && $extension.isInstalled("wiki:${xcontext.database}"))
         <li>#displayExtensionDetails_description_wikis($extension)</li>
       #end
     </ul>
@@ -874,13 +874,16 @@ Caused by: #printThrowable($throwable.cause true)
   #if ($jobStatus && $jobState != 'FINISHED')
     #set ($status = 'loading')
   #else
-    #set ($status = $extension.repository.descriptor.id)
-    #if ($status == 'installed')
+    #if ($extension.isInstalled($extensionNamespace))
       ## Determine if the extension is still valid.
       #if ("$!extension.isValid($extensionNamespace)" == 'false')
         #set ($status = 'installed-invalid')
+      #else
+        #set ($status = 'installed')
       #end
-    #elseif ($status != 'core')
+    #elseif ($extension.repository.descriptor.id == 'core')
+      #set ($status = 'core')
+    #else
       ## An extension, either local or remote, that might be available to install.
       ## Check if a different version of this extension is installed or is a core dependency.
       #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))

@@ -56,4 +56,9 @@ public interface WikiUIExtensionConstants
      * Extension parameters property.
      */
     String PARAMETERS_PROPERTY = "parameters";
+
+    /**
+     * Extension scope property.
+     */
+    String SCOPE_PROPERTY = "scope";
 }

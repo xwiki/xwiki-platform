@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-remote</artifactId>
   <name>XWiki Platform - Observation - Remote</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Observation - Remote</description>
+  <properties>
+    <xwiki.clover.targetPercentage>74.3%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -65,12 +68,6 @@
     </dependency>
 
     <!-- Tests dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-local</artifactId>

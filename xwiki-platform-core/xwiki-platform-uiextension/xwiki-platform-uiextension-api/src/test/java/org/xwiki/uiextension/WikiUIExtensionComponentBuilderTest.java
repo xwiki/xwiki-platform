@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
+import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
@@ -98,11 +99,13 @@ import junit.framework.Assert;
     DefaultStringEntityReferenceSerializer.class
 })
 @MockingRequirement(value = WikiUIExtensionComponentBuilder.class,
-    exceptions = {EntityReferenceSerializer.class, Parser.class})
+    exceptions = {EntityReferenceSerializer.class})
 public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponentTestCase
     implements WikiUIExtensionConstants
 {
     private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
     private XWiki xwiki;
 
@@ -158,12 +161,6 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(componentDoc).getContentAuthor();
-                will(returnValue("XWiki.Admin"));
-                oneOf(xwiki).getRightService();
-                will(returnValue(rightService));
-                oneOf(rightService).hasAccessLevel("admin", "XWiki.Admin", "XWiki.XWikiPreferences", xwikiContext);
-                will(returnValue(true));
                 oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(new ArrayList()));
                 oneOf(componentDoc).getPrefixedFullName();
@@ -184,10 +181,25 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     public void buildExtensionsWithoutAdminRights() throws Exception
     {
         final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
+        final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
+        final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
+        extensionObjects.add(extensionObject);
 
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
+                will(returnValue(extensionObjects));
+                oneOf(extensionObject).getStringValue(ID_PROPERTY);
+                will(returnValue("name"));
+                oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
+                will(returnValue("extensionPointId"));
+                oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
+                will(returnValue("content"));
+                oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
+                will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
+                oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
+                will(returnValue("wiki"));
                 oneOf(componentDoc).getContentAuthor();
                 will(returnValue("XWiki.Admin"));
                 oneOf(xwiki).getRightService();
@@ -201,8 +213,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
             this.builder.buildComponents(DOC_REF);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
-            Assert.assertEquals("Registering UI extensions requires admin rights at the wiki level",
-                expected.getMessage());
+            Assert.assertEquals("Registering UI extensions requires admin rights", expected.getMessage());
         }
     }
 
@@ -210,10 +221,25 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     public void buildComponentsWithoutRightService() throws Exception
     {
         final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
+        final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
+        final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
+        extensionObjects.add(extensionObject);
 
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
+                will(returnValue(extensionObjects));
+                oneOf(extensionObject).getStringValue(ID_PROPERTY);
+                will(returnValue("name"));
+                oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
+                will(returnValue("extensionPointId"));
+                oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
+                will(returnValue("content"));
+                oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
+                will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
+                oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
+                will(returnValue("wiki"));
                 oneOf(componentDoc).getContentAuthor();
                 will(returnValue("XWiki.Admin"));
                 oneOf(xwiki).getRightService();
@@ -227,7 +253,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
             this.builder.buildComponents(DOC_REF);
             Assert.fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
-            Assert.assertEquals("Failed to create UI Extension(s)", expected.getMessage());
+            Assert.assertEquals("Failed to check rights required to register UI Extension(s)", expected.getMessage());
         }
     }
 
@@ -237,20 +263,24 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     {
         final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
         final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
+        final ContentParser contentParser = getComponentManager().getInstance(ContentParser.class);
         final Parser parser = getMockery().mock(Parser.class);
         final Transformation transformation = getMockery().mock(Transformation.class, "macro");
         final VelocityManager velocityManager = getMockery().mock(VelocityManager.class);
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
         final VelocityContext velocityContext = new VelocityContext();
+
         final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
         final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
+        extensionObjects.add(extensionObject);
+
         final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);
         final StringWriter writer = new StringWriter();
         final EntityReferenceSerializer<String> serializer =
             registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
         writer.append("value=foo");
         final XDOM xdom = new XDOM(new ArrayList<Block>());
-        extensionObjects.add(extensionObject);
+
 
 
         getMockery().checking(new Expectations()
@@ -260,6 +290,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("does not matter"));
                 oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(extensionObjects));
+                oneOf(componentDoc).getAuthorReference();
+                will(returnValue(AUTHOR_REFERENCE));
                 oneOf(xwiki).getRightService();
                 will(returnValue(rightService));
                 oneOf(componentDoc).getContentAuthor();
@@ -276,10 +308,10 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("content"));
                 oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
                 will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
-                oneOf(parser).parse(with(any(Reader.class)));
+                oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
+                will(returnValue("wiki"));
+                oneOf(contentParser).parse("content", Syntax.XWIKI_2_0);
                 will(returnValue(xdom));
-                oneOf(componentManager).getInstance(Parser.class, Syntax.XWIKI_2_0.toIdString());
-                will(returnValue(parser));
                 oneOf(componentManager).getInstance(Transformation.class, "macro");
                 will(returnValue(transformation));
                 oneOf(componentManager).getInstance(Execution.class);

@@ -21,10 +21,11 @@ package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Represents the actions possible on the Users Administration Page.
- *
+ * 
  * @version $Id$
  * @since 4.2M1
  */
@@ -32,6 +33,11 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
 {
     @FindBy(id = "addNewUser")
     private WebElement addNewUserButton;
+
+    /**
+     * The live table listing the users.
+     */
+    private final LiveTableElement usersLiveTable;
 
     /**
      * @since 4.2M1
@@ -46,11 +52,21 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public UsersAdministrationSectionPage()
     {
         super("Users");
+        usersLiveTable = new LiveTableElement("userstable");
     }
 
     public LightBoxRegistrationPage clickAddNewUser()
     {
         this.addNewUserButton.click();
         return new LightBoxRegistrationPage();
+    }
+
+    /**
+     * @return the live table that list the users
+     * @since 4.3.1
+     */
+    public LiveTableElement getUsersLiveTable()
+    {
+        return usersLiveTable;
     }
 }

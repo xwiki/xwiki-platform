@@ -19,12 +19,13 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -69,14 +70,14 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     private Logger logger;
 
     @Override
-    public XarEntryMergeResult saveDocumen(String comment, XWikiDocument previousDocument,
+    public XarEntryMergeResult saveDocument(String comment, XWikiDocument previousDocument,
         XWikiDocument currentDocument, XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception
     {
         XarEntryMergeResult mergeResult = null;
 
         if (configuration.isLogEnabled()) {
             this.logger.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
-                nextDocument.getRealLanguage());
+                nextDocument.getRealLocale());
         }
 
         // Merge and save
@@ -135,32 +136,30 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         MergeResult documentMergeResult =
             mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
 
-        if (documentMergeResult.isModified()) {
-            if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
-                // Indicate future author to whoever is going to answer the question
-                nextDocument.setCreatorReference(currentDocument.getCreatorReference());
-                mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
-                DocumentReference userReference = configuration.getUserReference();
-                if (userReference != null) {
-                    nextDocument.setAuthorReference(userReference);
-                    nextDocument.setContentAuthorReference(userReference);
-                    mergedDocument.setAuthorReference(userReference);
-                    mergedDocument.setContentAuthorReference(userReference);
-                }
-
-                XWikiDocument documentToSave =
-                    askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration);
-
-                if (documentToSave != currentDocument) {
-                    saveDocument(documentToSave, comment, false, configuration);
-                }
-            } else {
-                saveDocument(mergedDocument, comment, false, configuration);
+        if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+            // Indicate future author to whoever is going to answer the question
+            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
+            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
+            DocumentReference userReference = configuration.getUserReference();
+            if (userReference != null) {
+                nextDocument.setAuthorReference(userReference);
+                nextDocument.setContentAuthorReference(userReference);
+                mergedDocument.setAuthorReference(userReference);
+                mergedDocument.setContentAuthorReference(userReference);
             }
+
+            XWikiDocument documentToSave =
+                askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration);
+
+            if (documentToSave != currentDocument) {
+                saveDocument(documentToSave, comment, false, configuration);
+            }
+        } else if (documentMergeResult.isModified()) {
+            saveDocument(mergedDocument, comment, false, configuration);
         }
 
-        return new XarEntryMergeResult(
-            new XarEntry(mergedDocument.getDocumentReference(), mergedDocument.getLanguage()), documentMergeResult);
+        return new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(), mergedDocument.getLocale()),
+            documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
@@ -241,15 +240,15 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     {
         XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
 
-        if (StringUtils.isNotEmpty(document.getLanguage())) {
-            String defaultLanguage = existingDocument.getDefaultLanguage();
-            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLanguage(), context);
+        if (!document.getLocale().equals(Locale.ROOT)) {
+            Locale defaultLocale = existingDocument.getDefaultLocale();
+            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLocale(), context);
 
             if (translatedDocument == existingDocument) {
                 translatedDocument = new XWikiDocument(document.getDocumentReference());
-                translatedDocument.setDefaultLanguage(defaultLanguage);
+                translatedDocument.setDefaultLocale(defaultLocale);
                 translatedDocument.setTranslation(1);
-                translatedDocument.setLanguage(document.getLanguage());
+                translatedDocument.setLocale(document.getLocale());
             }
 
             existingDocument = translatedDocument;
@@ -306,7 +305,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             // the document to actually be saved by context user
             xcontext.setUserReference(document.getAuthorReference());
 
-            xcontext.getWiki().saveDocument(document, comment, xcontext);
+            xcontext.getWiki().saveDocument(document, comment, false, xcontext);
         } catch (Exception e) {
             xcontext.setUserReference(userReference);
         }

@@ -357,7 +357,7 @@ var XWiki = (function(XWiki){
               },
               onFailure: function(transport) {
                    var errorMessage = "Failed to import documents. Reason: ";
-                   if (transport.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                   if (transport.statusText == '' /* No response */ || transport.status == 12031 /* In IE */) {
                      errorMessage += "Server not responding";
                    } else {
                      errorMessage += transport.statusText;

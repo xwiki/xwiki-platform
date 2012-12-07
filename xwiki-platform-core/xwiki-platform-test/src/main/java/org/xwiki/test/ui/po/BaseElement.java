@@ -20,9 +20,11 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
@@ -30,7 +32,6 @@ import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.XWikiWrappingDriver;
 
 /**
  * Represents all elements which include web pages as well as parts of web pages.
@@ -51,11 +52,11 @@ public class BaseElement
     public BaseElement()
     {
         ElementLocatorFactory finder =
-            new AjaxElementLocatorFactory(getDriver().getWrappedDriver(), getUtil().getTimeout());
+            new AjaxElementLocatorFactory(getDriver(), getUtil().getTimeout());
         PageFactory.initElements(finder, this);
     }
 
-    protected XWikiWrappingDriver getDriver()
+    protected WebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -244,7 +245,7 @@ public class BaseElement
 
     public Object executeJavascript(String javascript, Object... arguments)
     {
-        return getDriver().executeScript(javascript, arguments);
+        return ((JavascriptExecutor) getDriver()).executeScript(javascript, arguments);
     }
 
     /**
@@ -261,7 +262,7 @@ public class BaseElement
     public void makeConfirmDialogSilent(boolean accept)
     {
         String script = String.format("window.confirm = function() { return %s; }", accept);
-        getDriver().executeScript(script);
+        ((JavascriptExecutor) getDriver()).executeScript(script);
     }
 
     /**
@@ -270,7 +271,7 @@ public class BaseElement
      */
     public void makeAlertDialogSilent()
     {
-        getDriver().executeScript("window.alert = function() { return true; }");
+        ((JavascriptExecutor) getDriver()).executeScript("window.alert = function() { return true; }");
     }
 
     /**
@@ -278,12 +279,7 @@ public class BaseElement
      */
     public void waitForNotificationErrorMessage(String message)
     {
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-error') " + "and contains(text(), '"
-            + message + "')]"));
-        // in order to improve test speed, clicking on the notification will make it disappear
-        getDriver().findElement(
-            By.xpath("//div[contains(@class,'xnotification-error') " + "and contains(text(), '" + message + "')]"))
-            .click();
+        waitForNotificationMessage("error", message);
     }
 
     /**
@@ -291,12 +287,7 @@ public class BaseElement
      */
     public void waitForNotificationWarningMessage(String message)
     {
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-warning') " + "and contains(text(), '"
-            + message + "')]"));
-        // in order to improve test speed, clicking on the notification will make it disappear
-        getDriver().findElement(
-            By.xpath("//div[contains(@class,'xnotification-warning') " + "and contains(text(), '" + message + "')]"))
-            .click();
+        waitForNotificationMessage("warning", message);
     }
 
     /**
@@ -304,11 +295,28 @@ public class BaseElement
      */
     public void waitForNotificationSuccessMessage(String message)
     {
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') " + "and contains(text(), '"
-            + message + "')]"));
-        // in order to improve test speed, clicking on the notification will make it disappear
-        getDriver().findElement(
-            By.xpath("//div[contains(@class,'xnotification-done') " + "and contains(text(), '" + message + "')]"))
-            .click();
+        waitForNotificationMessage("done", message);
+    }
+
+    /**
+     * Waits for a notification message of the specified type with the given message to be displayed.
+     * 
+     * @param level the notification type (one of error, warning, done)
+     * @param message the notification message
+     * @see 4.3
+     */
+    private void waitForNotificationMessage(String level, String message)
+    {
+        By notificationMessageLocator =
+            By.xpath(String.format("//div[contains(@class,'xnotification-%s') and contains(., '%s')]", level, message));
+        waitUntilElementIsVisible(notificationMessageLocator);
+        // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
+        // this method always waits for the last notification message of the specified level.
+        try {
+            // The notification message may disappear before we get to click on it.
+            getUtil().findElementWithoutWaiting(getDriver(), notificationMessageLocator).click();
+        } catch (WebDriverException e) {
+            // Ignore.
+        }
     }
 }

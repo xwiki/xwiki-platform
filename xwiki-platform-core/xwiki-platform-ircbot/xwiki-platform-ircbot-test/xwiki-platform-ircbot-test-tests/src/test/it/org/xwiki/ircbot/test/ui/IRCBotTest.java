@@ -21,9 +21,10 @@ package org.xwiki.ircbot.test.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.ircbot.test.po.IRCConfigurationPage;
-import org.xwiki.ircbot.test.po.IRCBotPage;
-import org.xwiki.ircbot.test.po.WebHomePage;
+import org.xwiki.ircbot.test.po.IRCBotBotPage;
+import org.xwiki.ircbot.test.po.IRCBotConfigurationPage;
+import org.xwiki.ircbot.test.po.IRCBotHomePage;
+import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -53,7 +54,7 @@ public class IRCBotTest extends AbstractTest
         // Verify that the Bot is stopped, if not, stop it
         // We do this as the first thing since otherwise events could be sent to the bot which would make our
         // assertions below false.
-        IRCBotPage page = IRCBotPage.gotoPage();
+        IRCBotBotPage page = IRCBotBotPage.gotoPage();
         if (page.isBotStarted()) {
             page.clickActionButton();
         }
@@ -66,7 +67,7 @@ public class IRCBotTest extends AbstractTest
 
         // Configure the Logging Bot Listener to log into a fixed name page so that we can easily delete that page at
         // the test start and find it easily to assert its content below.
-        IRCConfigurationPage configPage = IRCConfigurationPage.gotoPage();
+        IRCBotConfigurationPage configPage = IRCBotConfigurationPage.gotoPage();
         configPage.setLoggingPage(getTestClassName() + "." + ARCHIVE_PAGE);
     }
 
@@ -81,8 +82,21 @@ public class IRCBotTest extends AbstractTest
             "event", "onMessage",
             "script", "gotcha!");
 
+        // Navigate to the IRCBot app by clicking in the Application Panel.
+        // This verifies that the IRCBot application is registered in the Applications Panel.
+        // It also verifies that the Translation is registered properly.
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
+        ViewPage vp = applicationPanel.clickApplication("IRC Bot");
+
+        // Verify we're on the right page!
+        Assert.assertEquals(IRCBotHomePage.getSpace(), vp.getMetaDataValue("space"));
+        Assert.assertEquals(IRCBotHomePage.getPage(), vp.getMetaDataValue("page"));
+        IRCBotHomePage homePage = new IRCBotHomePage();
+
+        // Navigate to the Command Center page
+        IRCBotBotPage page = homePage.clickCommandCenterLink();
+
         // Start the Bot
-        IRCBotPage page = IRCBotPage.gotoPage();
         // Note that starting the Bot will generate a Join Event and thanks to the Log Bot Listener, the following
         // will be logged in the archive page: "<XWikiBotTest> has joined #xwikitest"
         page.clickActionButton();
@@ -134,7 +148,7 @@ public class IRCBotTest extends AbstractTest
         archivePage.waitUntilContent("<nick> hello");
 
         // Stop the Bot
-        page = IRCBotPage.gotoPage();
+        page = IRCBotBotPage.gotoPage();
         page.clickActionButton();
 
         // Verify that the Bot is stopped again
@@ -151,11 +165,14 @@ public class IRCBotTest extends AbstractTest
         getUtil().deletePage(getTestClassName(), LISTENER_PAGE);
 
         // Verify that our Bot is no longer listed
-        page = IRCBotPage.gotoPage();
+        page = IRCBotBotPage.gotoPage();
         Assert.assertFalse(page.containsListener("Test"));
 
-        // Go to the IRC Home Page and verify that the Archive Livetable contains our Log Archive document
-        WebHomePage homePage = WebHomePage.gotoPage();
-        Assert.assertTrue(homePage.getArchiveLiveTable().hasRow("ircbot.livetable.doc.name", ARCHIVE_PAGE));
+        // Go to the IRC Home Page by clicking in the breadcrumb and:
+        // - verify that the Translation has been applied by checking the Translated livetable column name
+        // - verify that the Livetable contains our new Archive entry
+        page.clickBreadcrumbLink("IRC Bot");
+        homePage = new IRCBotHomePage();
+        Assert.assertTrue(homePage.getArchiveLiveTable().hasRow("Name", ARCHIVE_PAGE));
     }
 }

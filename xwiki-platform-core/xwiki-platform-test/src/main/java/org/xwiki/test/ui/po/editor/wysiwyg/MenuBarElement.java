@@ -21,6 +21,7 @@ package org.xwiki.test.ui.po.editor.wysiwyg;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -56,7 +57,7 @@ public class MenuBarElement extends BaseElement
      */
     public void clickImageMenu()
     {
-        clickMenuWithLabel("Image");
+        openMenuWithLabel("Image");
     }
 
     /**
@@ -64,7 +65,7 @@ public class MenuBarElement extends BaseElement
      */
     public void clickTableMenu()
     {
-        clickMenuWithLabel("Table");
+        openMenuWithLabel("Table");
     }
 
     /**
@@ -106,6 +107,21 @@ public class MenuBarElement extends BaseElement
     private boolean isMenuEnabled(WebElement menu)
     {
         return !menu.getAttribute("class").contains("gwt-MenuItem-disabled");
+    }
+
+    /**
+     * Opens a menu from the menu bar.
+     * 
+     * @param label the label of the menu to open
+     */
+    private void openMenuWithLabel(String label)
+    {
+        // Hover the menu bar to hide any page menus that may be displayed over the WYSIWYG editor menu bar. For
+        // instance, when you return from preview after clicking the "Back to edit" button, if the mouse is not moved it
+        // can end up over the edit menu after the page is loaded. This opens the edit menu which hides part of the
+        // WYSIWYG editor menu bar.
+        new Actions(getDriver()).moveToElement(container).perform();
+        clickMenuWithLabel(label);
     }
 
     /**

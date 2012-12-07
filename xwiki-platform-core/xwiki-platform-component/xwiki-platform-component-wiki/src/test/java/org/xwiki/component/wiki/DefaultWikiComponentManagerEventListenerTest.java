@@ -47,6 +47,8 @@ public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockin
 
     private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
 
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
+
     private DefaultWikiComponentManagerEventListener listener;
 
     private WikiComponentBuilder provider;
@@ -102,7 +104,9 @@ public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockin
         final List<DocumentReference> providerReferences = new ArrayList<DocumentReference>();
         providerReferences.add(DOC_REFERENCE);
         final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
-        final WikiComponent component = new DefaultWikiComponent(DOC_REFERENCE, TestRole.class, ROLE_HINT);
+        final WikiComponent component =
+            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
+                WikiComponentScope.WIKI);
         final List<WikiComponent> components = new ArrayList<WikiComponent>();
         components.add(component);
 
@@ -130,7 +134,9 @@ public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockin
         final List<DocumentReference> providerReferences = new ArrayList<DocumentReference>();
         providerReferences.add(DOC_REFERENCE);
         final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
-        final WikiComponent component = new DefaultWikiComponent(DOC_REFERENCE, TestRole.class, ROLE_HINT);
+        final WikiComponent component =
+            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
+                WikiComponentScope.WIKI);
         final List<WikiComponent> components = new ArrayList<WikiComponent>();
         components.add(component);
 
@@ -175,7 +181,9 @@ public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockin
     {
         final WikiComponentManager manager = getComponentManager().getInstance(WikiComponentManager.class);
         final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
-        final WikiComponent component = new DefaultWikiComponent(DOC_REFERENCE, TestRole.class, ROLE_HINT);
+        final WikiComponent component
+            = new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
+            WikiComponentScope.WIKI);
         final List<WikiComponent> components = new ArrayList<WikiComponent>();
         components.add(component);
         final List<DocumentReference> providerReferences = new ArrayList<DocumentReference>();

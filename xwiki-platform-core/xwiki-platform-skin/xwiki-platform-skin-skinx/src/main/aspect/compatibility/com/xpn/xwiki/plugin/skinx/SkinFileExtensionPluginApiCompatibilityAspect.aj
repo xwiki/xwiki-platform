@@ -23,7 +23,8 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.plugin.skinx.SkinFileExtensionPluginApi} class.
@@ -60,10 +61,9 @@ public aspect SkinFileExtensionPluginApiCompatibilityAspect
     {
         if (compatibilityMap.containsKey(path)) {
 
-            Logger logger = Logger.getLogger(thisJoinPoint.getSignature().getDeclaringType());
-            logger.warn(MessageFormat.format(
-                "Skin file extension with path [{0}] is deprecated. Please use [{1}] instead.", new Object[] {path,
-                    compatibilityMap.get(path)}));
+            Logger logger = LoggerFactory.getLogger(thisJoinPoint.getSignature().getDeclaringType());
+            logger.warn("Skin file extension with path [{}] is deprecated. Please use [{}] instead.", path,
+                compatibilityMap.get(path));
 
             proceed(compatibilityMap.get(path));
         }

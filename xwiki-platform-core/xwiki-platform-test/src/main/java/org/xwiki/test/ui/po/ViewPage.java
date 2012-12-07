@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -77,6 +78,15 @@ public class ViewPage extends BasePage
     @FindBy(id = "tmWatchDocument")
     private WebElement watchDocumentLink;
 
+    @FindBy(id = "tmCreate")
+    private WebElement createMenu;
+
+    @FindBy(id = "tmPage")
+    private WebElement pageMenu;
+
+    @FindBy(id = "tmSpace")
+    private WebElement spaceMenu;
+
     public boolean hasLoginLink()
     {
         // Note that we cannot test if the loginLink field is accessible since we're using an AjaxElementLocatorFactory
@@ -108,14 +118,14 @@ public class ViewPage extends BasePage
 
     public CreatePagePage createPage()
     {
-        hoverOverMenu("tmCreate");
+        new Actions(getDriver()).moveToElement(createMenu).perform();
         this.createPageMenuLink.click();
         return new CreatePagePage();
     }
 
     public CreateSpacePage createSpace()
     {
-        hoverOverMenu("tmCreate");
+        new Actions(getDriver()).moveToElement(createMenu).perform();
         this.createSpaceMenuLink.click();
         return new CreateSpacePage();
     }
@@ -202,14 +212,14 @@ public class ViewPage extends BasePage
 
     public CopyPage copy()
     {
-        hoverOverMenu("tmPage");
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
         this.copyPageLink.click();
         return new CopyPage();
     }
 
     public ConfirmationPage delete()
     {
-        hoverOverMenu("tmPage");
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
         this.deletePageLink.click();
         return new ConfirmationPage();
     }
@@ -217,7 +227,7 @@ public class ViewPage extends BasePage
     public boolean canDelete()
     {
         if (getUtil().hasElement(By.xpath("//div[@id='tmPage']//span[@class='menuarrow']"))) {
-            hoverOverMenu("tmPage");
+            new Actions(getDriver()).moveToElement(pageMenu).perform();
             return getUtil().hasElement(By.id("tmActionDelete"));
         } else {
             return false;
@@ -274,19 +284,19 @@ public class ViewPage extends BasePage
 
     public void watchDocument()
     {
-        hoverOverMenu("tmPage");
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
         this.watchDocumentLink.click();
     }
 
     public void watchSpace()
     {
-        hoverOverMenu("tmSpace");
+        new Actions(getDriver()).moveToElement(spaceMenu).perform();
         this.watchSpaceLink.click();
     }
 
     /**
      * Waits until the page has the passed content by refreshing the page
-     *
+     * 
      * @param expectedValue the content value to wait for (in regex format)
      * @since 4.0M1
      */

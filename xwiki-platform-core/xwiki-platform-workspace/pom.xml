@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>xwiki-platform-workspace</artifactId>
@@ -61,11 +61,6 @@
       <dependency>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-script</artifactId>
-        <version>${commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-test</artifactId>
         <version>${commons.version}</version>
       </dependency>
     </dependencies>

@@ -158,6 +158,15 @@ input[type="text"], input[type="password"] {
   box-shadow: 0px 1px 2px $theme.borderColor;
   color: $theme.textColor;
 }
+::-webkit-input-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
+:-moz-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
+:-ms-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
 /* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 textarea, select {
   background-color: $theme.pageContentBackgroundColor;
@@ -836,7 +845,7 @@ div.buttonwrapper {
   border: 1px solid $theme.borderColor;
 }
 
-#xwikieditcontent textarea#content {
+#xwikieditcontentinner textarea#content {
   border: 0;
   padding: 0;
   width: 100%;
@@ -1907,7 +1916,7 @@ ul.xlist li {
   float: right;
   height: 100%;
   list-style-type: none;
-  padding-top: .2em;
+  padding: .1em 0;
   width: 100% !important;
 }
 

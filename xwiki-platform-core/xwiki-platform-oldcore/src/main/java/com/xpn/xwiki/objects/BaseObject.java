@@ -101,7 +101,15 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     protected BaseObjectReference createReference()
     {
-        return new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
+        BaseObjectReference reference;
+    
+        if (getXClassReference() != null && getDocumentReference() != null) {
+            reference = new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
+        } else {
+            reference = null;
+        }
+        
+        return reference;
     }
 
     @Override
@@ -320,7 +328,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
@@ -359,7 +367,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
@@ -431,5 +439,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         this.ownerDocument = ownerDocument;
+        for (String propertyName : getPropertyList()) {
+            BaseProperty property = (BaseProperty) getField(propertyName);
+            property.setOwnerDocument(ownerDocument);
+        }
     }
 }

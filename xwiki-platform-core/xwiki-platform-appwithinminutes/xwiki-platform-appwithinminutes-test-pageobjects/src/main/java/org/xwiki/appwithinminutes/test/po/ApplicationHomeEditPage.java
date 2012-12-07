@@ -65,6 +65,9 @@ public class ApplicationHomeEditPage extends InlinePage
     @FindBy(xpath = "//div[@class = 'columnPicker']/input[@type = 'image' and @alt = 'Add']")
     private WebElement addColumnButton;
 
+    @FindBy(id = "applicationIcon")
+    private WebElement applicationIconInput;
+
     /**
      * The WYSIWYG editor used to input the application description.
      */
@@ -126,6 +129,25 @@ public class ApplicationHomeEditPage extends InlinePage
     }
 
     /**
+     * Sets the application icon.
+     * 
+     * @param icon the icon to set
+     */
+    public void setIcon(String icon)
+    {
+        applicationIconInput.clear();
+        applicationIconInput.sendKeys(icon);
+    }
+
+    /**
+     * @return the application icon
+     */
+    public String getIcon()
+    {
+        return applicationIconInput.getAttribute("value");
+    }
+
+    /**
      * Adds a new live table column.
      * 
      * @param columnLabel the label of the live table column to be added
@@ -147,7 +169,7 @@ public class ApplicationHomeEditPage extends InlinePage
         WebElement column = getLiveTableColumn(columnLabel);
         // FIXME: This doesn't trigger the :hover CSS pseudo class. The click still works because the delete X (text) is
         // not really hidden: it is displayed with white color (the page background-color).
-        new Actions(getDriver().getWrappedDriver()).moveToElement(column).perform();
+        new Actions(getDriver()).moveToElement(column).perform();
         column.findElement(By.className("delete")).click();
     }
 
@@ -159,8 +181,8 @@ public class ApplicationHomeEditPage extends InlinePage
      */
     public void moveLiveTableColumnBefore(String columnToMove, String beforeColumn)
     {
-        new Actions(getDriver().getWrappedDriver()).clickAndHold(getLiveTableColumn(columnToMove))
-            .moveToElement(getLiveTableColumn(beforeColumn), 0, 0).perform();
+        new Actions(getDriver()).clickAndHold(getLiveTableColumn(columnToMove))
+            .moveToElement(getLiveTableColumn(beforeColumn), -3, 0).release().perform();
     }
 
     /**

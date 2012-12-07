@@ -20,6 +20,7 @@
 package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -130,7 +131,7 @@ public class ClassFieldEditPane extends BaseElement
     private void clickToolBoxIcon(String alt)
     {
         // This doesn't trigger the :hover CSS pseudo class so we're forced to manually set the display of the tool box.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(container).perform();
+        new Actions(getDriver()).moveToElement(container).perform();
 
         // FIXME: The following line is a hack to overcome the fact that the previous line doesn't trigger the :hover
         // CSS pseudo class on the field container (even if the mouse if moved over it).
@@ -148,7 +149,7 @@ public class ClassFieldEditPane extends BaseElement
      */
     private void showToolBox()
     {
-        getDriver().executeScript("arguments[0].style.display = 'block';", toolBox);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", toolBox);
     }
 
     /**
@@ -158,7 +159,7 @@ public class ClassFieldEditPane extends BaseElement
      */
     private void hideToolBox()
     {
-        getDriver().executeScript("arguments[0].style.display = '';", toolBox);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = '';", toolBox);
     }
 
     /**
@@ -213,15 +214,14 @@ public class ClassFieldEditPane extends BaseElement
     public void dragTo(WebElement element, int xOffset, int yOffset)
     {
         // This doesn't trigger the :hover CSS pseudo class so we're forced to manually set the display of the tool box.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(container).perform();
+        new Actions(getDriver()).moveToElement(container).perform();
 
         // FIXME: The following line is a hack to overcome the fact that the previous line doesn't trigger the :hover
         // CSS pseudo class on the field container (even if the mouse if moved over it).
         showToolBox();
 
         WebElement dragHandler = toolBox.findElement(By.xpath("img[@alt = 'Move']"));
-        new Actions(getDriver().getWrappedDriver()).clickAndHold(dragHandler).moveToElement(element, xOffset, yOffset)
-            .perform();
+        new Actions(getDriver()).clickAndHold(dragHandler).moveToElement(element, xOffset, yOffset).release().perform();
 
         // Reset the tool box display. Remove this line when the :hover CSS class will be triggered by mouse over.
         hideToolBox();

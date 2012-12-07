@@ -19,30 +19,44 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.GroupsClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
+/**
+ * Defines the meta properties of a groups XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Groups")
+@Singleton
 public class GroupsMetaClass extends ListMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a List of Groups XClass property.
+     */
     public GroupsMetaClass()
     {
-        super();
         setPrettyName("List of Groups");
-        setName(GroupsClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        BooleanClass uselist_class = new BooleanClass(this);
-        uselist_class.setName("usesList");
-        uselist_class.setPrettyName("Uses List");
-        uselist_class.setDisplayType("yesno");
-        uselist_class.setDisplayFormType("checkbox");
-        uselist_class.setDefaultValue(1);
-        safeput("usesList", uselist_class);
+        BooleanClass useListClass = new BooleanClass(this);
+        useListClass.setName("usesList");
+        useListClass.setPrettyName("Uses List");
+        useListClass.setDisplayType("yesno");
+        useListClass.setDisplayFormType("checkbox");
+        useListClass.setDefaultValue(0);
+        safeput(useListClass.getName(), useListClass);
     }
 
     @Override
-    public BaseCollection newObject(XWikiContext context)
+    public PropertyClassInterface getInstance()
     {
         return new GroupsClass();
     }

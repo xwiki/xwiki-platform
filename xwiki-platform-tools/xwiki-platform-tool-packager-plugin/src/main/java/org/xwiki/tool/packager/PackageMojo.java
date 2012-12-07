@@ -58,15 +58,16 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
+import org.xwiki.velocity.internal.log.SLF4JLogChute;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.tool.backup.Importer;
 
 /**
@@ -261,6 +262,7 @@ public class PackageMojo extends AbstractMojo
             new WildcardFileFilter("start_xwiki*.*"), null);
 
         // Note: Init is done once even if this method is called several times...
+        Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
         Velocity.init();
         for (File startFile : startFiles) {
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));
@@ -570,6 +572,12 @@ public class PackageMojo extends AbstractMojo
         // with proper merge feature and then remove this...
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
             "xwiki-platform-uiextension-api", this.project.getVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-localization-script", this.project.getVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-localization-source-legacy", this.project.getVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-bridge", this.project.getVersion(), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",

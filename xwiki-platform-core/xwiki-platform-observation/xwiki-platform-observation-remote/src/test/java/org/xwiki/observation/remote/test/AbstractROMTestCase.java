@@ -22,6 +22,7 @@ package org.xwiki.observation.remote.test;
 import org.junit.Before;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.test.AbstractTestCase;
 import org.xwiki.test.MockConfigurationSource;
 import org.xwiki.test.XWikiComponentInitializer;
 
@@ -30,7 +31,7 @@ import org.xwiki.test.XWikiComponentInitializer;
  * 
  * @version $Id$
  */
-public abstract class AbstractROMTestCase
+public abstract class AbstractROMTestCase extends AbstractTestCase
 {
     private XWikiComponentInitializer initializer1 = new XWikiComponentInitializer();
 

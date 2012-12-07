@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -37,7 +36,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
@@ -47,13 +45,12 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
-import org.xwiki.extension.repository.AbstractExtensionRepository;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.internal.local.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
-import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
@@ -69,7 +66,7 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named(XarExtensionHandler.TYPE)
-public class XarInstalledExtensionRepository extends AbstractExtensionRepository implements
+public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepository<XarInstalledExtension> implements
     InstalledExtensionRepository, Initializable
 {
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
@@ -89,9 +86,6 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
      */
     @Inject
     private Logger logger;
-
-    private Map<ExtensionId, XarInstalledExtension> extensions =
-        new ConcurrentHashMap<ExtensionId, XarInstalledExtension>();
 
     @Override
     public void initialize() throws InitializationException
@@ -151,12 +145,12 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
     {
         XarInstalledExtension xarExtension = new XarInstalledExtension(extension, this, this.packager);
 
-        this.extensions.put(extension.getId(), xarExtension);
+        addCachedExtension(xarExtension);
     }
 
     private void removeXarExtension(ExtensionId extensionId)
     {
-        this.extensions.remove(extensionId);
+        removeCachedExtension(this.extensions.get(extensionId));
     }
 
     private void loadExtensions()
@@ -170,46 +164,6 @@ public class XarInstalledExtensionRepository extends AbstractExtensionRepository
                 }
             }
         }
-    }
-
-    // ExtensionRepository
-
-    @Override
-    public InstalledExtension resolve(ExtensionId extensionId) throws ResolveException
-    {
-        InstalledExtension extension = this.extensions.get(extensionId);
-
-        if (extension == null) {
-            throw new ResolveException("Extension [" + extensionId + "] does not exists or is not a xar extension");
-        }
-
-        return extension;
-    }
-
-    @Override
-    public InstalledExtension resolve(ExtensionDependency extensionDependency) throws ResolveException
-    {
-        InstalledExtension extension = this.installedRepository.resolve(extensionDependency);
-        extension = this.extensions.get(extension.getId());
-
-        if (extension == null) {
-            throw new ResolveException("Extension [" + extensionDependency
-                + "] does not exists or is not a xar extension");
-        }
-
-        return extension;
-    }
-
-    @Override
-    public boolean exists(ExtensionId extensionId)
-    {
-        return this.extensions.containsKey(extensionId);
-    }
-
-    @Override
-    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
-    {
-        return this.installedRepository.resolveVersions(id, offset, nb);
     }
 
     // LocalExtensionRepository

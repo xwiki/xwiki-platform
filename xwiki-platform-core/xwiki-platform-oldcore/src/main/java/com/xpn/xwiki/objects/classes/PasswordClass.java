@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -99,6 +100,7 @@ public class PasswordClass extends StringClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilter(new XMLAttributeValueFilter());
         ElementInterface prop = object.safeget(name);
         if (prop != null) {
             input.setValue(FORM_PASSWORD_PLACEHODLER);

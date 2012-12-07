@@ -51,9 +51,9 @@ public class AttachmentsPane extends BaseElement
         inputs.get(inputs.size() - 1).sendKeys(filePath);
     }
 
-    public void waitForUploadToFinish()
+    public void waitForUploadToFinish(String fileName)
     {
-        waitUntilElementIsVisible(By.xpath("//a[text()='Hide upload status']"));
+        waitForNotificationSuccessMessage("Attachment uploaded: " + fileName);
     }
 
     public void clickHideProgress()

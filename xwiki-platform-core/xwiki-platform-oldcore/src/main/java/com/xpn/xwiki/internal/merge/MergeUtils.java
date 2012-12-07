@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.merge;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -175,10 +176,16 @@ public final class MergeUtils
      */
     private static List<Character> toCharacters(String str)
     {
-        List<Character> characters = new ArrayList<Character>(str.length());
+        List<Character> characters;
 
-        for (char c : str.toCharArray()) {
-            characters.add(c);
+        if (str != null) {
+            characters = new ArrayList<Character>(str.length());
+
+            for (char c : str.toCharArray()) {
+                characters.add(c);
+            }
+        } else {
+            characters = Collections.emptyList();
         }
 
         return characters;

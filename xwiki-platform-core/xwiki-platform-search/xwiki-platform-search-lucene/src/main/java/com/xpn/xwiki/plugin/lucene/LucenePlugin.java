@@ -24,11 +24,15 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -420,7 +424,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         if (query.startsWith("PROP ")) {
             String property = query.substring(0, query.indexOf(":"));
             query = query.substring(query.indexOf(":") + 1, query.length());
-            QueryParser qp = new QueryParser(Version.LUCENE_34, property, this.analyzer);
+            QueryParser qp = new QueryParser(Version.LUCENE_36, property, this.analyzer);
             parsedQuery = qp.parse(query);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else if (query.startsWith("MULTI ")) {
@@ -431,7 +435,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             for (int i = 0; i < flags.length; i++) {
                 flags[i] = BooleanClause.Occur.SHOULD;
             }
-            parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_34, query, fields, flags, this.analyzer);
+            parsedQuery = MultiFieldQueryParser.parse(Version.LUCENE_36, query, fields, flags, this.analyzer);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else {
             String[] fields =
@@ -441,7 +445,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             for (int i = 0; i < flags.length; i++) {
                 flags[i] = BooleanClause.Occur.SHOULD;
             }
-            QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_34, fields, this.analyzer);
+            QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, this.analyzer);
             parsedQuery = parser.parse(query);
             // Since the sub-queries are OR-ed, each sub-query score is normally divided by the number of sub-queries,
             // which would cause extra-small scores whenever there's a hit on only one sub-query;
@@ -559,18 +563,25 @@ public class LucenePlugin extends XWikiDefaultPlugin
             @SuppressWarnings("unchecked")
             Class< ? extends Analyzer> clazz =
                 (Class< ? extends Analyzer>) Class.forName(context.getWiki().Param(PROP_ANALYZER, DEFAULT_ANALYZER));
-            this.analyzer = clazz.getConstructor(Version.class).newInstance(Version.LUCENE_34);
+            this.analyzer = clazz.getConstructor(Version.class).newInstance(Version.LUCENE_36);
         } catch (Exception e) {
             LOGGER.error("Error instantiating analyzer: {}", e.getMessage());
             LOGGER.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
             try {
                 @SuppressWarnings("unchecked")
                 Class< ? extends Analyzer> clazz = (Class< ? extends Analyzer>) Class.forName(DEFAULT_ANALYZER);
-                this.analyzer = clazz.getConstructor(Version.class).newInstance(Version.LUCENE_34);
+                this.analyzer = clazz.getConstructor(Version.class).newInstance(Version.LUCENE_36);
             } catch (Exception e1) {
                 throw new RuntimeException("Instantiation of default analyzer " + DEFAULT_ANALYZER + " failed", e1);
             }
         }
+        Map<String, Analyzer> specialAnalyzers = new HashMap<String, Analyzer>();
+        Analyzer preserve = new KeywordAnalyzer();
+        specialAnalyzers.put(IndexFields.DOCUMENT_EXACTSPACE, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_WIKI, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_TYPE, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_LANGUAGE, preserve);
+        this.analyzer = new PerFieldAnalyzerWrapper(this.analyzer, specialAnalyzers);
 
         LOGGER.debug("Assigning index updater: {}", indexUpdater);
 
@@ -651,7 +662,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         String[] dirs = StringUtils.split(indexDirs, ",");
         List<IndexSearcher> searchersList = new ArrayList<IndexSearcher>();
-        IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_34, this.analyzer);
+        IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_36, this.analyzer);
         for (String dir : dirs) {
             Directory d = FSDirectory.open(new File(dir));
             while (true) {

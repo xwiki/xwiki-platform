@@ -109,25 +109,25 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
         DocumentReference panelXClass = new DocumentReference(getXWikiContext().getDatabase(), "Panels", "PanelClass");
         String content = (String) documentAccessBridge.getProperty(reference, panelXClass, "content");
         Syntax syntax = null;
+        DocumentReference authorReference;
 
         try {
             syntax = documentAccessBridge.getDocument(reference).getSyntax();
-        } catch (Exception e) {
-            String.format("Failed to retrieve panel document [{}]", reference);
-        }
-
-        try {
+            authorReference =
+                getXWikiContext().getWiki().getDocument(reference, getXWikiContext()).getAuthorReference();
             Parser parser = componentManager.getInstance(Parser.class, syntax.toIdString());
 
             try {
                 XDOM xdom = parser.parse(new StringReader(content));
-                components.add(new PanelWikiUIExtension(reference, xdom, syntax, componentManager));
+                components.add(new PanelWikiUIExtension(reference, authorReference, xdom, syntax, componentManager));
             } catch (ParseException e) {
                 throw new WikiComponentException(
                     String.format("Failed to find parse content of panel [{}]", reference));
             }
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(String.format("Failed to find a parser for syntax [{}]", syntax));
+        }  catch (Exception e) {
+            String.format("Failed to retrieve panel document [{}]", reference);
         }
 
         return components;

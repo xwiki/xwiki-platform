@@ -38,10 +38,10 @@ import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  */
 public class PropertyClass extends BaseCollection<ClassPropertyReference> implements PropertyClassInterface,
-    PropertyInterface, Comparable<PropertyClass>
+    Comparable<PropertyClass>
 {
     /**
      * Logging helper object.
@@ -181,9 +181,10 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         XWikiContext context)
     {
         input input = new input();
-        PropertyInterface prop = object.safeget(name);
+        input.setAttributeFilter(new XMLAttributeValueFilter());
+        BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("hidden");
@@ -205,10 +206,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilter(new XMLAttributeValueFilter());
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("text");
@@ -267,6 +269,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             VelocityContext vcontext = Utils.getComponent(VelocityManager.class).getVelocityContext();
             vcontext.put("name", fieldName);
             vcontext.put("prefix", prefix);
+            // The PropertyClass instance can be used to access meta properties in the custom displayer (e.g.
+            // dateFormat, multiSelect). It can be obtained from the XClass of the given object but only if the property
+            // has been added to the XClass. We need to have it in the Velocity context for the use case when an XClass
+            // property needs to be previewed before being added to the XClass.
+            vcontext.put("field", new com.xpn.xwiki.api.PropertyClass(this, context));
             vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
             vcontext.put("type", type);
             vcontext.put("context", new com.xpn.xwiki.api.Context(context));
@@ -410,13 +417,33 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         setIntValue("number", number);
     }
 
+    /**
+     * Each type of XClass property is identified by a string that specifies the data type of the property value (e.g.
+     * 'String', 'Number', 'Date') without disclosing implementation details. The internal implementation of an XClass
+     * property type can change over time but its {@code classType} should not.
+     * <p>
+     * The {@code classType} can be used as a hint to lookup various components related to this specific XClass property
+     * type. See {@link com.xpn.xwiki.internal.objects.classes.PropertyClassProvider} for instance.
+     * 
+     * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
+     */
     public String getClassType()
     {
-        return getClass().getName();
+        // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
+        // (without the package). Subclasses can overwrite this method to use a different hint format.
+        return StringUtils.removeEnd(getClass().getSimpleName(), "Class");
     }
 
+    /**
+     * Sets the property class type.
+     * 
+     * @param type the class type
+     * @deprecated since 4.3M1, the property class type cannot be modified
+     */
+    @Deprecated
     public void setClassType(String type)
     {
+        LOGGER.warn("The property class type cannot be modified!");
     }
 
     @Override
@@ -424,7 +451,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     {
         PropertyClass pclass = (PropertyClass) super.clone();
         pclass.setObject(getObject());
-        pclass.setClassType(getClassType());
         return pclass;
     }
 
@@ -447,7 +473,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             pel.add(bprop.toXML());
         }
         Element el = new DOMElement("classType");
-        el.addText(getClassType());
+        String classType = getClassType();
+        if (this.getClass().getSimpleName().equals(classType + "Class")) {
+            // Keep exporting the full Java class name for old/default property types to avoid breaking the XAR format
+            // (to allow XClasses created with the current version of XWiki to be imported in an older version).
+            classType = this.getClass().getName();
+        }
+        el.addText(classType);
         pel.add(el);
         return pel;
     }

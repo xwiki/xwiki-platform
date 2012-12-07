@@ -34,17 +34,15 @@ import org.xwiki.test.integration.XWikiExecutor;
 public class PersistentTestContext
 {
     /**
-     * Decide on which browser to run the tests and defaults to Firefox if no system property is defined (useful
-     * for running in your IDE for example).
+     * Decide on which browser to run the tests and defaults to Firefox if no system property is defined (useful for
+     * running in your IDE for example).
      */
     private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
 
     /** This starts and stops the wiki engine. */
     private final XWikiExecutor executor;
 
-    private final XWikiWrappingDriver driver;
-
-    private String currentTestName;
+    private final WebDriver driver;
 
     /** Utility methods which should be available to tests and to pages. */
     private final TestUtils util = new TestUtils();
@@ -69,12 +67,10 @@ public class PersistentTestContext
     {
         this.executor = executor;
 
-        // Use a wrapping driver to display more information when there are failures.
         // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
         // extensions such as Firebug), simply uncomment the following line:
         // System.setProperty("webdriver.firefox.profile", "default");
-        WebDriver nativeDriver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
-        this.driver = new XWikiWrappingDriver(nativeDriver, getUtil());
+        this.driver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
 
         // Wait when trying to find elements on the page till the timeout expires
         getUtil().setDriverImplicitWait(this.driver);
@@ -87,17 +83,7 @@ public class PersistentTestContext
         this.properties.putAll(toClone.properties);
     }
 
-    public void setCurrentTestName(String currentTestName)
-    {
-        this.currentTestName = currentTestName;
-    }
-
-    public String getCurrentTestName()
-    {
-        return this.currentTestName;
-    }
-
-    public XWikiWrappingDriver getDriver()
+    public WebDriver getDriver()
     {
         return this.driver;
     }
@@ -112,7 +98,7 @@ public class PersistentTestContext
 
     public void shutdown() throws Exception
     {
-        this.driver.close();
+        this.driver.quit();
         this.executor.stop();
     }
 

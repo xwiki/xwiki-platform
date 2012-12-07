@@ -20,6 +20,7 @@
 package org.xwiki.annotation.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -90,7 +91,7 @@ public class AnnotatableViewPage extends BaseElement
         script.append("  if (!strFound) \n");
         script.append("    return;\n");
         script.append("}\n");
-        getDriver().executeScript(script.toString());
+        ((JavascriptExecutor) getDriver()).executeScript(script.toString());
 
         annotationsPane = new AnnotationsPane();
         annotationsWindow = new AnnotationsWindow();
@@ -161,7 +162,7 @@ public class AnnotatableViewPage extends BaseElement
     public void simulateCTRL_M()
     {
         WebElement body = getDriver().findElement(By.id("body"));
-        body.sendKeys(Keys.CONTROL, "m");
+        body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
     }
 
     /**
@@ -169,7 +170,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public void selectText(String annotationWord)
     {
-        getDriver().executeScript(script + "findString('" + annotationWord + "');");
+        ((JavascriptExecutor) getDriver()).executeScript(script + "findString('" + annotationWord + "');");
     }
 
     public boolean checkIfAnnotationsAreDisabled()

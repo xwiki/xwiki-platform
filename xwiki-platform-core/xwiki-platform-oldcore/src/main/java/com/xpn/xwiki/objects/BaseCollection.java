@@ -624,7 +624,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
@@ -666,7 +666,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
@@ -768,7 +768,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         BaseCollection<R> previousCollection = (BaseCollection<R>) previousElement;
         BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
 
-        List<ObjectDiff> classDiff = previousCollection.getDiff(newCollection, context);
+        List<ObjectDiff> classDiff = newCollection.getDiff(previousCollection, context);
         for (ObjectDiff diff : classDiff) {
             PropertyInterface propertyResult = getField(diff.getPropName());
             PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());

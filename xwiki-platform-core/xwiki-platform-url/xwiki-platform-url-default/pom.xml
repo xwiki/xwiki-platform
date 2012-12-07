@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform-url-default</artifactId>
@@ -44,12 +44,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-configuration-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

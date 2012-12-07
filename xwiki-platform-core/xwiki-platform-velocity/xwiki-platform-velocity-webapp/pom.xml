@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-velocity</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-velocity-webapp</artifactId>
   <name>XWiki Platform - Velocity - WebApp Implementation</name>
   <packaging>jar</packaging>
   <description>Velocity Engine implementation when in a Servlet environment (templates located in the webapp's root)</description>
+  <properties>
+    <xwiki.clover.targetPercentage>77.8%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -44,12 +47,6 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-velocity</artifactId>

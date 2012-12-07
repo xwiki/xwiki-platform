@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tools</artifactId>
   <name>XWiki Platform - Tools - Parent POM</name>
@@ -42,6 +42,14 @@
     <module>xwiki-platform-tool-standards-validator</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
   </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <pluginManagement>
       <plugins>

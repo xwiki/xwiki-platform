@@ -102,8 +102,12 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         }
     }
 
+    // Tests
+
+    // #merge
+
     @Test
-    public void testContent() throws Exception
+    public void testMergeContent() throws Exception
     {
         this.previousDocument.setContent("some content");
         this.newDocument.setContent("some new content");
@@ -115,7 +119,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testContentModified() throws Exception
+    public void testMergeContentModified() throws Exception
     {
         this.previousDocument.setContent("some content");
         this.newDocument.setContent("some content\nafter");
@@ -135,7 +139,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testNewObjectAdded() throws Exception
+    public void testMergeNewObjectAdded() throws Exception
     {
         this.newDocument.addXObject(this.xobject);
 
@@ -145,7 +149,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testNewObjectRemoved() throws Exception
+    public void testMergeNewObjectRemoved() throws Exception
     {
         this.previousDocument.addXObject(this.xobject);
         this.document.addXObject(this.xobject.clone());
@@ -153,5 +157,50 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         merge();
 
         Assert.assertNull(this.document.getXObject(this.xclass.getReference(), 0));
+    }
+
+    @Test
+    public void testMergeObjectModified() throws Exception
+    {
+        this.xobject.setStringValue("test", "");
+        this.previousDocument.addXObject(this.xobject);
+
+        BaseObject obj = this.xobject.clone();
+        obj.setStringValue("test", "test1");
+        this.document.addXObject(obj);
+
+        BaseObject newobj = this.xobject.clone();
+        newobj.setStringValue("test", "test2");
+        this.newDocument.addXObject(newobj);
+
+        merge();
+
+        BaseObject mergedobj = this.document.getXObject(this.xclass.getReference(), 0);
+        
+        Assert.assertNotNull(mergedobj);
+        Assert.assertEquals("test12", mergedobj.getStringValue("test"));
+    }
+
+    // #apply
+
+    @Test
+    public void testApplyWithUnmodifiedObject()
+    {
+        this.previousDocument.addXObject(this.xobject);
+        this.document.addXObject(this.xobject.clone());
+
+        Assert.assertFalse(this.previousDocument.apply(this.document, true));
+    }
+
+    @Test
+    public void testApplyWithModifiedObjectAndClean()
+    {
+        this.previousDocument.addXObject(this.xobject);
+        BaseObject modifiedObject = this.xobject.clone();
+        modifiedObject.setStringValue("string", "string2");
+        this.document.addXObject(modifiedObject);
+
+        Assert.assertTrue(this.previousDocument.apply(this.document, true));
+        Assert.assertEquals("string2", this.xobject.getStringValue("string"));
     }
 }

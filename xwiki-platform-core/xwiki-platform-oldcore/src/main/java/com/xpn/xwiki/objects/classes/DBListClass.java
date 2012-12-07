@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -294,7 +295,7 @@ public class DBListClass extends ListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
         }
 
         return sql;
@@ -470,6 +471,7 @@ public class DBListClass extends ListClass
         // input display
         if (getDisplayType().equals("input")) {
             input input = new input();
+            input.setAttributeFilter(new XMLAttributeValueFilter());
             input.setType("text");
             input.setSize(getSize());
             boolean changeInputName = false;
@@ -478,7 +480,7 @@ public class DBListClass extends ListClass
             BaseProperty prop = (BaseProperty) object.safeget(name);
             String val = "";
             if (prop != null) {
-                val = prop.toFormString();
+                val = prop.toText();
             }
 
             if (isPicker()) {
@@ -498,6 +500,7 @@ public class DBListClass extends ListClass
                     if (secondCol.compareTo("-") != 0) {
                         changeInputName = true;
                         input hidden = new input();
+                        hidden.setAttributeFilter(new XMLAttributeValueFilter());
                         hidden.setID(prefix + name);
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
@@ -546,6 +549,7 @@ public class DBListClass extends ListClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
         }
     }

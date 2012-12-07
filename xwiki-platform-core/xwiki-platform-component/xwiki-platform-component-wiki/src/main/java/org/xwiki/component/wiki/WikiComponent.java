@@ -39,6 +39,13 @@ public interface WikiComponent
      * @return the reference to the document holding this wiki component definition.
      */
     DocumentReference getDocumentReference();
+
+    /**
+     * Get the reference to the author of the document this component instance is bound to.
+     *
+     * @return the reference to the author of the document holding this wiki component definition.
+     */
+    DocumentReference getAuthorReference();
     
     /**
      * @return the role implemented by this component implementation.
@@ -49,4 +56,9 @@ public interface WikiComponent
      * @return the hint of the role implemented by this component implementation.
      */
     String getRoleHint();
+
+    /**
+     * @return the {@link WikiComponentScope} of the component.
+     */
+    WikiComponentScope getScope();
 }

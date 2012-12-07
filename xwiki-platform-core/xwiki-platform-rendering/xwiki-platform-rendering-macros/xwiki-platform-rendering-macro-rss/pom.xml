@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-rss</artifactId>
   <name>XWiki Platform - Rendering - Macro - RSS</name>
@@ -36,19 +36,11 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <version>1.0</version>
-      <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
+    <!-- Rome does not trigger version of jdom we want -->
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
-      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

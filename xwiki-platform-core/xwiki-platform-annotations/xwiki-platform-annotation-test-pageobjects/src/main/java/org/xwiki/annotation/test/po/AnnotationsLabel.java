@@ -55,7 +55,7 @@ public class AnnotationsLabel extends BaseElement
         WebElement annotationIcon = getDriver().findElement(By.id(annotationId));
 
         // Move mouse to annotation icon
-        Actions builder = new Actions(getDriver().getWrappedDriver());
+        Actions builder = new Actions(getDriver());
         builder.moveToElement(annotationIcon).build().perform();
 
         waitUntilElementIsVisible(By.className("annotation-box-view"));

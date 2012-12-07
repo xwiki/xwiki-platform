@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ircbot</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot-ui</artifactId>
   <name>XWiki Platform - IRC Bot - UI</name>
@@ -114,6 +114,23 @@
       <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Required for Document Translation Bundle -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-source-wiki</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The Panels application is an optional dependency since the IRCBot application can work even if it's not
+         present but if it's there then it'll register in it. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

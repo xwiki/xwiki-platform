@@ -48,16 +48,12 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -77,12 +73,10 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
  */
 public class TestUtils
 {
-    private static final String SCREENSHOT_DIR = System.getProperty("screenshotDirectory");
-
     private static PersistentTestContext context;
-    
+
     private static final String URL = System.getProperty("xe.url", "http://localhost");
-    
+
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
     private static final String BASE_URL = URL + ":" + DEFAULT_PORT + "/xwiki/";
@@ -146,7 +140,7 @@ public class TestUtils
         TestUtils.context = context;
     }
 
-    protected XWikiWrappingDriver getDriver()
+    protected WebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -250,19 +244,14 @@ public class TestUtils
     public <T> void waitUntilCondition(ExpectedCondition<T> condition)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        WebDriver driver = getDriver().getWrappedDriver();
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        getDriver().manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 
-        Wait<WebDriver> wait = new WebDriverWait(driver, getTimeout());
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), getTimeout());
         try {
             wait.until(condition);
-        } catch (TimeoutException e) {
-            takeScreenshot();
-            System.out.println("Page source = [" + getDriver().getPageSource() + "]");
-            throw e;
         } finally {
             // Reset timeout
-            setDriverImplicitWait(driver);
+            setDriverImplicitWait(getDriver());
         }
     }
 
@@ -660,39 +649,6 @@ public class TestUtils
     }
 
     /**
-     * Takes a screenshot and puts the generated image in the temporary directory.
-     */
-    public void takeScreenshot()
-    {
-        if (!(getDriver().getWrappedDriver() instanceof TakesScreenshot)) {
-            return;
-        }
-
-        try {
-            File scrFile = ((TakesScreenshot) getDriver().getWrappedDriver()).getScreenshotAs(OutputType.FILE);
-            File screenshotFile;
-            if (SCREENSHOT_DIR != null) {
-                File screenshotDir = new File(SCREENSHOT_DIR);
-                screenshotDir.mkdirs();
-                screenshotFile = new File(screenshotDir, context.getCurrentTestName() + ".png");
-            } else {
-                screenshotFile =
-                    new File(new File(System.getProperty("java.io.tmpdir")), context.getCurrentTestName() + ".png");
-            }
-            FileUtils.copyFile(scrFile, screenshotFile);
-            try {
-                throw new Exception("Screenshot for failing test [" + context.getCurrentTestName() + "] saved at ["
-                    + screenshotFile.getAbsolutePath() + "]");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            System.out.println("Failed to take screenshot for failing test [" + context.getCurrentTestName() + "]");
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Forces the current user to be the Guest user by clearing all coookies.
      */
     public void forceGuestUser()
@@ -902,9 +858,7 @@ public class TestUtils
     public boolean hasElement(By by)
     {
         try {
-            // Note: make sure to use the original driver since we don't want to generate logs/take screenshots when
-            // there's an exception.
-            getDriver().getWrappedDriver().findElement(by);
+            getDriver().findElement(by);
             return true;
         } catch (NoSuchElementException e) {
             return false;

@@ -163,12 +163,13 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
         Iterable<GroupSecurityReference> groups, Iterable<Right> rights, final RuleState state) {
         final SecurityRule rule = getMockery().mock(SecurityRule.class, name);
 
-        final List<Matcher<? extends UserSecurityReference>> userMatchers
-            = new ArrayList<Matcher<? extends UserSecurityReference>>();
-        final List<Matcher<? extends GroupSecurityReference>> groupMatchers
-            = new ArrayList<Matcher<? extends GroupSecurityReference>>();
-        final List<Matcher<? extends Right>> rightMatchers = new ArrayList<Matcher<? extends Right>>();
+        final List<Matcher<? super UserSecurityReference>> userMatchers
+            = new ArrayList<Matcher<? super UserSecurityReference>>();
+        final List<Matcher<? super GroupSecurityReference>> groupMatchers
+            = new ArrayList<Matcher<? super GroupSecurityReference>>();
+        final List<Matcher<? super Right>> rightMatchers = new ArrayList<Matcher<? super Right>>();
 
+//        Matcher<? extends UserSecurityReference>[] userMatchers = new Matcher<? extends UserSecurityReference>[users.
         for (UserSecurityReference user : users) {
             userMatchers.add(is(user));
         }
@@ -180,13 +181,13 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
         }
 
         getMockery().checking(new Expectations() {{
-            allowing (rule).match(with(anyOf(userMatchers))); will(returnValue(true));
-            allowing (rule).match(with(anyOf(groupMatchers))); will(returnValue(true));
-            allowing (rule).match(with(anyOf(rightMatchers))); will(returnValue(true));
-            allowing (rule).match(with(any(UserSecurityReference.class))); will(returnValue(false));
-            allowing (rule).match(with(any(GroupSecurityReference.class))); will(returnValue(false));
-            allowing (rule).match(with(any(Right.class))); will(returnValue(false));
-            allowing (rule).getState(); will(returnValue(state));
+            allowing(rule).match(with(anyOf(userMatchers))); will(returnValue(true));
+            allowing(rule).match(with(anyOf(groupMatchers))); will(returnValue(true));
+            allowing(rule).match(with(anyOf(rightMatchers))); will(returnValue(true));
+            allowing(rule).match(with(any(UserSecurityReference.class))); will(returnValue(false));
+            allowing(rule).match(with(any(GroupSecurityReference.class))); will(returnValue(false));
+            allowing(rule).match(with(any(Right.class))); will(returnValue(false));
+            allowing(rule).getState(); will(returnValue(state));
         }});
 
         return rule;

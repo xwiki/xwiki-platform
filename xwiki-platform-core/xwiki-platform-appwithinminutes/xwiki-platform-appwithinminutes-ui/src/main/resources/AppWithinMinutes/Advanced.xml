@@ -52,7 +52,7 @@
     <className>AppWithinMinutes.FormFieldCategoryClass</className>
     <guid>5fe12242-beb3-4689-92aa-1c1daf6fbb4d</guid>
     <property>
-      <priority>2</priority>
+      <priority>3</priority>
     </property>
   </object>
   <content/>

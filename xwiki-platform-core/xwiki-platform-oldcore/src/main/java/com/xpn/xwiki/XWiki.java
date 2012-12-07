@@ -79,7 +79,6 @@ import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
-import org.securityfilter.filter.URLPatternMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
@@ -102,6 +101,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -281,8 +281,6 @@ public class XWiki implements EventListener
 
     private String fullNameSQL;
 
-    private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
-
     // These are caches in order to improve finding virtual wikis
     private List<String> virtualWikiList = new ArrayList<String>();
 
@@ -339,6 +337,9 @@ public class XWiki implements EventListener
     private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
+    private EntityReferenceResolver<String> currentMixedEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.TYPE_STRING, "currentmixed");
+
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
 
@@ -392,24 +393,22 @@ public class XWiki implements EventListener
                         InputStream xwikicfgis = XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);
                         xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                         econtext.setAttribute(xwikiname, xwiki);
+
+                        // initialize stub context here instead of during Execution context initialization because
+                        // during Execution context initialization, the XWikiContext is not fully initialized (does not
+                        // contains XWiki object) which make it unusable
+                        Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
+                            .initialize(context);
+
+                        // Send Event to signal that the application is ready to service requests.
+                        Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
+                            new ApplicationReadyEvent(), xwiki, context);
+
                     }
                 }
-
-                context.setWiki(xwiki);
-
-                // initialize stub context here instead of during Execution context initialization because during
-                // Execution context initialization, the XWikiContext is not fully initialized (does not contains XWiki
-                // object) which make it unusable
-                Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
-                    .initialize(context);
-
-                // Send Event to signal that the application is ready to service requests.
-                Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
-                    new ApplicationReadyEvent(), xwiki, context);
-            } else {
-                context.setWiki(xwiki);
             }
 
+            context.setWiki(xwiki);
             return xwiki;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
@@ -2176,9 +2175,7 @@ public class XWiki implements EventListener
     public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
         try {
-            DocumentReference xwikiPreferencesReference =
-                new DocumentReference("XWikiPreferences", new SpaceReference(SYSTEM_SPACE, new WikiReference(
-                    context.getDatabase())));
+            DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
             XWikiDocument doc = getDocument(xwikiPreferencesReference, context);
             // First we try to get a translated preference object
             BaseObject object =
@@ -2235,9 +2232,7 @@ public class XWiki implements EventListener
                 XWikiDocument doc = getDocument(space + ".WebPreferences", context);
 
                 // First we try to get a translated preference object
-                DocumentReference xwikiPreferencesReference =
-                    new DocumentReference("XWikiPreferences", new SpaceReference(SYSTEM_SPACE, new WikiReference(
-                        context.getDatabase())));
+                DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
                 BaseObject object =
                     doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
                 String result = "";
@@ -2954,8 +2949,7 @@ public class XWiki implements EventListener
      */
     public BaseClass getPrefsClass(XWikiContext context) throws XWikiException
     {
-        return getMandatoryClass(context,
-            new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"));
+        return getMandatoryClass(context, getPreferencesDocumentReference(context));
     }
 
     public BaseClass getGroupClass(XWikiContext context) throws XWikiException
@@ -3603,7 +3597,9 @@ public class XWiki implements EventListener
             if (bundle == null) {
                 bundle = ResourceBundle.getBundle("ApplicationResources");
             }
-            XWikiMessageTool msg = new XWikiMessageTool(bundle, context);
+            XWikiMessageTool msg =
+                new XWikiMessageTool(Utils.getComponent(LocalizationManager.class), Utils.getComponentManager(),
+                    context);
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {
@@ -4403,11 +4399,11 @@ public class XWiki implements EventListener
     public String getURL(DocumentReference documentReference, String action, String queryString, String anchor,
         XWikiContext context)
     {
-        XWikiDocument doc = new XWikiDocument(documentReference);
-
         URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor,
-                doc.getDatabase(), context);
+            context.getURLFactory().createURL(documentReference.getLastSpaceReference().getName(),
+                documentReference.getName(), action, queryString, anchor,
+                documentReference.getWikiReference().getName(), context);
+
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -4417,12 +4413,8 @@ public class XWiki implements EventListener
     @Deprecated
     public String getURL(String fullname, String action, String queryString, String anchor, XWikiContext context)
     {
-        XWikiDocument doc = new XWikiDocument(this.currentMixedDocumentReferenceResolver.resolve(fullname));
-
-        URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor,
-                doc.getDatabase(), context);
-        return context.getURLFactory().getURL(url, context);
+        return getURL(this.currentMixedDocumentReferenceResolver.resolve(fullname), action, queryString, anchor,
+            context);
     }
 
     public String getURL(String fullname, String action, String querystring, XWikiContext context)
@@ -4503,7 +4495,7 @@ public class XWiki implements EventListener
 
     public boolean isMultiLingual(XWikiContext context)
     {
-        return "1".equals(getXWikiPreference("multilingual", "1", context));
+        return "1".equals(getXWikiPreference("multilingual", "0", context));
     }
 
     /**
@@ -4769,16 +4761,6 @@ public class XWiki implements EventListener
     public void setEngineContext(XWikiEngineContext engine_context)
     {
         this.engine_context = engine_context;
-    }
-
-    public URLPatternMatcher getUrlPatternMatcher()
-    {
-        return this.urlPatternMatcher;
-    }
-
-    public void setUrlPatternMatcher(URLPatternMatcher urlPatternMatcher)
-    {
-        this.urlPatternMatcher = urlPatternMatcher;
     }
 
     public void setAuthService(XWikiAuthService authService)
@@ -6614,11 +6596,13 @@ public class XWiki implements EventListener
         }
     };
 
+    @Override
     public List<Event> getEvents()
     {
         return LISTENER_EVENTS;
     }
 
+    @Override
     public String getName()
     {
         return "xwiki-core";
@@ -6648,6 +6632,33 @@ public class XWiki implements EventListener
     {
         XWikiMessageTool msg = context.getMessageTool();
 
-        return parseContent(msg.get(id), context);
+        List< ? > parameters = (List< ? >) context.get("messageParameters");
+
+        String translatedMessage;
+        if (parameters != null) {
+            translatedMessage = msg.get(id, parameters);
+        } else {
+            translatedMessage = msg.get(id);
+        }
+
+        return parseContent(translatedMessage, context);
+    }
+
+    /**
+     * Return the document reference to the wiki preferences.
+     * 
+     * @param context The current xwiki context.
+     * @since 4.3M2
+     */
+    private DocumentReference getPreferencesDocumentReference(XWikiContext context)
+    {
+        String database = context.getDatabase();
+        EntityReference spaceReference;
+        if (database != null) {
+            spaceReference = new EntityReference(SYSTEM_SPACE, EntityType.SPACE, new WikiReference(database));
+        } else {
+            spaceReference = this.currentMixedEntityReferenceResolver.resolve(SYSTEM_SPACE, EntityType.SPACE);
+        }
+        return new DocumentReference("XWikiPreferences", new SpaceReference(spaceReference));
     }
 }

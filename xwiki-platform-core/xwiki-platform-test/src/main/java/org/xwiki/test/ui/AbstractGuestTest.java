@@ -27,7 +27,7 @@ import org.junit.Before;
  * @version $Id$
  * @since 4.2M3
  */
-public class AbstractGuestTest extends AbstractTest
+public abstract class AbstractGuestTest extends AbstractTest
 {
     @Before
     public void setUp() throws Exception

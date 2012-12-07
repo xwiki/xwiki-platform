@@ -23,6 +23,8 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +64,8 @@ import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.ListProperty;
 
 public class XWikiHibernateBaseStore implements Initializable
 {

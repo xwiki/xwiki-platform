@@ -48,7 +48,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## --------------------------
 ## Hidden documents filtering
 ## --------------------------
-#set($hiddenClause = ' AND hidden:false')
+#set($hiddenClause = ' +hidden:false')
 ## TODO: rewrite this when we'll have a user configuration script service
 #if($xwiki.getDocument($xcontext.user).getValue('displayHiddenDocuments') == 1)
   #set($hiddenClause = '')
@@ -60,17 +60,17 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 #set($spaces = $xwiki.spaces)
 #set($selectedSpace = "$!request.space")
 #if($selectedSpace != '' &amp;&amp; !$blacklistedSpaces.contains($selectedSpace))
-  #set($extraClause = " +space:""${selectedSpace}""")
+  #set($extraClause = " +exactspace:""${selectedSpace}""")
 #end
 ## ----------------------------------------------------------------------
 ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
 ## Also exclude WebPreferences.
 ## ----------------------------------------------------------------------
 #foreach ($blacklistedSpace in $blacklistedSpaces)
-  #set ($extraClause = " AND NOT space:${blacklistedSpace}${extraClause}")
+  #set ($extraClause = " -exactspace:${blacklistedSpace}${extraClause}")
 #end
 #if(!$hasAdmin &amp;&amp; !$isAdvancedUser)
-  #set ($extraClause = " AND NOT name:WebPreferences${extraClause}")
+  #set ($extraClause = " -name:WebPreferences${extraClause}")
 #end
 ## ---------------
 ## Space macros
@@ -186,13 +186,19 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## ---------------
 ## Results processing
 ## ---------------
+## Since Lucene doesn't support '*' or '?' as the first character we just remove it for now. Note that the SOLR
+## search doesn't have this limitation
+#set ($query = $stringtool.removeStart($query, '*'))
+#set ($query = $stringtool.removeStart($query, '?'))
+## '!' is also an operator, and if it's not at the start of a word, it will cause a query parsing exception
+#set ($query = $query.replaceAll('(?&lt;!^| )!++|!++(?=$| )', ''))
 #if($query != '')
   #set($lucene = $xwiki.getPlugin("lucene"))
   #if($lucene)    
     ## ---------------
     ## Lucene search
     ## ---------------
-    #set($searchresults = $lucene.getSearchResults("(${query}${extraClause})${hiddenClause}", '', $wikinames, $!languages))
+    #set($searchresults = $lucene.getSearchResults("+(${query})${extraClause}${hiddenClause}", '', $wikinames, $!languages))
     #if($searchresults &amp;&amp; $searchresults.getHitcount() &gt; 0)
       ## -----------------
       ## Pagination (top)
@@ -262,6 +268,9 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
           &lt;a href="${rssURL}" class='hasIcon iconRSS'&gt;$msg.get("search.rss", ["[$escapetool.xml($query)]"])&lt;/a&gt;
         {{/html}}
       #end
+    #else
+
+      {{info}}$msg.get('search.page.results.noResults'){{/info}}
     #end
   #else
 

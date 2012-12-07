@@ -101,8 +101,7 @@ public class SimpleSearchPane extends BaseElement
     public SearchResultsPane search(CharSequence keywords)
     {
         searchInput.clear();
-        searchInput.sendKeys(keywords);
-        searchInput.sendKeys(Keys.RETURN);
+        searchInput.sendKeys(keywords, Keys.ENTER);
         return new SearchResultsPane();
     }
 }

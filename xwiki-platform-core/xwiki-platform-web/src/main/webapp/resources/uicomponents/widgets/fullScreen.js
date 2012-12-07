@@ -460,7 +460,9 @@ widgets.FullScreen = Class.create({
       parent = parents[i];
       parent.setStyle(parent._originalStyle);
       parent.siblings().each(function(item) {
-        item.style['display'] = item._originalDisplay;
+        if (item._originalDisplay) {
+          item.style['display'] = item._originalDisplay;
+        }
       });
     }
     document.body.setStyle(document.body._originalStyle);

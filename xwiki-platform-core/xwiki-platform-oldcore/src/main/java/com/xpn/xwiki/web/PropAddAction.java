@@ -78,10 +78,9 @@ public class PropAddAction extends XWikiAction
                 pclass.setName(propName);
                 pclass.setPrettyName(propName);
                 bclass.put(propName, pclass);
-                String username = context.getUser();
-                doc.setAuthor(username);
+                doc.setAuthorReference(context.getUserReference());
                 if (doc.isNew()) {
-                    doc.setCreator(username);
+                    doc.setCreatorReference(context.getUserReference());
                 }
                 doc.setMetaDataDirty(true);
                 xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addClassProperty"), true, context);

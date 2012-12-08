@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.lucene;
+package com.xpn.xwiki.plugin.lucene.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 
 /**
  * Holds all data but the content of an attachment to be indexed. The content is retrieved at indexing time, which
@@ -185,7 +186,7 @@ public class AttachmentData extends AbstractDocumentData
      * Return a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of this
      * attachment, as far as it could be extracted.
      * 
-     * @see com.xpn.xwiki.plugin.lucene.AbstractIndexData#getFullText(java.lang.StringBuilder,
+     * @see com.xpn.xwiki.plugin.lucene.internal.AbstractIndexData#getFullText(java.lang.StringBuilder,
      *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
      */
     @Override

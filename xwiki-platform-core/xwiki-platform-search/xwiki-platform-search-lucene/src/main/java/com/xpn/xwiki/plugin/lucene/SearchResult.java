@@ -27,6 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.plugin.lucene.internal.IndexFields;
 
 /**
  * Result of a search. The Plugin will return a collection of these for display on the search page.

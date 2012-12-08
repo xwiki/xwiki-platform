@@ -47,6 +47,9 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.lucene.internal.IndexFields;
+import com.xpn.xwiki.plugin.lucene.internal.IndexRebuilder;
+import com.xpn.xwiki.plugin.lucene.internal.IndexUpdater;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 

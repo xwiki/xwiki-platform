@@ -60,7 +60,7 @@ public class SearchResults extends Api
      * @param results Lucene search results
      * @param xwiki xwiki instance for access rights checking
      */
-    SearchResults(TopDocsCollector< ? extends ScoreDoc> results, IndexSearcher searcher, XWiki xwiki, XWikiContext context)
+    public SearchResults(TopDocsCollector< ? extends ScoreDoc> results, IndexSearcher searcher, XWiki xwiki, XWikiContext context)
     {
         super(context);
 

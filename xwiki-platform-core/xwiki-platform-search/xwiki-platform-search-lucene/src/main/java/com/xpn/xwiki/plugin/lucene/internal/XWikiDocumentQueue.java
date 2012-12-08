@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.lucene;
+package com.xpn.xwiki.plugin.lucene.internal;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.BufferUnderflowException;
 import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
+
 
 /**
  * This class represents a Queue (FirstInFirstOut) for XWikiDocument objects. It is used during indexing of the wiki.

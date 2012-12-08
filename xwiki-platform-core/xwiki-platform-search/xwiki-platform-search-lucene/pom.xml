@@ -105,19 +105,19 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            com/xpn/xwiki/plugin/lucene/AbstractDocumentData.java,
-            com/xpn/xwiki/plugin/lucene/AbstractIndexData.java,
-            com/xpn/xwiki/plugin/lucene/AttachmentData.java,
-            com/xpn/xwiki/plugin/lucene/DocumentData.java,
-            com/xpn/xwiki/plugin/lucene/IndexFields.java,
-            com/xpn/xwiki/plugin/lucene/IndexRebuilder.java,
-            com/xpn/xwiki/plugin/lucene/IndexUpdater.java,
+            com/xpn/xwiki/plugin/lucene/internal/AbstractDocumentData.java,
+            com/xpn/xwiki/plugin/lucene/internal/AbstractIndexData.java,
+            com/xpn/xwiki/plugin/lucene/internal/AttachmentData.java,
+            com/xpn/xwiki/plugin/lucene/internal/DocumentData.java,
+            com/xpn/xwiki/plugin/lucene/internal/IndexFields.java,
+            com/xpn/xwiki/plugin/lucene/internal/IndexRebuilder.java,
+            com/xpn/xwiki/plugin/lucene/internal/IndexUpdater.java,
             com/xpn/xwiki/plugin/lucene/LucenePlugin.java,
             com/xpn/xwiki/plugin/lucene/LucenePluginApi.java,
             com/xpn/xwiki/plugin/lucene/SearchResult.java,
             com/xpn/xwiki/plugin/lucene/SearchResults.java,
-            com/xpn/xwiki/plugin/lucene/WikiData.java,
-            com/xpn/xwiki/plugin/lucene/XWikiDocumentQueue.java
+            com/xpn/xwiki/plugin/lucene/internal/WikiData.java,
+            com/xpn/xwiki/plugin/lucene/internal/XWikiDocumentQueue.java
           </excludes>
         </configuration>
       </plugin>

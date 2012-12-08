@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.lucene;
+package com.xpn.xwiki.plugin.lucene.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ import com.xpn.xwiki.internal.event.AbstractAttachmentEvent;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
 import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 import com.xpn.xwiki.web.Utils;
 
@@ -82,7 +83,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     /**
      * Collecting all the fields for using up in search
      */
-    static final List<String> fields = new ArrayList<String>();
+    public static final List<String> fields = new ArrayList<String>();
 
     private final LucenePlugin plugin;
 
@@ -124,7 +125,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         xwikiContext.declareInExecutionContext(executionContext);
     }
 
-    IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
+    public IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
         this.xwikiContext = context.clone();
 

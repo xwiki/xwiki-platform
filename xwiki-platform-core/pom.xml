@@ -290,11 +290,83 @@
               <differenceType>3005</differenceType>
               <justification>The AbstractXWikiURL should have been abstract from the beginning, as the name implies.</justification>
             </difference>
+            <!-- XWIKI-8577 Move lucene plugin classes to an internal package -->
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/AbstractDocumentData</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/AbstractIndexData</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/AttachmentData</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/DocumentData</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/IndexFields</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/IndexRebuilder</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/IndexUpdater</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/WikiData</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/XWikiDocumentQueue</className>
+              <differenceType>8001</differenceType>
+              <justification>Moved to an internal package</justification>
+            </difference>
+            <!-- XWIKI-8404 Upgrade to lucene 4.0.0 -->
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/LucenePlugin</className>
+              <method>org.apache.lucene.search.Searcher[] createSearchers(java.lang.String, com.xpn.xwiki.XWikiContext)</method>
+              <differenceType>7002</differenceType>
+              <justification>Method removed (renamed) the searcher notion has been replaced by index readers in lucene 4.0</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/LucenePlugin</className>
+              <method>void openSearchers(com.xpn.xwiki.XWikiContext)</method>
+              <differenceType>7002</differenceType>
+              <justification>Method removed (renamed) the searcher notion has been replaced by index readers in lucene 4.0</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/plugin/lucene/LucenePlugin</className>
+              <method>void closeSearchers(org.apache.lucene.search.Searcher[])</method>
+              <differenceType>7002</differenceType>
+              <justification>Method removed : it is not needed anymore since index readers are automatically closed in Lucene 4.0</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Excluding the whole lucene plugin class as I could not succeed in expressing individual differences of type 7005 (Method Argument Type changed),
+                 it fails with java.util.Arrays$ArrayList cannot be cast to org.codehaus.mojo.clirr.Difference even though I declare the "method" and its new signature "to"
+                 There are 2 such differences :
+                   void init(com.xpn.xwiki.plugin.lucene.IndexUpdater, com.xpn.xwiki.XWikiContext) -> void init(com.xpn.xwiki.plugin.lucene.internal.IndexUpdater, com.xpn.xwiki.XWikiContext)
+               and void init(com.xpn.xwiki.plugin.lucene.IndexUpdater, com.xpn.xwiki.plugin.lucene.IndexRebuilder, com.xpn.xwiki.XWikiContext) -> void init(com.xpn.xwiki.plugin.lucene.internal.IndexUpdater, com.xpn.xwiki.plugin.lucene.internal.IndexRebuilder, com.xpn.xwiki.XWikiContext)
+                 -->
+            <exclude>com/xpn/xwiki/plugin/lucene/LucenePlugin</exclude>
           </excludes>
         </configuration>
       </plugin>

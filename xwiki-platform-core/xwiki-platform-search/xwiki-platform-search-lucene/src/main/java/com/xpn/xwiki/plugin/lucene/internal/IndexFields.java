@@ -17,12 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.lucene;
+package com.xpn.xwiki.plugin.lucene.internal;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.FastDateFormat;
+
+import com.xpn.xwiki.plugin.lucene.SearchResult;
+
 
 /**
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of

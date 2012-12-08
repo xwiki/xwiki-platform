@@ -69,6 +69,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.lucene.internal.IndexFields;
+import com.xpn.xwiki.plugin.lucene.internal.IndexRebuilder;
+import com.xpn.xwiki.plugin.lucene.internal.IndexUpdater;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -673,7 +676,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
     /**
      * Opens the readers for the configured index Dirs after closing any already existing ones.
      */
-    protected synchronized void openIndexReaders(XWikiContext context)
+    public synchronized void openIndexReaders(XWikiContext context)
     {
         try {
             this.indexReaders = createIndexReaders(this.indexDirs, context);
@@ -720,7 +723,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
     /**
      * Handle a corrupt index by clearing it and rebuilding from scratch.
      */
-    void handleCorruptIndex(XWikiContext context) throws IOException
+    public void handleCorruptIndex(XWikiContext context) throws IOException
     {
         rebuildIndex(context);
     }

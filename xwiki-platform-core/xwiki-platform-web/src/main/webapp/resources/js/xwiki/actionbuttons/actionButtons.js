@@ -69,7 +69,7 @@ actionButtons.EditActions = Class.create({
     #if($xwiki.isEditCommentMandatory())
       var commentField = form.comment
       while (commentField.value == "") {
-        var response = prompt("${msg.get('core.comment.prompt')}");
+        var response = prompt("${msg.get('core.comment.prompt')}", '');
         if (response === null) {
           return false;
         }
@@ -78,7 +78,7 @@ actionButtons.EditActions = Class.create({
     #elseif($xwiki.isEditCommentSuggested())
       var commentField = form.comment
       if (commentField.value == "") {
-        var response = prompt("${msg.get('core.comment.prompt')}");
+        var response = prompt("${msg.get('core.comment.prompt')}", '');
         if (response === null) {
           return false;
         }

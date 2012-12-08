@@ -822,19 +822,26 @@
      -->
   </requestHandler>
 
-  <!-- XML Update Request Handler.  
-       
+  <!-- Update Request Handler.  
+
        http://wiki.apache.org/solr/UpdateXmlMessages
 
        The canonical Request Handler for Modifying the Index through
-       commands specified using XML.
+       commands specified using XML, JSON, CSV, or JAVABIN
 
        Note: Since solr1.1 requestHandlers requires a valid content
        type header if posted in the body. For example, curl now
        requires: -H 'Content-type:text/xml; charset=utf-8'
+
+       To override the request content type and force a specific 
+       Content-type, use the request parameter: 
+         ?update.contentType=text/csv
+
+       This handler will pick a response format to match the input
+       if the 'wt' parameter is not explicit
     -->
   <requestHandler name="/update" 
-                  class="solr.XmlUpdateRequestHandler">
+                  class="solr.UpdateRequestHandler">
     <!-- See below for information on defining 
          updateRequestProcessorChains that can be used by name 
          on each Update Request
@@ -845,32 +852,24 @@
        </lst>
        -->
     </requestHandler>
-  <!-- Binary Update Request Handler
-       http://wiki.apache.org/solr/javabin
-    -->
-  <requestHandler name="/update/javabin" 
-                  class="solr.BinaryUpdateRequestHandler" />
 
-  <!-- CSV Update Request Handler
-       http://wiki.apache.org/solr/UpdateCSV
-    -->
-  <requestHandler name="/update/csv" 
-                  class="solr.CSVRequestHandler" 
-                  startup="lazy" />
-
-  <!-- JSON Update Request Handler
-       http://wiki.apache.org/solr/UpdateJSON
-    -->
-  <requestHandler name="/update/json" 
-                  class="solr.JsonUpdateRequestHandler" 
-                  startup="lazy" />
+   <!-- for back compat with clients using /update/json and /update/csv -->  
+  <requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler">
+        <lst name="defaults">
+         <str name="stream.contentType">application/json</str>
+       </lst>
+  </requestHandler>
+  <requestHandler name="/update/csv" class="solr.CSVRequestHandler">
+        <lst name="defaults">
+         <str name="stream.contentType">application/csv</str>
+       </lst>
+  </requestHandler> 
 
   <!-- Solr Cell Update Request Handler
 
        http://wiki.apache.org/solr/ExtractingRequestHandler 
 
     -->
-  
   <requestHandler name="/update/extract" class="org.apache.solr.handler.extraction.ExtractingRequestHandler">
     <lst name="defaults">
       <str name="fmap.Last-Modified">last_modified</str>
@@ -883,14 +882,6 @@
       <str>yyyy-MM-dd</str>
     </lst>
   </requestHandler>
-  
-
-  <!-- XSLT Update Request Handler
-       Transforms incoming XML with stylesheet identified by tr=
-  -->
-  <requestHandler name="/update/xslt"
-                   startup="lazy"
-                   class="solr.XsltUpdateRequestHandler"/>
 
   <!-- Field Analysis Request Handler
 

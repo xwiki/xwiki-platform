@@ -61,7 +61,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.DefaultIndexableReferenceExtractor;
 import org.xwiki.search.solr.internal.IndexableReferenceExtractor;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 

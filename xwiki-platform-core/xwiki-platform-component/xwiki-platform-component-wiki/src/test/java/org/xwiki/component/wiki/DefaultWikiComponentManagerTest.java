@@ -31,7 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentManager;
 import org.xwiki.component.wiki.internal.WikiComponentManagerContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 @MockingRequirement(DefaultWikiComponentManager.class)

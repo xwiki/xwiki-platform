@@ -30,7 +30,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.ircbot.IRCBotListener;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.MockingRequirement;
 

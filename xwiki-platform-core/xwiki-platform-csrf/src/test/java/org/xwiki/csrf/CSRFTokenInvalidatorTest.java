@@ -31,7 +31,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.csrf.internal.CSRFTokenInvalidator;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**

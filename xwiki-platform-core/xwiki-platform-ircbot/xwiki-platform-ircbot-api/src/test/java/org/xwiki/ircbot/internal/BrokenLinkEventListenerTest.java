@@ -31,7 +31,7 @@ import org.xwiki.ircbot.IRCBot;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.transformation.linkchecker.InvalidURLEvent;
 import org.xwiki.rendering.transformation.linkchecker.LinkState;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import junit.framework.Assert;

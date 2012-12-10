@@ -22,13 +22,14 @@ package org.xwiki.model.internal;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-import org.xwiki.test.AbstractTestCase;
+import org.xwiki.test.jmock.JMockRule;
 
 /**
  * Unit tests for {@link DefaultModelConfiguration}.
@@ -36,8 +37,11 @@ import org.xwiki.test.AbstractTestCase;
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultModelConfigurationTest extends AbstractTestCase
+public class DefaultModelConfigurationTest
 {
+    @Rule
+    public final JMockRule mockery = new JMockRule();
+
     private ModelConfiguration configuration;
 
     private ConfigurationSource mockSource;
@@ -45,12 +49,12 @@ public class DefaultModelConfigurationTest extends AbstractTestCase
     @Before
     public void setUp() throws Exception
     {
-        this.mockSource = getMockery().mock(ConfigurationSource.class);
+        this.mockSource = this.mockery.mock(ConfigurationSource.class);
         this.configuration = new DefaultModelConfiguration();
 
-        final ComponentManager mockCM = getMockery().mock(ComponentManager.class);
+        final ComponentManager mockCM = this.mockery.mock(ComponentManager.class);
         ReflectionUtils.setFieldValue(this.configuration, "componentManager", mockCM);
-        getMockery().checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
             allowing(mockCM).getInstance(ConfigurationSource.class, "xwikiproperties"); will(returnValue(mockSource));
         }});
     }
@@ -58,7 +62,7 @@ public class DefaultModelConfigurationTest extends AbstractTestCase
     @Test
     public void testGetDefaultReferenceNameWhenDefinedInConfiguration()
     {
-        getMockery().checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
             oneOf(mockSource).getProperty(with(equal("model.reference.default.wiki")), with(any(String.class)));
                 will(returnValue("defaultWiki"));
             oneOf(mockSource).getProperty(with(equal("model.reference.default.document")), with(any(String.class)));
@@ -85,7 +89,7 @@ public class DefaultModelConfigurationTest extends AbstractTestCase
     @Test
     public void testGetDefaultReferenceNameWhenNotDefinedInConfiguration()
     {
-        getMockery().checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
             oneOf(mockSource).getProperty("model.reference.default.wiki", "xwiki"); will(returnValue("xwiki"));
             oneOf(mockSource).getProperty("model.reference.default.document", "WebHome"); will(returnValue("WebHome"));
             oneOf(mockSource).getProperty("model.reference.default.space", "Main"); will(returnValue("Main"));

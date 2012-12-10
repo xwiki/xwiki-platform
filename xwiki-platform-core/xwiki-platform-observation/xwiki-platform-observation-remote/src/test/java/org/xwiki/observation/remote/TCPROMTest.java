@@ -49,7 +49,7 @@ public class TCPROMTest extends AbstractROMTestCase
     @After
     public void tearDown() throws Exception
     {
-        getMockery().assertIsSatisfied();
+        this.mockery.assertIsSatisfied();
     }
 
     /**
@@ -58,14 +58,14 @@ public class TCPROMTest extends AbstractROMTestCase
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener localListener = getMockery().mock(EventListener.class, "local");
-        final EventListener remoteListener = getMockery().mock(EventListener.class, "remote");
+        final EventListener localListener = this.mockery.mock(EventListener.class, "local");
+        final EventListener remoteListener = this.mockery.mock(EventListener.class, "remote");
 
         final TestEvent event = new TestEvent();
 
         final Unserializable unserializable = new Unserializable();
 
-        getMockery().checking(new Expectations()
+        this.mockery.checking(new Expectations()
         {{
                 allowing(localListener).getName();
                 will(returnValue("mylistener"));

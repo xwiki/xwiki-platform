@@ -37,7 +37,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.DefaultSolrIndex;
 import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.search.solr.internal.api.SolrIndex;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 

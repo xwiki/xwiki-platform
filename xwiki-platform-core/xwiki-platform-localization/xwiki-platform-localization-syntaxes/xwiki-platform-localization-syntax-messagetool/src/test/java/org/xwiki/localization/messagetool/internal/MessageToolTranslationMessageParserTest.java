@@ -33,7 +33,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 

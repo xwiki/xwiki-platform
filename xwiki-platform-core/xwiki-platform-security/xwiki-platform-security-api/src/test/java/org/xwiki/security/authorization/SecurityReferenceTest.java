@@ -31,7 +31,7 @@ import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import static org.hamcrest.CoreMatchers.equalTo;

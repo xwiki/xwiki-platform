@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.jmock.lib.action.CustomAction;

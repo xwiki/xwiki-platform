@@ -20,19 +20,23 @@
 package org.xwiki.observation.remote.test;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.test.AbstractTestCase;
 import org.xwiki.test.MockConfigurationSource;
-import org.xwiki.test.XWikiComponentInitializer;
+import org.xwiki.test.jmock.JMockRule;
+import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**
  * Base class to easily emulate two instances of observation manager communicate with each other by network.
  * 
  * @version $Id$
  */
-public abstract class AbstractROMTestCase extends AbstractTestCase
+public abstract class AbstractROMTestCase
 {
+    @Rule
+    public final JMockRule mockery = new JMockRule();
+
     private XWikiComponentInitializer initializer1 = new XWikiComponentInitializer();
 
     private XWikiComponentInitializer initializer2 = new XWikiComponentInitializer();

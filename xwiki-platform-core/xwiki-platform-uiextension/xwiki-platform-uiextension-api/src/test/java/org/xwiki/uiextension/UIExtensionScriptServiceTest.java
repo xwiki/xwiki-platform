@@ -42,7 +42,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;

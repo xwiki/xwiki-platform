@@ -34,6 +34,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
+import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -208,7 +209,12 @@ public class XWikiExecutor
         executor.setWorkingDirectory(new File(getExecutionDirectory()));
         executor.setProcessDestroyer(processDestroyer);
         executor.setWatchdog(watchDog);
-        executor.execute(command, this.environment, resultHandler);
+
+        // Inherit the current process's environment variables and add the user-defined ones
+        Map newEnvironment = EnvironmentUtils.getProcEnvironment();
+        newEnvironment.putAll(this.environment);
+
+        executor.execute(command, newEnvironment, resultHandler);
 
         return resultHandler;
     }

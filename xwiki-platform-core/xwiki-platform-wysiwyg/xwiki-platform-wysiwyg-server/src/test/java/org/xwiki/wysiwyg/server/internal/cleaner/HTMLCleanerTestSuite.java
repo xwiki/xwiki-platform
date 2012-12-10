@@ -36,7 +36,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
-import org.xwiki.test.XWikiComponentInitializer;
+import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**
  * A suite of {@link HTMLCleanerTest}.

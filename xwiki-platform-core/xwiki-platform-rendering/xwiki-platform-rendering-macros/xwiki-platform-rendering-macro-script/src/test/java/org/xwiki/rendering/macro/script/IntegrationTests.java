@@ -30,7 +30,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.script.event.ScriptEvaluatingEvent;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the

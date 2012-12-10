@@ -38,7 +38,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
 /**

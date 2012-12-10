@@ -27,7 +27,7 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the

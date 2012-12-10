@@ -25,13 +25,14 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.test.MockConfigurationSource;
-import org.xwiki.test.XWikiComponentInitializer;
+import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
- * available. Use this class for JUnit 3.x tests. For Junit 4.x tests use {@link org.xwiki.test.AbstractComponentTestCase} instead.
+ * available. Use this class for JUnit 3.x tests. For JUnit 4.x tests use {@link org.xwiki.test.ComponentManagerRule}
+ * instead.
  *
- * @deprecated use JUnit 4.x and {@link org.xwiki.test.AbstractComponentTestCase}
+ * @deprecated use JUnit 4.x and {@link org.xwiki.test.ComponentManagerRule}
  */
 @Deprecated
 public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase

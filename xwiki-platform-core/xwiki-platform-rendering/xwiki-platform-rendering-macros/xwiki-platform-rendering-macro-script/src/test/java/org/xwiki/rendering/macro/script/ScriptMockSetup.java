@@ -26,7 +26,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.wiki.WikiModel;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Dynamic mock setup for script macros.

@@ -32,7 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.rendering.parser.Parser;

@@ -33,7 +33,7 @@ import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the

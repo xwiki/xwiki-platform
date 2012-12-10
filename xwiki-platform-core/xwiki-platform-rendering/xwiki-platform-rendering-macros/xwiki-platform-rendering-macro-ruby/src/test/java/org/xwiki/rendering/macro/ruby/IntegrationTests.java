@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.ruby;
 import org.junit.runner.RunWith;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.MockingComponentManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the

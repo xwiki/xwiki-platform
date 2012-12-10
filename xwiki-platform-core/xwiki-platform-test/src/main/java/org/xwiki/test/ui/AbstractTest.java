@@ -85,7 +85,10 @@ public abstract class AbstractTest
     @AfterClass
     public static void shutdown() throws Exception
     {
-        context.shutdown();
+        // The context can be null if the XWiki Server couldn't start for example.
+        if (context != null) {
+            context.shutdown();
+        }
     }
 
     protected String getTestMethodName()

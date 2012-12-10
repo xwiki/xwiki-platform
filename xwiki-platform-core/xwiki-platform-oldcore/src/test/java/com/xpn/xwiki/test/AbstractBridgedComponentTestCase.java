@@ -32,7 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;

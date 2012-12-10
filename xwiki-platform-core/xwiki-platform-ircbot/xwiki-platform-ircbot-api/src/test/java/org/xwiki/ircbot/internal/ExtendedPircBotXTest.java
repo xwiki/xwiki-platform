@@ -26,7 +26,7 @@ import org.pircbotx.Channel;
 import org.pircbotx.OutputThread;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link HelpIRCBotListener}.

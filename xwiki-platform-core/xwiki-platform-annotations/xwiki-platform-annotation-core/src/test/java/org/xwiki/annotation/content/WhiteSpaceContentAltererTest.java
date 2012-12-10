@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * @version $Id$

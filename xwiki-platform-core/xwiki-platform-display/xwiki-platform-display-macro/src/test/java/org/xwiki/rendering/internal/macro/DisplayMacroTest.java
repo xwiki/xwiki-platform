@@ -52,7 +52,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
 /**

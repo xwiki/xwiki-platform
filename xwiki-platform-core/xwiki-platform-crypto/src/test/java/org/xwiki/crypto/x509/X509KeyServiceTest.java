@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.internal.X509KeyService;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * KeyService test, insure that the key service is able to make keys without throwing an exception.

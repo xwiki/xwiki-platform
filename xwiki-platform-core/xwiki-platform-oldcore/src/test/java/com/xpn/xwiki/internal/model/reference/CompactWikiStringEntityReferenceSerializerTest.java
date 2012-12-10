@@ -26,7 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer}.

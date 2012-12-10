@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Base class for testing cache component implementation.

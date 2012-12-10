@@ -25,7 +25,7 @@ import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests the default implementation of {@link IOTargetService}, and integration with target resolvers, up to the

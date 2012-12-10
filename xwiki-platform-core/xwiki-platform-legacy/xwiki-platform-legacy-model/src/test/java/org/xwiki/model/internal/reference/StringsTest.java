@@ -27,7 +27,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReferenceResolver;
 import org.xwiki.model.reference.ObjectReferenceResolver;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 public class StringsTest extends AbstractComponentTestCase
 {

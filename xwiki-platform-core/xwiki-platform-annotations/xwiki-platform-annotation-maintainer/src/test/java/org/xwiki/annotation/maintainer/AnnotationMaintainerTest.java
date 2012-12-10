@@ -42,7 +42,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests the annotation maintainer that updates annotations when documents change.

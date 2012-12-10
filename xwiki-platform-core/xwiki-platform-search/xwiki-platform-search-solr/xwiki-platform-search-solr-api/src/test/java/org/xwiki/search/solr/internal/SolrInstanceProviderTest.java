@@ -31,7 +31,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.search.solr.internal.SolrInstanceProvider;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * TODO DOCUMENT ME!

@@ -32,7 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link SecureGroovyCompilationCustomizer}.

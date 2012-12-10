@@ -33,7 +33,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import junit.framework.Assert;
 

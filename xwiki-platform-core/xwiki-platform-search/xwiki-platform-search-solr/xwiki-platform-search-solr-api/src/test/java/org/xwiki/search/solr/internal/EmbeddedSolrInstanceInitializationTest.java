@@ -34,7 +34,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Test the initialization of the Solr instance.

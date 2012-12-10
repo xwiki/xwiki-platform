@@ -27,7 +27,7 @@ import org.jmock.Expectations;
 import org.junit.Before;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Boilerplate for filesystem attachment tests.

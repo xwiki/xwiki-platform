@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Integration test for {@link XWikiWebappResourceLoader}.

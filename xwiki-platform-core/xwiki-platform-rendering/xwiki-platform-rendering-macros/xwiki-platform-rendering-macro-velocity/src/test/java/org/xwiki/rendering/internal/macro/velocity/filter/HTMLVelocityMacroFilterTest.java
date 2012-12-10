@@ -24,7 +24,7 @@ import junit.framework.Assert;
 import org.apache.velocity.VelocityContext;
 import org.junit.Test;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Validate the behavior of {@link HTMLVelocityMacroFilter}.

@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 

@@ -22,7 +22,7 @@ package org.xwiki.security.authorization.internal;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import junit.framework.Assert;
 

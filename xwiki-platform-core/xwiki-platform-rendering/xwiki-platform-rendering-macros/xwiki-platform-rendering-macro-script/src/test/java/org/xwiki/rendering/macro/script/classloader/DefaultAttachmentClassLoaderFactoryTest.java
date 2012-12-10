@@ -29,7 +29,7 @@ import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
 import org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link DefaultAttachmentClassLoaderFactory}.

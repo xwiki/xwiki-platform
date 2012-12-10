@@ -25,7 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
 
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests {@link org.xwiki.crypto.passwd.internal.DefaultPasswordCryptoService}.

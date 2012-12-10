@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 import com.xpn.xwiki.web.Utils;
 
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Test list property.

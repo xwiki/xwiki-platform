@@ -38,7 +38,7 @@ import org.xwiki.rendering.test.MockWikiModel;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Renderer tests for the XHTML annotations renderer, from the test files.

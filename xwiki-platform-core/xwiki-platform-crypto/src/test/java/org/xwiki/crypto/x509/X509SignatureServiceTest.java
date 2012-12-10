@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.internal.X509SignatureService;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Prove that X509SignatureService can sign and verify text and can verify text signed in firefox.

@@ -37,7 +37,7 @@ import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.FilterableEvent;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 @Deprecated
 public class LegacyEventDispatcherTest extends AbstractComponentTestCase

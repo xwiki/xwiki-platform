@@ -23,7 +23,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * An abstract test case to be used by all office-importer tests.

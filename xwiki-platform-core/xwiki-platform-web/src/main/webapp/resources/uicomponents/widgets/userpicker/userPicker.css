@@ -25,21 +25,21 @@ ul.users {
   margin: 0;
   padding: 0;
 }
-.user {
+.suggestItem .user, .users .user {
   /* Leave space for the user avatar. */
   min-height: 30px;
   padding-left: 38px;
   /* Needed because the avatar is displayed with absolute position. */
   position: relative;
 }
-.users .user:hover {
+.suggestItem .user:hover, .users .user:hover {
   background-color: $theme.highlightColor;
 }
-.accepted-suggestions .user, .users .user {
+.accepted-suggestions .user, .suggestItem .user, .users .user {
   margin: .2em 0;
 }
 /* Center the user avatar in a 30px square. */
-.user .user-avatar-wrapper {
+.suggestItem .user .user-avatar-wrapper, .users .user .user-avatar-wrapper {
   height: 30px;
   left: .2em;
   line-height: 30px;
@@ -48,7 +48,7 @@ ul.users {
   width: 30px;
 }
 /* User avatars are resized on the server but the default no-avatar image is not so it's safer to limit the size here */
-.user .user-avatar-wrapper img {
+.suggestItem .user .user-avatar-wrapper img, .users .user .user-avatar-wrapper img {
   max-height: 30px;
   max-width: 30px;
 }
@@ -56,15 +56,15 @@ div.suggestItems .user *, .accepted-suggestions .user *, .users .user * {
   /* Overwrite the line-height from suggest.css */
   line-height: normal;
 }
-.user .user-alias, .user .user-wiki {
+.suggestItem .user .user-alias, .suggestItem .user .user-wiki, .users .user .user-alias, .users .user .user-wiki {
   color: $theme.textSecondaryColor;
   font-size: 0.875em;
   padding-right: .2em;
 }
-.user .user-wiki:before {
+.suggestItem .user .user-wiki:before, .users .user .user-wiki:before {
   content: '(';
 }
-.user .user-wiki:after {
+.suggestItem .user .user-wiki:after, .users .user .user-wiki:after {
   content: ')';
 }
 .suggestItem .user-name {

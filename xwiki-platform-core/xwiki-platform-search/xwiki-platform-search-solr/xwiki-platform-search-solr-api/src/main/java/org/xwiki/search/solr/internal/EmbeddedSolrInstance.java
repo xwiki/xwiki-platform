@@ -69,6 +69,11 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
     protected static final String SCHEMA_XML = "schema.xml";
 
     /**
+     * Name of the default Solr cores configuration file.
+     */
+    protected static final String SOLR_XML = "solr.xml";
+
+    /**
      * SOLR HOME KEY.
      */
     protected static final String SOLR_HOME_KEY = "solr.solr.home";
@@ -141,6 +146,10 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
             confDirectory.mkdir();
         }
 
+        // Initialize the cores configuration file.
+        copyFileIfNotExists(solrHomeDir, SOLR_XML);
+
+        // Initialize configuration files in the conf directory of the default core.
         String[] fileNames =
         {SOLRCONFIG_XML, SCHEMA_XML, "protwords.txt", "stopwords.txt", "synonyms.txt", "elevate.xml"};
         for (String fileName : fileNames) {

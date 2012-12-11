@@ -56,8 +56,8 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
@@ -198,7 +198,7 @@ public class DefaultIndexableReferenceExtractorTest extends
             {
                 allowing(execution).getContext();
                 will(returnValue(executionContext));
-                
+
                 ignoring(serializer);
 
                 // ignoring(any(Logger.class));
@@ -437,7 +437,7 @@ public class DefaultIndexableReferenceExtractorTest extends
     public void testDocumentWithObjects() throws Exception
     {
         List<EntityReference> result = referenceExtractor.getReferences(document122);
-        
+
         Assert.assertNotNull(result);
         Assert.assertEquals(5, result.size());
 

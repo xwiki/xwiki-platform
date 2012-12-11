@@ -32,7 +32,7 @@ import org.xwiki.component.wiki.internal.DefaultWikiComponentManager;
 import org.xwiki.component.wiki.internal.WikiComponentManagerContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 @MockingRequirement(DefaultWikiComponentManager.class)
 public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTestCase

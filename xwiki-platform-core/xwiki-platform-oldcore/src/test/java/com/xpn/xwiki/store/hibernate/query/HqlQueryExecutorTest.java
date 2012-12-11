@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
  * Tests for {@link HqlQueryExecutor}

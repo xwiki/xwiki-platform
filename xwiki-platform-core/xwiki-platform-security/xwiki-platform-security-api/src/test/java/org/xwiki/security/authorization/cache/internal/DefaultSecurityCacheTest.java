@@ -52,8 +52,8 @@ import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.MockingRequirement;
-import org.xwiki.test.annotation.MockingRequirements;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirements;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;

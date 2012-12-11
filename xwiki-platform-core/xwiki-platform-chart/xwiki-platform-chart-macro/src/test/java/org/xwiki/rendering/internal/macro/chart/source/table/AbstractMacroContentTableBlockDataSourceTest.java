@@ -42,7 +42,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
  * Helper to write unit tests for Table-based data sources.

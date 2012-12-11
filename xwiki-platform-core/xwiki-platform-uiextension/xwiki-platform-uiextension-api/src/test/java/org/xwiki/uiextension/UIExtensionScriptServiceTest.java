@@ -20,7 +20,6 @@
 package org.xwiki.uiextension;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,21 +33,17 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 import org.xwiki.uiextension.internal.scripting.UIExtensionScriptService;
-import org.xwiki.velocity.VelocityManager;
 
 import junit.framework.Assert;
 

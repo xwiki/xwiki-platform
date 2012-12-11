@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.test.MockConfigurationSource;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.jmock.JMockRule;
 import org.xwiki.test.jmock.XWikiComponentInitializer;
 

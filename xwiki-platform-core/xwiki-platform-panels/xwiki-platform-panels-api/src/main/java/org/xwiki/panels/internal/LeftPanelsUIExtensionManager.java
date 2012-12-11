@@ -37,6 +37,6 @@ public class LeftPanelsUIExtensionManager extends AbstractPanelsUIExtensionManag
     @Override
     protected String getConfiguration()
     {
-        return configurationSource.getProperty("leftPanels");
+        return this.configurationSource.getProperty("leftPanels");
     }
 }

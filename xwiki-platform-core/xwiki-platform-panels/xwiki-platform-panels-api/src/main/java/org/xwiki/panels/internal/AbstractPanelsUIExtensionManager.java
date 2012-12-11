@@ -101,7 +101,8 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
             }
 
             try {
-                List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
+                List<UIExtension> allExtensions =
+                    contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
                 for (String panelSerializedReference : panelSerializedReferences) {
                     for (UIExtension extension : allExtensions) {
                         if (extension.getId().equals(panelSerializedReference)) {

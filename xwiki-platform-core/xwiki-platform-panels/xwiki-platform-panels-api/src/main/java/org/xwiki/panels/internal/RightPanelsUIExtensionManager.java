@@ -38,6 +38,6 @@ public class RightPanelsUIExtensionManager extends AbstractPanelsUIExtensionMana
     @Override
     protected String getConfiguration()
     {
-        return configurationSource.getProperty("rightPanels");
+        return this.configurationSource.getProperty("rightPanels");
     }
 }

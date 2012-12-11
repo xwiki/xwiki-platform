@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -89,23 +90,28 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
     public List<UIExtension> get(String extensionPointId)
     {
         List<UIExtension> panels = new ArrayList<UIExtension>();
-        List<String> panelSerializedReferences = new ArrayList<String>();
 
-        for (String serializedReference : getConfiguration().split(",")) {
-            panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference)));
-        }
+        String panelConfigurationString = getConfiguration();
 
-        try {
-            List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
-            for (String panelSerializedReference : panelSerializedReferences) {
-                for (UIExtension extension : allExtensions) {
-                    if (extension.getId().equals(panelSerializedReference)) {
-                        panels.add(extension);
+        // Verify that there's a panel configuration property defined, and if not don't return any panel extension.
+        if (!StringUtils.isEmpty(panelConfigurationString)) {
+            List<String> panelSerializedReferences = new ArrayList<String>();
+            for (String serializedReference : getConfiguration().split(",")) {
+                panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference)));
+            }
+
+            try {
+                List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
+                for (String panelSerializedReference : panelSerializedReferences) {
+                    for (UIExtension extension : allExtensions) {
+                        if (extension.getId().equals(panelSerializedReference)) {
+                            panels.add(extension);
+                        }
                     }
                 }
+            } catch (ComponentLookupException e) {
+                logger.error("Failed to lookup Panels instances, error: [{}]", e);
             }
-        } catch (ComponentLookupException e) {
-            logger.error("Failed to lookup Panels instances, error: [{}]", e);
         }
 
         return panels;

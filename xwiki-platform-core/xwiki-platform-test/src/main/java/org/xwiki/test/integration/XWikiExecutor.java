@@ -172,10 +172,11 @@ public class XWikiExecutor
             LOGGER.info("Using running instance at [{}:{}]", URL, getPort());
         }
         else {
-            LOGGER.info("Starting XWiki server at [{}:{}]", URL, getPort());
+            LOGGER.info("Checking if an XWiki server is already started at [{}:{}]", URL, getPort());
             // First, verify if XWiki is started. If it is then don't start it again.
             this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
             if (!this.wasStarted) {
+                LOGGER.info("Starting XWiki server at [{}:{}]", URL, getPort());
                 startXWiki();
                 waitForXWikiToLoad();
             } else {
@@ -292,6 +293,11 @@ public class XWikiExecutor
             Thread.sleep(500L);
             response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
         }
+
+        if (response.timedOut) {
+            LOGGER.info("No server is responding on [{}] after [{}] seconds", url, timeout);
+        }
+
         return response;
     }
 

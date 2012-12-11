@@ -43,7 +43,7 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import junit.framework.Assert;
 

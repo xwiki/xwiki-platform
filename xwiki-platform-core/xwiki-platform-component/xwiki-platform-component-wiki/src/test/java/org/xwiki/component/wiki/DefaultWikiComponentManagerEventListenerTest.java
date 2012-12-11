@@ -37,7 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 @MockingRequirement(DefaultWikiComponentManagerEventListener.class)
 public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockingComponentTestCase implements

@@ -32,13 +32,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.DocumentModifiedEventListenerConfiguration;
 import org.xwiki.ircbot.IRCBot;
-import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;

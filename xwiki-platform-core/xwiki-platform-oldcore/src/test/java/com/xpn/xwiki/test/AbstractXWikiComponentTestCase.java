@@ -24,7 +24,7 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.test.MockConfigurationSource;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**

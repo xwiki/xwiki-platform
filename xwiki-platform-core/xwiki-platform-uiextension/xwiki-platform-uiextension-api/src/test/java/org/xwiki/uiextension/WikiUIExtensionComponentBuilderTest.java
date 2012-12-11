@@ -19,7 +19,6 @@
  */
 package org.xwiki.uiextension;
 
-import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;

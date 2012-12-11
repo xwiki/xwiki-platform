@@ -45,7 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
  * Unit tests for {@link DefaultWikiIRCBotListenerManager}.

@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
@@ -58,12 +56,9 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.search.solr.internal.DefaultIndexableReferenceExtractor;
-import org.xwiki.search.solr.internal.IndexableReferenceExtractor;
-import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

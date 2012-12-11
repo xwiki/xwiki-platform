@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.test.MockConfigurationSource;
+import org.xwiki.test.internal.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;

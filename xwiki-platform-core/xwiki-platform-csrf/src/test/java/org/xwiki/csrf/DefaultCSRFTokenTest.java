@@ -42,7 +42,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 import static org.hamcrest.Matchers.*;
 
 /**

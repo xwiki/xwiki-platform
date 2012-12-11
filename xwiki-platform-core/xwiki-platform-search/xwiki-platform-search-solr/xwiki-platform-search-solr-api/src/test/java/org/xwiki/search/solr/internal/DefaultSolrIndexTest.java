@@ -34,12 +34,10 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.search.solr.internal.DefaultSolrIndex;
-import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.search.solr.internal.api.SolrIndex;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

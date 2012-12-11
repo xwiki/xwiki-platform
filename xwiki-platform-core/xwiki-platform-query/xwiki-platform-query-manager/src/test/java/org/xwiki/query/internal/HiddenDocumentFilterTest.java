@@ -29,7 +29,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import static org.junit.Assert.assertEquals;
 

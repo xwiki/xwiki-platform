@@ -35,7 +35,7 @@ import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 @MockingRequirement(value = MessageToolTranslationMessageParser.class, exceptions = Parser.class)
 @ComponentList({PlainTextBlockParser.class, PlainTextStreamParser.class})

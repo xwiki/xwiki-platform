@@ -28,7 +28,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBot;
-import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -38,7 +37,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;

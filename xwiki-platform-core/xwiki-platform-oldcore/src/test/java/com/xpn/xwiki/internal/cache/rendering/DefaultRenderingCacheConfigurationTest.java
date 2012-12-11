@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.MockConfigurationSource;
+import org.xwiki.test.internal.MockConfigurationSource;
 
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 

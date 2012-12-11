@@ -28,8 +28,8 @@ import org.xwiki.query.internal.DefaultQueryExecutorManager;
 import org.xwiki.query.internal.DefaultQueryManager;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
-import org.xwiki.test.annotation.MockingRequirements;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirements;
 
 /**
  * Basic test for the {@link SolrQueryExecutor}.

@@ -123,7 +123,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     protected void declareProperties(ExecutionContext executionContext)
     {
         xwikiContext.declareInExecutionContext(executionContext);
-        xwikiContext = null;
     }
 
 

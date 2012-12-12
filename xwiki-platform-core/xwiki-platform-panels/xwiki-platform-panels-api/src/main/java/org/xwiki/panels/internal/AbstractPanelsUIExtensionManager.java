@@ -97,7 +97,7 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
         if (!StringUtils.isEmpty(panelConfigurationString)) {
             List<String> panelSerializedReferences = new ArrayList<String>();
             for (String serializedReference : getConfiguration().split(",")) {
-                panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference)));
+                panelSerializedReferences.add(serializer.serialize(resolver.resolve(serializedReference.trim())));
             }
 
             try {

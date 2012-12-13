@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
@@ -34,6 +35,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.workspace.Workspace;
 import org.xwiki.workspace.WorkspaceException;
 import org.xwiki.workspace.WorkspaceManager;
@@ -48,9 +50,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.wikimanager.WikiManager;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
-import com.xpn.xwiki.plugin.wikimanager.WikiManagerPluginApi;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
+import com.xpn.xwiki.plugin.wikimanager.internal.WikiManagerScriptService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
@@ -101,6 +103,14 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     @Inject
     private ObservationManager observationManager;
 
+    /**
+     * Wiki Manager Script service that we are using instead of the deprecated PluginAPI, until a decent WikiManager
+     * component becomes available.
+     */
+    @Inject
+    @Named("wikimanager")
+    private ScriptService wikiManagerService;
+
     /** Internal wiki manager tookit required to overcome the rights checking of the API. */
     private WikiManager wikiManagerInternal;
 
@@ -121,20 +131,15 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     /**
-     * Note: This is a method instead of a cached field because the wiki manager plugin API is initialized, at every
-     * usage, with the current context. Caching the plugin API instance would mean caching the context and that caused
-     * problems.
+     * Convenience method to avoid writing the cast every time.
      * 
-     * @return the wrapped wiki manager plugin
+     * @return the wiki manager script service implementation that exposes the API.
      */
-    private WikiManagerPluginApi getWikiManager()
+    private WikiManagerScriptService getWikiManager()
     {
-        XWikiContext deprecatedContext = getXWikiContext();
+        WikiManagerScriptService scriptService = (WikiManagerScriptService) wikiManagerService;
 
-        WikiManagerPluginApi wikiManager =
-            (WikiManagerPluginApi) deprecatedContext.getWiki().getPluginApi("wikimanager", deprecatedContext);
-
-        return wikiManager;
+        return scriptService;
     }
 
     @Override
@@ -189,7 +194,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
                 logger.error("Failed to check if user [{}] can edit workspace [{}]. Assuming false.", new Object[] {
-                    userName, workspaceName, e});
+                userName, workspaceName, e});
             }
 
             return false;
@@ -220,7 +225,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
                 logger.error("Failed to check if user [{}] can delete workspace [{}]. Assuming false.", new Object[] {
-                    userName, workspaceName, e});
+                userName, workspaceName, e});
             }
 
             return false;
@@ -243,8 +248,8 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     @Override
-    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument,
-        String templateWikiName) throws WorkspaceException
+    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument, String templateWikiName)
+        throws WorkspaceException
     {
         XWikiContext deprecatedContext = getXWikiContext();
 
@@ -480,7 +485,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
         Workspace result = null;
         try {
-            Wiki wikiDocument = wikiManagerInternal.getWikiFromName(workspaceName, deprecatedContext);
+            Wiki wikiDocument = getWikiManager().getWikiFromName(workspaceName);
             if (wikiDocument == null || wikiDocument.isNew()) {
                 return null;
             }
@@ -552,7 +557,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         List<Workspace> workspaces = getWorkspaces();
         for (Workspace workspace : workspaces) {
             XWikiServer server = workspace.getWikiDescriptor();
-            if(server.isWikiTemplate()){
+            if (server.isWikiTemplate()) {
                 result.add(workspace);
             }
         }

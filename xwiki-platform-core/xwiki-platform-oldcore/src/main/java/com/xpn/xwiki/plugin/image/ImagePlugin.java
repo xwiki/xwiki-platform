@@ -146,15 +146,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
             configuration.setConfigurationId("xwiki.plugin.image");
 
-            // Set folder to store cache.
-            File tempDir = this.environment.getTemporaryDirectory();
-            File imgTempDir = new File(tempDir, configuration.getConfigurationId());
-            try {
-                imgTempDir.mkdirs();
-            } catch (Exception ex) {
-                LOG.warn("Cannot create temporary files.", ex);
-            }
-            configuration.put("cache.path", imgTempDir.getAbsolutePath());
             // Set cache constraints.
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);

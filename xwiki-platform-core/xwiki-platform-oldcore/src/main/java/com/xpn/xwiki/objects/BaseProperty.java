@@ -33,13 +33,13 @@ import org.dom4j.io.XMLWriter;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
@@ -194,7 +194,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     @Override
     public String toFormString()
     {
-        return Utils.formEncode(toText());
+        return XMLUtils.escape(toText());
     }
 
     public String toText()

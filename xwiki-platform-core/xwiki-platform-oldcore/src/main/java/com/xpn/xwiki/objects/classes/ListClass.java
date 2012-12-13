@@ -429,11 +429,14 @@ public abstract class ListClass extends PropertyClass
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<String>();
             for (String value : selectlist) {
-                newlist.add(getDisplayValue(value, name, map, context));
+                // We have to escape the XML special chars because the output of the display methods is assumed to be
+                // HTML and the list values should be handled as plain text not HTML.
+                newlist.add(XMLUtils.escape(getDisplayValue(value, name, map, context)));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+            // Escape the value because it has to be treated as plain text not HTML.
+            buffer.append(XMLUtils.escape(getDisplayValue(prop.getValue(), name, map, context)));
         }
     }
 
@@ -507,14 +510,15 @@ public abstract class ListClass extends PropertyClass
             }
             radio.addElement(display);
 
-            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + name + "-" + object.getNumber()
-                + "-" + count++ + "\">");
+            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + XMLUtils.escape(name) + "-"
+                + object.getNumber() + "-" + count++ + "\">");
             buffer.append(radio.toString());
             buffer.append("</label>");
         }
 
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
         hidden.setAttributeFilter(new XMLAttributeValueFilter());
+        hidden.setDisabled(isDisabled());
         buffer.append(hidden);
     }
 
@@ -594,9 +598,10 @@ public abstract class ListClass extends PropertyClass
         // Add options from Set
         for (String rawvalue : list) {
             String value = getElementValue(rawvalue);
-            String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
+            String display = getDisplayValue(rawvalue, name, map, context);
             option option = new option(display, value);
-            option.addElement(display);
+            option.setAttributeFilter(new XMLAttributeValueFilter());
+            option.addElement(XMLUtils.escape(display));
             if (selectlist.contains(value)) {
                 option.setSelected(true);
             }

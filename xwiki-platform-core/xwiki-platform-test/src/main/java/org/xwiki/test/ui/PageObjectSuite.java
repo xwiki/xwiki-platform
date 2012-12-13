@@ -90,6 +90,6 @@ public class PageObjectSuite extends XWikiExecutorSuite
             throw new RuntimeException("Failed to shutdown PersistentTestContext", e);
         }
 
-        super.afterTests();
+        // Note: Don't call super.afterTests() since XWiki will be stopped twice otherwise!
     }
 }

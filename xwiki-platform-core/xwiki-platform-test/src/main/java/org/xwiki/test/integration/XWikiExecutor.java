@@ -305,13 +305,21 @@ public class XWikiExecutor
     {
         // Stop XWiki if it was started by start()
         if (!this.wasStarted) {
-            executeCommand(getDefaultStopCommand(getStopPort()));
-            // Wait for the start process to be stopped, waiting a max of 5 minutes!
+            DefaultExecuteResultHandler stopProcessHandler = executeCommand(getDefaultStopCommand(getStopPort()));
+
+            // First wait for the stop process to have stopped, waiting a max of 5 minutes!
+            // It's going to stop the start process...
+            stopProcessHandler.waitFor(5*60L*1000L);
+
+            // Now wait for the start process to be stopped, waiting a max of 5 minutes!
             if (this.startedProcessHandler != null) {
                 this.startedProcessHandler.waitFor(5*60L*1000L);
             }
+
+            LOGGER.info("XWiki server stopped");
+        } else {
+            LOGGER.info("XWiki server not stopped since we didn't start it (it was already started)");
         }
-        LOGGER.info("XWiki server stopped");
     }
 
     public String getWebInfDirectory()

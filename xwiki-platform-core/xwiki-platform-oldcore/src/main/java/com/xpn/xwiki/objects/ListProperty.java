@@ -28,11 +28,10 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
 import org.xwiki.diff.DiffManager;
-import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.util.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.util.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
@@ -75,9 +74,14 @@ public class ListProperty extends BaseProperty implements Cloneable
         this.setList((List<String>) value);
     }
 
+    /**
+     * This method is called by Hibernate to get the raw value to store in the database. Check the xwiki.hbm.xml file.
+     * 
+     * @return the string value that is saved in the database
+     */
     public String getTextValue()
     {
-        return toFormString();
+        return toText();
     }
 
     @Override
@@ -87,25 +91,16 @@ public class ListProperty extends BaseProperty implements Cloneable
             return "";
         }
 
-        return StringUtils.join(getList().toArray(), " ");
+        List<String> escapedValues = new ArrayList<String>();
+        for (String value : getList()) {
+            escapedValues.add(value.replace(this.formStringSeparator, "\\" + this.formStringSeparator));
+        }
+        return StringUtils.join(escapedValues, this.formStringSeparator);
     }
 
     public String toSingleFormString()
     {
         return super.toFormString();
-    }
-
-    @Override
-    public String toFormString()
-    {
-        List<String> list = getList();
-        StringBuilder result = new StringBuilder();
-        for (String item : list) {
-            result.append(XMLUtils.escape(item).replace(this.formStringSeparator, "\\" + this.formStringSeparator));
-            result.append(this.formStringSeparator);
-        }
-
-        return StringUtils.chomp(result.toString(), this.formStringSeparator);
     }
 
     @Override

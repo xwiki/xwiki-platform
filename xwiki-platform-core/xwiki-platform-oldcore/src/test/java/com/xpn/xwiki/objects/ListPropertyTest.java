@@ -19,16 +19,15 @@
  */
 package com.xpn.xwiki.objects;
 
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.junit.Test;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Test list property.
@@ -83,5 +82,40 @@ public class ListPropertyTest extends AbstractComponentTestCase
 
         Assert.assertFalse(p.isValueDirty());
         Assert.assertTrue(clone.isValueDirty());
+    }
+
+    /**
+     * Tests that the value that is saved in the database for a list property is not XML-encoded.
+     */
+    @Test
+    public void getTextValue()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a<b>c", "1\"2'3", "x{y&z"));
+        Assert.assertEquals("a<b>c|1\"2'3|x{y&z", listProperty.getTextValue());
+    }
+
+    /**
+     * Tests that {@link ListProperty#toText()} joins the values using the right separator, without XML-encoding the
+     * values.
+     */
+    @Test
+    public void toText()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setFormStringSeparator("*");
+        listProperty.setValue(Arrays.asList("c<b>a", "3\"2'1", "z{y&x"));
+        Assert.assertEquals("c<b>a*3\"2'1*z{y&x", listProperty.toText());
+    }
+
+    /**
+     * Tests that {@link ListProperty#toFormString()} is XML-encoded.
+     */
+    @Test
+    public void toFormString()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("o<n>e", "t\"w'o", "t{h&ree"));
+        Assert.assertEquals("o&#60;n&#62;e|t&#34;w&#39;o|t&#123;h&#38;ree", listProperty.toFormString());
     }
 }

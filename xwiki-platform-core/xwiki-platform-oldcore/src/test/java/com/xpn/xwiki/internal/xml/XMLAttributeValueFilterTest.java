@@ -19,31 +19,35 @@
  */
 package com.xpn.xwiki.internal.xml;
 
-import org.apache.ecs.filter.CharacterFilter;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.xml.XMLUtils;
 
 /**
- * A filter that can be used to encode the attribute values when serializing XML elements. It should behave exactly as
- * {@link org.xwiki.xml.XMLUtils#escape(Object)}.
- * <p>
- * Fixes the encoding of the apostrophe character which by default is replaced with a left single quote..
+ * Unit tests for {@link XMLAttributeValueFilter}.
  * 
  * @version $Id$
- * @since 4.3M2
  */
-public class XMLAttributeValueFilter extends CharacterFilter
+public class XMLAttributeValueFilterTest
 {
     /**
-     * Serial version identifier.
+     * The object being tested.
      */
-    private static final long serialVersionUID = 1L;
+    private final XMLAttributeValueFilter filter = new XMLAttributeValueFilter();
 
     /**
-     * Default constructor.
+     * Tests the XML escaping of the attribute values. Ensures that {@link XMLAttributeValueFilter} behaves exactly as
+     * {@link XMLUtils#escape(Object)}.
      */
-    public XMLAttributeValueFilter()
+    @Test
+    public void process()
     {
-        addAttribute("'", "&#39;");
-        // Left curly bracket is included here to protect against {{/html}} in XWiki 2.x syntax.
-        addAttribute("{", "&#123;");
+        List<String> inputs = Arrays.asList("a<b>c\"d'e{f&g");
+        for (String input : inputs) {
+            Assert.assertEquals(XMLUtils.escape(input), filter.process(input));
+        }
     }
 }

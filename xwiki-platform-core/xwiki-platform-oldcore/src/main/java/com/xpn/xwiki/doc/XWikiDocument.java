@@ -3119,7 +3119,11 @@ public class XWikiDocument implements DocumentModelBridge
     {
         ListProperty prop = (ListProperty) getTagProperty(context);
 
-        return prop != null ? prop.getTextValue() : "";
+        // I don't know why we need to XML-escape the list of tags but for backwards compatibility we need to keep doing
+        // this. When this method was added it was using ListProperty#getTextValue() which used to return
+        // ListProperty#toFormString() before we fixed it to return the unescaped value because we need to save the raw
+        // value in the database and ListProperty#getTextValue() is called when the list property is saved.
+        return prop != null ? prop.toFormString() : "";
     }
 
     public List<String> getTagsList(XWikiContext context)

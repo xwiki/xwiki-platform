@@ -29,6 +29,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -147,7 +148,8 @@ public class LevelsClass extends ListClass
         for (String value : list) {
             String display = getText(value, context);
             option option = new option(display, value);
-            option.addElement(display);
+            option.setAttributeFilter(new XMLAttributeValueFilter());
+            option.addElement(XMLUtils.escape(display));
             // If we don't have this option in the list then add it
             if (!list.contains(value)) {
                 list.add(value);

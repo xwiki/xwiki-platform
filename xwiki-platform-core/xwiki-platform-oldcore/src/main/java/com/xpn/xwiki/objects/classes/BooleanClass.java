@@ -27,6 +27,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -174,14 +175,18 @@ public class BooleanClass extends PropertyClass
         if (getDefaultValue() == -1) {
             options = new option[] {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
             options[0].addElement("---");
-            options[1].addElement(String1);
-            options[2].addElement(String0);
+            options[1].addElement(XMLUtils.escape(String1));
+            options[2].addElement(XMLUtils.escape(String0));
         } else {
             options = new option[] {new option(String1, "1"), new option(String0, "0")};
-            options[0].addElement(String1);
-            options[1].addElement(String0);
+            options[0].addElement(XMLUtils.escape(String1));
+            options[1].addElement(XMLUtils.escape(String0));
             nb1 = 0;
             nb2 = 1;
+        }
+
+        for (option option : options) {
+            option.setAttributeFilter(new XMLAttributeValueFilter());
         }
 
         try {

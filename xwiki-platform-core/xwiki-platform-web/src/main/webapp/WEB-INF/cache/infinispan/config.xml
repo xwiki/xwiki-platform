@@ -219,15 +219,6 @@
       ******************************************************************************************************************
    -->
 
-   <!-- Image plugin cache -->
-   <namedCache name="xwiki.plugin.image">
-      <loaders>
-         <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
-           <!-- Let XWiki cache module set the proper location -->
-         </loader>
-      </loaders>
-   </namedCache>
-
    <!-- Equation plugin cache -->
    <namedCache name="xwiki.plugin.equation">
       <loaders>

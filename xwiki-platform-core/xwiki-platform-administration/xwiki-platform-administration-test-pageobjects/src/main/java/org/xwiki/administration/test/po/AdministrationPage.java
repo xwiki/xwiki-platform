@@ -57,6 +57,9 @@ public class AdministrationPage extends ViewPage
     @FindBy(xpath = "//a[contains(@href, 'section=WYSIWYG')]")
     WebElement wysiwygLink;
 
+    @FindBy(xpath = "//a[contains(@href, 'section=Elements')]")
+    private WebElement pageElementsLink;
+
     @FindBy(id = "goto-select")
     WebElement spaceAdminSelect;
 
@@ -106,6 +109,17 @@ public class AdministrationPage extends ViewPage
     {
         this.wysiwygLink.click();
         return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
+    /**
+     * Opens the "Page Elements" administration section.
+     * 
+     * @return the "Page Elements" administration section
+     */
+    public PageElementsAdministrationSectionPage clickPageElementsSection()
+    {
+        pageElementsLink.click();
+        return new PageElementsAdministrationSectionPage();
     }
 
     public boolean hasSection(String sectionName)

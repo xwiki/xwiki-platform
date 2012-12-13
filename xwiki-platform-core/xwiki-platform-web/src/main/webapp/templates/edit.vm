@@ -31,7 +31,7 @@
     ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
     #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
     #if($editor == '')
-      #if(!$services.sheet.getSheets($tdoc, $context.action).isEmpty())
+      #if(!$services.sheet.getSheets($doc, $context.action).isEmpty())
         #set($editor = 'inline')
       #elseif(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
         #set($editor = 'wysiwyg')

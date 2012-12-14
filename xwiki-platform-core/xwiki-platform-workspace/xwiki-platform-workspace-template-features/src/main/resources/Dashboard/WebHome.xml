@@ -305,8 +305,11 @@
   {{error}}$msg.get('platform.workspace.wikiNotWorkspace'){{/error}}
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
-  #set($prettyName = $wikiDescriptor.getValue('wikiprettyname'))
-  $msg.get('platform.workspace.gadgetWelcomeToWorkspace', $prettyName)
+  #set($displayName = $wikiDescriptor.getValue('wikiprettyname'))
+  #if ("$!displayName" == '')
+    #set($displayName = $currentWiki)
+  #end
+  $msg.get('platform.workspace.gadgetWelcomeToWorkspace', $displayName)
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
 

@@ -112,14 +112,17 @@
   #if ($hasGlobalAdmin)
     #if ($doc.getAttachment($TEMPLATE_PACKAGE))
       #if ("$!request.confirmTemplateInstall" == '1')
-        #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, $msg.get('platform.workspace.templateWikiTitle'), $TEMPLATE_PACKAGE))
+        #set ($result = $WikiManager.createWikiTemplate($TEMPLATE_NAME, '', $TEMPLATE_PACKAGE))
         #if ($result == $Exception.ERROR_NOERROR)
+          ## Set the template's pretty name.
           #set($wikiTemplateDocument = $WikiManager.getWikiDocument($TEMPLATE_NAME))
-          #set($workspaceObj = $wikiTemplateDocument.getObject('WorkspaceManager.WorkspaceClass'))
-          #if(!$workspaceObj)
-            #set($discard = $wikiTemplateDocument.createNewObject('WorkspaceManager.WorkspaceClass'))
-            #set($discard = $wikiTemplateDocument.save())
-          #end          
+          #set($discard = $wikiTemplateDocument.setWikiPrettyName($msg.get('platform.workspace.templateWikiTitle')))
+          ##
+          ## Mark the template as a workspace to differentiate it from other regular wiki templates.
+          #set($workspaceObj = $wikiTemplateDocument.getObject('WorkspaceManager.WorkspaceClass', true))
+          #set($discard = $workspaceObj.set('membershipType', 'open'))
+          #set($discard = $wikiTemplateDocument.save('Marked the template as a workspace.', true))
+          ##
           ## Use a redirect so that the page can be refreshed after the form's POST.
           #set ($discard = $response.sendRedirect($doc.getURL()))
 

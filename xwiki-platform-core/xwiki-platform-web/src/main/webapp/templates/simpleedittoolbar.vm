@@ -48,10 +48,10 @@
 document.writeln("<div class='leftmenu2'>");
 #foreach($item in $syntaxElements)
   #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.png"))
-  #set($speedTip = $msg.get("core.edit.wikiToolbar.${item.get(0)}").replaceAll("'", "\\'"))
-  #set($tagOpen = ${item.get(1)})
-  #set($tagClose = ${item.get(2)})
-  #set($sampleText = $msg.get("core.edit.wikiToolbar.${item.get(0)}text").replaceAll("'", "\\'"))
+  #set($speedTip = $escapetool.javascript($msg.get("core.edit.wikiToolbar.${item.get(0)}")))
+  #set($tagOpen = $escapetool.javascript($item.get(1)))
+  #set($tagClose = $escapetool.javascript($item.get(2)))
+  #set($sampleText = $escapetool.javascript($msg.get("core.edit.wikiToolbar.${item.get(0)}text")))
   addButton('$imageFile', '$speedTip', '$tagOpen', '$tagClose', '$sampleText');
 #end
 document.writeln("<" + "/div>");

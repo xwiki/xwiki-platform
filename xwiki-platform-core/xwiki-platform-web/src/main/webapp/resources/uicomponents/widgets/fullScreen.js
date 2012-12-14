@@ -460,9 +460,9 @@ widgets.FullScreen = Class.create({
       parent = parents[i];
       parent.setStyle(parent._originalStyle);
       parent.siblings().each(function(item) {
-        if (item._originalDisplay) {
-          item.style['display'] = item._originalDisplay;
-        }
+        // IE8 does not like null values. Default to "" (specific to each element's type) for elements that were added
+        // while in full screen mode (like the Save & Continue notifications) and which don't have the _originalDisplay set.
+        item.style['display'] = item._originalDisplay || "";
       });
     }
     document.body.setStyle(document.body._originalStyle);

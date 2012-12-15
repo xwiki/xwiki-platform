@@ -55,7 +55,10 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.get('xredirect'))}" />
 <input type="hidden" name="xnotification" value="$!{escapetool.xml($request.get('xnotification'))}" />
 <input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
-<input type="hidden" name="language" value="$!{escapetool.xml($doc.language)}" />
+## We need to submit the language of the translated document because the inline edit mode is not limited to editing only
+## the objects, which are shared by all translations. We can also edit the content or the title of the document which are
+## specific to each translation and so we need to specify which translation is being edited.
+<input type="hidden" name="language" value="$!{escapetool.xml($tdoc.realLanguage)}" />
 #if("$!request.parent" != '')
   <input type="hidden" name="parent" value="$escapetool.xml($!request.parent)" />
 #end

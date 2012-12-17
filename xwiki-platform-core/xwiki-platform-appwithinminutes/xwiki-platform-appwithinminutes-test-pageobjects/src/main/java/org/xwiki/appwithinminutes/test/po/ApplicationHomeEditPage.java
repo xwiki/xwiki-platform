@@ -240,4 +240,11 @@ public class ApplicationHomeEditPage extends InlinePage
             getUtil().findElementsWithoutWaiting(getDriver(), getForm(), By.className("warningmessage"));
         return warnings.size() == 1 && warnings.get(0).isDisplayed();
     }
+
+    @Override
+    public ApplicationHomeEditPage waitUntilPageIsLoaded()
+    {
+        descriptionEditor.waitToLoad();
+        return this;
+    }
 }

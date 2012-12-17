@@ -207,10 +207,12 @@ public class BasePage extends BaseElement
      * Waits until the page has loaded. Normally we don't need to call this method since a click in Selenium2 is a
      * blocking call. However there are cases (such as when using a shortcut) when we asynchronously load a page.
      * 
+     * @return this page
      * @since 3.2M3
      */
-    public void waitUntilPageIsLoaded()
+    public BasePage waitUntilPageIsLoaded()
     {
         waitUntilElementIsVisible(By.id("footerglobal"));
+        return this;
     }
 }

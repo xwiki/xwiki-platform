@@ -24,6 +24,11 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+XWiki.WorkspaceCandidateMemberClass_status_accepted=Accepté
+XWiki.WorkspaceCandidateMemberClass_status_pending=En attente
+XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejeté
+XWiki.WorkspaceCandidateMemberClass_type_invitation=Invitation
+XWiki.WorkspaceCandidateMemberClass_type_request=Demande de rejoindre
 admin.xwiki.manageworkspace.description=Gestion des réglages de l'espace de travail comme le nom, la description, le propriétaire et le type d’adhésion. 
 admin.xwiki.workspaceusers.description=Gérer les membres de l'espace de travail\: ajouter, supprimer, inviter, accepter ou rejeter des membres de l'espace de travail. 
 core.menu.admin.wiki=Administrer l'espace de travail

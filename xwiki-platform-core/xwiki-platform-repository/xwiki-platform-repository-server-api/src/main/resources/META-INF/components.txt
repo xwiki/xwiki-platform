@@ -1,3 +1,4 @@
+org.xwiki.repository.internal.DefaultRepositoryConfiguration
 org.xwiki.repository.internal.DefaultRepositoryManager
 org.xwiki.repository.internal.ExtensionUpdaterListener
 org.xwiki.repository.internal.RepositoryScriptService

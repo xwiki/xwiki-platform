@@ -29,11 +29,11 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.context.Execution;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
@@ -106,15 +106,13 @@ public class DefaultRepositoryManager implements RepositoryManager
     private QueryManager queryManager;
 
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private RepositoryConfiguration configuration;
 
     @Inject
     private Logger logger;
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-    }
 
     public <T> XWikiDocument getDocument(T[] data) throws XWikiException
     {
@@ -123,7 +121,7 @@ public class DefaultRepositoryManager implements RepositoryManager
 
     public XWikiDocument getDocument(String space, String name) throws XWikiException
     {
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getDatabase(), space, name), xcontext);
     }
@@ -179,7 +177,7 @@ public class DefaultRepositoryManager implements RepositoryManager
 
         boolean needSave = false;
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiDocument documentToSave = null;
         BaseObject extensionObjectToSave = null;
@@ -291,80 +289,91 @@ public class DefaultRepositoryManager implements RepositoryManager
      * @param extensionObject the extension object
      * @param context the XWiki context
      * @return true if the extension is valid from Extension Manager point of view
+     * @throws XWikiException unknown issue when manipulating the model
      */
     private boolean isValid(XWikiDocument document, BaseObject extensionObject, XWikiContext context)
+        throws XWikiException
     {
         String extensionId = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID);
         boolean valid = !StringUtils.isBlank(extensionId);
         if (valid) {
-            int nbVersions = 0;
-            List<BaseObject> extensionVersions =
-                document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
-            if (extensionVersions != null) {
-                for (BaseObject extensionVersionObject : extensionVersions) {
-                    if (extensionVersionObject != null) {
-                        // Has a version
-                        String extensionVersion =
-                            getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
-                        if (StringUtils.isBlank(extensionVersion)) {
-                            this.logger.debug("No actual version provided for object [{}({})]",
-                                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
-                                extensionVersionObject.getNumber());
-                            valid = false;
-                            break;
-                        }
+            // Type
+            String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 
-                        ResourceReference resourceReference = getDownloadReference(document, extensionVersionObject);
+            valid = this.configuration.isValidType(type);
 
-                        if (resourceReference != null) {
-                            if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
-                                AttachmentReference attachmentReference =
-                                    this.attachmentResolver.resolve(resourceReference.getReference(),
-                                        document.getDocumentReference());
+            if (valid) {
+                // Versions
+                int nbVersions = 0;
+                List<BaseObject> extensionVersions =
+                    document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+                if (extensionVersions != null) {
+                    for (BaseObject extensionVersionObject : extensionVersions) {
+                        if (extensionVersionObject != null) {
+                            // Has a version
+                            String extensionVersion =
+                                getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
+                            if (StringUtils.isBlank(extensionVersion)) {
+                                this.logger.debug("No actual version provided for object [{}({})]",
+                                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
+                                    extensionVersionObject.getNumber());
+                                valid = false;
+                                break;
+                            }
 
-                                XWikiDocument attachmentDocument;
-                                try {
-                                    attachmentDocument =
-                                        context.getWiki().getDocument(attachmentReference.getDocumentReference(),
-                                            context);
+                            ResourceReference resourceReference =
+                                getDownloadReference(document, extensionVersionObject);
 
-                                    valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
-                                } catch (XWikiException e) {
-                                    this.logger.error("Failed to get document [{}]",
-                                        attachmentReference.getDocumentReference(), e);
+                            if (resourceReference != null) {
+                                if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
+                                    AttachmentReference attachmentReference =
+                                        this.attachmentResolver.resolve(resourceReference.getReference(),
+                                            document.getDocumentReference());
 
+                                    XWikiDocument attachmentDocument;
+                                    try {
+                                        attachmentDocument =
+                                            context.getWiki().getDocument(attachmentReference.getDocumentReference(),
+                                                context);
+
+                                        valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
+                                    } catch (XWikiException e) {
+                                        this.logger.error("Failed to get document [{}]",
+                                            attachmentReference.getDocumentReference(), e);
+
+                                        valid = false;
+                                    }
+
+                                    if (!valid) {
+                                        this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                                    }
+                                } else if (ResourceType.URL.equals(resourceReference.getType())
+                                    || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
+                                    valid = true;
+                                } else {
                                     valid = false;
-                                }
 
-                                if (!valid) {
-                                    this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                                    this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
                                 }
-                            } else if (ResourceType.URL.equals(resourceReference.getType())
-                                || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
-                                valid = true;
                             } else {
                                 valid = false;
 
-                                this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
+                                this.logger.debug("No actual download provided for object [{}({})]",
+                                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
+                                    extensionVersionObject.getNumber());
                             }
-                        } else {
-                            valid = false;
 
-                            this.logger.debug("No actual download provided for object [{}({})]",
-                                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
-                                extensionVersionObject.getNumber());
+                            ++nbVersions;
                         }
 
-                        ++nbVersions;
-                    }
-
-                    if (!valid) {
-                        break;
+                        if (!valid) {
+                            break;
+                        }
                     }
                 }
-            }
 
-            valid &= nbVersions > 0;
+                valid &= nbVersions > 0;
+            }
         }
 
         return valid;
@@ -471,7 +480,7 @@ public class DefaultRepositoryManager implements RepositoryManager
             }
         }
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         boolean needSave = false;
 
@@ -661,7 +670,7 @@ public class DefaultRepositoryManager implements RepositoryManager
     {
         String[] authorElements = StringUtils.split(authorName, ' ');
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         String authorId = resolveAuthorIdOnWiki(xcontext.getDatabase(), authorName, authorElements, xcontext);
 
@@ -737,7 +746,7 @@ public class DefaultRepositoryManager implements RepositoryManager
         }
 
         // Add missing dependencies
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
         for (ExtensionDependency dependency : dependenciesToAdd) {
             BaseObject dependencyObject =
                 document.newXObject(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE, xcontext);
@@ -758,7 +767,7 @@ public class DefaultRepositoryManager implements RepositoryManager
     {
         boolean needSave;
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         // Update version object
         BaseObject versionObject = getExtensionVersion(document, extension.getId().getVersion());
@@ -804,7 +813,7 @@ public class DefaultRepositoryManager implements RepositoryManager
     protected boolean update(BaseObject object, String fieldName, Object value)
     {
         if (ObjectUtils.notEqual(value, getValue(object, fieldName))) {
-            object.set(fieldName, value, getXWikiContext());
+            object.set(fieldName, value, this.xcontextProvider.get());
 
             return true;
         }

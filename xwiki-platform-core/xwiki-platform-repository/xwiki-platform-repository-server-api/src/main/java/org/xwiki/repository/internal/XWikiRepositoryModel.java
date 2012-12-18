@@ -49,6 +49,14 @@ public interface XWikiRepositoryModel
     public final static EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
         EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
+    public final static String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
+
+    public final static EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+
+    public final static EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+
     // Properties
 
     public final static String PROP_EXTENSION_ID = "id";
@@ -86,6 +94,10 @@ public interface XWikiRepositoryModel
     public static final String PROP_PROXY_REPOSITORYTYPE = "repositoryType";
 
     public static final String PROP_PROXY_REPOSITORYURI = "repositoryURI";
+
+    public final static String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
+
+    public static final String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
 
     // Consolidation
 

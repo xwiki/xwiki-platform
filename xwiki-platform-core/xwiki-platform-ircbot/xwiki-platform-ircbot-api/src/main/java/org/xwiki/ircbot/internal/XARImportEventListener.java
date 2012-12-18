@@ -44,7 +44,7 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 
 /**
- * Send notifications to an IRC channel when a document is modified in the wiki.
+ * Send notifications to an IRC channel when a XAR is imported in the wiki.
  *
  * @version $Id$
  * @since 4.2M3

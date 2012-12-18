@@ -68,7 +68,7 @@ public class ObjectAddAction extends XWikiAction
         // We need to have a string in the map for each field for the object to be correctly created.
         // Otherwise, queries using the missing properties will fail to return this object.
         BaseClass baseclass = object.getXClass(context);
-        Map<String, String[]> objmap = oform.getObject(className);
+        Map<String, String[]> objmap = oform.getObject(className + "_" + object.getNumber());
         @SuppressWarnings("unchecked")
         Collection<PropertyClass> fields = baseclass.getFieldList();
         for (PropertyClass property : fields) {

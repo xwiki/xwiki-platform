@@ -210,6 +210,6 @@ public class EditorElement extends BaseElement
      */
     protected WebElement getContainer()
     {
-        return getDriver().findElement(By.xpath("//div[starts-with(@id, '" + fieldId + "_container')]"));
+        return getContainer(getDriver());
     }
 }

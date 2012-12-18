@@ -31,6 +31,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.util.xml.XmlDocument;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
@@ -132,6 +135,62 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             }
             replaceVariables(configuration);
             return configuration;
+        }
+
+        @Override
+	public void add(XmlDocument metadataXml)
+        {
+            Element basePropertyElement = selectChildClassMappingElement(metadataXml.getDocumentTree().getRootElement(),
+                                                                         "class", "com.xpn.xwiki.objects.BaseProperty");
+            if (basePropertyElement != null) {
+                decorateDBStringListMapping(basePropertyElement);
+            }
+
+            super.add(metadataXml);
+        }
+
+        /**
+         * Select the class definition element that is an immediate child element of the given element.
+         *
+         * @param parentElement The parent element.
+         * @param elementName The element name for the given class definition ("class" or "joined-subclass").
+         * @param className The qualified class name to match.
+         */
+        private Element selectChildClassMappingElement(Element parentElement, String elementName, String className)
+        {
+            for (Object elementObj : parentElement.elements(elementName)) {
+                if (elementObj instanceof Element) {
+                    Element element = (Element) elementObj;
+                    Attribute attribute = element.attribute("name");
+                    if (attribute != null && className.equals(attribute.getValue())) {
+                        return element;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Decorate the hibernate mapping for the class DBStringListProperty with a collection-type attribute.
+         *
+         * @param basePropertyElement The element of the base property class mapping.
+         */
+        private void decorateDBStringListMapping(Element basePropertyElement)
+        {
+            final String className = "com.xpn.xwiki.objects.DBStringListProperty";
+            final String collectionType = "com.xpn.xwiki.internal.objects.ListPropertyCollectionType";
+
+            Element listClassElement = selectChildClassMappingElement(basePropertyElement, "joined-subclass",
+                                                                      className);
+
+            if (listClassElement != null) {
+                Element listElement = listClassElement.element("list");
+                if (listElement != null) {
+                    listElement.addAttribute("collection-type",
+                                              collectionType);
+                    logger.debug("Added collection-type attribute [{}] to hibernate mapping for [{}].", collectionType, className);
+                }
+            }
         }
 
         // There is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream

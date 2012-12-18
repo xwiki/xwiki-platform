@@ -65,10 +65,13 @@ public class ObjectAddAction extends XWikiAction
         EntityReference classReference = this.relativeResolver.resolve(className, EntityType.DOCUMENT);
         BaseObject object = doc.newXObject(classReference, context);
 
+        BaseClass baseclass = object.getXClass(context);
+        // The request parameter names that correspond to object fields must NOT specify the object number because the
+        // object number is not known before the object is added. The following is a good parameter name:
+        // Space.Class_property. As a consequence we use only the class name to extract the object from the request.
+        Map<String, String[]> objmap = oform.getObject(className);
         // We need to have a string in the map for each field for the object to be correctly created.
         // Otherwise, queries using the missing properties will fail to return this object.
-        BaseClass baseclass = object.getXClass(context);
-        Map<String, String[]> objmap = oform.getObject(className);
         @SuppressWarnings("unchecked")
         Collection<PropertyClass> fields = baseclass.getFieldList();
         for (PropertyClass property : fields) {

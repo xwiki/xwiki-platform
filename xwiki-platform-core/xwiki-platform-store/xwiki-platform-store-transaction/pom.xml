@@ -82,6 +82,7 @@
     new DoSomethingElseTransactionRunnable().runIn(this);
     }
     ..
+    }
 
     The only limitations on running TransactionRunnables inside of one another are they cannot run more
     than once and they cannot call themselves (this would be an infinite loop).

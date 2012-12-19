@@ -84,7 +84,7 @@
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>
         <version>1.0</version>
-        <!-- Exclude JDOM since Rome depends on JDOM 1.0 and we want to use JDOM 1.1 -->
+        <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
         <exclusions>
           <exclusion>
             <groupId>jdom</groupId>
@@ -96,6 +96,13 @@
         <groupId>rome</groupId>
         <artifactId>rome-fetcher</artifactId>
         <version>1.0</version>
+        <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
+        <exclusions>
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->

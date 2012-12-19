@@ -198,7 +198,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param str the String to convert to an integer
      * @return the parsed integer or zero if the string is not a valid integer number
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.toInteger($string}
+     * @deprecated use {@code $mathtool.toInteger($string)}
      *             ({@link org.apache.velocity.tools.generic.MathTool#toInteger(Object)})
      */
     @Deprecated
@@ -217,7 +217,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param str the String to convert to an Integer Object
      * @return the parsed integer or zero if the string is not a valid integer number
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.toInteger($string}
+     * @deprecated use {@code $mathtool.toInteger($string)}
      *             ({@link org.apache.velocity.tools.generic.MathTool#toInteger(Object)})
      */
     @Deprecated
@@ -251,7 +251,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param str the String to convert to a double
      * @return the parsed double or zero if the string is not a valid double number
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.toDouble($string}
+     * @deprecated use {@code $mathtool.toDouble($string)}
      *             ({@link org.apache.velocity.tools.generic.MathTool#toDouble(Object)})
      */
     @Deprecated
@@ -273,7 +273,7 @@ public privileged aspect UtilCompatibilityAspect
      * @since 1.3 Milestone 2
      * @deprecated values should be passed as positional parameters, not concatenated in the query; see
      *             {@link XWiki#searchDocuments(String, List)}; if escaping SQL is really needed, use {@code
-     *             $escapetool.sql($string} ({@link org.xwiki.velocity.tools.EscapeTool#sql(Object)})
+     *             $escapetool.sql($string)} ({@link org.xwiki.velocity.tools.EscapeTool#sql(Object)})
      */
     @Deprecated
     public String Util.escapeSQL(String text)
@@ -288,7 +288,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param b the second number to add
      * @return the sum of the two parameters
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.add($n1, $n2}
+     * @deprecated use {@code $mathtool.add($n1, $n2)}
      *             ({@link org.apache.velocity.tools.generic.MathTool#add(Object, Object)})
      */
     @Deprecated
@@ -304,7 +304,7 @@ public privileged aspect UtilCompatibilityAspect
      * @param b the second number to add
      * @return the sum of the two parameters
      * @since 1.3 Milestone 2
-     * @deprecated use {@code $mathtool.add($n1, $n2}
+     * @deprecated use {@code $mathtool.add($n1, $n2)}
      *             ({@link org.apache.velocity.tools.generic.MathTool#add(Object, Object)})
      */
     @Deprecated

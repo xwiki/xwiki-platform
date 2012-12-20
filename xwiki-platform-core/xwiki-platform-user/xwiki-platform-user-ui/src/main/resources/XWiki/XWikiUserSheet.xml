@@ -186,9 +186,10 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
       <cache>long</cache>
     </property>
     <property>
-      <code>Object.extend(XWiki, {
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+Object.extend(XWiki, {
   userprofile : {
-
     init : function() {
       this.crtCategory = '';
       this.tabsContainer = $('vertical-tabs');
@@ -275,8 +276,15 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
   }
 });
 
-Event.observe(window, 'load', function() { XWiki.userprofile.init() });
-document.observe('lightbox:userprofile:loaded', function() { XWiki.userprofile.init() });</code>
+var init = function() {
+  XWiki.userprofile.init();
+  return true;
+};
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+document.observe('lightbox:userprofile:loaded', init);
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
     </property>
     <property>
       <name>userprofile</name>

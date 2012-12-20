@@ -121,7 +121,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
     /**
      * The thread running the index updater.
      */
-    private Thread indexUpdaterThread;
+    protected Thread indexUpdaterThread;
 
     /**
      * List of Lucene indexes used for searching. By default there is only one such index for all the wiki. One r

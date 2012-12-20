@@ -27,7 +27,6 @@ import java.util.concurrent.Semaphore;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
@@ -122,6 +121,19 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         }
     }
 
+    private class TestLucenePlugin extends LucenePlugin
+    {
+        TestLucenePlugin(String name, String className, XWikiContext context)
+        {
+            super(name, className, context);
+        }
+
+        public Thread getIndexUpdatedThread()
+        {
+            return this.indexUpdaterThread;
+        }
+    }
+
     @Override
     protected void setUp() throws Exception
     {
@@ -201,30 +213,50 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         int maxQueueSize;
         maxQueueSize = 1000;
 
-        LucenePlugin plugin = new LucenePlugin("Monkey", "Monkey", getContext());
+        // Create an instance of the test plugin.
+        TestLucenePlugin plugin = new TestLucenePlugin("Monkey", "Monkey", getContext());
+
+        // Initialize the test index updater and rebuilder.
         IndexUpdater indexUpdater =
             new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
         IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext());
-        Thread writerBlocker = new Thread(indexUpdater, "writerBlocker");
-        writerBlocker.start();
-        plugin.init(indexUpdater, indexRebuilder, getContext());
 
+        // Make sure to have a clean index.
         indexUpdater.cleanIndex();
 
+        // Launch a thread that simulates work, blocking the index writer for 5000ms.
+        Thread writerBlocker = new Thread(indexUpdater, "writerBlocker");
+        writerBlocker.start();
+
+        // Initialize the plugin with the above index updater and index rebuilder.
+        // Note: This also launches the plugin's "Lucene Index Updater" thread.
+        plugin.init(indexUpdater, indexRebuilder, getContext());
+
+        // Launch a third thread that will compete with the others.
         Thread indexUpdaterThread = new Thread(indexUpdater, "Lucene Index Updater");
         indexUpdaterThread.start();
 
+        // Queue the same document twice, testing if it will be indexed only once.
         indexUpdater.queueDocument(this.loremIpsum.clone(), getContext(), false);
         indexUpdater.queueDocument(this.loremIpsum.clone(), getContext(), false);
 
-        try {
-            Thread.sleep(1000);
-            indexUpdater.doExit();
-        } catch (InterruptedException e) {
+        // Wait for the queued documents to be consumed by the index updater.
+        int waitAttempts = 7;
+        while (indexUpdater.getQueueSize() > 0 && waitAttempts-- > 0) {
+            try {
+                Thread.yield();
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
         }
+
+        // Enough waiting, let's see what is the result.
+        indexUpdater.doExit();
+
         while (true) {
             try {
                 indexUpdaterThread.join();
+                plugin.getIndexUpdatedThread().join();
                 break;
             } catch (InterruptedException e) {
             }
@@ -324,10 +356,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         assertFalse(IndexWriter.isLocked(indexUpdater.getDirectory()));
 
-        IndexWriterConfig config =
-            new IndexWriterConfig(Version.LUCENE_40, new StandardAnalyzer(Version.LUCENE_40));
-        IndexWriter w =
-            new IndexWriter(indexUpdater.getDirectory(), config);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new StandardAnalyzer(Version.LUCENE_40));
+        IndexWriter w = new IndexWriter(indexUpdater.getDirectory(), config);
         w.close();
     }
 }

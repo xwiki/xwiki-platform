@@ -90,6 +90,10 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
+    /** For backwards compliancy with old xwiki context.  */
+    @Inject
+    private EffectiveUserUpdater effectiveUserUpdater;
+
     @Override
     public void initialize(ExecutionContext executionContext)
     {
@@ -140,7 +144,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         } catch (ComponentRepositoryException e) {
             throw new InitializationException("Failed to register authorization context controller components.", e);
         }
-        
+
         this.componentManager = null;
         this.configuration = null;
     }
@@ -234,7 +238,11 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         {
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
-            ctx.effectiveUser = user;
+            if (user != ctx.effectiveUser || (user != null && !user.equals(ctx.effectiveUser))) {
+                ctx.effectiveUser = new DocumentReference(user);
+
+                effectiveUserUpdater.updateUser(user);
+            }
         }
     }
 

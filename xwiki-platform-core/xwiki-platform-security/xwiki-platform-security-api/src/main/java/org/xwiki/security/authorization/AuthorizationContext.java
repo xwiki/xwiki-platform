@@ -42,7 +42,7 @@ public interface AuthorizationContext
 
     /**
      * @return {@literal true} if the security stack is empty, which means that we are not executing any user
-     * content.  
+     * content.
      */
     boolean securityStackIsEmpty();
 

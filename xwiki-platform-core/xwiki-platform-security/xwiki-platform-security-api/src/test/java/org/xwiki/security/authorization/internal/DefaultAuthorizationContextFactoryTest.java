@@ -38,8 +38,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import org.xwiki.component.manager.ComponentManager;
 
@@ -69,6 +69,8 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
     private ContentAuthorResolver contentAuthorResolver;
 
+    private EffectiveUserUpdater effectiveUserUpdater;
+
     private Execution execution;
 
     @Before
@@ -80,12 +82,12 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         final ConfigurationSource configurationSource
             = getComponentManager().getInstance(ConfigurationSource.class, "xwikiproperties");
 
-        registerMockComponent(ContentAuthorResolver.class, 
+        registerMockComponent(ContentAuthorResolver.class,
             DefaultAuthorizationContextFactory.DEFAULT_CONTENT_AUTHOR_RESOLVER);
 
         getMockery().checking(new Expectations() {{
             allowing(configurationSource)
-                 .getProperty(DefaultAuthorizationContextFactory.CONTENT_AUTHOR_RESOLVER_PROPERTY, 
+                 .getProperty(DefaultAuthorizationContextFactory.CONTENT_AUTHOR_RESOLVER_PROPERTY,
                               DefaultAuthorizationContextFactory.DEFAULT_CONTENT_AUTHOR_RESOLVER);
             will(returnValue(DefaultAuthorizationContextFactory.DEFAULT_CONTENT_AUTHOR_RESOLVER));
         }});
@@ -95,12 +97,16 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         this.contentAuthorResolver = getComponentManager().getInstance(ContentAuthorResolver.class);
 
+        this.effectiveUserUpdater = getComponentManager().getInstance(EffectiveUserUpdater.class);
+
         execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext executionContext = new ExecutionContext();
         getMockery().checking(new Expectations() {{
             allowing(execution).setContext(executionContext);
             allowing(execution).getContext();   will(returnValue(executionContext));
             allowing(contentAuthorResolver).resolveContentAuthor(null); will(returnValue(null));
+            allowing(effectiveUserUpdater).updateUser(with(any(DocumentReference.class)));
+            allowing(effectiveUserUpdater).updateUser(null);
         }});
 
         authorizationContextFactory.initialize(executionContext);
@@ -175,7 +181,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cdc.pushContentDocument(document2);
-        
+
         Assert.assertTrue(user2.equals(authorizationContext.getContentAuthor()));
 
         cdc.popContentDocument();
@@ -205,7 +211,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cac.pushContentAuthor(user2);
-        
+
         Assert.assertTrue(user2.equals(authorizationContext.getContentAuthor()));
 
         cac.popContentAuthor();
@@ -216,7 +222,6 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         Assert.assertTrue(authorizationContext.getContentAuthor() == null);
         Assert.assertTrue(authorizationContext.securityStackIsEmpty());
-        
     }
 
     @Test

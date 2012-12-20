@@ -19,36 +19,21 @@
  */
 package com.xpn.xwiki.plugin.applicationmanager.core.api;
 
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
+import junit.framework.TestCase;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi}.
  * 
  * @version $Id$
  */
-public class XWikiExceptionApiTest extends AbstractComponentTestCase
+public class XWikiExceptionApiTest extends TestCase
 {
-
-    @Before
-    public void setComponentManager() throws Exception
-    {
-        Utils.setComponentManager(getComponentManager());
-    }
-    
     /**
      * We only verify here we get the correct error code for some static error field name.
      * 
      * @throws XWikiException error occurred.
      */
-    @Test
     public void testGetStaticErrorCode() throws XWikiException
     {
         XWikiExceptionApi exceptionapi = new XWikiExceptionApi(new XWikiException(), null);
@@ -64,7 +49,6 @@ public class XWikiExceptionApiTest extends AbstractComponentTestCase
     /**
      * Try to get error code that does not exists.
      */
-    @Test
     public void testCantFindErrorCode()
     {
         XWikiExceptionApi exceptionapi = new XWikiExceptionApi(new XWikiException(), null);
@@ -102,7 +86,6 @@ public class XWikiExceptionApiTest extends AbstractComponentTestCase
      * 
      * @throws XWikiException error occurred.
      */
-    @Test
     public void testGetExtendedStaticErrorCode() throws XWikiException
     {
         XWikiExceptionApi exceptionapi1 = new XWikiExceptionApi(new SomeExtendedException(), null);

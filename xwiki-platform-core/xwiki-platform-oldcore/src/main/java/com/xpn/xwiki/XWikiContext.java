@@ -352,8 +352,18 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.userReference;
     }
 
+    /**
+     * @param userReference The reference to the user's profile document.
+     * @deprecated since 5.0M1  Use the EffectiveUserController instead.
+     */
+    @Deprecated
     public void setUserReference(DocumentReference userReference)
     {
+        if (userReference == this.userReference ||
+            (userReference != null && userReference.equals(this.userReference))) {
+            return;
+        }
+
         if (userReference == null) {
             this.userReference = null;
             remove(USER_KEY);

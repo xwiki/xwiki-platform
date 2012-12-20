@@ -17,26 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.display.internal;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Component used to display data.
- * 
- * @param <T> the type of data displayed by this class
- * @param <P> the type of the display parameters bean
+ * Bridge component for updating the user in the legacy xwiki context.
+ *
  * @version $Id$
- * @since 3.2M3
+ * @since 4.4RC1
  */
-public interface Displayer<T, P>
+@Role
+public interface EffectiveUserUpdater
 {
     /**
-     * Displays the given data.
-     * 
-     * @param data the data to be displayed
-     * @param parameters display parameters
-     * @return the result of displaying the given data
+     * Update the user in the legacy xwiki context.
+     *
+     * @param userReference the new user reference.
      */
-    XDOM display(T data, P parameters);
+    void updateUser(DocumentReference userReference);
 }

@@ -235,7 +235,7 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         authorizationContextFactory.expects(once()).method("initialize").with(ANYTHING);
         effectiveUserController
             = registerMockComponent(EffectiveUserController.class);
-        effectiveUserController.expects(new InvokeAtLeastOnceMatcher()).method("setEffectiveUser").with(ANYTHING);
+        effectiveUserController.stubs().method("setEffectiveUser").with(ANYTHING);
 
     }
 }

@@ -51,17 +51,6 @@ public class Api
     protected XWikiContext context;
 
     /**
-     * The execution.
-     */
-    protected final Execution execution = Utils.getComponent(Execution.class);
-
-    /**
-     * An entity reference serializer for generating the effective script author user name.
-     */
-    protected final EntityReferenceSerializer<String> entityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING);
-
-    /**
      * @param context the XWiki Context object
      * @see #getXWikiContext()
      */
@@ -168,6 +157,11 @@ public class Api
      */
     String getEffectiveScriptAuthorName()
     {
+        Execution execution = Utils.getComponent(Execution.class);
+
+        EntityReferenceSerializer<String> entityReferenceSerializer
+            = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+
         AuthorizationContext authContext
             = (AuthorizationContext) execution.getContext().getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
 

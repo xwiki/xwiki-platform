@@ -17,26 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.display.internal;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+
+import com.xpn.xwiki.XWikiContext;
+
+import javax.inject.Singleton;
+import javax.inject.Inject;
 
 /**
- * Component used to display data.
- * 
- * @param <T> the type of data displayed by this class
- * @param <P> the type of the display parameters bean
+ * Bridge component for setting the user in the legacy context.
+ *
  * @version $Id$
- * @since 3.2M3
+ * @since 4.4RC1
  */
-public interface Displayer<T, P>
+@Component
+@Singleton
+public class DefaultEffectiveUserUpdater implements EffectiveUserUpdater
 {
-    /**
-     * Displays the given data.
-     * 
-     * @param data the data to be displayed
-     * @param parameters display parameters
-     * @return the result of displaying the given data
-     */
-    XDOM display(T data, P parameters);
+
+
+    /** The execution. */
+    @Inject
+    private Execution execution;
+
+    @Override
+    public void updateUser(DocumentReference userReference)
+    {
+        XWikiContext context = (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+        context.setUserReference(userReference);
+    }
 }

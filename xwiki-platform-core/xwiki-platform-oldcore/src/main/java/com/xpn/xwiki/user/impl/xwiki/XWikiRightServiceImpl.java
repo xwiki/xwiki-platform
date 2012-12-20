@@ -1017,6 +1017,3 @@ public class XWikiRightServiceImpl implements XWikiRightService
             .getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
     }
 }
-
-
-

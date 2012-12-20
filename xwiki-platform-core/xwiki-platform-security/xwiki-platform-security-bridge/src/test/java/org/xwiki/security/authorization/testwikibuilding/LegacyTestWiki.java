@@ -163,6 +163,7 @@ public class LegacyTestWiki extends AbstractTestWiki {
                             documentReferenceResolver.resolve(currentDatabase + ":Main.WebHome"));
                     }
                 });
+            allowing(context).setUserReference(with(any(DocumentReference.class)));
             allowing(context).get("sdoc");
             will(new CustomAction("return the current sdoc") {
                     @Override
@@ -244,13 +245,12 @@ public class LegacyTestWiki extends AbstractTestWiki {
                     }
                 });
 
-            // Expectations needed for old implementation 
-        
+            // Expectations needed for old implementation
+
             allowing(xwiki).getXWikiPreference(with(any(String.class)), with(equal("")), with(any(XWikiContext.class)));      will(returnValue("false"));
             allowing(xwiki).getXWikiPreferenceAsInt(with(any(String.class)), with(0), with(any(XWikiContext.class))); will(returnValue(0));
             allowing(xwiki).getSpacePreference(with(any(String.class)), with(equal("")), with(any(XWikiContext.class)));      will(returnValue("false"));
             allowing(xwiki).getSpacePreferenceAsInt(with(any(String.class)), with(0), with(any(XWikiContext.class))); will(returnValue(0));
-        
         }});
 
     }
@@ -272,7 +272,6 @@ public class LegacyTestWiki extends AbstractTestWiki {
     public void setUser(String username) throws Exception {
         componentManager.<EffectiveUserController>getInstance(EffectiveUserController.class)
             .setEffectiveUser(documentReferenceResolver.resolve(username, new WikiReference(currentDatabase)));
-                                                                                     
         this.currentUsername = username;
     }
 

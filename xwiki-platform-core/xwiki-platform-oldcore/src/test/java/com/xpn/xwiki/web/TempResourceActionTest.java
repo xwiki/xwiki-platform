@@ -31,7 +31,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.security.authorization.EffectiveUserController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -80,9 +79,6 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
         final ExecutionContextManager mockExecutionContextManager =
             registerMockComponent(ExecutionContextManager.class);
         final Execution mockExecution = registerMockComponent(Execution.class);
-
-        final EffectiveUserController effectiveUserController
-            = registerMockComponent(EffectiveUserController.class);
         
         getMockery().checking(new Expectations()
         {
@@ -91,7 +87,6 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockExecution).getContext(); will(returnValue(executionContext));
                 allowing(mockExecution).removeContext();
-                allowing(effectiveUserController).setEffectiveUser(null);
             }
         });
     }

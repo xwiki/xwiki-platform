@@ -39,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
@@ -47,7 +46,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
-import org.xwiki.security.authorization.EffectiveUserController;
 
 /**
  * Make sure the user's locks are released when they logout.
@@ -68,7 +66,6 @@ public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCa
     @Before
     public void configure() throws Exception
     {
-
         // Needed because XHS has initializers which depend on Utils.
         Utils.setComponentManager(this.getComponentManager());
 
@@ -100,8 +97,6 @@ public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCa
             this.getComponentManager().getInstance(HibernateSessionFactory.class);
         final SessionFactory hsf = this.getMockery().mock(SessionFactory.class, "hsf");
         final Session session = this.getMockery().mock(org.hibernate.classic.Session.class);
-        final EffectiveUserController effectiveUserController = getComponentManager()
-            .registerMockComponent(getMockery(), EffectiveUserController.class);
         this.getMockery().checking(new Expectations() {{
             oneOf(xhsf).getSessionFactory(); will(returnValue(hsf));
             oneOf(hsf).openSession(); will(returnValue(session));
@@ -119,7 +114,6 @@ public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCa
                 will(returnValue(mockTransaction));
             oneOf(mockTransaction).commit();
             oneOf(session).close();
-            oneOf(effectiveUserController).setEffectiveUser(with(any(DocumentReference.class)));
         }});
 
         // setDatabase() is called for each transaction and that calls checkDatabase().

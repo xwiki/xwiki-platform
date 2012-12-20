@@ -17,26 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.display.internal;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import javax.inject.Singleton;
 
 /**
- * Component used to display data.
+ * This purpose of this stub is to avoid having the integration tests depend on xwiki-security-bridge.
  * 
- * @param <T> the type of data displayed by this class
- * @param <P> the type of the display parameters bean
+ * @since 4.4RC1
  * @version $Id$
- * @since 3.2M3
  */
-public interface Displayer<T, P>
+@Component
+@Singleton
+public class StubEffectiveUserUpdater implements EffectiveUserUpdater
 {
-    /**
-     * Displays the given data.
-     * 
-     * @param data the data to be displayed
-     * @param parameters display parameters
-     * @return the result of displaying the given data
-     */
-    XDOM display(T data, P parameters);
+
+    @Override
+    public void updateUser(DocumentReference userReference)
+    {
+    }
 }

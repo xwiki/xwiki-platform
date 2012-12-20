@@ -23,10 +23,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import org.xwiki.test.AbstractMockingTestCase;
-
 import com.xpn.xwiki.doc.XWikiDocument;
-
 
 import org.junit.Test;
 import org.junit.Assert;

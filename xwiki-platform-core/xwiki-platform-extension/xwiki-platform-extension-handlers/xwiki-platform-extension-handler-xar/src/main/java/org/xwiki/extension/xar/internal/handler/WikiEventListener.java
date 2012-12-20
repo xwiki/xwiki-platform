@@ -157,13 +157,15 @@ public class WikiEventListener implements EventListener
         installRequest.setInteractive(false);
 
         for (InstalledExtension installedExtension : installedExtensions) {
-            installRequest.addExtension(installedExtension.getId());
+            if (installedExtension.getType().equals(XarExtensionHandler.TYPE)) {
+                installRequest.addExtension(installedExtension.getId());
 
-            try {
-                xarHandler.install(installedExtension, namespace, installRequest);
-            } catch (InstallException e) {
-                this.logger.error("Failed to import extension [{}] in wiki [{}]", installedExtension,
-                    event.getWikiId(), e);
+                try {
+                    xarHandler.install(installedExtension, namespace, installRequest);
+                } catch (InstallException e) {
+                    this.logger.error("Failed to import extension [{}] in wiki [{}]", installedExtension,
+                        event.getWikiId(), e);
+                }
             }
         }
     }

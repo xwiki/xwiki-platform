@@ -75,6 +75,11 @@ public class PreferencesEditPage extends EditPage
         select.selectByValue(EDITOR_TEXT);
     }
 
+    public String getDefaultEditor()
+    {
+        return new Select(this.defaultEditor).getFirstSelectedOption().getText();
+    }
+
     public void setTimezone(String value)
     {
         Select select = new Select(this.timezone);

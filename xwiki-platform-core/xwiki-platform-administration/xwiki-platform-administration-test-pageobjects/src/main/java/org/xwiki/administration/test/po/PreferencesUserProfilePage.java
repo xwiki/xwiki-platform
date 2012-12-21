@@ -69,7 +69,17 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     public PreferencesEditPage editPreferences()
     {
         this.editPreferences.click();
-        return new PreferencesEditPage();
+
+        PreferencesEditPage editPage = new PreferencesEditPage();
+        // The user profile and the user preferences are currently loaded together. This means that when we edit the
+        // preferences the entire user profile is edited but only the preferences are visible. The consequence is that
+        // the WYSIWYG editor is loaded (but not displayed) for the user profile fields even if they are hidden so we
+        // need to wait for it to be safe.
+        if (!"Text".equals(editPage.getDefaultEditor())) {
+            new ProfileUserProfilePage(getUsername()).waitForProfileEditionToLoad();
+        }
+
+        return editPage;
     }
 
     public ChangePasswordPage changePassword()

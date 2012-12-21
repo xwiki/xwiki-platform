@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -131,12 +132,14 @@ public class WatchListJob extends AbstractJob implements Job
     protected void cleanupComponents()
     {
         Container container = Utils.getComponent(Container.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.
         container.removeRequest();
         container.removeResponse();
         container.removeSession();
+        execution.removeContext();
     }
 
     /**

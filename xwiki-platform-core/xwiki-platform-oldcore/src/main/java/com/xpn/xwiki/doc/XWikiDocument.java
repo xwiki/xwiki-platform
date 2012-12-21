@@ -914,7 +914,7 @@ public class XWikiDocument implements DocumentModelBridge
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
             parameters.setContentTranslated(tdoc != this);
-            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters, tdoc);
+            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
             getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
         }
@@ -1185,7 +1185,7 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
-        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters, this);
+        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
         try {
             return renderXDOM(titleXDOM, outputSyntax);
         } catch (XWikiException e) {

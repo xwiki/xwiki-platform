@@ -138,7 +138,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         }
 
         @Override
-        public void add(XmlDocument metadataXml)
+	public void add(XmlDocument metadataXml)
         {
             Element basePropertyElement = selectChildClassMappingElement(metadataXml.getDocumentTree().getRootElement(),
                                                                          "class", "com.xpn.xwiki.objects.BaseProperty");

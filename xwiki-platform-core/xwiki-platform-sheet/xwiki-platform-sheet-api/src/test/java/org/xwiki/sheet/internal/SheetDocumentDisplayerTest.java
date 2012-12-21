@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -165,7 +164,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     @Test
     public void testPreserveSheetPRWhenDocumentIsOnContext() throws Exception
     {
-
         final DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE, ALICE, false);
         final DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE, BOB, true);
 
@@ -174,7 +172,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
         final SheetManager sheetManager = getComponentManager().getInstance(SheetManager.class);
         final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
         final Sequence displaySequence = getMockery().sequence("displayInCurrentContext");
-
         getMockery().checking(new Expectations()
         {
             {
@@ -182,11 +179,17 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 inSequence(displaySequence);
                 will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
 
-                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)),
                 // Required in order to preserve the programming rights of the sheet.
-                                                 with(sheet));
+                oneOf(modelBridge).setContentAuthorReference(document, BOB);
+                inSequence(displaySequence);
+
+                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
                 inSequence(displaySequence);
                 will(returnValue(new XDOM(Collections.<Block> emptyList())));
+
+                // Document author must be reverted.
+                oneOf(modelBridge).setContentAuthorReference(document, ALICE);
+                inSequence(displaySequence);
             }
         });
 
@@ -212,7 +215,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
         final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
         final Map<String, Object> backupObjects = new HashMap<String, Object>();
         final Sequence displaySequence = getMockery().sequence("displayInNewContext");
-
         getMockery().checking(new Expectations()
         {
             {
@@ -225,16 +227,22 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
                 oneOf(sheetManager).getSheets(with(document), with(any(String.class)));
                 inSequence(displaySequence);
                 will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
+
+                // Required in order to preserve the programming rights of the sheet.
+                oneOf(modelBridge).setContentAuthorReference(document, BOB);
+                inSequence(displaySequence);
             }
         });
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)),
-                // Required in order to preserve the programming rights of the sheet.
-                                                 with(sheet));
+                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
                 inSequence(displaySequence);
                 will(returnValue(new XDOM(Collections.<Block> emptyList())));
+
+                // Document content author must be restored.
+                oneOf(modelBridge).setContentAuthorReference(document, ALICE);
+                inSequence(displaySequence);
 
                 // The previous execution context must be restored.
                 oneOf(documentAccessBridge).popDocumentFromContext(backupObjects);

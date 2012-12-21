@@ -30,9 +30,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -136,10 +134,6 @@ public class XWikiCachingRightService implements XWikiRightService
     /** The authorization manager used to really do the job. */
     private final AuthorizationManager authorizationManager
         = Utils.getComponent(AuthorizationManager.class);
-
-    /** The execution. */
-    private final Execution execution
-        = Utils.getComponent(Execution.class);
 
     /**
      * Specialized map with a chainable put action to avoid exceeding code complexity during initialization.
@@ -347,10 +341,6 @@ public class XWikiCachingRightService implements XWikiRightService
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
         throws XWikiException
     {
-        if (getAuth().grantAll()) {
-            return true;
-        }
-
         WikiReference wikiReference = new WikiReference(context.getDatabase());
         DocumentReference document = resolveDocumentName(docname, wikiReference);
         LOGGER.debug("Resolved '{}' into {}", docname, document);
@@ -362,48 +352,22 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-        DocumentReference contentAuthor = getAuth().getContentAuthor();
-
-        WikiReference wikiReference = new WikiReference(context.getDatabase());
-
-        if (getAuth().securityStackIsEmpty()) {
-            return hasProgrammingRights(getAuth().getEffectiveUser(), wikiReference);
-        }
-
-        return hasProgrammingRights(contentAuthor, wikiReference);
+        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+        return hasProgrammingRights((sdoc != null) ? sdoc : context.getDoc(), context);
     }
 
     @Override
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
-        if (doc == null) {
-            return hasProgrammingRights(getAuth().getEffectiveUser(),
-                                        new WikiReference(context.getDatabase()));
-        }
+        DocumentReference user;
+        WikiReference wiki;
 
-        DocumentReference user = doc.getContentAuthorReference();
-        WikiReference wiki = doc.getDocumentReference().getWikiReference();
-
-        return hasProgrammingRights(user, wiki);
-    }
-
-    /**
-     * @param user The user reference.
-     * @param wiki The wiki reference.
-     * @return {@literal true} only if the user should be granted programming rights.
-     */
-    private boolean hasProgrammingRights(DocumentReference user, WikiReference wiki)
-    {
-        if (!getAuth().isPrivileged()) {
-            return false;
-        }
-
-        if (getAuth().grantAll()) {
-            return true;
-        }
-
-        if (user == null) {
-            return false;
+        if (doc != null) {
+            user = doc.getContentAuthorReference();
+            wiki = doc.getDocumentReference().getWikiReference();
+        } else {
+            user = context.getUserReference();
+            wiki = new WikiReference(context.getDatabase());
         }
 
         return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);
@@ -412,11 +376,7 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasAdminRights(XWikiContext context)
     {
-        if (getAuth().grantAll()) {
-            return true;
-        }
-
-        DocumentReference user = getAuth().getEffectiveUser();
+        DocumentReference user = context.getUserReference();
         DocumentReference document = context.getDoc().getDocumentReference();
         return authorizationManager.hasAccess(Right.ADMIN, user, document);
     }
@@ -424,10 +384,6 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasWikiAdminRights(XWikiContext context)
     {
-        if (getAuth().grantAll()) {
-            return true;
-        }
-
         DocumentReference user = context.getUserReference();
         WikiReference wiki = new WikiReference(context.getDatabase());
         return authorizationManager.hasAccess(Right.ADMIN, user, wiki);
@@ -438,12 +394,5 @@ public class XWikiCachingRightService implements XWikiRightService
         throws XWikiException
     {
         return Right.getAllRightsAsString();
-    }
-
-    /** @return the authorization context. */
-    private AuthorizationContext getAuth()
-    {
-        return (AuthorizationContext) execution.getContext()
-            .getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
     }
 }

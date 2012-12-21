@@ -79,7 +79,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
             // level yet. Using "xwiki" since in pratice there is no way to change the main wiki
             InstalledExtension installedExtension =
                 this.installedRepository.getInstalledExtension(extensionUI.getId(), "wiki:xwiki");
-            if (installedExtension != null && !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
+            if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
                 step1.setUpdateState(null);
             }
         }

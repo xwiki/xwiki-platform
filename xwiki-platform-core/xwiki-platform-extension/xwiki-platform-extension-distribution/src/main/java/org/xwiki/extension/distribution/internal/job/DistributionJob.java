@@ -73,8 +73,15 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
         DistributionStepStatus step1 = new DistributionStepStatus("extension.mainui");
         steps.add(step1);
         // Only if the UI is not already installed
-        if (extensionUI == null || this.installedRepository.getInstalledExtension(extensionUI) != null) {
-            step1.setUpdateState(UpdateState.COMPLETED);
+        step1.setUpdateState(UpdateState.COMPLETED);
+        if (extensionUI != null) {
+            // FIXME: using "xwiki" directly is cheating but there is no way to get the official main wiki at this
+            // level yet. Using "xwiki" since in pratice there is no way to change the main wiki
+            InstalledExtension installedExtension =
+                this.installedRepository.getInstalledExtension(extensionUI.getId(), "wiki:xwiki");
+            if (installedExtension != null && !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
+                step1.setUpdateState(null);
+            }
         }
 
         // Step 2: Upgrade outdated extensions

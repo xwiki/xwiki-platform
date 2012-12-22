@@ -1,3 +1,0 @@
-body {
-  behavior: url("$xwiki.getSkinFile('/htc/csshover3.htc')");
-}

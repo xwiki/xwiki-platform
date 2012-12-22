@@ -450,7 +450,6 @@
     <module>xwiki-platform-store</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-test</module>
-    <module>xwiki-platform-toucan</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>

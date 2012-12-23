@@ -41,7 +41,7 @@ $xwiki.jsfx.use('js/xwiki/xwikiexplorer/xwikiexplorer.js', {'forceSkinAction' : 
 {{/velocity}}
 
 {{html}}
-&lt;div id="XWEWrapper" style="height:300px;margin-right:20px;padding-bottom:30px;"&gt;&lt;/div&gt;
+&lt;div id="XWEWrapper" style="height:300px;padding-bottom:30px;"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
 isc.XWETreeGrid.create({
   ID: "Treeview",

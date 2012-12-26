@@ -224,7 +224,7 @@ public class WatchListStore implements EventListener
      */
     public boolean initWatchListClassDocumentFields(XWikiDocument doc)
     {
-        boolean needsUpdate = true;
+        boolean needsUpdate = false;
 
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;

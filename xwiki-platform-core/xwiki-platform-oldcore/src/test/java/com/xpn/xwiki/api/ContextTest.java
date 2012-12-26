@@ -47,7 +47,7 @@ import junit.framework.Assert;
  * Unit tests for {@link Context}.
  *
  * @version $Id$
- * @since 4.4M1
+ * @since 4.4RC1
  */
 public class ContextTest extends AbstractComponentTestCase
 {

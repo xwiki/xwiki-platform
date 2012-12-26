@@ -64,7 +64,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
      * the dirty bit of the owner document.
      *
      * @param storage the file where the data is stored.
-     * @since 4.4M1
+     * @since 4.4RC1
      */
     public FilesystemAttachmentContent(final File storage)
     {

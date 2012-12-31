@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -37,7 +36,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.internal.AbstractTranslationBundle;
-import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.localization.wiki.internal.DefaultDocumentTranslationBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -70,35 +68,31 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
      */
     private static final String JOIN_SEPARATOR = ",";
 
-    private ComponentManager componentManager;
-
     private ObservationManager observation;
 
     private DocumentAccessBridge documentAccessBridge;
 
     private DocumentReferenceResolver<String> resolver;
 
-    private TranslationMessageParser translationMessageParser;
-
     private final List<Event> events;
 
     private final String wiki;
 
-    private Map<DocumentReference, DefaultDocumentTranslationBundle> bundles =
-        new ConcurrentHashMap<DocumentReference, DefaultDocumentTranslationBundle>();
+    private XWikiPreferencesTranslationBundle parent;
 
-    public XWikiPreferencesWikiTranslationBundle(String wiki, ComponentManager componentManager)
-        throws ComponentLookupException
+    private Map<DocumentReference, DefaultDocumentTranslationBundle> bundles;
+
+    public XWikiPreferencesWikiTranslationBundle(String wiki, XWikiPreferencesTranslationBundle parent,
+        ComponentManager componentManager) throws ComponentLookupException
     {
         super(XWikiPreferencesWikiTranslationBundle.ID + '.' + wiki);
 
         this.wiki = wiki;
+        this.parent = parent;
 
-        this.componentManager = componentManager;
         this.observation = componentManager.getInstance(ObservationManager.class);
         this.documentAccessBridge = componentManager.getInstance(DocumentAccessBridge.class);
         this.resolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        this.translationMessageParser = componentManager.getInstance(TranslationMessageParser.class, "messagetool/1.0");
 
         intializeBundles();
 
@@ -147,23 +141,13 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
         Map<DocumentReference, DefaultDocumentTranslationBundle> newBundles =
             new LinkedHashMap<DocumentReference, DefaultDocumentTranslationBundle>(documents.size());
         for (DocumentReference document : documents) {
-            DefaultDocumentTranslationBundle documentBundle = this.bundles.get(document);
-            if (documentBundle == null) {
-                try {
-                    documentBundle =
-                        new DefaultDocumentTranslationBundle(document, this.componentManager,
-                            this.translationMessageParser);
-                } catch (ComponentLookupException e) {
-                    // Should never happen
-                    this.logger.error("Failed to create document bundle for document [{}]", document, e);
-                }
-            }
-            newBundles.put(document, documentBundle);
+            newBundles.put(document, this.parent.getDocumentTranslationBundle(document));
         }
+
         this.bundles = newBundles;
     }
 
-    // EventListener
+    // EventListeners
 
     @Override
     public String getName()

@@ -20,6 +20,8 @@
 package org.xwiki.localization.legacy.internal.xwikipreferences;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,8 +38,12 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractTranslationBundle;
+import org.xwiki.localization.message.TranslationMessageParser;
+import org.xwiki.localization.wiki.internal.DefaultDocumentTranslationBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Bundle corresponding to global (at the wiki level) localization documents.
@@ -74,9 +80,29 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     private ComponentManager componentManager;
 
     /**
-     * The cache of bundles by document reference.
+     * Used to parse translation messages.
      */
-    private Cache<XWikiPreferencesWikiTranslationBundle> bundlesCache;
+    @Inject
+    @Named("messagetool/1.0")
+    private TranslationMessageParser translationMessageParser;
+
+    /**
+     * Used to generate a document unique String identifier.
+     */
+    @Inject
+    @Named("uid")
+    private EntityReferenceSerializer<String> uidSerializer;
+
+    /**
+     * The cache of bundles by wiki.
+     */
+    private Map<String, XWikiPreferencesWikiTranslationBundle> wikiBundlesCache =
+        new ConcurrentHashMap<String, XWikiPreferencesWikiTranslationBundle>();
+
+    /**
+     * The cache of bundles by document id.
+     */
+    private Cache<DefaultDocumentTranslationBundle> documentBundlesCache;
 
     /**
      * Default constructor.
@@ -93,7 +119,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
         CacheConfiguration cacheConfiguration = new CacheConfiguration("localization." + getId());
 
         try {
-            this.bundlesCache = this.cacheManager.createNewCache(cacheConfiguration);
+            this.documentBundlesCache = this.cacheManager.createNewCache(cacheConfiguration);
         } catch (CacheException e) {
             this.logger.error("Failed to create cache [{}]", cacheConfiguration.getConfigurationId(), e);
         }
@@ -121,11 +147,11 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      */
     private XWikiPreferencesWikiTranslationBundle getBundle(String wiki)
     {
-        XWikiPreferencesWikiTranslationBundle bundle = this.bundlesCache.get(wiki);
+        XWikiPreferencesWikiTranslationBundle bundle = this.wikiBundlesCache.get(wiki);
         if (bundle == null) {
             try {
                 bundle = createWikiBundle(wiki);
-                this.bundlesCache.set(wiki, bundle);
+                this.wikiBundlesCache.put(wiki, bundle);
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to create preferences bundle for wiki [{}]", wiki, e);
             }
@@ -141,6 +167,32 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      */
     private XWikiPreferencesWikiTranslationBundle createWikiBundle(String wiki) throws ComponentLookupException
     {
-        return new XWikiPreferencesWikiTranslationBundle(wiki, this.componentManager);
+        return new XWikiPreferencesWikiTranslationBundle(wiki, this, this.componentManager);
+    }
+
+    /**
+     * Get document bundle from passed reference.
+     * 
+     * @param document the document reference
+     * @return the document bundle
+     */
+    protected DefaultDocumentTranslationBundle getDocumentTranslationBundle(DocumentReference document)
+    {
+        String uid = this.uidSerializer.serialize(document);
+
+        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        if (documentBundle == null) {
+            try {
+                documentBundle =
+                    new DefaultDocumentTranslationBundle(document, this.componentManager,
+                        this.translationMessageParser);
+                this.documentBundlesCache.set(uid, documentBundle);
+            } catch (ComponentLookupException e) {
+                // Should never happen
+                this.logger.error("Failed to create document bundle for document [{}]", document, e);
+            }
+        }
+
+        return documentBundle;
     }
 }

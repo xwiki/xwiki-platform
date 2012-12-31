@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -92,9 +93,13 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         @Override
         public void onEvent(Event arg0, Object arg1, Object arg2)
         {
-            XWikiDocument document = (XWikiDocument) arg1;
+            if (arg0 instanceof WikiDeletedEvent) {
+                bundleCache.clear();
+            } else {
+                XWikiDocument document = (XWikiDocument) arg1;
 
-            bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
+                bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
+            }
         }
 
         @Override
@@ -135,7 +140,8 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     {
         this.events =
             Arrays.<Event> asList(new DocumentUpdatedEvent(this.documentReference), new DocumentCreatedEvent(
-                this.documentReference), new DocumentDeletedEvent(this.documentReference));
+                this.documentReference), new DocumentDeletedEvent(this.documentReference), new WikiDeletedEvent(
+                this.documentReference.getWikiReference().getName()));
 
         this.observation.addListener(this.listener);
     }

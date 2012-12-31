@@ -48,6 +48,11 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-annotatedxhtml</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

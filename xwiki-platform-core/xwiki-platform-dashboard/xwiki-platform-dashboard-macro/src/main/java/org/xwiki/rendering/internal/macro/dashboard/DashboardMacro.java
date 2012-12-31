@@ -187,12 +187,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         }
 
         GadgetRenderer gadgetRenderer = getGadgetRenderer(isInEditMode);
-        if (gadgetRenderer == null) {
-            String message = "Could not find gadgets renderer.";
-            // log and throw further
-            this.logger.error(message);
-            throw new MacroExecutionException(message);
-        }
 
         // else, layout
         List<Block> layoutedResult;
@@ -278,8 +272,9 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
     /**
      * @param isEditing whether this dashboard is in edit mode or in view mode
      * @return the gadgets renderer used by this dashboard
+     * @throws MacroExecutionException if the gadget renderer cannot be found
      */
-    protected GadgetRenderer getGadgetRenderer(boolean isEditing)
+    protected GadgetRenderer getGadgetRenderer(boolean isEditing) throws MacroExecutionException
     {
         String hint = "default";
         if (isEditing) {
@@ -288,8 +283,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         try {
             return this.componentManager.getInstance(GadgetRenderer.class, hint);
         } catch (ComponentLookupException e) {
-            this.logger.warn("Could not find the Gadgets renderer for hint \"" + hint + "\".");
-            return null;
+            throw new MacroExecutionException(String.format("Could not find the Gadgets renderer for hint [%s].",
+                hint), e);
         }
     }
 

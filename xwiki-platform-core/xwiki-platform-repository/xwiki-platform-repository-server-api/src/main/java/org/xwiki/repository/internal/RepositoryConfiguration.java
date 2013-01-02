@@ -29,14 +29,27 @@ import com.xpn.xwiki.XWikiException;
  * Contains various configuration of the repository.
  * 
  * @version $Id$
- * @since 4.4M2
+ * @since 4.5M1
  */
 @Role
 public interface RepositoryConfiguration
 {
+    /**
+     * @return the default prefix used when generating the extension id
+     * @throws XWikiException when failing to access the configuration
+     */
     String getDefaultIdPrefix() throws XWikiException;
 
+    /**
+     * @return the valid types
+     * @throws XWikiException when failing to access the configuration
+     */
     List<String> getValidTypes() throws XWikiException;
-    
+
+    /**
+     * @param type the type to validate
+     * @return true of the type is valid, false otherwise
+     * @throws XWikiException when failing to access the configuration
+     */
     boolean isValidType(String type) throws XWikiException;
 }

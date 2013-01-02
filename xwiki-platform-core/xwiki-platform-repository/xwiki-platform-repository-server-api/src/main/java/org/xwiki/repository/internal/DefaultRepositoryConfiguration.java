@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Default implementation of {@link RepositoryConfiguration}.
  * 
  * @version $Id$
- * @since 4.4M2
+ * @since 4.5M1
  */
 @Component
 public class DefaultRepositoryConfiguration implements RepositoryConfiguration

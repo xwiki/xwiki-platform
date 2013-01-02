@@ -49,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <artifactId>xwiki-rendering-syntax-annotatedxhtml</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

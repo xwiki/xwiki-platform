@@ -24,11 +24,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.context.Execution;
 import org.xwiki.rendering.internal.renderer.xhtml.link.AbstractXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -49,19 +49,17 @@ import com.xpn.xwiki.XWikiContext;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class ExtensionXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 {
+    /**
+     * Give access to current {@link XWikiContext}.
+     */
     @Inject
-    private Execution execution;
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-    }
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         String prefix = xcontext.getWiki().getWebAppPath(xcontext);
         if (prefix.isEmpty() || prefix.charAt(0) != '/') {

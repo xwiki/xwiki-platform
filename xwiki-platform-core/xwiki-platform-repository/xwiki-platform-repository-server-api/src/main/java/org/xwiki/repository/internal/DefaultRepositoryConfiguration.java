@@ -44,13 +44,23 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class DefaultRepositoryConfiguration implements RepositoryConfiguration
 {
+    /**
+     * Gives access to the current {@link XWikiContext}.
+     */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    /**
+     * Used to create an absolute reference from a relative one.
+     */
     @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> resolver;
 
+    /**
+     * @return the XWiki object containing the configuration
+     * @throws XWikiException when failing to get the object
+     */
     private BaseObject getConfigurationObject() throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

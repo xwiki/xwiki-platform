@@ -98,8 +98,7 @@
             **/ExtensionVersionFileRESTResource.java,
             **/ExtensionVersionRESTResource.java,
             **/ExtensionVersionsRESTResource.java,
-            **/SearchRESTResource.java,
-            **/ExtensionXHTMLLinkTypeRenderer.java
+            **/SearchRESTResource.java
           </excludes>
         </configuration>
       </plugin>

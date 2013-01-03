@@ -14,38 +14,38 @@
   ##
   #set($app = $Appmanager.getApplicationDocument($doc.getValue("appname", $object)))
   ##
-  #if($context.action == "view")
+  #if($xcontext.action == "view")
     1 Application \"#if($app.appprettyname && $app.appprettyname.trim() != "")$app.appprettyname#else$app.appname#end\"
   #end
   ##
   <dl>
     #foreach($prop in $class.properties)
       <dt> ${prop.prettyName} </dt>
-      #if($context.action == "view" && $prop.name == "documents")
+      #if($xcontext.action == "view" && $prop.name == "documents")
         <dd>
           #foreach($docfullname in $app.getDocumentsNames(false, false))
             [$docfullname>$docfullname]
           #end
         </dd>
-      #elseif($context.action == "view" && $prop.name == "docstoinclude")
+      #elseif($xcontext.action == "view" && $prop.name == "docstoinclude")
         <dd>
           #foreach($docfullname in $app.getDocsNameToInclude(false))
             [$docfullname>$docfullname]
           #end
         </dd>
-      #elseif($context.action == "view" && $prop.name == "docstolink")
+      #elseif($xcontext.action == "view" && $prop.name == "docstolink")
         <dd>
           #foreach($docfullname in $app.getDocsNameToLink(false))
             [$docfullname>$docfullname]
           #end
         </dd>
-      #elseif($context.action == "view" && $prop.name == "translationdocs")
+      #elseif($xcontext.action == "view" && $prop.name == "translationdocs")
         <dd>
           #foreach($docfullname in $app.getTranslationDocs())
             [$docfullname>$docfullname]
           #end
         </dd>
-      #elseif($context.action == "view" && $prop.name == "applications")
+      #elseif($xcontext.action == "view" && $prop.name == "applications")
         <dd>
           #foreach($appname in $app.getApplications())
             [$appname>$Appmanager.getApplicationDocument($appname).fullName]

@@ -460,7 +460,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 hint = "user:" + this.serializer.serialize(document.getAuthorReference());
                 break;
             default:
-                hint = "root";
+                hint = null;
                 break;
         }
 

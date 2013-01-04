@@ -306,7 +306,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             xcontext.setUserReference(document.getAuthorReference());
 
             xcontext.getWiki().saveDocument(document, comment, false, xcontext);
-        } catch (Exception e) {
+        } finally {
             xcontext.setUserReference(userReference);
         }
     }

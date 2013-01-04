@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1192218584000</creationDate>
-  <date>1208451748000</date>
-  <contentUpdateDate>1208451748000</contentUpdateDate>
+  <date>1357298902000</date>
+  <contentUpdateDate>1357298902000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -254,7 +254,7 @@
       <appprettyname>Application Manager</appprettyname>
     </property>
     <property>
-      <appversion>3.2-SNAPSHOT</appversion>
+      <appversion>3.4</appversion>
     </property>
     <property>
       <dependencies>
@@ -289,9 +289,7 @@
       <license>LGPL</license>
     </property>
     <property>
-      <translationdocs>
-        <value>XAppResources.Translations</value>
-      </translationdocs>
+      <translationdocs/>
     </property>
   </object>
   <content>#includeForm("XAppSheets.XWikiApplicationClassSheet")</content>

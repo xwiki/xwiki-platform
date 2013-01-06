@@ -50,7 +50,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <displayType>input</displayType>
-      <multiSelect>0</multiSelect>
+      <multiSelect>1</multiSelect>
       <name>validTypes</name>
       <number>2</number>
       <picker>0</picker>

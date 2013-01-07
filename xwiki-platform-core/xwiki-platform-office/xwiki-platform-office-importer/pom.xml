@@ -108,8 +108,8 @@
       <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
-      <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
       <exclusions>
+        <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
         <exclusion>
           <groupId>org.gagravarr</groupId>
           <artifactId>vorbis-java-core</artifactId>

@@ -47,9 +47,9 @@
       <artifactId>jython-standalone</artifactId>
     </dependency>
     <dependency>
-      <groupId>pygments</groupId>
+      <groupId>org.pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.5-xwiki</version>
+      <version>1.5</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

@@ -23,7 +23,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{include document="Stats.Macros" /}}
+
+{{velocity}}
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
 #set ($chartWidth = 380)

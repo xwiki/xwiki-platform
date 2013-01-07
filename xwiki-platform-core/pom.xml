@@ -173,6 +173,12 @@
         <artifactId>woodstox-core-asl</artifactId>
         <version>4.1.4</version>
       </dependency>
+      <!-- Drawn by several transitive dependencies -->
+      <dependency>
+        <groupId>javax.transaction</groupId>
+        <artifactId>jta</artifactId>
+        <version>1.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

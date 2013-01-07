@@ -158,4 +158,14 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         assertGetFullText("zip.txt\nzip content\n\n\n\n", "zip.zip");
         assertGetMimeType("application/zip", "zip.zip");
     }
+
+    public void testGetFullTextFromHTML() throws IOException, XWikiException
+    {
+        Mock mockServletContext = mock(ServletContext.class);
+        mockServletContext.stubs().method("getMimeType").with(eq("html.html")).will(returnValue("text/html"));
+        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
+        getContext().setEngineContext(xwikiServletContext);
+        assertGetFullText("something\n", "html.html");
+        assertGetMimeType("text/html", "html.html");
+    }
 }

@@ -46,13 +46,6 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Rome does not trigger version of jdom we want -->
     <dependency>

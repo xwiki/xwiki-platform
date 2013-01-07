@@ -84,8 +84,8 @@
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>
         <version>1.0</version>
-        <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
         <exclusions>
+          <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
           <exclusion>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
@@ -101,6 +101,11 @@
           <exclusion>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
+          </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

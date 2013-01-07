@@ -167,6 +167,12 @@
         <!-- Only needed at build time -->
         <scope>provided</scope>
       </dependency>
+      <!-- Used at least in Solr Search and in Infinispan Cache -->
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>woodstox-core-asl</artifactId>
+        <version>4.1.4</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

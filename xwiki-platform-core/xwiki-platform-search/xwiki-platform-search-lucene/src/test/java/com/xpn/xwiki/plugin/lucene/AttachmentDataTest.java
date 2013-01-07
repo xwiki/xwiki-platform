@@ -168,4 +168,20 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         assertGetFullText("something\n", "html.html");
         assertGetMimeType("text/html", "html.html");
     }
+
+    public void testGetFullTextFromClass() throws IOException, XWikiException
+    {
+        Mock mockServletContext = mock(ServletContext.class);
+        // TODO: For some unknown reason XWikiAttachment.getMimeType puts the filename in lowercase...
+        mockServletContext.stubs().method("getMimeType").with(eq("helloworld.class")).will(
+            returnValue("application/java-vm"));
+        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
+        getContext().setEngineContext(xwikiServletContext);
+        String expectedContent = "public synchronized class helloworld {\n"
+            + "    public void helloworld();\n"
+            + "    public static void main(string[]);\n"
+            + "}\n\n";
+        assertGetFullText(expectedContent, "HelloWorld.class");
+        assertGetMimeType("application/java-vm", "HelloWorld.class");
+    }
 }

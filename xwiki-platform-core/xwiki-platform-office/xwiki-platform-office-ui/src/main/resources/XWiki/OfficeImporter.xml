@@ -423,7 +423,7 @@ select#childPagesNamingMethod {
   {{error}}$msg.get('xe.officeimporter.notallowed'){{/error}}
 #elseif ("$!oomanager.serverState" != 'Connected')
   #if ($hasAdmin)
-    {{error}}$msg.get('xe.officeimporter.error.adminuser'){{/error}}
+    {{error}}$msg.get('xe.officeimporter.error.adminuser', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/Extension/Office%20Importer%20Application]]']){{/error}}
   #else
     {{error}}$msg.get('xe.officeimporter.error.normaluser'){{/error}}
   #end

@@ -127,6 +127,17 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
       this._scope.src = "$xwiki.getSkinFile('icons/silk/world_delete.png')";
     }
     this.sources[0].script = this._sourceURL + 'wiki=' + this._scope.value + '&';
+  },
+
+  // @Override
+  detach: function($super) {
+    // Remove the list of accepted suggestions.
+    this._selectionManager && this._selectionManager.detach();
+
+    // Remove the scope toggle.
+    this._scope && this._scope.stopObserving('click').up().insert({before: this.fld}).remove();
+
+    $super();
   }
 });
 // Used to access the created user pickers.

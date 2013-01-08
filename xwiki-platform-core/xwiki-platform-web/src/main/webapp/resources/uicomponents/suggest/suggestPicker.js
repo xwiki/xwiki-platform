@@ -315,6 +315,14 @@ var XWiki = (function (XWiki) {
    */
   getInputId : function(key) {
     return this.inputName + "_" + key;
+  },
+
+  /**
+   * Remove suggest behavior from the target field (detach all listeners and remove the list of accepted suggestions)
+   */
+  detach : function() {
+    this.clearTool && this.clearTool.stopObserving('click').remove();
+    this.list && this.list.remove();
   }
 });
   return XWiki;

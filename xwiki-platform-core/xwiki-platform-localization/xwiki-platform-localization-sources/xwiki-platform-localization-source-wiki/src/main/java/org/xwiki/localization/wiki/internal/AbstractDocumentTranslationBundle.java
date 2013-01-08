@@ -27,7 +27,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.slf4j.LoggerFactory;
@@ -65,55 +64,24 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 4.3M2
  */
 public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements
-    TranslationBundle, DisposableCacheValue, Disposable
+    TranslationBundle, DisposableCacheValue, Disposable, EventListener
 {
     /**
      * The prefix to use in all wiki document based translations.
      */
     public static final String ID_PREFIX = "document:";
 
-    @Inject
     protected TranslationBundleContext bundleContext;
 
-    @Inject
     protected EntityReferenceSerializer<String> serializer;
 
-    @Inject
     protected Provider<XWikiContext> contextProvider;
 
-    @Inject
     private ObservationManager observation;
 
     protected TranslationMessageParser translationMessageParser;
 
     protected List<Event> events;
-
-    private EventListener listener = new EventListener()
-    {
-        @Override
-        public void onEvent(Event arg0, Object arg1, Object arg2)
-        {
-            if (arg0 instanceof WikiDeletedEvent) {
-                bundleCache.clear();
-            } else {
-                XWikiDocument document = (XWikiDocument) arg1;
-
-                bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
-            }
-        }
-
-        @Override
-        public String getName()
-        {
-            return "localization.bundle." + getId();
-        }
-
-        @Override
-        public List<Event> getEvents()
-        {
-            return events;
-        }
-    };
 
     protected DocumentReference documentReference;
 
@@ -143,7 +111,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
                 this.documentReference), new DocumentDeletedEvent(this.documentReference), new WikiDeletedEvent(
                 this.documentReference.getWikiReference().getName()));
 
-        this.observation.addListener(this.listener);
+        this.observation.addListener(this);
     }
 
     protected void setReference(DocumentReference reference)
@@ -215,9 +183,37 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         return localeBundle;
     }
 
+    // DisposableCacheValue Disposable
+
     @Override
     public void dispose()
     {
-        this.observation.removeListener(this.listener.getName());
+        this.observation.removeListener(getName());
+    }
+
+    // EventListener
+
+    @Override
+    public void onEvent(Event arg0, Object arg1, Object arg2)
+    {
+        if (arg0 instanceof WikiDeletedEvent) {
+            bundleCache.clear();
+        } else {
+            XWikiDocument document = (XWikiDocument) arg1;
+
+            bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
+        }
+    }
+
+    @Override
+    public String getName()
+    {
+        return "localization.bundle." + getId();
+    }
+
+    @Override
+    public List<Event> getEvents()
+    {
+        return events;
     }
 }

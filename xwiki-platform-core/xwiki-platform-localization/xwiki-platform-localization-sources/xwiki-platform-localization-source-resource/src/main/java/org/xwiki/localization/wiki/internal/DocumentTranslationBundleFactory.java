@@ -29,13 +29,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.management.Query;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -53,70 +50,30 @@ import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.RegexEntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.StringProperty;
 
 /**
- * Generate and manage wiki document based translations bundles.
+ * Generate and manage resource based translations bundles.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 4.5M1
  */
 @Component
-@Named("document")
+@Named("resource")
 @Singleton
 public class DocumentTranslationBundleFactory implements TranslationBundleFactory, Initializable, Disposable
 {
-    private static final RegexEntityReference TRANSLATIONOBJET = new RegexEntityReference(Pattern.compile("[^:]+:"
-        + TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
-
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectAddedEvent(TRANSLATIONOBJET),
-        new XObjectUpdatedEvent(TRANSLATIONOBJET), new XObjectDeletedEvent(TRANSLATIONOBJET));
-
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
-
-    @Inject
-    @Named("uid")
-    private EntityReferenceSerializer<String> uidSerializer;
-
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentResolver;
 
     @Inject
     private CacheManager cacheManager;
 
     @Inject
     private ObservationManager observation;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     @Named("messagetool/1.0")
@@ -127,12 +84,6 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private QueryManager queryManager;
-
-    @Inject
-    private AuthorizationManager authorizationManager;
 
     private Cache<TranslationBundle> bundlesCache;
 
@@ -155,7 +106,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         @Override
         public String getName()
         {
-            return "localization.bundle.document";
+            return "localization.bundle.resource";
         }
 
         @Override
@@ -201,7 +152,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         this.observation.addListener(this.listener);
     }
 
-    private void loadTranslations(String wiki, XWikiContext xcontext)
+    private void loadTranslations()
     {
         try {
             Query query =
@@ -228,7 +179,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     @Override
     public TranslationBundle getBundle(String bundleId) throws TranslationBundleDoesNotExistsException
     {
-        String id = AbstractDocumentTranslationBundle.ID_PREFIX + bundleId;
+        String id = AbstractResourceTranslationBundle.ID_PREFIX + bundleId;
 
         if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, id)) {
             try {
@@ -260,7 +211,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         return bundle;
     }
 
-    private DefaultDocumentTranslationBundle createDocumentBundle(DocumentReference documentReference)
+    private DefaultResourceTranslationBundle createDocumentBundle(DocumentReference documentReference)
         throws TranslationBundleDoesNotExistsException
     {
         XWikiContext context = this.xcontextProvider.get();
@@ -280,7 +231,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         return createDocumentBundle(document);
     }
 
-    private DefaultDocumentTranslationBundle createDocumentBundle(XWikiDocument document)
+    private DefaultResourceTranslationBundle createDocumentBundle(XWikiDocument document)
         throws TranslationBundleDoesNotExistsException
     {
         BaseObject translationObject = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
@@ -290,10 +241,10 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 document));
         }
 
-        DefaultDocumentTranslationBundle documentBundle;
+        DefaultResourceTranslationBundle documentBundle;
         try {
             documentBundle =
-                new DefaultDocumentTranslationBundle(document.getDocumentReference(),
+                new DefaultResourceTranslationBundle(document.getDocumentReference(),
                     this.componentManagerProvider.get(), this.translationParser);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
@@ -392,7 +343,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         if (scope != null && scope != Scope.ON_DEMAND) {
             checkRegistrationAuthorization(document, scope);
 
-            DefaultDocumentTranslationBundle bundle = createDocumentBundle(document);
+            DefaultResourceTranslationBundle bundle = createDocumentBundle(document);
 
             ComponentDescriptor<TranslationBundle> descriptor =
                 createComponentDescriptor(document.getDocumentReference());
@@ -431,9 +382,9 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
 
-        descriptor.setImplementation(DefaultDocumentTranslationBundle.class);
+        descriptor.setImplementation(DefaultResourceTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-        descriptor.setRoleHint(AbstractDocumentTranslationBundle.ID_PREFIX
+        descriptor.setRoleHint(AbstractResourceTranslationBundle.ID_PREFIX
             + this.serializer.serialize(documentReference));
         descriptor.setRoleType(TranslationBundle.class);
 

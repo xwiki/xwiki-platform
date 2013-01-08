@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.wiki.internal;
+package org.xwiki.localization.jar.internal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,39 +28,39 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
 /**
  * Trigger existing translations bundles initialization at startup.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 4.5M1
  */
 @Component
-@Named(DocumentTranslationBundleInitializer.NAME)
+@Named(JARTranslationBundleInitializer.NAME)
 @Singleton
-public class DocumentTranslationBundleInitializer implements EventListener
+public class JARTranslationBundleInitializer implements EventListener
 {
     /**
      * The name of the event listener.
      */
-    protected static final String NAME = "localization.bundle.DocumentTranslationBundleInitializer";
+    protected static final String NAME = "localization.bundle.ResourceTranslationBundleInitializer";
 
     /**
      * The events to listen.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent());
 
     /**
      * Lazily loaded to avoid dependency issue (default BundleFactory depends on
      * {@link org.xwiki.observation.ObservationManager}).
      */
     @Inject
-    @Named("document")
+    @Named("resource")
     private Provider<TranslationBundleFactory> bundleFactoryProvider;
 
     /**

@@ -90,6 +90,11 @@
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
           </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -106,6 +111,10 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

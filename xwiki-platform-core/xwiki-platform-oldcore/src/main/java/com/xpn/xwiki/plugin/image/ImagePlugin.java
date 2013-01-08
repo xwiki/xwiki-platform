@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.image;
 
 import java.awt.Image;
 import java.awt.image.RenderedImage;
+import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,6 +30,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -339,10 +341,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
         XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
         thumbnail.loadContent(context);
 
+        OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
         this.imageProcessor.writeImage(shrunkImage,
                                        attachment.getMimeType(context),
                                        quality,
-                                       thumbnail.getAttachment_content().getContentOutputStream());
+                                       acos);
+
+        IOUtils.closeQuietly(acos);
 
         return thumbnail;
     }

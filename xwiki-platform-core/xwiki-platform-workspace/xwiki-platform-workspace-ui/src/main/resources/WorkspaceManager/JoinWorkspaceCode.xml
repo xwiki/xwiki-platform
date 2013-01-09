@@ -93,7 +93,7 @@
           ##
           ## The user decided whether to accept or to reject the invitation.
           #set ($saveComment = $msg.get('platform.workspace.invitationUserAcceptedSaveComment', $currentUser))
-          #set ($notificationMessage = $msge.get('platform.workspace.invitationUserAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${workspaceName}, $workspaceId]))
+          #set ($notificationMessage = $msg.get('platform.workspace.invitationUserAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${workspaceName}, $workspaceId]))
           ## Common values.
           #set ($temp = $existingInvitation.setDateValue('date', $datetool.date))
           #set ($temp = $existingInvitation.setLargeStringValue('userComment', "$!{escapetool.xml($request.userComment)}"))
@@ -232,7 +232,7 @@
           #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $msg.get('platform.workspace.joinRequestSaveComment', $currentUser), true, $xcontext.context))
           ## Send message to workspace admins. (XWikiAdminGroup)
           #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
-          #set ($notificationMessage = $msg.get('platform.workspace.joinRequestNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $workspaceName, $workspaceId]))
+          #set ($notificationMessage = $msg.get('platform.workspace.joinRequestSaveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $workspaceName, $workspaceId]))
           #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
           {{success}}$msg.get('platform.workspace.joinRequestSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
         #end

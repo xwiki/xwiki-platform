@@ -338,11 +338,11 @@
     #set ($hasJoin = ("$!currentUserGroupObject" == ''))
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
-      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=$prettyName"))
+      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${displayName}"))
       $msg.get('platform.workspace.currentUserNotMember') $msg.get('platform.workspace.currentUserCanJoin', $joinUrl)
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
-      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=$prettyName"))
+      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${displayName}"))
       $msg.get('platform.workspace.currentUserIsMember') $msg.get('platform.workspace.currentUserCanLeave', $leaveUrl)
     #end
   #end

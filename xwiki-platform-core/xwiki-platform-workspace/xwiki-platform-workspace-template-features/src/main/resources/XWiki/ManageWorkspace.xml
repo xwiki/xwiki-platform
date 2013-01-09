@@ -67,7 +67,13 @@
         &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.owner.label')&lt;/label&gt;
         &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.owner.hint')&lt;/span&gt;
       &lt;/dt&gt;
-      &lt;dd&gt;((($wikiDocument.display('owner', 'edit'))))&lt;/dd&gt;
+      &lt;dd&gt;
+        ## The workspace owner has to be a global user. Currently the "List of Users" XClass property type doesn't have
+        ## a meta property to force global or local users so we have to customize the display to add this restriction.
+        #userPicker_import(false)
+        &lt;input type="text" id="XWiki.XWikiServerClass_0_owner" name="XWiki.XWikiServerClass_0_owner"
+          value="$!escapetool.xml($wikiDocument.getObject('XWiki.XWikiServerClass').getProperty('owner').value)" class="suggestUsers global" /&gt;
+      &lt;/dd&gt;
 
       &lt;dt&gt;
         &lt;label for='WorkspaceManager.WorkspaceClass_0_membershipType'&gt;$msg.get('workspacemanager.prop.membershipType.label')&lt;/label&gt;

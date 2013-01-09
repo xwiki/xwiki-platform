@@ -347,6 +347,8 @@ function prettyNameChanged()
 #getRequestList($members 'members')
 ## Remove any duplicate members (like the owner in some cases).
 #set ($discard = $members.remove($wikidocument.owner))
+## Remove empty strings from the list of members (the user picker submits by default an empty string).
+#set ($discard = $members.removeAll(['']))
 #############################################################################
 ##
 #if ($action &amp;&amp; $action == 'create')
@@ -432,8 +434,8 @@ function prettyNameChanged()
     &lt;/dt&gt;
     &lt;dd&gt;&lt;textarea id='XWiki.XWikiServerClass_0_description' name='XWiki.XWikiServerClass_0_description' rows='7' cols='45' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;&lt;/textarea&gt;&lt;/dd&gt;
 
-  #set ($rightsmanager = $xwiki.rightsmanager)
-  #set ($users = $sorttool.sort($rightsmanager.usersApi.allGlobalUsersNames))
+  ## We need the user picker for the workspace owner and the list of workspace members.
+  #userPicker_import(true)
 
   ## Make this section available only to admins, so that only admins can create workspaces in the name of other users.
   #if ($hasAdmin)
@@ -442,16 +444,8 @@ function prettyNameChanged()
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name='XWiki.XWikiServerClass_0_owner' id='XWiki.XWikiServerClass_0_owner' size='4' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;
-        #foreach ($user in $users)
-          ## Skip the guest user.
-          #if ($user != 'XWiki.XWikiGuest')
-            #set ($selectAsOwner = ($xcontext.user == $user))
-            #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-            &lt;option value="$user" #if($selectAsOwner)selected='selected'#{end}&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
-          #end
-        #end
-      &lt;/select&gt;
+      &lt;input type="text" id="XWiki.XWikiServerClass_0_owner" name="XWiki.XWikiServerClass_0_owner"
+        value="$!escapetool.xml($xcontext.user)" class="suggestUsers" #if(!$isInstallComplete)disabled='disabled' #{end}/&gt;
     &lt;/dd&gt;
   #else
   &lt;div&gt;
@@ -466,17 +460,8 @@ function prettyNameChanged()
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.doc.createwiki.members')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;select name='members' id='members' multiple='multiple' #if(!$isInstallComplete)disabled='disabled'#{end} &gt;
-        #foreach ($user in $users)
-          ## Skip the current user if the user is not an admin. The current user is made owner by default and,
-          ## thus, a member of the workspace. However, an admin can choose a different owner.
-          ## Also skip the guest user.
-          #if (($hasAdmin || (!$hasAdmin &amp;&amp; $user != $xcontext.user)) &amp;&amp; ($user != 'XWiki.XWikiGuest'))
-            #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-            &lt;option value="$user"&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
-          #end
-        #end
-      &lt;/select&gt;
+      &lt;input type="text" id="members" name="members" value="$!escapetool.xml($value)"
+        class="suggestUsers multipleSelection" #if(!$isInstallComplete)disabled='disabled' #{end}/&gt;
     &lt;/dd&gt;
 
   #set($workspaceClass = $xwiki.getDocument('WorkspaceClass').getxWikiClass())

@@ -184,8 +184,7 @@ workspacemanager.doc.createwiki.desc.wikiprettyname=The display name of the work
 platform.workspace.newWorkspaceTemplateHint=Template to use for this new workspace (all documents will be cloned).
 workspacemanager.doc.createwiki.desc.description=A brief description of the workspace and its purpose.
 workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the workspace.
-workspacemanager.doc.createwiki.members=The users that can participate in the workspace.\n\
-Tip: Use CTRL+Click to select multiple users.
+workspacemanager.doc.createwiki.members=The users that can participate in the workspace.
 workspacemanager.prop.workspace.membershipType.hint=The way users can join this workspace.
 platform.workspace.invitationReplyHint=A reply message to send, viewable by the workspace admin, in which you can motivate your decision.
 platform.workspace.joinRequestHint=To join the workspace [[{0}&gt;&gt;{1}]], you must first issue a join request. After this, a workspace admin will review your request and consider accepting or rejecting it.

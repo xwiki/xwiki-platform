@@ -50,12 +50,12 @@
       <customDisplay/>
       <disabled>0</disabled>
       <displayType>input</displayType>
-      <multiSelect>1</multiSelect>
+      <multiSelect>0</multiSelect>
       <name>validTypes</name>
       <number>2</number>
       <picker>0</picker>
       <prettyName>Valid types</prettyName>
-      <relationalStorage>0</relationalStorage>
+      <relationalStorage>1</relationalStorage>
       <separator>,</separator>
       <separators> ,|</separators>
       <size>30</size>

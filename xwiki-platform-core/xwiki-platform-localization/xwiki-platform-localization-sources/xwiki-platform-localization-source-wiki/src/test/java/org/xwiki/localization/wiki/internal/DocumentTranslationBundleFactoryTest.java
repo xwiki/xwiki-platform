@@ -33,9 +33,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -277,7 +279,8 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
             translationObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
                 "TranslationDocumentClass"));
             if (scope != null) {
-                translationObject.setStringValue(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, scope.toString());
+                translationObject
+                    .setStringValue(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, scope.toString());
             }
             document.addXObject(translationObject);
 
@@ -326,12 +329,28 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
     // tests
 
     @Test
-    public void getTranslation() throws XWikiException
+    public void getTranslationScopeWiki() throws XWikiException
     {
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
         addTranslation("wiki.translation", "Wiki translation", new DocumentReference(getContext().getDatabase(),
             "space", "translation"), Locale.ROOT, Scope.WIKI);
+
+        assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
+    }
+
+    @Test
+    public void getTranslationScopeONDemand() throws XWikiException, TranslationBundleDoesNotExistsException,
+        TranslationBundleFactoryDoesNotExistsException
+    {
+        assertTranslation("wiki.translation", null, Locale.ROOT);
+
+        DocumentReference translationDocument =
+            new DocumentReference(getContext().getDatabase(), "space", "translation");
+
+        addTranslation("wiki.translation", "Wiki translation", translationDocument, Locale.ROOT, Scope.ON_DEMAND);
+
+        this.localization.use("document", translationDocument.toString());
 
         assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
     }

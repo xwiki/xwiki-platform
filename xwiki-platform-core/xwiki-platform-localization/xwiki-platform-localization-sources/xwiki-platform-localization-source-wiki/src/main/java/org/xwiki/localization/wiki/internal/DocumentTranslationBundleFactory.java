@@ -253,6 +253,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 bundle = this.bundlesCache.get(uid);
                 if (bundle == null) {
                     bundle = createDocumentBundle(documentReference);
+                    this.bundlesCache.set(uid, bundle);
                 }
             }
         }

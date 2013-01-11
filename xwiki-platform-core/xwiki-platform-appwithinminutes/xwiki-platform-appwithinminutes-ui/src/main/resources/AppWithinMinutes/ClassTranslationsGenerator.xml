@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>ClassTranslationsGenerator</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1357837220000</creationDate>
+  <date>1357890165000</date>
+  <contentUpdateDate>1357890165000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+$escapetool.h Class fields
+#set ($prefix = "${doc.fullName}_")
+#foreach ($property in $doc.getxWikiClass().properties)
+$prefix$property.name=$property.prettyName
+#if ($property.type.endsWith('ListClass'))
+## Generate translations for the list values.
+#foreach ($entry in $property.mapValues.entrySet())
+$prefix${property.name}_$entry.key=$entry.value.value
+#end
+#end
+#end
+
+$escapetool.h Live table generic keys
+#set ($prefix = "${doc.name.replaceAll('Class', '').toLowerCase()}.livetable.")
+${prefix}doc.title=$msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnName')
+${prefix}doc.name=$msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnName')
+${prefix}doc.space=$msg.get('platform.appwithinminutes.liveTableEditorDocSpaceColumnName')
+${prefix}doc.fullname=$msg.get('platform.appwithinminutes.liveTableEditorDocFullNameColumnName')
+${prefix}doc.author=$msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnName')
+${prefix}doc.creator=$msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnName')
+${prefix}doc.date=$msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnName')
+${prefix}doc.creationDate=$msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName')
+${prefix}_avatar=$msg.get('platform.appwithinminutes.liveTableEditorAvatarColumnName')
+${prefix}_images=$msg.get('platform.appwithinminutes.liveTableEditorImagesColumnName')
+${prefix}_attachments=$msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnName')
+${prefix}_actions=$msg.get('platform.appwithinminutes.liveTableEditorActionsColumnName')
+${prefix}_actions.edit=$msg.get('platform.appwithinminutes.appLiveTableEditEntryActionName')
+${prefix}_actions.delete=$msg.get('platform.appwithinminutes.appLiveTableDeleteEntryActionName')
+${prefix}emptyvalue=-
+
+$escapetool.h Live table specific keys
+#foreach ($property in $doc.getxWikiClass().properties)
+$prefix$property.name=$property.prettyName
+#end
+{{/velocity}}</content>
+</xwikidoc>

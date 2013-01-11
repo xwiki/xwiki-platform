@@ -76,6 +76,9 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 
 /**
  * Extends the default message tool with the ability to add/overwrite translation keys dynamically.
+ * @deprecated since 4.5M1 the AppWithinMinutes wizard generates a translation bundle for each application so there's
+ *             no need to use this hack any more. We keep it just to not break existing applications. It's enough to
+ *             edit and save an existing application to migrate it to the new translation engine.
  */
 public class XWikiDynamicMessageTool extends XWikiMessageTool
 {

@@ -134,6 +134,17 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     }
 
     /**
+     * Get the translated user-friendly name of this property.
+     * 
+     * @return the configured pretty name of this property definition
+     * @see #getName() {@code getName()} returns the actual property name
+     */
+    public String getTranslatedPrettyName()
+    {
+        return getBasePropertyClass().getTranslatedPrettyName(context);
+    }
+
+    /**
      * Get the message that should be displayed when a value for an instance of this property definition fails the
      * validation. For example, {@code Please enter a valid IP address}.
      * 

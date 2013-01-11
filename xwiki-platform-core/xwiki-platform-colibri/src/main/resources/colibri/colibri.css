@@ -1342,6 +1342,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform input[type="text"], .xform input[type="password"] {
   width: 99%;
 }
+.xform label input[type=checkbox], .xform label input[type=radio] {
+  margin: 0 0.2em 0 0;
+  vertical-align: text-bottom;
+}
 /* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 .xform select, .xform textarea {
   width: 99%;

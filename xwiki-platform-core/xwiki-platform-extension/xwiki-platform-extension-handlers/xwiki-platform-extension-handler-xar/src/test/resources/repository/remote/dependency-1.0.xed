@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <extension>
-  <id>test</id>
+  <id>dependency</id>
   <version>1.0</version>
   <type>xar</type>
+  <dependency>true</dependency>
   <description>description</description>
   <author>author</author>
   <website>http://website</website>
-  <dependencies>
-    <dependency>
-      <id>dependency</id>
-      <version>1.0</version>
-    </dependency>
-  </dependencies>
 </extension>

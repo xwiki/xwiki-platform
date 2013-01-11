@@ -20,7 +20,12 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,13 +34,20 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
+import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.job.plan.ExtensionPlanAction;
+import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
@@ -63,6 +75,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
     public static final String TYPE = "xar";
+
+    public static final String CONTEXTKEY_XARPAGES = "extension.xar.installplan.pages";
 
     protected static final String WIKI_NAMESPACEPREFIX = "wiki:";
 
@@ -101,6 +115,15 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
+    @Inject
+    private LocalExtensionRepository localReposirory;
+
+    /**
+     * Used to access the execution context.
+     */
+    @Inject
+    private Execution execution;
+
     protected static String getWikiFromNamespace(String namespace) throws UnsupportedNamespaceException
     {
         String wiki = namespace;
@@ -123,6 +146,47 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (obj instanceof DocumentReference) {
             return (DocumentReference) obj;
+        }
+
+        return null;
+    }
+
+    private Map<XarEntry, LocalExtension> getXAREnttries()
+    {
+        ExecutionContext context = this.execution.getContext();
+
+        if (context != null) {
+            ExtensionPlan plan = (ExtensionPlan) context.getProperty(InstallJob.CONTEXTKEY_PLAN);
+
+            if (plan != null) {
+                Map<XarEntry, LocalExtension> xarEntries =
+                    (Map<XarEntry, LocalExtension>) context.getProperty(CONTEXTKEY_XARPAGES);
+
+                if (xarEntries == null) {
+                    xarEntries = new HashMap<XarEntry, LocalExtension>();
+
+                    for (ExtensionPlanAction action : plan.getActions()) {
+                        if (action.getAction() == Action.INSTALL || action.getAction() == Action.UPGRADE
+                            && action.getExtension().getType().equals(TYPE)) {
+                            LocalExtension localExtension =
+                                this.localReposirory.getLocalExtension(action.getExtension().getId());
+                            try {
+                                List<XarEntry> entries =
+                                    this.packager.getEntries(new File(localExtension.getFile().getAbsolutePath()));
+
+                                for (XarEntry entry : entries) {
+                                    xarEntries.put(entry, localExtension);
+                                }
+                            } catch (IOException e) {
+                                this.logger.error("Failed to parse extension file [{}]", localExtension.getFile()
+                                    .getAbsolutePath(), e);
+                            }
+                        }
+                    }
+                }
+
+                return xarEntries;
+            }
         }
 
         return null;
@@ -173,16 +237,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void install(XarInstalledExtension previousExtension, LocalExtension localExtension, String wiki,
+    private void install(XarInstalledExtension previousExtension, LocalExtension newLocalExtension, String wiki,
         Request request) throws InstallException
     {
         // import xar into wiki (add new version when the page already exists)
         try {
             this.packager.importXAR(previousExtension != null ? new XarFile(new File(previousExtension.getFile()
-                .getAbsolutePath()), previousExtension.getPages()) : null, new File(localExtension.getFile()
-                .getAbsolutePath()), createPackageConfiguration(request, wiki));
+                .getAbsolutePath()), previousExtension.getPages()) : null, new File(newLocalExtension.getFile()
+                .getAbsolutePath()), createPackageConfiguration(newLocalExtension, request, wiki));
         } catch (Exception e) {
-            throw new InstallException("Failed to import xar for extension [" + localExtension + "]", e);
+            throw new InstallException("Failed to import xar for extension [" + newLocalExtension + "]", e);
         }
     }
 
@@ -209,7 +273,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 XarInstalledExtension xarLocalExtension =
                     (XarInstalledExtension) this.xarRepository.resolve(localExtension.getId());
                 List<XarEntry> pages = xarLocalExtension.getPages();
-                this.packager.unimportPages(pages, createPackageConfiguration(request, wiki));
+                this.packager.unimportPages(pages, createPackageConfiguration(null, request, wiki));
             } catch (Exception e) {
                 // Not supposed to be possible
                 throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
@@ -218,7 +282,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private PackageConfiguration createPackageConfiguration(Request request, String wiki)
+    private PackageConfiguration createPackageConfiguration(LocalExtension extension, Request request, String wiki)
     {
         DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
 
@@ -234,6 +298,21 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             }
         } catch (Exception e) {
             this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
+        }
+
+        // Entries to import
+        if (extension != null) {
+            Map<XarEntry, LocalExtension> entries = getXAREnttries();
+
+            Set<String> entriesToImport = new HashSet<String>();
+
+            for (Map.Entry<XarEntry, LocalExtension> entry : entries.entrySet()) {
+                if (entry.getValue() == extension) {
+                    entriesToImport.add(entry.getKey().getEntryName());
+                }
+            }
+
+            configuration.setEntriesToImport(entriesToImport);
         }
 
         return configuration;

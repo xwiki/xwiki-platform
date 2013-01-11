@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -37,6 +40,8 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     private JobStatus jobStatus;
 
     private boolean logEnabled = false;
+
+    private Set<String> entriesToImport;
 
     @Override
     public String getWiki()
@@ -91,5 +96,25 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     public void setLogEnabled(boolean logEnabled)
     {
         this.logEnabled = logEnabled;
+    }
+
+    @Override
+    public Set<String> getEntriesToImport()
+    {
+        return this.entriesToImport;
+    }
+
+    public void setEntriesToImport(Set<String> entriesToImport)
+    {
+        this.entriesToImport = entriesToImport;
+    }
+
+    public void addEntry(String entry)
+    {
+        if (this.entriesToImport == null) {
+            this.entriesToImport = new HashSet<String>();
+        }
+
+        this.entriesToImport.add(entry);
     }
 }

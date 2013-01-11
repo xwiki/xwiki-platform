@@ -339,7 +339,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
@@ -582,7 +582,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                exactly(3).of(mockRightService).hasAccessLevel(with(equal("admin")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(true));
@@ -648,7 +648,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         {
             {
 
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
@@ -690,7 +690,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
                 will(returnValue(Arrays.asList("wiki1", "wiki2")));
 
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
@@ -711,6 +711,12 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki2", "space1", "page1"), getContext());
 
         Assert.assertFalse(pageWiki2.isNew());
+        
+        XWikiDocument overwrittenpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "overwrittenpage"), getContext());
+
+        Assert.assertFalse(overwrittenpage.isNew());
+        Assert.assertEquals("1.1", overwrittenpage.getVersion());
 
         // uninstall
 
@@ -860,7 +866,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
                 will(returnValue(Arrays.asList("wiki1", "wiki2")));
 
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
@@ -886,7 +892,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
                     with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
                 will(returnValue(true));
             }

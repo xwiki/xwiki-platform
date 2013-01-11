@@ -159,32 +159,38 @@ public class DefaultPackager implements Packager, Initializable
 
             for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (!entry.isDirectory()) {
-                    DocumentImporterHandler documentHandler =
-                        new DocumentImporterHandler(this, this.componentManager, wiki, this.importer);
+                    // Only import what should be imported
+                    if (configuration.getEntriesToImport() == null
+                        || configuration.getEntriesToImport().contains(entry.getName())) {
+                        DocumentImporterHandler documentHandler =
+                            new DocumentImporterHandler(this, this.componentManager, wiki, this.importer);
 
-                    try {
-                        documentHandler.setPreviousXarFile(previousXarFile);
-                        documentHandler.setConfiguration(configuration);
+                        try {
+                            documentHandler.setPreviousXarFile(previousXarFile);
+                            documentHandler.setConfiguration(configuration);
 
-                        parseDocument(zis, documentHandler);
+                            parseDocument(zis, documentHandler);
 
-                        if (documentHandler.getMergeResult() != null) {
-                            mergeResult.addMergeResult(documentHandler.getMergeResult());
-                        }
+                            if (documentHandler.getMergeResult() != null) {
+                                mergeResult.addMergeResult(documentHandler.getMergeResult());
+                            }
 
-                        if (configuration.isLogEnabled()) {
-                            this.logger.info("Successfully imported document [{}] in language [{}]", documentHandler
-                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLocale());
-                        }
-                    } catch (NotADocumentException e) {
-                        // Impossible to know that before parsing
-                        this.logger.debug("Entry [" + entry + "] is not a document", e);
-                    } catch (Exception e) {
-                        this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+                            if (configuration.isLogEnabled()) {
+                                this.logger.info("Successfully imported document [{}] in language [{}]",
+                                    documentHandler.getDocument().getDocumentReference(), documentHandler.getDocument()
+                                        .getRealLocale());
+                            }
+                        } catch (NotADocumentException e) {
+                            // Impossible to know that before parsing
+                            this.logger.debug("Entry [" + entry + "] is not a document", e);
+                        } catch (Exception e) {
+                            this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
 
-                        if (configuration.isLogEnabled()) {
-                            this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
-                                .getDocument().getDocumentReference(), documentHandler.getDocument().getRealLocale());
+                            if (configuration.isLogEnabled()) {
+                                this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
+                                    .getDocument().getDocumentReference(), documentHandler.getDocument()
+                                    .getRealLocale());
+                            }
                         }
                     }
                 }
@@ -255,26 +261,31 @@ public class DefaultPackager implements Packager, Initializable
 
         XWikiContext xcontext = this.xcontextProvider.get();
         for (XarEntry xarEntry : pages) {
-            DocumentReference documentReference = this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
-            try {
-                XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+            // Only delete what should be deleted.
+            if (configuration.getEntriesToImport() == null
+                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
+                DocumentReference documentReference =
+                    this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
+                try {
+                    XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
-                if (!document.isNew()) {
-                    Locale locale = xarEntry.getLocale();
-                    if (locale != null && !Locale.ROOT.equals(locale)) {
-                        document = document.getTranslatedDocument(locale, xcontext);
-                        xcontext.getWiki().deleteDocument(document, xcontext);
+                    if (!document.isNew()) {
+                        Locale locale = xarEntry.getLocale();
+                        if (locale != null && !Locale.ROOT.equals(locale)) {
+                            document = document.getTranslatedDocument(locale, xcontext);
+                            xcontext.getWiki().deleteDocument(document, xcontext);
 
-                        this.logger.info("Successfully deleted document [{}] in language [{}]",
-                            document.getDocumentReference(), document.getRealLocale());
-                    } else {
-                        xcontext.getWiki().deleteAllDocuments(document, xcontext);
+                            this.logger.info("Successfully deleted document [{}] in language [{}]",
+                                document.getDocumentReference(), document.getRealLocale());
+                        } else {
+                            xcontext.getWiki().deleteAllDocuments(document, xcontext);
 
-                        this.logger.info("Successfully deleted document [{}]", document.getDocumentReference());
+                            this.logger.info("Successfully deleted document [{}]", document.getDocumentReference());
+                        }
                     }
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to delete document [{}]", documentReference, e);
                 }
-            } catch (XWikiException e) {
-                this.logger.error("Failed to delete document [{}]", documentReference, e);
             }
         }
     }

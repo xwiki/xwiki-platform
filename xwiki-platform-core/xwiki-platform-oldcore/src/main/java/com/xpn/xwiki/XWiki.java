@@ -144,6 +144,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -344,6 +345,9 @@ public class XWiki implements EventListener
         EntityReferenceResolver.TYPE_STRING, "relative");
 
     private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
+
+    /** Renderer for elevating privileges for selected file system templates. */
+    private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils.getComponent(PrivilegedTemplateRenderer.class);
 
     private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent((Type) XWikiURLBuilder.class, "entity");
 
@@ -1762,7 +1766,7 @@ public class XWiki implements EventListener
         }
 
         String content = getResourceContent(template);
-        return XWikiVelocityRenderer.evaluate(content, template, (VelocityContext) context.get("vcontext"), context);
+        return privilegedTemplateRenderer.evaluateTemplate(content, template);
     }
 
     public String parseTemplate(String template, String skin, XWikiContext context)

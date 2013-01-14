@@ -38,10 +38,14 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
 
 /**
  * An {@link EventListener} responsible for registering all the wiki components when the application starts. It also
@@ -81,6 +85,12 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiSerializer;
 
+    /**
+     * The execution used to get the xwiki context, to reset the context grouplist cache.
+     */
+    @Inject
+    private Execution execution;
+
     @Override
     public List<Event> getEvents()
     {
@@ -89,7 +99,8 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             new DocumentUpdatedEvent(),
             new DocumentDeletedEvent(),
             new ApplicationReadyEvent(),
-            new WikiReadyEvent());
+            new WikiReadyEvent(),
+            new XARImportedEvent());
     }
 
     @Override
@@ -113,7 +124,16 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             }
         } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
             registerComponents();
+        } else if (event instanceof XARImportedEvent) {
+            // When component documents are created from a XAR import, the XAR might also contain the document author or
+            // groups. In those cases, if the component document is imported _before_ the author or a group he belongs
+            // to, the rights evaluation can be wrong and prevent the component instantiation.
+            // We also need to clear the group cache since the list of groups might change during the import.
+            XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+            xcontext.remove("grouplist");
+            registerComponents();
         }
+
     }
 
     /**

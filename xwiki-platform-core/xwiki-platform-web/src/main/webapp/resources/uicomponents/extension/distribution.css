@@ -47,3 +47,6 @@
 #welcome .steps.vertical .description {
   font-size: smaller;
 }
+#previousUi dt label {
+  font-size: .75em;
+}

@@ -59,6 +59,8 @@ XWiki.MainUIStep = Class.create({
     secondaryButton.up().removeClassName('hidden');
     var hidePreviousUiForm = this._hidePreviousUiForm.bindAsEventListener(this);
     secondaryButton.observe('click', hidePreviousUiForm);
+    // Simplify the way the previous UI is specified.
+    this._enhancePreviousUiInput();
     // Enhance and show the upgrade question.
     var question = form.previous().removeClassName('hidden');
     question.down('.button').observe('click', function(event) {
@@ -74,6 +76,67 @@ XWiki.MainUIStep = Class.create({
     while (next && next.tagName.toLowerCase() != 'form') {
       next = next.hide().next();
     }
+  },
+
+  _enhancePreviousUiInput : function() {
+    // The element used to toggle advanced input.
+    var pencil = new Element('input', {
+      type: 'image',
+      'class': 'icon',
+      src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
+      alt: '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint"))',
+      title: '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint"))'
+    });
+    var idInput = $('previousUiId');
+    var versionInput = $('previousUiVersion');
+    var versionList = $('previousUiVersionList');
+    // Display the version list by default instead of the version input.
+    versionList.up('dd').removeClassName('hidden').previous().removeClassName('hidden');
+    versionInput.up('dd').hide().previous().hide();
+    // Hide the id input and its hint by default because we auto-complete the id based on the selected version.
+    idInput.hide().up('dd').previous().down('.xHint').hide();
+    // Display a pencil next to the id value to let the user change it.
+    idInput.insert({after: pencil}).insert({after: new Element('span')});
+    // Hide the id label and value by default. Display it when the user selects a version.
+    idInput.up('dd').hide().previous().hide();
+    versionList.observe('change', this._onSelectPreviousUiVersion.bind(this));
+    // Allow advanced input.
+    pencil.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
+  },
+
+  _onSelectPreviousUiVersion : function() {
+    var idInput = $('previousUiId');
+    idInput.up('dd').show().previous().show();
+    var versionList = $('previousUiVersionList');
+    $('previousUiVersion').value = versionList.options[versionList.selectedIndex].value;
+    // Auto-complete the id based on the selected version.
+    if (versionList.selectedIndex == 0) {
+      var id = '';
+    } else if (versionList.selectedIndex < 112) {
+      // 1.1-milestone-3 -> 2.5.2
+      var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
+    } else if (versionList.selectedIndex < 138) {
+      // 2.6-rc-1 -> 3.2.1
+      var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
+    } else {
+      // 3.3-milestone-1 -> 4.2M2
+      var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
+    }
+    // Update the value of the hidden input.
+    idInput.value = id;
+    // Update the displayed value.
+    idInput.next().update(id);
+  },
+
+  _switchToAdvancedPreviousUiInput : function(event) {
+    event.stop();
+    event.element().hide().previous().hide();
+    // Show the id input and its hint.
+    $('previousUiId').show().activate().up('dd').previous().down('.xHint').show();
+    // Show the version input and its hint.
+    $('previousUiVersion').up('dd').show().previous().show();
+    // Hide the version list.
+    $('previousUiVersionList').up('dd').hide().previous().hide();
   },
 
   _hidePreviousUiForm : function(event) {

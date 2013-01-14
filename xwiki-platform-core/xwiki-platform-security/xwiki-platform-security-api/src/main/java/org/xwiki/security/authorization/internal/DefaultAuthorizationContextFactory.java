@@ -42,7 +42,7 @@ import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
 import org.xwiki.security.authorization.ContentDocumentController;
 import org.xwiki.security.authorization.PrivilegedModeController;
-import org.xwiki.security.authorization.GrantAllController;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.Execution;
@@ -139,7 +139,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
             addSingleton(EffectiveUserController.class, new PrivateEffectiveUserController());
             addSingleton(ContentAuthorController.class, new PrivateContentAuthorController());
             addSingleton(ContentDocumentController.class, new PrivateContentDocumentController());
-            addSingleton(GrantAllController.class, new PrivateGrantAllController());
+            addSingleton(GrantProgrammingRightController.class, new PrivateGrantProgrammingRightController());
             addSingleton(PrivilegedModeController.PROVIDER_TYPE, new PrivatePrivilegedModeControllerProvider());
         } catch (ComponentRepositoryException e) {
             throw new InitializationException("Failed to register authorization context controller components.", e);
@@ -216,9 +216,9 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
         }
 
         @Override
-        public boolean grantAll()
+        public boolean grantProgrammingRight()
         {
-            return !securityStack.isEmpty() && securityStack.peek().grantAll();
+            return !securityStack.isEmpty() && securityStack.peek().grantProgrammingRight();
         }
 
     }
@@ -239,7 +239,11 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
             if (user != ctx.effectiveUser || (user != null && !user.equals(ctx.effectiveUser))) {
-                ctx.effectiveUser = new DocumentReference(user);
+                if (user == null) {
+                    ctx.effectiveUser = null;
+                } else {
+                    ctx.effectiveUser = new DocumentReference(user);
+                }
 
                 effectiveUserUpdater.updateUser(user);
             }
@@ -305,30 +309,31 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
     }
 
     /**
-     * The grant all controller implementation used by this authorization context factory implementation.
+     * The grant programming right controller implementation used by this authorization context factory implementation.
      */
-    private final class PrivateGrantAllController implements GrantAllController
+    private final class PrivateGrantProgrammingRightController implements GrantProgrammingRightController
     {
 
         /** There is no need to allocate multiple instances of the grant all entry. */
-        private final GrantAllSecurityStackEntry grantAllEntry = new GrantAllSecurityStackEntry();
+        private final GrantProgrammingRightSecurityStackEntry grantProgrammingRightEntry
+            = new GrantProgrammingRightSecurityStackEntry();
 
         /** Make constructor private. */
-        private PrivateGrantAllController()
+        private PrivateGrantProgrammingRightController()
         {
         }
 
 
         @Override
-        public void pushGrantAll()
+        public void pushGrantProgrammingRight()
         {
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 
-            ctx.securityStack.addFirst(grantAllEntry);
+            ctx.securityStack.addFirst(grantProgrammingRightEntry);
         }
 
         @Override
-        public void popGrantAll()
+        public void popGrantProgrammingRight()
         {
             PrivateAuthorizationContext ctx = currentAuthorizationContext();
 

@@ -29,8 +29,8 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public interface SecurityStackEntry
 {
-    /** @return {@literal true} if the right service currently should grant all permissions. */
-    boolean grantAll();
+    /** @return {@literal true} if the right service currently should grant programming right permissions. */
+    boolean grantProgrammingRight();
 
     /**
      * @return A the content author, which is the user who is responsible for any content that is be rendered while the

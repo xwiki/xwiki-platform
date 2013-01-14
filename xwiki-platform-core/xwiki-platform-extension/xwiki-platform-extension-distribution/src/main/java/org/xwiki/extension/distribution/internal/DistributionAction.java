@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import org.xwiki.security.authorization.GrantAllController;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -56,7 +56,7 @@ public class DistributionAction extends XWikiAction
 
         // We put a grant all document at the bottom of the security stack to ensure that we get full privileges, as
         // long as we're not rendering any document.
-        Utils.getComponent(GrantAllController.class).pushGrantAll();
+        Utils.getComponent(GrantProgrammingRightController.class).pushGrantProgrammingRight();
 
         return true;
     }

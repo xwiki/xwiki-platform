@@ -45,7 +45,7 @@ public class UserSecurityStackEntry implements SecurityStackEntry
     }
 
     @Override
-    public boolean grantAll()
+    public boolean grantProgrammingRight()
     {
         return false;
     }

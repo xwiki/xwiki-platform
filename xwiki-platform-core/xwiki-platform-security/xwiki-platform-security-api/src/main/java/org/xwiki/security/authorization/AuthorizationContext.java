@@ -55,6 +55,6 @@ public interface AuthorizationContext
     /**
      * @return {@literal true} if the rights service should grant all rights.
      */
-    boolean grantAll();
+    boolean grantProgrammingRight();
 
 }

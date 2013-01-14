@@ -512,11 +512,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
     {
         LOGGER.debug("hasAccessLevel for [{}], [{}], [{}]", accessLevel, userOrGroupName, entityReference);
 
-        if (getAuth().grantAll()) {
-            LOGGER.debug("Granting access because grant all is enabled.");
-            return true;
-        }
-
         DocumentReference userOrGroupNameReference =
             this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
 
@@ -948,8 +943,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
             return false;
         }
 
-        if (getAuth().grantAll()) {
-            LOGGER.debug("Programming rights granted because grant all is enabled.");
+        if (getAuth().grantProgrammingRight()) {
+            LOGGER.debug("Programming rights granted because grant programming right is enabled.");
             return true;
         }
 

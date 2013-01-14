@@ -17,32 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.authorization.internal;
 
-import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Interface for temporarily granting all rights.
- *
- * Pushing a "grant all" entry will not override any subsequent security entries pushed to the stack.
- *
- * The grant all controller must always be used in a try-finally statement to ensure that the grant-all security stack
- * entry is correctly popped of the stack.
+ * This is an entry that grants programming rights while at the top of the security stack.
  *
  * @version $Id$
  * @since 4.3M2
  */
-@Role
-public interface GrantAllController
+public class GrantProgrammingRightSecurityStackEntry implements SecurityStackEntry
 {
-    /**
-     * Put a "grant all" entry on top of the security stack.
-     */
-    void pushGrantAll();
+    @Override
+    public boolean grantProgrammingRight()
+    {
+        return true;
+    }
 
-    /**
-     * Remove a "grant all" entry from the top of the security stack.
-     */
-    void popGrantAll();
-
+    @Override
+    public DocumentReference getContentAuthor()
+    {
+        return null;
+    }
 }

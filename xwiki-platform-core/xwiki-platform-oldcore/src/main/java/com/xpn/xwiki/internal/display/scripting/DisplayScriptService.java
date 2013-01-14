@@ -42,7 +42,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContentDocumentController;
-import org.xwiki.security.authorization.GrantAllController;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -103,7 +103,7 @@ public class DisplayScriptService implements ScriptService
      *  Used for bypassing programming rights check when obtaining the xwiki document.
      */
     @Inject
-    private GrantAllController grantAllController;
+    private GrantProgrammingRightController grantProgrammingRightController;
 
     /**
      * Displays a document.
@@ -259,11 +259,11 @@ public class DisplayScriptService implements ScriptService
      */
     private DocumentModelBridge getDocument(Document document)
     {
-        grantAllController.pushGrantAll();
+        grantProgrammingRightController.pushGrantProgrammingRight();
         try {
             return document.getDocument();
         } finally {
-            grantAllController.popGrantAll();
+            grantProgrammingRightController.popGrantProgrammingRight();
         }
     }
 

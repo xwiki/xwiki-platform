@@ -48,7 +48,7 @@ public class DocumentSecurityStackEntry implements SecurityStackEntry
     }
 
     @Override
-    public boolean grantAll()
+    public boolean grantProgrammingRight()
     {
         return false;
     }

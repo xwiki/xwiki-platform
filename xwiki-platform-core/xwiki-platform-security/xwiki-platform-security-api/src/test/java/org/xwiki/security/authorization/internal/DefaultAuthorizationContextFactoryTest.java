@@ -23,7 +23,7 @@ import org.xwiki.security.authorization.AuthorizationContext;
 import org.xwiki.security.authorization.EffectiveUserController;
 import org.xwiki.security.authorization.ContentAuthorController;
 import org.xwiki.security.authorization.ContentDocumentController;
-import org.xwiki.security.authorization.GrantAllController;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 import org.xwiki.security.authorization.PrivilegedModeController;
 
 import org.xwiki.context.Execution;
@@ -135,7 +135,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
         Assert.assertTrue(authorizationContext.securityStackIsEmpty());
 
-        Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.grantProgrammingRight());
 
     }
 
@@ -225,42 +225,42 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
     }
 
     @Test
-    public void grantAllControl() throws Exception
+    public void grantProgrammingRightControl() throws Exception
     {
         final AuthorizationContext authorizationContext = getAuthorizationContext();
 
-        final GrantAllController gac = getComponentManager().getInstance(GrantAllController.class);
+        final GrantProgrammingRightController gac = getComponentManager().getInstance(GrantProgrammingRightController.class);
         final ContentAuthorController cac = getComponentManager().getInstance(ContentAuthorController.class);
         final ContentDocumentController cdc = getComponentManager().getInstance(ContentDocumentController.class);
 
         final DocumentModelBridge document2 = getMockery().mock(DocumentModelBridge.class, "document2");
 
-        Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.grantProgrammingRight());
         Assert.assertTrue(authorizationContext.securityStackIsEmpty());
 
         cac.pushContentAuthor(user1);
 
-        Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.grantProgrammingRight());
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
-        gac.pushGrantAll();
+        gac.pushGrantProgrammingRight();
 
-        Assert.assertTrue(authorizationContext.grantAll());
+        Assert.assertTrue(authorizationContext.grantProgrammingRight());
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cdc.pushContentDocument(document2);
 
-        Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.grantProgrammingRight());
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
         cdc.popContentDocument();
 
-        Assert.assertTrue(authorizationContext.grantAll());
+        Assert.assertTrue(authorizationContext.grantProgrammingRight());
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 
-        gac.popGrantAll();
+        gac.popGrantProgrammingRight();
 
-        Assert.assertFalse(authorizationContext.grantAll());
+        Assert.assertFalse(authorizationContext.grantProgrammingRight());
         Assert.assertEquals(user1, authorizationContext.getContentAuthor());
         Assert.assertFalse(authorizationContext.securityStackIsEmpty());
 

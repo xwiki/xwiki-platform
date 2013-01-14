@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.sheet.SheetManager;
-import org.xwiki.security.authorization.GrantAllController;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 
 import com.xpn.xwiki.api.Document;
 
@@ -78,7 +78,7 @@ public class SheetScriptService implements ScriptService
      * Used for bypassing programming rights check when obtaining the xwiki document.
      */
     @Inject
-    private GrantAllController grantAllController;
+    private GrantProgrammingRightController grantProgrammingRightController;
 
     /**
      * Returns the list of sheets associated with a XWiki document.
@@ -206,11 +206,11 @@ public class SheetScriptService implements ScriptService
      */
     private DocumentModelBridge getDocument(Document document)
     {
-        grantAllController.pushGrantAll();
+        grantProgrammingRightController.pushGrantProgrammingRight();
         try {
             return document.getDocument();
         } finally {
-            grantAllController.popGrantAll();
+            grantProgrammingRightController.popGrantProgrammingRight();
         }
     }
 }

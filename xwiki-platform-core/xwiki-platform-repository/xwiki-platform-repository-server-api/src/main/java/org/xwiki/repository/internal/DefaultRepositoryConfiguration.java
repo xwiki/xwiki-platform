@@ -34,7 +34,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Default implementation of {@link RepositoryConfiguration}.
@@ -86,16 +85,8 @@ public class DefaultRepositoryConfiguration implements RepositoryConfiguration
     {
         BaseObject obj = getConfigurationObject();
 
-        if (obj != null) {
-            BaseProperty< ? > property =
-                (BaseProperty< ? >) obj.safeget(XWikiRepositoryModel.PROP_CONFIGURATION_DEFAULTIDPREFIX);
-
-            if (property != null) {
-                return (List<String>) property.getValue();
-            }
-        }
-
-        return Collections.<String> emptyList();
+        return obj != null ? obj.getListValue(XWikiRepositoryModel.PROP_CONFIGURATION_VALIDTYPEs) : Collections
+            .<String> emptyList();
     }
 
     @Override

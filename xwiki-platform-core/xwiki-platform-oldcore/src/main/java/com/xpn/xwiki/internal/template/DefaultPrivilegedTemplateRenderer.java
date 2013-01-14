@@ -21,14 +21,11 @@ package com.xpn.xwiki.internal.template;
 
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 import org.apache.velocity.VelocityContext;
-
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
 
 import javax.inject.Inject;
 import java.util.Set;
@@ -45,34 +42,31 @@ import java.util.HashSet;
 @Component
 public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRenderer
 {
-    /**
-     * The reference of the superadmin user document.
-     */
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki",
-        XWikiRightService.SUPERADMIN_USER);
-
     /** The execution. */
     @Inject
     private Execution execution;
+
+    /** The controller for elevating privileges during template execution. */
+    @Inject
+    private GrantProgrammingRightController grantProgrammingRightController;
 
     /** The set of privileged templates. */
     private final Set<String> privilegedTemplates = new HashSet<String>();
 
     {
-        // TODO: Add the "distribution" template to the set.
         privilegedTemplates.add("/templates/suggest.vm");
+        privilegedTemplates.add("/templates/distribution.vm");
     }
 
 
     @Override
     public String evaluateTemplate(String content, String templateName)
     {
-        XWikiContext context = (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
 
         if (privilegedTemplates.contains(templateName)) {
-            return evaluatePrivileged(content, templateName, context);
+            return evaluatePrivileged(content, templateName);
         } else {
-            return evaluate(content, templateName, context);
+            return evaluate(content, templateName);
         }
     }
 
@@ -81,34 +75,14 @@ public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRend
      *
      * @param content The template content.
      * @param templateName The template nam
-     * @param context The context.
      * @return The rendered result.
      */
-    private String evaluatePrivileged(String content, String templateName, XWikiContext context) {
-        XWikiDocument oldDocument = context.getDoc();
-
-        // Make sure to have programming rights
-        // 
-        // This is the same hack as is currently used in DistributionAction.
-        //
-        // Since the context document is replaced to delegate programming rights to the template, the template will not
-        // be able to access the original context document.
-        //
-        // In the branch 'feature-authorization-context' a nicer solution will be possible, where programming rights can
-        // be delegated to the template, while automatically dropping the programming rights when rendering a document
-        // which doesn't have programming rights.
-        XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getDatabase(),
-                              SUPERADMIN_REFERENCE.getLastSpaceReference().getName(), "Distribution"));
-        document.setContentAuthorReference(SUPERADMIN_REFERENCE);
-        document.setAuthorReference(SUPERADMIN_REFERENCE);
-        document.setCreatorReference(SUPERADMIN_REFERENCE);
-        context.setDoc(document);
-
+    private String evaluatePrivileged(String content, String templateName) {
+        grantProgrammingRightController.pushGrantProgrammingRight();
         try {
-            return evaluate(content, templateName, context);
+            return evaluate(content, templateName);
         } finally {
-            context.setDoc(oldDocument);
+            grantProgrammingRightController.popGrantProgrammingRight();
         }
     }
 
@@ -117,11 +91,12 @@ public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRend
      *
      * @param content The template content.
      * @param templateName The template nam
-     * @param context The context.
      * @return The rendered result.
      */
-    private String evaluate(String content, String templateName, XWikiContext context)
+    private String evaluate(String content, String templateName)
     {
+        XWikiContext context = (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
         return XWikiVelocityRenderer
             .evaluate(content, templateName, (VelocityContext) context.get("vcontext"), context);
     }

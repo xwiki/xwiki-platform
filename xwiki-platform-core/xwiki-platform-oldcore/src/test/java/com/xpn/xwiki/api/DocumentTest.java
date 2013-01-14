@@ -51,6 +51,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
 
 public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
@@ -90,8 +91,10 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(1, lst.size());
     }
 
-    public void testRemoveObjectDoesntCauseDataLoss() throws XWikiException
+    public void testRemoveObjectDoesntCauseDataLoss() throws Exception
     {
+        registerMockComponent(PrivilegedTemplateRenderer.class);
+
         Mock mockXWiki = mock(XWiki.class);
         BaseClass c = new BaseClass();
         c.setDocumentReference(new DocumentReference("xwiki", "XWiki", "XWikiComments"));
@@ -129,6 +132,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testSaveAsAuthorUsesGuestIfDroppedPermissions() throws Exception
     {
+        registerMockComponent(PrivilegedTemplateRenderer.class);
+
         final XWikiDocument xdoc = new XWikiDocument("Space", "Page");
 
         final Mock mockRightService = mock(XWikiRightService.class);

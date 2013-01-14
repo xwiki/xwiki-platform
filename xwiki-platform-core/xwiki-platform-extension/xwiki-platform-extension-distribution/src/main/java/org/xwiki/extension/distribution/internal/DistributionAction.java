@@ -19,12 +19,9 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import org.xwiki.security.authorization.GrantProgrammingRightController;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiAction;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Action used to apply various distribution related actions. We create a special action to make sure to execute the
@@ -46,18 +43,6 @@ public class DistributionAction extends XWikiAction
     public boolean action(XWikiContext context) throws XWikiException
     {
         context.put("action", DISTRIBUTION_ACTION);
-
-        // Disallow template override with xpage parameter.
-        if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                                     String.format("Template may not be overriden with 'xpage' in [%s] action.",
-                                                   DISTRIBUTION_ACTION));
-        }
-
-        // We put a grant all document at the bottom of the security stack to ensure that we get full privileges, as
-        // long as we're not rendering any document.
-        Utils.getComponent(GrantProgrammingRightController.class).pushGrantProgrammingRight();
-
         return true;
     }
 

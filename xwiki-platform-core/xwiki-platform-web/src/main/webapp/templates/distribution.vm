@@ -136,31 +136,81 @@
       #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
       #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
 
-      ## Allow the user to install, upgrade or downgrade the UI.
       <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepUILabel')</div>
+
+      #set ($documentCount = $xwiki.countDocuments(''))
+      #if ($distributionState == 'NEW' && !$showCompleteStepButton && $documentCount > 30)
+        ## Upgrade from a version that doesn't have the distribution module.
+        #displayMainUIStep_unknownPreviousUI()
+      #elseif ($distributionState == 'DIFFERENT')
+        ## TODO: Display the previous distribution UI extension to let the user uninstall it.
+      #end
+
       <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepUIHint')</div>
       #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
       #if ($distributionUIExtension)
         <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepInternetAccessWarning')</div>
+        ## Allow the user to install, upgrade or downgrade the UI.
         #displayExtension($distributionUIExtension)
       #else
         <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
           ["<strong>$!escapetool.xml($distributionUIId.id)</strong>",
           "<strong>$!escapetool.xml($distributionUIId.version)</strong>"])</div>
       #end
-
-      #if ($distributionState == 'NEW' && !$showCompleteStepButton)
-        ## Either a new install or an upgrade from a version that doesn't have the distribution module.
-        ## TODO: Ask the user if a previous version of the UI was installed without the Extension Manager. Retrieve the
-        ## list of versions available for the recommended UI and let the user choose the version he's currently using.
-        ## Do a fake install of the selected version.
-      #elseif ($distributionState == 'DIFFERENT')
-        ## TODO: Display the previous distribution UI extension to let the user uninstall it.
-      #end
     #else
       <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepUIUnspecifiedError')</div>
       ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
     #end
+  #end
+#end
+
+#macro(displayMainUIStep_unknownPreviousUI)
+  #if ($request.previousUiId && $request.previousUiVersion)
+    #set ($previousUi = $services.extension.resolve($request.previousUiId, $request.previousUiVersion))
+  #end
+  #if ($previousUi)
+    ## Allow the user to mark the previous UI as installed.
+    <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIHint'))</div>
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    <div>#displayExtension($previousUi)</div>
+  #else
+    <form action="" class="xform hidden">
+      <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
+      <p class="buttons">
+        <span class="buttonwrapper">
+          <input type="submit" class="button" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeYesLabel'))" />
+        </span>
+        <span class="buttonwrapper">
+          <input type="submit" class="button secondary" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeNoLabel'))" />
+        </span>
+      </p>
+    </form>
+    <form id="previousUi" action="" method="post" class="xform">
+      <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
+      <dl>
+        <dt><label for="previousUiId">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIIdLabel'))</label></dt>
+        #set ($previousUiId = $distributionUIId.id)
+        #if ("$!request.previousUiId" != '')
+          #set ($previousUiId = $request.previousUiId)
+        #end
+        <dd><input id="previousUiId" name="previousUiId" type="text" value="$!escapetool.xml($previousUiId)" /></dd>
+        <dt><label for="previousUiVersion">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label></dt>
+        <dd><input id="previousUiVersion" name="previousUiVersion" type="text" value="$!escapetool.xml($request.previousUiVersion)" /></dd>
+      </dl>
+      <p class="buttons">
+        <span class="buttonwrapper">
+          <input type="submit" class="button" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUISubmitLabel'))" />
+        </span>
+        <span class="buttonwrapper hidden">
+          <input type="submit" class="button secondary" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUICancelLabel'))" />
+        </span>
+      </p>
+      #if ($request.previousUiId && $request.previousUiVersion)
+        <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
+          ["<strong>$!escapetool.xml($request.previousUiId)</strong>",
+          "<strong>$!escapetool.xml($request.previousUiVersion)</strong>"])</div>
+      #end
+    </form>
   #end
 #end
 

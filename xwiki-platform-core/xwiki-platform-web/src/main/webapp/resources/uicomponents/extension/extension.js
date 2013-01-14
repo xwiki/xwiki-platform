@@ -52,6 +52,14 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
+   * Returns the extension version.
+   */
+  getVersion : function() {
+    var versionHiddenInput = this.container.down('input[name="extensionVersion"]');
+    return versionHiddenInput ? versionHiddenInput.value : null;
+  },
+
+  /**
    * Returns the status of the extension (loading, core, remote, installed, etc.).
    */
   getStatus : function() {
@@ -486,6 +494,7 @@ XWiki.ExtensionBehaviour = Class.create({
     var form = this.container.down('.extension-actions');
     var formData = new Hash(form.serialize({submit: false}));
     formData.unset('extensionVersion');
+    formData.unset('confirm');
 
     var dependency = dependencies[index];
     formData.set('extensionId', dependency.down('.extension-name').innerHTML);
@@ -572,16 +581,21 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
 });
 
 
-function init() {
-  new XWiki.ExtensionSearchFormBehaviour();
-  $$('.extension-item').each(function (extension) {
-    new XWiki.ExtensionBehaviour(extension);
+var enhanceExtensions = function(event) {
+  ((event && event.memo.elements) || [$('body')]).each(function(element) {
+    element.select('.extension-item').each(function(extension) {
+      new XWiki.ExtensionBehaviour(extension);
+    });
   });
+};
+var init = function(event) {
+  new XWiki.ExtensionSearchFormBehaviour();
+  enhanceExtensions(event);
   return true;
-}
-
+};
 // When the document is loaded, trigger the Extension Manager form enhancements.
 (XWiki.domIsLoaded && init()) || document.observe("xwiki:dom:loaded", init);
+document.observe('xwiki:dom:updated', enhanceExtensions);
 
 // End XWiki augmentation.
 return XWiki;

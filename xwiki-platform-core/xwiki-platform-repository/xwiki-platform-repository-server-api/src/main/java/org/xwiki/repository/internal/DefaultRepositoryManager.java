@@ -20,12 +20,14 @@
 package org.xwiki.repository.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +36,15 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
@@ -46,12 +57,17 @@ import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.Version.Type;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.RegexEntityReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -67,11 +83,26 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
-public class DefaultRepositoryManager implements RepositoryManager
+public class DefaultRepositoryManager implements RepositoryManager, Initializable, Disposable
 {
+    /**
+     * The reference to match property {@link XWikiRepositoryModel#PROP_EXTENSION_ID} of class
+     * {@link XWikiRepositoryModel#EXTENSION_CLASSNAME} on whatever wiki.
+     */
+    private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE = new RegexEntityReference(
+        Pattern.compile(XWikiRepositoryModel.PROP_DEPENDENCY_ID), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
+            Pattern.compile(".*:" + XWikiRepositoryModel.EXTENSION_CLASSNAME + "\\[\\d*\\]"), EntityType.OBJECT));
+
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectPropertyAddedEvent(
+        XWIKIPREFERENCE_PROPERTY_REFERENCE), new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
+
     /**
      * Get the reference of the class in the current wiki.
      */
@@ -112,7 +143,66 @@ public class DefaultRepositoryManager implements RepositoryManager
     private RepositoryConfiguration configuration;
 
     @Inject
+    private CacheManager cacheManager;
+
+    @Inject
+    private ObservationManager observation;
+
+    @Inject
     private Logger logger;
+
+    /**
+     * Link extension id to document reference. The tabe contains null if the id link to no extension.
+     */
+    private Cache<DocumentReference[]> documentReferenceCache;
+
+    private EventListener listener = new EventListener()
+    {
+        @Override
+        public void onEvent(Event event, Object source, Object data)
+        {
+            // TODO: Improve a bit by removing only what's changed
+            documentReferenceCache.removeAll();
+        }
+
+        @Override
+        public String getName()
+        {
+            return "repository.DefaultRepositoryManager";
+        }
+
+        @Override
+        public List<Event> getEvents()
+        {
+            return EVENTS;
+        }
+    };
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Init cache
+        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        cacheConfiguration.setConfigurationId("repository.extensionid.documentreference");
+        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+        lru.setMaxEntries(10000);
+        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+        try {
+            this.documentReferenceCache = this.cacheManager.createNewCache(cacheConfiguration);
+        } catch (CacheException e) {
+            throw new InitializationException("Failed to initialize cache", e);
+        }
+
+        // Listen to modifications
+        this.observation.addListener(listener);
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.observation.removeListener(listener.getName());
+    }
 
     public <T> XWikiDocument getDocument(T[] data) throws XWikiException
     {
@@ -129,20 +219,33 @@ public class DefaultRepositoryManager implements RepositoryManager
     @Override
     public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
     {
-        Query query =
-            this.queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object("
-                + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension where extension."
-                + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId", Query.XWQL);
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-        query.bindValue("extensionId", extensionId);
+        DocumentReference[] cachedDocumentReference = this.documentReferenceCache.get(extensionId);
 
-        List<Object[]> documentNames = query.execute();
+        if (cachedDocumentReference == null) {
+            Query query =
+                this.queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object("
+                    + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension where extension."
+                    + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId", Query.XWQL);
 
-        if (documentNames.isEmpty()) {
-            return null;
+            query.bindValue("extensionId", extensionId);
+
+            List<Object[]> documentNames = query.execute();
+
+            if (!documentNames.isEmpty()) {
+                cachedDocumentReference =
+                    new DocumentReference[] {new DocumentReference(this.xcontextProvider.get().getDatabase(),
+                        (String) documentNames.get(0)[0], (String) documentNames.get(0)[1])};
+            } else {
+                cachedDocumentReference = new DocumentReference[1];
+            }
+
+            this.documentReferenceCache.set(extensionId, cachedDocumentReference);
         }
 
-        return getDocument(documentNames.get(0));
+        return cachedDocumentReference[0] != null ? xcontext.getWiki()
+            .getDocument(cachedDocumentReference[0], xcontext) : null;
     }
 
     @Override

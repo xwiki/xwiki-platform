@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -384,6 +385,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
         Assert.assertFalse("Document is hidden", page.isHidden());
 
         BaseClass baseClass = page.getXClass();
@@ -502,6 +504,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong author", xarAuthorReference, page.getAuthorReference());
         Assert.assertEquals("Wrong content author", xarContentAuthorReference, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
         Assert.assertFalse("Document is hidden", page.isHidden());
 
         BaseClass baseClass = page.getXClass();
@@ -627,6 +630,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
         Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -695,6 +699,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
         Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -779,6 +784,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong content", "content", modifiedpage.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
         Assert.assertEquals("Wrong versions", "3.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));

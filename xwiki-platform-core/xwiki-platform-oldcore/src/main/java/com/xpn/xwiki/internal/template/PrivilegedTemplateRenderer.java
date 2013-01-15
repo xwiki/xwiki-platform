@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Role;
  * template.
  * 
  * @version $Id$
- * @since 4.4.1
+ * @since 4.5M1
  */
 @Role
 public interface PrivilegedTemplateRenderer

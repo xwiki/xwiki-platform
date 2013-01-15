@@ -273,15 +273,12 @@ public class DefaultPackager implements Packager, Initializable
                         Locale locale = xarEntry.getLocale();
                         if (locale != null && !Locale.ROOT.equals(locale)) {
                             document = document.getTranslatedDocument(locale, xcontext);
-                            xcontext.getWiki().deleteDocument(document, xcontext);
-
-                            this.logger.info("Successfully deleted document [{}] in language [{}]",
-                                document.getDocumentReference(), document.getRealLocale());
-                        } else {
-                            xcontext.getWiki().deleteAllDocuments(document, xcontext);
-
-                            this.logger.info("Successfully deleted document [{}]", document.getDocumentReference());
                         }
+
+                        xcontext.getWiki().deleteDocument(document, xcontext);
+
+                        this.logger.info("Successfully deleted document [{}] in language [{}]",
+                            document.getDocumentReference(), document.getRealLocale());
                     }
                 } catch (XWikiException e) {
                     this.logger.error("Failed to delete document [{}]", documentReference, e);

@@ -73,4 +73,10 @@ public class XarFile
     {
         return this.entries.get(new XarEntry(reference, locale));
     }
+
+    @Override
+    public String toString()
+    {
+        return this.zipFile.toString();
+    }
 }

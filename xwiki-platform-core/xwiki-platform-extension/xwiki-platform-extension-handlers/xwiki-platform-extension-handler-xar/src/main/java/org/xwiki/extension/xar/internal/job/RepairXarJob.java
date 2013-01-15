@@ -30,7 +30,8 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
+import org.xwiki.extension.job.internal.AbstractExtensionJob;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
@@ -45,7 +46,7 @@ import org.xwiki.job.Request;
  */
 @Component
 @Named(RepairXarJob.JOBTYPE)
-public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
+public class RepairXarJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
      * The id of the job.
@@ -63,6 +64,12 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
      */
     @Inject
     private LocalExtensionRepository localRepository;
+
+    /**
+     * Used to resolve extensions to install.
+     */
+    @Inject
+    protected ExtensionRepositoryManager repositoryManager;
 
     @Override
     public String getType()

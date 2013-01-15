@@ -3164,6 +3164,14 @@ public class XWiki implements EventListener
 
         try {
             sender = getXWikiPreference("admin_email", context);
+            if (StringUtils.isBlank(sender)) {
+                String server = context.getRequest().getServerName();
+                if (server.matches("\\[.*\\]|(\\d{1,3}+\\.){3}+\\d{1,3}+")) {
+                    sender = "noreply@domain.net";
+                } else {
+                    sender = "noreply@" + server;
+                }
+            }
             content = getXWikiPreference(contentfield, context);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,

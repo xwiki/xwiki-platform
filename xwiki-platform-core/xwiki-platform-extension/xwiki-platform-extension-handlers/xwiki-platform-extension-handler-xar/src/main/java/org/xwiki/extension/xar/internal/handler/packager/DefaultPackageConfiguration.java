@@ -19,7 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.job.event.status.JobStatus;
@@ -40,6 +41,8 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     private JobStatus jobStatus;
 
     private boolean logEnabled = false;
+
+    private Map<XarEntry, XarFile> previousPages;
 
     private Set<String> entriesToImport;
 
@@ -109,12 +112,14 @@ public class DefaultPackageConfiguration implements PackageConfiguration
         this.entriesToImport = entriesToImport;
     }
 
-    public void addEntry(String entry)
+    @Override
+    public Map<XarEntry, XarFile> getPreviousPages()
     {
-        if (this.entriesToImport == null) {
-            this.entriesToImport = new HashSet<String>();
-        }
+        return this.previousPages != null ? this.previousPages : Collections.<XarEntry, XarFile> emptyMap();
+    }
 
-        this.entriesToImport.add(entry);
+    public void setPreviousPages(Map<XarEntry, XarFile> previousPages)
+    {
+        this.previousPages = previousPages;
     }
 }

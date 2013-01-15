@@ -112,15 +112,15 @@ XWiki.MainUIStep = Class.create({
     // Auto-complete the id based on the selected version.
     if (versionList.selectedIndex == 0) {
       var id = '';
-    } else if (versionList.selectedIndex < 112) {
-      // 1.1-milestone-3 -> 2.5.2
-      var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
-    } else if (versionList.selectedIndex < 138) {
-      // 2.6-rc-1 -> 3.2.1
+    } else if (versionList.selectedIndex < 27) {
+      // 4.2M2 -> 3.3-milestone-1
+      var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
+    } else if (versionList.selectedIndex < 53) {
+      // 3.2.1 -> 2.6-rc-1
       var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
     } else {
-      // 3.3-milestone-1 -> 4.2M2
-      var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
+      // 2.5.2 -> 1.1-milestone-3
+      var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
     }
     // Update the value of the hidden input.
     idInput.value = id;
@@ -168,11 +168,17 @@ XWiki.MainUIStep = Class.create({
         var container = new Element('div').update(response.responseText);
         var previousUiExtension = container.down('.extension-item');
         if (previousUiExtension) {
-          this._previousUiExtensionId = {
-            id: formData.previousUiId,
-            version: formData.previousUiVersion
-          };
-          this._displayPreviousUiExtension(previousUiExtension);
+          if (previousUiExtension.down('input[name="actionInstall"]')) {
+            // The specified previous UI is not installed. We have to update the extension index.
+            this._previousUiExtensionId = {
+              id: formData.previousUiId,
+              version: formData.previousUiVersion
+            };
+            this._displayPreviousUiExtension(previousUiExtension);
+          } else {
+            // The specified previous UI is probably already installed. Just show the recommended UI.
+            this._hidePreviousUiForm();
+          }
         } else {
           // Display the received message.
           form.enable().insert(container);
@@ -197,7 +203,6 @@ XWiki.MainUIStep = Class.create({
     document.fire('xwiki:dom:updated', {elements: [container]});
     // Hack the install button to perform a fake install (only mark the extension as installed).
     var installButton = previousUiExtension.down('input[name="actionInstall"]');
-    if (!installButton) return;
     installButton.value = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairLabel"))';
     installButton.title = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairHint"))';
     installButton.name = 'actionRepairXAR';

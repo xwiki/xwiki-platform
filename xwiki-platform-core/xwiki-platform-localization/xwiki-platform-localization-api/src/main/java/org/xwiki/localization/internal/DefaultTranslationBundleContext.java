@@ -103,6 +103,7 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
 
             if (bundles == null) {
                 bundles = initializeContextBundle();
+                context.setProperty(CKEY_BUNDLES, bundles);
             }
         } else {
             bundles = initializeContextBundle();

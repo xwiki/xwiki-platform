@@ -170,7 +170,8 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     protected boolean setParameter(String key, String value) throws MacroExecutionException
     {
         if (DOCUMENT_PARAM.equals(key)) {
-            this.documentReference = this.documentReferenceResolver.resolve(value);
+            this.documentReference
+                = this.documentReferenceResolver.resolve(value, docBridge.getCurrentDocumentReference());
             return true;
         }
 

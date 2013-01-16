@@ -4,8 +4,6 @@
   <id>test</id>
   <version>2.0</version>
   <type>xar</type>
-  <dependency>false</dependency>
-  <installed>true</installed>
   <description>description</description>
   <author>author</author>
   <website>http://website</website>

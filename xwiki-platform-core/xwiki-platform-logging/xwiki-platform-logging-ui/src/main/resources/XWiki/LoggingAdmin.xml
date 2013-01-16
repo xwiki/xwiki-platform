@@ -194,11 +194,6 @@ $msg.get('logging.admin.intro')
   #end
 #end
 ##
-#if( $request.loggeraction_reload )
-    $logging.reloadDefaultConfiguration()
-    {{success}}Configuration has been reloaded from logback file{{/success}} 
-#end
-##
 ## Livetable #
 ##
 #set($columns = [ 'logger'  , 'level'])

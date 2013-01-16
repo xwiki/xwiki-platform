@@ -23,11 +23,14 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.jmock.Expectations;
 import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
@@ -65,6 +68,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -79,6 +83,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     private XWikiRightService mockRightService;
 
     private JobStatus mockJobStatus;
+
+    private XWikiAttachmentStoreInterface mockAttachmentStore;
 
     private Map<DocumentReference, Map<String, XWikiDocument>> documents =
         new HashMap<DocumentReference, Map<String, XWikiDocument>>();
@@ -120,6 +126,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         this.contextUser = new DocumentReference(getContext().getDatabase(), "XWiki", "ExtensionUser");
 
         this.mockStore = getMockery().mock(XWikiStoreInterface.class);
+        this.mockAttachmentStore = getMockery().mock(XWikiAttachmentStoreInterface.class);
 
         this.mockRightService = getMockery().mock(XWikiRightService.class);
 
@@ -265,6 +272,12 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 will(returnValue(mockRightService));
 
                 allowing(mockXWiki).prepareResources(with(any(XWikiContext.class)));
+
+                allowing(mockXWiki).hasAttachmentRecycleBin(with(any(XWikiContext.class)));
+                will(returnValue(false));
+
+                allowing(mockXWiki).getAttachmentStore();
+                will(returnValue(mockAttachmentStore));
             }
         });
 
@@ -339,8 +352,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
-                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
         });
@@ -371,6 +385,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
         Assert.assertFalse("Document is hidden", page.isHidden());
 
         BaseClass baseClass = page.getXClass();
@@ -489,6 +504,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong author", xarAuthorReference, page.getAuthorReference());
         Assert.assertEquals("Wrong content author", xarContentAuthorReference, page.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
         Assert.assertFalse("Document is hidden", page.isHidden());
 
         BaseClass baseClass = page.getXClass();
@@ -582,7 +598,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                exactly(3).of(mockRightService).hasAccessLevel(with(equal("admin")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
                 will(returnValue(true));
@@ -614,6 +630,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
         Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -642,14 +659,169 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
+    public void testUpgradeOnRoot() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
+                will(returnValue(Arrays.asList("wiki1", "wiki2")));
+
+                exactly(3).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
+        install(this.localXarExtensiontId1, null, this.contextUser);
+
+        // upgrade
+
+        install(this.localXarExtensiontId2, null, this.contextUser);
+
+        // validate
+
+        // samespace.samepage
+
+        XWikiDocument samepage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "samespace", "samepage"), getContext());
+
+        Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+
+        // space.page
+
+        XWikiDocument modifiedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "page"), getContext());
+
+        Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+
+        Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
+        Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
+        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
+
+        BaseClass baseClass = modifiedpage.getXClass();
+        Assert.assertNotNull(baseClass.getField("property"));
+        Assert.assertEquals("property", baseClass.getField("property").getName());
+        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+
+        XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
+        Assert.assertNotNull(attachment);
+        Assert.assertEquals("attachment.txt", attachment.getFilename());
+        Assert.assertEquals(18, attachment.getContentSize(getContext()));
+        Assert.assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getContext())));
+
+        // space2.page2
+
+        XWikiDocument newPage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space2", "page2"), getContext());
+
+        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", newPage.isNew());
+
+        // space1.page1
+
+        XWikiDocument removedPage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space1", "page1"), getContext());
+
+        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", removedPage.isNew());
+    }
+
+    @Test
+    public void testDowngradeOnWiki() throws Throwable
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                exactly(3).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
+        install(this.localXarExtensiontId2, "wiki", this.contextUser);
+
+        // upgrade
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                // One attachment exist in the recent version but not in the old one
+                oneOf(mockAttachmentStore).deleteXWikiAttachment(with(new BaseMatcher<XWikiAttachment>()
+                {
+                    public boolean matches(Object arg)
+                    {
+                        return ((XWikiAttachment) arg).getFilename().equals("attachment.txt");
+                    }
+
+                    public void describeTo(Description description)
+                    {
+                        description.appendValue("attachment.ext");
+                    }
+                }), with(any(XWikiContext.class)), with(equal(true)));
+            }
+        });
+
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        // validate
+
+        // samespace.samepage
+
+        XWikiDocument samepage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "samespace", "samepage"), getContext());
+
+        Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+
+        // space.page
+
+        XWikiDocument modifiedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+
+        Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+
+        Assert.assertEquals("Wrong content", "content", modifiedpage.getContent());
+        Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
+        Assert.assertEquals("Wrong versions", "3.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
+
+        BaseClass baseClass = modifiedpage.getXClass();
+        Assert.assertNotNull(baseClass.getField("property"));
+        Assert.assertEquals("property", baseClass.getField("property").getName());
+        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+
+        XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
+        Assert.assertNotNull(attachment);
+        Assert.assertEquals("attachment.txt", attachment.getFilename());
+        Assert.assertEquals(18, attachment.getContentSize(getContext()));
+        Assert.assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getContext())));
+
+        // space2.page2
+
+        XWikiDocument newPage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space2", "page2"), getContext());
+
+        Assert.assertTrue("Document wiki.space2.page2 has not been removed from the database", newPage.isNew());
+
+        // space1.page1
+
+        XWikiDocument removedPage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
+
+        Assert.assertFalse("Document wiki.space1.page1 has not been saved in the database", removedPage.isNew());
+    }
+
+    @Test
     public void testUninstallFromWiki() throws Throwable
     {
         getMockery().checking(new Expectations()
         {
             {
 
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
-                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
         });
@@ -690,8 +862,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
                 will(returnValue(Arrays.asList("wiki1", "wiki2")));
 
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
-                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
         });
@@ -711,6 +884,12 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
             this.mockXWiki.getDocument(new DocumentReference("wiki2", "space1", "page1"), getContext());
 
         Assert.assertFalse(pageWiki2.isNew());
+
+        XWikiDocument overwrittenpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "overwrittenpage"), getContext());
+
+        Assert.assertFalse(overwrittenpage.isNew());
+        Assert.assertEquals("1.1", overwrittenpage.getVersion());
 
         // uninstall
 
@@ -860,8 +1039,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getVirtualWikisDatabaseNames(with(any(XWikiContext.class)));
                 will(returnValue(Arrays.asList("wiki1", "wiki2")));
 
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
-                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
         });
@@ -886,8 +1066,9 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockRightService).hasAccessLevel(with(equal("admin")), with(equal("xwiki:XWiki.ExtensionUser")),
-                    with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                exactly(2).of(mockRightService).hasAccessLevel(with(equal("admin")),
+                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
+                    with(any(XWikiContext.class)));
                 will(returnValue(true));
             }
         });

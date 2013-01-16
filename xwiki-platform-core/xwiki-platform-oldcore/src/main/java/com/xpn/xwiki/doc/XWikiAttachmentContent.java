@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.xpn.xwiki.web.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
@@ -33,6 +32,8 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
 import org.xwiki.store.UnexpectedException;
+
+import com.xpn.xwiki.web.Utils;
 
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
@@ -88,8 +89,8 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * @since 4.1M3
      * @return a new FileItem for temporarily storing attachment content.
+     * @since 4.2M3
      */
     private static FileItem getNewFileItem()
     {
@@ -101,7 +102,7 @@ public class XWikiAttachmentContent implements Cloneable
             }
             final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, dir);
             // This causes the temp file to be created.
-            dfi.getOutputStream();
+            dfi.getOutputStream().close();
             // Make sure this file is marked for deletion on VM exit because DiskFileItem does not.
             dfi.getStoreLocation().deleteOnExit();
             return dfi;

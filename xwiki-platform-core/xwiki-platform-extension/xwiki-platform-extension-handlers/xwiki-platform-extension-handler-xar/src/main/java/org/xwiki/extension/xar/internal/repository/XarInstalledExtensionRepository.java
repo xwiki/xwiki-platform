@@ -98,15 +98,15 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
         this.observation.addListener(new EventListener()
         {
             @Override
-            public void onEvent(Event event, Object arg1, Object arg2)
+            public void onEvent(Event event, Object source, Object data)
             {
-                LocalExtension extension = (LocalExtension) arg1;
+                LocalExtension extension = (LocalExtension) source;
                 if (extension.getType().equals(XarExtensionHandler.TYPE)) {
                     updateXarExtension(extension);
-                }
-
-                if (arg2 != null) {
-                    updateXarExtension((LocalExtension) arg2);
+                    
+                    if (data != null) {
+                        updateXarExtension((LocalExtension) data);
+                    }
                 }
             }
 

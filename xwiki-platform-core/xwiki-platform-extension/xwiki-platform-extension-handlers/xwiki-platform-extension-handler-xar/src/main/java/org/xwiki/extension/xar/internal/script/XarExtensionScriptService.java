@@ -39,6 +39,7 @@ import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobManager;
+import org.xwiki.script.service.ScriptService;
 
 /**
  * Various XAR oriented APIs for scripts.
@@ -48,7 +49,7 @@ import org.xwiki.job.JobManager;
 @Component
 @Named("xarextension")
 @Singleton
-public class XarExtensionScriptService
+public class XarExtensionScriptService implements ScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.

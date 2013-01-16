@@ -51,6 +51,18 @@
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
       <version>5.1.8.Final</version>
+      <exclusions>
+        <!-- Use javax.transaction:jta instead to not have duplicate JARs in generated WARs -->
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Use javax.transaction:jta instead to not have duplicate JARs in generated WARs -->
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

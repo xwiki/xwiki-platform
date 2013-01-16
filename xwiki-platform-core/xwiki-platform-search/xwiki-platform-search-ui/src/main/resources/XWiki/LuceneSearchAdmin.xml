@@ -12,10 +12,10 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1272286749000</creationDate>
-  <date>1326733733000</date>
-  <contentUpdateDate>1326733733000</contentUpdateDate>
+  <date>1357918882000</date>
+  <contentUpdateDate>1357918882000</contentUpdateDate>
   <version>1.1</version>
-  <title>Lucene search administration</title>
+  <title>$msg.get('search.admin.lucene.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

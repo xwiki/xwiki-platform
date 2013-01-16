@@ -66,18 +66,6 @@
       <version>1.0-a1-amelentev-dev</version>
     </dependency>
     
-    <!-- VMA: I'm not sure if we have the right to distribute this jar. It's not on the central repository because
-         of licensing issues. -->
-    <!-- Sergiu: No, we cannot redistribute it. And we definitely shouldn't put it in our repo.
-         We can redistribute version 1.1, but we should make users approve their License Agreement.
-         Can we drop this completely? Why is it needed? -->
-    <!-- TODO: Version 1.1 is available, should we upgrade? -->
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.0.1B</version>
-    </dependency>
-
     <!-- See http://jira.codehaus.org/browse/MEV-488 -->
     <dependency>
       <groupId>javax.jcr</groupId>
@@ -131,6 +119,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/builddef.lst</exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
         <!-- Merge components.txt files -->

@@ -38,8 +38,8 @@ import com.xpn.xwiki.XWikiException;
 @Role
 public interface Packager
 {
-    void importXAR(XarFile previousXarFile, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException, ComponentLookupException;
+    void importXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException,
+        ComponentLookupException;
 
     void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
 

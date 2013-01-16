@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.image;
 
+import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +28,10 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.plugin.image.ImageProcessor;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.codec.binary.Base64;
 import org.jmock.Mock;
 import org.xwiki.cache.Cache;
@@ -132,8 +135,11 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
         this.getContext().setRequest(req);
 
         final XWikiAttachment scaled = plugin.downloadAttachment(attach, this.getContext());
-        // Make sure the attachment is scaled down and uses less space.
-        assertTrue(scaled.getFilesize() < attach.getFilesize());
+
+        // Check that the width is indeed 30
+        ImageProcessor imageProcessor = Utils.getComponent(ImageProcessor.class);
+        Image scaledImage = imageProcessor.readImage(scaled.getContentInputStream(this.getContext()));
+        assertEquals(30, scaledImage.getWidth(null));
 
         // Load the scaled attachment again and make sure it's the same object in memory.
         final XWikiAttachment cached = plugin.downloadAttachment(attach, this.getContext());

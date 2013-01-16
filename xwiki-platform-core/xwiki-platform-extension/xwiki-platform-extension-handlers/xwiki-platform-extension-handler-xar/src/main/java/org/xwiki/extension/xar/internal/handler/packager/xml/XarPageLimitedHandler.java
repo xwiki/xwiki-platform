@@ -50,7 +50,6 @@ public class XarPageLimitedHandler extends AbstractHandler
         addsupportedElements("name");
         addsupportedElements("web");
         addsupportedElements("language");
-        addsupportedElements("defaultLanguage");
     }
 
     public XarEntry getXarEntry()
@@ -76,10 +75,8 @@ public class XarPageLimitedHandler extends AbstractHandler
         if (qName.equals("language")) {
             if (this.value.length() > 0) {
                 this.xarEntry.setLocale(toLocale(this.value.toString()));
-            }
-        } else if (qName.equals("defaultLanguage")) {
-            if (this.xarEntry.getLocale() == null) {
-                this.xarEntry.setLocale(toLocale(this.value.toString()));
+            } else {
+                this.xarEntry.setLocale(Locale.ROOT);
             }
         } else if (qName.equals("name")) {
             this.pageReference =

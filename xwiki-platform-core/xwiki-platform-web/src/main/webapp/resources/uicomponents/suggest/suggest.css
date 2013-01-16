@@ -43,6 +43,12 @@ div.suggestItems li {
   white-space:nowrap;
 }
 
+div.suggestItems ul.xlist.suggestList > li.xitem {
+  /* Reset the float because we want the suggest items to take only the necessary width. This way, if the width of the
+  suggest list is not specified, the list adapts its width to fit the suggest items. */
+  float: none;
+}
+
 div.suggestItems * {
   line-height:1.6em;
 }

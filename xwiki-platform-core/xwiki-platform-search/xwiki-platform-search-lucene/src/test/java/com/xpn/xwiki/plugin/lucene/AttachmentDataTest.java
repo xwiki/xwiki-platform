@@ -23,16 +23,20 @@ import java.io.IOException;
 
 import javax.servlet.ServletContext;
 
-import org.jmock.Mock;
+import org.jmock.Expectations;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.lucene.internal.AttachmentData;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletContext;
-import org.apache.lucene.document.Document;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -40,7 +44,7 @@ import com.xpn.xwiki.XWikiException;
  * 
  * @version $Id$
  */
-public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
+public class AttachmentDataTest extends AbstractBridgedComponentTestCase
 {
     private XWikiDocument document;
 
@@ -48,18 +52,28 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
     private AttachmentData attachmentData;
 
-    @Override
-    protected void setUp() throws Exception
+    private ServletContext mockServletContext;
+
+    @Before
+    public void setUp() throws Exception
     {
         super.setUp();
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.document.setSyntax(Syntax.XWIKI_2_0);
         this.attachment = new XWikiAttachment(this.document, "filename");
         this.document.getAttachmentList().add(this.attachment);
 
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").will(returnValue("default"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
+        this.mockServletContext = getMockery().mock(ServletContext.class, "AttachmentDataTest");
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockServletContext).getMimeType(with(any(String.class)));
+                will(returnValue("default"));
+            }
+        });
+
+        XWikiServletContext xwikiServletContext = new XWikiServletContext(mockServletContext);
         getContext().setEngineContext(xwikiServletContext);
 
         this.attachmentData = new AttachmentData(this.attachment, getContext(), false);
@@ -71,9 +85,16 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         super.registerComponents();
 
         // Setup display configuration.
-        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
-        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
-        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
+        final DisplayConfiguration mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDisplayConfiguration).getDocumentDisplayerHint();
+                will(returnValue("default"));
+                allowing(mockDisplayConfiguration).getTitleHeadingDepth();
+                will(returnValue(2));
+            }
+        });
     }
 
     private void assertGetFullText(String expect, String filename) throws IOException
@@ -85,7 +106,7 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
         String fullText = this.attachmentData.getFullText(this.document, getContext());
 
-        assertEquals("Wrong attachment content indexed", expect, fullText);
+        Assert.assertEquals("Wrong attachment content indexed", expect, fullText);
     }
 
     private void assertGetMimeType(String expect, String filename)throws XWikiException
@@ -93,90 +114,87 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
        
         this.attachmentData.setMimeType(this.attachment.getMimeType(getContext()));
         String mimeType = this.attachmentData.getMimeType();
-        assertEquals("Wrong mimetype content indexed", expect, mimeType);
+        Assert.assertEquals("Wrong mimetype content indexed", expect, mimeType);
         
     }
-    
-    public void testGetFullTextFromTxt() throws IOException, XWikiException
-    {    
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("txt.txt")).will(returnValue("text/plain"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+
+    private void setUpMockServletContext(final String expectedFileName, final String expectedMimeType)
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockServletContext).getMimeType(with(expectedFileName));
+                will(returnValue(expectedMimeType));
+            }
+        });
+        getContext().setEngineContext(new XWikiServletContext(mockServletContext));
+    }
+
+    @Test
+    public void getFullTextFromTxt() throws IOException, XWikiException
+    {
+        setUpMockServletContext("txt.txt", "text/plain");
         assertGetFullText("text content\n", "txt.txt");
         assertGetMimeType("text/plain", "txt.txt");
     }
 
-    public void testGetFullTextFromMSOffice97() throws IOException, XWikiException
-    {   
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("msoffice97.doc")).will(returnValue("application/msword"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+    @Test
+    public void getFullTextFromMSOffice97() throws IOException, XWikiException
+    {
+        setUpMockServletContext("msoffice97.doc", "application/msword");
         assertGetFullText("ms office 97 content\n\n", "msoffice97.doc");
         assertGetMimeType("application/msword" , "msoffice97.doc");
         
     }
 
-    public void testGetFullTextFromOpenXML() throws IOException, XWikiException
-    {   
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("openxml.docx")).will(returnValue("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+    @Test
+    public void getFullTextFromOpenXML() throws IOException, XWikiException
+    {
+        setUpMockServletContext("openxml.docx",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         assertGetFullText("openxml content\n", "openxml.docx");
         assertGetMimeType("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "openxml.docx");
         
     }
 
-    public void testGetFullTextFromOpenDocument() throws IOException, XWikiException
-    {   
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("opendocument.odt")).will(returnValue("application/vnd.oasis.opendocument.text"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+    @Test
+    public void getFullTextFromOpenDocument() throws IOException, XWikiException
+    {
+        setUpMockServletContext("opendocument.odt", "application/vnd.oasis.opendocument.text");
         assertGetFullText("opendocument content\n", "opendocument.odt");
         assertGetMimeType("application/vnd.oasis.opendocument.text", "opendocument.odt");
     }
 
-    public void testGetFullTextFromPDF() throws IOException, XWikiException
-    {   
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("pdf.pdf")).will(returnValue("application/pdf"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+    @Test
+    public void getFullTextFromPDF() throws IOException, XWikiException
+    {
+        setUpMockServletContext("pdf.pdf", "application/pdf");
         assertGetFullText("\npdf content\n\n\n", "pdf.pdf");
         assertGetMimeType("application/pdf", "pdf.pdf");
     }
 
-    public void testGetFullTextFromZIP() throws IOException , XWikiException
-    {   
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("zip.zip")).will(returnValue("application/zip"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+    @Test
+    public void getFullTextFromZIP() throws IOException , XWikiException
+    {
+        setUpMockServletContext("zip.zip", "application/zip");
         assertGetFullText("zip.txt\nzip content\n\n\n\n", "zip.zip");
         assertGetMimeType("application/zip", "zip.zip");
     }
 
-    public void testGetFullTextFromHTML() throws IOException, XWikiException
+    @Test
+    public void getFullTextFromHTML() throws IOException, XWikiException
     {
-        Mock mockServletContext = mock(ServletContext.class);
-        mockServletContext.stubs().method("getMimeType").with(eq("html.html")).will(returnValue("text/html"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+        setUpMockServletContext("html.html", "text/html");
         assertGetFullText("something\n", "html.html");
         assertGetMimeType("text/html", "html.html");
     }
 
-    public void testGetFullTextFromClass() throws IOException, XWikiException
+    @Test
+    @Ignore("Remove once http://jira.xwiki.org/browse/XWIKI-8656 is fixed")
+    public void getFullTextFromClass() throws IOException, XWikiException
     {
-        Mock mockServletContext = mock(ServletContext.class);
         // TODO: For some unknown reason XWikiAttachment.getMimeType puts the filename in lowercase...
-        mockServletContext.stubs().method("getMimeType").with(eq("helloworld.class")).will(
-            returnValue("application/java-vm"));
-        XWikiServletContext xwikiServletContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
-        getContext().setEngineContext(xwikiServletContext);
+        setUpMockServletContext("helloworld.class", "application/java-vm");
         String expectedContent = "public synchronized class helloworld {\n"
             + "    public void helloworld();\n"
             + "    public static void main(string[]);\n"

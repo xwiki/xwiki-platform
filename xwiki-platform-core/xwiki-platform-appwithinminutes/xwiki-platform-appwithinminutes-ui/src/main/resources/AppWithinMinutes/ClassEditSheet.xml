@@ -1507,7 +1507,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
- * Display the options to create/update the class template and the class sheet.
+ * Display the options to create/update the class template, the class sheet and the class translation bundle.
  *#
 #macro(displayClassOptions)
   #set($className = $doc.name)
@@ -1515,6 +1515,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
   #end
   #set($templateName = "${className}Template")
+  #set($translationsName = "${className}Translations")
   #set($classSheets = $services.sheet.getClassSheets($doc))
   #if($classSheets.isEmpty())
     #set($sheetName = "${className}Sheet")
@@ -1522,8 +1523,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($sheetName = $services.model.serialize($classSheets.get(0)))
   #end
   {{html wiki="true"}}
-  ## Hide the options if neither the sheet nor the template exists. They don't have to be updated, they have to be created.
-  (% id="options" #if(!$xwiki.exists($sheetName) &amp;&amp; !$xwiki.exists($templateName))class="hidden" #end%)
+  ## Hide the options if neither the sheet nor the template nor the translation bundle exists. They don't have to be updated, they have to be created.
+  (% id="options" #if(!$xwiki.exists($sheetName) &amp;&amp; !$xwiki.exists($templateName) &amp;&amp; !$xwiki.exists($translationsName))class="hidden" #end%)
   ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;$msg.get('platform.appwithinminutes.classEditorUpdateTemplateLabel')&lt;/label&gt;
   : (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateTemplateHint', "[[$templateName]]")
   ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;$msg.get('platform.appwithinminutes.classEditorUpdateSheetLabel')&lt;/label&gt;
@@ -1532,6 +1533,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #else
       (% class="warningmessage" %)$msg.get('platform.appwithinminutes.classEditorMultipleSheetsWarning')
     #end
+  ; &lt;label for="updateClassTranslations"&gt;&lt;input type="checkbox" id="updateClassTranslations" name="updateClassTranslations" checked="checked" /&gt;$msg.get('platform.appwithinminutes.classEditorUpdateTranslationsLabel')&lt;/label&gt;
+  : (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateTranslationsHint', "[[$translationsName]]")
   {{/html}}
 #end
 
@@ -1881,6 +1884,29 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
+ * Updates and saves the class translation bundle based on the submitted data.
+ *#
+#macro(updateAndSaveTranslations)
+  #if(!$errorMessage &amp;&amp; $request.updateClassTranslations)
+    #set($className = $doc.name)
+    #if($className.endsWith('Class'))
+      #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
+    #end
+    #set($translationsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Translations"))
+    #set($translationsDoc = $xwiki.getDocument($translationsRef))
+    #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass', true))
+    ## We don't use the translation bundle on demand because some translations are required by the live table results
+    ## which are fetched in a separate request (and we don't want to use a custom live table results page just for this).
+    #set($discard = $translationsObj.set('scope', 'WIKI'))
+    #set($discard = $translationsDoc.setParent($doc.name))
+    #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
+    #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content, $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+    #set($discard = $translationsDoc.setHidden(true))
+    #set($discard = $translationsDoc.save($msg.get('platform.appwithinminutes.classEditorTranslationsSaveComment'), $minorEdit))
+  #end
+#end
+
+#**
  * Updates and saves the class definition, the class sheet and the class template.
  *#
 #macro(doSave)
@@ -1888,6 +1914,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #updateAndSaveClass()
   #updateAndSaveTemplate()
   #updateAndSaveSheet()
+  #updateAndSaveTranslations()
   #if($action == 'save')
     #if($errorMessage)
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}

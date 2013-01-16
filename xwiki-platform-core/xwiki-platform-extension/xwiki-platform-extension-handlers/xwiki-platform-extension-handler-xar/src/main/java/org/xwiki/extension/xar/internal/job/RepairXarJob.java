@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.job;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,7 +32,8 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
+import org.xwiki.extension.job.internal.AbstractExtensionJob;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
@@ -45,7 +48,7 @@ import org.xwiki.job.Request;
  */
 @Component
 @Named(RepairXarJob.JOBTYPE)
-public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
+public class RepairXarJob extends AbstractExtensionJob<InstallRequest>
 {
     /**
      * The id of the job.
@@ -63,6 +66,12 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
      */
     @Inject
     private LocalExtensionRepository localRepository;
+
+    /**
+     * Used to resolve extensions to install.
+     */
+    @Inject
+    protected ExtensionRepositoryManager repositoryManager;
 
     @Override
     public String getType()
@@ -123,8 +132,12 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
         LocalExtension localExtension = this.localRepository.getLocalExtension(extensionId);
 
         if (localExtension == null) {
+            notifyPushLevelProgress(2);
+
             try {
                 Extension extension = this.repositoryManager.resolve(extensionId);
+
+                notifyStepPropress();
 
                 if (extension.getType().equals(XarExtensionHandler.TYPE)) {
                     localExtension = this.localExtensionRepository.storeExtension(extension);
@@ -133,6 +146,8 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
                 throw new InstallException("Failed to find extension", e);
             } catch (LocalExtensionRepositoryException e) {
                 throw new InstallException("Failed save extension in local reposiory", e);
+            } finally {
+                notifyPopLevelProgress();
             }
         } else if (!localExtension.getType().equals(XarExtensionHandler.TYPE)) {
             localExtension = null;
@@ -157,10 +172,18 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
             return;
         }
 
-        LocalExtension localExtension = getLocalXARExtension(extensionId);
+        notifyPushLevelProgress(2);
 
-        if (localExtension != null) {
-            repairExtension(localExtension, namespace, dependency);
+        try {
+            LocalExtension localExtension = getLocalXARExtension(extensionId);
+
+            notifyStepPropress();
+
+            if (localExtension != null) {
+                repairExtension(localExtension, namespace, dependency);
+            }
+        } finally {
+            notifyPopLevelProgress();
         }
     }
 
@@ -173,22 +196,42 @@ public class RepairXarJob extends AbstractInstallPlanJob<InstallRequest>
     private void repairExtension(LocalExtension localExtension, String namespace, boolean dependency)
         throws InstallException
     {
-        for (ExtensionDependency extensionDependency : localExtension.getDependencies()) {
-            if (extensionDependency.getVersionConstraint().getVersion() == null) {
-                this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
-                    + " since there is no way to know what has been installed", extensionDependency.getId(),
-                    extensionDependency.getVersionConstraint());
-            } else {
+        notifyPushLevelProgress(2);
+
+        try {
+            Collection< ? extends ExtensionDependency> dependencies = localExtension.getDependencies();
+
+            if (!dependencies.isEmpty()) {
+                notifyPushLevelProgress(dependencies.size());
+
                 try {
-                    repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency
-                        .getVersionConstraint().getVersion()), namespace, true);
-                } catch (InstallException e) {
-                    this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+                    for (ExtensionDependency extensionDependency : dependencies) {
+                        if (extensionDependency.getVersionConstraint().getVersion() == null) {
+                            this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
+                                + " since there is no way to know what has been installed",
+                                extensionDependency.getId(), extensionDependency.getVersionConstraint());
+                        } else {
+                            try {
+                                repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency
+                                    .getVersionConstraint().getVersion()), namespace, true);
+                            } catch (InstallException e) {
+                                this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+                            }
+                        }
+
+                        notifyStepPropress();
+                    }
+                } finally {
+                    notifyPopLevelProgress();
                 }
             }
-        }
 
-        this.installedRepository.installExtension(localExtension, namespace, dependency);
+            notifyStepPropress();
+
+            this.installedRepository.installExtension(localExtension, namespace, dependency);
+        } finally {
+            notifyPopLevelProgress();
+        }
 
         this.logger.info("Successfully Repaired extension [{}] on namespace [{}]", localExtension, namespace);
     }

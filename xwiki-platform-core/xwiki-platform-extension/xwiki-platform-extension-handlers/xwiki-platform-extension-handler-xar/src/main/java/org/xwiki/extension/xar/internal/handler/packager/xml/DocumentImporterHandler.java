@@ -34,9 +34,7 @@ import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -50,8 +48,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class DocumentImporterHandler extends DocumentHandler
 {
-    private XarFile previousXarFile;
-
     private DefaultPackager packager;
 
     private XarEntryMergeResult mergeResult;
@@ -78,11 +74,6 @@ public class DocumentImporterHandler extends DocumentHandler
 
         this.packager = packager;
         this.importer = importer;
-    }
-
-    public void setPreviousXarFile(XarFile previousXarFile)
-    {
-        this.previousXarFile = previousXarFile;
     }
 
     public void setConfiguration(PackageConfiguration configuration)
@@ -163,16 +154,15 @@ public class DocumentImporterHandler extends DocumentHandler
     {
         XWikiDocument previousDocument = null;
 
-        if (this.previousXarFile != null) {
-            XWikiDocument document = getDocument();
-
+        XWikiDocument document = getDocument();
+        XarEntry xarEntry = new XarEntry(document.getSpace(), document.getName(), document.getLocale());
+        XarFile previousXarFile = this.configuration.getPreviousPages().get(xarEntry);
+        if (previousXarFile != null) {
             DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
 
-            XarEntry realEntry =
-                this.previousXarFile.getEntry(new EntityReference(document.getName(), EntityType.DOCUMENT,
-                    new EntityReference(document.getSpace(), EntityType.SPACE)), document.getRealLocale());
+            XarEntry realEntry = previousXarFile.getEntry(xarEntry.getDocumentReference(), xarEntry.getLocale());
             if (realEntry != null) {
-                this.packager.parseDocument(this.previousXarFile.getInputStream(realEntry), documentHandler);
+                this.packager.parseDocument(previousXarFile.getInputStream(realEntry), documentHandler);
 
                 previousDocument = documentHandler.getDocument();
             }

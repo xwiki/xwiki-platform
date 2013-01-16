@@ -406,22 +406,24 @@ var XWiki = (function(XWiki){
       // The 2px substracted correspond to one pixel of border on each side of the field,
       // this allows to have the suggestion box borders well aligned with the field borders.
       // FIXME this should be computed instead, since border might not always be 1px.
-      var containerWidth = this.options.width ? this.options.width : (this.fld.offsetWidth - 2)
+      var fieldWidth = this.fld.offsetWidth - 2;
+      var containerWidth = this.options.width || fieldWidth;
 
       if (this.options.align == 'left') {
         // Align the box on the left
         div.style.left = pos.left + "px";
       } else if (this.options.align == "center") {
         // Align the box to the center
-        div.style.left = pos.left + (this.fld.getWidth() - containerWidth - 2) / 2 + "px";
+        div.style.left = pos.left + (fieldWidth - containerWidth) / 2 + "px";
       } else {
         // Align the box on the right.
         // This has a visible effect only when the container width is not the same as the input width
-        div.style.left = (pos.left - containerWidth + this.fld.offsetWidth - 2) + "px";
+        div.style.left = (pos.left + fieldWidth - containerWidth) + "px";
       }
 
       div.style.top = (pos.top + this.fld.offsetHeight + this.options.offsety) + "px";
-      div.style.width = containerWidth + "px";
+      // Don't enforce the width if it wasn't specified to let the container adjust its width to fit the suggest items.
+      div.style[this.options.width ? 'width' : 'minWidth'] = containerWidth + "px";
 
       // set mouseover functions for div
       // when mouse pointer leaves div, set a timeout to remove the list after an interval

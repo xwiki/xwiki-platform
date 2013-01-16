@@ -19,6 +19,10 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -37,6 +41,10 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     private JobStatus jobStatus;
 
     private boolean logEnabled = false;
+
+    private Map<XarEntry, XarFile> previousPages;
+
+    private Set<String> entriesToImport;
 
     @Override
     public String getWiki()
@@ -91,5 +99,27 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     public void setLogEnabled(boolean logEnabled)
     {
         this.logEnabled = logEnabled;
+    }
+
+    @Override
+    public Set<String> getEntriesToImport()
+    {
+        return this.entriesToImport;
+    }
+
+    public void setEntriesToImport(Set<String> entriesToImport)
+    {
+        this.entriesToImport = entriesToImport;
+    }
+
+    @Override
+    public Map<XarEntry, XarFile> getPreviousPages()
+    {
+        return this.previousPages != null ? this.previousPages : Collections.<XarEntry, XarFile> emptyMap();
+    }
+
+    public void setPreviousPages(Map<XarEntry, XarFile> previousPages)
+    {
+        this.previousPages = previousPages;
     }
 }

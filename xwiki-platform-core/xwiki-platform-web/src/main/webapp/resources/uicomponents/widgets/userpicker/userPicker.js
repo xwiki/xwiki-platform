@@ -51,7 +51,8 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
     }, options || {}));
 
     var listInsertionElement = input;
-    if (input.hasClassName('withScope')) {
+    // The scope toggle doesn't make sense when global users are required.
+    if (input.hasClassName('withScope') && !input.hasClassName('global')) {
       this._sourceURL = options.script;
       this._createScope();
       listInsertionElement = input.up();
@@ -127,6 +128,17 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
       this._scope.src = "$xwiki.getSkinFile('icons/silk/world_delete.png')";
     }
     this.sources[0].script = this._sourceURL + 'wiki=' + this._scope.value + '&';
+  },
+
+  // @Override
+  detach: function($super) {
+    // Remove the list of accepted suggestions.
+    this._selectionManager && this._selectionManager.detach();
+
+    // Remove the scope toggle.
+    this._scope && this._scope.stopObserving('click').up().insert({before: this.fld}).remove();
+
+    $super();
   }
 });
 // Used to access the created user pickers.
@@ -148,7 +160,13 @@ var init = function(event) {
     containers.each(function(container) {
       container.select('input.suggest' + key.capitalize()).each(function(input) {
         if (!input.hasClassName('initialized')) {
-          new widgets.UserPicker(input, suggestionsMapping[key]);
+          var options = Object.clone(suggestionsMapping[key]);
+          // The picker suggests by default local users or groups.
+          if (input.hasClassName('global')) {
+            // Suggest global users or groups.
+            options.script = options.script + 'wiki=global&';
+          }
+          new widgets.UserPicker(input, options);
           input.addClassName('initialized');
         }
       });

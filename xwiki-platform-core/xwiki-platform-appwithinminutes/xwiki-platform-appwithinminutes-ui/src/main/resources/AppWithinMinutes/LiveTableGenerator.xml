@@ -24,65 +24,6 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false" filter="none"}}
-#macro(escapeApostrophe $string)
-$string.replace("'", "''")##
-#end
-
-#macro(prepareTranslations)
-${escapetool.h}set(${escapetool.d}originalMsg = ${escapetool.d}msg)
-${escapetool.h}set(${escapetool.d}msg = ${escapetool.d}services.dynamicMessageToolFactory.createDynamicMessageTool(${escapetool.d}msg, {
-##
-## Inject translations for the selected columns.
-#set($genericColumns = {
-'doc.title': '$msg.get(''platform.appwithinminutes.liveTableEditorDocTitleColumnName'')',
-'doc.name': '$msg.get(''platform.appwithinminutes.liveTableEditorDocNameColumnName'')',
-'doc.space': '$msg.get(''platform.appwithinminutes.liveTableEditorDocSpaceColumnName'')',
-'doc.fullname': '$msg.get(''platform.appwithinminutes.liveTableEditorDocFullNameColumnName'')',
-'doc.author': '$msg.get(''platform.appwithinminutes.liveTableEditorDocAuthorColumnName'')',
-'doc.creator': '$msg.get(''platform.appwithinminutes.liveTableEditorDocCreatorColumnName'')',
-'doc.date': '$msg.get(''platform.appwithinminutes.liveTableEditorDocDateColumnName'')',
-'doc.creationDate': '$msg.get(''platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'')',
-'_avatar': '$msg.get(''platform.appwithinminutes.liveTableEditorAvatarColumnName'')',
-'_images': '$msg.get(''platform.appwithinminutes.liveTableEditorImagesColumnName'')',
-'_attachments': '$msg.get(''platform.appwithinminutes.liveTableEditorAttachmentsColumnName'')',
-'_actions': '$msg.get(''platform.appwithinminutes.liveTableEditorActionsColumnName'')'
-})
-#foreach($column in $columns)
-## Default on the specified column name.
-#set($translatedColumnName = $column)
-#set($wrapper = "'")
-## Check if the column is based on a class field.
-#set($field = $xclass.get($column))
-#if($field)
-#set($translatedColumnName = "#escapeApostrophe($field.prettyName)")
-#if($field.type.endsWith('ListClass'))
-## Inject translations for the list values.
-#foreach($entry in $field.mapValues.entrySet())
-  '#escapeApostrophe("${className}_${column}_$entry.key")': '#escapeApostrophe($entry.value.value)',
-#end
-#end
-#elseif($genericColumns.containsKey($column))
-## A generic column.
-## Don't escape the apostrophes because we simply copy the translation.
-#set($translatedColumnName = $genericColumns.get($column))
-#set($wrapper = '')
-## The Actions column is a bit special.
-#if($column == '_actions')
-#set($actionNames = {'edit': '$msg.get(''platform.appwithinminutes.appLiveTableEditEntryActionName'')', 'delete': '$msg.get(''platform.appwithinminutes.appLiveTableDeleteEntryActionName'')'})
-#foreach($entry in $actionNames.entrySet())
-  '${shortName}.livetable._actions.${entry.key}': $entry.value,
-#end
-#end## Actions column
-#end## Generic column
-  '${shortName}.livetable.$column': $wrapper$translatedColumnName$wrapper##
-#if($velocityCount &lt; $columns.size())
-,
-#end
-#end## Selected columns
-
-}))
-#end
-
 #macro(prepareColumnProperties)
 ${escapetool.h}set(${escapetool.d}columnsProperties = {##
 #set($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
@@ -132,18 +73,14 @@ $separator
 
 #macro(generateLiveTable)
 {{{##
-{{include document="AppWithinMinutes.DynamicMessageTool" context="new" /}}
-
 {{velocity}}
 #set($className = $liveTableObj.getProperty('class').value)
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
-#prepareTranslations()
 #prepareColumnProperties()
 ${escapetool.h}set(${escapetool.d}options = {
   'className': '$className',
-  'resultPage' : 'AppWithinMinutes.LiveTableGenerator',
   'translationPrefix': '${shortName}.livetable.',
   'tagCloud': true,
   'rowCount': 15,
@@ -153,33 +90,10 @@ ${escapetool.h}set(${escapetool.d}options = {
 })
 ${escapetool.h}set(${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'$column'#end])
 ${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}columnsProperties ${escapetool.d}options)
-##
-## Restore the original message tool.
-${escapetool.h}set(${escapetool.d}msg = ${escapetool.d}originalMsg)
 {{/velocity}}##
 }}}
 #end
-
-#macro(outputLiveTableResults)
-  #set($output = "#gridresult($!request.classname $request.collist.split(','))")
-  ## We have to escape the translation key because it appears as JSON value in the output.
-  #set($escapedEmptyValueTranslationKey = $escapetool.javascript("${request.transprefix}emptyvalue"))
-  $output.replace($escapedEmptyValueTranslationKey, '-')
-#end
 {{/velocity}}{{velocity}}
-#set($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
-## We do the include separately because the wiki syntax is evaluated after the Velocity code.
-#if($isLiveTableResultsRequest)
-  {{include document="XWiki.LiveTableResultsMacros" /}}
-#end
-{{/velocity}}{{velocity wiki="false"}}
-## We need custom live table results just because we don't generate/register a document translation bundle yet.
-#if($isLiveTableResultsRequest)
-  #outputLiveTableResults()
-#end
-{{/velocity}}{{velocity}}
-#if(!$isLiveTableResultsRequest)
-  #maybeGenerateLiveTable()
-#end
+#maybeGenerateLiveTable()
 {{/velocity}}</content>
 </xwikidoc>

@@ -49,6 +49,7 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.message.TranslationMessageParser;
@@ -133,6 +134,12 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
     @Inject
     private AuthorizationManager authorizationManager;
+    
+    /**
+     * Used to access the current bundles.
+     */
+    @Inject
+    private TranslationBundleContext bundleContext;
 
     private Cache<TranslationBundle> bundlesCache;
 
@@ -253,6 +260,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 bundle = this.bundlesCache.get(uid);
                 if (bundle == null) {
                     bundle = createDocumentBundle(documentReference);
+                    this.bundlesCache.set(uid, bundle);
                 }
             }
         }
@@ -398,6 +406,8 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 createComponentDescriptor(document.getDocumentReference());
 
             getComponentManager(document, scope, true).registerComponent(descriptor, bundle);
+
+            this.bundleContext.addBundle(bundle);
         }
     }
 

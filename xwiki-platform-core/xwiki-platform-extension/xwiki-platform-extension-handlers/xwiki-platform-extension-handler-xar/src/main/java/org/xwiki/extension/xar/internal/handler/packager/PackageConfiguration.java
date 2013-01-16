@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -37,4 +40,8 @@ public interface PackageConfiguration
     JobStatus getJobStatus();
 
     boolean isLogEnabled();
+
+    Map<XarEntry, XarFile> getPreviousPages();
+
+    Set<String> getEntriesToImport();
 }

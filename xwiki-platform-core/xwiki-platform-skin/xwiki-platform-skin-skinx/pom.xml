@@ -113,7 +113,17 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>    
+      </plugin>
+      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/builddef.lst</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>

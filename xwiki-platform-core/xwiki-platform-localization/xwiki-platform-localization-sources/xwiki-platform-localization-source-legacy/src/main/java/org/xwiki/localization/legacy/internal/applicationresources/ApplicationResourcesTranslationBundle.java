@@ -24,7 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.internal.AbstractResourceTranslationBundle;
+import org.xwiki.localization.internal.AbstractURLResourceTranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
 
 /**
@@ -36,7 +36,7 @@ import org.xwiki.localization.message.TranslationMessageParser;
 @Component
 @Singleton
 @Named("resource:ApplicationResources")
-public class ApplicationResourcesTranslationBundle extends AbstractResourceTranslationBundle
+public class ApplicationResourcesTranslationBundle extends AbstractURLResourceTranslationBundle
 {
     /**
      * The parser to use for each message.

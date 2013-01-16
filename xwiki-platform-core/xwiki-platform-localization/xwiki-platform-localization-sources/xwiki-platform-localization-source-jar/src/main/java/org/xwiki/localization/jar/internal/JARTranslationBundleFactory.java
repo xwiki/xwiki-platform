@@ -49,7 +49,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
-import org.xwiki.localization.jar.internal.TranslationDocumentModel.Scope;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -151,7 +150,7 @@ public class JARTranslationBundleFactory implements TranslationBundleFactory, In
     {
         DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
 
-        descriptor.setImplementation(JARResourceTranslationBundle.class);
+        descriptor.setImplementation(JARFileTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
         descriptor.setRoleHint(ID + ':' + jarURL);
         descriptor.setRoleType(TranslationBundle.class);

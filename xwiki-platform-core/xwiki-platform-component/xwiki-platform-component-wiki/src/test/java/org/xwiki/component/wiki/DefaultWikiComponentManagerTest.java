@@ -92,19 +92,14 @@ public class DefaultWikiComponentManagerTest extends AbstractMockingComponentTes
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(rootComponentManager).getInstance(ComponentManager.class, "wiki");
+            allowing(rootComponentManager).getInstance(ComponentManager.class, "wiki");
             will(returnValue(componentManager));
+            oneOf(componentManager).registerComponent(with(any(ComponentDescriptor.class)), with(any(Object.class)));
             oneOf(componentManager).registerComponent(with(any(ComponentDescriptor.class)), with(any(Object.class)));
         }});
 
         this.wikiComponentManager.registerWikiComponent(this.component);
-
-        try {
-            this.wikiComponentManager.registerWikiComponent(this.component);
-            Assert.fail("Should have thrown an exception");
-        } catch (WikiComponentException expected) {
-            Assert.assertEquals("Component already registered. Try unregistering it first.", expected.getMessage());
-        }
+        this.wikiComponentManager.registerWikiComponent(this.component);
     }
 
     @Test

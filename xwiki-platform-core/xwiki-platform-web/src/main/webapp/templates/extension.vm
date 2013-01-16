@@ -94,7 +94,14 @@
       #if(!$extensionStatus)
         #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
       #end
-      #if ($extensionStatus.startsWith('installed'))
+      ## TODO: Find a better way to 'force' the repair XAR extension button.
+      #if ($xcontext.action == 'distribution' && $showRepairXARButton)
+        #set ($showRepairXARButton = $NULL)
+        #em_submitButton('extensions.actions.repairXAR' 'actionRepairXAR')
+        ## The repair job is executed without confirmation.
+        <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
+        <input name="confirm" value="1" type="hidden" />
+      #elseif ($extensionStatus.startsWith('installed'))
         ## This extension can be uninstalled.
         #extensionActionButton($extension 'uninstall' true)
       #elseif ($extensionStatus == 'remote')

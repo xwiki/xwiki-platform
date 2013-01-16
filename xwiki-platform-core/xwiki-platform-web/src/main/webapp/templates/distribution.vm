@@ -172,12 +172,7 @@
   #if ($request.previousUiId && $request.previousUiVersion)
     #set ($previousUi = $services.extension.resolve($request.previousUiId, $request.previousUiVersion))
   #end
-  #if ($previousUi)
-    ## Allow the user to mark the previous UI as installed.
-    <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIHint'))</div>
-    ## Wrap the extension in a DIV so that its bottom border is displayed.
-    <div>#displayExtension($previousUi)</div>
-  #else
+  #if (!$previousUi)
     <form action="" class="xform hidden">
       <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
       <p class="buttons">
@@ -229,6 +224,14 @@
           "<strong>$!escapetool.xml($request.previousUiVersion)</strong>"])</div>
       #end
     </form>
+  #elseif (!$previousUi.isInstalled('wiki:xwiki'))
+    ## Allow the user to repair the previous UI extension.
+    ## NOTE: We shouldn't get here unless the JavaScript is disabled. The following code was added explicitly to support this use case.
+    <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIHint'))</div>
+    ## TODO: Find a better way to 'force' the repair XAR extension button.
+    #set ($showRepairXARButton = true)
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    <div>#displayExtension($previousUi)</div>
   #end
 #end
 

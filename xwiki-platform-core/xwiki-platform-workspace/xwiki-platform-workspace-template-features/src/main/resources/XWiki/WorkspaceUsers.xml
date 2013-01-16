@@ -25,6 +25,129 @@
   <hidden>true</hidden>
   <object>
     <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.WorkspaceUsers</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>97a34330-a9ab-4bab-8295-73bb1a6ed2a9</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function() {
+  var addMembers = function(event) {
+    event &amp;&amp; event.stop();
+    var form = event.element().form;
+    if (form.select('ul.accepted-suggestions li').length == 0 &amp;&amp; $('userInput').value.strip() == '') {
+      // Nothing to add.
+      return;
+    }
+    new Ajax.Request("$xwiki.getURL('XWiki.XWikiAllGroup', 'get', 'xpage=adduorg')", {
+      parameters: form.serialize(),
+      onSuccess: function() {
+        // Clear the list of selected users.
+        XWiki.widgets.UserPicker.instances.userInput.clear();
+        // Reload the live table.
+        var end = editgrouptable.limit;
+        var start = Math.max(editgrouptable.lastOffset, 1);
+        editgrouptable.clearCache();
+        editgrouptable.getRows(start, end, start, end);
+        // Show notification message.
+        new XWiki.widgets.Notification("$msg.get('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+      },
+      onFailure: function(response) {
+        new XWiki.widgets.Notification("$msg.get('xe.admin.groups.addFailure')" + response.statusText, 'error', {timeout: 5});
+      }
+    });
+  }
+  var init = function() {
+    $('addMembers') &amp;&amp; $('addMembers').observe('click', addMembers);
+    return true;
+  };
+  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+})()</code>
+    </property>
+    <property>
+      <name>Code</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
       <customMapping/>
@@ -103,16 +226,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#inputContainer {
-  display: inline-block;
-  width: 99%;
-}
-
-#messageContainer textarea {
-  margin-top: 0;
-}
-
-#candidates {
+      <code>#candidates {
   padding-left: 4px;
 }
 
@@ -165,28 +279,15 @@
     </property>
   </object>
   <content>{{velocity output="false"}}
-#set($mainwk = $xcontext.isMainWiki())
-$xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
-$xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css')
-$xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
-$xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
-$xwiki.ssx.use('XWiki.WorkspaceUsers')
-
-## Use the XWikiAllGroup as the group target
+## Use XWikiAllGroup as the group target.
 #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
-
 #macro(hasGroupRight $right $hasGroupRight)
-  #set($result = false)
-  #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
-    #set($result = true)
-  #end
+  #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
   #set($hasGroupRight = $NULL)
   #setVariable("$hasGroupRight" $result)
 #end
 #hasGroupRight('edit' $hasEditGroupRight)
 #hasGroupRight('delete' $hasDeleteGroupRight)
-##
-##
 {{/velocity}}
 
 {{velocity}}
@@ -242,41 +343,42 @@ $msg.get('platform.workspace.candidateHandledComment') ${request.reviewerComment
     #end
   #end
 #elseif($hasAdmin &amp;&amp; $request.inviteUser)
-  ## Handle inviting a user.
+  ## Handle inviting users.
   ##
-  #set ($userName = $request.userName)
+  #set ($names = [])
+  #set ($namesArray = $request.getParameterValues('name'))
+  #set ($discard = $names.addAll($namesArray.subList(0, $namesArray.size())))
+  #set ($discard = $names.removeAll(['']))
   #set ($message = $request.message)
-  #set ($okToInvite = "$!{userName}" != '')
   ##
-  #if ($okToInvite)
-    #set ($isMember = ("$!{groupDoc.getObject($xwikiGroupsClass, 'member', $userName)}" != ''))
-    #if ($isMember)
-      #set ($okToInvite = false)
-      {{error}}$msg.get('platform.workspace.inviteUserAlreadyMember'){{/error}}
+  ## Remove users that are already members.
+  #set ($alreadyMembers = [])
+  #foreach ($name in $names)
+    #if ($groupDoc.getObject($xwikiGroupsClass, 'member', $name))
+      #set ($discard = $alreadyMembers.add($name))
+      {{error}}$msg.get('platform.workspace.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
     #end
   #end
+  #set ($discard = $names.removeAll($alreadyMembers))
   ##
-  #if ($okToInvite)
-    #set ($candidateMembers = $groupDoc.getObjects($candidateClass, 'userName', $userName))
-    #set ($requestExists = false)
-    #set ($invitationExists = false)
-    #foreach ($candidateMember in $candidateMembers)
+  ## Remove users that have already been invited.
+  #set ($alreadyInvited = [])
+  #foreach ($name in $names)
+    #foreach ($candidateMember in $groupDoc.getObjects($candidateClass, 'userName', $name))
       #if ($candidateMember.getProperty('status').getValue() == 'pending')
+        #set ($errorMessageKey = 'platform.workspace.inviteUserAlreadyInvited')
         #if ($candidateMember.getProperty('type').getValue() == 'request')
-          #set ($requestExists = true)
-          {{error}}$msg.get('platform.workspace.inviteRequestAlreadyExists'){{/error}}
-        #else
-          #set ($invitationExists = true)
-          {{error}}$msg.get('platform.workspace.inviteUserAlreadyInvited'){{/error}}
+          #set ($errorMessageKey = 'platform.workspace.inviteRequestAlreadyExists')
         #end
-        #set ($okToInvite = false)
-        ## Stop here.
+        {{error}}$msg.get($errorMessageKey, [$xwiki.getUserName($name, false)]){{/error}}
+        #set ($discard = $alreadyInvited.add($name))
         #break
       #end
     #end
   #end
+  #set ($discard = $names.removeAll($alreadyInvited))
   ##
-  #if ($okToInvite)
+  #foreach ($userName in $names)
     #set ($newInvitationObject = $groupDoc.newObject($candidateClass))
     #set ($temp = $newInvitationObject.set('status', 'pending'))
     #set ($temp = $newInvitationObject.set('type', 'invitation'))
@@ -296,7 +398,7 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
     #end
     #set ($userDocumentReference = $services.model.resolveDocument($userName))
     #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-    {{info}}$msg.get('platform.workspace.inviteSuccess'){{/info}}
+    {{info}}$msg.get('platform.workspace.inviteSuccess', [$xwiki.getUserName($userName, false)]){{/info}}
   #end
 #elseif ($hasAdmin &amp;&amp; $request.cancelInvitation)
   ##
@@ -317,117 +419,45 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
 #end
 
 ##
-## In the original sheet, this was displayed only when in inline edit mode. 
+## In the original sheet, this was displayed only in edit mode. 
 #if($hasEditGroupRight)
 {{html}}
+#userPicker_import()
+#set ($discard = $xwiki.ssx.use('XWiki.WorkspaceUsers'))
+#set ($discard = $xwiki.jsx.use('XWiki.WorkspaceUsers'))
 &lt;form id='inviteUserForm' class='xform half'&gt;
-&lt;h2&gt;$msg.get('workspacemanager.member.add')&lt;/h2&gt;
+  &lt;h2&gt;$msg.get('workspacemanager.member.add')&lt;/h2&gt;
   &lt;dl&gt;
-    &lt;div id='inputContainer'&gt;
-      &lt;div id='userNameContainer'&gt;
-        &lt;dt&gt;
-          &lt;label for='userName'&gt;$msg.get('platform.workspace.inviteUserNameLabel')&lt;/label&gt;
-          &lt;div class='xHint'&gt;$msg.get('platform.workspace.inviteUserNameHint')&lt;/div&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;input id='userSuggest' type='text' size='30' name='userName' autocomplete='off' /&gt;
-          &lt;span id='errMsg' class='xErrorMsg'&gt;&lt;/span&gt;
-        &lt;/dd&gt;
-      &lt;/div&gt;
-      &lt;div id='messageContainer'&gt;
-        &lt;dt&gt;
-          &lt;label for='message'&gt;$msg.get('platform.workspace.inviteMessageLabel')&lt;/label&gt;
-          &lt;div class='xHint'&gt;$msg.get('platform.workspace.inviteMessageHint')&lt;/div&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;textarea name='message' /&gt;
-        &lt;/dd&gt;
-      &lt;/div&gt;
-      &lt;div class='clearfloats'&gt;&lt;/div&gt;
-    &lt;/div&gt;
-    &lt;br/&gt;
-    &lt;div id='addInviteButtonContainer'&gt;
-      &lt;span class='buttonwrapper'&gt;
-        &lt;input id='addNewUser' type='button' class='button' name='addUser' value="$msg.get('xe.admin.groups.addUser.submit')"/&gt;
-      &lt;/span&gt;
-      &lt;span class='buttonwrapper'&gt;
-        &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser' value="$msg.get('platform.workspace.inviteInviteButtonLabel')"/&gt;
-      &lt;/span&gt;
-    &lt;/div&gt;
+    &lt;dt&gt;
+      &lt;label for='userInput'&gt;$msg.get('platform.workspace.inviteUserNameLabel')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('platform.workspace.inviteUserNameHint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      ## The workspace can accept only global users.
+      &lt;input type="text" id="userInput" name="name" class="suggestUsers multipleSelection global" /&gt;
+    &lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for='message'&gt;$msg.get('platform.workspace.inviteMessageLabel')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$msg.get('platform.workspace.inviteMessageHint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;textarea name='message'&gt;&lt;/textarea&gt;
+    &lt;/dd&gt;
   &lt;/dl&gt;
-  &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
-  &lt;input type='hidden' name='section' value='XWiki.WorkspaceUsers'/&gt;
+  &lt;p class="buttons"&gt;
+    &lt;span class='buttonwrapper'&gt;
+      &lt;input type="submit" id="addMembers" class="button" value="$msg.get('xe.admin.groups.addUser.submit')" /&gt;
+    &lt;/span&gt;
+    &lt;span class='buttonwrapper'&gt;
+      &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser' value="$msg.get('platform.workspace.inviteInviteButtonLabel')"/&gt;
+    &lt;/span&gt;
+  &lt;/p&gt;
+  &lt;div class="hidden"&gt;
+    &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
+    &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
+    &lt;input type='hidden' name='section' value='XWiki.WorkspaceUsers'/&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
-  ##
-  ##
-  &lt;script type="text/javascript"&gt;
-    // &lt;![CDATA[
-      if (typeof XWiki == "undefined") {
-        var XWiki = {}; 
-      }
-      Object.extend(XWiki, {
-        groupmanager : {
-          /*
-          ** Initialize Group Manager javascript widgets (called on document load).
-          */
-          userSuggest: null,
-
-          groupSuggest: null,
-
-          init: function() {
-              /* Initialize everything also in view mode */
-              this.initSuggestWidget();
-              this.initAddNewMemberWidget();
-          },
-          initSuggestWidget: function() {
-            if ($('userSuggest')) {
-              $('userSuggest').observe('focus', this.createSuggest.bind(this, $('userSuggest'), 'user', true));
-            } 
-          },
-          initAddNewMemberWidget: function() {
-            if ($('addNewUser')) {
-              $('addNewUser').observe('click', this.addNewMember.bind(this, 'user', $('userSuggest')));
-            }
-          },
-          createSuggest: function(input, uorg, suggestObj) {
-            // Clear the errors
-            $('errMsg').innerHTML = "";
-            suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers')}";
-            suggesturl += "&amp;uorg=user&amp;wiki=global" + "&amp;";
-            icon = "$xwiki.getSkinFile('icons/silk/user.png')";
-
-            return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });
-          },
-          addNewMember: function(uorg, input) {
-            if (input) {
-              var url = "${groupDoc.getURL()}?xpage=adduorg&amp;uorg=" + encodeURIComponent(uorg) + "&amp;name=" + encodeURIComponent(input.value) + "&amp;form_token=$!{escapetool.url($services.csrf.getToken())}";
-              new Ajax.Request(url, {
-                method: 'get',
-                onSuccess: function(transport) {
-                  $('userSuggest').value = "";
-                  var nr = parseInt(transport.responseText);
-                  if (nr == 0) {
-                    if (uorg == "user") {
-                      $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addUser.duplicate')";
-                    } 
-                  } else {
-                    var end = editgrouptable.limit;
-                    var start = editgrouptable.lastOffset;
-                    editgrouptable.clearCache();
-                    if (start &lt; 1) {
-                      start = 1;
-                    }
-                    editgrouptable.getRows(start, end, start, end);
-                  }
-                }
-              });
-            }
-          }
-        }
-      });
-      XWiki.groupmanager.init();
-    // ]]&gt;
-  &lt;/script&gt;
 {{/html}}
 #end
 

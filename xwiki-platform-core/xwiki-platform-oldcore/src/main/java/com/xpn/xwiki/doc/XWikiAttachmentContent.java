@@ -42,6 +42,9 @@ import org.xwiki.store.UnexpectedException;
  */
 public class XWikiAttachmentContent implements Cloneable
 {
+    /** An empty byte array returned for empty attachment contents. */
+    private static final byte[] NULLFILE = new byte[0];
+
     /** The XWikiAttachment (attachment metadata) which this attachment content is associated with. */
     private XWikiAttachment attachment;
 
@@ -75,7 +78,6 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent(XWikiAttachment attachment)
     {
-        this();
         this.setAttachment(attachment);
     }
 
@@ -84,7 +86,6 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent()
     {
-        this.file = this.getNewFileItem();
     }
 
     /**
@@ -144,6 +145,9 @@ public class XWikiAttachmentContent implements Cloneable
     @Deprecated
     public byte[] getContent()
     {
+        if (this.file == null) {
+            return NULLFILE;
+        }
         return this.file.get();
     }
 
@@ -214,6 +218,9 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public InputStream getContentInputStream()
     {
+        if (this.file == null) {
+            return new ByteArrayInputStream(NULLFILE);
+        }
         try {
             return new AutoCloseInputStream(this.file.getInputStream());
         } catch (IOException e) {
@@ -250,6 +257,9 @@ public class XWikiAttachmentContent implements Cloneable
                 super.close();
                 xac.file = fi;
                 xac.setContentDirty(true);
+                if (xac.attachment != null) {
+                    xac.attachment.setFilesize(xac.getSize());
+                }
             }
         });
     }
@@ -278,11 +288,12 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is) throws IOException
     {
-        this.file = this.getNewFileItem();
-        IOUtils.copy(is, this.file.getOutputStream());
-        this.setContentDirty(true);
-
-        this.attachment.setFilesize(this.getSize());
+        OutputStream fios = getContentOutputStream();
+        try {
+            IOUtils.copy(is, fios);
+        } finally {
+            fios.close();
+        }
     }
 
     /**
@@ -291,7 +302,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public int getSize()
     {
-        return (int) this.file.getSize();
+        return (this.file != null) ? (int) this.file.getSize() : 0;
     }
 
     /**

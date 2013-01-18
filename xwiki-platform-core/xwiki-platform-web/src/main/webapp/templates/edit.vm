@@ -34,7 +34,7 @@
       ## Determine the sheets using the default document translation because objects are accessible only from the default translation.
       #if(!$services.sheet.getSheets($doc, $context.action).isEmpty())
         #set($editor = 'inline')
-      #elseif(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
+      #elseif(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()) && $services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
         #set($editor = 'wysiwyg')
       #else
         #set($editor = 'wiki')

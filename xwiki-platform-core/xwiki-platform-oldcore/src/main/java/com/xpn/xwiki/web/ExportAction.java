@@ -39,10 +39,6 @@ import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.user.api.XWikiRightService;
-
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Exports in XAR, PDF, RTF or HTML formats.
@@ -100,23 +96,62 @@ public class ExportAction extends XWikiAction
                 name = context.getDoc().getFullName();
             }
         } else {
-
-            final DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-            final EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
-
-            final String userName = context.getUserReference() == null 
-                ? XWikiRightService.GUEST_USER_FULLNAME
-                : serializer.serialize(context.getUserReference());
-
+            Map<String, Object[]> wikiQueries = new HashMap<String, Object[]>();
             for (int i = 0; i < pages.length; ++i) {
+                String pattern = pages[i];
 
-                final String pageParam = pages[i];
-
-                final String pageName = serializer.serialize(resolver.resolve(pageParam));
-
-                if (context.getWiki().getRightService().hasAccessLevel("view", userName, pageName, context)) {
-                    pageList.add(pageName);
+                String wikiName;
+                if (pattern.contains(":")) {
+                    int index = pattern.indexOf(':');
+                    wikiName = pattern.substring(0, index);
+                    pattern = pattern.substring(index + 1);
+                } else {
+                    wikiName = context.getDatabase();
                 }
+
+                StringBuffer where;
+                List<String> params;
+
+                if (!wikiQueries.containsKey(wikiName)) {
+                    Object[] query = new Object[2];
+                    query[0] = where = new StringBuffer("where ");
+                    query[1] = params = new ArrayList<String>();
+                    wikiQueries.put(wikiName, query);
+                } else {
+                    Object[] query = wikiQueries.get(wikiName);
+                    where = (StringBuffer) query[0];
+                    params = (List<String>) query[1];
+                }
+
+                if (i > 0) {
+                    where.append(" or ");
+                }
+
+                where.append("doc.fullName like ?");
+                params.add(pattern);
+            }
+
+            String database = context.getDatabase();
+            try {
+                for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
+                    String wikiName = entry.getKey();
+                    Object[] query = entry.getValue();
+                    String where = ((StringBuffer) query[0]).toString();
+                    @SuppressWarnings("unchecked")
+                    List<String> params = (List<String>) query[1];
+
+                    context.setDatabase(wikiName);
+                    List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
+                    for (String docName : docsNames) {
+                        String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
+                        if (context.getWiki().getRightService()
+                            .hasAccessLevel("view", context.getUser(), pageReference, context)) {
+                            pageList.add(pageReference);
+                        }
+                    }
+                }
+            } finally {
+                context.setDatabase(database);
             }
         }
 

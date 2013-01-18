@@ -458,3 +458,5 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# 
 #-# The default is:
 # extension.userAgent=XWikiExtensionManager
+
+$!xwikiPropertiesAdditionalProperties

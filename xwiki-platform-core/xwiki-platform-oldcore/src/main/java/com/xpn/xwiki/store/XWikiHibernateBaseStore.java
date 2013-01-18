@@ -23,8 +23,6 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,8 +62,6 @@ import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.ListProperty;
 
 public class XWikiHibernateBaseStore implements Initializable
 {
@@ -491,9 +487,7 @@ public class XWikiHibernateBaseStore implements Initializable
             stmt = connection.createStatement();
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
         } catch (Exception e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Failed creating schema update script", e);
-            }
+            throw new HibernateException("Failed creating schema update script", e);
         } finally {
             try {
                 if (stmt != null) {
@@ -518,7 +512,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param createSQL
      * @param context
      */
-    public void updateSchema(String[] createSQL, XWikiContext context)
+    public void updateSchema(String[] createSQL, XWikiContext context) throws HibernateException
     {
         // Updating the schema for custom mappings
         Session session;
@@ -548,9 +542,7 @@ public class XWikiHibernateBaseStore implements Initializable
             }
             connection.commit();
         } catch (Exception e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Failed updating schema while executing query [" + sql + "]", e);
-            }
+            throw new HibernateException("Failed updating schema while executing query [" + sql + "]", e);
         } finally {
             try {
                 if (stmt != null) {
@@ -579,7 +571,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param context
      * @throws com.xpn.xwiki.XWikiException
      */
-    public void updateSchema(BaseClass bclass, XWikiContext context) throws XWikiException
+    public void updateSchema(BaseClass bclass, XWikiContext context) throws XWikiException, HibernateException
     {
         String custommapping = bclass.getCustomMapping();
         if (!bclass.hasExternalCustomMapping()) {

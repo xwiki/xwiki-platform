@@ -151,7 +151,7 @@ The following configuration is used:
 #set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCConfiguration'))
 #set ($localircconfigdoc = $ircconfigdoc)
 #if ($ircconfigdoc.isNew())
-  #set ($ircconfigdoc = $xwiki.getDocument($services.model.createDocumentReference('', 'IRC', 'IRCConfiguration')))
+  #set ($ircconfigdoc = $xwiki.getDocument($services.model.createDocumentReference('', 'IRC', 'IRCConfiguration', 'default')))
 #end
 #set ($discard = $ircconfigdoc.use($doc.fullName))
 * Server: {{box}}$ircconfigdoc.getValue('server'){{/box}}
@@ -159,7 +159,7 @@ The following configuration is used:
 * Bot name: {{box}}$ircconfigdoc.getValue('botname'){{/box}}
 
 #if ($localircconfigdoc.isNew())
-There's no ##IRC.IRCConfiguration## document in this wiki, defaulting to the main wiki [[IRC Configuration page&gt;&gt;$xwiki.model.serialize($ircconfigdoc)]].
+There's no IRC.IRCConfiguration document in this wiki, defaulting to the main wiki [[IRC Configuration page&gt;&gt;$services.model.serialize($ircconfigdoc.documentReference)]].
 #else
 To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfiguration]].
 #end

@@ -546,7 +546,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
   (((
     (% id="PanelListSection" %)
     (((
-      (% id="draganddroptooltip" class="hastooltip" title="${escapetool.xml($msg.get('panelwizard.tip'))}"%)$msg.get('panelwizard.draganddrop')(%%)
+      (% id="draganddroptooltip" class="hastooltip" title="${msg.get('panelwizard.tip')}"%)$msg.get('panelwizard.draganddrop')(%%)
       #set ($panelClass = $xwiki.getDocument('Panels.PanelClass').xWikiClass)
       #set ($categoryList = $panelClass.category.getProperty('values').value.split('[|]'))
       #set ($panelsList = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName &lt;&gt; ''Panels.PanelTemplate''').execute())
@@ -649,16 +649,16 @@ div.pagelayoutoption:hover .lmleftcolumn,
             (((
               #set ($categPanels = $categoryMap.get($category))
               #if ($categPanels.size() == 0)
-                $escapetool.xml($msg.get('panelwizard.nopanels'))
+                $msg.get('panelwizard.nopanels')
               #else
                 #foreach ($item in $categPanels)
                   #set ($panelDoc = $xwiki.getDocument($item))
                   #set ($obj = $panelDoc.getObject('Panels.PanelClass'))
                   (% class="panelitemc" %)
                   (((
-                    (% class="label" %)((($escapetool.xml($doc.display('name', $obj)))))
-                    (% id="panelContainer${panelCount}" class="panelcontainer" title="${escapetool.xml($doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', ''))}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
-                    (% class="xwikibuttonlink" %)((([[$escapetool.xml($msg.get('edit'))&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$escapetool.xml($msg.get('delete'))&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
+                    (% class="label" %)((($doc.display('name', $obj))))
+                    (% id="panelContainer${panelCount}" class="panelcontainer" title="${doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', '')}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
+                    (% class="xwikibuttonlink" %)((([[$msg.get('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$msg.get('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
                   )))
                   #set ($panelCount = $panelCount + 1)
                 #end## foreach panel
@@ -672,7 +672,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
 
     (% id="PageLayoutSection" %)
     (((
-      $escapetool.xml($msg.get('panelwizard.choosepagelayout'))
+      $msg.get('panelwizard.choosepagelayout')
 
       #set($crtlayout = 0)
       #if($showLeftPanels and $showLeftPanels == "1")
@@ -715,16 +715,11 @@ div.pagelayoutoption:hover .lmleftcolumn,
   (% id="panelwizardbuttons" class="floatcontainer" %)
   (((
     (% class="xwikibuttonlink" %)
-      (% class="buttonwrapper" %)[[$escapetool.xml($msg.get('xe.panels.wizard.savenew'))&gt;&gt;path:#||id="saveLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$escapetool.xml($msg.get('xe.panels.wizard.revert'))&gt;&gt;$doc.fullName||id="revertLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$escapetool.xml($msg.get('xe.panels.wizard.homepage'))&gt;&gt;Panels.WebHome]](%%) ##
+      (% class="buttonwrapper" %)[[$msg.get('xe.panels.wizard.savenew')&gt;&gt;path:#||id="saveLayout"]](%%) ##
+      (% class="buttonwrapper" %)[[$msg.get('xe.panels.wizard.revert')&gt;&gt;$doc.fullName||id="revertLayout"]](%%) ##
+      (% class="buttonwrapper" %)[[$msg.get('xe.panels.wizard.homepage')&gt;&gt;Panels.WebHome]](%%) ##
     (%%)
   )))
-#else
-  {{html clean="false"}}
-  #xwikimessageboxstart($escapetool.xml($msg.get('panelwizard.paneleditor')) $escapetool.xml($msg.get('panelwizard.needadminright')))
-  #xwikimessageboxend()
-  {{/html}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

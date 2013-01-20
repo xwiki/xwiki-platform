@@ -1,41 +1,35 @@
-## get the number of columns from the parameter
+/* Get the number of columns from the request parameter. */
 #set ($columns = "$!request.columns")
 #set ($columnsNumber = $mathtool.toInteger($columns))
 #if (!$columnsNumber || $columnsNumber <= 0)
   #set ($columnsNumber = 1)
 #end
-## don't fill 100% because IE doesn't fit things properly in
+/* Don't fill 100% because IE doesn't fit things properly in. */
 #set($columnsTotalWidth = 99)
-## 1.5% padding right to all the columns except last one
+/* 1.5% padding right to all the columns except last one. */
 #set($columnPadding = 0.75)
-## compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. 
+/* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. */
 #set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columnsNumber - 1)) / $columnsNumber))
 #set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
 
-## FIXME: this style should not be here, it's style for the container overall, not for the columns layout. 
-## For the moment it's here to minimize the number of requested csss, 
-## since there are no other container rules at the moment (like border, title, or other decoration).
+/* FIXME: this style should not be here, it's style for the container overall, not for the columns layout. For the moment
+   it's here to minimize the number of requested css, since there are no other container rules at the moment (like
+   border, title, or other decoration). */
 .container-justified {
   text-align: justify;
 }
 
-## set all the styles computed above
-
 .container-columns .column {
   float: left;
-  width: ${computedColumnWidth}%;
-  padding-right: ${columnPadding}%;
-  padding-left: ${columnPadding}%;
+  width: $computedColumnWidth%;
+  padding-right: $columnPadding%;
+  padding-left: $columnPadding%;
 }
 
-/* Make sure that the columns take space when they're empty: if height is auto, and they are floated, 
-   they will collapse as if they didn't exist, which breaks the layout */
+/* Make sure that the columns take space when they're empty: if height is auto, and they are floated, they will collapse
+   as if they didn't exist, which breaks the layout */
 .container-columns .column {
   min-height: 10px;
-}
-/* And for IE6, which doesn't understand the min-height */
-* html .container-columns .column {
-  height: 10px;
 }
 
 .container-columns .first-column {

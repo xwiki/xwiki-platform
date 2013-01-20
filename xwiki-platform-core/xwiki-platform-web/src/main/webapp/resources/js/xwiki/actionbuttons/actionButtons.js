@@ -66,7 +66,7 @@ actionButtons.EditActions = Class.create({
         return false;
       }
     }
-    #if($xwiki.isEditCommentMandatory())
+    if ($xwiki.isEditCommentMandatory()) {
       var commentField = form.comment
       while (commentField.value == "") {
         var response = prompt("${msg.get('core.comment.prompt')}", '');
@@ -75,7 +75,7 @@ actionButtons.EditActions = Class.create({
         }
         commentField.value = response;
       }
-    #elseif($xwiki.isEditCommentSuggested())
+    } else if ($xwiki.isEditCommentSuggested()) {
       var commentField = form.comment
       if (commentField.value == "") {
         var response = prompt("${msg.get('core.comment.prompt')}", '');
@@ -84,7 +84,7 @@ actionButtons.EditActions = Class.create({
         }
         commentField.value = response;
       }
-    #end
+    }
     return true;
   },
   onCancel : function(event) {

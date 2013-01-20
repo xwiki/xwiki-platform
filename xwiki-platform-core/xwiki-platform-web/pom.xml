@@ -133,15 +133,12 @@
               <exclude>**/*-min.js</exclude>
               <exclude>**/*-debug.js</exclude>
               <exclude>**/langs/*.js</exclude>
-              <!-- Exclude files with Velocity inside -->
-              <exclude>**/actionButtons.js</exclude>
-              <exclude>**/notification.css</exclude>
-              <exclude>**/usersandgroups.js</exclude>
-              <exclude>**/columns.css</exclude>
-              <exclude>**/gallery.css</exclude>
-              <exclude>**/modalPopup.css</exclude>
+              <!-- Exclude files with complex Velocity code inside -->
+              <!-- This one iterates over xobjects of type XWiki.SearchSuggestSourceClass -->
               <exclude>**/searchSuggest.js</exclude>
-              <exclude>**/upload.js</exclude>
+              <!-- The following stylesheets use the css3_backgroundLinearGradient Velocity macro which expects a map as
+                parameter and the curly brackets have special meaning in CSS. -->
+              <exclude>**/modalPopup.css</exclude>
               <exclude>**/dashboard.css</exclude>
             </excludes>
           </configuration>

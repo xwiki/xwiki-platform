@@ -359,24 +359,20 @@ var XWiki = (function(XWiki) {
     }
   });
 
+  // Determine the configured maximum attachment size.
+  var maxAttachmentSize = '$!escapetool.javascript($xwiki.getSpacePreference("upload_maxsize"))';
+  // 32MB is the default maximum size used inside the FileUploadPlugin.
+  // There's no easy way of getting that internal value, so we just assume it didn't change.
+  maxAttachmentSize = parseInt(maxAttachmentSize || 33554432);
+
   /**
    * HTML5 file uploader associated with an input of type file.
    */
   XWiki.FileUploader = Class.create({
-    ##
-    ## Determine the configured maximum attachment size
-    #set ($maxAttachmentSize = "$!xwiki.getSpacePreference('upload_maxsize')")
-    #if ($maxAttachmentSize == '')
-      ## 32MB is the default maximum size used inside the FileUploadPlugin;
-      ## there's no easy way of getting that internal value, so we just assume it didn't change
-      #set ($maxAttachmentSize = 33554432)
-    #else
-      #set ($maxAttachmentSize = $mathtool.toInteger($maxAttachmentSize))
-    #end
     /** Default configuration. */
     options : {
       /** Maximum accepted file size. */
-      maxFilesize : ${maxAttachmentSize},
+      maxFilesize : maxAttachmentSize,
       /** Regular expression defining accepted MIME types. */
       fileFilter  : /.*/i,
       /** Should information (name, type, size) about each selected file be displayed? */

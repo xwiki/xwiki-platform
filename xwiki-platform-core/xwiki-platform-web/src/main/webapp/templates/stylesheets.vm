@@ -28,9 +28,6 @@
 <!--[if IE]>
   <link href="$xwiki.getSkinFile('ie-all.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" />
 <![endif]-->
-<!--[if IE 6]>
-  <link href="$xwiki.getSkinFile('ie-6.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" />
-<![endif]-->
 ## Hook for inserting CSS skin extensions
 ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
 <!-- com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin -->

@@ -35,6 +35,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
@@ -49,6 +50,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <disabled>0</disabled>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -58,6 +60,7 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <name>
+        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <prettyName>Name</prettyName>
@@ -66,6 +69,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parse>
+        <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
@@ -76,6 +80,7 @@
       </parse>
       <use>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
@@ -190,17 +195,17 @@ $xwiki.ssx.use('Main.Dashboard')##
 ##
 ## Set application variables (action and tag) from URL parameters.
 ##
-#set($do = "$!{request.get('do')}")
-#set($tag = "$!{request.get('tag')}")
-#set($urlEscapedTag = $escapetool.url($tag))
-#set($htmlEscapedTag = $escapetool.xml($tag))
+#set ($do = "$!{request.get('do')}")
+#set ($tag = "$!{request.get('tag')}")
+#set ($urlEscapedTag = $escapetool.url($tag))
+#set ($htmlEscapedTag = $escapetool.xml($tag))
 ##
 ## Macro displayTagAppTitle. Display level1 title of this app.
 ##
-#macro(displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
+#macro (displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
   (% class="xapp" %)
   = (% class="highlight tag" %)[[$tag&gt;&gt;$doc.fullName||queryString="do=viewTag&amp;tag=${urlEscapedTag}"]]##
-      #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
+      #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
         [[Rename&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[Delete&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
       #end
     (%%) =
@@ -209,16 +214,16 @@ $xwiki.ssx.use('Main.Dashboard')##
 ## Switch between all possible actions:
 ## viewTag, prepareRename, rename, prepareDelete, delete, default (Tag cloud)
 ##
-#if($do == 'viewTag')
+#if ($do == 'viewTag')
   ##
   ## View tag
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag true)
-  #if("$!{request.get('renamedTag')}" != '')
+  #if ("$!{request.get('renamedTag')}" != '')
     {{info}}$msg.get('xe.tag.rename.success', ["//${request.get('renamedTag')}//"]){{/info}}
 
   #end
-  #set($list = $xwiki.tag.getDocumentsWithTag($tag))
+  #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
   {{container layoutStyle="columns"}}
     (((
       (% class="xapp" %)
@@ -233,7 +238,7 @@ $xwiki.ssx.use('Main.Dashboard')##
       {{activity tags="$tag" /}}
     )))
   {{/container}}
-#elseif($do == 'prepareRename')
+#elseif ($do == 'prepareRename')
   ##
   ## Prepare rename tag
   ##
@@ -248,22 +253,22 @@ $xwiki.ssx.use('Main.Dashboard')##
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
-#elseif($do == 'renameTag')
+#elseif ($do == 'renameTag')
   ##
   ## Rename tag
   ##
-  #set($renameTo = "$!{request.get('renameTo')}")
-  #set($success = false)
+  #set ($renameTo = "$!{request.get('renameTo')}")
+  #set ($success = false)
   #if ($renameTo != '')
-    #set($success = $xwiki.tag.renameTag($tag, $renameTo))
+    #set ($success = $xwiki.tag.renameTag($tag, $renameTo))
   #end
   #if ($success == true || $success == 'OK')
-   #set($urlEscapedRenameTo = $escapetool.url($renameTo))
+   #set ($urlEscapedRenameTo = $escapetool.url($renameTo))
    $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
   #else
     {{error}}$msg.get('xe.tag.rename.failure', ["//${tag}//", "//${renameTo}//"]){{/error}}
   #end
-#elseif($do == 'prepareDelete')
+#elseif ($do == 'prepareDelete')
   ##
   ## Prepare delete tag
   ##
@@ -278,11 +283,11 @@ $xwiki.ssx.use('Main.Dashboard')##
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
-#elseif($do == 'deleteTag')
+#elseif ($do == 'deleteTag')
   ##
   ## Delete tag
   ##
-  #set($success = $xwiki.tag.deleteTag($tag))
+  #set ($success = $xwiki.tag.deleteTag($tag))
   #if ($success == true || $success == 'OK')
     $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
   #else
@@ -292,13 +297,12 @@ $xwiki.ssx.use('Main.Dashboard')##
   ##
   ## View all tags (Tag Cloud)
   ##
-  #set($tags = $xwiki.tag.getTags(true))
-  #set($title = 'All Tags')
-  #if("$!{request.get('deletedTag')}" != '')
+  #set ($title = 'All Tags')
+  #if ("$!{request.get('deletedTag')}" != '')
     {{info}}$msg.get('xe.tag.delete.success', ["//${request.get('deletedTag')}//"]){{/info}}
 
   #end
-  #set($docextras = [])
+  #set ($docextras = [])
   {{tagcloud/}}
 #end
 {{/velocity}}</content>

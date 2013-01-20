@@ -302,8 +302,8 @@ $xwiki.ssx.use('Main.Dashboard')##
     {{info}}$msg.get('xe.tag.delete.success', ["//${request.get('deletedTag')}//"]){{/info}}
 
   #end
-  #set ($docextras = [])
   {{tagcloud/}}
 #end
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

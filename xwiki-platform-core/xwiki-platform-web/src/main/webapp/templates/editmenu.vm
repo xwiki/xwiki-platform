@@ -14,7 +14,7 @@
     #set($editaction = $doc.getDefaultEditMode())
     #xwikitopmenuentrystart('' $currentEditorTitle 'tmCurrentEditor' "$currentEditorId hasIcon")
     #submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=wiki") $msg.get('core.menu.edit.wiki') 'tmEditWiki', '')
-    #if ($services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
+    #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) || $tdoc.syntax.toIdString() == 'xwiki/1.0')
       #submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=wysiwyg") $msg.get('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '')
     #end
     #submenuitem($doc.getURL($editaction, "$!{languageparams}&amp;editor=inline") $msg.get('core.menu.edit.inline') 'tmEditInline', '')

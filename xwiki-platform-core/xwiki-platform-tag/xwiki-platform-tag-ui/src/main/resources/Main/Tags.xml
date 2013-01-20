@@ -104,70 +104,50 @@
     </property>
     <property>
       <code>h1.xapp {
-  margin-bottom: 1em;
+  border-bottom: 0px none;
+  margin: 0;
 }
 
-h1.xapp span {
-  border:0;
-  margin-top:0;
-  display: inline;
+h1.xapp + form {
+  margin: 1.5em 0 1em;
 }
 
-h1.xapp span.highlight {
-  display: inline-block;
-  background-color: lemonChiffon;
-  border: solid 1px Gainsboro;
-  font-weight:bold;
-  white-space: nowrap;
-  padding: 2px 10px 0 25px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  margin-bottom: -8px;
-}
-
-h1.xapp span.tag {
-  background: lemonChiffon url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50%;
-}
-
-h1.xapp span.highlight a.button {
-  font-size: 12px;
-  font-weight: normal;
-  line-height: 18px;
-  display : inline-block;
-  background-color: lightYellow;
-  border: solid 1px Gainsboro;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  padding: 2px 5px 0 5px;
+h1.xapp * {
   vertical-align: middle;
 }
 
-h1.xapp span.highlight a.delete {
-  background: lightYellow url("$xwiki.getSkinFile('icons/silk/cross.png')") no-repeat 3px 50%;
-  padding: 2px 5px 0px 20px;
+h1.xapp .highlight {
+  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% #FFC;
+  border: solid 1px #DDD;
+  border-radius: 10px;
+  display: inline-block;
+  font-weight: bold;
+  padding: 2px 8px 2px 25px;
+  white-space: nowrap;
 }
 
-h1.xapp span.highlight a.rename {
-  background: lightYellow url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')") no-repeat 3px 50%;
-  padding: 2px 5px 0px 20px;
+h1.xapp .button {
+  background: no-repeat 3px 50% #FFD;
+  border: solid 1px #DDD;
+  border-radius: 7px;
+  display : inline-block;
+  font-size: 50%;
+  font-weight: normal;
+  line-height: 1.5em;
+  padding: 2px 5px 2px 20px;
 }
 
-h1.xapp span.highlight a:hover.button {
-  background-color: Lavender;
-  border: solid 1px Gainsboro;
+h1.xapp .delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
-h1.xapp span.highlight span:hover.button a,
-h1.xapp span.highlight span:hover.button a:link,
-h1.xapp span.highlight span:hover.button a:active,
-h1.xapp span.highlight span:hover.button a:visited {
+h1.xapp .rename {
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')");
+}
+
+h1.xapp .button:hover {
+  background-color: #EEF;
   text-decoration: none;
-}
-
-h3.xapp span {
-  margin:0;
 }
 </code>
     </property>
@@ -191,7 +171,6 @@ h3.xapp span {
 ## - Delete a tag.
 ##
 $xwiki.ssx.use('Main.Tags')##
-$xwiki.ssx.use('Main.Dashboard')##
 ##
 ## Set application variables (action and tag) from URL parameters.
 ##
@@ -204,7 +183,7 @@ $xwiki.ssx.use('Main.Dashboard')##
 ##
 #macro (displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
   (% class="xapp" %)
-  = (% class="highlight tag" %)[[$tag&gt;&gt;$doc.fullName||queryString="do=viewTag&amp;tag=${urlEscapedTag}"]]##
+  = (% class="highlight tag" %)${tag}##
       #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
         [[Rename&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[Delete&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
       #end
@@ -249,7 +228,7 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="renameTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;
+    $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
@@ -279,7 +258,7 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}

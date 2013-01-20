@@ -44,7 +44,7 @@
     #end
   #end
 /** $notificationType */
-.xnotification-$notificationType {
+.xnotification-${notificationType} {
   background-color: $bgColor;
   color:  $textColor;
   border-color:  $textColor;

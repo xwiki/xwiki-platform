@@ -2375,9 +2375,9 @@ $string##
     ## Needed for sorting the selected values.
     #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #end
-  ## Needed for displaying a list of suggestions based on the user input.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
+  ## Needed for displaying a list of suggestions based on the user input (included by default).
+  ##set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
+  ##set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
   ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
   ## overwrites the previously selected value.
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))

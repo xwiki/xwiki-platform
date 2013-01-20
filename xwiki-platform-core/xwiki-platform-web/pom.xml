@@ -114,11 +114,39 @@
             <!-- Exclude files with complex Velocity code inside -->
             <!-- This one iterates over xobjects of type XWiki.SearchSuggestSourceClass -->
             <exclude>**/searchSuggest.js</exclude>
-            <!-- The following stylesheets use the css3_backgroundLinearGradient Velocity macro which expects a map as
-              parameter and the curly brackets have special meaning in CSS. -->
-            <exclude>**/modalPopup.css</exclude>
-            <exclude>**/dashboard.css</exclude>
           </excludes>
+          <aggregations>
+            <!-- Aggregate the JavaScript code that is loaded on every page. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <inputDir>${project.build.directory}/minimized</inputDir>
+              <output>${project.build.directory}/minimized/resources/js/xwiki/xwiki-min.js</output>
+              <includes>
+                <include>**/xwiki.js</include>
+                <include>**/entityReference.js</include>
+                <include>**/modalPopup.js</include>
+                <include>**/jumpToPage.js</include>
+                <include>**/confirmationBox.js</include>
+                <include>**/confirmedAjaxRequest.js</include>
+                <include>**/notification.js</include>
+                <include>**/xlist.js</include>
+                <include>**/suggest.js</include>
+              </includes>
+            </aggregation>
+            <!-- Aggregate the CSS code that is loaded on every page. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <inputDir>${project.build.directory}/minimized</inputDir>
+              <output>${project.build.directory}/minimized/resources/css/xwiki-min.css</output>
+              <includes>
+                <include>**/modalPopup.css</include>
+                <include>**/jumpToPage.css</include>
+                <include>**/confirmationBox.css</include>
+                <include>**/notification.css</include>
+                <include>**/suggest.css</include>
+              </includes>
+            </aggregation>
+          </aggregations>
         </configuration>
       </plugin>
     </plugins>

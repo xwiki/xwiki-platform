@@ -99,8 +99,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Stats.Macros" /}}
-{{velocity}}
+      <content>{{include document="Stats.Macros" /}}((({{velocity}}
 #panelheader($msg.get('xe.statistics.pages.mostviewed'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
@@ -118,7 +117,7 @@
 #end
 {{/html}}
 #panelfooter()
-{{/velocity}}</content>
+{{/velocity}})))</content>
     </property>
     <property>
       <description>Display the most viewed pages</description>

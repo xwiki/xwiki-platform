@@ -99,8 +99,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Stats.Macros" /}}
-{{velocity}}
+      <content>{{include document="Stats.Macros" /}}((({{velocity}}
 #panelheader($msg.get('xe.statistics.current.month.caps'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
@@ -135,7 +134,7 @@
 #end
 {{/html}}
 #panelfooter()
-{{/velocity}}</content>
+{{/velocity}})))</content>
     </property>
     <property>
       <description>Displays the activity during the current month</description>

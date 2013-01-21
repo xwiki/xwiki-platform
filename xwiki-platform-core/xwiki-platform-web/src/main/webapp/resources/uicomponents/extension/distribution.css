@@ -47,6 +47,10 @@
 #welcome .steps.vertical .description {
   font-size: smaller;
 }
+/* The extension actions available on the Main UI step should target only the main wiki. */
+#extension\.mainui .extension-actions .button[name$="Globally"] {
+  display: none;
+}
 #previousUi dt label {
   font-size: .75em;
 }

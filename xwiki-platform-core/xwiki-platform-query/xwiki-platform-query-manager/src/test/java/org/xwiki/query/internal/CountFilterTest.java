@@ -19,39 +19,49 @@
  */
 package org.xwiki.query.internal;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-
-import static org.junit.Assert.assertEquals;
+import org.xwiki.test.ComponentManagerRule;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.jmock.JMockRule;
 
 /**
  * Tests for {@link CountFilter}
  *
  * @version $Id$
  */
-@MockingRequirement(CountFilter.class)
-public class CountFilterTest extends AbstractMockingComponentTestCase
+@ComponentList({
+    CountFilter.class
+})
+public class CountFilterTest
 {
+    @Rule
+    public final ComponentManagerRule componentManager = new ComponentManagerRule();
+
+    @Rule
+    public final JMockRule jmock = new JMockRule();
+
     private CountFilter filter;
 
     @Before
     public void configure() throws Exception
     {
-        getMockery().checking(new Expectations() {{
+        jmock.checking(new Expectations() {{
             ignoring(any(Logger.class)).method("debug");
         }});
 
-        this.filter = getComponentManager().getInstance(QueryFilter.class, "count");
+        this.filter = componentManager.getInstance(QueryFilter.class, "count");
     }
 
     @Test
@@ -59,6 +69,13 @@ public class CountFilterTest extends AbstractMockingComponentTestCase
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc",
                 filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
+    }
+
+    @Test
+    public void filterSelectStatementWithWhitespace() throws Exception
+    {
+        assertEquals("select count(doc.fullName) from XWikiDocument as doc",
+            filter.filterStatement("  select doc.fullName from XWikiDocument as doc ", Query.HQL));
     }
 
     @Test

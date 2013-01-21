@@ -135,7 +135,7 @@ public class UploadAction extends XWikiAction
         }
         String redirect = fileupload.getFileItemAsString("xredirect", context);
         if (StringUtils.isEmpty(redirect)) {
-            redirect = context.getDoc().getURL("attach", true, context);
+            redirect = context.getDoc().getURL("attach", context);
         }
         sendRedirect(response, redirect);
         return false;

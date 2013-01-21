@@ -264,7 +264,7 @@ public class Utils
             }
         }
         if (StringUtils.isEmpty(redirect)) {
-            redirect = context.getDoc().getURL(action, queryString, true, context);
+            redirect = context.getDoc().getURL(action, queryString, context);
         }
         return redirect;
     }

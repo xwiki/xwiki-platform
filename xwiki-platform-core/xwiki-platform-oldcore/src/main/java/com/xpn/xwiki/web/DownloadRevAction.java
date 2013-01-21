@@ -68,7 +68,7 @@ public class DownloadRevAction extends XWikiAction
                     throw new XWikiException();
                 }
             } catch (XWikiException e) {
-                String url = context.getDoc().getURL("viewattachrev", true, context);
+                String url = context.getDoc().getURL("viewattachrev", context);
                 url += "/" + filename;
                 if (request.getParameter("rid") != null) {
                     url += "?rid=" + request.getParameter("rid");

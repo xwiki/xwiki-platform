@@ -37,7 +37,8 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
     /**
      * The bundle cache.
      */
-    protected Map<Locale, LocalizedBundle> bundleCache = new ConcurrentHashMap<Locale, LocalizedBundle>();
+    protected Map<Locale, LocalizedTranslationBundle> bundleCache =
+        new ConcurrentHashMap<Locale, LocalizedTranslationBundle>();
 
     /**
      * Default constructor.
@@ -92,11 +93,11 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
      * @param locale the Locale
      * @return the bundle containing translation for the passed Locale
      */
-    private LocalizedBundle getLocalizedBundle(Locale locale)
+    private LocalizedTranslationBundle getLocalizedBundle(Locale locale)
     {
         String localeString = locale.toString();
 
-        LocalizedBundle bundle = this.bundleCache.get(localeString);
+        LocalizedTranslationBundle bundle = this.bundleCache.get(localeString);
         if (bundle == null) {
             bundle = getSynchLocalizedBundle(locale);
         }
@@ -108,14 +109,14 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
      * @param locale the Locale
      * @return the bundle containing translation for the passed Locale
      */
-    private synchronized LocalizedBundle getSynchLocalizedBundle(Locale locale)
+    private synchronized LocalizedTranslationBundle getSynchLocalizedBundle(Locale locale)
     {
-        LocalizedBundle bundle = this.bundleCache.get(locale);
+        LocalizedTranslationBundle bundle = this.bundleCache.get(locale);
 
         if (bundle == null) {
             bundle = createBundle(locale);
             if (bundle == null) {
-                bundle = LocalizedBundle.EMPTY;
+                bundle = LocalizedTranslationBundle.EMPTY;
             }
 
             this.bundleCache.put(locale, bundle);
@@ -129,7 +130,7 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
     {
         Translation translation;
 
-        LocalizedBundle bundle = getLocalizedBundle(locale);
+        LocalizedTranslationBundle bundle = getLocalizedBundle(locale);
         if (bundle != null) {
             translation = bundle.getTranslation(key);
             if (translation == null) {
@@ -149,5 +150,5 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
      * @param locale the locale
      * @return the bundle containing translation for the passed Locale
      */
-    protected abstract LocalizedBundle createBundle(Locale locale);
+    protected abstract LocalizedTranslationBundle createBundle(Locale locale);
 }

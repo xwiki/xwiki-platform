@@ -35,6 +35,7 @@
   <description>XWiki Platform - Localization - Sources Parent POM</description>
   <modules>
     <module>xwiki-platform-localization-source-wiki</module>
+    <module>xwiki-platform-localization-source-jar</module>
     <module>xwiki-platform-localization-source-legacy</module>
   </modules>
   <dependencies>

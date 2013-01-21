@@ -20,8 +20,8 @@
 package org.xwiki.localization.jar.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -51,8 +51,6 @@ public class JARFileTranslationBundle extends AbstractURLResourceTranslationBund
     public static final Pattern TRANSLATION_PATTERN = Pattern.compile("ApplicationResources([a-zA-Z]{2,8}"
         + "(_([a-zA-Z]{2} | [0-9]{3})" + "(_([0-9][0-9a-zA-Z]{3} | [0-9a-zA-Z]{5,8}))?)?)?.properties");
 
-    private File jarFile;
-
     /**
      * @param jarFile the jar
      * @param componentManager used to lookup components needed to manipulate wiki documents
@@ -65,31 +63,45 @@ public class JARFileTranslationBundle extends AbstractURLResourceTranslationBund
         LocalizationException
     {
         super(getURL(jarFile), componentManager, translationMessageParser);
-
-        this.jarFile = jarFile;
     }
 
-    public File getJarFile()
+    /**
+     * @param jarFile the jar
+     * @param componentManager used to lookup components needed to manipulate wiki documents
+     * @param translationMessageParser the parser to use for each message
+     * @throws IOException failed to parse passed JAR file
+     * @throws LocalizationException failed to find translation resource in the passed JAR file
+     */
+    public JARFileTranslationBundle(URL jarURL, ComponentManager componentManager,
+        TranslationMessageParser translationMessageParser) throws ComponentLookupException, IOException,
+        LocalizationException
     {
-        return this.jarFile;
+        super(getURL(jarURL), componentManager, translationMessageParser);
     }
 
     private static URL getURL(File jarFile) throws IOException, LocalizationException
     {
-        FileInputStream is = new FileInputStream(jarFile);
+        URL jarURL = JARUtils.toJARURL(jarFile);
+
+        return getURL(jarURL);
+    }
+
+    private static URL getURL(URL jarURL) throws IOException, LocalizationException
+    {
+        InputStream is = jarURL.openStream();
 
         try {
             ZipInputStream zis = new ZipInputStream(is);
 
             for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (TRANSLATION_PATTERN.matcher(entry.getName()).matches()) {
-                    return new URL("jar:" + jarFile.toURI() + "!/" + entry.getName());
+                    return new URL(jarURL.toExternalForm() + entry.getName());
                 }
             }
         } finally {
             IOUtils.closeQuietly(is);
         }
 
-        throw new LocalizationException("Can't find any translation resource in jar [" + jarFile + "]");
+        throw new LocalizationException("Can't find any translation resource in jar [" + jarURL + "]");
     }
 }

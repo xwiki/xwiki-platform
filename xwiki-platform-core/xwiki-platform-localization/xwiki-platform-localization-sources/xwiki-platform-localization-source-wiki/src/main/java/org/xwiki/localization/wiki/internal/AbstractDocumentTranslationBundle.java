@@ -44,7 +44,7 @@ import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
 import org.xwiki.localization.internal.DefaultLocalizedTranslationBundle;
 import org.xwiki.localization.internal.DefaultTranslation;
-import org.xwiki.localization.internal.LocalizedBundle;
+import org.xwiki.localization.internal.LocalizedTranslationBundle;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.model.reference.DocumentReference;
@@ -121,7 +121,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         setId(ID_PREFIX + this.serializer.serialize(reference));
     }
 
-    protected LocalizedBundle loadDocumentLocaleBundle(Locale locale) throws Exception
+    protected LocalizedTranslationBundle loadDocumentLocaleBundle(Locale locale) throws Exception
     {
         XWikiContext context = this.contextProvider.get();
 
@@ -169,9 +169,9 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     }
 
     @Override
-    protected LocalizedBundle createBundle(Locale locale)
+    protected LocalizedTranslationBundle createBundle(Locale locale)
     {
-        LocalizedBundle localeBundle;
+        LocalizedTranslationBundle localeBundle;
         try {
             localeBundle = loadDocumentLocaleBundle(locale);
         } catch (Exception e) {

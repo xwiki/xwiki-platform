@@ -85,10 +85,15 @@ import com.xpn.xwiki.objects.StringProperty;
  * @since 4.3M2
  */
 @Component
-@Named("document")
+@Named(DocumentTranslationBundleFactory.ID)
 @Singleton
 public class DocumentTranslationBundleFactory implements TranslationBundleFactory, Initializable, Disposable
 {
+    /**
+     * The identifier of this {@link TranslationBundleFactory}.
+     */
+    public final static String ID = "document";
+
     private static final RegexEntityReference TRANSLATIONOBJET = new RegexEntityReference(Pattern.compile("[^:]+:"
         + TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
 
@@ -134,7 +139,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
     @Inject
     private AuthorizationManager authorizationManager;
-    
+
     /**
      * Used to access the current bundles.
      */

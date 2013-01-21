@@ -27,15 +27,15 @@ import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
 
 /**
- * Default implementation of {@link LocalizedBundle}.
+ * Default implementation of {@link LocalizedTranslationBundle}.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public class DefaultLocalizedTranslationBundle implements LocalizedBundle
+public class DefaultLocalizedTranslationBundle implements LocalizedTranslationBundle
 {
     /**
-     * The {@link TranslationBundle} containing this {@link LocalizedBundle}.
+     * The {@link TranslationBundle} containing this {@link LocalizedTranslationBundle}.
      */
     private TranslationBundle bundle;
 
@@ -50,7 +50,7 @@ public class DefaultLocalizedTranslationBundle implements LocalizedBundle
     private Map<String, Translation> translations = new HashMap<String, Translation>();
 
     /**
-     * @param bundle the {@link TranslationBundle} containing this {@link LocalizedBundle}
+     * @param bundle the {@link TranslationBundle} containing this {@link LocalizedTranslationBundle}
      * @param locale the {@link Locale} associated to this bundle.
      */
     public DefaultLocalizedTranslationBundle(TranslationBundle bundle, Locale locale)

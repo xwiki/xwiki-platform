@@ -44,7 +44,7 @@ public abstract class AbstractTranslation implements Translation
     /**
      * The bundle containing the translation.
      */
-    private LocalizedBundle localeBundle;
+    private LocalizedTranslationBundle localeBundle;
 
     /**
      * The key associated to the translation.
@@ -62,7 +62,7 @@ public abstract class AbstractTranslation implements Translation
      * @param key the key associated to the translation
      * @param message the actual translation message
      */
-    public AbstractTranslation(TranslationBundleContext context, LocalizedBundle localeBundle, String key,
+    public AbstractTranslation(TranslationBundleContext context, LocalizedTranslationBundle localeBundle, String key,
         TranslationMessage message)
     {
         this.context = context;

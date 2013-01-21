@@ -1,3 +1,2 @@
 org.xwiki.localization.legacy.internal.XWikiLocalizationContext
-org.xwiki.localization.legacy.internal.applicationresources.ApplicationResourcesTranslationBundle
 org.xwiki.localization.legacy.internal.xwikipreferences.XWikiPreferencesTranslationBundle

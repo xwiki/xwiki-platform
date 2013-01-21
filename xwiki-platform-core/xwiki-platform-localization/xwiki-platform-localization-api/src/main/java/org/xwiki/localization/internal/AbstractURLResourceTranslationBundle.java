@@ -76,11 +76,11 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
         setId(ID_PREFIX + url);
     }
 
-    protected LocalizedBundle loadResourceLocaleBundle(Locale locale) throws Exception
+    protected LocalizedTranslationBundle loadResourceLocaleBundle(Locale locale) throws Exception
     {
         // Find resource
 
-        String content = ;
+        String content = "";
 
         // Parse resource
         Properties properties = new Properties();
@@ -112,9 +112,9 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
     }
 
     @Override
-    protected LocalizedBundle createBundle(Locale locale)
+    protected LocalizedTranslationBundle createBundle(Locale locale)
     {
-        LocalizedBundle localeBundle;
+        LocalizedTranslationBundle localeBundle;
         try {
             localeBundle = loadResourceLocaleBundle(locale);
         } catch (Exception e) {

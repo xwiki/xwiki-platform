@@ -30,12 +30,12 @@ import org.xwiki.localization.Translation;
  * @version $Id$
  * @since 4.3M2
  */
-public interface LocalizedBundle
+public interface LocalizedTranslationBundle
 {
     /**
-     * An empty {@link LocalizedBundle}.
+     * An empty {@link LocalizedTranslationBundle}.
      */
-    LocalizedBundle EMPTY = new LocalizedBundle()
+    LocalizedTranslationBundle EMPTY = new LocalizedTranslationBundle()
     {
         @Override
         public TranslationBundle getBundle()
@@ -57,7 +57,7 @@ public interface LocalizedBundle
     };
 
     /**
-     * @return the {@link TranslationBundle} containing this {@link LocalizedBundle}
+     * @return the {@link TranslationBundle} containing this {@link LocalizedTranslationBundle}
      */
     TranslationBundle getBundle();
 

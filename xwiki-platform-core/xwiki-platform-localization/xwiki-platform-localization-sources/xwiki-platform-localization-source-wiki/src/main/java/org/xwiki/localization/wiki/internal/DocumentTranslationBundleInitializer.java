@@ -60,7 +60,7 @@ public class DocumentTranslationBundleInitializer implements EventListener
      * {@link org.xwiki.observation.ObservationManager}).
      */
     @Inject
-    @Named("document")
+    @Named(DocumentTranslationBundleFactory.ID)
     private Provider<TranslationBundleFactory> bundleFactoryProvider;
 
     /**

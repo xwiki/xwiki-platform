@@ -99,8 +99,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Stats.Macros" /}}
-{{velocity}}
+      <content>{{include document="Stats.Macros" /}}((({{velocity}}
 #panelheader($msg.get('xe.statistics.bestreferrers'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
@@ -117,7 +116,8 @@
   #printStatisticsDisabled()
 #end
 {{/html}}
-#panelfooter()</content>
+#panelfooter()
+{{/velocity}})))</content>
     </property>
     <property>
       <description>Displays the best referrers</description>

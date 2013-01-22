@@ -228,7 +228,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 registerTranslationBundle(document);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to load eexisting translations", e);
+            this.logger.error("Failed to load existing translations", e);
         }
     }
 

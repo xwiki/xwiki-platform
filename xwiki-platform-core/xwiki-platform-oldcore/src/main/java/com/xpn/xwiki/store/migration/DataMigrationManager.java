@@ -40,6 +40,7 @@ public interface DataMigrationManager
     /**
      * @return current DB migration status or null for a new database
      * @throws DataMigrationException if any error
+     * @since 4.4.1
      */
     DataMigrationStatus getDataMigrationStatus() throws DataMigrationException;
 

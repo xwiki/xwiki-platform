@@ -24,6 +24,7 @@ package com.xpn.xwiki.store.migration;
  * Common interface to report data migration status.
  *
  * @version $Id$
+ * @since 4.4.1
  */
 public interface DataMigrationStatus
 {

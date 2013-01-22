@@ -511,9 +511,9 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-rest-server", this.project.getVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
             "xwiki-platform-gwt-api", this.project.getVersion(), null, "jar"));
-        // Use XWiki Commons version because xwiki-platform-portlet is not yet integrated into the XWiki platform.
+        // Use a different version because xwiki-platform-portlet is not yet integrated into the XWiki platform.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-portlet", this.getXWikiCommonsVersion(), null, "jar"));
+            "xwiki-platform-portlet", "3.5-SNAPSHOT", null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",

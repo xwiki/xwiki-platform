@@ -38,6 +38,12 @@ public interface DataMigrationManager
     XWikiDBVersion getDBVersion() throws DataMigrationException;
 
     /**
+     * @return current DB migration status or null for a new database
+     * @throws DataMigrationException if any error
+     */
+    DataMigrationStatus getDataMigrationStatus() throws DataMigrationException;
+
+    /**
      * Check current database version and proceed to migrations.
      * Migration is processed only once, and depends on the following configuration:
      * @xwikicfg xwiki.store.migration  - 1 to enable migration, default to 0

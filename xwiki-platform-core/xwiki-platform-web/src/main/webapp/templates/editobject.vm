@@ -82,7 +82,7 @@
  * Returns the first 120 characters of the first line of the raw value of the specified object field.
  *#
 #macro (getFieldSummary $obj $fieldName $fieldSummary)
-  #set ($summary = "$obj.getProperty($fieldName).value")
+  #set ($summary = "$!obj.getProperty($fieldName).value")
   #set ($summary = $summary.trim())
   #set ($multiline = $summary.contains($util.newline))
   #set ($summary = $stringtool.substringBefore($summary, $util.newline))

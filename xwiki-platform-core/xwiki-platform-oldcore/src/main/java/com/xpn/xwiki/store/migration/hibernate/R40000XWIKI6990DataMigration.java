@@ -1370,7 +1370,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         // Retrieve the constraint name from the database
                         return (String) session.createSQLQuery(
                             "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS" +
-                                " WHERE TABLE_NAME = :tableName and CONSTRAINT_TYPE = 'PRIMARY KEY'")
+                                " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
                             .setString("tableName", tableName)
                             .uniqueResult();
                     }
@@ -1489,7 +1489,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         String tableName = table.getName();
 
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"dgervalle\">\n")
+            .append('-').append(Util.getHash(String.format("modifyDataType-%s-%s",table,column)))
+            .append("\" author=\"xwiki\">\n")
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(tableName)
             .append("] to BIGINT type</comment >\n");
 
@@ -1522,6 +1523,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         sb.append("  </changeSet>\n");
+        this.logCount++;
     }
 
     /**
@@ -1611,8 +1613,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Preamble
         String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++))
-            .append("\" author=\"sdumitriu\" failOnError=\"false\">\n")
+            .append('-').append(Util.getHash(String.format("dropForeignKeyConstraint-%s",tableName)))
+            .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\" failOnError=\"false\">\n")
             .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
 
         // Concrete Property types should each have a foreign key referencing the BaseProperty
@@ -1628,6 +1630,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
         // All done!
         sb.append("  </changeSet>\n");
+        this.logCount++;
     }
 
     /**
@@ -1644,7 +1647,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Preamble
         String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
+            .append('-').append(Util.getHash(String.format("addForeignKeyConstraint-%s",tableName)))
+            .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\">\n")
             .append("    <comment>Add foreign keys on table [").append(tableName)
             .append("] to use ON UPDATE CASCADE</comment>\n");
 
@@ -1693,6 +1697,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
         // All done!
         sb.append("  </changeSet>\n");
+        this.logCount++;
     }
 
     /**

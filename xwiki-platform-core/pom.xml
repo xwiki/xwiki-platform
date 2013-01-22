@@ -276,91 +276,10 @@
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
-              <className>com/xpn/xwiki/objects/ListProperty</className>
-              <method>void setUseHibernateWorkaround(boolean)</method>
-              <differenceType>7002</differenceType>
-              <justification>The hibernate workaround added in 4.3M2 have been replaced with a cleaner solution.</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
-              <method>void addListPropertyWorkaroundHandler(com.xpn.xwiki.objects.PropertyInterface)</method>
-              <differenceType>7002</differenceType>
-              <justification>The hibernate workaround added in 4.3M2 have been replaced with a cleaner solution.</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/util/AbstractNotifyOnUpdateList</className>
-              <differenceType>8001</differenceType>
-              <justification>The AbtractNotifyOnUpdateList wrapper class no longer inherits ArrayList, because it is used as a non-static enclosed class in XWikiDocument, which is non-serializable, so the list wrapper cannot be serializeble.  Let's move the entire class to an internal package while we are at it.</justification>
-            </difference>
-            <difference>
-              <className>org/xwiki/url/AbstractXWikiURL</className>
-              <differenceType>3005</differenceType>
-              <justification>The AbstractXWikiURL should have been abstract from the beginning, as the name implies.</justification>
-            </difference>
-            <!-- XWIKI-8577 Move lucene plugin classes to an internal package -->
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/AbstractDocumentData</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/AbstractIndexData</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/AttachmentData</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/DocumentData</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/IndexFields</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/IndexRebuilder</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/IndexUpdater</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/WikiData</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/XWikiDocumentQueue</className>
-              <differenceType>8001</differenceType>
-              <justification>Moved to an internal package</justification>
-            </difference>
-            <!-- XWIKI-8404 Upgrade to lucene 4.0.0 -->
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/LucenePlugin</className>
-              <method>org.apache.lucene.search.Searcher[] createSearchers(java.lang.String, com.xpn.xwiki.XWikiContext)</method>
-              <differenceType>7002</differenceType>
-              <justification>Method removed (renamed) the searcher notion has been replaced by index readers in lucene 4.0</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/LucenePlugin</className>
-              <method>void openSearchers(com.xpn.xwiki.XWikiContext)</method>
-              <differenceType>7002</differenceType>
-              <justification>Method removed (renamed) the searcher notion has been replaced by index readers in lucene 4.0</justification>
-            </difference>
-            <difference>
-              <className>com/xpn/xwiki/plugin/lucene/LucenePlugin</className>
-              <method>void closeSearchers(org.apache.lucene.search.Searcher[])</method>
-              <differenceType>7002</differenceType>
-              <justification>Method removed : it is not needed anymore since index readers are automatically closed in Lucene 4.0</justification>
+              <className>com/xpn/xwiki/store/migration/DataMigrationManager</className>
+              <method>com.xpn.xwiki.store.migration.DataMigrationStatus getDataMigrationStatus()</method>
+              <differenceType>7012</differenceType>
+              <justification>New method to allow building an UI for reporting migration issues (mainly for sub-wiki)</justification>
             </difference>
           </ignored>
           <excludes>

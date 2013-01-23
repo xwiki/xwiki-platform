@@ -117,7 +117,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     /**
      * Internal class used to prevent double checking of the database during migration operation.
      */
-    private class ThreadLock extends ThreadLocal<Integer>
+    private static class ThreadLock extends ThreadLocal<Integer>
     {
         @Override
         protected Integer initialValue()
@@ -168,7 +168,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     /**
      * Internal class used to store the migration status of the database.
      */
-    private class MigrationStatus implements DataMigrationStatus
+    private static class MigrationStatus implements DataMigrationStatus
     {
         /**
          * Current version of the database.

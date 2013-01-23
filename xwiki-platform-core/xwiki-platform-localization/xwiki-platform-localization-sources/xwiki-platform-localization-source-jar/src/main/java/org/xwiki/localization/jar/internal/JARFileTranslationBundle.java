@@ -66,7 +66,7 @@ public class JARFileTranslationBundle extends AbstractURLResourceTranslationBund
     }
 
     /**
-     * @param jarFile the jar
+     * @param jarURL the jar URL
      * @param componentManager used to lookup components needed to manipulate wiki documents
      * @param translationMessageParser the parser to use for each message
      * @throws IOException failed to parse passed JAR file

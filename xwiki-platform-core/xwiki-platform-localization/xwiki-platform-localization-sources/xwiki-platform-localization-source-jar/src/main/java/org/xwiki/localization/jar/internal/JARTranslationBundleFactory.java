@@ -39,7 +39,6 @@ import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -217,7 +216,7 @@ public class JARTranslationBundleFactory implements TranslationBundleFactory, In
             ComponentManager componentManager = this.componentManagerManager.getComponentManager(namespace, false);
 
             componentManager.unregisterComponent(descriptor);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             this.logger.error("Failed to create TranslationBundle descriptor for extension [{}]", extension, e);
         }
     }
@@ -232,12 +231,10 @@ public class JARTranslationBundleFactory implements TranslationBundleFactory, In
             ComponentManager componentManager = this.componentManagerManager.getComponentManager(namespace, false);
 
             JARFileTranslationBundle bundle =
-                new JARFileTranslationBundle(jarURL, componentManager, translationMessageParser);
+                new JARFileTranslationBundle(jarURL, componentManager, this.translationParser);
 
-            componentManager.registerComponent(descriptor);
-        } catch (MalformedURLException e) {
-            this.logger.error("Failed to create TranslationBundle descriptor for extension [{}]", extension, e);
-        } catch (ComponentRepositoryException e) {
+            componentManager.registerComponent(descriptor, bundle);
+        } catch (Exception e) {
             this.logger.error("Failed to register a TranslationBundle component for extension [{}] on namespace [{}]",
                 extension, namespace, e);
         }

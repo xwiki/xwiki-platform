@@ -19,7 +19,9 @@
  */
 package org.xwiki.localization.internal;
 
-import java.io.StringReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -55,9 +57,9 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
 
     protected TranslationMessageParser translationMessageParser;
 
-    protected URL url;
+    protected URL baseURL;
 
-    public AbstractURLResourceTranslationBundle(URL url, ComponentManager componentManager,
+    public AbstractURLResourceTranslationBundle(URL baseURL, ComponentManager componentManager,
         TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
         this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);
@@ -66,25 +68,61 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
 
         this.logger = LoggerFactory.getLogger(getClass());
 
-        setURL(url);
+        setURL(baseURL);
     }
 
     protected void setURL(URL url)
     {
-        this.url = url;
+        this.baseURL = url;
 
         setId(ID_PREFIX + url);
+    }
+
+    protected URL getLocaleURL(Locale locale)
+    {
+        String urlString = this.baseURL.toString();
+
+        String localeURL = urlString;
+
+        if (locale.equals(Locale.ROOT)) {
+            if (urlString.endsWith(".properties")) {
+                int index = urlString.lastIndexOf('.');
+                urlString = localeURL.substring(0, index);
+                urlString += locale.toString();
+                urlString += ".properties";
+            } else {
+                // No idea what is it
+                localeURL = null;
+            }
+        }
+
+        try {
+            return new URL(localeURL);
+        } catch (MalformedURLException e) {
+            // Should never happen
+            return null;
+        }
     }
 
     protected LocalizedTranslationBundle loadResourceLocaleBundle(Locale locale) throws Exception
     {
         // Find resource
+        URL localeURL = getLocaleURL(locale);
 
-        String content = "";
+        if (localeURL == null) {
+            return null;
+        }
 
         // Parse resource
         Properties properties = new Properties();
-        properties.load(new StringReader(content));
+
+        try {
+            InputStream componentListStream = localeURL.openStream();
+
+            properties.load(componentListStream);
+        } catch (IOException e) {
+            this.logger.error("Failed to parse resource [{}] as translation budle", localeURL, e);
+        }
 
         // Convert to LocalBundle
         DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);

@@ -32,6 +32,7 @@ import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.internal.DefaultExtensionManagerConfiguration;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.LocalizationManager;
@@ -42,24 +43,19 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 @ComponentList({
-    DefaultExtensionManagerConfiguration.class,
-    DefaultLoggerManager.class,
-    DefaultObservationManager.class
+    JARTranslationBundleFactory.class,
+    DefaultObservationManager.class,
+    
 })
-public class JARTranslationBundleFactory
+public class JARTranslationBundleFactoryTest
 {
     @Rule
     public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
-    private ObservationManager observation;
-
-    private LocalizationManager localization;
-
-    @Override
     @Before
     public void setUp() throws Exception
     {
-        super.setUp();
+        this.configuration = this.componentManager.getInstance(ExtensionManagerConfiguration.class);
         
         // checking
 

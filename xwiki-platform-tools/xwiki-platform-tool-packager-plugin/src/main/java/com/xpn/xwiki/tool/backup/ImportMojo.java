@@ -22,9 +22,10 @@ package com.xpn.xwiki.tool.backup;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -179,19 +180,22 @@ public class ImportMojo extends AbstractMojo
     {
         XWikiContext xcontext = importer.createXWikiContext(databaseName, hibernateConfig);
 
-        Set<Artifact> artifacts = this.project.getArtifacts();
-        if (artifacts != null) {
-            for (Artifact artifact : artifacts) {
-                if (!artifact.isOptional()) {
-                    if ("xar".equals(artifact.getType())) {
-                        getLog().info("  ... Importing XAR file: " + artifact.getFile());
+        // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
+        // LinkedHashSet behind the scene)
+        // TODO: upgrade to Maven 3.x APIS and use AETHER
+        List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(this.project.getArtifacts());
+        Collections.reverse(dependenciesFirstArtifacts);
 
-                        // Import XAR into database
-                        importer.importXAR(artifact.getFile(), null, xcontext);
+        for (Artifact artifact : dependenciesFirstArtifacts) {
+            if (!artifact.isOptional()) {
+                if ("xar".equals(artifact.getType())) {
+                    getLog().info("  ... Importing XAR file: " + artifact.getFile());
 
-                        // Install extension
-                        installExtension(artifact, xcontext);
-                    }
+                    // Import XAR into database
+                    importer.importXAR(artifact.getFile(), null, xcontext);
+
+                    // Install extension
+                    installExtension(artifact, xcontext);
                 }
             }
         }

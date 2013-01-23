@@ -198,9 +198,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private abstract static class AbstractUpdateHibernateCallback implements HibernateCallback<Object>
     {
-        /** The current timer. */
-        public int timer;
-
         /** Place holder for new id. */
         protected static final String NEWID = "newid";
 
@@ -209,6 +206,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         /** The new identifier. */
         protected Session session;
+
+        /** The current timer. */
+        public int timer;
 
         @Override
         public Object doInHibernate(Session session)
@@ -775,7 +775,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * @param pClass the persisted class to analyse
      * @return a list of hibernate collections
      */
-    private List<org.hibernate.mapping.Collection> getCollection(PersistentClass pClass) {
+    private List<org.hibernate.mapping.Collection> getCollection(PersistentClass pClass)
+    {
         List<org.hibernate.mapping.Collection> list = new ArrayList<org.hibernate.mapping.Collection>();
 
         if (pClass != null) {
@@ -796,6 +797,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      * get all table to process, including collections if needed.
      * @param className the persistent class
      * @return a list of pair of table name and key field name.
+     * @throws DataMigrationException on failure
      */
     private List<String[]> getAllTableToProcess(String className) throws DataMigrationException
     {
@@ -803,9 +805,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * get hibernate mapping of the given class or entity name
+     * get hibernate mapping of the given class or entity name.
      * @param className the class or entity name
      * @return a list of pair of table name and the property field name.
+     * @throws DataMigrationException if mapping cannot be found
      */
     private PersistentClass getClassMapping(String className) throws DataMigrationException
     {
@@ -827,23 +830,25 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-    * get all table to process, including collections if needed.
-    * @param className the class or entity name
-    * @param propertyName the name of the property for which the column name is returned
-    * @return a list of pair of table name and the property field name.
-    */
+     * get all table to process, including collections if needed.
+     * @param className the class or entity name
+     * @param propertyName the name of the property for which the column name is returned
+     * @return a list of pair of table name and the property field name.
+     * @throws DataMigrationException on failure
+     */
     private List<String[]> getAllTableToProcess(String className, String propertyName) throws DataMigrationException
     {
         return getAllTableToProcess(getClassMapping(className), propertyName);
     }
 
     /**
-        * get all table to process, including collections if needed.
-        * @param pClass the persistent class
-        * @param propertyName the name of the property for which the column name is returned
-        * @return a list of pair of table name and the property field name.
-        */
-    private List<String[]> getAllTableToProcess(PersistentClass pClass, String propertyName) {
+     * get all table to process, including collections if needed.
+     * @param pClass the persistent class
+     * @param propertyName the name of the property for which the column name is returned
+     * @return a list of pair of table name and the property field name.
+     */
+    private List<String[]> getAllTableToProcess(PersistentClass pClass, String propertyName)
+    {
         List<String[]> list = new ArrayList<String[]>();
 
         // Add collection table that will not be updated by cascaded updates
@@ -1369,8 +1374,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     {
                         // Retrieve the constraint name from the database
                         return (String) session.createSQLQuery(
-                            "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS" +
-                                " WHERE TABLE_NAME = :tableName and CONSTRAINT_TYPE = 'PRIMARY KEY'")
+                            "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
+                                + " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
                             .setString("tableName", tableName)
                             .uniqueResult();
                     }
@@ -1489,7 +1494,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         String tableName = table.getName();
 
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"dgervalle\">\n")
+            .append('-').append(Util.getHash(String.format("modifyDataType-%s-%s", table, column)))
+            .append("\" author=\"xwiki\">\n")
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(tableName)
             .append("] to BIGINT type</comment >\n");
 
@@ -1522,6 +1528,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         sb.append("  </changeSet>\n");
+        this.logCount++;
     }
 
     /**
@@ -1611,8 +1618,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Preamble
         String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++))
-            .append("\" author=\"sdumitriu\" failOnError=\"false\">\n")
+            .append('-').append(Util.getHash(String.format("dropForeignKeyConstraint-%s", tableName)))
+            .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\" failOnError=\"false\">\n")
             .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
 
         // Concrete Property types should each have a foreign key referencing the BaseProperty
@@ -1628,6 +1635,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
         // All done!
         sb.append("  </changeSet>\n");
+        this.logCount++;
     }
 
     /**
@@ -1644,7 +1652,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // Preamble
         String tableName = table.getName();
         sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion())
-            .append("-").append(String.format("%03d", this.logCount++)).append("\" author=\"sdumitriu\">\n")
+            .append('-').append(Util.getHash(String.format("addForeignKeyConstraint-%s", tableName)))
+            .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\">\n")
             .append("    <comment>Add foreign keys on table [").append(tableName)
             .append("] to use ON UPDATE CASCADE</comment>\n");
 
@@ -1693,6 +1702,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
         // All done!
         sb.append("  </changeSet>\n");
+        this.logCount++;
     }
 
     /**

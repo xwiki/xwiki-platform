@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -35,6 +35,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
@@ -49,6 +50,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <disabled>0</disabled>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -58,6 +60,7 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <name>
+        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <prettyName>Name</prettyName>
@@ -66,6 +69,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parse>
+        <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
@@ -76,6 +80,7 @@
       </parse>
       <use>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
@@ -99,70 +104,50 @@
     </property>
     <property>
       <code>h1.xapp {
-  margin-bottom: 1em;
+  border-bottom: 0px none;
+  margin: 0;
 }
 
-h1.xapp span {
-  border:0;
-  margin-top:0;
-  display: inline;
+h1.xapp + form {
+  margin: 1.5em 0 1em;
 }
 
-h1.xapp span.highlight {
-  display: inline-block;
-  background-color: lemonChiffon;
-  border: solid 1px Gainsboro;
-  font-weight:bold;
-  white-space: nowrap;
-  padding: 2px 10px 0 25px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  margin-bottom: -8px;
-}
-
-h1.xapp span.tag {
-  background: lemonChiffon url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50%;
-}
-
-h1.xapp span.highlight a.button {
-  font-size: 12px;
-  font-weight: normal;
-  line-height: 18px;
-  display : inline-block;
-  background-color: lightYellow;
-  border: solid 1px Gainsboro;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  padding: 2px 5px 0 5px;
+h1.xapp * {
   vertical-align: middle;
 }
 
-h1.xapp span.highlight a.delete {
-  background: lightYellow url("$xwiki.getSkinFile('icons/silk/cross.png')") no-repeat 3px 50%;
-  padding: 2px 5px 0px 20px;
+h1.xapp .highlight {
+  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% #FFC;
+  border: solid 1px #DDD;
+  border-radius: 10px;
+  display: inline-block;
+  font-weight: bold;
+  padding: 2px 8px 2px 25px;
+  white-space: nowrap;
 }
 
-h1.xapp span.highlight a.rename {
-  background: lightYellow url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')") no-repeat 3px 50%;
-  padding: 2px 5px 0px 20px;
+h1.xapp .button {
+  background: no-repeat 3px 50% #FFD;
+  border: solid 1px #DDD;
+  border-radius: 7px;
+  display : inline-block;
+  font-size: 50%;
+  font-weight: normal;
+  line-height: 1.5em;
+  padding: 2px 5px 2px 20px;
 }
 
-h1.xapp span.highlight a:hover.button {
-  background-color: Lavender;
-  border: solid 1px Gainsboro;
+h1.xapp .delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
-h1.xapp span.highlight span:hover.button a,
-h1.xapp span.highlight span:hover.button a:link,
-h1.xapp span.highlight span:hover.button a:active,
-h1.xapp span.highlight span:hover.button a:visited {
+h1.xapp .rename {
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')");
+}
+
+h1.xapp .button:hover {
+  background-color: #EEF;
   text-decoration: none;
-}
-
-h3.xapp span {
-  margin:0;
 }
 </code>
     </property>
@@ -186,124 +171,118 @@ h3.xapp span {
 ## - Delete a tag.
 ##
 $xwiki.ssx.use('Main.Tags')##
-$xwiki.ssx.use('Main.Dashboard')##
 ##
 ## Set application variables (action and tag) from URL parameters.
 ##
-#set($do = "$!{request.get('do')}")
-#set($tag = "$!{request.get('tag')}")
-#set($urlEscapedTag = $escapetool.url($tag))
-#set($htmlEscapedTag = $escapetool.xml($tag))
+#set ($do = "$!{request.get('do')}")
+#set ($tag = "$!{request.get('tag')}")
+#set ($urlEscapedTag = $escapetool.url($tag))
+#set ($htmlEscapedTag = $escapetool.xml($tag))
 ##
 ## Macro displayTagAppTitle. Display level1 title of this app.
 ##
-#macro(displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
-  &lt;h1 class="xapp"&gt;
-    &lt;span class="highlight tag"&gt;
-      &lt;a href="$doc.getURL('view', "do=viewTag&amp;amp;tag=${urlEscapedTag}")"&gt;$htmlEscapedTag&lt;/a&gt;
-      #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons)
-        &lt;a href="$doc.getURL('view', "do=prepareRename&amp;amp;tag=${urlEscapedTag}")" class="button rename" rel="nofollow"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL('view', "do=prepareDelete&amp;amp;tag=${urlEscapedTag}")" class="button delete" rel="nofollow"&gt;Delete&lt;/a&gt;
+#macro (displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
+  (% class="xapp" %)
+  = (% class="highlight tag" %)${tag}##
+      #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
+        [[Rename&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[Delete&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
       #end
-    &lt;/span&gt;
-  &lt;/h1&gt;
+    (%%) =
 #end
 ##
 ## Switch between all possible actions:
 ## viewTag, prepareRename, rename, prepareDelete, delete, default (Tag cloud)
 ##
-{{html wiki=true}}
-#if($do == 'viewTag')
+#if ($do == 'viewTag')
   ##
   ## View tag
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag true)
-  #if("$!{request.get('renamedTag')}" != '')
-    #set($htmlEscapedRenamedTag = $escapetool.xml($request.get('renamedTag')))
-    #info($msg.get('xe.tag.rename.success', [$htmlEscapedRenamedTag]))
+  #if ("$!{request.get('renamedTag')}" != '')
+    {{info}}$msg.get('xe.tag.rename.success', ["//${request.get('renamedTag')}//"]){{/info}}
+
   #end
-  #set($list = $xwiki.tag.getDocumentsWithTag($tag))
-  &lt;div&gt;
-    &lt;div id="dashboardleft"&gt;
-      &lt;div id="dashboardleftcontent"&gt;
-        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get('xe.tag.alldocs', [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
-        #displayDocumentList($list true $blacklistedSpaces)
-      &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div id="dashboardright"&gt;
-      &lt;div id="dashboardrightcontent"&gt;
-        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.activity", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
-        
-        {{activity tags="$htmlEscapedTag" /}}
-        
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;/div&gt;
-&lt;/div&gt;
-#elseif($do == 'prepareRename')
+  #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
+  {{container layoutStyle="columns"}}
+    (((
+      (% class="xapp" %)
+      === $msg.get('xe.tag.alldocs', ["//${tag}//"]) ===
+
+      {{html}}#displayDocumentList($list true $blacklistedSpaces){{/html}}
+    )))
+    (((
+      (% class="xapp" %)
+      === $msg.get('xe.tag.activity', [$tag]) ===
+
+      {{activity tags="$tag" /}}
+    )))
+  {{/container}}
+#elseif ($do == 'prepareRename')
   ##
   ## Prepare rename tag
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag false)
+{{html}}
   &lt;form id="renameForm" action="$doc.getURL()" method="post"&gt;
    &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="renameTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;
+    $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
-#elseif($do == 'renameTag')
+{{/html}}
+#elseif ($do == 'renameTag')
   ##
   ## Rename tag
   ##
-  #set($renameTo = "$!{request.get('renameTo')}")
-  #set($success = false)
+  #set ($renameTo = "$!{request.get('renameTo')}")
+  #set ($success = false)
   #if ($renameTo != '')
-    #set($success = $xwiki.tag.renameTag($tag, $renameTo))
+    #set ($success = $xwiki.tag.renameTag($tag, $renameTo))
   #end
   #if ($success == true || $success == 'OK')
-   #set($urlEscapedRenameTo = $escapetool.url($renameTo))
+   #set ($urlEscapedRenameTo = $escapetool.url($renameTo))
    $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
   #else
-    #set($htmlEscapedRenameTo = $escapetool.xml($renameTo))
-    #error($msg.get('xe.tag.rename.failure', [$htmlEscapedTag, $htmlEscapedRenameTo]))
+    {{error}}$msg.get('xe.tag.rename.failure', ["//${tag}//", "//${renameTo}//"]){{/error}}
   #end
-#elseif($do == 'prepareDelete')
+#elseif ($do == 'prepareDelete')
   ##
   ## Prepare delete tag
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag false)
+{{html}}
   &lt;form id="deleteForm" action="$doc.getURL()" method="post"&gt;
    &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
-#elseif($do == 'deleteTag')
+{{/html}}
+#elseif ($do == 'deleteTag')
   ##
   ## Delete tag
   ##
-  #set($success = $xwiki.tag.deleteTag($tag))
+  #set ($success = $xwiki.tag.deleteTag($tag))
   #if ($success == true || $success == 'OK')
     $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
   #else
-    #error($msg.get('xe.tag.delete.failure', [$htmlEscapedTag]))
+    {{error}}$msg.get('xe.tag.delete.failure', ["//${tag}//"]){{/error}}
   #end
 #else
   ##
   ## View all tags (Tag Cloud)
   ##
-  #set($tags = $xwiki.tag.getTags(true))
-  #set($title = 'All Tags')
-  #if("$!{request.get('deletedTag')}" != '')
-    #set($htmlEscapedTag = $escapetool.xml($request.get('deletedTag')))
-    #info($msg.get('xe.tag.delete.success', [$htmlEscapedTag]))
+  #set ($title = 'All Tags')
+  #if ("$!{request.get('deletedTag')}" != '')
+    {{info}}$msg.get('xe.tag.delete.success', ["//${request.get('deletedTag')}//"]){{/info}}
+
   #end
-  #set($docextras = [])
-  #includeInContext("XWiki.TagCloud")
+  {{tagcloud/}}
 #end
-{{/html}}
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

@@ -69,7 +69,7 @@ import static org.mockito.Mockito.when;
  * Test that delegation of programming rights is enabled and disabled only when executing "privileged" templates.
  *
  * @version $Id$
- * @since 4.4.1
+ * @since 4.5M1
  */
 // This is the component list required for instantiating an XWikiDocument.
 @ComponentList({CurrentStringDocumentReferenceResolver.class, CurrentStringEntityReferenceResolver.class,

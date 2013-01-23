@@ -142,7 +142,9 @@
   {{html clean="false"}}
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;
-      #template('simpleedittoolbar.vm')
+      ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
+      #set ($toolBar = "#template('simpleedittoolbar.vm')")
+      $!toolBar.replace('{{html}}', '{\{html}}')
   #end
   $xwiki.getTextArea($tdoc.content)
   #if ($useWysiwygEditor)

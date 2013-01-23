@@ -196,9 +196,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
         XWikiContext context) throws Exception
     {
         IndexReader[] readers = createIndexReaders(myIndexDirs, context);
-        SearchResults retval = search(query, (String) null, null, languages, readers, context);
+        try {
+            SearchResults retval = search(query, (String) null, null, languages, readers, context);
 
-        return retval;
+            return retval;
+        } finally {
+            destroyIndexReaders(readers);
+        }
     }
 
     /**
@@ -219,9 +223,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
         String languages, XWikiContext context) throws Exception
     {
         IndexReader[] readers = createIndexReaders(myIndexDirs, context);
-        SearchResults retval = search(query, sortFields, null, languages, readers, context);
+        try {
+            SearchResults retval = search(query, sortFields, null, languages, readers, context);
 
-        return retval;
+            return retval;
+        } finally {
+            destroyIndexReaders(readers);
+        }
     }
 
     /**
@@ -243,9 +251,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
         String languages, XWikiContext context) throws Exception
     {
         IndexReader[] readers = createIndexReaders(myIndexDirs, context);
-        SearchResults retval = search(query, sortField, null, languages, readers, context);
+        try {
+            SearchResults retval = search(query, sortField, null, languages, readers, context);
 
-        return retval;
+            return retval;
+        } finally {
+            destroyIndexReaders(readers);
+        }
     }
 
     /**
@@ -674,16 +686,38 @@ public class LucenePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Closes all index readers in the array.
+     *
+     * @param indexReaders An array of index readers that have been created by createIndexReaders.
+     * @since 4.4.1
+     */
+    private static void destroyIndexReaders(IndexReader [] indexReaders)
+    {
+        for (IndexReader indexReader : indexReaders) {
+            try {
+                indexReader.close();
+            } catch (IOException e) {
+                LOGGER.error("Failed to close lucene index reader.", e);
+            }
+        }
+    }
+
+    /**
      * Opens the readers for the configured index Dirs after closing any already existing ones.
      */
     public synchronized void openIndexReaders(XWikiContext context)
     {
+        if (this.indexReaders != null) {
+            destroyIndexReaders(this.indexReaders);
+            this.indexReaders = null;
+        }
+
         try {
             this.indexReaders = createIndexReaders(this.indexDirs, context);
         } catch (Exception e) {
             LOGGER.error("Error opening readers for index dirs [{}]", context.getWiki().Param(PROP_INDEX_DIR), e);
             throw new RuntimeException("Error opening readers for index dirs "
-                + context.getWiki().Param(PROP_INDEX_DIR), e);
+                                       + context.getWiki().Param(PROP_INDEX_DIR), e);
         }
     }
 

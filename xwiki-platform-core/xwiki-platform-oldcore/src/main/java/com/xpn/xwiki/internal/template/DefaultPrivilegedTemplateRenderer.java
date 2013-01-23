@@ -40,7 +40,7 @@ import java.util.HashSet;
  * all.
  * 
  * @version $Id$
- * @since 4.4.1
+ * @since 4.5M1
  */
 @Component
 public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRenderer

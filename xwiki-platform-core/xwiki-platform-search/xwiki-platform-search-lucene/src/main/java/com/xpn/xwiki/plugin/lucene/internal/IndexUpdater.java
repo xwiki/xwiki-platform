@@ -247,12 +247,16 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             } catch (Exception e) {
                 LOGGER.error("error indexing documents", e);
             } finally {
-                context.getWiki().getStore().cleanUp(context);
+                try {
+                    context.getWiki().getStore().cleanUp(context);
+                } catch (Exception e) {
+                    LOGGER.error("Failed to cleanup hibernate session in lucene index updater.", e);
+                }
 
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    LOGGER.warn("Failed to close writer.", e);
+                    LOGGER.error("Failed to close writer.", e);
                 }
             }
 
@@ -433,8 +437,11 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
         try {
             IndexWriter w = openWriter(false);
-            n = w.numDocs();
-            w.close();
+            try {
+                n = w.numDocs();
+            } finally {
+                w.close();
+            }
         } catch (IOException e) {
             LOGGER.error("Failed to get the number of documents in Lucene index writer", e);
         }

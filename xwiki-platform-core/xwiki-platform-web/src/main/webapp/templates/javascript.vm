@@ -1,15 +1,13 @@
 ##
-## CSS files related to JS libraries.
-##
-<link href="$xwiki.getSkinFile("uicomponents/suggest/suggest.css", true)" rel="stylesheet" type="text/css" />
-<link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
-<!--[if IE]>
-  <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
-<![endif]-->
-##
 ## JS Libraries.
 ##
+$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})
 $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
+$xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})
+$xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})
+## The following resources are aggregated by the previous two.
+#*
+$xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
 $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
@@ -22,6 +20,8 @@ $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
 $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
 $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})
+$xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)
+*#
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
@@ -30,22 +30,42 @@ $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'l
   #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
   #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
   #if($searchSuggestConfigObject.getProperty('activated').value == 1)
-   #set($searchSuggestConfigHash = '')
-   #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-     #if($source.getProperty('activated').value == 1)
-       #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
-       #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
-     #end
-   #end
-   $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-    'forceSkinAction' : true,  
-    'h' : $searchSuggestConfigHash.hashCode()  
-   })
-   $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
+    #set($searchSuggestConfigHash = '')
+    #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
+      #if($source.getProperty('activated').value == 1)
+        #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
+        #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
+      #end
+    #end
+    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
+      'forceSkinAction' : true,
+      'h' : $searchSuggestConfigHash.hashCode()
+    })
+    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
   #end
 #end
-<script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
+#set($editActions = ['edit', 'inline', 'admin'])
+#if($editActions.contains($xcontext.action))
+  $xwiki.jsfx.use('uicomponents/lock/lock.js')
+  $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')
+  $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)
+#end
+##
+## Hooks for inserting JavaScript skin extensions
+##
+## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+<!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
+## - Skin file extension hook.
+<!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
+## - Skin extension hook
+<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+##
+## Compatibility "aspect" file for deprecated code.
+## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
+##
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
 <script type="text/javascript">
 // <![CDATA[
 XWiki.webapppath = "${xwiki.webAppPath}";
@@ -71,25 +91,3 @@ window.docsaveurl = "${doc.getURL('save')}";
 window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
-#set($editActions = ['edit', 'inline', 'admin'])
-#if($editActions.contains($xcontext.action))
-$xwiki.get('jsfx').use('uicomponents/lock/lock.js')
-$xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
-#end
-##
-## Hooks for inserting JavaScript skin extensions
-##
-## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
-<!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
-## - Skin file extension hook.
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
-## - Skin extension hook
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
-##
-## Compatibility "aspect" file for deprecated code.
-## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
-##
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
-## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>

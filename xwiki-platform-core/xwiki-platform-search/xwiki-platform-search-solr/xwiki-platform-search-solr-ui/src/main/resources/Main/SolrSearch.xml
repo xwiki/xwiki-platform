@@ -948,7 +948,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   &lt;option value='' #if($selectedSpace == '')selected='selected'#end&gt;$msg.get('search.page.bar.spaces.all')&lt;/option&gt;
   #foreach ($space in $spaces)
     #if (!$blacklistedSpaces.contains($space) &amp;&amp; $xwiki.hasAccessLevel('view', "${space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
-      &lt;option value="${space}" #if($selectedSpace == $space)selected='selected'#end&gt;$space&lt;/option&gt;
+      &lt;option value="$!{escapetool.xml($space)}" #if($selectedSpace == $space)selected='selected'#end&gt;$!{escapetool.xml($space)}&lt;/option&gt;
     #end
   #end
 &lt;/select&gt;
@@ -982,6 +982,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 {{/velocity}}
 
 {{velocity}}
+{{warning}}The Solr search feature is experimental and currently under heavy development.{{/warning}}
+
 {{html}}
 &lt;div id='search-form-container'&gt;
   ##*************##
@@ -1093,8 +1095,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
     &lt;span&gt;Debug is On&lt;/span&gt;
     #if ($debugMap)
       &lt;div&gt;&lt;b&gt;Query Parser:&lt;/b&gt;$!{debugMap.get('QParser')}&lt;/div&gt;
-      &lt;div&gt;&lt;b&gt;Parsed Query:&lt;/b&gt;$!{debugMap.get('parsedquery')}&lt;/div&gt;
-      &lt;div&gt;&lt;b&gt;Filter Queries:&lt;/b&gt;$!{debugMap.get('filter_queries')}&lt;/div&gt;
+      &lt;div&gt;&lt;b&gt;Parsed Query:&lt;/b&gt;$!{debugMap.get('parsedquery_toString')}&lt;/div&gt;
+      &lt;div&gt;&lt;b&gt;Filter Queries:&lt;/b&gt;$!{escapetool.xml($!debugMap.get('filter_queries'))}&lt;/div&gt;
       &lt;div&gt;&lt;b&gt;Processing time:&lt;/b&gt;$!{debugMap.get('timing')}&lt;/div&gt; 
     #end
   &lt;/div&gt;

@@ -17,28 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
 
-import org.xwiki.component.annotation.Role;
+package com.xpn.xwiki.store.migration;
 
 /**
- * This component might elevate the privileges delegated to a template depending on some condition before evaluating the
- * template.
- * 
+ * Common interface to report data migration status.
+ *
  * @version $Id$
- * @since 4.5M1
+ * @since 4.4.1
  */
-@Role
-public interface PrivilegedTemplateRenderer
+public interface DataMigrationStatus
 {
+    /**
+     * @return current DB version or null for a new database
+     * @xwikicfg xwiki.store.migration.version - override data version
+     * @throws DataMigrationException if any error
+     */
+    XWikiDBVersion getDBVersion() throws DataMigrationException;
 
     /**
-     * Evaluate a template while potentially delegating programming rights to it.
-     * 
-     * @param content The template content.
-     * @param templateName The template name.
-     * @return The rendered result.
+     * @return true if any migration has been attempted on current database
      */
-    String evaluateTemplate(String content, String templateName);
+    boolean hasDataMigrationBeenAttempted();
 
+    /**
+     * @return true if all attempted migrations has been successfully applied on current database
+     */
+    boolean hasBeenSuccessfullyMigrated();
+
+    /**
+     * @return the exception returned on failure by the last attempted migration on this database
+     */
+    Exception getLastMigrationException();
 }

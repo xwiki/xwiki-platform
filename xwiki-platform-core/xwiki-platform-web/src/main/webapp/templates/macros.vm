@@ -1928,12 +1928,16 @@ function (row, i, table) {
     loading.style.width = field.offsetWidth + 'px';
     loading.style.height = field.offsetHeight + 'px';
     field.parentNode.insertBefore(loading, field);
-    // Remove the loading animation after the WYSIWYG module has been loaded.
-    Wysiwyg.onModuleLoad(function() {
-      loading.parentNode.removeChild(loading);
-    });
+    var removeLoadingAnimation = function() {
+      // Remove the loading animation after the WYSIWYG module has been loaded.
+      Wysiwyg.onModuleLoad(function() {
+        loading.parentNode.removeChild(loading);
+      });
+      return true;
+    };
+    (XWiki.domIsLoaded && removeLoadingAnimation()) || document.observe('xwiki:dom:loaded', removeLoadingAnimation);
   }
-}).call();
+})(XWiki || {});
 //]]>
 </script>
 #end
@@ -1945,20 +1949,20 @@ function (row, i, table) {
   *#
 #macro(wysiwyg_import $lazy)
 ## SmartClient (used by the XWikiExplorer)
-$xwiki.jsfx.use("js/smartclient/initsc.js", {"forceSkinAction": true, 'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/initsc.js", true)
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js")
 ## TODO: remove the following line when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
-$xwiki.jsfx.use("js/smartclient/overwritesc.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/overwritesc.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js")
+$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
 ## XWikiExplorer (used by the link plug-in)
-$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", {"forceSkinAction": true, 'defer': false})
+$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
 ## WYSIWYG
-$xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true, "lazy": ${lazy}, 'defer': false})
+$xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true, "lazy": ${lazy}})
 #end
 
 #**
@@ -2090,10 +2094,16 @@ var $jsVarName = {
 #wysiwyg_writeConfig($jsVarName $parameters)
 <script type="text/javascript">
 //<![CDATA[
-Wysiwyg.onModuleLoad(function() {
-  new WysiwygEditor($jsVarName);
-  $jsVarName = undefined;
-});
+(function() {
+  var init = function() {
+    Wysiwyg.onModuleLoad(function() {
+      new WysiwygEditor($jsVarName);
+      $jsVarName = undefined;
+    });
+    return true;
+  };
+  (XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
+})(XWiki || {});
 //]]>
 </script>
 #end
@@ -2375,9 +2385,9 @@ $string##
     ## Needed for sorting the selected values.
     #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #end
-  ## Needed for displaying a list of suggestions based on the user input.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
+  ## Needed for displaying a list of suggestions based on the user input (included by default).
+  ##set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
+  ##set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
   ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
   ## overwrites the previously selected value.
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))

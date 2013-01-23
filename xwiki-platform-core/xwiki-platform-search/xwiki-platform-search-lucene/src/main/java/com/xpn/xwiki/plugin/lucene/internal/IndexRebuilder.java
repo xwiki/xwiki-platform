@@ -158,10 +158,13 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 } else {
                     try {
                         IndexWriter writer = this.indexUpdater.openWriter(false);
-                        for (String wiki : wikis) {
-                            writer.deleteDocuments(new Term(IndexFields.DOCUMENT_WIKI, wiki));
+                        try {
+                            for (String wiki : wikis) {
+                                writer.deleteDocuments(new Term(IndexFields.DOCUMENT_WIKI, wiki));
+                            }
+                        } finally {
+                            writer.close();
                         }
-                        writer.close();
                     } catch (IOException ex) {
                         LOGGER.warn("Failed to clean wiki index: {}", ex.getMessage());
                     }

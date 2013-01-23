@@ -51,6 +51,7 @@
 ## inject needed JS and CSS files
 ##
 #set($ok = $xwiki.jsfx.use("js/xwiki/lightbox/lightbox.js", true))
+#set($ok = $xwiki.ssfx.use("js/xwiki/lightbox/lightbox.css", true))
 #set($ok = $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true))
 #set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
 #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))

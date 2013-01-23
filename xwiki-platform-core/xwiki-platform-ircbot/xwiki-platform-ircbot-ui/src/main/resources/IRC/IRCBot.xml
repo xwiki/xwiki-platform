@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1330074099000</creationDate>
-  <date>1330105843000</date>
-  <contentUpdateDate>1330105843000</contentUpdateDate>
+  <creationDate>1358446241000</creationDate>
+  <date>1358500868000</date>
+  <contentUpdateDate>1358500868000</contentUpdateDate>
   <version>1.1</version>
   <title>IRC Bot Command Center</title>
   <template/>
@@ -149,12 +149,20 @@
 ## -------------------------
 The following configuration is used:
 #set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCConfiguration'))
+#set ($localircconfigdoc = $ircconfigdoc)
+#if ($ircconfigdoc.isNew())
+  #set ($ircconfigdoc = $xwiki.getDocument($services.model.createDocumentReference('', 'IRC', 'IRCConfiguration', 'default')))
+#end
 #set ($discard = $ircconfigdoc.use($doc.fullName))
 * Server: {{box}}$ircconfigdoc.getValue('server'){{/box}}
 * Channel: {{box}}$ircconfigdoc.getValue('channel'){{/box}}
 * Bot name: {{box}}$ircconfigdoc.getValue('botname'){{/box}}
 
+#if ($localircconfigdoc.isNew())
+There's no IRC.IRCConfiguration document in this wiki, defaulting to the main wiki [[IRC Configuration page&gt;&gt;$services.model.serialize($ircconfigdoc.documentReference)]].
+#else
 To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfiguration]].
+#end
 {{/velocity}}
 
 = Available Bot Listeners =

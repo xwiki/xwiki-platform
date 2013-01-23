@@ -99,7 +99,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{velocity}}
+      <content>{{include document="Stats.Macros"/}}((({{velocity}}
 #panelheader($msg.get('xe.statistics.spaces.mostviewed'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
@@ -117,7 +117,7 @@
 #end
 {{/html}}
 #panelfooter()
-{{/velocity}}</content>
+{{/velocity}})))</content>
     </property>
     <property>
       <description>Displays the most viewed spaces</description>
@@ -129,7 +129,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Stats.Macros"/}}
-
-{{include document="Panels.PanelSheet" /}}</content>
+  <content>{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

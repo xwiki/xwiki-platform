@@ -218,7 +218,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         try {
             Query query =
                 this.queryManager.createQuery(String.format(
-                    "select doc.space, doc.name from Document doc, doc.object(%s) as translation",
+                    "select distinct doc.space, doc.name from Document doc, doc.object(%s) as translation",
                     TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
 
             query.setWiki(wiki);
@@ -233,7 +233,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 registerTranslationBundle(document);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to load eexisting translations", e);
+            this.logger.error("Failed to load existing translations", e);
         }
     }
 

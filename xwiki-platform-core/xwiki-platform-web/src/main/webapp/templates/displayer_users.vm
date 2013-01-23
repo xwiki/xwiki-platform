@@ -35,6 +35,9 @@
     #end
     </ul>
   #end
+#elseif ($type == 'hidden')
+  #set($id = $escapetool.xml("${prefix}${name}"))
+  <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />
 #else
   ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
   ## mode must not be empty. Let's output something.

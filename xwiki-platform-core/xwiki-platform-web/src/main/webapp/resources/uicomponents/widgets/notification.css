@@ -23,24 +23,24 @@
 }
 
 #set($notificationCustommization = [])
-## each element:                       [notification type, bg color, text color, icon]
-#set($discard = $notificationCustommization.add(["info", "$theme.notificationInfoColor", "#fff"]))
-#set($discard = $notificationCustommization.add(["warning", "$theme.notificationWarningColor ", "#330"]))
-#set($discard = $notificationCustommization.add(["error", "$theme.notificationErrorColor", "#fff"]))
-#set($discard = $notificationCustommization.add(["inprogress", "#333", "#fff", "icons/xwiki/spinner-white.gif"]))
-#set($discard = $notificationCustommization.add(["done", "$theme.notificationSuccessColor", "#fff"]))
-##
+/* each element specifies [notification type, bg color, text color, icon] */
+#set($discard = $notificationCustommization.add(['info', "$theme.notificationInfoColor", '#fff']))
+#set($discard = $notificationCustommization.add(['warning', "$theme.notificationWarningColor ", '#330']))
+#set($discard = $notificationCustommization.add(['error', "$theme.notificationErrorColor", '#fff']))
+#set($discard = $notificationCustommization.add(['inprogress', '#333', '#fff', 'icons/xwiki/spinner-white.gif']))
+#set($discard = $notificationCustommization.add(['done', "$theme.notificationSuccessColor", '#fff']))
 #foreach($item in $notificationCustommization)
-  #set($notificationType  = ${item.get(0)})
-  #set($bgColor = ${item.get(1)})
-  #set($textColor = ${item.get(2)})
+  #set($notificationType  = $item.get(0))
+  #set($bgColor = $item.get(1))
+  #set($textColor = $item.get(2))
   #set($imgUrl = '')
   #if ($item.size() >= 4)
-    #set($imgName = "$!{item.get(3)}")
+    #set($imgName = "$!item.get(3)")
     #if($imgName.indexOf("/") >= 0)
       #set($imgUrl = $xwiki.getSkinFile($imgName))
     #else
-      #set($imgUrl = $xwiki.getSkinFile("icons/silk/${imgName}.png"))
+      #set($imgExtension = '.png')
+      #set($imgUrl = $xwiki.getSkinFile("icons/silk/$imgName$imgExtension"))
     #end
   #end
 /** $notificationType */
@@ -49,7 +49,7 @@
   color:  $textColor;
   border-color:  $textColor;
 #if($imgUrl != '')
-  background-image: url(${imgUrl});
+  background-image: url($imgUrl);
   padding-left: 22px;
 #end
 }

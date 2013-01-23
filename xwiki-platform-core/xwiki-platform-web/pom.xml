@@ -36,8 +36,6 @@
   <properties>
     <!-- Don't run CLIRR on this module since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- JS/CSS minification is on by default -->
-    <xwiki.minification.skip>false</xwiki.minification.skip>
   </properties>
   <build>
     <plugins>
@@ -99,55 +97,59 @@
         <artifactId>yuicompressor-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>minify</id>
             <goals>
               <goal>compress</goal>
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <!-- Don't output in the default webapp location, since the war plugin will overwrite the files in there
+               with the original, uncompressed ones. -->
+          <webappDirectory>${project.build.directory}/minimized</webappDirectory>
+          <excludes>
+            <!-- Exclude already minified files -->
+            <exclude>**/*-min.js</exclude>
+            <exclude>**/*-debug.js</exclude>
+            <exclude>**/langs/*.js</exclude>
+            <!-- Exclude files with complex Velocity code inside -->
+            <!-- This one iterates over xobjects of type XWiki.SearchSuggestSourceClass -->
+            <exclude>**/searchSuggest.js</exclude>
+          </excludes>
+          <aggregations>
+            <!-- Aggregate the JavaScript code that is loaded on every page. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <inputDir>${project.build.directory}/minimized</inputDir>
+              <output>${project.build.directory}/minimized/resources/js/xwiki/xwiki-min.js</output>
+              <includes>
+                <include>**/xwiki.js</include>
+                <include>**/entityReference.js</include>
+                <include>**/modalPopup.js</include>
+                <include>**/jumpToPage.js</include>
+                <include>**/confirmationBox.js</include>
+                <include>**/confirmedAjaxRequest.js</include>
+                <include>**/notification.js</include>
+                <include>**/xlist.js</include>
+                <include>**/suggest.js</include>
+              </includes>
+            </aggregation>
+            <!-- Aggregate the CSS code that is loaded on every page. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <inputDir>${project.build.directory}/minimized</inputDir>
+              <output>${project.build.directory}/minimized/resources/css/xwiki-min.css</output>
+              <includes>
+                <include>**/modalPopup.css</include>
+                <include>**/jumpToPage.css</include>
+                <include>**/confirmationBox.css</include>
+                <include>**/notification.css</include>
+                <include>**/suggest.css</include>
+              </includes>
+            </aggregation>
+          </aggregations>
+        </configuration>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!-- Javascript and CSS files compression -->
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.1</version>
-          <configuration>
-            <skip>${xwiki.minification.skip}</skip>
-            <!-- Don't output in the default webapp location, since the war plugin will overwrite the files in there
-                 with the original, uncompressed ones. -->
-            <webappDirectory>${project.build.directory}/minimized</webappDirectory>
-            <jswarn>false</jswarn>
-            <!-- Overwrite existing files -->
-            <nosuffix>true</nosuffix>
-            <includes>
-              <include>resources/js/**.js</include>
-              <include>resources/js/**.css</include>
-              <include>resources/uicomponents/**.js</include>
-              <include>resources/uicomponents/**.css</include>
-            </includes>
-            <excludes>
-              <!-- Exclude already minified files -->
-              <exclude>**/*-min.js</exclude>
-              <exclude>**/*-debug.js</exclude>
-              <exclude>**/langs/*.js</exclude>
-              <!-- Exclude files with Velocity inside -->
-              <exclude>**/actionButtons.js</exclude>
-              <exclude>**/notification.css</exclude>
-              <exclude>**/usersandgroups.js</exclude>
-              <exclude>**/columns.css</exclude>
-              <exclude>**/gallery.css</exclude>
-              <exclude>**/modalPopup.css</exclude>
-              <exclude>**/searchSuggest.js</exclude>
-              <exclude>**/upload.js</exclude>
-              <exclude>**/dashboard.css</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
   <profiles>
     <profile>

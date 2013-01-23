@@ -129,13 +129,8 @@
       </plugin>
       <plugin>
         <!-- JavaScript and CSS files compression and concatenation -->
-        <groupId>net.sf.alchim</groupId>
+        <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.7.1</version>
-        <configuration>
-          <!-- Overwrite the resource files with the minimized version. -->
-          <nosuffix>true</nosuffix>
-        </configuration>
         <executions>
           <execution>
             <id>aggregate-css</id>

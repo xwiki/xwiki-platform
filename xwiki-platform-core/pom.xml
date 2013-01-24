@@ -314,12 +314,6 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <className>com/xpn/xwiki/store/migration/DataMigrationManager</className>
-              <method>com.xpn.xwiki.store.migration.DataMigrationStatus getDataMigrationStatus()</method>
-              <differenceType>7012</differenceType>
-              <justification>New method to allow building an UI for reporting migration issues (mainly for sub-wiki)</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -19,76 +19,58 @@
  */
 package org.xwiki.localization.jar.internal;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Arrays;
 
-import junit.framework.Assert;
-
-import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.extension.ExtensionManagerConfiguration;
-import org.xwiki.extension.internal.DefaultExtensionManagerConfiguration;
+import org.mockito.Mockito;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.component.internal.multi.ComponentManagerManager;
+import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
-import org.xwiki.localization.LocalizationManager;
-import org.xwiki.localization.Translation;
+import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-@ComponentList({
-    JARTranslationBundleFactory.class,
-    DefaultObservationManager.class,
-    
-})
+@ComponentList({JARTranslationBundleFactory.class, MessageToolTranslationMessageParser.class,
+PlainTextBlockParser.class, ContextComponentManagerProvider.class})
 public class JARTranslationBundleFactoryTest
 {
     @Rule
     public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
+    private TranslationBundleFactory factory;
+
+    private InstalledExtensionRepository mockInstalledExtensionRepository;
+
     @Before
     public void setUp() throws Exception
     {
-        this.configuration = this.componentManager.getInstance(ExtensionManagerConfiguration.class);
-        
-        // checking
+        // Mocks
 
-        this.observation = getComponentManager().getInstance(ObservationManager.class);
+        this.componentManager.registerMockComponent(ComponentManagerManager.class);
+        this.componentManager.registerMockComponent(ObservationManager.class);
+        this.mockInstalledExtensionRepository =
+            this.componentManager.registerMockComponent(InstalledExtensionRepository.class);
 
-        // Initialiaze document bundle factory
-        getComponentManager().getInstance(TranslationBundleFactory.class, "document");
+        // Components
 
-        this.localization = getComponentManager().getInstance(LocalizationManager.class);
-    }
-
-    private void assertTranslation(String key, String message, Locale locale)
-    {
-        Translation translation = this.localization.getTranslation(key, locale);
-
-        if (message != null) {
-            Assert.assertNotNull(translation);
-            Assert.assertEquals(message, translation.getRawSource());
-        } else {
-            Assert.assertNull(translation);
-        }
+        this.factory = this.componentManager.getInstance(TranslationBundleFactory.class, "jar");
     }
 
     // tests
 
     @Test
-    public void getTranslation() throws XWikiException
+    public void getBundle() throws TranslationBundleDoesNotExistsException
     {
-        assertTranslation("wiki.translation", null, Locale.ROOT);
+        Mockito.when(mockInstalledExtensionRepository.getInstalledExtensions()).thenReturn(
+            Arrays.<InstalledExtension> asList());
 
-        addTranslation("wiki.translation", "Wiki translation", new DocumentReference(getContext().getDatabase(),
-            "space", "translation"), Locale.ROOT, Scope.WIKI);
-
-        assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
+        this.factory.getBundle("toto");
     }
 }

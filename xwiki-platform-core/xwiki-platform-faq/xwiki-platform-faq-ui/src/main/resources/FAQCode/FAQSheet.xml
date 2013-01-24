@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1319793947000</creationDate>
-  <date>1321536437000</date>
-  <contentUpdateDate>1321536437000</contentUpdateDate>
+  <date>1353670124000</date>
+  <contentUpdateDate>1353669949000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -36,13 +36,13 @@
         {{/context}}
       #else
         {{error}}
-          No answer has been provided yet for this FAQ entry. Be the first to provide one! Register on this wiki and edit this page to add an answer to this FAQ entry.
+          $msg.get('platform.faq.noAnswer')
         {{/error}}
       #end
     #else
       $doc.display("answer")
     #end
 #else
-  This class sheet must be applied on a document containing an FAQCode.FAQClass object
+  $msg.get('platform.faq.sheet')
 #end</content>
 </xwikidoc>

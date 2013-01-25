@@ -49,7 +49,7 @@ public interface SolrInstance extends Initializable
      * @throws InitializationException if problems occur.
      */
     void initialize() throws InitializationException;
-    
+
     /**
      * Shutdown the instance.
      */

@@ -21,14 +21,13 @@ package org.xwiki.search.solr.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
 /**
@@ -38,25 +37,20 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  * @since 4.3M2
  */
 @Component
-@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+@Singleton
 public class SolrInstanceProvider implements Provider<SolrInstance>
 {
-    /**
-     * Default component type.
-     */
-    public static final String DEFAULT_SOLR_TYPE = "embedded";
-
-    /**
-     * The configuration where the provider looks.
-     */
-    @Inject
-    private ConfigurationSource configuration;
-
     /**
      * Logging framework.
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Solr configuration.
+     */
+    @Inject
+    private SolrConfiguration configuration;
 
     /**
      * The component manager used to lookup the configured component.
@@ -67,7 +61,7 @@ public class SolrInstanceProvider implements Provider<SolrInstance>
     @Override
     public SolrInstance get()
     {
-        String type = getType();
+        String type = configuration.getServerType();
 
         SolrInstance newInstance = null;
         try {
@@ -77,14 +71,5 @@ public class SolrInstanceProvider implements Provider<SolrInstance>
         }
 
         return newInstance;
-    }
-
-    /**
-     * @return the configured component type.
-     */
-    String getType()
-    {
-        // TODO: Read this from the configuration.
-        return DEFAULT_SOLR_TYPE;
     }
 }

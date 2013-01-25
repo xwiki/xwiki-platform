@@ -93,6 +93,12 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
 
+    <!-- Apache xalan used for Solr's internal XML operations. -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+    </dependency>
+
     <!-- XWiki dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

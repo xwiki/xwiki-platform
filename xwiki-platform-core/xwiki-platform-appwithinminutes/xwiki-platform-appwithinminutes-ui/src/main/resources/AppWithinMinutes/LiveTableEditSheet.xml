@@ -541,10 +541,11 @@ return XWiki;
   &lt;select id="availableColumns"&gt;
     #set($className = "$!liveTableObj.getProperty('class').value")
     #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
+    #set($discard = $services.localization.use('document', "$stringtool.removeEnd($className, 'Class')Translations"))
     #if($classFields.size() &gt; 0)
       &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
         #foreach($field in $classFields)
-          &lt;option value="$field.name"&gt;$escapetool.xml($field.prettyName)&lt;/option&gt;
+          &lt;option value="$field.name"&gt;$escapetool.xml($field.translatedPrettyName)&lt;/option&gt;
         #end
       &lt;/optgroup&gt;
     #end
@@ -675,6 +676,18 @@ return XWiki;
   #set($discard = $doc.save($comment, $minorEdit))
 #end
 
+#macro(maybeCreateLiveTableResultsPage)
+  #set ($className = "$!doc.getObject('AppWithinMinutes.LiveTableClass').getProperty('class').value")
+  #set ($liveTableResultsDoc = $xwiki.getDocument("$!stringtool.removeEnd($className, 'Class')LiveTableResults"))
+  #set ($liveTableResultsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableResultsGenerator'))
+  #if ($liveTableResultsDoc.isNew())
+    #set ($discard = $liveTableResultsDoc.setParent($doc.name))
+    #set ($discard = $liveTableResultsDoc.setHidden(true))
+    #set ($discard = $liveTableResultsDoc.setContent($doc.getRenderedContent($liveTableResultsGeneratorDoc.content, $liveTableResultsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+    #set ($discard = $liveTableResultsDoc.save($msg.get('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
+  #end
+#end
+
 #macro(updateAndSaveIcon)
   #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
   #set($discard = $uix.set('name', "platform.panels.${doc.space}Application"))
@@ -686,6 +699,7 @@ return XWiki;
 #macro(doSave)
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
+  #maybeCreateLiveTableResultsPage()
   #updateAndSaveIcon()
   #if($action == 'save')
     #if($errorMessage)

@@ -402,10 +402,7 @@ return XWiki;
     #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
     #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
   #end
-  #set($appHomeURL = $xwiki.getDocument($appHomeRef).getExternalURL())
-  #if($appHomeURL.endsWith('/WebHome'))
-    #set($appHomeURL = $appHomeURL.substring(0, $mathtool.sub($appHomeURL.length(), 7)))
-  #end
+  #set($appHomeURL = $stringtool.removeEnd($xwiki.getDocument($appHomeRef).getExternalURL(), 'WebHome'))
   ; $msg.get('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
   : {{{$!appHomeURL}}}
   ; $msg.get('platform.appwithinminutes.appNamePreviewDataSpaceLabel')

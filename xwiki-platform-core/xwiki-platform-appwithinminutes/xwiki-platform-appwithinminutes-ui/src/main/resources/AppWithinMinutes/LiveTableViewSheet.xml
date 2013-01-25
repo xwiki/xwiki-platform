@@ -340,10 +340,7 @@ return XWiki;
   #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
   #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
   #if($hasCreatePage || ($hasEdit &amp;&amp; !$isReadOnly) || $hasSpaceAdmin)
-    #set($className = $liveTableObj.getProperty('class').value)
-    #if($className.endsWith('Class'))
-      #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
-    #end
+    #set($className = $stringtool.removeEnd($liveTableObj.getProperty('class').value, 'Class'))
     (% id="actionBox" class="floatinginfobox" %)
     (((
       = $msg.get('platform.appwithinminutes.appHomePageActionsHeading') =

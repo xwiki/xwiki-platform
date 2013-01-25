@@ -381,4 +381,13 @@ public class BasePage extends BaseElement
         new Actions(getDriver()).moveToElement(spaceMenu).perform();
         this.watchSpaceLink.click();
     }
+
+    /**
+     * @return the URL of the link representing the current page in the Page top level menu entry
+     * @since 4.5M1
+     */
+    public String getPageMenuLink()
+    {
+        return this.pageMenu.findElement(By.xpath(".//a[contains(@class, 'tme')]")).getAttribute("href");
+    }
 }

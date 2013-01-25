@@ -493,6 +493,6 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 4.5M1]
 #-# The list of multilingual fields for which to use optimized indexing.
-# solr.multilingual.fields=title,doccontent,comment,objcontent,attcontent
+# solr.multilingual.fields=title,doccontent,comment,objcontent,propertyvalue,attcontent
 
 $!xwikiPropertiesAdditionalProperties

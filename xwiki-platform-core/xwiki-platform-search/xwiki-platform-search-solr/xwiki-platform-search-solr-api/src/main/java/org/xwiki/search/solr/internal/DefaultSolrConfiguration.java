@@ -65,7 +65,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
      * Default list of multilingual fields.
      */
     public static final List<String> DEFAULT_MULTILINGUAL_FIELDS = Arrays.asList("title", "doccontent", "comment",
-        "objcontent", "attcontent");
+        "objcontent", "propertyvalue", "attcontent");
 
     /**
      * The classpath location prefix to use when looking for the default solr configuration files.

@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.List;
+
 import javax.inject.Named;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -64,12 +66,54 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
             solrDocument.addField(Fields.TYPE, objectPropertyReference.getType().name());
             solrDocument.addField(Fields.CLASS, compactSerializer.serialize(classReference));
             solrDocument.addField(Fields.PROPERTY_NAME, objectProperty.getName());
-            solrDocument.addField(Fields.PROPERTY_VALUE, objectProperty.getValue());
+
+            addLanguageAndContentFields(documentReference, solrDocument, objectProperty);
 
             return solrDocument;
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to get Solr document for '%s'",
                 serializer.serialize(objectPropertyReference)), e);
         }
+    }
+
+    /**
+     * Set the language to all the translations that the owning document has. This ensures that this entity is found for
+     * all the translations of a document, not just the original document.
+     * <p/>
+     * Also, index the content with each language so that the right analyzer is used.
+     * 
+     * @param documentReference the original document's reference.
+     * @param solrDocument the Solr document where to add the fields.
+     * @param objectProperty the object property.
+     * @throws Exception if problems occur.
+     */
+    protected void addLanguageAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
+        BaseProperty<ObjectPropertyReference> objectProperty) throws Exception
+    {
+        XWikiDocument originalDocument = getDocument(documentReference);
+
+        // Get all the languages in which the document is available.
+        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
+        // Make sure that the original document's language is there as well.
+        String originalDocumentLanguage = getLanguage(documentReference);
+        if (!documentLanguages.contains(originalDocumentLanguage)) {
+            documentLanguages.add(originalDocumentLanguage);
+        }
+
+        // Do the work for each language.
+        for (String documentLanguage : documentLanguages) {
+            if (!documentLanguage.equals(originalDocumentLanguage)) {
+                // The original document's language is already set by the call to the addDocumentFields method.
+                solrDocument.addField(Fields.LANGUAGE, documentLanguage);
+            }
+
+            solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.PROPERTY_VALUE, documentLanguage),
+                objectProperty.getValue());
+        }
+
+        // We can`t rely on the schema's copyField here because we would trigger it for each language. Doing the copy to
+        // the text_general field manually.
+        solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.PROPERTY_VALUE, Fields.MULTILINGUAL),
+            objectProperty.getValue());
     }
 }

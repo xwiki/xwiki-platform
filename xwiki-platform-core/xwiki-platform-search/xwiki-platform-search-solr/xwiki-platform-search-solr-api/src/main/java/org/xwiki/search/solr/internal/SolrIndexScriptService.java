@@ -30,13 +30,15 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndex;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * TODO DOCUMENT ME!
+ * Script service exposing interaction with the Solr index. Queries on the index are performed using XWiki's <a
+ * href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Query+Module">Query Module API</a> with query type "solr".
  * 
  * @version $Id$
  * @since 4.3M2
@@ -49,6 +51,12 @@ public class SolrIndexScriptService implements ScriptService
      * Field name of the last API exception inserted in context.
      */
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
+
+    /**
+     * The Solr configuration.
+     */
+    @Inject
+    protected SolrConfiguration configuration;
 
     /**
      * Execution context.
@@ -130,6 +138,28 @@ public class SolrIndexScriptService implements ScriptService
         } catch (SolrIndexException e) {
             error(e);
         }
+    }
+
+    /**
+     * @see SolrConfiguration#getOptimizableLanguages()
+     * @return the list of supported language codes for which optimized indexing can be performed.
+     */
+    public List<String> getOptimizableLanguages()
+    {
+        clearException();
+
+        return this.configuration.getOptimizableLanguages();
+    }
+
+    /**
+     * @see SolrConfiguration#getOptimizedLanguages()
+     * @return the list of language codes for which to perform optimized indexing.
+     */
+    public List<String> getOptimizedLanguages()
+    {
+        clearException();
+
+        return this.configuration.getOptimizedLanguages();
     }
 
     /**

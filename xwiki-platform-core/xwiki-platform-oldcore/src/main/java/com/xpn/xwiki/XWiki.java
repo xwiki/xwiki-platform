@@ -2205,7 +2205,7 @@ public class XWiki implements EventListener
                 return result;
             }
         } catch (Exception e) {
-            LOGGER.warn("Exception while getting wiki preference [" + prefname + "]", e);
+            LOGGER.debug("Exception while getting wiki preference [" + prefname + "]", e);
         }
         return Param(fallback_param, default_value);
     }
@@ -2241,18 +2241,14 @@ public class XWiki implements EventListener
                     doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
                 String result = "";
                 if (object != null) {
-                    try {
-                        result = object.getStringValue(preference);
-                    } catch (Exception e) {
-                        LOGGER.warn("Exception while getting space preference [" + preference + "]", e);
-                    }
+                    result = object.getStringValue(preference);
                 }
 
                 if (!result.equals("")) {
                     return result;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Exception while getting space preference [" + preference + "]", e);
+                LOGGER.debug("Exception while getting space preference [" + preference + "]", e);
             }
         }
         return getXWikiPreference(preference, defaultValue, context);
@@ -2270,7 +2266,7 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Exception while getting user preference [" + prefname + "]", e);
+            LOGGER.debug("Exception while getting user preference [" + prefname + "]", e);
         }
 
         return getSpacePreference(prefname, context);

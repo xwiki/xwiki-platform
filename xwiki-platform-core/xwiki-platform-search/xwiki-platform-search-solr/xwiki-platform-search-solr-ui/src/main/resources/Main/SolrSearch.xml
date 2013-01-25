@@ -885,6 +885,10 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
     #set ($discard = $query.bindValue('qf', $boost))
   #end
 
+  #if ($debug != '')
+    #set ($discard = $query.bindValue('debugQuery', 'on'))
+  #end
+
   ##
   ## Filters
   ##
@@ -1160,7 +1164,11 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
     &lt;div id='search-results'&gt;
     #foreach ($searchResult in $results)
       #set ($resultDocumentReference = $services.model.createDocumentReference($searchResult.wiki, $searchResult.space, $searchResult.name))
+      ## The lang field is multivalued to support attachments, objects and properties. For documents however, we only have 1 value.
       #set ($resultLanguage = $searchResult.lang)
+      #if ($resultLanguage.size() &gt; 0)
+        #set ($resultLanguage = $resultLanguage[0])
+      #end
       #set ($searchResultDocument = $xwiki.getDocument($resultDocumentReference))
       ## Make sure we get the right document translation based on what the resultLanguage says.
       #if ($searchResultDocument.realLanguage != $resultLanguage)

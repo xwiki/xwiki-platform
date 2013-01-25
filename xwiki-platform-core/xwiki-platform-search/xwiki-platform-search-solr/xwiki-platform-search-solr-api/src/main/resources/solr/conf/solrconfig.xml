@@ -792,6 +792,10 @@
          objcontent_el objcontent_es objcontent_eu objcontent_fa objcontent_fi objcontent_fr objcontent_ga objcontent_gl objcontent_hi objcontent_hu
          objcontent_hy objcontent_id objcontent_it objcontent_ja objcontent_lv objcontent_nl objcontent_no objcontent_pt objcontent_ro objcontent_ru
          objcontent_sv objcontent_th objcontent_tr</str>
+       <str name="f.propertyvalue.qf">propertyvalue_ml propertyvalue_ar propertyvalue_bg propertyvalue_ca propertyvalue_cz propertyvalue_da propertyvalue_de propertyvalue_en
+         propertyvalue_el propertyvalue_es propertyvalue_eu propertyvalue_fa propertyvalue_fi propertyvalue_fr propertyvalue_ga propertyvalue_gl propertyvalue_hi propertyvalue_hu
+         propertyvalue_hy propertyvalue_id propertyvalue_it propertyvalue_ja propertyvalue_lv propertyvalue_nl propertyvalue_no propertyvalue_pt propertyvalue_ro propertyvalue_ru
+         propertyvalue_sv propertyvalue_th propertyvalue_tr</str>
        <str name="f.attcontent.qf">attcontent_ml attcontent_ar attcontent_bg attcontent_ca attcontent_cz attcontent_da attcontent_de attcontent_en
          attcontent_el attcontent_es attcontent_eu attcontent_fa attcontent_fi attcontent_fr attcontent_ga attcontent_gl attcontent_hi attcontent_hu
          attcontent_hy attcontent_id attcontent_it attcontent_ja attcontent_lv attcontent_nl attcontent_no attcontent_pt attcontent_ro attcontent_ru

@@ -91,13 +91,13 @@ public class DefaultSolrConfiguration implements SolrConfiguration
      * Solr conf directory file names (including default language resources).
      */
     public static final String[] CONF_DIRECTORY_FILE_NAMES = {"solrconfig.xml", "schema.xml", "elevate.xml",
-    "protwords.txt", "stopwords.txt", "synonyms.txt"};
+        "protwords.txt", "stopwords.txt", "synonyms.txt"};
 
     /**
      * Solr language analysis resource file names.
      */
     public static final String[] LANGUAGE_RESOURCE_FILE_NAME_PREFIXES = {"contractions", "hyphenations", "stemdict",
-    "stoptags", "stopwords", "synonyms", "userdict"};
+        "stoptags", "stopwords", "synonyms", "userdict"};
 
     /**
      * The Solr configuration source.

@@ -28,7 +28,7 @@ import org.xwiki.localization.Translation;
  * A translations bundle in a specific {@link Locale}.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 4.5M1
  */
 public interface LocalizedTranslationBundle
 {

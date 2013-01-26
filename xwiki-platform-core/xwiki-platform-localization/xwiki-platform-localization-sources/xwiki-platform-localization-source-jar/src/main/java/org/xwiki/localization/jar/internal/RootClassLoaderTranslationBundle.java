@@ -41,7 +41,10 @@ import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 
 /**
+ * Provide translations coming from the root {@link ClassLoader}.
+ * 
  * @version $Id$
+ * @since 4.5M1
  */
 @Component
 @Named("rootclassloader")

@@ -56,6 +56,7 @@ public interface LocalizationManager
      * @return the {@link TranslationBundle} or null if none could be found
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
+     * @since 4.5M1
      */
     TranslationBundle getTranslationBundle(String bundleType, String bundleId)
         throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException;

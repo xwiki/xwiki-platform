@@ -24,6 +24,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
@@ -55,6 +56,48 @@ public class BasePage extends BaseElement
      */
     @FindBy(id = "tmEdit")
     private WebElement editMenu;
+
+    @FindBy(id = "tmCreatePage")
+    private WebElement createPageMenuLink;
+
+    @FindBy(id = "tmCreateSpace")
+    private WebElement createSpaceMenuLink;
+
+    @FindBy(id = "tmCreate")
+    private WebElement createMenu;
+
+    @FindBy(id = "tmActionCopy")
+    private WebElement copyPageLink;
+
+    @FindBy(id = "tmActionDelete")
+    private WebElement deletePageLink;
+
+    @FindBy(id = "tmWatchDocument")
+    private WebElement watchDocumentLink;
+
+    @FindBy(id = "tmPage")
+    private WebElement pageMenu;
+
+    @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
+    private WebElement registerLink;
+
+    @FindBys({@FindBy(id = "tmLogin"), @FindBy(tagName = "a")})
+    private WebElement loginLink;
+
+    @FindBys({@FindBy(id = "tmLogout"), @FindBy(tagName = "a")})
+    private WebElement logoutLink;
+
+    @FindBys({@FindBy(id = "tmUser"), @FindBy(tagName = "a")})
+    private WebElement userLink;
+
+    @FindBy(id = "document-title")
+    private WebElement documentTitle;
+
+    @FindBy(id = "tmWatchSpace")
+    private WebElement watchSpaceLink;
+
+    @FindBy(id = "tmSpace")
+    private WebElement spaceMenu;
 
     public String getPageTitle()
     {
@@ -214,5 +257,137 @@ public class BasePage extends BaseElement
     {
         waitUntilElementIsVisible(By.id("footerglobal"));
         return this;
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public CreatePagePage createPage()
+    {
+        new Actions(getDriver()).moveToElement(createMenu).perform();
+        this.createPageMenuLink.click();
+        return new CreatePagePage();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public CreateSpacePage createSpace()
+    {
+        new Actions(getDriver()).moveToElement(createMenu).perform();
+        this.createSpaceMenuLink.click();
+        return new CreateSpacePage();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public CopyPage copy()
+    {
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
+        this.copyPageLink.click();
+        return new CopyPage();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public ConfirmationPage delete()
+    {
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
+        this.deletePageLink.click();
+        return new ConfirmationPage();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public boolean canDelete()
+    {
+        if (getUtil().hasElement(By.xpath("//div[@id='tmPage']//span[@class='menuarrow']"))) {
+            new Actions(getDriver()).moveToElement(pageMenu).perform();
+            return getUtil().hasElement(By.id("tmActionDelete"));
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public void watchDocument()
+    {
+        new Actions(getDriver()).moveToElement(pageMenu).perform();
+        this.watchDocumentLink.click();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public boolean hasLoginLink()
+    {
+        // Note that we cannot test if the loginLink field is accessible since we're using an AjaxElementLocatorFactory
+        // and thus it would wait 15 seconds before considering it's not accessible.
+        return !getUtil().findElementsWithoutWaiting(getDriver(), By.id("tmLogin")).isEmpty();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public LoginPage login()
+    {
+        this.loginLink.click();
+        return new LoginPage();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public String getCurrentUser()
+    {
+        return this.userLink.getText();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public void logout()
+    {
+        this.logoutLink.click();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public RegistrationPage register()
+    {
+        this.registerLink.click();
+        return new RegistrationPage();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public String getDocumentTitle()
+    {
+        return this.documentTitle.getText();
+    }
+
+    /**
+     * @since 4.5M1
+     */
+    public void watchSpace()
+    {
+        new Actions(getDriver()).moveToElement(spaceMenu).perform();
+        this.watchSpaceLink.click();
+    }
+
+    /**
+     * @return the URL of the link representing the current page in the Page top level menu entry
+     * @since 4.5M1
+     */
+    public String getPageMenuLink()
+    {
+        return this.pageMenu.findElement(By.xpath(".//a[contains(@class, 'tme')]")).getAttribute("href");
     }
 }

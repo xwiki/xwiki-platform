@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
-import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
@@ -73,6 +72,8 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
         EmbeddedSolrInstance instance = getComponentManager().getInstance(SolrInstance.class, "embedded");
         instance.shutDown();
 
+        super.tearDown();
+
         FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
     }
 
@@ -80,7 +81,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
     public void testInitialization() throws Exception
     {
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, url.getPath());
+        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
 
         getInstanceAndAssertHomeDirectory(url.getPath());
     }
@@ -89,7 +90,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
     public void testInstantiationNewHome() throws Exception
     {
         String newHome = new File(PERMANENT_DIRECTORY, "doesNotExist").getAbsolutePath();
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, newHome);
+        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, newHome);
 
         getInstanceAndAssertHomeDirectory(newHome);
     }
@@ -97,7 +98,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
     @Test
     public void testInstantiationNoHome() throws ComponentLookupException, Exception
     {
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, "");
+        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, "");
 
         // Not actually expecting null, just trying to reuse code. Actually expecting default directory.
         getInstanceAndAssertHomeDirectory(null);
@@ -122,10 +123,10 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
             expected = implementation.getDefaultHomeDirectory();
         }
         Assert.assertEquals(expected + File.separator, container.getSolrHome());
-        Assert.assertTrue(new File(new File(container.getSolrHome(), EmbeddedSolrInstance.CONF_DIRECTORY),
-            EmbeddedSolrInstance.SCHEMA_XML).exists());
-        Assert.assertTrue(new File(new File(container.getSolrHome(), EmbeddedSolrInstance.CONF_DIRECTORY),
-            EmbeddedSolrInstance.SOLRCONFIG_XML).exists());
+        Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
+            "schema.xml").exists());
+        Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
+            "solrconfig.xml").exists());
     }
 
 }

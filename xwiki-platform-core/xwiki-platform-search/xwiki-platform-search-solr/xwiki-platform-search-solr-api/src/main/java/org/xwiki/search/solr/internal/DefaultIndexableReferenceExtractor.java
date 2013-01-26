@@ -54,6 +54,8 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
  * @version $Id$
  * @since 4.3M2
  */
+// FIXME: REFACTOR into multiple implementations of the IndexableReferenceExtractor interface, just like we did for
+// SolrMetadataExtractor
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
 public class DefaultIndexableReferenceExtractor implements IndexableReferenceExtractor
@@ -148,7 +150,6 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
         // FIXME: The things we do to make checkstyle happy...
         if (!(getDocument(classReference).getXClass().get(objectPropertyReference.getName())
             instanceof PasswordClass)) {
-
             result.add(objectPropertyReference);
         }
 
@@ -193,8 +194,10 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
 
         XWikiContext context = getXWikiContext();
 
-        if (context.getWiki().exists(documentReference, context)
-            && !documentReference.getName().contains("WatchList")) {
+        // FIXME: The GSoC implementation had a second part in the if. Remove this comment if it proves to be not
+        // important in, say... version 5.1.
+        // && !documentReference.getName().contains("WatchList")
+        if (context.getWiki().exists(documentReference, context)) {
 
             // Document itself
             result.add(documentReference);

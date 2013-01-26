@@ -46,18 +46,13 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
- * TODO DOCUMENT ME!
+ * Abstract implementation for a metadata extractor.
  * 
  * @version $Id$
  * @since 4.3M2
  */
 public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtractor
 {
-    /**
-     * Underscore.
-     */
-    protected static final String USCORE = "_";
-
     /**
      * Logging framework.
      */
@@ -212,13 +207,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param solrDocument the document where to add the properties.
      * @param object the object whose properties to add.
+     * @param language the language of the indexed document. In case of translations, this will obviously be different
+     *            than the original document's language.
      */
-    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object)
+    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object, String language)
     {
         if (object == null) {
             // Yes, the platform can return null objects.
             return;
         }
+
+        String fieldName = String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, language);
 
         XWikiContext context = getXWikiContext();
 
@@ -232,7 +231,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 // Avoid indexing password.
                 PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
                 if (!(propertyClass instanceof PasswordClass)) {
-                    solrDocument.addField(Fields.OBJECT_CONTENT, property.getName() + ":" + property.getValue());
+                    solrDocument.addField(fieldName, String.format("%s:%s", property.getName(), property.getValue()));
                 }
             }
         }

@@ -32,6 +32,10 @@
   <artifactId>xwiki-platform-dashboard-macro</artifactId>
   <name>XWiki Platform - Dashboard - Macro</name>
   <description>Displays the macro instances (gadgets) inside in a dashboard.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Dashboard Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -31,6 +31,10 @@
   <name>XWiki Platform - JIRA</name>
   <packaging>jar</packaging>
   <description>Component for using Atlassian's JIRA REST API to access JIRA instances</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>JIRA Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

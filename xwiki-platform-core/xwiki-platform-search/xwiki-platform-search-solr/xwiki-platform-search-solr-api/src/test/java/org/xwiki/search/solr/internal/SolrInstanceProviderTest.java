@@ -25,11 +25,10 @@ import javax.inject.Provider;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
-import org.xwiki.search.solr.internal.SolrInstanceProvider;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
@@ -52,7 +51,16 @@ public class SolrInstanceProviderTest extends AbstractComponentTestCase
             getComponentManager().getInstance(new DefaultParameterizedType(null, Provider.class, SolrInstance.class));
 
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, url.getPath());
+        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
+    }
+
+    @Override
+    @After
+    public void tearDown() throws Exception
+    {
+        this.provider.get().shutDown();
+
+        super.tearDown();
     }
 
     @Test
@@ -65,10 +73,10 @@ public class SolrInstanceProviderTest extends AbstractComponentTestCase
     @Test
     public void testInstanceRetrieval() throws Exception
     {
-        Assert.assertEquals(SolrInstanceProvider.DEFAULT_SOLR_TYPE, ((SolrInstanceProvider) provider).getType());
-
         SolrInstance instance = provider.get();
         Assert.assertNotNull(instance);
         Assert.assertTrue(instance instanceof EmbeddedSolrInstance);
     }
+
+    // FIXME: add test for remote solr instance.
 }

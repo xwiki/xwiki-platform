@@ -36,6 +36,8 @@
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Application Manager Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

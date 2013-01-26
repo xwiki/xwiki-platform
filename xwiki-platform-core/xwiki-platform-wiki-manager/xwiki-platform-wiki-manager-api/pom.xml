@@ -32,6 +32,10 @@
   <artifactId>xwiki-platform-wiki-manager-api</artifactId>
   <name>XWiki Platform - Wiki Manager - API</name>
   <description>XWiki Platform - Wiki Manager - API</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Manager API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

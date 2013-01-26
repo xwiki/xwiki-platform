@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false" filter="none"}}
 #macro(prepareColumnProperties)
-${escapetool.h}set(${escapetool.d}columnsProperties = {##
+${escapetool.h}set (${escapetool.d}columnsProperties = {##
 #set($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
 #set($specialColumns = ['_avatar', '_images', '_attachments', '_actions'])
 #set($separator = '')
@@ -75,12 +75,15 @@ $separator
 {{{##
 {{velocity}}
 #set($className = $liveTableObj.getProperty('class').value)
+#set($translationBundleId = "$stringtool.removeEnd($className, 'Class')Translations")
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '$translationBundleId'))
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
 #prepareColumnProperties()
-${escapetool.h}set(${escapetool.d}options = {
+${escapetool.h}set (${escapetool.d}options = {
   'className': '$className',
+  'resultPage': '$stringtool.removeEnd($className, 'Class')LiveTableResults',
   'translationPrefix': '${shortName}.livetable.',
   'tagCloud': true,
   'rowCount': 15,
@@ -88,7 +91,7 @@ ${escapetool.h}set(${escapetool.d}options = {
   'selectedColumn': '$columns.get(0)',
   'defaultOrder': 'asc'
 })
-${escapetool.h}set(${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'$column'#end])
+${escapetool.h}set (${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'$column'#end])
 ${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}columnsProperties ${escapetool.d}options)
 {{/velocity}}##
 }}}

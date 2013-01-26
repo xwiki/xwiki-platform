@@ -15,7 +15,7 @@
   <date>1319634251000</date>
   <contentUpdateDate>1319634251000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if(!$doc.name.endsWith('Sheet'))Class: #end#if($doc.name.endsWith('Class'))$doc.name.substring(0, $mathtool.sub($doc.name.length(), 5))#{else}$doc.name#end</title>
+  <title>#if(!$doc.name.endsWith('Sheet'))Class: #end$stringtool.removeEnd($doc.name, 'Class')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -1510,10 +1510,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Display the options to create/update the class template, the class sheet and the class translation bundle.
  *#
 #macro(displayClassOptions)
-  #set($className = $doc.name)
-  #if($className.endsWith('Class'))
-    #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
-  #end
+  #set($className = $stringtool.removeEnd($doc.name, 'Class'))
   #set($templateName = "${className}Template")
   #set($translationsName = "${className}Translations")
   #set($classSheets = $services.sheet.getClassSheets($doc))
@@ -1556,10 +1553,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     &lt;input type="hidden" id="template-$field.name" name="template-$field.name" value="$escapetool.xml($formFieldDoc.fullName)" /&gt;
   {{/html}}
 
-  #set($className = $doc.name)
-  #if($className.endsWith('Class'))
-    #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
-  #end
+  #set($className = $stringtool.removeEnd($doc.name, 'Class'))
   #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
   #set($templateDoc = $xwiki.getDocument($templateRef))
   ## Simulate the editing of the class instance from the template document.
@@ -1842,10 +1836,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(updateAndSaveTemplate)
   #if(!$errorMessage &amp;&amp; $request.updateClassTemplate)
-    #set($className = $doc.name)
-    #if($className.endsWith('Class'))
-      #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
-    #end
+    #set($className = $stringtool.removeEnd($doc.name, 'Class'))
     #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.setParent($doc.name))
@@ -1862,10 +1853,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #if(!$errorMessage &amp;&amp; $request.updateClassSheet)
     #set($classSheets = $services.sheet.getClassSheets($doc))
     #if($classSheets.isEmpty())
-      #set($className = $doc.name)
-      #if($className.endsWith('Class'))
-        #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
-      #end
+      #set($className = $stringtool.removeEnd($doc.name, 'Class'))
       #set($sheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Sheet"))
       #set($discard = $services.sheet.bindClassSheet($doc, $sheetReference))
       #set($discard = $doc.save($msg.get('platform.appwithinminutes.classEditorBindSheetSaveComment'), $minorEdit))
@@ -1888,16 +1876,14 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(updateAndSaveTranslations)
   #if(!$errorMessage &amp;&amp; $request.updateClassTranslations)
-    #set($className = $doc.name)
-    #if($className.endsWith('Class'))
-      #set($className = $className.substring(0, $mathtool.sub($className.length(), 5)))
-    #end
+    #set($className = $stringtool.removeEnd($doc.name, 'Class'))
     #set($translationsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Translations"))
     #set($translationsDoc = $xwiki.getDocument($translationsRef))
     #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass', true))
-    ## We don't use the translation bundle on demand because some translations are required by the live table results
-    ## which are fetched in a separate request (and we don't want to use a custom live table results page just for this).
-    #set($discard = $translationsObj.set('scope', 'WIKI'))
+    ## We use the translation bundle on demand because none of the available scopes suits our needs. Simple users can't
+    ## register document translation bundles at WIKI level and the SPACE scope doesn't remove the need to create a
+    ## custom live table results page in the same space as the application.
+    #set($discard = $translationsObj.set('scope', 'ON_DEMAND'))
     #set($discard = $translationsDoc.setParent($doc.name))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content, $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))

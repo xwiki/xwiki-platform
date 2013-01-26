@@ -25,12 +25,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -52,7 +51,7 @@ import com.xpn.xwiki.XWikiContext;
  * @since 4.3M2
  */
 @Component
-@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+@Singleton
 public class DefaultSolrIndex implements SolrIndex
 {
     /**

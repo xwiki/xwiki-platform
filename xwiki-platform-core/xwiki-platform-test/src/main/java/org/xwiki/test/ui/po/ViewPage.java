@@ -25,9 +25,7 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
@@ -39,96 +37,11 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class ViewPage extends BasePage
 {
-    @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
-    private WebElement registerLink;
-
-    @FindBys({@FindBy(id = "tmLogin"), @FindBy(tagName = "a")})
-    private WebElement loginLink;
-
-    @FindBys({@FindBy(id = "tmLogout"), @FindBy(tagName = "a")})
-    private WebElement logoutLink;
-
-    @FindBys({@FindBy(id = "tmUser"), @FindBy(tagName = "a")})
-    private WebElement userLink;
-
-    @FindBy(id = "tmCreatePage")
-    private WebElement createPageMenuLink;
-
-    @FindBy(id = "tmCreateSpace")
-    private WebElement createSpaceMenuLink;
-
     @FindBy(id = "xwikicontent")
     private WebElement content;
 
-    @FindBy(id = "tmActionCopy")
-    private WebElement copyPageLink;
-
-    @FindBy(id = "tmActionDelete")
-    private WebElement deletePageLink;
-
-    @FindBy(id = "document-title")
-    private WebElement documentTitle;
-
     @FindBy(id = "hierarchy")
     private WebElement breadcrumbDiv;
-
-    @FindBy(id = "tmWatchSpace")
-    private WebElement watchSpaceLink;
-
-    @FindBy(id = "tmWatchDocument")
-    private WebElement watchDocumentLink;
-
-    @FindBy(id = "tmCreate")
-    private WebElement createMenu;
-
-    @FindBy(id = "tmPage")
-    private WebElement pageMenu;
-
-    @FindBy(id = "tmSpace")
-    private WebElement spaceMenu;
-
-    public boolean hasLoginLink()
-    {
-        // Note that we cannot test if the loginLink field is accessible since we're using an AjaxElementLocatorFactory
-        // and thus it would wait 15 seconds before considering it's not accessible.
-        return !getUtil().findElementsWithoutWaiting(getDriver(), By.id("tmLogin")).isEmpty();
-    }
-
-    public LoginPage login()
-    {
-        this.loginLink.click();
-        return new LoginPage();
-    }
-
-    public String getCurrentUser()
-    {
-        return this.userLink.getText();
-    }
-
-    public void logout()
-    {
-        this.logoutLink.click();
-    }
-
-    public RegistrationPage register()
-    {
-        this.registerLink.click();
-        return new RegistrationPage();
-    }
-
-    public CreatePagePage createPage()
-    {
-        new Actions(getDriver()).moveToElement(createMenu).perform();
-        this.createPageMenuLink.click();
-        return new CreatePagePage();
-    }
-
-    public CreateSpacePage createSpace()
-    {
-        new Actions(getDriver()).moveToElement(createMenu).perform();
-        this.createSpaceMenuLink.click();
-        return new CreateSpacePage();
-    }
 
     /**
      * Opens the comments tab.
@@ -210,35 +123,6 @@ public class ViewPage extends BasePage
         }
     }
 
-    public CopyPage copy()
-    {
-        new Actions(getDriver()).moveToElement(pageMenu).perform();
-        this.copyPageLink.click();
-        return new CopyPage();
-    }
-
-    public ConfirmationPage delete()
-    {
-        new Actions(getDriver()).moveToElement(pageMenu).perform();
-        this.deletePageLink.click();
-        return new ConfirmationPage();
-    }
-
-    public boolean canDelete()
-    {
-        if (getUtil().hasElement(By.xpath("//div[@id='tmPage']//span[@class='menuarrow']"))) {
-            new Actions(getDriver()).moveToElement(pageMenu).perform();
-            return getUtil().hasElement(By.id("tmActionDelete"));
-        } else {
-            return false;
-        }
-    }
-
-    public String getDocumentTitle()
-    {
-        return this.documentTitle.getText();
-    }
-
     public String getBreadcrumbContent()
     {
         return this.breadcrumbDiv.getText();
@@ -280,18 +164,6 @@ public class ViewPage extends BasePage
     public void waitForDocExtraPaneActive(String paneId)
     {
         waitUntilElementIsVisible(By.id(paneId + "content"));
-    }
-
-    public void watchDocument()
-    {
-        new Actions(getDriver()).moveToElement(pageMenu).perform();
-        this.watchDocumentLink.click();
-    }
-
-    public void watchSpace()
-    {
-        new Actions(getDriver()).moveToElement(spaceMenu).perform();
-        this.watchSpaceLink.click();
     }
 
     /**

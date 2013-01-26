@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
@@ -57,6 +58,17 @@ public abstract class AbstractSolrInstance implements SolrInstance
      */
     @Inject
     protected Logger logger;
+
+    @Override
+    public void shutDown()
+    {
+        if (this.server != null) {
+            ((EmbeddedSolrServer) this.server).shutdown();
+        }
+        if (this.container != null) {
+            container.shutdown();
+        }
+    }
 
     @Override
     public void add(SolrInputDocument solrDocument) throws SolrServerException, IOException

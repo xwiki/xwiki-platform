@@ -32,6 +32,10 @@
   <artifactId>xwiki-platform-watchlist-api</artifactId>
   <name>XWiki Platform - WatchList - API</name>
   <description>XWiki Platform - WatchList - API</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Watchlist API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

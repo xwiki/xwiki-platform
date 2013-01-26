@@ -19,10 +19,16 @@
  */
 package org.xwiki.search.solr.internal.api;
 
-
 /**
- * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of
- * special field values like dates.
+ * Contains constants naming the Solr/Lucene index fields used by this module for indexing entities. Also contains
+ * additional constants used for composing field names on multilingual fields.
+ * <p/>
+ * A multilingual and virtual/alias field, is not stored in the index with the specified name. It is only used at query
+ * time and it is expanded automatically to the actual fields from the index.
+ * <p/>
+ * Example: "title" becomes "title_ml | title_en | title_ro | title_fr | etc..."
+ * <p/>
+ * <b>Note</b>: When indexing a field, the actual field name must be used instead of the virtual field name.
  * 
  * @version $Id$
  * @since 4.3M2
@@ -62,6 +68,8 @@ public interface Fields
 
     /**
      * Title of the document.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String TITLE = "title";
 
@@ -84,6 +92,8 @@ public interface Fields
     /**
      * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
      * the contained objects.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String OBJECT_CONTENT = "objcontent";
 
@@ -113,24 +123,23 @@ public interface Fields
     String HIDDEN = "hidden";
 
     /**
-     * Document score.
+     * Document score, not an actual field. It's only computed at query time.
      */
     String SCORE = "score";
 
     /**
      * Fulltext content, not stored (and can therefore not be restored from the index).
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String DOCUMENT_CONTENT = "doccontent";
 
     /**
      * Attachment content.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String ATTACHMENT_CONTENT = "attcontent";
-
-    /**
-     * not in use.
-     */
-    String KEYWORDS = "kw";
 
     /**
      * For storing mimetype of the attachments.
@@ -143,12 +152,9 @@ public interface Fields
     String FILENAME = "filename";
 
     /**
-     * For storing the doc reference . Used by attachments.
-     */
-    String DOC_REFERENCE = "docref";
-
-    /**
      * For storing the comments.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String COMMENT = "comment";
 
@@ -159,6 +165,23 @@ public interface Fields
 
     /**
      * For storing property value.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String PROPERTY_VALUE = "propertyvalue";
+
+    /**
+     * Underscore character, used to separate the field name from the suffix.
+     */
+    String USCORE = "_";
+
+    /**
+     * Multilingual field suffix for the field of "text_general" type.
+     */
+    String MULTILINGUAL = "ml";
+
+    /**
+     * Format string for multilingual fields.
+     */
+    String MULTILIGNUAL_FORMAT = "%s_%s";
 }

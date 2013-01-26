@@ -48,14 +48,27 @@ public interface LocalizationManager
     Translation getTranslation(String key, Locale locale);
 
     /**
+     * Find a bundle.
+     * 
+     * @param bundleType a hint identifying the bundle type.
+     * @param bundleId the identifier of the bindle, for example a wiki document name, or the URL to a
+     *            <tt>.properties</tt> file.
+     * @return the {@link TranslationBundle} or null if none could be found
+     * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
+     * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
+     */
+    TranslationBundle getTranslationBundle(String bundleType, String bundleId)
+        throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException;
+
+    /**
      * Registers a resource location as a possible localization bundle that should be used in the current execution. The
      * order in which resource of the same type are considered when searching for a translation corresponds to the order
      * in which they were pulled. Each execution (generally a client request) has its own list of pulled resources, and
      * at the end of an execution, its list of pulled resources is cleared.
      * 
      * @param bundleType a hint identifying the bundle type.
-     * @param bundleId the identifier of the bindle, for example a wiki document name, or the name of a
-     *            <tt>.properties</tt> resource bundle.
+     * @param bundleId the identifier of the bindle, for example a wiki document name, or the URL to a
+     *            <tt>.properties</tt> file.
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
      */

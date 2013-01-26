@@ -55,6 +55,13 @@
       <version>${platform.version}</version>
     </dependency>
     
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-source-jar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    
     <!-- Test dependencies -->
 
     <dependency>

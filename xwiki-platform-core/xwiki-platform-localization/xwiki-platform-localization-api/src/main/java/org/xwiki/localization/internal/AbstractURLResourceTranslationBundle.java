@@ -19,6 +19,7 @@
  */
 package org.xwiki.localization.internal;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -52,13 +53,33 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
      */
     public static final String ID_PREFIX = "resource:";
 
+    /**
+     * The file extension of files containing translations.
+     */
+    private static final String PROPERTIES_EXT = ".properties";
+
+    /**
+     * Used to add no bundles to the list of current translation bundles.
+     */
     @Inject
     protected TranslationBundleContext bundleContext;
 
+    /**
+     * Used to parse translation messages.
+     */
     protected TranslationMessageParser translationMessageParser;
 
+    /**
+     * The URL of the Locale.Root translations. Other Locale files will be "calculated" from it.
+     */
     protected URL baseURL;
 
+    /**
+     * @param baseURL the base URL from which to calculate all translations URLs
+     * @param componentManager used to lookup of the components
+     * @param translationMessageParser used to parse translation messages
+     * @throws ComponentLookupException failed to lookup some component
+     */
     public AbstractURLResourceTranslationBundle(URL baseURL, ComponentManager componentManager,
         TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
@@ -68,28 +89,28 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
 
         this.logger = LoggerFactory.getLogger(getClass());
 
-        setURL(baseURL);
+        this.baseURL = baseURL;
+
+        setId(ID_PREFIX + baseURL);
     }
 
-    protected void setURL(URL url)
-    {
-        this.baseURL = url;
-
-        setId(ID_PREFIX + url);
-    }
-
+    /**
+     * @param locale the locale
+     * @return the URL corresponding to the passed {@link Locale}
+     */
     protected URL getLocaleURL(Locale locale)
     {
         String urlString = this.baseURL.toString();
 
         String localeURL = urlString;
 
-        if (locale.equals(Locale.ROOT)) {
-            if (urlString.endsWith(".properties")) {
+        if (!locale.equals(Locale.ROOT)) {
+            if (urlString.endsWith(PROPERTIES_EXT)) {
                 int index = urlString.lastIndexOf('.');
-                urlString = localeURL.substring(0, index);
-                urlString += locale.toString();
-                urlString += ".properties";
+
+                localeURL = urlString.substring(0, index);
+                localeURL += "_" + locale.toString();
+                localeURL += PROPERTIES_EXT;
             } else {
                 // No idea what is it
                 localeURL = null;
@@ -104,7 +125,12 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
         }
     }
 
-    protected LocalizedTranslationBundle loadResourceLocaleBundle(Locale locale) throws Exception
+    /**
+     * @param locale the locale
+     * @return the {@link LocalizedTranslationBundle} corresponding to the passed {@link Locale}, null if none could be
+     *         found
+     */
+    protected LocalizedTranslationBundle loadResourceLocaleBundle(Locale locale)
     {
         // Find resource
         URL localeURL = getLocaleURL(locale);
@@ -120,6 +146,9 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
             InputStream componentListStream = localeURL.openStream();
 
             properties.load(componentListStream);
+        } catch (FileNotFoundException e) {
+            // No translation files for the passed locale
+            return null;
         } catch (IOException e) {
             this.logger.error("Failed to parse resource [{}] as translation budle", localeURL, e);
         }
@@ -144,6 +173,9 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
         return localeBundle;
     }
 
+    /**
+     * @return the parser to use
+     */
     protected TranslationMessageParser getTranslationMessageParser()
     {
         return this.translationMessageParser;
@@ -152,15 +184,6 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
     @Override
     protected LocalizedTranslationBundle createBundle(Locale locale)
     {
-        LocalizedTranslationBundle localeBundle;
-        try {
-            localeBundle = loadResourceLocaleBundle(locale);
-        } catch (Exception e) {
-            this.logger.error("Failed to get localization bundle", e);
-
-            localeBundle = null;
-        }
-
-        return localeBundle;
+        return loadResourceLocaleBundle(locale);
     }
 }

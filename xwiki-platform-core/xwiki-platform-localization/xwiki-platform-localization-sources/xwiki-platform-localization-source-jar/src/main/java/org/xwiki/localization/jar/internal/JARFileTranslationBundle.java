@@ -21,16 +21,10 @@ package org.xwiki.localization.jar.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.internal.AbstractURLResourceTranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
 
@@ -46,62 +40,28 @@ public class JARFileTranslationBundle extends AbstractURLResourceTranslationBund
     /**
      * Location in the translation bundle default language.
      */
-    public static final String TRANSLATION = "ApplicationResources.properties";
-
-    public static final Pattern TRANSLATION_PATTERN = Pattern.compile("ApplicationResources([a-zA-Z]{2,8}"
-        + "(_([a-zA-Z]{2} | [0-9]{3})" + "(_([0-9][0-9a-zA-Z]{3} | [0-9a-zA-Z]{5,8}))?)?)?.properties");
+    public static final String TRANSLATIONFILE = "ApplicationResources.properties";
 
     /**
      * @param jarFile the jar
      * @param componentManager used to lookup components needed to manipulate wiki documents
      * @param translationMessageParser the parser to use for each message
-     * @throws IOException failed to parse passed JAR file
-     * @throws LocalizationException failed to find translation resource in the passed JAR file
+     * @throws IOException failed to create translation file URL
+     * @throws ComponentLookupException failed to lookup required component
      */
     public JARFileTranslationBundle(File jarFile, ComponentManager componentManager,
-        TranslationMessageParser translationMessageParser) throws ComponentLookupException, IOException,
-        LocalizationException
+        TranslationMessageParser translationMessageParser) throws ComponentLookupException, IOException
     {
         super(getURL(jarFile), componentManager, translationMessageParser);
     }
 
     /**
-     * @param jarURL the jar URL
-     * @param componentManager used to lookup components needed to manipulate wiki documents
-     * @param translationMessageParser the parser to use for each message
-     * @throws IOException failed to parse passed JAR file
-     * @throws LocalizationException failed to find translation resource in the passed JAR file
+     * @param jarFile the jar file
+     * @return an URL to the translation file inside the jar
+     * @throws IOException when failing to create the URL
      */
-    public JARFileTranslationBundle(URL jarURL, ComponentManager componentManager,
-        TranslationMessageParser translationMessageParser) throws ComponentLookupException, IOException,
-        LocalizationException
+    private static URL getURL(File jarFile) throws IOException
     {
-        super(getURL(jarURL), componentManager, translationMessageParser);
-    }
-
-    private static URL getURL(File jarFile) throws IOException, LocalizationException
-    {
-        URL jarURL = JARUtils.toJARURL(jarFile);
-
-        return getURL(jarURL);
-    }
-
-    private static URL getURL(URL jarURL) throws IOException, LocalizationException
-    {
-        InputStream is = jarURL.openStream();
-
-        try {
-            ZipInputStream zis = new ZipInputStream(is);
-
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (TRANSLATION_PATTERN.matcher(entry.getName()).matches()) {
-                    return new URL(jarURL.toExternalForm() + entry.getName());
-                }
-            }
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
-
-        throw new LocalizationException("Can't find any translation resource in jar [" + jarURL + "]");
+        return new URL("jar:" + jarFile.toURI() + "!/" + TRANSLATIONFILE);
     }
 }

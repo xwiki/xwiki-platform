@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
@@ -32,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -54,6 +58,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     private XWiki mockXWiki;
 
     private XWikiStoreInterface mockStore;
+
+    private ServletContext mockServletContext;
 
     private Map<DocumentReference, Map<Locale, XWikiDocument>> documents =
         new HashMap<DocumentReference, Map<Locale, XWikiDocument>>();
@@ -80,6 +86,9 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         this.mockStore = getMockery().mock(XWikiStoreInterface.class);
 
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
+        this.mockServletContext = environment.getServletContext();
+        
         // checking
 
         getMockery().checking(new Expectations()
@@ -186,7 +195,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                             documentLanguages.remove(document.getLocale());
                         }
 
-                        observation.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, getContext());
+                        observation.notify(new DocumentCreatedEvent(document.getDocumentReference()), document,
+                            getContext());
 
                         return null;
                     }
@@ -212,6 +222,9 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockXWiki).getCurrentContentSyntaxId(with(any(String.class)), with(any(XWikiContext.class)));
                 will(returnValue("plain/1.0"));
+                
+                allowing(mockServletContext).getResourceAsStream("/META-INF/MANIFEST.MF");
+                will(returnValue(null));
             }
         });
 

@@ -1,3 +1,2 @@
 org.xwiki.localization.internal.DefaultTranslationBundleContext
 org.xwiki.localization.internal.DefaultLocalizationManager
-org.xwiki.localization.internal.RootClassLoaderTranslationBundle

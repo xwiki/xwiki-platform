@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.internal;
+package org.xwiki.localization.jar.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +33,10 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
+import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
+import org.xwiki.localization.internal.DefaultLocalizedTranslationBundle;
+import org.xwiki.localization.internal.DefaultTranslation;
+import org.xwiki.localization.internal.LocalizedTranslationBundle;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 
@@ -61,6 +65,10 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
     {
         Properties properties = getResourceProperties(locale);
 
+        if (properties == null) {
+            return null;
+        }
+
         // Convert to LocalBundle
         DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);
 
@@ -87,7 +95,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
     {
         String resourceName = "ApplicationResources";
         if (!locale.equals(Locale.ROOT)) {
-            resourceName += locale;
+            resourceName += "_" + locale;
         }
         resourceName += ".properties";
 

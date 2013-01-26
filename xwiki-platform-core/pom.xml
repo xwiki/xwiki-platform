@@ -320,6 +320,12 @@
               <differenceType>7012</differenceType>
               <justification>New method to allow building an UI for reporting migration issues (mainly for sub-wiki)</justification>
             </difference>
+            <difference>
+              <className>org/xwiki/localization/LocalizationManager</className>
+              <method>org.xwiki.localization.TranslationBundle getTranslationBundle(java.lang.String, java.lang.String)</method>
+              <differenceType>7012</differenceType>
+              <justification>New method to access bundle</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -321,6 +321,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 } else {
                     stmt.execute("create database " + escapedSchema);
                 }
+            } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
+                stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else {
                 stmt.execute("create database " + escapedSchema);
             }

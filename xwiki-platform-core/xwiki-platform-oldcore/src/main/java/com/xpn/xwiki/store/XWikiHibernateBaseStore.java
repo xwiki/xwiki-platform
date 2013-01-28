@@ -384,6 +384,8 @@ public class XWikiHibernateBaseStore implements Initializable
                     schema = "APP";
                 } else if (databaseProduct == DatabaseProduct.HSQLDB) {
                     schema = "PUBLIC";
+                } else if (databaseProduct == DatabaseProduct.POSTGRESQL) {
+                    schema = "public";
                 } else {
                     schema = wikiName.replace('-', '_');
                 }
@@ -472,8 +474,12 @@ public class XWikiHibernateBaseStore implements Initializable
             String contextSchema = getSchemaFromWikiName(context);
 
             DatabaseProduct databaseProduct = getDatabaseProductName();
-            if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
-                || databaseProduct == DatabaseProduct.DERBY || databaseProduct == DatabaseProduct.DB2) {
+            if (databaseProduct == DatabaseProduct.ORACLE
+                || databaseProduct == DatabaseProduct.HSQLDB
+                || databaseProduct == DatabaseProduct.DERBY
+                || databaseProduct == DatabaseProduct.DB2
+                || databaseProduct == DatabaseProduct.POSTGRESQL)
+            {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
                 Iterator iter = config.getTableMappings();
@@ -643,6 +649,8 @@ public class XWikiHibernateBaseStore implements Initializable
                         || DatabaseProduct.DB2 == databaseProduct)
                     {
                         executeSQL("SET SCHEMA " + escapedSchemaName, session);
+                    } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
+                        executeSQL("SET search_path TO " + escapedSchemaName, session);
                     } else {
                         String catalog = session.connection().getCatalog();
                         catalog = (catalog == null) ? null : catalog.replace('_', '-');

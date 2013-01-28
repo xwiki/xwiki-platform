@@ -19,65 +19,60 @@
  */
 package org.xwiki.model.internal;
 
-import java.net.URL;
-
-import org.jmock.Expectations;
+import static org.mockito.Mockito.*;
 import org.junit.*;
 import org.xwiki.model.*;
+import org.xwiki.model.reference.WikiReference;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Unit tests for {@link BridgedServer}.
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 5.0M1
  */
-public class BridgedServerTest extends AbstractBridgedComponentTestCase
+public class BridgedServerTest
 {
     private Server server;
+
+    private EntityManager entityManager;
 
     @Before
     public void configure() throws Exception
     {
-        final XWiki xwiki = getMockery().mock(XWiki.class);
-        getContext().setWiki(xwiki);
-
-        EntityManager entityManager = getComponentManager().getInstance(EntityManager.class, "bridge");
-        this.server = new BridgedServer(entityManager, getContext());
+        XWikiContext xcontext = mock(XWikiContext.class);
+        this.entityManager = mock(EntityManager.class);
+        this.server = new BridgedServer(this.entityManager, xcontext);
     }
 
     @Test
     public void addWiki() throws Exception
     {
+        Wiki expectedWiki = mock(Wiki.class);
+        when(this.entityManager.addEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(expectedWiki);
+
         Wiki wiki = this.server.addWiki("wiki");
 
         Assert.assertNotNull(wiki);
-        Assert.assertTrue(wiki.isNew());
     }
 
     @Test
-    public void hasWikiWhenWikiExists() throws Exception
+    public void hasWiki() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
-                will(returnValue(new URL("http://whatever/not/null")));
-        }});
+        when(this.entityManager.hasEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(true);
 
         Assert.assertTrue(this.server.hasWiki("wiki"));
     }
 
     @Test
-    public void getWikiWhenWikiExists() throws Exception
+    public void getWiki() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            oneOf(getContext().getWiki()).getServerURL("wiki", getContext());
-            will(returnValue(new URL("http://whatever/not/null")));
-        }});
+        Wiki expectedWiki = mock(Wiki.class);
+        when(this.entityManager.getEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(expectedWiki);
 
         Wiki wiki = this.server.getWiki("wiki");
+
         Assert.assertNotNull(wiki);
-        Assert.assertFalse(wiki.isNew());
     }
 }

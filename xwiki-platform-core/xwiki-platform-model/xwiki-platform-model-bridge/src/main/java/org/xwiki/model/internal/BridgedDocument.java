@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * @since 4.3M1
+ * @since 5.0M1
  */
 public class BridgedDocument extends AbstractBridgedEntity implements Document
 {

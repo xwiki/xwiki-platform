@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  *
- * @since 4.3M1
+ * @since 5.0M1
  */
 public interface Persistable
 {

@@ -420,7 +420,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other

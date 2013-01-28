@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * @since 4.3M1
+ * @since 5.0M1
  */
 public class BridgedObject extends AbstractBridgedEntity implements Object
 {

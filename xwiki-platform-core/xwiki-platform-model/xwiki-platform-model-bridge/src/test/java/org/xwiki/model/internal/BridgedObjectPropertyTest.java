@@ -21,8 +21,10 @@ package org.xwiki.model.internal;
 
 import org.junit.Test;
 
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import static org.mockito.Mockito.*;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseProperty;
 
 import junit.framework.Assert;
 
@@ -30,17 +32,17 @@ import junit.framework.Assert;
  * Unit tests for {@link BridgedObjectProperty}.
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 5.0M1
  */
-public class BridgedObjectPropertyTest extends AbstractBridgedComponentTestCase
+public class BridgedObjectPropertyTest
 {
     @Test
     public void getValueWhenDefined()
     {
-        StringProperty property = new StringProperty();
-        property.setValue("test");
+        BaseProperty property = mock(BaseProperty.class);
+        when(property.getValue()).thenReturn("test");
 
-        BridgedObjectProperty bop = new BridgedObjectProperty(property, getContext());
+        BridgedObjectProperty bop = new BridgedObjectProperty(property, mock(XWikiContext.class));
         Assert.assertEquals("test", bop.getValue());
     }
 }

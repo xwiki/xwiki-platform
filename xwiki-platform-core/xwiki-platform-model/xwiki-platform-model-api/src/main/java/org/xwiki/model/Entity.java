@@ -22,7 +22,7 @@ package org.xwiki.model;
 import java.util.Locale;
 
 /**
- * @since 4.3M1
+ * @since 5.0M1
  */
 public interface Entity extends Persistable, Linkable, Referenceable
 {

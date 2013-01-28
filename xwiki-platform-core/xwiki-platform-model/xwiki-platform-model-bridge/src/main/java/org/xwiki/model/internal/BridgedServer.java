@@ -33,7 +33,7 @@ import org.xwiki.model.reference.WikiReference;
 import java.util.Map;
 
 /**
- * @since 4.3M1
+ * @since 5.0M1
  */
 public class BridgedServer implements Server
 {

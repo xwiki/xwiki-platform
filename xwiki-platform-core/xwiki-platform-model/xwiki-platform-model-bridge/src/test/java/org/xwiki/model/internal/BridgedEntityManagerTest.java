@@ -22,10 +22,10 @@ package org.xwiki.model.internal;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
+import static org.mockito.Mockito.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
@@ -34,6 +34,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.Document;
+import org.xwiki.model.EntityManager;
 import org.xwiki.model.ModelException;
 import org.xwiki.model.ObjectProperty;
 import org.xwiki.model.Space;
@@ -44,9 +45,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -54,93 +53,64 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Unit tests for {@link BridgedEntityManager}.
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 5.0M1
  */
-@AllComponents
-@MockingRequirement(BridgedEntityManager.class)
-public class BridgedEntityManagerTest extends AbstractMockingComponentTestCase<BridgedEntityManager>
+public class BridgedEntityManagerTest
 {
-    private XWikiContext context;
+    @Rule
+    public MockitoComponentMockingRule<EntityManager> componentManager =
+        new MockitoComponentMockingRule<EntityManager>(BridgedEntityManager.class);
+
+    private XWiki xwiki;
 
     @Before
     public void configure() throws Exception
     {
-        // Allow mocking Classes...
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        Utils.setComponentManager(getComponentManager());
-        this.context = new XWikiContext();
-        final XWiki xwiki = getMockery().mock(XWiki.class);
-        this.context.setWiki(xwiki);
+        // Mock the Entity Cache
+        CacheManager cacheManager = this.componentManager.getInstance(CacheManager.class);
+        CacheFactory cacheFactory = mock(CacheFactory.class);
+        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
+        Cache cache = mock(Cache.class);
+        when(cacheFactory.newCache(any(CacheConfiguration.class))).thenReturn(cache);
 
-        final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
-        final CacheFactory cacheFactory = getMockery().mock(CacheFactory.class);
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", this.context);
+        // Set a valid XWiki object in the XWikiContext
+        this.xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(this.xwiki);
 
-        getMockery().checking(new Expectations() {{
-            oneOf(cacheManager).getCacheFactory();
-            will(returnValue(cacheFactory));
-            oneOf(cacheFactory).newCache(with(any(CacheConfiguration.class)));
-            will(returnValue(getMockery().mock(Cache.class)));
-            allowing(execution).getContext();
-            will(returnValue(executionContext));
-        }});
+        // Set a valid XWikiContext object in the Execution Context
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContext ec = new ExecutionContext();
+        when(execution.getContext()).thenReturn(ec);
+        ec.setProperty("xwikicontext", xcontext);
     }
 
     @Test
     public void getEntityForDocumentThatExists() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final XWikiDocument xdoc = new XWikiDocument(documentReference);
-        xdoc.setNew(false);
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-                will(returnValue(xdoc));
-        }});
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        when(xdoc.isNew()).thenReturn(false);
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
 
-        Document doc = getMockedComponent().getEntity(new UniqueReference(documentReference));
+        Document doc = this.componentManager.getMockedComponent().getEntity(new UniqueReference(documentReference));
         Assert.assertNotNull(doc);
         Assert.assertFalse(doc.isNew());
     }
 
     @Test
-    public void getEntityForDocumentThatDoesntExist() throws Exception
-    {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final XWikiDocument xdoc = new XWikiDocument(documentReference);
-        // This means the doc doesn't exist in the old model
-        xdoc.setNew(true);
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-                will(returnValue(xdoc));
-        }});
-
-        Document doc = getMockedComponent().getEntity(new UniqueReference(documentReference));
-        Assert.assertNotNull(doc);
-        Assert.assertTrue(doc.isNew());
-    }
-
-    @Test
     public void getEntityForDocumentWhenStoreException() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final XWikiDocument xdoc = new XWikiDocument(documentReference);
-        // This means the doc doesn't exist in the old model
-        xdoc.setNew(true);
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-            will(throwException(new XWikiException()));
-        }});
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenThrow(new XWikiException());
 
         try {
-            getMockedComponent().getEntity(new UniqueReference(documentReference));
+            this.componentManager.getMockedComponent().getEntity(new UniqueReference(documentReference));
             Assert.fail("Should have thrown an exception");
         } catch (ModelException expected) {
             Assert.assertEquals("Error loading document [wiki:space.page]", expected.getMessage());
@@ -150,13 +120,11 @@ public class BridgedEntityManagerTest extends AbstractMockingComponentTestCase<B
     @Test
     public void getEntityForWikiThatExists() throws Exception
     {
-        final WikiReference wikiReference = new WikiReference("wiki");
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getServerURL("wiki", context);
-                will(returnValue(new URL("http://whatever/not/null")));
-        }});
+        WikiReference wikiReference = new WikiReference("wiki");
+        when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(
+            new URL("http://whatever/not/null"));
 
-        Wiki wiki = getMockedComponent().getEntity(new UniqueReference(wikiReference));
+        Wiki wiki = this.componentManager.getMockedComponent().getEntity(new UniqueReference(wikiReference));
         Assert.assertNotNull(wiki);
         Assert.assertFalse(wiki.isNew());
     }
@@ -164,67 +132,54 @@ public class BridgedEntityManagerTest extends AbstractMockingComponentTestCase<B
     @Test
     public void getEntityForWikiThatDoesntExists() throws Exception
     {
-        final WikiReference wikiReference = new WikiReference("wiki");
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getServerURL("wiki", context);
-                will(returnValue(null));
-        }});
+        WikiReference wikiReference = new WikiReference("wiki");
+        when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(null);
 
-        Wiki wiki = getMockedComponent().getEntity(new UniqueReference(wikiReference));
+        Wiki wiki = this.componentManager.getMockedComponent().getEntity(new UniqueReference(wikiReference));
         Assert.assertNull(wiki);
     }
 
     @Test
     public void hasEntityForDocumentThatExists() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).exists(documentReference, context);
-                will(returnValue(true));
-        }});
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(this.xwiki.exists(eq(documentReference), any(XWikiContext.class))).thenReturn(true);
 
-        Assert.assertTrue(getMockedComponent().hasEntity(new UniqueReference(documentReference)));
+        Assert.assertTrue(this.componentManager.getMockedComponent().hasEntity(new UniqueReference(documentReference)));
     }
 
     @Test
     public void hasEntityForWikiThatExists() throws Exception
     {
-        final WikiReference wikiReference = new WikiReference("wiki");
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getServerURL("wiki", context);
-                will(returnValue(new URL("http://whatever/not/null")));
-        }});
+        WikiReference wikiReference = new WikiReference("wiki");
+        when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(
+            new URL("http://whatever/not/null"));
 
-        Assert.assertTrue(getMockedComponent().hasEntity(new UniqueReference(wikiReference)));
+        Assert.assertTrue(this.componentManager.getMockedComponent().hasEntity(new UniqueReference(wikiReference)));
     }
 
     @Test
     public void hasEntityForWikiThatDoesntExist() throws Exception
     {
-        final WikiReference wikiReference = new WikiReference("wiki");
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getServerURL("wiki", context);
-                will(returnValue(null));
-        }});
+        WikiReference wikiReference = new WikiReference("wiki");
+        when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(null);
 
-        Assert.assertFalse(getMockedComponent().hasEntity(new UniqueReference(wikiReference)));
+        Assert.assertFalse(this.componentManager.getMockedComponent().hasEntity(new UniqueReference(wikiReference)));
     }
 
     @Test
     public void getEntityForObjectThatExists() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final ObjectReference objectReference = new ObjectReference("object", documentReference);
-        final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
-        final BaseObject baseObject = getMockery().mock(BaseObject.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-                will(returnValue(xdoc));
-            oneOf(xdoc).getXObject(objectReference);
-                will(returnValue(baseObject));
-        }});
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        ObjectReference objectReference = new ObjectReference("object", documentReference);
 
-        org.xwiki.model.Object object = getMockedComponent().getEntity(new UniqueReference(objectReference));
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
+        BaseObject baseObject = mock(BaseObject.class);
+        when(xdoc.getXObject(objectReference)).thenReturn(baseObject);
+
+        org.xwiki.model.Object object = this.componentManager.getMockedComponent().getEntity(
+            new UniqueReference(objectReference));
         Assert.assertNotNull(object);
         Assert.assertFalse(object.isNew());
     }
@@ -232,48 +187,41 @@ public class BridgedEntityManagerTest extends AbstractMockingComponentTestCase<B
     @Test
     public void getEntityForObjectThatDoesntExists() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final ObjectReference objectReference = new ObjectReference("object", documentReference);
-        final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-                will(returnValue(xdoc));
-            oneOf(xdoc).getXObject(objectReference);
-                will(returnValue(null));
-        }});
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        ObjectReference objectReference = new ObjectReference("object", documentReference);
 
-        org.xwiki.model.Object object = getMockedComponent().getEntity(new UniqueReference(objectReference));
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
+        when(xdoc.getXObject(objectReference)).thenReturn(null);
+
+        org.xwiki.model.Object object = this.componentManager.getMockedComponent().getEntity(
+            new UniqueReference(objectReference));
         Assert.assertNull(object);
     }
 
     @Test
     public void getEntityForObjectWhenDocumentDoesntExists() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final ObjectReference objectReference = new ObjectReference("object", documentReference);
-        final XWikiDocument xdoc = new XWikiDocument(documentReference);
-        // This means the doc doesn't exist in the old model
-        xdoc.setNew(true);
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-                will(returnValue(xdoc));
-        }});
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        ObjectReference objectReference = new ObjectReference("object", documentReference);
 
-        org.xwiki.model.Object object = getMockedComponent().getEntity(new UniqueReference(objectReference));
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
+        // This means the doc doesn't exist in the old model
+        when(xdoc.isNew()).thenReturn(true);
+
+        org.xwiki.model.Object object = this.componentManager.getMockedComponent().getEntity(
+            new UniqueReference(objectReference));
         Assert.assertNull(object);
     }
 
     @Test
     public void getEntityForSpaceThatExists() throws Exception
     {
-        final SpaceReference spaceReference = new SpaceReference("space", new WikiReference("wiki"));
+        SpaceReference spaceReference = new SpaceReference("space", new WikiReference("wiki"));
+        when(this.xwiki.getSpaces(any(XWikiContext.class))).thenReturn(Arrays.asList("space", "otherspace"));
 
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getSpaces(context);
-            will(returnValue(Arrays.asList("space", "otherspace")));
-        }});
-
-        Space space = getMockedComponent().getEntity(new UniqueReference(spaceReference));
+        Space space = this.componentManager.getMockedComponent().getEntity(new UniqueReference(spaceReference));
         Assert.assertNotNull(space);
         Assert.assertFalse(space.isNew());
     }
@@ -281,23 +229,19 @@ public class BridgedEntityManagerTest extends AbstractMockingComponentTestCase<B
     @Test
     public void getEntityForObjectPropertyThatExists() throws Exception
     {
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final ObjectReference objectReference = new ObjectReference("object", documentReference);
-        final ObjectPropertyReference propertyReference = new ObjectPropertyReference("property", objectReference);
-        final XWikiDocument xdoc = getMockery().mock(XWikiDocument.class);
-        final BaseObject baseObject = getMockery().mock(BaseObject.class);
-        final BaseProperty baseProperty = getMockery().mock(BaseProperty.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        ObjectReference objectReference = new ObjectReference("object", documentReference);
+        ObjectPropertyReference propertyReference = new ObjectPropertyReference("property", objectReference);
 
-        getMockery().checking(new Expectations() {{
-            oneOf(context.getWiki()).getDocument(documentReference, context);
-            will(returnValue(xdoc));
-            oneOf(xdoc).getXObject(objectReference);
-            will(returnValue(baseObject));
-            oneOf(baseObject).get("property");
-            will(returnValue(baseProperty));
-        }});
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
+        BaseObject baseObject = mock(BaseObject.class);
+        when(xdoc.getXObject(objectReference)).thenReturn(baseObject);
+        BaseProperty baseProperty = mock(BaseProperty.class);
+        when(baseObject.get("property")).thenReturn(baseProperty);
 
-        ObjectProperty objectProperty = getMockedComponent().getEntity(new UniqueReference(propertyReference));
+        ObjectProperty objectProperty = this.componentManager.getMockedComponent().getEntity(
+            new UniqueReference(propertyReference));
         Assert.assertNotNull(objectProperty);
         Assert.assertFalse(objectProperty.isNew());
     }

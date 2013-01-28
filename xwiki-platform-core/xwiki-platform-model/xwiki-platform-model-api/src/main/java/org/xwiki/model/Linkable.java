@@ -29,7 +29,7 @@ import org.xwiki.model.reference.EntityReference;
  *   <li>aliases an entity</li>
  * </ul>
  *
- * @since 4.3M1
+ * @since 5.0M1
  */
 public interface Linkable
 {

@@ -19,14 +19,20 @@
  */
 package org.xwiki.model;
 
+import java.lang.*;
+import java.lang.Object;
 import java.util.Locale;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * TODO: Decide if this should be part of the current EntityReference implementation.
  *
- * @since 4.3M1
+ * @since 5.0M1
  */
 public class UniqueReference
 {
@@ -76,8 +82,40 @@ public class UniqueReference
     @Override
     public String toString()
     {
-        return "reference = [" + getReference() + "], locale = [" + getLocale() + "], version = [" + getVersion() + "]";
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("reference", getReference());
+        builder.append("locale", getLocale());
+        builder.append("version", getVersion());
+        return builder.toString();
     }
 
-    // TODO: Implement hashcode, equals
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(13, 5)
+            .append(getReference())
+            .append(getLocale())
+            .append(getVersion())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        UniqueReference rhs = (UniqueReference) object;
+        return new EqualsBuilder()
+            .append(getReference(), rhs.getReference())
+            .append(getLocale(), rhs.getLocale())
+            .append(getVersion(), rhs.getVersion())
+            .isEquals();
+    }
 }

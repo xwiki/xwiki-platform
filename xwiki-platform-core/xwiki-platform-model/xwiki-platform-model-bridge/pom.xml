@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-bridge</artifactId>
   <name>XWiki Platform - Model - OldCore Bridge</name>
@@ -46,22 +46,9 @@
     </dependency>
     <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${project.version}</version>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- We need to have the Servlet API JAR available since Component Initialization will initialize
@@ -71,11 +58,10 @@
       <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- Used to mock XWiki class -->
+    <!-- Needed for ClassImposteriser for mocking oldcore classes -->
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
-      <version>2.5.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -27,7 +27,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Note that this class is immutable (text and syntax cannot be changed once set).
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 5.0M1
  */
 public class Content
 {

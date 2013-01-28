@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * @since 4.3M1
+ * @since 5.0M1
  */
 public class BridgedWiki extends AbstractBridgedEntity implements Wiki
 {

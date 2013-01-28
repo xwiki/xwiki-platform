@@ -28,15 +28,15 @@ import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * Implementation of {@link ComponentManagerFactory} which force parent to be {@link SpaceComponentManager}.
+ * Implementation of {@link ComponentManagerFactory} which force parent to be {@link WikiComponentManager}.
  * 
  * @version $Id$
- * @since 3.3M2
+ * @since 5.0M1
  */
 @Component
 @Named("user")
 @Singleton
-public class UserComponentManagerFactory implements ComponentManagerFactory
+public class SpaceComponentManagerFactory implements ComponentManagerFactory
 {
     /**
      * The default {@link ComponentManagerFactory} used to actually create the {@link ComponentManager} instance.
@@ -48,12 +48,12 @@ public class UserComponentManagerFactory implements ComponentManagerFactory
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(DocumentComponentManager.ID)
-    private ComponentManager documentComponentManager;
+    @Named(WikiComponentManager.ID)
+    private ComponentManager wikiComponentManager;
 
     @Override
     public ComponentManager createComponentManager(ComponentManager parentComponentManager)
     {
-        return this.factory.createComponentManager(this.documentComponentManager);
+        return this.factory.createComponentManager(this.wikiComponentManager);
     }
 }

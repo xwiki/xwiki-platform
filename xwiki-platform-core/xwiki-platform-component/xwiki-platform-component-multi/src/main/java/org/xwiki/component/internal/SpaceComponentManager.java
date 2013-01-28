@@ -23,56 +23,47 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.EntityType;
 
 /**
- * Proxy Component Manager that creates and queries individual Component Managers specific to the current user in the
+ * Proxy Component Manager that creates and queries individual Component Managers specific to the current space in the
  * Execution Context. These Component Managers are created on the fly the first time a component is registered for the
- * current user.
+ * current space.
  * 
  * @version $Id$
- * @since 2.1RC1
+ * @since 5.0M1
  */
 @Component
-@Named(UserComponentManager.ID)
+@Named("space")
 @Singleton
-public class UserComponentManager extends AbstractGenericComponentManager implements Initializable
+public class SpaceComponentManager extends AbstractEntityComponentManager implements Initializable
 {
     /**
      * The identifier of this {@link ComponentManager}.
      */
-    public static final String ID = "user";
-
-    /**
-     * Used to access the current user in the Execution Context.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    public static final String ID = "space";
 
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(DocumentComponentManager.ID)
-    private ComponentManager documentComponentManager;
+    @Named(WikiComponentManager.ID)
+    private ComponentManager wikiComponentManager;
+
+    public SpaceComponentManager()
+    {
+        super(EntityType.SPACE);
+    }
 
     @Override
     public void initialize() throws InitializationException
     {
-        // Set the parent to the Wiki Component Manager since if a component isn't found for a particular user
-        // we want to check if it's available in the current wiki and if not then in the Wiki Component Manager's
-        // parent.
-        setInternalParent(this.documentComponentManager);
-    }
-
-    @Override
-    protected String getKey()
-    {
-        return ID + ':' + this.documentAccessBridge.getCurrentUser();
+        // Set the parent to the Root Component Manager since if a component isn't found for a particular wiki
+        // we want to check if it's available in the Root Component Manager.
+        setInternalParent(this.wikiComponentManager);
     }
 }

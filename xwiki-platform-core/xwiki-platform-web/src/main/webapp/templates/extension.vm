@@ -858,6 +858,9 @@ Caused by: #printThrowable($throwable.cause true)
         #set ($_extensionName = $argument)
       #end
       #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
+    #elseif ($argument.size() > 0)
+      ## Job ID.
+      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
     #else
       #set ($message = "$message$escapetool.xml($argument)")
     #end

@@ -384,7 +384,7 @@ public class XWikiHibernateBaseStore implements Initializable
                     schema = "APP";
                 } else if (databaseProduct == DatabaseProduct.HSQLDB) {
                     schema = "PUBLIC";
-                } else if (databaseProduct == DatabaseProduct.POSTGRESQL) {
+                } else if (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()) {
                     schema = "public";
                 } else {
                     schema = wikiName.replace('-', '_');
@@ -649,7 +649,7 @@ public class XWikiHibernateBaseStore implements Initializable
                         || DatabaseProduct.DB2 == databaseProduct)
                     {
                         executeSQL("SET SCHEMA " + escapedSchemaName, session);
-                    } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
+                    } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
                         executeSQL("SET search_path TO " + escapedSchemaName, session);
                     } else {
                         String catalog = session.connection().getCatalog();
@@ -1359,5 +1359,14 @@ public class XWikiHibernateBaseStore implements Initializable
     private void setCurrentDatabase(XWikiContext context, String database)
     {
         context.put(currentDatabaseKey, database);
+    }
+
+    /**
+     * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
+     * @since 4.5M1
+     */
+    protected boolean isInSchemaMode()
+    {
+        return getConfiguration().getProperty("xwiki.virtual_mode").equals("schema");
     }
 }

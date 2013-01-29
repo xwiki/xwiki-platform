@@ -153,6 +153,8 @@
          Notes:
            - "jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
+           - "xwiki.virtual_mode" can be set to either "schema" or "database". Note that currently the database mode
+             doesn't support database creation (see http://jira.xwiki.org/browse/XWIKI-8753)
 
     <property name="connection.url">jdbc:postgresql:xwiki</property>
     <property name="connection.username">xwiki</property>
@@ -160,6 +162,7 @@
     <property name="connection.driver_class">org.postgresql.Driver</property>
     <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <property name="jdbc.use_streams_for_binary">false</property>
+    <property name="xwiki.virtual_mode">schema</property>
     <mapping resource="xwiki.postgresql.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated

@@ -635,14 +635,14 @@ public class XWikiHibernateBaseStore implements Initializable
         try {
             if (isVirtual(context)) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Switch database to: [" + context.getDatabase() + "]");
+                    LOGGER.debug("Switch database to [{}]", context.getDatabase());
                 }
 
                 if (context.getDatabase() != null) {
                     String schemaName = getSchemaFromWikiName(context);
                     String escapedSchemaName = escapeSchema(schemaName, context);
 
-                    DatabaseProduct databaseProduct = getDatabaseProductName(context);
+                    DatabaseProduct databaseProduct = getDatabaseProductName();
                     if (DatabaseProduct.ORACLE == databaseProduct) {
                         executeSQL("alter session set current_schema = " + escapedSchemaName, session);
                     } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct

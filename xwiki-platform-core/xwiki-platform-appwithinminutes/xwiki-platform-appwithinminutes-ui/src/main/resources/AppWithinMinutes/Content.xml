@@ -138,7 +138,9 @@
   </object>
   <content>{{velocity}}
 #if ($type == 'edit')
-  #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
+  ## Don't load the WYSIWYG editor when the Content field is added to a class, because it's too heavy.
+  #set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+  #set ($useWysiwygEditor = !$isAjaxRequest &amp;&amp; $xwiki.getUserPreference('editor') == 'Wysiwyg')
   {{html clean="false"}}
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;

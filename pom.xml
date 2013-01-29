@@ -36,7 +36,7 @@
   <version>4.5-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
-    <!-- Useful for Platform extensions -->
+    <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
     <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>

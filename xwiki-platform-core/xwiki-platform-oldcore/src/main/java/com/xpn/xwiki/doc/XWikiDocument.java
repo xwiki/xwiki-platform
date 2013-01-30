@@ -3246,6 +3246,7 @@ public class XWikiDocument implements DocumentModelBridge
                         "Template document {0} does not exist when adding to document {1}", null, args);
                 } else {
                     setTemplateDocumentReference(templateDocumentReference);
+                    setTitle(templatedoc.getTitle());
                     setContent(templatedoc.getContent());
 
                     // Set the new document syntax as the syntax of the template since the template content

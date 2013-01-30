@@ -27,6 +27,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 
 /**
  * Represents the actions possible when editing an application entry.
@@ -115,5 +116,21 @@ public class EntryEditPage extends InlinePage
     public void setTitle(String title)
     {
         new FormElement(getForm()).setFieldValue(By.name("title"), title);
+    }
+
+    /**
+     * @return the value of the title input
+     */
+    public String getTitle()
+    {
+        return getForm().findElement(By.name("title")).getAttribute("value");
+    }
+
+    /**
+     * @return the content editor
+     */
+    public EditorElement getContentEditor()
+    {
+        return new EditorElement("content");
     }
 }

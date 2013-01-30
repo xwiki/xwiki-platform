@@ -1842,6 +1842,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.setParent($doc.name))
+    #if ($request.templateTitle)
+      #set($discard = $templateDoc.setTitle($request.templateTitle))
+    #end
+    #if ($request.templateContent)
+      #set($discard = $templateDoc.setContent($request.templateContent))
+    #end
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
     #set($discard = $templateDoc.setHidden(true))
     #set($discard = $templateDoc.save($msg.get('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))

@@ -31,6 +31,9 @@
   <name>XWiki Platform - Formula - Renderer</name>
   <packaging>jar</packaging>
   <description>XWiki component for rendering mathematical formulae into images</description>
+  <properties>
+    <xwiki.clover.targetPercentage>0%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <!-- Apache commons, helper libraries for keeping the code small -->
     <dependency>

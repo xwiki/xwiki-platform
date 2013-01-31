@@ -34,6 +34,7 @@
   <properties>
     <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.clover.targetPercentage>52.4%</xwiki.clover.targetPercentage>
   </properties>
   <dependencies>
     <dependency>

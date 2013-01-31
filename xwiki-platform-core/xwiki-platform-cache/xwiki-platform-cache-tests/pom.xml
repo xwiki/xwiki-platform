@@ -36,6 +36,7 @@
   <properties>
     <!-- Don't consider cache test framework as public API since it imposes unnecessary restrictions -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.clover.targetPercentage>0%</xwiki.clover.targetPercentage>
   </properties>
   <dependencies>
     <dependency>

@@ -31,6 +31,9 @@
   <name>XWiki Platform - Cache - Infinispan</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - Infinispan</description>
+  <properties>
+    <xwiki.clover.targetPercentage>69.6%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

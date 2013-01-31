@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
   <name>XWiki Platform - Rendering - Macro - Gallery</name>
   <description>A simple image gallery. Images are collected from the macro content and displayed using a slide-show view.</description>
+  <properties>
+    <xwiki.clover.targetPercentage>86.2%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

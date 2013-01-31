@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-macro-context</artifactId>
   <name>XWiki Platform - Rendering - Macro - Context</name>
   <description>XWiki Platform - Rendering - Macro - Context</description>
+  <properties>
+    <xwiki.clover.targetPercentage>88.6%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

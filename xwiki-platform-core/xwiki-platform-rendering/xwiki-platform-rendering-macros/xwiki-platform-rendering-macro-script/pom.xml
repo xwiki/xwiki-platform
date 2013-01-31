@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-macro-script</artifactId>
   <name>XWiki Platform - Rendering - Macro - Script</name>
   <description>XWiki Platform - Rendering - Macro - Script</description>
+  <properties>
+    <xwiki.clover.targetPercentage>56.7%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

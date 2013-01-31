@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-refactoring</artifactId>
   <name>XWiki Platform - Refactoring</name>
   <description>XWiki Platform - Refactoring</description>
+  <properties>
+    <xwiki.clover.targetPercentage>82.6%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

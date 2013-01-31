@@ -34,6 +34,9 @@
   <packaging>jar</packaging>
   <description>Provides APIs to display XWiki entities (documents, objects, etc.). You can use for instance the
     DocumentDisplayer to display the title and the content of XWiki documents.</description>
+  <properties>
+    <xwiki.clover.targetPercentage>0%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

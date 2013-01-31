@@ -33,6 +33,9 @@
   <name>XWiki Platform - XMLRPC - Model</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - XMLRPC - Model</description>
+  <properties>
+    <xwiki.clover.targetPercentage>0%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>

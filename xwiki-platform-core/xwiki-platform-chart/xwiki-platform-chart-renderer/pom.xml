@@ -31,6 +31,9 @@
   <name>XWiki Platform - Chart - Rendering</name>
   <packaging>jar</packaging>
   <description>XWiki component for rendering charts into images</description>
+  <properties>
+    <xwiki.clover.targetPercentage>0%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

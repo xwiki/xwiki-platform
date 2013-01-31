@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-query-manager</artifactId>
   <name>XWiki Platform - Query - Manager</name>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.clover.targetPercentage>53.4%</xwiki.clover.targetPercentage>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

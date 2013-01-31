@@ -306,7 +306,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
     &lt;/dt&gt;
 
     &lt;dt&gt;
-      &lt;label for='XWiki.SearchConfigClass_0_engine'&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
+      &lt;label&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('search.admin.configuration.seexwikicfg')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;

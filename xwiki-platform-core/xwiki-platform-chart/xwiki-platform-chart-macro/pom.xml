@@ -33,6 +33,9 @@
   <artifactId>xwiki-platform-chart-macro</artifactId>
   <name>XWiki Platform - Chart - Macro</name>
   <description>Macro for displaying charts</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>80.40</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>

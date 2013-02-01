@@ -34,6 +34,9 @@
     single string.
   </description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>43.71</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

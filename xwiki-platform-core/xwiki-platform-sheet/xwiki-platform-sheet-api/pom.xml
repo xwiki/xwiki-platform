@@ -35,6 +35,7 @@
     class and document sheets.</description>
   <properties>
     <xwiki.clover.targetPercentage>77.9%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>78.42</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

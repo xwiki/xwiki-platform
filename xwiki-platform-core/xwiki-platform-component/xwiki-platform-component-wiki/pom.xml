@@ -33,6 +33,9 @@
   <name>XWiki Platform - Component - Wiki Components</name>
   <packaging>jar</packaging>
   <description>Make it possible to implement a component in a wiki page, using wiki objects</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>40.80</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>

@@ -33,6 +33,9 @@
   <name>XWiki Platform - Cache - OSCache</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - OSCache</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>71.27</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <!-- We only need this dependency for the Logging API/Implementation part -->
     <dependency>

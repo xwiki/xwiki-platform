@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-query-xwql</artifactId>
   <name>XWiki Platform - Query - XWQL</name>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>80.55</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

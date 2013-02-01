@@ -35,6 +35,7 @@
   <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
   <properties>
     <xwiki.clover.targetPercentage>32.1%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>31.03</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

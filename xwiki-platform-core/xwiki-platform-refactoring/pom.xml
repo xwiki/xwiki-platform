@@ -34,6 +34,7 @@
   <description>XWiki Platform - Refactoring</description>
   <properties>
     <xwiki.clover.targetPercentage>82.6%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>87.32</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

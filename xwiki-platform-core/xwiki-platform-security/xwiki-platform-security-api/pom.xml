@@ -30,6 +30,9 @@
   <version>4.5-SNAPSHOT</version>
   <description>XWiki Platform - Security - API - a new security API. Currently only a replacement for the old RightService (experimental)</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>61.55</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

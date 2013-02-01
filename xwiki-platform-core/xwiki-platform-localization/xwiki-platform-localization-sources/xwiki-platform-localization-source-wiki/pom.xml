@@ -33,6 +33,9 @@
   <name>XWiki Platform - Localization - Source - Wiki</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Localization - Source - Wiki</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>68.30</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

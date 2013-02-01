@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-display-macro</artifactId>
   <name>XWiki Platform - Display - Macro</name>
   <description>XWiki Platform - Display - Macro</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>80.41</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

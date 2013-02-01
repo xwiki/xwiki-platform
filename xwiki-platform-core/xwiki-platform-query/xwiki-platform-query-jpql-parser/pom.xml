@@ -33,6 +33,9 @@
   <name>XWiki Platform - Query - JPQL Parser</name>
   <description>Simple Java Persistence Query Language parser based on SableCC</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>13.50</xwiki.jacoco.instructionRatio>
+  </properties>
   <build>
     <plugins>
       <plugin>

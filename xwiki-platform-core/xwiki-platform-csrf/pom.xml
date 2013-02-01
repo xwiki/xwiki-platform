@@ -33,6 +33,9 @@
   <name>XWiki Platform - CSRF</name>
   <packaging>jar</packaging>
   <description>XWiki CSRF Protection Module</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>74.35</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

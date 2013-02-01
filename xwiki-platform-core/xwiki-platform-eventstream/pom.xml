@@ -35,6 +35,9 @@
     Store and query events from the wiki. At the moment this is only an API which replaces the older ActivityStream API.
     However, at this stage it still uses the ActivityStream implementation as its back-end.
   </description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>87.96</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

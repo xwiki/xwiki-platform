@@ -33,6 +33,9 @@
   <name>XWiki Platform - User Interface Extension - API</name>
   <packaging>jar</packaging>
   <description>Java API for the User Interface extensions</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>68.42</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

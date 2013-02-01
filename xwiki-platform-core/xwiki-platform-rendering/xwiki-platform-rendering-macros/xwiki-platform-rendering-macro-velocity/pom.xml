@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
   <name>XWiki Platform - Rendering - Macro - Velocity</name>
   <description>XWiki Platform - Rendering - Macro - Velocity</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>89.71</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

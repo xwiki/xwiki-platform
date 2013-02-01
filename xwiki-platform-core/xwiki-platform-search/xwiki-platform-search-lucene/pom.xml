@@ -34,6 +34,7 @@
   <description>XWiki Platform - Search - Lucene</description>
   <properties>
     <lucene.version>4.0.0</lucene.version>
+    <xwiki.jacoco.instructionRatio>35.78</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

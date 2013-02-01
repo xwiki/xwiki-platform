@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-macro-include</artifactId>
   <name>XWiki Platform - Rendering - Macro - Include</name>
   <description>XWiki Platform - Rendering - Macro - Include</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>78.88</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

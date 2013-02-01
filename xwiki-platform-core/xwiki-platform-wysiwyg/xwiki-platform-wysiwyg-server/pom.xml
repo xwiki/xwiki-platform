@@ -31,6 +31,9 @@
   <name>XWiki Platform - WYSIWYG Editor - Server Side</name>
   <packaging>jar</packaging>
   <description>The server side of XWiki's WYSIWYG editor.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>8.45</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

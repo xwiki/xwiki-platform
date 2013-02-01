@@ -33,6 +33,9 @@
   <name>XWiki Platform - Git</name>
   <packaging>jar</packaging>
   <description>Script Service to make it easy to run Git commands in wiki pages</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>81.81</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

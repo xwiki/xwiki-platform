@@ -34,6 +34,7 @@
   <description>XWiki Platform - Rendering - Macro - Context</description>
   <properties>
     <xwiki.clover.targetPercentage>88.6%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>88.11</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

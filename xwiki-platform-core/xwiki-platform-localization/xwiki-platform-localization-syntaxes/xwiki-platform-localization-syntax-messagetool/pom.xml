@@ -33,7 +33,9 @@
   <name>XWiki Platform - Localization - Syntax - MessageTool</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Localization - Syntax - MessageTool</description>
-  
+  <properties>
+    <xwiki.jacoco.instructionRatio>82.79</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

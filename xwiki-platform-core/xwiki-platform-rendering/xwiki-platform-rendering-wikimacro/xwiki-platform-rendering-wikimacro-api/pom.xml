@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - API</name>
   <description>XWiki Platform - Rendering - Wiki Macro Bridge - API</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>67.85</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -30,6 +30,9 @@
   <artifactId>xwiki-platform-annotation-io</artifactId>
   <name>XWiki Platform - Annotations - XWiki Storage Implementation</name>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>5.15</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

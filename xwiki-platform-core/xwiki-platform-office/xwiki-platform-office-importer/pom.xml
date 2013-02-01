@@ -35,7 +35,7 @@
     <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <xwiki.clover.targetPercentage>52.4%</xwiki.clover.targetPercentage>
-    <xwiki.jacoco.instructionRatio>58.82</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>58.77</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

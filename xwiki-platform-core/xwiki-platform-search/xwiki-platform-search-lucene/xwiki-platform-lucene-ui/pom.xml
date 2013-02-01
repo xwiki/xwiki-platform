@@ -33,4 +33,16 @@
   <packaging>xar</packaging>
   <name>XWiki Platform - Search - Lucene - UI</name>
   <description>Lucene search and administration related pages</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-lucene-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

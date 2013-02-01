@@ -67,7 +67,7 @@
     <!-- Needed for the Wiki Search Bot Listener -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-lucene</artifactId>
+      <artifactId>xwiki-platform-search-lucene-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Add Panel dep which is optional in xwiki-platform-ircbot-ui in order to test registration in the App panel -->

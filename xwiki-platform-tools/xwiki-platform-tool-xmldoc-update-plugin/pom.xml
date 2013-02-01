@@ -54,7 +54,6 @@
       <artifactId>xwiki-commons-environment-standard</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -109,7 +108,6 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -119,8 +117,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

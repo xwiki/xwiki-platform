@@ -21,8 +21,8 @@ package com.xpn.xwiki.tool.doc;
 
 import java.io.File;
 import java.io.FileReader;
-import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.*;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,13 +43,9 @@ public class DocumentUpdateMojoTest
     {
         AttachMojo mojo = new AttachMojo();
 
-        URL resURL = this.getClass().getResource("/SampleWikiXMLDocument.input");
-        File resourceFile = new File(resURL.getPath());
-        FileReader fr = new FileReader(resourceFile);
-        char[] bytes = new char[(int) resourceFile.length()];
-        fr.read(bytes);
-        String inputContent = new String(bytes);
+        File resourceFile = new File(this.getClass().getResource("/SampleWikiXMLDocument.input").toURI());
 
+        String inputContent = IOUtils.toString(new FileReader(resourceFile));
         Assert.assertTrue(inputContent.contains("<class>"));
 
         XWikiDocument doc = mojo.loadFromXML(resourceFile);
@@ -58,10 +54,7 @@ public class DocumentUpdateMojoTest
         File outputFile = File.createTempFile("output", "xml");
         mojo.writeToXML(doc, outputFile);
 
-        fr = new FileReader(outputFile);
-        bytes = new char[(int) outputFile.length()];
-        fr.read(bytes);
-        String outputContent = new String(bytes);
+        String outputContent = IOUtils.toString(new FileReader(outputFile));
 
         // Check that we did not lose the class definition during the loading from XML/writing to XML process.
         Assert.assertTrue(outputContent.contains("<class>"));

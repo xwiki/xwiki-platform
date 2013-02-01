@@ -32,13 +32,15 @@
   <artifactId>xwiki-platform-rendering-macro-cache</artifactId>
   <name>XWiki Platform - Rendering - Macro - Cache</name>
   <description>XWiki Platform - Rendering - Macro - Cache</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>92.95</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

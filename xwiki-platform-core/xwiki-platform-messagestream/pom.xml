@@ -34,6 +34,7 @@
   <description>Publish and display user status messages in different streams</description>
   <properties>
     <xwiki.clover.targetPercentage>64.6%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>63.59</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

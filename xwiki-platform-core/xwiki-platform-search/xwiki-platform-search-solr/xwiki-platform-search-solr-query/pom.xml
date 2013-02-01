@@ -33,6 +33,9 @@
   <packaging>jar</packaging>
   <name>XWiki Platform - Search - Solr - Query</name>
   <description>Query module for the Solr index. Allows performing Solr queries using XWiki's Query API.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>1.94</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -35,6 +35,7 @@
   <description>Java API for the IRC Bot Application</description>
   <properties>
     <xwiki.clover.targetPercentage>55.3%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>60.84</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -83,4 +84,18 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- TODO: Remove this once this bug is fixed: http://code.google.com/p/pircbotx/issues/detail?id=114 -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>org.pircbotx.hooks.ListenerAdapter</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

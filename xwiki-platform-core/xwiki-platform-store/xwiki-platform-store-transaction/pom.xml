@@ -106,4 +106,7 @@
     code review easy in the place where it is most important. This part of the code is entirely generic
     and has no dependence on any type of underlying transactional storage engine.
   </description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>84.82</xwiki.jacoco.instructionRatio>
+  </properties>
 </project>

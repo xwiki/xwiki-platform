@@ -32,6 +32,9 @@
   <artifactId>xwiki-platform-rendering-macro-useravatar</artifactId>
   <name>XWiki Platform - Rendering - Macro - User Avatar</name>
   <description>XWiki Platform - Rendering - Macro - User Avatar</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>98.84</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

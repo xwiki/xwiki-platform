@@ -33,6 +33,9 @@
   <name>XWiki Platform - XML - Script Service</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - XML - Script Service</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>88.60</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

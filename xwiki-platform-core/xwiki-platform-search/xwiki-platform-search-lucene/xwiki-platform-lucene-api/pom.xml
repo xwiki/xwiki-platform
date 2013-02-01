@@ -26,12 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search</artifactId>
+    <artifactId>xwiki-platform-search-lucene</artifactId>
     <version>4.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-lucene</artifactId>
-  <name>XWiki Platform - Search - Lucene</name>
-  <description>XWiki Platform - Search - Lucene</description>
+  <artifactId>xwiki-platform-search-lucene-api</artifactId>
+  <name>XWiki Platform - Search - Lucene - API</name>
+  <description>XWiki Platform - Search - Lucene - API</description>
   <properties>
     <lucene.version>4.0.0</lucene.version>
     <xwiki.jacoco.instructionRatio>35.78</xwiki.jacoco.instructionRatio>

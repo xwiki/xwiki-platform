@@ -34,7 +34,6 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Component - Multi Component Manager Implementation</description>
   <properties>
-    <xwiki.clover.targetPercentage>72.7%</xwiki.clover.targetPercentage>
     <xwiki.jacoco.instructionRatio>83.33</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

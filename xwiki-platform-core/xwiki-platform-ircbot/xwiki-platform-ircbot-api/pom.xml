@@ -34,7 +34,6 @@
   <packaging>jar</packaging>
   <description>Java API for the IRC Bot Application</description>
   <properties>
-    <xwiki.clover.targetPercentage>55.3%</xwiki.clover.targetPercentage>
     <xwiki.jacoco.instructionRatio>60.84</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

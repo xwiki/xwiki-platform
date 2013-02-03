@@ -34,7 +34,6 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Observation - Remote</description>
   <properties>
-    <xwiki.clover.targetPercentage>74.3%</xwiki.clover.targetPercentage>
     <xwiki.jacoco.instructionRatio>67.71</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

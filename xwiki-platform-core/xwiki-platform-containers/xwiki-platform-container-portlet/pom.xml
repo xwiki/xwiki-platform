@@ -34,7 +34,6 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Containers - Portlet</description>
   <properties>
-    <xwiki.clover.targetPercentage>17.2%</xwiki.clover.targetPercentage>
     <xwiki.jacoco.instructionRatio>17.08</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

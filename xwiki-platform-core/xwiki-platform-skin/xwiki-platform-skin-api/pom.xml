@@ -33,8 +33,7 @@
   <name>XWiki Platform - Skin - API</name>
   <description>XWiki Platform - Skin - API</description>
   <properties>
-    <!-- TODO: Clover bug which reports a TPC of -100%, probably because there's only one interface... -->
-    <xwiki.clover.targetPercentage>-100%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

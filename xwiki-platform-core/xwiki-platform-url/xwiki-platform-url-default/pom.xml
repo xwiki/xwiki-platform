@@ -35,7 +35,6 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - URL - Default Implementation</description>
   <properties>
-    <xwiki.clover.targetPercentage>77.9%</xwiki.clover.targetPercentage>
     <xwiki.jacoco.instructionRatio>68.70</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

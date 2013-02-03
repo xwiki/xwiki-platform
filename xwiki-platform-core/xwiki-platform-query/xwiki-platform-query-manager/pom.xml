@@ -33,7 +33,6 @@
   <name>XWiki Platform - Query - Manager</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.clover.targetPercentage>53.4%</xwiki.clover.targetPercentage>
     <xwiki.jacoco.instructionRatio>58.53</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

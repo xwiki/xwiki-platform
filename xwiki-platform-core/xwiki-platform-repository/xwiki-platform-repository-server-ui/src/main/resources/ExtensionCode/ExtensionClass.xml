@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1304002820000</creationDate>
-  <date>1329816524000</date>
-  <contentUpdateDate>1329816524000</contentUpdateDate>
+  <creationDate>1359990173000</creationDate>
+  <date>1359997467000</date>
+  <contentUpdateDate>1359997467000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -34,7 +34,7 @@
     <validationScript/>
     <authors>
       <cache>0</cache>
-      <customDisplay/>
+      <customDisplay>{{include document="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
       <disabled>0</disabled>
       <displayType>input</displayType>
       <multiSelect>1</multiSelect>

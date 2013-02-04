@@ -778,7 +778,9 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         String authorId = resolveAuthorIdOnWiki(xcontext.getDatabase(), authorName, authorElements, xcontext);
 
         if (authorId == null && !xcontext.isMainWiki()) {
-            authorId = resolveAuthorIdOnWiki(xcontext.getMainXWiki(), authorName, authorElements, xcontext);
+            authorId =
+                xcontext.getMainXWiki() + ':'
+                    + resolveAuthorIdOnWiki(xcontext.getMainXWiki(), authorName, authorElements, xcontext);
         }
 
         return authorId != null ? authorId : authorName;
@@ -799,11 +801,21 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
             List<String> documentNames = query.execute();
 
-            for (String documentName : documentNames) {
-                String userName = xcontext.getWiki().getUserName(documentName, null, false, xcontext);
+            if (!documentNames.isEmpty()) {
+                String currentWiki = xcontext.getDatabase();
+                try {
+                    for (String documentName : documentNames) {
 
-                if (userName.equals(authorName)) {
-                    return documentName;
+                        xcontext.setDatabase(wiki);
+
+                        String userName = xcontext.getWiki().getUserName(documentName, null, false, xcontext);
+
+                        if (userName.equals(authorName)) {
+                            return documentName;
+                        }
+                    }
+                } finally {
+                    xcontext.setDatabase(currentWiki);
                 }
             }
         } catch (QueryException e) {

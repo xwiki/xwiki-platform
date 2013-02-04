@@ -35,7 +35,7 @@
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.jacoco.instructionRatio>65.56</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

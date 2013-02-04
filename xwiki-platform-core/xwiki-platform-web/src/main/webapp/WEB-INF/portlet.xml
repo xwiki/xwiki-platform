@@ -12,9 +12,6 @@
       <portlet-mode>edit</portlet-mode>
       <portlet-mode>edit_defaults_compatibility</portlet-mode>
     </supports>
-    <custom-portlet-mode>
-      <portlet-mode>edit_defaults_compatibility</portlet-mode>
-    </custom-portlet-mode>
     <portlet-info>
       <title>XWiki Dispatch Portlet</title>
       <short-title>XWiki</short-title>
@@ -41,4 +38,7 @@
       </preference>
     </portlet-preferences>
   </portlet>
+  <custom-portlet-mode>
+    <portlet-mode>edit_defaults_compatibility</portlet-mode>
+  </custom-portlet-mode>
 </portlet-app>

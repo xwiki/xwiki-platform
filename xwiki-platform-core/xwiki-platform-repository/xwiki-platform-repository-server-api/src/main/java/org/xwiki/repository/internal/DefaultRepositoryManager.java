@@ -792,8 +792,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                 this.queryManager.createQuery("from doc.object(XWiki.XWikiUsers) as user"
                     + " where user.first_name like :userfirstname OR user.last_name like :userlastname", Query.XWQL);
 
-            query.bindValue("userfirstname", authorElements[0]);
-            query.bindValue("userlastname", authorElements[authorElements.length - 1]);
+            query.bindValue("userfirstname", '%' + authorElements[0] + '%');
+            query.bindValue("userlastname", '%' + authorElements[authorElements.length - 1] + '%');
 
             query.setWiki(wiki);
 

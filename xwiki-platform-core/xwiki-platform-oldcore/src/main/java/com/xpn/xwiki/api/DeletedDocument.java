@@ -167,15 +167,19 @@ public class DeletedDocument extends Api
     }
 
     /**
-     * @return the document as it is in the recycle bin
+     * @return the document as it is in the recycle bin if the user has view rights on it, {@code null} otherwise
      */
     public Document getDocument()
     {
         try {
-            return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
+            XWikiDocument restoredDocument = this.deletedDoc.restoreDocument(null, this.context);
+            if (getXWikiContext().getWiki().getRightService().checkAccess("view", restoredDocument, this.context)) {
+                return new Document(restoredDocument, this.context);
+            }
         } catch (XWikiException e) {
             LOGGER.warn("Failed to parse deleted document: " + e.getMessage());
-            return null;
         }
+
+        return null;
     }
 }

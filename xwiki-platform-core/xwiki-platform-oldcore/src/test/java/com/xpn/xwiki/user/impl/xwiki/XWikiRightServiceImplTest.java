@@ -597,7 +597,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             .with(ANYTHING, ANYTHING, ANYTHING, ANYTHING).will(
                   returnValue(Collections.emptyList()));
 
-        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getFullName()), ANYTHING)
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING)
             .will(returnValue(doc));
 
         this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(

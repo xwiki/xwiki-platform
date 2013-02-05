@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.type;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 /**
  * Represents various Wikis supported by Wiki Importer.
  * 
@@ -73,59 +75,33 @@ public class WikiType
         return name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
-        // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
-        // algorithm.
-        // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's identity
-        int hash = 7;
-        hash = 31 * hash + (null == getId() ? 0 : getId().hashCode());
-        return hash;
+        return getId().hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object object)
     {
         boolean result;
 
-        // See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this algorithm.
         if (this == object) {
             result = true;
         } else {
-            if ((object == null) || (object.getClass() != this.getClass())) {
-                result = false;
+            if (object instanceof WikiType) {
+                result = ObjectUtils.equals(getId(), ((WikiType) object).getId());
             } else {
-                // Object must be Syntax at this point.
-                WikiType syntaxType = (WikiType) object;
-                // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's
-                // identity.
-                result = (getId() == syntaxType.getId() || (getId() != null && getId().equals(syntaxType.getId())));
+                result = false;
             }
         }
 
         return result;
     }
-
 }

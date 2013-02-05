@@ -64,9 +64,9 @@ public class InputWikiStreamMediaWikiXml extends AbstractXMLInputWikiStream<Medi
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.wikistream.input.InputWikiStream#parse(java.lang.Object, org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.wikistream.input.InputWikiStream#read(java.lang.Object, org.xwiki.rendering.listener.Listener)
      */
-    public void parse(MediaWikiXmlParameters parametersBean, Listener wikiEventListener) throws WikiStreamException
+    public void read(MediaWikiXmlParameters parametersBean, Listener wikiEventListener) throws WikiStreamException
     {
         String srcPath=parametersBean.getSrcPath();
         Map<String,String> xmlTagParameters=parametersBean.getXmlTagParams();

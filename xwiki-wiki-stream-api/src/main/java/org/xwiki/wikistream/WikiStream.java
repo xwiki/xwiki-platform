@@ -30,7 +30,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * 
  * @version $Id$
  */
-public interface WikiStream<P>
+public interface WikiStream
 {
     /**
      * @return The {@link WikiStreamType}, which identifies a wiki stream input and output components using a role hint.

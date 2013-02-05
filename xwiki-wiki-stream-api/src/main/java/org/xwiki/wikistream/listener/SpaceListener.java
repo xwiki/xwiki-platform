@@ -28,7 +28,6 @@ import org.xwiki.rendering.listener.MetaData;
  */
 public interface SpaceListener
 {
-
     /**
      * Marks the begin of wiki space
      * 
@@ -46,7 +45,7 @@ public interface SpaceListener
     /**
      * Start of metadata related to a wiki space
      * 
-     * @param metdata The metadata and various properties related to wiki space
+     * @param metadata The metadata and various properties related to wiki space
      */
     void beginMetadata(MetaData metadata);
 

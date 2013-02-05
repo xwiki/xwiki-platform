@@ -73,7 +73,7 @@ public class InputWikiStreamMediaWikiXmlTest extends AbstractComponentTestCase
 
     @Test
     public void testXmlParsing() throws WikiStreamException{
-        mediaWikiXmlInputStream.parse(parametersBean, listener);
+        mediaWikiXmlInputStream.read(parametersBean, listener);
         System.out.println(listener.getXMLString());
 
     }

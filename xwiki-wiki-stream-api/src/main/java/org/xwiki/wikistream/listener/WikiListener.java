@@ -26,7 +26,6 @@ import org.xwiki.rendering.listener.MetaData;
  */
 public interface WikiListener
 {
-
     /**
      * Start of wiki
      * 
@@ -44,7 +43,7 @@ public interface WikiListener
     /**
      * Start of metadata related to a wiki
      * 
-     * @param metdata The metadata and various properties related to wiki
+     * @param metadata The metadata and various properties related to wiki
      */
     void beginMetadata(MetaData metadata);
 

@@ -22,14 +22,14 @@ package org.xwiki.wikistream.input;
 import java.util.Map;
 
 import org.xml.sax.ContentHandler;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.wikistream.listener.Listener;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface ContentHandlerParser extends ContentHandler
 {
 

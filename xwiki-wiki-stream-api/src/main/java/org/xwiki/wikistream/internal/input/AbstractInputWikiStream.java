@@ -33,7 +33,6 @@ import org.xwiki.wikistream.input.InputWikiStream;
  */
 public abstract class AbstractInputWikiStream<P> implements InputWikiStream<P>, Initializable
 {
-
     /**
      * The {@link BeanManager} component.
      */
@@ -58,11 +57,7 @@ public abstract class AbstractInputWikiStream<P> implements InputWikiStream<P>, 
         this.parametersBeanClass = parameterBeanClass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // Initialise WikiStream Descriptor.
@@ -113,9 +108,7 @@ public abstract class AbstractInputWikiStream<P> implements InputWikiStream<P>, 
         this.descriptor = descriptor;
     }
 
-    /**
-     * @return the descriptor
-     */
+    @Override
     public WikiStreamDescriptor getDescriptor()
     {
         return descriptor;

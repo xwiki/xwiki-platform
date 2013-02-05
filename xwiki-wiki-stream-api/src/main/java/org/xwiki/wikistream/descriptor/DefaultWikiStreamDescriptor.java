@@ -30,7 +30,6 @@ import org.xwiki.properties.PropertyDescriptor;
  */
 public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
 {
-
     /**
      * @see #getName()
      */
@@ -56,14 +55,12 @@ public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
         new LinkedHashMap<String, WikiStreamParameterDescriptor>();
 
     /**
-     * @param type
      * @param name
      * @param description
      * @param parametersBeanDescriptor
      */
     public DefaultWikiStreamDescriptor(String name, String description, BeanDescriptor parametersBeanDescriptor)
     {
-        super();
         this.name = name;
         this.description = description;
         this.parametersBeanDescriptor = parametersBeanDescriptor;
@@ -77,43 +74,25 @@ public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamDescriptor#getName()
-     */
+    @Override
     public String getName()
     {
-        // TODO Auto-generated method stub
         return name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamDescriptor#getDescription()
-     */
+    @Override
     public String getDescription()
     {
-        // TODO Auto-generated method stub
         return description;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamDescriptor#getParametersBeanClass()
-     */
+    @Override
     public Class< ? > getParametersBeanClass()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamDescriptor#getParameterDescriptorMap()
-     */
+    @Override
     public Map<String, WikiStreamParameterDescriptor> getParameterDescriptorMap()
     {
         return parameterDescriptorMap;

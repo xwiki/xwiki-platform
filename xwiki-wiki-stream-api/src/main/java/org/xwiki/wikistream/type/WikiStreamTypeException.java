@@ -26,7 +26,6 @@ package org.xwiki.wikistream.type;
  */
 public class WikiStreamTypeException extends Exception
 {
-
     /**
      * Class version.
      */
@@ -45,7 +44,7 @@ public class WikiStreamTypeException extends Exception
     /**
      * Constructs a new exception with the specified cause.
      * 
-     * @param throwable The underlying cause for this exception.
+     * @param cause The underlying cause for this exception.
      */
     public WikiStreamTypeException(Throwable cause)
     {
@@ -56,7 +55,7 @@ public class WikiStreamTypeException extends Exception
      * Constructs a new exception with the specified message and cause.
      * 
      * @param message The explanation of the exception.
-     * @param throwable The underlying cause for this exception.
+     * @param cause The underlying cause for this exception.
      */
     public WikiStreamTypeException(String message, Throwable cause)
     {

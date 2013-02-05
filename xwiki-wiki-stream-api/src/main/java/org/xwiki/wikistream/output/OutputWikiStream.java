@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.output;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.listener.Listener;
@@ -28,13 +28,13 @@ import org.xwiki.wikistream.listener.Listener;
  * @param <P> The parameter bean class
  * @version $Id$
  */
-@ComponentRole
-public interface OutputWikiStream<P> extends WikiStream<P>
+@Role
+public interface OutputWikiStream<P> extends WikiStream
 {
     /**
-     * @param parameters
-     * @return {@link Listener}
-     * @throws OutputWikiStreamException
+     * @param parameters the custom parameters
+     * @return the {@link Listener}
+     * @throws WikiStreamException
      */
     Listener createListener(P parameters) throws WikiStreamException;
 

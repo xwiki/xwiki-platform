@@ -19,23 +19,22 @@
  */
 package org.xwiki.wikistream.input;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.wikistream.listener.Listener;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.listener.Listener;
 
 /**
  * @param <P>
  * @version $Id$
  */
-@ComponentRole
-public interface InputWikiStream<P> extends WikiStream<P>
+@Role
+public interface InputWikiStream<P> extends WikiStream
 {
-
     /**
      * @param parameters
      * @param listener
-     * @throws InputWikiStreamException
+     * @throws WikiStreamException
      */
-    void parse(P parameters, Listener listener) throws WikiStreamException;
+    void read(P parameters, Listener listener) throws WikiStreamException;
 }

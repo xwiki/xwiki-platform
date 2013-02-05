@@ -19,6 +19,9 @@
  */
 package org.xwiki.wikistream.type;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Combination of supported wikis and their export types.
  * 
@@ -26,7 +29,6 @@ package org.xwiki.wikistream.type;
  */
 public class WikiStreamType
 {
-
     public static final WikiStreamType MEDIAWIKI_XML = new WikiStreamType(WikiType.MEDIAWIKI, "XML");
 
     public static final WikiStreamType CONFLUENCE_XML = new WikiStreamType(WikiType.CONFLUENCE, "XML");
@@ -49,7 +51,7 @@ public class WikiStreamType
     private String dataFormat;
 
     /**
-     * @param id of Wiki
+     * @param type the type of Wiki
      * @param dataFormat the export data format
      */
     public WikiStreamType(WikiType type, String dataFormat)
@@ -79,59 +81,32 @@ public class WikiStreamType
         return getType().getId() + "/" + getDataFormat().toLowerCase();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return getType().toString() + " " + getDataFormat();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
-        // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
-        // algorithm.
-        // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's identity
-        int hash = 7;
-        hash = 31 * hash + (null == getType() ? 0 : getType().hashCode());
-        hash = 31 * hash + (null == getDataFormat() ? 0 : getDataFormat().hashCode());
-        return hash;
+        return new HashCodeBuilder().append(getType()).append(getDataFormat()).toHashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object object)
     {
         boolean result;
 
-        // See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this algorithm.
         if (this == object) {
             result = true;
         } else {
-            if ((object == null) || (object.getClass() != this.getClass())) {
-                result = false;
-            } else {
-                // Object must be Syntax at this point.
-                WikiStreamType type = (WikiStreamType) object;
-                // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's
-                // identity.
+            if (object instanceof WikiStreamType) {
                 result =
-                    (getType() == type.getType() || (getType() != null && getType().equals(type.getType())))
-                        && (getDataFormat() == type.getDataFormat() || (getDataFormat() != null && getDataFormat()
-                            .equals(type.getDataFormat())));
+                    ObjectUtils.equals(getType(), ((WikiStreamType) object).getType())
+                        && ObjectUtils.equals(getDataFormat(), ((WikiStreamType) object).getDataFormat());
+            } else {
+                result = false;
             }
         }
 

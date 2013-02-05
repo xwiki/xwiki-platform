@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.descriptor;
 
 import java.lang.reflect.Type;
+
 import org.xwiki.properties.PropertyDescriptor;
 
 /**
@@ -29,7 +30,6 @@ import org.xwiki.properties.PropertyDescriptor;
  */
 public class DefaultWikiStreamParameterDescriptor implements WikiStreamParameterDescriptor
 {
-
     /**
      * The description of the parameter.
      */
@@ -43,64 +43,39 @@ public class DefaultWikiStreamParameterDescriptor implements WikiStreamParameter
         this.propertyDescriptor = propertyDescriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamParameterDescriptor#getId()
-     */
+    @Override
     public String getId()
     {
         return this.propertyDescriptor.getId();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamParameterDescriptor#getName()
-     */
+    @Override
     public String getName()
     {
         return this.propertyDescriptor.getName();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamParameterDescriptor#getDescription()
-     */
+    @Override
     public String getDescription()
     {
         return this.propertyDescriptor.getDescription();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamParameterDescriptor#getParameterType()
-     */
+    @Override
     public Type getParameterType()
     {
         return this.propertyDescriptor.getPropertyType();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamParameterDescriptor#getDefaultValue()
-     */
+    @Override
     public Object getDefaultValue()
     {
         return this.propertyDescriptor.getDefaultValue();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.wikistream.descriptor.WikiStreamParameterDescriptor#isMandatory()
-     */
+    @Override
     public boolean isMandatory()
     {
         return this.propertyDescriptor.isMandatory();
     }
-
 }

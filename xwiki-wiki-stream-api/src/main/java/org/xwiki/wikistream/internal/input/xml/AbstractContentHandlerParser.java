@@ -21,8 +21,6 @@ package org.xwiki.wikistream.internal.input.xml;
 
 import java.util.Map;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.wikistream.input.ContentHandlerParser;
 import org.xwiki.wikistream.listener.Listener;
@@ -33,7 +31,6 @@ import org.xwiki.wikistream.type.WikiStreamType;
  */
 public class AbstractContentHandlerParser extends DefaultHandler implements ContentHandlerParser
 {
-
     private Listener listener;
 
     protected Map<String, String> xmlTagParameters;
@@ -51,7 +48,6 @@ public class AbstractContentHandlerParser extends DefaultHandler implements Cont
         return WikiStreamType.MEDIAWIKI_XML;
     }
 
-    
     /**
      * @return the listener
      */
@@ -59,7 +55,6 @@ public class AbstractContentHandlerParser extends DefaultHandler implements Cont
     {
         return listener;
     }
-
 
     /**
      * {@inheritDoc}
@@ -72,7 +67,6 @@ public class AbstractContentHandlerParser extends DefaultHandler implements Cont
         this.listener = listener;
     }
 
-    
     /**
      * @return the xmlTagParameters
      */
@@ -80,7 +74,6 @@ public class AbstractContentHandlerParser extends DefaultHandler implements Cont
     {
         return xmlTagParameters;
     }
-
 
     /**
      * {@inheritDoc}
@@ -93,6 +86,4 @@ public class AbstractContentHandlerParser extends DefaultHandler implements Cont
         this.xmlTagParameters = xmlTagParameters;
     }
 
-
-    
 }

@@ -27,46 +27,21 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib</groupId>
-    <artifactId>xwiki-wiki-stream</artifactId>
+    <artifactId>xwiki-wiki-stream-modules</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-wiki-stream-api</artifactId>
-  <name>XWiki WikiStream API</name>
-  <packaging>jar</packaging>
+  <artifactId>xwiki-wiki-stream-mediawiki-xml</artifactId>
+  <name>MediaWiki Xml InputStream</name>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-transformation-macro</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>xwiki-wiki-stream-xml</artifactId>
+      <version>${project.version}</version>
     </dependency>
-
-    <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.4.2</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/test/**.class</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

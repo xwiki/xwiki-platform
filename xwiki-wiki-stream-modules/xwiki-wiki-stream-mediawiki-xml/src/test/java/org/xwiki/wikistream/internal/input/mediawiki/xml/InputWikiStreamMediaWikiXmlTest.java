@@ -24,7 +24,7 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
@@ -51,12 +51,12 @@ public class InputWikiStreamMediaWikiXmlTest extends AbstractComponentTestCase
     {
         super.setUp();
         mediaWikiXmlInputStream =
-            (InputWikiStreamMediaWikiXml) getComponentManager().lookup(InputWikiStream.class, "mediawiki-xml");
+            (InputWikiStreamMediaWikiXml) getComponentManager().getInstance(InputWikiStream.class, "mediawiki-xml");
         parametersBean = new MediaWikiXmlParameters();
         parametersBean.setDefaultSpace("MediaWiki");
         parametersBean.setSrcPath(this.getClass().getResource("/MediaWikiXML.xml").getPath());
 
-        outputWikiStream = (OutputWikiStreamWikiXML) getComponentManager().lookup(OutputWikiStream.class, "wiki-xml");
+        outputWikiStream = (OutputWikiStreamWikiXML) getComponentManager().getInstance(OutputWikiStream.class, "wiki-xml");
         listener=(WikiXMLListener) outputWikiStream.createListener(null);
     }
 

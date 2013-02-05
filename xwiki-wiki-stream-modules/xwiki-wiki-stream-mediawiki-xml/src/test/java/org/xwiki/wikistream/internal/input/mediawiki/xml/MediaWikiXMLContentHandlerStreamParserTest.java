@@ -17,38 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.test;
+package org.xwiki.wikistream.internal.input.mediawiki.xml;
 
-import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.wikistream.input.ContentHandlerParser;
 
 /**
- * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
+ * @version $Id$
  */
-public abstract class AbstractWikiStreamTest extends AbstractComponentTestCase
+public class MediaWikiXMLContentHandlerStreamParserTest extends AbstractComponentTestCase
 {
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
-    @Override
-    public void setUp() throws Exception
+    @Test
+    public void testComponent() throws Exception
     {
-        // TODO Auto-generated method stub
-        super.setUp();
-    }
+        Object obj = getComponentManager().getInstance(ContentHandlerParser.class, "mediawiki/xml/contenthandler");
+        Assert.assertNotNull(obj);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#tearDown()
-     */
-    @Override
-    public void tearDown() throws Exception
-    {
-        // TODO Auto-generated method stub
-        super.tearDown();
     }
-
 }

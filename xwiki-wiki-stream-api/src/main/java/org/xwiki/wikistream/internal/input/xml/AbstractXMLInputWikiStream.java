@@ -77,7 +77,8 @@ public abstract class AbstractXMLInputWikiStream<P> extends AbstractInputWikiStr
         ContentHandlerParser parser = null;
         try {
             parser =
-                this.componentManager.lookup(ContentHandlerParser.class, getType().toIdString() + "/contenthandler");
+                this.componentManager.getInstance(ContentHandlerParser.class, getType().toIdString()
+                    + "/contenthandler");
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to create [" + getType().toString() + "] ContentHandler parser", e);
         }

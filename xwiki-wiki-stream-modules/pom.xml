@@ -30,17 +30,32 @@
     <artifactId>xwiki-wiki-stream</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-wiki-stream-api</artifactId>
-  <name>XWiki WikiStream API</name>
-  <packaging>jar</packaging>
+  <artifactId>xwiki-wiki-stream-modules</artifactId>
+  <packaging>pom</packaging>
+  <name>XWiki Platform - Wiki Stream</name>
+  <properties>
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <modules>
+    <module>xwiki-wiki-stream-mediawiki-xml</module>
+    <module>xwiki-wiki-stream-xml</module>
+  </modules>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-transformation-macro</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>xwiki-wiki-stream-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
-    <!-- Testing dependencies -->
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>xwiki-wiki-stream-api</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test-component</artifactId>
@@ -48,25 +63,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/test/**.class</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

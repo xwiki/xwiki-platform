@@ -518,7 +518,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     public boolean hasAccessLevel(String accessLevel, String userOrGroupName, XWikiDocument targetDoc, boolean user,
         XWikiContext context) throws XWikiException
     {
-        LOGGER.debug("hasAccessLevel for [{}], [{}], [{}]", accessLevel, userOrGroupName, targetDoc.getFullName());
+        LOGGER.debug("hasAccessLevel for [{}], [{}], [{}]", accessLevel, userOrGroupName,
+            targetDoc.getPrefixedFullName());
 
         DocumentReference userOrGroupNameReference =
             this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);

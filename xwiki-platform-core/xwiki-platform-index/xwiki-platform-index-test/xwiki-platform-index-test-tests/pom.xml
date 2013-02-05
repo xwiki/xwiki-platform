@@ -35,6 +35,9 @@
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>XWiki Platform - Index - Tests - Functional Tests</description>
+  <properties>
+    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+  </properties>
   <dependencies>
     <!-- These XARs will be installed in the packaged XWiki for the test -->
     <dependency>

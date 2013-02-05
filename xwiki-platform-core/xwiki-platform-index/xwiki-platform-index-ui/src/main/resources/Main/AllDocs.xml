@@ -36,14 +36,18 @@
 ##========
 ## Set Tab Data
 ##========
-#set ($tabs = [
-  {'tabName' : 'index', 'idSuffix' : 'index', 'translationKey' : 'platform.index', 'document' : 'XWiki.Tableview'},
-  {'tabName' : 'tree', 'idSuffix' : 'treeview', 'translationKey' : 'platform.index.tree', 'document' : 'XWiki.Treeview'},
-  {'tabName' : 'orphans', 'idSuffix' : 'orphansview', 'translationKey' : 'platform.index.orphaned', 'document' : 'XWiki.OrphanedPages'},
-  {'tabName' : 'attachments', 'idSuffix' : 'attachments', 'translationKey' : 'platform.index.attachments', 'document' : 'XWiki.AllAttachments'},
-  {'tabName' : 'deletedDocs', 'idSuffix' : 'deletedDocs', 'translationKey' : 'platform.index.documentsTrash', 'document' : 'XWiki.DeletedDocuments'},
-  {'tabName' : 'deletedAttachments', 'idSuffix' : 'deletedAttachments', 'translationKey' : 'platform.index.attachmentsTrash', 'document' : 'XWiki.DeletedAttachments'}
-])
+#set($tabs = [])
+#macro(addAllDocsTab $tab)
+  #if($xwiki.hasAccessLevel('view', "$!context.user", $tab.get('document')))
+    #set($discard = $tabs.add($tab))
+  #end
+#end
+#addAllDocsTab({'tabName' : 'index', 'idSuffix' : 'index', 'translationKey' : 'platform.index', 'document' : 'XWiki.Tableview'})
+#addAllDocsTab({'tabName' : 'tree', 'idSuffix' : 'treeview', 'translationKey' : 'platform.index.tree', 'document' : 'XWiki.Treeview'})
+#addAllDocsTab({'tabName' : 'orphans', 'idSuffix' : 'orphansview', 'translationKey' : 'platform.index.orphaned', 'document' : 'XWiki.OrphanedPages'})
+#addAllDocsTab({'tabName' : 'attachments', 'idSuffix' : 'attachments', 'translationKey' : 'platform.index.attachments', 'document' : 'XWiki.AllAttachments'})
+#addAllDocsTab({'tabName' : 'deletedDocs', 'idSuffix' : 'deletedDocs', 'translationKey' : 'platform.index.documentsTrash', 'document' : 'XWiki.DeletedDocuments'})
+#addAllDocsTab({'tabName' : 'deletedAttachments', 'idSuffix' : 'deletedAttachments', 'translationKey' : 'platform.index.attachmentsTrash', 'document' : 'XWiki.DeletedAttachments'})
 ##=============================================
 ## Add External Links tab if the LinkChecker module is present.
 ## TODO: In the future replace this hardcoded link with Interface Extensions

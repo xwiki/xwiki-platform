@@ -19,6 +19,7 @@
  */
 package org.xwiki.index.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -37,6 +38,12 @@ public class AllDocsPage extends ViewPage
 
     @FindBy(xpath = "//li[@id='xwikiattachments']/a")
     private WebElement attachmentsTab;
+
+    @FindBy(xpath = "//li[@id='xwikideletedDocs']/a")
+    private WebElement deletedDocsTab;
+
+    @FindBy(xpath = "//li[@id='xwikideletedAttachments']/a")
+    private WebElement deletedAttachmentsTab;
 
     public static AllDocsPage gotoPage()
     {
@@ -64,6 +71,36 @@ public class AllDocsPage extends ViewPage
         this.attachmentsTab.click();
 
         LiveTableElement lt = new LiveTableElement("allattachments");
+        lt.waitUntilReady();
+
+        return lt;
+    }
+
+    public boolean hasDeletedDocsTab()
+    {
+        return getDriver().findElements(By.xpath("//li[@id='xwikideletedDocs']/a")).size() > 0;
+    }
+
+    public boolean hasDeletedAttachmentsTab()
+    {
+        return getDriver().findElements(By.xpath("//li[@id='xwikideletedAttachments']/a")).size() > 0;
+    }
+
+    public LiveTableElement clickDeletedDocsTab()
+    {
+        this.deletedDocsTab.click();
+
+        LiveTableElement lt = new LiveTableElement("documentsTrash");
+        lt.waitUntilReady();
+
+        return lt;
+    }
+
+    public LiveTableElement clickDeletedAttachmentsTab()
+    {
+        this.deletedAttachmentsTab.click();
+
+        LiveTableElement lt = new LiveTableElement("attachmentTrash");
         lt.waitUntilReady();
 
         return lt;

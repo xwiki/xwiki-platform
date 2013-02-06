@@ -299,7 +299,7 @@
       </action>
       <action path="/downloadrev/"
               type="com.xpn.xwiki.web.DownloadRevAction"
-              name="dowloadrev"
+              name="downloadrev"
               scope="request">
       </action>
       <action path="/dot/"

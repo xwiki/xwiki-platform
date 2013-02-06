@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormElement;
 
 /**
@@ -29,12 +27,8 @@ import org.xwiki.test.ui.po.FormElement;
  * @version $Id$
  * @since 3.2M3
  */
-public class StaticListClassEditElement extends BaseElement
+public class StaticListClassEditElement extends ClassPropertyEditPane
 {
-    private final String propertyName;
-
-    private final FormElement form;
-
     /** The display type for inputting to setDisplayType. */
     public enum DisplayType
     {
@@ -59,28 +53,26 @@ public class StaticListClassEditElement extends BaseElement
 
     public StaticListClassEditElement(FormElement form, String propertyName)
     {
-        this.form = form;
-        this.propertyName = propertyName;
+        super(form, propertyName);
     }
 
     public void setValues(String values)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_values"), values);
+        setMetaProperty("values", values);
     }
 
     public void setMultiSelect(boolean isMultiSelect)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_multiSelect"), isMultiSelect ? "true" : "false");
+        setMetaProperty("multiSelect", isMultiSelect ? "true" : "false");
     }
 
     public void setDisplayType(DisplayType type)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_displayType"), type.toString());
+        setMetaProperty("displayType", type.toString());
     }
 
     public void setRelationalStorage(boolean isRelationalStorage)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_relationalStorage"),
-                                isRelationalStorage ? "true" : "false");
+        setMetaProperty("relationalStorage", isRelationalStorage ? "true" : "false");
     }
 }

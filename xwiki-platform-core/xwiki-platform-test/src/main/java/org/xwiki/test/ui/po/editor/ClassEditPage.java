@@ -67,12 +67,12 @@ public class ClassEditPage extends BasePage
         return new ClassEditPage();
     }
 
-    public void addProperty(String propertyName, String propertyType)
+    public ClassPropertyEditPane addProperty(String propertyName, String propertyType)
     {
         addPropertyWithoutWaiting(propertyName, propertyType);
 
-        // Make sure we wait for the element to appear since there's no page refresh.
-        waitUntilElementIsVisible(By.id("xproperty_" + propertyName));
+        // The following call waits for the element to appear since there's no page refresh.
+        return getPropertyEditPane(propertyName);
     }
 
     /**
@@ -104,6 +104,23 @@ public class ClassEditPage extends BasePage
             this.form = new FormElement(this.propertyForm);
         }
         return this.form;
+    }
+
+    /**
+     * Use this method if you need to set generic meta-properties (common to all XClass property types). For specific
+     * meta-properties use the methods dedicated to each XClass property type.
+     * 
+     * @param propertyName the name of a property of this class
+     * @return the pane used to edit the specified property
+     * @since 4.5
+     */
+    public ClassPropertyEditPane getPropertyEditPane(String propertyName)
+    {
+        // Make the element visible before returning it
+        By locator = By.id("xproperty_" + propertyName + "_title");
+        waitUntilElementIsVisible(locator);
+        getDriver().findElement(locator).click();
+        return new ClassPropertyEditPane(getForm(), propertyName);
     }
 
     public DatabaseListClassEditElement getDatabaseListClassEditElement(String propertyName)

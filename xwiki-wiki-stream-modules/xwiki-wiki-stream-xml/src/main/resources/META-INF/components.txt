@@ -1,1 +1,0 @@
-org.xwiki.wikistream.internal.output.xml.OutputWikiStreamWikiXML

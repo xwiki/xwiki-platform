@@ -558,16 +558,18 @@ public class LegacyTestWiki extends AbstractTestWiki {
             this.space = space;
             this.name = name;
             this.creator = creator;
-            final String prefixedFullName = new Formatter().format("%s:%s.%s",
-                getSpace().getWiki().getName(),
-                getSpace().getName(),
-                getName()).toString();
 
-            mockedDocument = mockery.mock(XWikiDocument.class, prefixedFullName);
+            mockedDocument = mockery.mock(XWikiDocument.class,
+                                          new Formatter().format("%s:%s.%s",
+                                                                 getSpace().getWiki().getName(),
+                                                                 getSpace().getName(),
+                                                                 getName())
+                                          .toString());
 
             final DocumentReference documentReference = new DocumentReference(getSpace().getWiki().getName(),
                                                                               getSpace().getName(),
                                                                               getName());
+                                                                              
 
             mockery.checking(new Expectations() {{
                 allowing(mockedDocument).getObjects("XWiki.XWikiGlobalRights");
@@ -604,7 +606,6 @@ public class LegacyTestWiki extends AbstractTestWiki {
                 allowing(mockedDocument).getDatabase(); will(returnValue(getSpace().getWiki().getName()));
                 allowing(mockedDocument).getSpace(); will(returnValue(getSpace().getName()));
                 allowing(mockedDocument).isNew(); will(returnValue(isNew));
-                allowing(mockedDocument).getPrefixedFullName(); will(returnValue(prefixedFullName));
             }});
         }
 

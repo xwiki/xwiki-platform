@@ -17,20 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input.mediawiki.xml;
+package org.xwiki.wikistream.mediawiki.xml.input;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.wikistream.xml.internal.input.XMLInputParameters;
 
-public class MediaWikiXmlParameters
+public class MediaWikiXMLInputParameters extends XMLInputParameters
 {
-    private String srcPath;
-
     private String attachmentSrcPath;
 
     private String attachmentExcludeDirs;
@@ -40,17 +38,6 @@ public class MediaWikiXmlParameters
     private String allowedImageExtensions;
 
     private Map<String, String> xmlTagParams;
-
-    /**
-     * @param srcPath absolute path of the exported xml file.
-     */
-    @PropertyName("Source Path")
-    @PropertyDescription("Absolute Path to Exported XML file")
-    @PropertyMandatory
-    public void setSrcPath(String srcPath)
-    {
-        this.srcPath = srcPath;
-    }
 
     /**
      * @param attachmentSrcPath absolute path to MediaWiki attachments directory.
@@ -74,19 +61,11 @@ public class MediaWikiXmlParameters
     }
 
     /**
-     * @return the srcPath
-     */
-    public String getSrcPath()
-    {
-        return srcPath;
-    }
-
-    /**
      * @return the attachmentSrcPath
      */
     public String getAttachmentSrcPath()
     {
-        return attachmentSrcPath;
+        return this.attachmentSrcPath;
     }
 
     /**
@@ -94,7 +73,7 @@ public class MediaWikiXmlParameters
      */
     public String getAttachmentExcludeDirs()
     {
-        return attachmentExcludeDirs;
+        return this.attachmentExcludeDirs;
     }
 
     /**
@@ -102,7 +81,7 @@ public class MediaWikiXmlParameters
      */
     public String getDefaultSpace()
     {
-        return defaultSpace;
+        return this.defaultSpace;
     }
 
     /**
@@ -120,7 +99,7 @@ public class MediaWikiXmlParameters
      */
     public String getAllowedImageExtensions()
     {
-        return allowedImageExtensions;
+        return this.allowedImageExtensions;
     }
 
     /**
@@ -138,10 +117,10 @@ public class MediaWikiXmlParameters
      */
     public Map<String, String> getXmlTagParams()
     {
-        if (xmlTagParams == null) {
-            xmlTagParams = Collections.unmodifiableMap(getDefaultXmlTagParameters());
+        if (this.xmlTagParams == null) {
+            this.xmlTagParams = Collections.unmodifiableMap(getDefaultXmlTagParameters());
         }
-        return xmlTagParams;
+        return this.xmlTagParams;
     }
 
     /**

@@ -32,21 +32,21 @@ import org.xwiki.wikistream.internal.output.WriterOuputTarget;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.xml.internal.ContentHandlerOuputTarget;
 
-public abstract class AbstractXMLOutputWikiStream implements OutputWikiStream
+public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputParameters> implements OutputWikiStream
 {
-    protected XMLOuputParameters parameters;
+    protected final P parameters;
+
+    protected final ContentHandler contentHandler;
 
     protected Object listener;
 
-    protected ContentHandler contentHandler;
-
-    public AbstractXMLOutputWikiStream(XMLOuputParameters parameters) throws WikiStreamException
+    public AbstractXMLOutputWikiStream(P parameters) throws WikiStreamException
     {
         this.parameters = parameters;
         this.contentHandler = createContentHandler(this.parameters);
     }
 
-    protected ContentHandler createContentHandler(XMLOuputParameters parameters) throws WikiStreamException
+    protected ContentHandler createContentHandler(P parameters) throws WikiStreamException
     {
         OuputTarget target = parameters.getTarget();
 

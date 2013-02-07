@@ -19,22 +19,27 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLReader;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.internal.input.FileInputSource;
 import org.xwiki.wikistream.internal.input.InputSource;
 import org.xwiki.wikistream.internal.input.InputStreamInputSource;
 import org.xwiki.wikistream.internal.input.ReaderInputSource;
 
-public abstract class AbstractXMLInputWikiStream implements InputWikiStream
+public abstract class AbstractXMLInputWikiStream<P extends XMLInputParameters> implements InputWikiStream
 {
-    private XMLInputParameters parameters;
+    private P parameters;
 
-    public AbstractXMLInputWikiStream(XMLInputParameters parameters)
+    public AbstractXMLInputWikiStream(P parameters)
     {
         this.parameters = parameters;
     }
@@ -65,7 +70,17 @@ public abstract class AbstractXMLInputWikiStream implements InputWikiStream
 
             xmlReader.setContentHandler(createContentHandler(listener));
 
-            xmlReader.parse(getSAXInputSource());
+            if (this.parameters.getSource() instanceof FileInputSource) {
+                File file = ((FileInputSource) this.parameters.getSource()).getFile();
+                FileInputStream fis = new FileInputStream(file);
+                try {
+                    xmlReader.parse(new org.xml.sax.InputSource(fis));
+                } finally {
+                    IOUtils.closeQuietly(fis);
+                }
+            } else {
+                xmlReader.parse(getSAXInputSource());
+            }
         } catch (Exception e) {
             throw new WikiStreamException("Faild to parse XML source", e);
         }

@@ -4,10 +4,15 @@ import java.io.Reader;
 
 public class ReaderInputSource implements InputSource
 {
-    private Reader reader;
+    private final Reader reader;
+
+    public ReaderInputSource(Reader reader)
+    {
+        this.reader = reader;
+    }
 
     public Reader getReader()
     {
-        return reader;
+        return this.reader;
     }
 }

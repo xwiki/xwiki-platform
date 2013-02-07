@@ -4,10 +4,15 @@ import java.io.InputStream;
 
 public class InputStreamInputSource implements InputSource
 {
-    private InputStream inputStream;
+    private final InputStream inputStream;
+
+    public InputStreamInputSource(InputStream inputStream)
+    {
+        this.inputStream = inputStream;
+    }
 
     public InputStream getInputStream()
     {
-        return inputStream;
+        return this.inputStream;
     }
 }

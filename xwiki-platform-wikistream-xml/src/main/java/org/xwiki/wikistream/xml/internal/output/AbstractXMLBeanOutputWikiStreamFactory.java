@@ -17,14 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml.internal.output;
+package org.xwiki.wikistream.xml.internal.output;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.xml.internal.serializer.XMLSerializerFactory;
+import org.xml.sax.ContentHandler;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
@@ -36,25 +31,19 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * 
  * @version $Id$
  */
-@Component
-@Named("wiki+xml")
-@Singleton
-public class WikiXMLOutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<WikiXMLOuputParameters>
+public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputParameters> extends
+    AbstractBeanOutputWikiStreamFactory<P>
 {
-    @Inject
-    private XMLSerializerFactory serializerFactory;
-
-    public WikiXMLOutputWikiStreamFactory()
+    public AbstractXMLBeanOutputWikiStreamFactory(WikiStreamType type)
     {
-        super(WikiStreamType.WIKI_XML);
-
-        setName("Wiki XML output stream");
-        setDescription("Generates wiki events from MediaWiki XML inputstream.");
+        super(type);
     }
 
     @Override
-    public OutputWikiStream creaOutputWikiStream(WikiXMLOuputParameters parameters) throws WikiStreamException
+    public OutputWikiStream creaOutputWikiStream(P parameters) throws WikiStreamException
     {
-        return new WikiXMLOutputWikiStream(this.serializerFactory, parameters);
+        return new DefaultXMLOutputWikiStream<P>(this, parameters);
     }
+
+    protected abstract Object createListener(ContentHandler contentHandler);
 }

@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input.mediawiki.xml;
+package org.xwiki.wikistream.mediawiki.xml.input;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * 
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
  */
 public class MediaWikiConstants
@@ -49,15 +48,4 @@ public class MediaWikiConstants
 
     public final static List<String> MW_PROPERTIES = new ArrayList<String>(Arrays.asList(PAGE_TITLE_TAG, AUTHOR_TAG,
         COMMENT_TAG, IS_MINOR_TAG, TIMESTAMP_TAG));
-
-    public static String convertPageName(String mediaWikiPageName)
-    {
-        String xwikiPageName = mediaWikiPageName.replaceAll("[.:\\\\]", "");
-
-        // In MediaWiki the first character can have any case
-        xwikiPageName = xwikiPageName.substring(0, 1).toUpperCase() + xwikiPageName.substring(1);
-
-        return xwikiPageName;
-    }
-
 }

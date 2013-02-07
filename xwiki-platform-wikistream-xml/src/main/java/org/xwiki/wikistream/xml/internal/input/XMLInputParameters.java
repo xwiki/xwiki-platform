@@ -19,12 +19,18 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.wikistream.internal.input.InputSource;
 
 public class XMLInputParameters
 {
     private InputSource source;
 
+    @PropertyName("The source")
+    @PropertyDescription("The source to load the wiki from")
+    @PropertyMandatory
     public InputSource getSource()
     {
         return this.source;

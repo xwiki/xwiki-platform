@@ -4,10 +4,15 @@ import java.io.Writer;
 
 public class WriterOuputTarget implements OuputTarget
 {
-    private Writer writer;
+    private final Writer writer;
+
+    public WriterOuputTarget(Writer writer)
+    {
+        this.writer = writer;
+    }
 
     public Writer getWriter()
     {
-        return writer;
+        return this.writer;
     }
 }

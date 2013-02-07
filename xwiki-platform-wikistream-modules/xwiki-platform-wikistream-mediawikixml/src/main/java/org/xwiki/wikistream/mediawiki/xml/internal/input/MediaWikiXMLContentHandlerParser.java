@@ -17,58 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input.mediawiki.xml;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.xwiki.wikistream.mediawiki.xml.internal.input;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.xml.internal.input.AbstractContentHandlerParser;
 
-/**
- * @version $Id$
- */
-@Component
-@Named("mediawiki/xml/contenthandler")
-@Singleton
 public class MediaWikiXMLContentHandlerParser extends AbstractContentHandlerParser
 {
     private StringBuffer value;
+
+    public MediaWikiXMLContentHandlerParser(Object listener)
+    {
+
+    }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
     {
         if (this.level > 0) {
             if (getXmlTagParameters() != null && getXmlTagParameters().containsKey(qName)) {
-                this.value=new StringBuffer();
+                this.value = new StringBuffer();
             }
         }
 
         ++this.level;
     }
-    
-    
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
-     */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException
     {
-        if(this.value!=null){
+        if (this.value != null) {
             this.value.append(ch, start, length);
         }
     }
-
-
 
     public void endElement(String uri, String localName, String qName) throws SAXException
     {
         // Fill in.
         --this.level;
     }
-
 }

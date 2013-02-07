@@ -17,18 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml.internal.input;
+package org.xwiki.wikistream.wiki.xml.internal.input;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xml.sax.ContentHandler;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.xml.internal.parser.XMLParserFactory;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
-import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
 
 /**
  * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
@@ -39,7 +38,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<WikiXMLInputParameters>
+public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputParameters>
 {
     @Inject
     private XMLParserFactory parserFactory;
@@ -53,8 +52,8 @@ public class WikiXMLInputWikiStreamFactory extends AbstractBeanInputWikiStreamFa
     }
 
     @Override
-    protected InputWikiStream createInputWikiStream(WikiXMLInputParameters parameters) throws WikiStreamException
+    protected ContentHandler createContentHandler(Object listener)
     {
-        return new WikiXMLInputWikiStream(this.parserFactory, parameters);
+        return this.parserFactory.createContentHandler(listener, null);
     }
 }

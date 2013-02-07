@@ -27,10 +27,11 @@ import org.junit.Test;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.input.mediawiki.xml.MediaWikiXmlParameters;
+import org.xwiki.wikistream.mediawiki.xml.input.MediaWikiXMLInputParameters;
+import org.xwiki.wikistream.mediawiki.xml.internal.input.MediaWikiXMLInputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.xml.internal.input.WikiXMLListener;
-import org.xwiki.wikistream.xml.internal.output.WikiXMLOutputWikiStreamFactory;
+import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
 /**
  * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
@@ -38,11 +39,11 @@ import org.xwiki.wikistream.xml.internal.output.WikiXMLOutputWikiStreamFactory;
 public class InputWikiStreamMediaWikiXmlTest extends AbstractComponentTestCase
 {
 
-    private InputWikiStreamMediaWikiXml mediaWikiXmlInputStream = null;
+    private MediaWikiXMLInputWikiStreamFactory mediaWikiXmlInputStream = null;
 
-    private MediaWikiXmlParameters parametersBean = null;
+    private MediaWikiXMLInputParameters parametersBean = null;
 
-    private WikiXMLOutputWikiStreamFactory outputWikiStream = null;
+    private AbstractXMLBeanOutputWikiStreamFactory outputWikiStream = null;
     
     private WikiXMLListener listener=null;
 
@@ -51,12 +52,12 @@ public class InputWikiStreamMediaWikiXmlTest extends AbstractComponentTestCase
     {
         super.setUp();
         mediaWikiXmlInputStream =
-            (InputWikiStreamMediaWikiXml) getComponentManager().getInstance(InputWikiStreamFactory.class, "mediawiki-xml");
-        parametersBean = new MediaWikiXmlParameters();
+            (MediaWikiXMLInputWikiStreamFactory) getComponentManager().getInstance(InputWikiStreamFactory.class, "mediawiki-xml");
+        parametersBean = new MediaWikiXMLInputParameters();
         parametersBean.setDefaultSpace("MediaWiki");
         parametersBean.setSrcPath(this.getClass().getResource("/MediaWikiXML.xml").getPath());
 
-        outputWikiStream = (WikiXMLOutputWikiStreamFactory) getComponentManager().getInstance(OutputWikiStreamFactory.class, "wiki-xml");
+        outputWikiStream = (AbstractXMLBeanOutputWikiStreamFactory) getComponentManager().getInstance(OutputWikiStreamFactory.class, "wiki-xml");
         listener=(WikiXMLListener) outputWikiStream.createListener(null);
     }
 

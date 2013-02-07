@@ -17,26 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml.internal.input;
+package org.xwiki.wikistream.mediawiki.xml.internal.input;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xml.sax.ContentHandler;
-import org.xwiki.rendering.xml.internal.parser.XMLParserFactory;
-import org.xwiki.wikistream.xml.internal.input.AbstractXMLInputWikiStream;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.mediawiki.xml.input.MediaWikiXMLInputParameters;
+import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
 
-public class WikiXMLInputWikiStream extends AbstractXMLInputWikiStream
+@Component
+@Singleton
+@Named("mediawiki+xml")
+public class MediaWikiXMLInputWikiStreamFactory extends
+    AbstractXMLBeanInputWikiStreamFactory<MediaWikiXMLInputParameters>
 {
-    private XMLParserFactory parserFactory;
-
-    public WikiXMLInputWikiStream(XMLParserFactory parserFactory, WikiXMLInputParameters parameters)
+    public MediaWikiXMLInputWikiStreamFactory()
     {
-        super(parameters);
+        super(WikiStreamType.MEDIAWIKI_XML);
 
-        this.parserFactory = parserFactory;
+        setName("MediaWiki XML input");
+        setDescription("Generates wiki events from MediaWiki XML inputstream.");
     }
 
     @Override
     protected ContentHandler createContentHandler(Object listener)
     {
-        return this.parserFactory.createContentHandler(listener, null);
+        return new MediaWikiXMLContentHandlerParser(listener);
     }
 }

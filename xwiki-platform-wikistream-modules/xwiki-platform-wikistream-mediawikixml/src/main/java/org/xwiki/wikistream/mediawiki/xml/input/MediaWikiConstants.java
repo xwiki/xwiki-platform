@@ -19,33 +19,41 @@
  */
 package org.xwiki.wikistream.mediawiki.xml.input;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * @version $Id: 5c213c4c836ba7a506c7fae073a3c2eee28e20be $
- */
-public class MediaWikiConstants
+public interface MediaWikiConstants
 {
-    public final static String PAGE_TAG = "page";
+    String PAGE_TAG = "page";
 
-    public final static String PAGE_TITLE_TAG = "title";
+    String PAGE_TITLE_TAG = "title";
 
-    public final static String PAGE_REVISION_TAG = "revision";
+    String PAGE_REVISION_TAG = "revision";
 
-    public final static String AUTHOR_TAG = "username";
+    String AUTHOR_TAG = "username";
 
-    public final static String TIMESTAMP_TAG = "timestamp";
+    String TIMESTAMP_TAG = "timestamp";
 
-    public final static String IS_MINOR_TAG = "minor";
+    String IS_MINOR_TAG = "minor";
 
-    public final static String VERSION_TAG = "version";
+    String VERSION_TAG = "version";
 
-    public final static String COMMENT_TAG = "comment";
+    String COMMENT_TAG = "comment";
 
-    public final static String TEXT_CONTENT_TAG = "text";
+    String TEXT_CONTENT_TAG = "text";
 
-    public final static List<String> MW_PROPERTIES = new ArrayList<String>(Arrays.asList(PAGE_TITLE_TAG, AUTHOR_TAG,
-        COMMENT_TAG, IS_MINOR_TAG, TIMESTAMP_TAG));
+    List<String> MW_PROPERTIES = Arrays.asList(PAGE_TITLE_TAG, AUTHOR_TAG, COMMENT_TAG, IS_MINOR_TAG, TIMESTAMP_TAG);
+
+    Map<String, String> EVENT_MAPPING = new HashMap<String, String>()
+    {
+        {
+            put("page", "page");
+            put("title", "title");
+            put("revision", "revision");
+            put("comment", "comment");
+            put("username", "author");
+        }
+    };
 }

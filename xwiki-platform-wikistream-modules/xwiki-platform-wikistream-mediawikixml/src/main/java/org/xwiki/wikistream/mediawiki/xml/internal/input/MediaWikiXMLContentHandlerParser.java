@@ -21,14 +21,20 @@ package org.xwiki.wikistream.mediawiki.xml.internal.input;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xwiki.wikistream.mediawiki.xml.input.MediaWikiXMLInputParameters;
 
 public class MediaWikiXMLContentHandlerParser extends AbstractContentHandlerParser
 {
+    private final Object listener;
+
+    private final MediaWikiXMLInputParameters parameters;
+
     private StringBuffer value;
 
-    public MediaWikiXMLContentHandlerParser(Object listener)
+    public MediaWikiXMLContentHandlerParser(Object listener, MediaWikiXMLInputParameters parameters)
     {
-
+        this.listener = listener;
+        this.parameters = parameters;
     }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException

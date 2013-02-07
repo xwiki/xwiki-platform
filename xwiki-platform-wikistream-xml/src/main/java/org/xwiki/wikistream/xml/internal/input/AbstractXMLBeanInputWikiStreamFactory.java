@@ -20,5 +20,5 @@ public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputPa
         return new DefaultXMLInputWikiStream<P>(this, parameters);
     }
 
-    protected abstract ContentHandler createContentHandler(Object listener);
+    protected abstract ContentHandler createContentHandler(Object listener, P parameters);
 }

@@ -19,10 +19,6 @@
  */
 package org.xwiki.wikistream.mediawiki.xml.input;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.wikistream.xml.internal.input.XMLInputParameters;
@@ -36,8 +32,6 @@ public class MediaWikiXMLInputParameters extends XMLInputParameters
     private String defaultSpace = "Main";
 
     private String allowedImageExtensions;
-
-    private Map<String, String> xmlTagParams;
 
     /**
      * @param attachmentSrcPath absolute path to MediaWiki attachments directory.
@@ -111,40 +105,4 @@ public class MediaWikiXMLInputParameters extends XMLInputParameters
     {
         this.allowedImageExtensions = allowedImageExtensions;
     }
-
-    /**
-     * @return the xmlTagParams
-     */
-    public Map<String, String> getXmlTagParams()
-    {
-        if (this.xmlTagParams == null) {
-            this.xmlTagParams = Collections.unmodifiableMap(getDefaultXmlTagParameters());
-        }
-        return this.xmlTagParams;
-    }
-
-    /**
-     * @param xmlTagParams the xmlTagParams to set
-     */
-    @PropertyName("Source XML tags to events map")
-    @PropertyDescription("Mapping of source xml tags to wiki events.")
-    public void setXmlTagParams(Map<String, String> xmlTagParams)
-    {
-        this.xmlTagParams = xmlTagParams;
-    }
-
-    private Map<String, String> getDefaultXmlTagParameters()
-    {
-        Map<String, String> defaultXmlTagParams = new HashMap<String, String>();
-
-        defaultXmlTagParams.put("mediawiki", "wiki");
-        defaultXmlTagParams.put("page", "page");
-        defaultXmlTagParams.put("title", "title");
-        defaultXmlTagParams.put("revision", "revision");
-        defaultXmlTagParams.put("comment", "comment");
-        defaultXmlTagParams.put("username", "author");
-
-        return defaultXmlTagParams;
-    }
-
 }

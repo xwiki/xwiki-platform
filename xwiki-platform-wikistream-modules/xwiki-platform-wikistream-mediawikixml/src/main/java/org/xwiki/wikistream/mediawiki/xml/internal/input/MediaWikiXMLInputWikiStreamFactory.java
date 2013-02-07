@@ -43,8 +43,8 @@ public class MediaWikiXMLInputWikiStreamFactory extends
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener)
+    protected ContentHandler createContentHandler(Object listener, MediaWikiXMLInputParameters parameters)
     {
-        return new MediaWikiXMLContentHandlerParser(listener);
+        return new MediaWikiXMLContentHandlerParser(listener, parameters);
     }
 }

@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-rss</artifactId>
   <name>XWiki Platform - Rendering - Macro - RSS</name>
   <description>XWiki Platform - Rendering - Macro - RSS</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>80.39</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>rome</groupId>

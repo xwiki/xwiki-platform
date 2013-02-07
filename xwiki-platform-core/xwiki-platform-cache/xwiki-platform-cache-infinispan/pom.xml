@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-infinispan</artifactId>
   <name>XWiki Platform - Cache - Infinispan</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - Infinispan</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>68.79</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

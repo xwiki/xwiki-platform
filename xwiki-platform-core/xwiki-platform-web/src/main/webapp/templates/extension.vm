@@ -597,7 +597,16 @@
     <form action="" class="xform">
       <div class="hidden">
         #set ($_extensionId = $plan.request.extensions.get(0))
-        #extensionHiddenFormFields($_extensionId.id $_extensionId.version.value)
+        #set ($_extensionVersion = $_extensionId.version.value)
+        #if (!$_extensionVersion)
+          ## The version is not specified when an extension is uninstalled. Use the version installed on the specified namespace.
+          #set ($_namespace = $NULL)
+          #if ($plan.request.hasNamespaces())
+            #set ($_namespace = $plan.request.getNamespaces().get(0))
+          #end
+          #set ($_extensionVersion = $extensionManager.getInstalledExtension($_extensionId.id, $_namespace).id.version.value)
+        #end
+        #extensionHiddenFormFields($_extensionId.id $_extensionVersion)
         #set ($_action = $stringtool.capitalize($stringtool.removeEnd($plan.request.getProperty('job.type'), 'plan')))
         <input name="action$_action#if (!$plan.request.hasNamespaces())Globally#end" type="hidden" />
       </div>
@@ -858,6 +867,9 @@ Caused by: #printThrowable($throwable.cause true)
         #set ($_extensionName = $argument)
       #end
       #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
+    #elseif ($argument.listIterator())
+      ## Assume the argument is a job id.
+      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
     #else
       #set ($message = "$message$escapetool.xml($argument)")
     #end
@@ -970,8 +982,8 @@ $status##
   #if (!$noCSRFToken)
     <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
   #end
-  <input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" />
-  <input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" />
+  <input name="extensionId" value="$!escapetool.xml($extensionId)" type="hidden" />
+  <input name="extensionVersion" value="$!escapetool.xml($extensionVersion)" type="hidden" />
   #if ($request.section)
     <input name="section" value="$escapetool.xml($request.section)" type="hidden" />
   #end

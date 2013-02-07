@@ -115,35 +115,37 @@ public class WorkspaceManagerScriptService implements ScriptService
     }
 
     /**
-     * Creates a new workspace from a wiki descriptor.
+     * Creates a new workspace from a wiki descriptor. The default template will be used.
      * 
-     * @param workspaceName name of the new workspace
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
-     *            document will be created. This method will take care of saving the document.
+     *            document will be created. This method will take care of saving the document. <b>Note:</b>The name of
+     *            the wiki will also have to be set inside this descriptor.
      * @see {@link #getLastException()} to check for abnormal method termination
      */
-    public void createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
+    public void createWorkspace(XWikiServer newWikiXObjectDocument)
     {
-        createWorkspace(workspaceName, newWikiXObjectDocument, "workspacetemplate");
+        createWorkspace(newWikiXObjectDocument, "workspacetemplate");
     }
 
     /**
      * Creates a new workspace from a wiki descriptor.
      * 
-     * @param workspaceName name of the new workspace
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
-     *            document will be created. This method will take care of saving the document.
-     * @param templateWikiName the name of the wiki from where to copy document to the new wiki.
+     *            document will be created. This method will take care of saving the document. <b>Note:</b>The name of
+     *            the wiki will also have to be set inside this descriptor.
+     * @param templateWikiName the name of the wiki template to use when creating the new workspace.
      * @see {@link #getLastException()} to check for abnormal method termination
      */
-    public void createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument, String templateWikiName)
+    public void createWorkspace(XWikiServer newWikiXObjectDocument, String templateWikiName)
     {
         clearException();
 
+        String workspaceName = newWikiXObjectDocument.getWikiName();
+
         try {
             if (!canCreateWorkspace(getXWikiContext().getUser(), workspaceName)) {
-                throw new WorkspaceException(String.format("Access denied to create the workspace [%s]",
-                    workspaceName));
+                throw new WorkspaceException(String.format("Access denied for user [%s] to create the workspace [%s]",
+                    getXWikiContext().getUser(), workspaceName));
             }
 
             /* Avoid "traps" by making sure the page from where this is executed has PR. */
@@ -156,7 +158,7 @@ public class WorkspaceManagerScriptService implements ScriptService
                 throw new WorkspaceException(String.format("Workspace name [%s] is invalid", workspaceName));
             }
 
-            this.workspaceManager.createWorkspace(workspaceName, newWikiXObjectDocument, templateWikiName);
+            this.workspaceManager.createWorkspace(newWikiXObjectDocument, templateWikiName);
         } catch (Exception e) {
             error(String.format("Failed to create workspace [%s]", workspaceName), e);
         }

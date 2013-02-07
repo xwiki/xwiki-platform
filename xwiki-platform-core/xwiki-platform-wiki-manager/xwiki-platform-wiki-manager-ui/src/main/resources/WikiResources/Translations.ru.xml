@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1186679007000</creationDate>
-  <date>1300991417000</date>
-  <contentUpdateDate>1300991417000</contentUpdateDate>
+  <date>1357298520000</date>
+  <contentUpdateDate>1357298514000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <template/>
@@ -100,7 +100,7 @@ wikimanager.prop.wiki.visibility=Видимость вики
 wikimanager.prop.wiki.wikiname=Идентификатор вики
 wikimanager.prop.wiki.wikiprettyname=Удобное имя
 wikimanager.readers=Читатели
-wikimanager.successcreatewiki=Ваша вики "{0}" была создана. Вы можете получить доступ к ней по адресу\: {1}.
+wikimanager.successcreatewiki=Ваша вики "{0}" была создана. Вы можете получить доступ к ней по адресу\: [{1}].
 wikimanager.successdeletewiki=Вики "{0}" удалена.
 wikimanager.successsettemplate=Видимость Вики "{0}" изменена на "{1}".
 wikimanager.title.createnewalias=Создать новые альтернативные имена (алиасы)
@@ -122,7 +122,7 @@ wikimanager.widget.userwikisuser.title=Вики, которые доступны
 wikimanager.wikimanager=Вики Менеджер
 wikimanager.wikiname.error.alreadyused=Такой идентификатор уже существует
 wikimanager.wikiname.error.databasealreadyexists=База данных с таким идентификатором уже существует
-wikimanager.wikiname.error.empty=Идентификатор не омжет быть пустым
+wikimanager.wikiname.error.empty=Идентификатор не может быть пустым
 wikimanager.wikiname.error.wikialreadyexists=Вики с таким идентификатором уже существует
 wikimanager.wikiname.info.valid=Вы можете использовать это название в качестве идентификатора
 wikimanager.wikinameneeded=Название для вики все же необходимо

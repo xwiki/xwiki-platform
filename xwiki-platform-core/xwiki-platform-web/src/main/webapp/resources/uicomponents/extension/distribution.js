@@ -112,15 +112,33 @@ XWiki.MainUIStep = Class.create({
     // Auto-complete the id based on the selected version.
     if (versionList.selectedIndex == 0) {
       var id = '';
-    } else if (versionList.selectedIndex < 27) {
-      // 4.2M2 -> 3.3-milestone-1
-      var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
-    } else if (versionList.selectedIndex < 53) {
-      // 3.2.1 -> 2.6-rc-1
-      var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
+    } else if (versionList.length == 102) {
+      // XWiki Manager versions
+      if (versionList.selectedIndex < 27) {
+        // 4.2M2 -> 3.3-milestone-1
+        var id = 'org.xwiki.manager:xwiki-manager-ui';
+      } else if (versionList.selectedIndex < 38) {
+        // 3.2.1 -> 3.1-milestone-1
+        var id = 'org.xwiki.manager:xwiki-manager-wiki-administrator';
+      } else if (versionList.selectedIndex < 46) {
+        // 3.0.1 -> 2.6
+        var id = 'org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator';
+      } else {
+        // 2.5.2 -> 1.0-milestone-1
+        var id = 'com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator';
+      }
     } else {
-      // 2.5.2 -> 1.1-milestone-3
-      var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
+      // XWiki Enterprise versions
+      if (versionList.selectedIndex < 27) {
+        // 4.2M2 -> 3.3-milestone-1
+        var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
+      } else if (versionList.selectedIndex < 53) {
+        // 3.2.1 -> 2.6-rc-1
+        var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
+      } else {
+        // 2.5.2 -> 1.1-milestone-3
+        var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
+      }
     }
     // Update the value of the hidden input.
     idInput.value = id;

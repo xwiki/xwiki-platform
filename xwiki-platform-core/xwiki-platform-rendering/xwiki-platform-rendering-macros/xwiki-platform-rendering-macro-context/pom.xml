@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-context</artifactId>
   <name>XWiki Platform - Rendering - Macro - Context</name>
   <description>XWiki Platform - Rendering - Macro - Context</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>88.11</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

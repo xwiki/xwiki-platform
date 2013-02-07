@@ -1875,7 +1875,11 @@ public class XWikiDocument implements DocumentModelBridge
     public BaseClass getXClass()
     {
         if (this.xClass == null) {
-            this.setXClass(new BaseClass());
+            BaseClass emptyClass = new BaseClass();
+            // Make sure not to cause any false document versions if this document is saved.
+            emptyClass.setDirty(false);
+
+            this.setXClass(emptyClass);
         }
         return this.xClass;
     }
@@ -3246,6 +3250,7 @@ public class XWikiDocument implements DocumentModelBridge
                         "Template document {0} does not exist when adding to document {1}", null, args);
                 } else {
                     setTemplateDocumentReference(templateDocumentReference);
+                    setTitle(templatedoc.getTitle());
                     setContent(templatedoc.getContent());
 
                     // Set the new document syntax as the syntax of the template since the template content

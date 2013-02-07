@@ -294,24 +294,11 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
 (% id='Hsearch.admin.configuration.title' %)
 = {{velocity}}$msg.get('search.admin.configuration.title'){{/velocity}} =
 
-{{velocity output='false'}}
-## Create the configuration object if it does not exists
-#if (!$searchConfigObj)
-  #if ($searchConfigDoc.parent == '')
-    $searchConfigDoc.setParent('XWiki.SearchAdmin')
-  #end
-  #set ($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
-  #if ("$!searchEngine" != '')
-    #set ($discard = $searchConfigObj.set('engine', $searchEngine))
-  #end
-  $searchConfigDoc.save()
-#end
-#set ($searchEnginePropertyClass = $searchConfigClass.engine)
-{{/velocity}}
-
 {{velocity}}
+#set ($searchEnginePropertyClass = $searchConfigClass.engine)
+#set ($availableSearchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortById' : ''}))
 {{html wiki='true'}}
-&lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform third'&gt;
+&lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform half'&gt;
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
@@ -319,11 +306,15 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
     &lt;/dt&gt;
 
     &lt;dt&gt;
-      &lt;label for='XWiki.SearchConfigClass_0_engine'&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
+      &lt;label&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('search.admin.configuration.seexwikicfg')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      $searchConfigDoc.displayEdit($searchEnginePropertyClass, 'XWiki.SearchConfigClass_0_', $searchConfigObj)
+      &lt;select name='XWiki.SearchConfigClass_0_engine'&gt;
+      #foreach ($availableSearchExtension in $availableSearchExtensions)
+        &lt;option value="$availableSearchExtension.id" #if($availableSearchExtension.id == $searchEngine)selected='selected'#end&gt;$availableSearchExtension.parameters.label&lt;/option&gt;
+      #end
+      &lt;/select&gt;
     &lt;/dd&gt;
 
     &lt;dt&gt;
@@ -334,14 +325,13 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
   &lt;/dl&gt;
 &lt;/form&gt;
 {{/html}}
-{{/velocity}}
 
-{{velocity}}
-#set ($searchAdminPage = "XWiki.${searchPageName}Admin")
 #set ($searchAdminDoc = $xwiki.getDocument($searchAdminPage))
+#if ($searchAdminDoc)
 = $searchAdminDoc.displayTitle =
 
 ## Use context='new' in the include so that we can use PR.
 {{include document="$searchAdminPage" context='new'}}
+#end
 {{/velocity}}</content>
 </xwikidoc>

@@ -32,8 +32,6 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +54,9 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
+import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
@@ -155,6 +156,8 @@ public class DefaultIndexableReferenceExtractorTest extends
 
     WikiReference wiki2 = new WikiReference("xwiki2");
 
+    QueryManager queryManager;
+
     @Before
     public void configure() throws Exception
     {
@@ -193,6 +196,13 @@ public class DefaultIndexableReferenceExtractorTest extends
             getComponentManager().getInstance(
                 new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
 
+        queryManager = getComponentManager().getInstance(QueryManager.class);
+        final Query spacesWiki1Query = getMockery().mock(DefaultQuery.class, "getSpacesWiki1");
+        final Query documentsSpace11Query = getMockery().mock(DefaultQuery.class, "getSpaceDocsNameSpace11");
+        final Query documentsSpace12Query = getMockery().mock(DefaultQuery.class, "getSpaceDocsNameSpace12");
+        final Query documentsSpace13Query = getMockery().mock(DefaultQuery.class, "getSpaceDocsNameSpace13");
+        final Query spacesWiki2Query = getMockery().mock(DefaultQuery.class, "getSpacesWiki2");
+
         getMockery().checking(new Expectations()
         {
             {
@@ -208,23 +218,44 @@ public class DefaultIndexableReferenceExtractorTest extends
                 allowing(xwiki).exists(with(any(DocumentReference.class)), with(xwikiContext));
                 will(returnValue(true));
 
-                allowing(xwiki).getSpaces(xwikiContext);
-                will(doAll(new CustomAction("getSpaces")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        XWikiContext context = (XWikiContext) invocation.getParameter(0);
-                        if (wiki1.getName().equals(context.getDatabase())) {
-                            return Arrays.asList(space11.getName(), space12.getName(), space13.getName());
-                        } else {
-                            return Collections.emptyList();
-                        }
-                    }
-                }));
+                allowing(referenceExtractor.documentAccessBridge).exists(with(any(DocumentReference.class)));
+                will(returnValue(true));
+
+                // Query manager and specific queries mocking.
+
+                allowing(queryManager).getNamedQuery("getSpaces");
+                will(returnValue(spacesWiki1Query));
+
+                allowing(spacesWiki1Query).setWiki(wiki1.getName());
+                will(returnValue(spacesWiki1Query));
+
+                allowing(spacesWiki1Query).setWiki(wiki2.getName());
+                will(returnValue(spacesWiki2Query));
+
+                allowing(queryManager).getNamedQuery("getSpaceDocsName");
+                will(returnValue(documentsSpace11Query));
+
+                allowing(documentsSpace11Query).setWiki(with(any(String.class)));
+                will(returnValue(documentsSpace11Query));
+
+                allowing(documentsSpace11Query).bindValue("space", space11.getName());
+                will(returnValue(documentsSpace11Query));
+
+                allowing(documentsSpace11Query).bindValue("space", space12.getName());
+                will(returnValue(documentsSpace12Query));
+
+                allowing(documentsSpace11Query).bindValue("space", space13.getName());
+                will(returnValue(documentsSpace13Query));
+
+                // Spaces in wikis.
+                allowing(spacesWiki1Query).execute();
+                will(returnValue(Arrays.asList(space11.getName(), space12.getName(), space13.getName())));
+
+                allowing(spacesWiki2Query).execute();
+                will(returnValue(Collections.emptyList()));
 
                 // space 11
-                allowing(xwiki).getSpaceDocsName(space11.getName(), xwikiContext);
+                allowing(documentsSpace11Query).execute();
                 will(returnValue(Arrays.asList(class111.getName(), document112.getName(), document113.getName())));
 
                 // document 111
@@ -264,7 +295,7 @@ public class DefaultIndexableReferenceExtractorTest extends
                 will(returnValue(Arrays.asList("ro")));
 
                 // space 12
-                allowing(xwiki).getSpaceDocsName(space12.getName(), xwikiContext);
+                allowing(documentsSpace12Query).execute();
                 will(returnValue(Arrays.asList(document121.getName(), document122.getName())));
 
                 // document 121
@@ -349,9 +380,8 @@ public class DefaultIndexableReferenceExtractorTest extends
                 allowing(xwikiClass111).get(property12223.getName());
                 will(returnValue(null));
 
-                // Space 13
-
-                allowing(xwiki).getSpaceDocsName(space13.getName(), xwikiContext);
+                // space 13
+                allowing(documentsSpace13Query).execute();
                 will(returnValue(Collections.emptyList()));
             }
         });

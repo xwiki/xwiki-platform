@@ -34,6 +34,8 @@
       <includes>
         <include>org.eclipse.jetty:jetty-start</include>
       </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
     <dependencySet>
       <outputDirectory>/jetty/lib</outputDirectory>
@@ -41,12 +43,16 @@
         <exclude>org.eclipse.jetty:jetty-start</exclude>
         <exclude>org.xwiki.platform:xwiki-platform-tool-jetty-listener</exclude>
       </excludes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
     <dependencySet>
       <outputDirectory>/jetty/lib/ext</outputDirectory>
       <includes>
         <include>org.xwiki.platform:xwiki-platform-tool-jetty-listener</include>
       </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
   </dependencySets>
   <fileSets>

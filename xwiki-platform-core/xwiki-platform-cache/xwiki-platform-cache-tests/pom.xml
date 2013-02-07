@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-tests</artifactId>
   <name>XWiki Platform - Cache - Tests</name>
@@ -36,6 +36,7 @@
   <properties>
     <!-- Don't consider cache test framework as public API since it imposes unnecessary restrictions -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

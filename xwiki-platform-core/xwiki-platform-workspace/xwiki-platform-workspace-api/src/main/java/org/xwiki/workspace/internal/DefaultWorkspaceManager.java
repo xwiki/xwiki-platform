@@ -241,25 +241,24 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     }
 
     @Override
-    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
-        throws WorkspaceException
+    public XWikiServer createWorkspace(XWikiServer newWikiXObjectDocument) throws WorkspaceException
     {
-        return this.createWorkspace(workspaceName, newWikiXObjectDocument, "workspacetemplate");
+        return this.createWorkspace(newWikiXObjectDocument, "workspacetemplate");
     }
 
     @Override
-    public XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument, String templateWikiName)
+    public XWikiServer createWorkspace(XWikiServer newWikiXObjectDocument, String templateWikiName)
         throws WorkspaceException
     {
         XWikiContext deprecatedContext = getXWikiContext();
+
+        String workspaceName = newWikiXObjectDocument.getWikiName();
 
         String comment = String.format("Created new workspace '%s'", workspaceName);
 
         /* Create new wiki. */
         XWikiServer result = null;
         try {
-            newWikiXObjectDocument.setWikiName(workspaceName);
-
             result =
                 this.wikiManagerInternal.createNewWikiFromTemplate(newWikiXObjectDocument, templateWikiName, true,
                     comment, deprecatedContext);

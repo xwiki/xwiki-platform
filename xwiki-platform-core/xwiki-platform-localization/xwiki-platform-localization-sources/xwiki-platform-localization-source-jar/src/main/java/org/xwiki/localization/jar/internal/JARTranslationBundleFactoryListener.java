@@ -66,6 +66,11 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     protected static final String NAME = "localization.bundle.JARTranslationBundleFactoryListener";
 
     /**
+     * The type of extension supported by this translation bundle.
+     */
+    private static final String EXTENSION_TYPE = "jar";
+
+    /**
      * The events to listen.
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
@@ -76,6 +81,12 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
      */
     @Inject
     private ComponentManagerManager componentManagerManager;
+
+    /**
+     * The root component manager to fallback on.
+     */
+    @Inject
+    private ComponentManager rootComponentManager;
 
     /**
      * Used to parse translation messages.
@@ -102,7 +113,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         ExtensionEvent extensionEvent = (ExtensionEvent) event;
         InstalledExtension extension = (InstalledExtension) source;
 
-        if (extension.getType().equals("jar")) {
+        if (extension.getType().equals(EXTENSION_TYPE)) {
             if (event instanceof ExtensionInstalledEvent) {
                 extensionAdded(extension, extensionEvent.getNamespace());
             } else if (event instanceof ExtensionUninstalledEvent) {
@@ -130,11 +141,13 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     {
         // Load installed extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
-            if (extension.isInstalled(null)) {
-                extensionAdded(extension, null);
-            } else {
-                for (String namespace : extension.getNamespaces()) {
-                    extensionAdded(extension, namespace);
+            if (extension.getType().equals(EXTENSION_TYPE)) {
+                if (extension.isInstalled(null)) {
+                    extensionAdded(extension, null);
+                } else {
+                    for (String namespace : extension.getNamespaces()) {
+                        extensionAdded(extension, namespace);
+                    }
                 }
             }
         }
@@ -209,6 +222,10 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
             File jarFile = new File(extension.getFile().getAbsolutePath());
 
             ComponentManager componentManager = this.componentManagerManager.getComponentManager(namespace, false);
+
+            if (componentManager == null) {
+                componentManager = this.rootComponentManager;
+            }
 
             JARFileTranslationBundle bundle =
                 new JARFileTranslationBundle(jarFile, componentManager, this.translationParser);

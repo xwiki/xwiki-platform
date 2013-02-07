@@ -25,7 +25,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 
 /**
  * Represents the actions possible when editing an application entry.
@@ -49,7 +51,7 @@ public class EntryEditPage extends InlinePage
     /**
      * The XPath that locates a form field.
      */
-    private static final String FIELD_XPATH_FORMAT = "//*[substring(@id, string-length(@id) - %s - 2) = '_0_%s']";
+    private static final String FIELD_XPATH_FORMAT = "//*[substring(@name, string-length(@name) - %s - 2) = '_0_%s']";
 
     /**
      * Retrieves the label of the specified form field.
@@ -73,8 +75,7 @@ public class EntryEditPage extends InlinePage
     public String getValue(String fieldName)
     {
         String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
-        WebElement field = getForm().findElement(By.xpath(xpath));
-        return field.getAttribute("value");
+        return new FormElement(getForm()).getFieldValue(By.xpath(xpath));
     }
 
     /**
@@ -87,8 +88,12 @@ public class EntryEditPage extends InlinePage
     {
         String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
         WebElement field = getForm().findElement(By.xpath(xpath));
-        field.clear();
-        field.sendKeys(fieldValue);
+        if (field.getAttribute("name").equals(field.getAttribute("id"))) {
+            new FormElement(getForm()).setFieldValue(field, fieldValue);
+        } else {
+            xpath = String.format("//*[@name = '%s' and @value = '%s']", field.getAttribute("name"), fieldValue);
+            new FormElement(getForm()).setCheckBox(By.xpath(xpath), true);
+        }
     }
 
     /**
@@ -101,5 +106,31 @@ public class EntryEditPage extends InlinePage
             fieldNames.add(StringUtils.substringAfter(field.getAttribute("name"), "_0_"));
         }
         return fieldNames;
+    }
+
+    /**
+     * Sets the entry title, if the application class has a Title field.
+     * 
+     * @param title the entry title
+     */
+    public void setTitle(String title)
+    {
+        new FormElement(getForm()).setFieldValue(By.name("title"), title);
+    }
+
+    /**
+     * @return the value of the title input
+     */
+    public String getTitle()
+    {
+        return getForm().findElement(By.name("title")).getAttribute("value");
+    }
+
+    /**
+     * @return the content editor
+     */
+    public EditorElement getContentEditor()
+    {
+        return new EditorElement("content");
     }
 }

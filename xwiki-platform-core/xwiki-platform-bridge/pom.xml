@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-bridge</artifactId>
   <name>XWiki Platform - Bridge</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
   <properties>
-    <xwiki.clover.targetPercentage>32.1%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>31.03</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

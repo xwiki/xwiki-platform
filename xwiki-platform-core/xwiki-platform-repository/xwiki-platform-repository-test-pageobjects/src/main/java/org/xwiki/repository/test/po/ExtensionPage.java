@@ -21,6 +21,7 @@ package org.xwiki.repository.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -29,6 +30,9 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ExtensionPage extends ViewPage
 {
+    @FindBy(xpath = "//a[@title='Update extension']")
+    private WebElement update;
+
     /**
      * @since 4.2M1
      */
@@ -40,7 +44,14 @@ public class ExtensionPage extends ViewPage
                 return true;
             }
         }
-        
+
         return false;
+    }
+
+    public ExtensionPage updateExtension()
+    {
+        this.update.click();
+
+        return new ExtensionPage();
     }
 }

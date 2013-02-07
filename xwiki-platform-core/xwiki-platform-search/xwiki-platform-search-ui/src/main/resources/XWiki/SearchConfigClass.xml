@@ -33,23 +33,17 @@
     <nameField/>
     <validationScript/>
     <engine>
-      <cache>0</cache>
-      <displayType>select</displayType>
-      <multiSelect>0</multiSelect>
+      <customDisplay/>
+      <disabled>0</disabled>
       <name>engine</name>
       <number>1</number>
       <picker>0</picker>
-      <prettyName>Search engine to use</prettyName>
-      <relationalStorage>0</relationalStorage>
-      <separator> </separator>
-      <separators> ,|</separators>
-      <size>1</size>
-      <sort>none</sort>
+      <prettyName>Default search engine</prettyName>
+      <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>lucene=Lucene|solr=Solr (Experimental)|database=Database</values>
-      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </engine>
   </class>
   <object>

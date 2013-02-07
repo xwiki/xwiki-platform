@@ -24,14 +24,33 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#set($searchConfigDoc = $xwiki.getDocument('XWiki.SearchConfig'))
-#set($searchConfigClass = $xwiki.getDocument('XWiki.SearchConfigClass').xWikiClass)
-#set($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name))
-#set($searchEngine = $!searchConfigObj.getProperty('engine').value)
-#if (!$searchEngine || $searchEngine == '')
-  #set($searchEngine = 'lucene')
+#set ($searchConfigDoc = $xwiki.getDocument('XWiki.SearchConfig'))
+#set ($searchConfigClass = $xwiki.getDocument('XWiki.SearchConfigClass').xWikiClass)
+
+## Get or create the configuration object
+#set ($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
+#set ($searchEngine = "$!{searchConfigObj.getProperty('engine').value}")
+
+## Default search engine to use in case the configured one is not found:
+## - 'lucene' is the preferred default
+## - 'database' is the fall-back default
+#set ($searchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortByCustomOrder' : "${searchEngine}, lucene, database"}))
+#set ($searchExtension = $searchExtensions[0])
+
+## Update the configuration if it is out of synch with the reality (installed extensions).
+#if ($searchEngine != $searchExtension.id)
+  #if ($searchConfigDoc.parent == '')
+    $searchConfigDoc.setParent('XWiki.SearchAdmin')
+  #end
+
+  #set ($searchEngine = $searchExtension.id)
+
+  ## Save the updated configuration.
+  $searchConfigObj.set('engine', $searchEngine)
+  $searchConfigDoc.save()
 #end
-#set($searchPageName = "${searchEngine.substring(0, 1).toUpperCase()}${searchEngine.substring(1)}Search")
-#set($searchPage = "Main.${searchPageName}")
+
+#set($searchPage = $searchExtension.parameters.search)
+#set($searchAdminPage = $searchExtension.parameters.admin)
 {{/velocity}}</content>
 </xwikidoc>

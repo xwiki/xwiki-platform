@@ -46,6 +46,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -1558,5 +1560,30 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         }
         Assert.assertTrue(attachmentNames.contains(attachmentName1));
         Assert.assertTrue(attachmentNames.contains(attachmentName2));
+    }
+
+    /**
+     * Unit test for {@link XWikiDocument#readFromTemplate(DocumentReference, XWikiContext)}.
+     */
+    public void testReadFromTemplate() throws Exception
+    {
+        SpaceReference spaceReference = new SpaceReference("Space", new WikiReference("wiki"));
+        XWikiDocument template = new XWikiDocument(new DocumentReference("Template", spaceReference));
+        template.setParentReference(new EntityReference("Parent", EntityType.DOCUMENT, spaceReference));
+        template.setTitle("Enter title here");
+        template.setSyntax(Syntax.XWIKI_2_0);
+        template.setContent("Enter content here");
+
+        template.setNew(false);
+        this.mockXWiki.stubs().method("getDocument").will(returnValue(template));
+
+        XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
+        target.readFromTemplate(template.getDocumentReference(), this.getContext());
+
+        Assert.assertEquals(template.getDocumentReference(), target.getTemplateDocumentReference());
+        Assert.assertEquals(template.getParentReference(), target.getParentReference());
+        Assert.assertEquals(template.getTitle(), target.getTitle());
+        Assert.assertEquals(template.getSyntax(), target.getSyntax());
+        Assert.assertEquals(template.getContent(), target.getContent());
     }
 }

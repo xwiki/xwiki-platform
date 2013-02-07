@@ -20,6 +20,8 @@
 package org.xwiki.model;
 
 /**
+ * Allows retrieving data by batch (with pagination).
+ *
  * @since 5.0M1
  */
 public class EntityIterator<T extends Entity>

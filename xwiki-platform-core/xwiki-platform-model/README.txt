@@ -2,7 +2,11 @@ Design Rules Implemented
 ========================
 
 * Typed API
-* Entities are represented by Interfaces so that we can have several implementations
+* Entities are represented by Interfaces for the following reasons:
+** We don't expose any implementation details. If we had a class we would have to share it between implementation and
+   introduce a Storage API. We don't need to do that with interfaces
+** Makes the Model to be easily unit-testable
+** Easy to have an in-memory implementation for functional testing (makes test real fast!)
 * Entity getters will return a new Entity if the asked Entity doesn't exist in the store
 * All APIs that call the Store will throw a checked ModelException to signify an error (rather than ignoring the error
   and returning an empty Entity)

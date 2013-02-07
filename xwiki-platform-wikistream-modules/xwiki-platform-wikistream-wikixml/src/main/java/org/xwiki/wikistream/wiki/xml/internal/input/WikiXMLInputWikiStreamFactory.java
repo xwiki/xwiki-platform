@@ -52,7 +52,7 @@ public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStrea
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener)
+    protected ContentHandler createContentHandler(Object listener, WikiXMLInputParameters parameters)
     {
         return this.parserFactory.createContentHandler(listener, null);
     }

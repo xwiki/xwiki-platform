@@ -37,7 +37,7 @@ import org.xwiki.wikistream.internal.input.ReaderInputSource;
 
 public abstract class AbstractXMLInputWikiStream<P extends XMLInputParameters> implements InputWikiStream
 {
-    private P parameters;
+    protected P parameters;
 
     public AbstractXMLInputWikiStream(P parameters)
     {

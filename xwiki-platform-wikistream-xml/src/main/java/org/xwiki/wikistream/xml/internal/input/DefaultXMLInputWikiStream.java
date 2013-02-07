@@ -16,6 +16,6 @@ public class DefaultXMLInputWikiStream<P extends XMLInputParameters> extends Abs
     @Override
     protected ContentHandler createContentHandler(Object listener)
     {
-        return this.factory.createContentHandler(listener);
+        return this.factory.createContentHandler(listener, this.parameters);
     }
 }

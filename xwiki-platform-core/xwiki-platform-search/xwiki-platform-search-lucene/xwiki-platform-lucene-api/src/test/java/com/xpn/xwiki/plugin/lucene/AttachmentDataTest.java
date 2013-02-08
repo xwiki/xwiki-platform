@@ -177,7 +177,7 @@ public class AttachmentDataTest extends AbstractBridgedComponentTestCase
     public void getFullTextFromZIP() throws IOException , XWikiException
     {
         setUpMockServletContext("zip.zip", "application/zip");
-        assertGetFullText("zip.txt\nzip content\n\n\n\n", "zip.zip");
+        assertGetFullText("\nzip.txt\nzip content\n\n\n\n", "zip.zip");
         assertGetMimeType("application/zip", "zip.zip");
     }
 

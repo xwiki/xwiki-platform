@@ -76,7 +76,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             solrDocument.addField(Fields.ID, getId(documentReference));
             addDocumentFields(documentReference, solrDocument);
             solrDocument.addField(Fields.TYPE, documentReference.getType().name());
-            solrDocument.addField(Fields.FULLNAME, compactSerializer.serialize(documentReference));
+            solrDocument.addField(Fields.FULLNAME, localSerializer.serialize(documentReference));
 
             // Convert the XWiki syntax of document to plain text.
             WikiPrinter printer = new DefaultWikiPrinter();

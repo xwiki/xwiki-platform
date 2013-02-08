@@ -1178,6 +1178,22 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 
       #set ($resultHighlightingMap = $searchResponse.highlighting.get($searchResult.id))
 
+      ## Filter the highliting results map to have simple field names (without language suffixes).
+      #set ($filteredResultHighlightingMap = {})
+      #foreach ($highlighting in $resultHighlightingMap.entrySet())
+        #set ($highlightedField = $highlighting.key)
+        #if ($highlightedField.contains('_'))
+          ## Clean the field to remove any multilingual marker at the end (_ml, _en, _fr, etc.)
+          #set ($highlightedField = $highlightedField.substring(0, $highlightedField.indexOf('_')))
+        #end
+        #set ($highlightedValues = $highlighting.value)
+        ## Preffer the field variant that has the most highlightings to display.
+        #if (!$filteredResultHighlightingMap.containsKey($highlightedField) || $filteredResultHighlightingMap.get($highlightedField).size() &lt; $highlightedValues.size())
+          #set ($discard = $filteredResultHighlightingMap.put($highlightedField, $highlightedValues))
+        #end
+      #end
+      #set ($resultHighlightingMap = $filteredResultHighlightingMap)
+
       #set ($title = $escapetool.xml($searchResultDocument.plainTitle))
       #set ($titleUrl = $searchResultDocument.getURL())
       #set ($date = $datetool.format('d MMM yyyy', $searchResultDocument.date))
@@ -1189,41 +1205,39 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       #set ($propertyName = $searchResult.propertyname)
       #set ($mimeType = $searchResult.mimetype)
 
-      #set ($highlightText = '')
+      #set ($highlightTexts = [])
       #if ($searchResultType == 'ATTACHMENT')
         #set ($itemtypeclass = 'search-attachment')
         #set ($title = $searchResult.filename)
         #set ($titleUrl = $searchResultDocument.getAttachmentURL($searchResult.filename))
-        #set ($highlightText = $resultHighlightingMap.get('attcontent')[0])
+        #set ($highlightTexts = $resultHighlightingMap.get('attcontent'))
       #elseif ($searchResultType == 'OBJECT')
         #set ($itemtypeclass = 'search-object')
-        #set ($highlightText = $resultHighlightingMap.get('objcontent')[0])
+        #set ($highlightTexts = $resultHighlightingMap.get('objcontent'))
       #elseif ($searchResultType == 'OBJECT_PROPERTY')
         #set ($itemtypeclass = 'search-property')
-        #set ($highlightText = $resultHighlightingMap.get('propertyvalue')[0])
+        #set ($highlightTexts = $resultHighlightingMap.get('propertyvalue'))
       #elseif ($searchResultType == 'DOCUMENT')
         #set ($itemtypeclass = 'search-doc')
         ## This always sets the language parameter to the URL. It can be improved on a per-result basis and not be set when the result's original document is the same
         ## as the requested language. However, this complicates things and will cause problems when facets will be added and multiple languages will be queried at once.
         #set ($titleUrl = $searchResultDocument.getURL('view', "language=${resultLanguage}"))
         ## Document content highlighting, if there is a valid hit on the content property.
-        ## FIXME: handling multiple languages the rought way for now
-        ## #set ($docContentFieldName = "doccontent_${resultLanguage}")
-        #set ($highlightText = "$!{resultHighlightingMap.get('doccontent')[0]}")
+        #set ($highlightTexts = $resultHighlightingMap.get('doccontent'))
         ## Display other highlighting if the doccontent was not hit.
-        #if ($highlightText == '')
-          #set ($highlightText = "$!{resultHighlightingMap.get('comment')[0]}")
+        #if ($highlightTexts == '')
+          #set ($highlightTexts = $resultHighlightingMap.get('comment'))
         #end
         #* TODO: Should we show object content hightlighting? It might be too messy.
-        #if ($highlightText == '')
-          #set ($highlightText = "$!{resultHighlightingMap.get('objcontent')[0]}")
+        #if ($highlightTexts == '')
+          #set ($highlightTexts = $resultHighlightingMap.get('objcontent'))
         #end
         *#
       #end
 
       ## Sanitize the highlightText.
       ## Note: Looks a bit dirty but seems to work well enough.
-      #if ("$!highlightText" != '')
+      #foreach ($highlightText in $highlightTexts)
         ##
         ## Escape the XML tags
         #set ($highlightText = $escapetool.xml($highlightText))
@@ -1251,6 +1265,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
             #break
           #end
         #end
+        #set ($highlighIndex = $mathtool.sub($foreach.count, 1))
+        #set ($discard = $highlightTexts.set($highlighIndex, $highlightText))
       #end
       &lt;div&gt;
         &lt;div class='search-item'&gt;
@@ -1281,8 +1297,14 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
             #if ("$!propertyName" != '')
             &lt;div class='search-item-propertyname'&gt;Property: $propertyName&lt;/div&gt;
             #end
-            #if ("$!highlightText" != '')
-            &lt;blockquote class='search-item-highlight'&gt;${highlightText}&lt;/blockquote&gt;
+            #if ($highlightTexts &amp;&amp; $highlightTexts.size() &gt; 0)
+              #set ($highlightUpperIndex = $mathtool.min(2, $mathtool.sub($highlightTexts.size(), 1)))
+              #foreach ($highlighIndex in [0..$highlightUpperIndex])
+                #if ($highlighIndex != 0)
+                ...
+                #end
+                &lt;blockquote class='search-item-highlight'&gt;$highlightTexts[$highlighIndex]&lt;/blockquote&gt;
+              #end
             #end
           &lt;/div&gt;
           &lt;div class='search-item-relevance'&gt;

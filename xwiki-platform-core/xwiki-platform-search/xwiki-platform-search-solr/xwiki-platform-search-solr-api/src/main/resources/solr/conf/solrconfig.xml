@@ -821,12 +821,20 @@
        <str name="facet.field">creator</str>
 
        <!-- Highlighting defaults -->
-       <str name="hl">on</str>
-       <!-- Note: It seems that in Solr 3.6.1 we can not highlight dates because of the wrong way they are handled internally. -->
-       <str name="hl.fl">doccontent objcontent comment attcontent propertyvalue</str>
+       <str name="hl">true</str>
+       <!-- Highlight all possible fields, on which we get a hit. -->
+       <str name="hl.fl">*</str>
+       <str name="hl.requireFieldMatch">true</str>
+       <!-- Surround the highlight result with a HTML span. -->
        <str name="hl.simple.pre"><![CDATA[<span class="search-text-highlight">]]></str>
        <str name="hl.simple.post"><![CDATA[<span class="search-text-highlight-stop"></span></span>]]></str>
-       
+       <!-- Enable highlighting for range/wildcard/fuzzy/prefix queries. -->
+       <str name="hl.hl.usePhraseHighlighter">true</str>
+       <str name="hl.highlightMultiTerm">true</str>
+       <!-- Return up to 3 highlighted snippets. -->
+       <int name="hl.snippets">3</int>
+       <!-- If the snippets are contiguous, merge them into a single snippet instead of handling them separately. -->
+       <str name="hl.mergeContiguous">true</str>
 
      </lst>
     <!-- In addition to defaults, "appends" params can be specified

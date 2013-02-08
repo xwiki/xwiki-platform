@@ -333,6 +333,8 @@
             <exclude>com/xpn/xwiki/web/XWikiServletResponse</exclude>
             <exclude>com/xpn/xwiki/web/XWikiServletResponseStub</exclude>
             <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
+            <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</exclude>
+            <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
           </excludes>
         </configuration>
       </plugin>

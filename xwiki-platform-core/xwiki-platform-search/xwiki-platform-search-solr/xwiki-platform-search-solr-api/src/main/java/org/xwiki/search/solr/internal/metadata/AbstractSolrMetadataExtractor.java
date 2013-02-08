@@ -72,11 +72,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected EntityReferenceSerializer<String> serializer;
 
     /**
-     * Reference to String serializer. Used for fields such as fullName that are relative to the wiki.
+     * Reference to String serializer. Used for fields such as class and fullname that are relative to their wiki and
+     * are stored without the wiki name.
      */
     @Inject
-    @Named("compactwiki")
-    protected EntityReferenceSerializer<String> compactSerializer;
+    @Named("local")
+    protected EntityReferenceSerializer<String> localSerializer;
 
     /**
      * DocumentAccessBridge component.

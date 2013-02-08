@@ -64,7 +64,7 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
             solrDocument.addField(Fields.ID, getId(objectPropertyReference));
             addDocumentFields(documentReference, solrDocument);
             solrDocument.addField(Fields.TYPE, objectPropertyReference.getType().name());
-            solrDocument.addField(Fields.CLASS, compactSerializer.serialize(classReference));
+            solrDocument.addField(Fields.CLASS, localSerializer.serialize(classReference));
             solrDocument.addField(Fields.PROPERTY_NAME, objectProperty.getName());
 
             addLanguageAndContentFields(documentReference, solrDocument, objectProperty);

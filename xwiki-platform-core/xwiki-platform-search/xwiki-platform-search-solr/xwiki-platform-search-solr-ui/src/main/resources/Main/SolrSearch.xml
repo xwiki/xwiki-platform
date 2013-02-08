@@ -1272,7 +1272,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
             &lt;div class='search-item-mimetype'&gt;File type: $mimeType&lt;/div&gt;
             #end
             #if ("$!class" != '')
-            &lt;div class='search-item-class'&gt;Class: &lt;a href="$xwiki.getURL($class)"&gt;$class&lt;/a&gt;&lt;/div&gt;
+            #set ($classReference = $services.model.resolveDocument("${searchResult.wiki}:${class}"))
+            &lt;div class='search-item-class'&gt;Class: &lt;a href="$xwiki.getURL($classReference)"&gt;$class&lt;/a&gt;&lt;/div&gt;
             #end
             #if ("$!propertyName" != '')
             &lt;div class='search-item-propertyname'&gt;Property: $propertyName&lt;/div&gt;

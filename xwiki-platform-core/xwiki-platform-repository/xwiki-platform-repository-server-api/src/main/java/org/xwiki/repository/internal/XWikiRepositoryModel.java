@@ -95,6 +95,8 @@ public interface XWikiRepositoryModel
 
     String PROP_PROXY_REPOSITORYURI = "repositoryURI";
 
+    String PROP_PROXY_AUTOUPDATE = "autoUpdate";
+
     String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
 
     String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";

@@ -684,6 +684,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         BaseObject extensionProxyObject = document.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
         if (extensionProxyObject == null) {
             extensionProxyObject = document.newXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE, xcontext);
+            extensionProxyObject.setIntValue(XWikiRepositoryModel.PROP_PROXY_AUTOUPDATE, 1);
             needSave = true;
         }
 

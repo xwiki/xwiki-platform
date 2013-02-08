@@ -68,7 +68,7 @@ public class XWikiSetupCleanupFilter extends Filter
         // Release all the JAX-RS resources that are implemented as components with per-lookup policy and that have been
         // instantiated during this request.
         ComponentManager componentManager =
-            (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+            (ComponentManager) getApplication().getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
         for (XWikiRestComponent component : getReleasableComponents(componentManager)) {
             try {
                 componentManager.release(component);

@@ -324,6 +324,16 @@ public class TestUtils
         return getURL(space, page, "delete", "confirm=1");
     }
 
+    /**
+     * @param space the name of the space to delete
+     * @return the URL that can be used to delete the specified pace
+     * @since 4.5
+     */
+    public String getURLToDeleteSpace(String space)
+    {
+        return getURL(space, "WebHome", "deletespace", "confirm=1");
+    }
+
     public ViewPage createPage(String space, String page, String content, String title)
     {
         return createPage(space, page, content, title, null);
@@ -357,6 +367,17 @@ public class TestUtils
     public void deletePage(String space, String page)
     {
         getDriver().get(getURLToDeletePage(space, page));
+    }
+
+    /**
+     * Accesses the URL to delete the specified space.
+     * 
+     * @param space the name of the space to delete
+     * @since 4.5
+     */
+    public void deleteSpace(String space)
+    {
+        getDriver().get(getURLToDeleteSpace(space));
     }
 
     public boolean pageExists(String space, String page)

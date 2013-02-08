@@ -95,9 +95,7 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
      */
     private LocalizedTranslationBundle getLocalizedBundle(Locale locale)
     {
-        String localeString = locale.toString();
-
-        LocalizedTranslationBundle bundle = this.bundleCache.get(localeString);
+        LocalizedTranslationBundle bundle = this.bundleCache.get(locale);
         if (bundle == null) {
             bundle = getSynchLocalizedBundle(locale);
         }

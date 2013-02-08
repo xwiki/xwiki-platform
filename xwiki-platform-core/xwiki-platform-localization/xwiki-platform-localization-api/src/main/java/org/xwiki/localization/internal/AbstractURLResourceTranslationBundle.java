@@ -113,7 +113,7 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
                 localeURL += PROPERTIES_EXT;
             } else {
                 // No idea what is it
-                localeURL = null;
+                return null;
             }
         }
 

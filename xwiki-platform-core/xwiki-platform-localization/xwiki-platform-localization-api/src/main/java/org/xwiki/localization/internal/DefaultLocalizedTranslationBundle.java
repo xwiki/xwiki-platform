@@ -55,6 +55,7 @@ public class DefaultLocalizedTranslationBundle implements LocalizedTranslationBu
      */
     public DefaultLocalizedTranslationBundle(TranslationBundle bundle, Locale locale)
     {
+        this.bundle = bundle;
         this.locale = locale;
     }
 

@@ -2510,7 +2510,7 @@ public class XWiki implements EventListener
 
         // Determine which language to use
         // First we get the language from the request
-        if ((requestLanguage != null) && (!requestLanguage.equals(""))) {
+        if (StringUtils.isNotEmpty(requestLanguage)) {
             if (requestLanguage.equals("default")) {
                 setCookie = true;
             } else {
@@ -2524,15 +2524,15 @@ public class XWiki implements EventListener
             }
         }
         // Next we get the language from the cookie
-        if (cookieLanguage != null && cookieLanguage != "") {
+        if (StringUtils.isNotEmpty(cookieLanguage)) {
             language = cookieLanguage;
         }
         // Next from the default user preference
-        else if (userPreferenceLanguage != null && userPreferenceLanguage != "") {
+        else if (StringUtils.isNotEmpty(userPreferenceLanguage)) {
             language = userPreferenceLanguage;
         }
         // Then from the navigator language setting
-        else if (navigatorLanguage != null && navigatorLanguage != "") {
+        else if (StringUtils.isNotEmpty(navigatorLanguage)) {
             language = navigatorLanguage;
         }
         context.setLanguage(language);
@@ -2615,15 +2615,15 @@ public class XWiki implements EventListener
             language = contextLanguage;
         }
         // Next we get the language from the cookie
-        else if (cookieLanguage != null && cookieLanguage != "") {
+        else if (StringUtils.isNotEmpty(cookieLanguage)) {
             language = cookieLanguage;
         }
         // Next from the default user preference
-        else if (userPreferenceLanguage != null && userPreferenceLanguage != "") {
+        else if (StringUtils.isNotEmpty(userPreferenceLanguage)) {
             language = userPreferenceLanguage;
         }
         // Then from the navigator language setting
-        else if (navigatorLanguage != null && navigatorLanguage != "") {
+        else if (StringUtils.isNotEmpty(navigatorLanguage)) {
             language = navigatorLanguage;
         }
         context.setLanguage(language);

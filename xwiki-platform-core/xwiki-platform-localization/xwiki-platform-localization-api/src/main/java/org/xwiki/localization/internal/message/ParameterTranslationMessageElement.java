@@ -62,6 +62,7 @@ public class ParameterTranslationMessageElement implements TranslationMessageEle
     public ParameterTranslationMessageElement(int index, Parser plainParser)
     {
         this.index = index;
+        this.plainParser = plainParser;
     }
 
     @Override

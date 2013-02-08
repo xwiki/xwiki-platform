@@ -38,7 +38,9 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * @version $Id$
+ * @deprecated since 4.1 use diff service
  */
+@Deprecated
 public class DiffPlugin extends XWikiDefaultPlugin
 {
     /**

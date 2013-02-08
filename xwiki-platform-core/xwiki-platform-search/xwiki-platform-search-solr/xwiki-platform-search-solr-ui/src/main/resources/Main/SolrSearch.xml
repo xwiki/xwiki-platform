@@ -1203,6 +1203,9 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
         #set ($highlightText = $resultHighlightingMap.get('propertyvalue')[0])
       #elseif ($searchResultType == 'DOCUMENT')
         #set ($itemtypeclass = 'search-doc')
+        ## This always sets the language parameter to the URL. It can be improved on a per-result basis and not be set when the result's original document is the same
+        ## as the requested language. However, this complicates things and will cause problems when facets will be added and multiple languages will be queried at once.
+        #set ($titleUrl = $searchResultDocument.getURL('view', "language=${resultLanguage}"))
         ## Document content highlighting, if there is a valid hit on the content property.
         ## FIXME: handling multiple languages the rought way for now
         ## #set ($docContentFieldName = "doccontent_${resultLanguage}")

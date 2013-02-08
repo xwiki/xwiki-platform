@@ -21,6 +21,7 @@ package com.xpn.xwiki.render;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
@@ -28,14 +29,24 @@ import javax.script.SimpleScriptContext;
 import org.apache.velocity.VelocityContext;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 import junit.framework.Assert;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,7 +66,7 @@ public class DefaultVelocityManagerTest
      * the XWiki Context.
      */
     @Test
-    public void testGetVelocityContextUpdatesXContext() throws Exception
+    public void getVelocityContextUpdatesXContext() throws Exception
     {
         Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = new ExecutionContext();
@@ -73,5 +84,36 @@ public class DefaultVelocityManagerTest
 
         this.mocker.getComponentUnderTest().getVelocityContext();
         Assert.assertEquals(velocityContext, xwikiContext.get("vcontext"));
+    }
+
+    @Test
+    public void getVelocityEngineWhenNoVelocityEngineInCache() throws Exception
+    {
+        Execution execution = this.mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        when(execution.getContext()).thenReturn(executionContext);
+
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+        executionContext.setProperty("xwikicontext", xwikiContext);
+        com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(xwikiContext.getWiki()).thenReturn(xwiki);
+        when(xwiki.getSkin(any(XWikiContext.class))).thenReturn("testskin");
+
+        ComponentManager componentManager = mock(ComponentManager.class);
+        Utils.setComponentManager(componentManager);
+        VelocityFactory velocityFactory = mock(VelocityFactory.class);
+        when(componentManager.getInstance(VelocityFactory.class, "default")).thenReturn(velocityFactory);
+
+        when(velocityFactory.hasVelocityEngine("default")).thenReturn(false);
+
+        VelocityConfiguration velocityConfiguration = mock(VelocityConfiguration.class);
+        when(componentManager.getInstance(VelocityConfiguration.class, "default")).thenReturn(velocityConfiguration);
+        Properties properties = new Properties();
+        when(velocityConfiguration.getProperties()).thenReturn(properties);
+
+        VelocityEngine velocityEngine = mock(VelocityEngine.class);
+        when(velocityFactory.createVelocityEngine(eq("default"), any(Properties.class))).thenReturn(velocityEngine);
+
+        Assert.assertSame(velocityEngine, this.mocker.getComponentUnderTest().getVelocityEngine());
     }
 }

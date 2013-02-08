@@ -332,6 +332,7 @@
             <exclude>com/xpn/xwiki/web/XWikiServletRequestStub</exclude>
             <exclude>com/xpn/xwiki/web/XWikiServletResponse</exclude>
             <exclude>com/xpn/xwiki/web/XWikiServletResponseStub</exclude>
+            <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
           </excludes>
         </configuration>
       </plugin>

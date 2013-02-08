@@ -65,13 +65,13 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public final static String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
-    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
+    public static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
+        XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
 
-    public final static String[] EPROPERTIES_EXTRA = new String[] {XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
-    XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
-    XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
-    XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME};
+    public static final String[] EPROPERTIES_EXTRA = new String[] {XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
+        XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
+        XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
+        XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME};
 
     private static Map<String, Integer> EPROPERTIES_INDEX = new HashMap<String, Integer>();
 
@@ -253,7 +253,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version)
     {
         if (version == null) {
-            List<BaseObject> objects = extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+            List<BaseObject> objects =
+                extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
 
             if (objects == null || objects.isEmpty()) {
                 return null;
@@ -291,7 +292,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            extension = extensionVersion = this.extensionObjectFactory.createExtensionVersion();
+            extensionVersion = this.extensionObjectFactory.createExtensionVersion();
+            extension = extensionVersion;
             extensionVersion.setVersion((String) getValue(extensionVersionObject,
                 XWikiRepositoryModel.PROP_VERSION_VERSION));
         }

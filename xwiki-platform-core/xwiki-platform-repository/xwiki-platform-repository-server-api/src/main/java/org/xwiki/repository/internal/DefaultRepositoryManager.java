@@ -528,7 +528,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
             if (attachment != null) {
                 resourceReference =
-                    new AttachmentResourceReference(this.entityReferenceSerializer.serialize(attachment.getReference()));
+                    new AttachmentResourceReference(
+                        this.entityReferenceSerializer.serialize(attachment.getReference()));
             }
         }
 
@@ -839,7 +840,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
                 if (dependencyObject != null) {
                     String extensionVersion =
-                        getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, (String) null);
+                        getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION,
+                            (String) null);
 
                     if (StringUtils.isNotEmpty(extensionVersion)
                         && extension.getId().getVersion().equals(new DefaultVersion(extensionVersion))) {

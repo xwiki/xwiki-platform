@@ -137,7 +137,6 @@ public class EditRightsPane extends BaseElement
      * 
      * @param entityName the target user or group name
      * @param right the target right
-     * @return the new state of the button
      */
     public void clickRight(String entityName, Right right)
     {

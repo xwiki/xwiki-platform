@@ -161,6 +161,7 @@ public class LiveTableElement extends BaseElement
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 return driver.findElements(by).size() >= minimalExpectedRowCount;

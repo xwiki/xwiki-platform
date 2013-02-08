@@ -442,6 +442,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 4.3M1 use {@link #getLocale()} instead
      */
+    @Deprecated
     public String getLanguage()
     {
         return this.locale != null ? this.locale.toString() : null;
@@ -709,9 +710,9 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * @return true if {@link XWikiContext#dropPermissions()} has been called on this context, or if the
-     *         {@link XWikiConstant.DROPPED_PERMISSIONS} key has been set in the
+     *         {@link XWikiConstant#DROPPED_PERMISSIONS} key has been set in the
      *         {@link org.xwiki.context.ExecutionContext} for this thread. This is done by calling
-     *         {@Document#dropPermissions()}
+     *         {Document#dropPermissions()}
      */
     public boolean hasDroppedPermissions()
     {

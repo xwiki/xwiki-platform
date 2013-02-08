@@ -108,7 +108,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                             results = filter.filterResults(results);
                         }
                     }
-                    return (List<T>) results;
+                    return results;
                 }
             });
         } catch (XWikiException e) {

@@ -299,6 +299,7 @@ public class Class extends Collection
 
 class PropertyComparator implements Comparator<PropertyClass>
 {
+    @Override
     public int compare(PropertyClass o1, PropertyClass o2)
     {
         return o1.getNumber() - o2.getNumber();

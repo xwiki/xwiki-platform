@@ -234,9 +234,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * @param engineName the script engine name (eg "groovy", etc)
      * @return the Script engine to use to evaluate the script
-     * @throws MacroExecutionException in case of an error in parsing the jars parameter
      */
-    private ScriptEngine getScriptEngine(String engineName) throws MacroExecutionException
+    private ScriptEngine getScriptEngine(String engineName)
     {
         // Look for a script engine in the Execution Context since we want the same engine to be used
         // for all evals during the same execution lifetime.

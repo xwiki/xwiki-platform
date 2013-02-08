@@ -24,6 +24,7 @@ import java.util.logging.LogManager;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.io.IOUtils;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -93,8 +94,11 @@ public class XWikiRestletServlet extends ServerServlet
             }
 
             if (is != null) {
-                LogManager.getLogManager().readConfiguration(is);
-                is.close();
+                try {
+                    LogManager.getLogManager().readConfiguration(is);
+                } finally {
+                    IOUtils.closeQuietly(is);
+                }
             }
         } catch (Exception e) {
             log("Unable to initialize Java logging framework. Using defaults", e);

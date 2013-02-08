@@ -271,6 +271,7 @@ public class XWikiException extends Exception
         this.message = message;
     }
 
+    @Override
     public String getMessage() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("Error number ");
@@ -313,6 +314,7 @@ public class XWikiException extends Exception
         return buffer.toString();
     }
 
+    @Override
     public void printStackTrace(PrintWriter s) {
         super.printStackTrace(s);
         if (exception != null) {
@@ -331,6 +333,7 @@ public class XWikiException extends Exception
         }
     }
 
+    @Override
     public void printStackTrace(PrintStream s) {
         super.printStackTrace(s);
         if (exception != null) {

@@ -54,6 +54,7 @@ public class AttachmentDataTest extends AbstractBridgedComponentTestCase
 
     private ServletContext mockServletContext;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -109,7 +110,7 @@ public class AttachmentDataTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong attachment content indexed", expect, fullText);
     }
 
-    private void assertGetMimeType(String expect, String filename)throws XWikiException
+    private void assertGetMimeType(String expect, String filename)
     { 
        
         this.attachmentData.setMimeType(this.attachment.getMimeType(getContext()));

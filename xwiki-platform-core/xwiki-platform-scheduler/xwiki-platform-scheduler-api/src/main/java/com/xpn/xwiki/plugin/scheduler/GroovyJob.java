@@ -23,7 +23,6 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

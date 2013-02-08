@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
@@ -62,7 +61,6 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
             Objects objects = objectFactory.createObjects();
 
             List<BaseObject> objectList = getBaseObjects(doc);
-            new ArrayList<BaseObject>();
 
             RangeIterable<BaseObject> ri =
                     new RangeIterable<BaseObject>(objectList, start, number);

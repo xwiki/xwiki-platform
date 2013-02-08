@@ -24,8 +24,6 @@ import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
 
-import com.xpn.xwiki.stats.impl.xwiki.XWikiStatsReader;
-
 /**
  * Unit tests for {@link PeriodFactory}.
  */

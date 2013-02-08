@@ -59,6 +59,7 @@ public class WYSIWYGEditPage extends PreviewableEditPage
         return new WYSIWYGEditPage();
     }
 
+    @Override
     public String getDocumentTitle()
     {
         return this.titleField.getAttribute("value");

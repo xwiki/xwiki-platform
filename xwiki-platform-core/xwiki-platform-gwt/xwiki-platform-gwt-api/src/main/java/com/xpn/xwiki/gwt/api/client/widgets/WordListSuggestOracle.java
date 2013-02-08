@@ -101,6 +101,7 @@ public class WordListSuggestOracle extends SuggestOracle {
      * @param request
      * @param callback
      */
+    @Override
     public void requestSuggestions(Request request, final Callback callback) {
         //get query
         String query = request.getQuery();
@@ -126,6 +127,7 @@ public class WordListSuggestOracle extends SuggestOracle {
         // Get the response from the embedded wordOracle
         request.setQuery(oneWordQuery);
         Callback innerCallback = new Callback() {
+            @Override
             public void onSuggestionsReady(Request defaultRequest, Response defaultResponse) {
                 Response wordListResponse = new Response();
                 ArrayList suggestions = new ArrayList();
@@ -192,6 +194,7 @@ public class WordListSuggestOracle extends SuggestOracle {
         this.separators = separators;
     }
 
+    @Override
     public boolean isDisplayStringHTML() {
         return this.wordOracle.isDisplayStringHTML();
     }

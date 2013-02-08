@@ -31,8 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -50,7 +48,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
@@ -221,7 +218,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // Debug time taken.
         long time = System.currentTimeMillis();
 
-        XWiki xwiki = context.getWiki();
         HttpServletRequest request = null;
         HttpServletResponse response = null;
 

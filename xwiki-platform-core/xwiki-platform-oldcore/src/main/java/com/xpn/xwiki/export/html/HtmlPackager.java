@@ -245,7 +245,7 @@ public class HtmlPackager
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
         try {
-            XWikiContext renderContext = (XWikiContext) context.clone();
+            XWikiContext renderContext = context.clone();
             renderContext.put("action", "view");
 
             ExecutionContext executionContext = ecim.clone(execution.getContext());

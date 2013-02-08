@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -39,7 +41,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -51,8 +52,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
-
-import junit.framework.Assert;
 
 /**
  * Unit tests for {@link SyndEntryDocumentSource}.

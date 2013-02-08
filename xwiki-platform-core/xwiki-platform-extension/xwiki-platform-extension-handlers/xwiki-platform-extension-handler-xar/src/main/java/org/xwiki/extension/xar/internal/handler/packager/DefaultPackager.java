@@ -40,7 +40,6 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.slf4j.Logger;
 import org.xml.sax.ContentHandler;

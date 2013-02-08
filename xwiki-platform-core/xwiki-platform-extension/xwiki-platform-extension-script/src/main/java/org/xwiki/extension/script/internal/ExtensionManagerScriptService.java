@@ -41,7 +41,6 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
@@ -270,9 +269,8 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param offset the offset from where to start returning versions
      * @param nb the maximum number of versions to return
      * @return the versions of the provided extension id
-     * @throws ResolveException fail to find extension for provided id
      */
-    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb)
     {
         setError(null);
 

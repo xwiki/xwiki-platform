@@ -438,9 +438,10 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     /**
      * Update or create XWiki user base on LDAP.
      * 
-     * @param userName the name of the user.
-     * @param userDN the LDAP user DN.
+     * @param userProfile the XWiki user profile page.
      * @param searchAttributeListIn the attributes.
+     * @param ldapDn the LDAP user DN.
+     * @param ldapUid the uid of the user in LDAP
      * @param ldapUtils the LDAP communication tool.
      * @param context the XWiki context.
      * @throws XWikiException error when updating or creating XWiki user.

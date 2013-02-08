@@ -53,6 +53,7 @@ public class DefaultDialog extends DialogBox {
      *
      * @param w widget to add to the dialog.
      */
+    @Override
     public void add(Widget w) {
         this.contentPanel.add(w);
     }
@@ -60,6 +61,7 @@ public class DefaultDialog extends DialogBox {
     /**
      * Override show to also center the dialog.
      */
+    @Override
     public void show() {
         super.show();
         super.center();
@@ -67,6 +69,7 @@ public class DefaultDialog extends DialogBox {
         RootPanel.get().addStyleName("gwt-ModalDialog-show");
     }
 
+    @Override
     public void hide() {
         //remove the body class
         RootPanel.get().removeStyleName("gwt-ModalDialog-show");        

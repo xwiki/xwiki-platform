@@ -51,9 +51,10 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepositoryFactory;
-import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -206,14 +207,14 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         if (repository == null && extensionResource.getRepositoryType() != null
             && extensionResource.getRepositoryURI() != null) {
-            ExtensionRepositoryId repositoryId =
-                new ExtensionRepositoryId("tmp", extensionResource.getRepositoryType(),
+            ExtensionRepositoryDescriptor repositoryDescriptor =
+                new DefaultExtensionRepositoryDescriptor("tmp", extensionResource.getRepositoryType(),
                     extensionResource.getRepositoryURI());
             try {
                 ExtensionRepositoryFactory repositoryFactory =
-                    this.componentManager.getInstance(ExtensionRepositoryFactory.class, repositoryId.getType());
+                    this.componentManager.getInstance(ExtensionRepositoryFactory.class, repositoryDescriptor.getType());
 
-                repository = repositoryFactory.createRepository(repositoryId);
+                repository = repositoryFactory.createRepository(repositoryDescriptor);
             } catch (Exception e) {
                 // Ignore invalid repository
                 this.logger.warning("Invalid repository in download link [" + extensionResource + "]");

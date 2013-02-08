@@ -28,7 +28,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 /**
  * Interface for manipulate document history.

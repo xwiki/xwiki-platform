@@ -252,6 +252,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * @since 2.2M1
      */
+    @Override
     public BaseClass getXClass(XWikiContext context)
     {
         BaseClass baseClass = null;

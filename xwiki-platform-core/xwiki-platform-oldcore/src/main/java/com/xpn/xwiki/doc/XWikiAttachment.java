@@ -330,7 +330,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * Retrieve an attachment as an XML string. You should prefer
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)}
      * to avoid memory loads when appropriate.
      *
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)

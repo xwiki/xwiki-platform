@@ -1271,7 +1271,7 @@ public class Document extends Api
      * Displays the pretty name of the given field of the given object.
      * 
      * @param fieldname fieldname to display the pretty name of
-     * @param object Object to find the class to display the pretty name of
+     * @param obj Object to find the class to display the pretty name of
      * @return the pretty name display of the field.
      */
     public String displayPrettyName(String fieldname, Object obj)
@@ -1307,7 +1307,7 @@ public class Document extends Api
      * with the optional addition of a mandatory field.
      *
      * @param fieldname fieldname to display the pretty name of
-     * @param object Object to find the class to display the pretty name of
+     * @param obj Object to find the class to display the pretty name of
      * @param showMandatory true to display a mandatory sign
      * @return the pretty name display of the field.
      */

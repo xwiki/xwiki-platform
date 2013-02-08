@@ -160,6 +160,7 @@ public class DefaultVelocityManager implements VelocityManager
      *         skin can have global velocimacros defined
      * @throws XWikiVelocityException in case of an error while creating a Velocity Engine
      */
+    @Override
     public synchronized VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
         // Note: This method is synchronized to prevent several threads to create several instances of

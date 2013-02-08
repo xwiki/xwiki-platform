@@ -98,8 +98,6 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
@@ -121,7 +119,6 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.sheet.SheetBinder;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
 import org.xwiki.xml.XMLUtils;
@@ -347,7 +344,8 @@ public class XWiki implements EventListener
     private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
     /** Renderer for elevating privileges for selected file system templates. */
-    private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils.getComponent(PrivilegedTemplateRenderer.class);
+    private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
+        .getComponent(PrivilegedTemplateRenderer.class);
 
     private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent((Type) XWikiURLBuilder.class, "entity");
 
@@ -1101,8 +1099,12 @@ public class XWiki implements EventListener
         if (this.version == null) {
             try {
                 InputStream is = getResourceAsStream(VERSION_FILE);
-                XWikiConfig properties = new XWikiConfig(is);
-                this.version = properties.getProperty(VERSION_FILE_PROPERTY);
+                try {
+                    XWikiConfig properties = new XWikiConfig(is);
+                    this.version = properties.getProperty(VERSION_FILE_PROPERTY);
+                } finally {
+                    IOUtils.closeQuietly(is);
+                }
             } catch (Exception e) {
                 // Failed to retrieve the version, log a warning and default to "Unknown"
                 LOGGER.warn("Failed to retrieve XWiki's version from [" + VERSION_FILE + "], using the ["
@@ -1143,7 +1145,11 @@ public class XWiki implements EventListener
             return FileUtils.readFileToString(new File(name), DEFAULT_ENCODING);
         }
 
-        return IOUtils.toString(is, DEFAULT_ENCODING);
+        try {
+            return IOUtils.toString(is, DEFAULT_ENCODING);
+        } finally {
+            IOUtils.closeQuietly(is);
+        }
     }
 
     public Date getResourceLastModificationDate(String name)
@@ -1174,7 +1180,11 @@ public class XWiki implements EventListener
             return FileUtils.readFileToByteArray(new File(name));
         }
 
-        return IOUtils.toByteArray(is);
+        try {
+            return IOUtils.toByteArray(is);
+        } finally {
+            IOUtils.closeQuietly(is);
+        }
     }
 
     public boolean resourceExists(String name)
@@ -2698,20 +2708,6 @@ public class XWiki implements EventListener
         return Integer.parseInt(getUserPreference(prefname, context));
     }
 
-    /**
-     * Get XWiki context from execution context.
-     * 
-     * @return the XWiki context for the current thread
-     */
-    private XWikiContext getXWikiContext()
-    {
-        Execution execution = Utils.getComponent((Type) Execution.class);
-
-        ExecutionContext ec = execution.getContext();
-
-        return ec != null ? (XWikiContext) ec.getProperty("xwikicontext") : null;
-    }
-
     public void flushCache(XWikiContext context)
     {
         // We need to flush the virtual wiki list
@@ -3865,8 +3861,10 @@ public class XWiki implements EventListener
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            om.notify(new DocumentDeletingEvent(doc.getDocumentReference()),
-                new XWikiDocument(doc.getDocumentReference()), context);
+            if (om != null) {
+                om.notify(new DocumentDeletingEvent(doc.getDocumentReference()),
+                    new XWikiDocument(doc.getDocumentReference()), context);
+            }
 
             if (hasRecycleBin(context) && totrash) {
                 getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
@@ -6418,50 +6416,6 @@ public class XWiki implements EventListener
     {
         // TODO: Fix this method to return a Syntax object instead of a String
         return Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax().toIdString();
-    }
-
-    /**
-     * Set the fields of the class document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
-     * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
-     * otherwise generate XWiki Syntax 2.0.
-     * 
-     * @param title the page title to set
-     * @return true if the document has been modified, false otherwise
-     */
-    private boolean setClassDocumentFields(XWikiDocument doc, String title)
-    {
-        boolean needsUpdate = false;
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle(title);
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
-        SheetBinder documentSheetBinder = Utils.getComponent(SheetBinder.class, "document");
-        if (documentSheetBinder.getSheets(doc).isEmpty()) {
-            String wikiName = doc.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, SYSTEM_SPACE, "ClassSheet");
-            needsUpdate |= documentSheetBinder.bind(doc, sheet);
-        }
-
-        return needsUpdate;
     }
 
     /**

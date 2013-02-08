@@ -750,11 +750,13 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                 // One attachment exist in the recent version but not in the old one
                 oneOf(mockAttachmentStore).deleteXWikiAttachment(with(new BaseMatcher<XWikiAttachment>()
                 {
+                    @Override
                     public boolean matches(Object arg)
                     {
                         return ((XWikiAttachment) arg).getFilename().equals("attachment.txt");
                     }
 
+                    @Override
                     public void describeTo(Description description)
                     {
                         description.appendValue("attachment.ext");
@@ -931,7 +933,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         documentHandler.setConfiguration(configuration);
 
         InputStream is = getClass().getResourceAsStream(resource);
-        this.defaultPackager.parseDocument(is, documentHandler);
+        try {
+            this.defaultPackager.parseDocument(is, documentHandler);
+        } finally {
+            is.close();
+        }
 
         return documentHandler.getDocument();
     }

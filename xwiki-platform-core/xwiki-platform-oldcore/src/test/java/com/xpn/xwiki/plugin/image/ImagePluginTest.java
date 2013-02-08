@@ -36,7 +36,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.jmock.Mock;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.event.CacheEntryListener;
 
 /**
@@ -96,12 +95,19 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
         Mock mockCacheFactory = mock(CacheFactory.class);
         Cache<XWikiAttachment> cache = (new Cache<XWikiAttachment>() {
             private final Map<String, XWikiAttachment> map = new HashMap<String, XWikiAttachment>();
+            @Override
             public void set(String key, XWikiAttachment value) { map.put(key, value); }
+            @Override
             public XWikiAttachment get(String key) { return map.get(key); }
+            @Override
             public void remove(String key) { }
+            @Override
             public void removeAll() { }
+            @Override
             public void addCacheEntryListener(CacheEntryListener<XWikiAttachment> listener) { }
+            @Override
             public void removeCacheEntryListener(CacheEntryListener<XWikiAttachment> listener) { }
+            @Override
             public void dispose() { }
         });
         mockCacheFactory.expects(once()).method("newCache").will(returnValue(cache));
@@ -121,15 +127,18 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
     public void testCacheOfScaledAttachment() throws Exception
     {
         XWikiAttachment attach = (new XWikiAttachment() {
+            @Override
             public XWikiAttachment clone() {
                 XWikiAttachment out = new XWikiAttachment();
                 out.setAttachment_content(new XWikiAttachmentContent(this.getAttachment_content()));
                 return out;
             }
+            @Override
             public String getMimeType(XWikiContext context) { return "image/png"; }
         });
         attach.setContent(new ByteArrayInputStream(testPngImageContent));
         XWikiServletRequest req = (new XWikiServletRequest(null) {
+            @Override
             public String getParameter(String prop) { return "30"; }
         });
         this.getContext().setRequest(req);

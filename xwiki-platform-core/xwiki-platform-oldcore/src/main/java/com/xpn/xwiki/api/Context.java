@@ -369,7 +369,7 @@ public class Context extends Api
      * @param key The key to look for in the context.
      * @return The value associated with the given key in the XWiki context, if you have programming rights, or
      *         <code>null</code> otherwise.
-     * @see #put(String, Object)
+     * @see #put(String, java.lang.Object)
      */
     @Programming
     public java.lang.Object get(String key)

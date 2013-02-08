@@ -111,7 +111,6 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                     query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
                 }
 
-                queryResult = null;
                 queryResult = query.execute();
             } catch (QueryException e) {
                 throw new XWikiRestException(e);

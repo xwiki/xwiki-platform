@@ -66,6 +66,7 @@ public class MessageDialog extends Dialog {
         add(main);
     }
 
+    @Override
     protected void endDialog() {
         setCurrentResult(null);
         super.endDialog();

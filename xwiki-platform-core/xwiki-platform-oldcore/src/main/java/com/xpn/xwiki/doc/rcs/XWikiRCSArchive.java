@@ -46,7 +46,6 @@ import org.suigeneris.jrcs.util.ToString;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
  * Class for String [de]serialization for {@link XWikiDocumentArchive}.

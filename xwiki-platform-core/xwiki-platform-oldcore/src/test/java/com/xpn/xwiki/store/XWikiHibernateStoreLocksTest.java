@@ -74,17 +74,20 @@ public class XWikiHibernateStoreLocksTest extends AbstractMockingComponentTestCa
         this.observationManager = om;
         this.getMockery().checking(new Expectations() {{
             oneOf(om).addListener(with(new BaseMatcher<EventListener>() {
+                @Override
                 public void describeTo(final Description d)
                 {
                     d.appendText("See if the listener is a deleteLocksOnLogoutListener.");
                 }
 
+                @Override
                 public boolean matches(final Object o)
                 {
                     return ((EventListener) o).getName().equals("deleteLocksOnLogoutListener");
                 }
             }));
                 will(new CustomAction("grab the EventListener so it can be called") {
+                    @Override
                     public Object invoke(org.jmock.api.Invocation invocation) throws Exception
                     {
                         listener[0] = (EventListener) invocation.getParameter(0);

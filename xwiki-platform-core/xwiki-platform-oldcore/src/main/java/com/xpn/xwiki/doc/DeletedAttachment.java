@@ -137,7 +137,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /**
      * Setter for {@link #docName}.
      * 
-     * @param docId The document name to set. Used only by hibernate.
+     * @param docName The document name to set. Used only by hibernate.
      */
     protected void setDocName(String docName)
     {

@@ -759,7 +759,7 @@ public class BaseSearchResult extends XWikiResource
     protected List<SearchResult> searchLucene(String query, String defaultWikiName, String wikis,
             boolean hasProgrammingRights, String orderField, String order, int number, int start,
             Boolean withPrettyNames)
-            throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+            throws IllegalArgumentException, UriBuilderException, XWikiException
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 

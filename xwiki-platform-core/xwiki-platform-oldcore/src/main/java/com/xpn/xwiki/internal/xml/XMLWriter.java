@@ -93,10 +93,11 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     }
 
     /**
-     * Write the <code>{@link Document}</code> declaration, and its <code>{@link DocumentType}</code> if available to
-     * the output stream.
+     * Write the <code>{@link Document}</code> declaration, and its <code>{@link org.dom4j.DocumentType}</code> if
+     * available to the output stream.
      * 
-     * @param doc <code>{@link Document}</code> to be started, may specify a <code>{@link DocumentType}</code>.
+     * @param doc <code>{@link Document}</code> to be started, may specify a <code>{@link org.dom4j.DocumentType}</code>
+     *            .
      * @throws IOException a problem occurs during writing
      */
     public void writeDocumentStart(Document doc) throws IOException
@@ -128,7 +129,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
-     * Attribute}</code>s, using the <code>{@link Reader}</code> for its content.
+     * org.dom4j.Attribute}</code>s, using the <code>{@link Reader}</code> for its content.
      * <p>
      * Note that proper decoding/encoding will occurs during this operation, converting the encoding of the Reader into
      * the encoding of the Writer.
@@ -147,7 +148,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
-     * Attribute}</code>s, using the <code>{@link InputStream}</code> for its content.
+     * org.dom4j.Attribute}</code>s, using the <code>{@link InputStream}</code> for its content.
      * <p>
      * Note that no decoding/encoding of the InputStream will be ensured during this operation. The byte content is
      * transfered untouched.
@@ -167,7 +168,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
-     * Attribute}</code>s, using the <code>{@link InputStream}</code> encoded in Base64 for its content.
+     * org.dom4j.Attribute}</code>s, using the <code>{@link InputStream}</code> encoded in Base64 for its content.
      * 
      * @param element <code>{@link Element}</code> to output.
      * @param is <code>{@link InputStream}</code> that will be fully read and encoded in Base64 into the element
@@ -185,7 +186,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     }
 
     /**
-     * Writes the opening tag of an {@link Element}, including its {@link Attribute}s but without its content.
+     * Writes the opening tag of an {@link Element}, including its {@link org.dom4j.Attribute}s but without its content.
      * <p>
      * Compared to the DOM4J implementation, this function keeps track of opened elements.
      * </p>

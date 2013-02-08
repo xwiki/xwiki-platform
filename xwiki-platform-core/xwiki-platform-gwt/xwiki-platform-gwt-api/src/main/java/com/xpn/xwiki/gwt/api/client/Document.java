@@ -330,7 +330,7 @@ public class Document implements IsSerializable {
         XObject obj = currentObj;
         if (obj==null)
          obj = getFirstObject(name);
-        return (String) obj.getViewProperty(name);
+        return obj.getViewProperty(name);
     }
 
     public Object getValue(String name) {
@@ -350,9 +350,9 @@ public class Document implements IsSerializable {
         if (obj==null)
          obj = getFirstObject(name);
         if (type.equals("edit"))
-            return (String) obj.getEditProperty(name);
+            return obj.getEditProperty(name);
         else
-         return (String) obj.getViewProperty(name);
+         return obj.getViewProperty(name);
     }
 
 

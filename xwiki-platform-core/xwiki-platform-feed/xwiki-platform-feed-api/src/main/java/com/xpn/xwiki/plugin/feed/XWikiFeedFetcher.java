@@ -29,7 +29,6 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -254,17 +253,8 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         return syndFeedInfo;
     }
 
-    /**
-     * @param urlStr
-     * @param method
-     * @return
-     * @throws IOException
-     * @throws HttpException
-     * @throws FetcherException
-     * @throws FeedException
-     */
     private static SyndFeed retrieveFeed(String urlStr, HttpMethod method)
-        throws IOException, FetcherException, FeedException
+        throws IOException, FeedException
     {
 
         InputStream stream = null;
@@ -291,7 +281,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
     }
 
     private SyndFeed getFeed(SyndFeedInfo syndFeedInfo, String urlStr, HttpMethod method, int statusCode)
-        throws IOException, FetcherException, FeedException
+        throws IOException, FeedException
     {
 
         if (statusCode == HttpURLConnection.HTTP_NOT_MODIFIED && syndFeedInfo != null) {

@@ -215,8 +215,9 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public List<E> subList(int fromIndex, int toIndex)
     {
-        return new AbstractNotifyOnUpdateList(list.subList(fromIndex, toIndex))
+        return new AbstractNotifyOnUpdateList<E>(list.subList(fromIndex, toIndex))
         {
+            @Override
             public void onUpdate()
             {
                 AbstractNotifyOnUpdateList.this.onUpdate();

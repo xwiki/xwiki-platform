@@ -39,6 +39,7 @@ public class XWikiGWTException extends Exception implements IsSerializable {
         this.setModule(module);
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

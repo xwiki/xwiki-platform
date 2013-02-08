@@ -28,7 +28,6 @@ import java.lang.reflect.Method;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 import org.xwiki.test.integration.XWikiExecutorSuite;
-import org.xwiki.test.integration.XWikiExecutorSuite.PostStart;
 
 /**
  * Extends {@link XWikiExecutorSuite} and initialize the {@link PersistentTestContext}.

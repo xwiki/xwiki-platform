@@ -431,10 +431,11 @@ public class Package
         return "";
     }
 
-/**
+    /**
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
-     * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
-     *
+     * Your should prefer {@link #Import(InputStream, XWikiContext)} which may avoid loading the package twice in
+     * memory.
+     * 
      * @param file a byte array containing the content of a zipped package file
      * @param context current XWikiContext
      * @return an empty string, useless.
@@ -1085,10 +1086,9 @@ public class Package
      * Write the package.xml file to a ZipOutputStream
      * 
      * @param zos the ZipOutputStream to write to
-     * @param context curent XWikiContext
-     * @throws IOException when an error occurs during streaming operation
+     * @param context current XWikiContext
      */
-    private void addInfosToZip(ZipArchiveOutputStream zos, XWikiContext context) throws IOException
+    private void addInfosToZip(ZipArchiveOutputStream zos, XWikiContext context)
     {
         try {
             String zipname = DefaultPackageFileName;

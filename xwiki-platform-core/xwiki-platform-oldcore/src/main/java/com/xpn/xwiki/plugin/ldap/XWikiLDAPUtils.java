@@ -386,10 +386,9 @@ public class XWikiLDAPUtils
      * @param memberMap the result: maps DN to member id.
      * @param subgroups return all the subgroups identified.
      * @param context the XWiki context.
-     * @throws LDAPException error when parsing provided LDAP entry
      */
     private void getGroupMembersFromLDAPEntry(LDAPEntry ldapEntry, Map<String, String> memberMap,
-        List<String> subgroups, XWikiContext context) throws LDAPException
+        List<String> subgroups, XWikiContext context)
     {
         for (String memberField : getGroupMemberFields()) {
             LDAPAttribute attribute = ldapEntry.getAttribute(memberField);

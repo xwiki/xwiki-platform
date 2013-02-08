@@ -52,7 +52,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
@@ -603,8 +602,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param nb the maximum number of result to return.
-     * @param start the index of the first found user or group to return.
      * @param context the {@link XWikiContext}.
      * @return the of found users or groups.
      * @throws XWikiException error when calling for

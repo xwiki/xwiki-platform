@@ -283,7 +283,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         private List<String> actualList;
 
         /**
-         * @param list {@see AbstractNotifyOnUpdateList}.
+         * @param list {@link AbstractNotifyOnUpdateList}.
          */
         public NotifyList(List<String> list)
         {

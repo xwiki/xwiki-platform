@@ -234,6 +234,7 @@ public class TestUtils
         final String pageURI = pageURL.replaceAll("\\?.*", "");
         waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 return getDriver().getCurrentUrl().contains(pageURI);
@@ -1001,7 +1002,7 @@ public class TestUtils
             is.close();
         }
 
-        return (T) resource;
+        return resource;
     }
 
     protected GetMethod executeGet(String uri, int expectedCode) throws Exception

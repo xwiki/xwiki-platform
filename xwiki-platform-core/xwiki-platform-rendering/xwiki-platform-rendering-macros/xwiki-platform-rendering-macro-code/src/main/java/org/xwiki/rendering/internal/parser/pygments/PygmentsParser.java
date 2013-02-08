@@ -211,9 +211,8 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      * @param syntaxId the identifier of the source syntax.
      * @param code the content to highlight.
      * @return the highlighted version of the provided source.
-     * @throws ParseException the highlighting failed.
      */
-    private synchronized List<Block> highlight(String syntaxId, String code) throws ParseException
+    private synchronized List<Block> highlight(String syntaxId, String code)
     {
         PythonInterpreter interpreter = getPythonInterpreter();
         BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener(this.plainTextParser);

@@ -216,6 +216,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
         velocityEngineEvaluateStub = new CustomStub("Implements VelocityEngine.evaluate")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 // Output the given text without changes.
@@ -416,7 +417,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("", copy.getXClass().getCustomMapping());
     }
 
-    public void testCloneNullObjects() throws XWikiException
+    public void testCloneNullObjects()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
 
@@ -944,7 +945,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
     }
 
-    public void testGetRenderedContentWithSourceSyntax() throws XWikiException
+    public void testGetRenderedContentWithSourceSyntax()
     {
         this.document.setSyntax(Syntax.XWIKI_1_0);
 
@@ -959,7 +960,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // "space.name" -means----> DOCWIKI+":"+input
         // "database:space.name" (no change)
 
-        DocumentReference sourceReference = new DocumentReference(this.document.getDocumentReference());
         this.document.setContent("[[pageinsamespace]]");
         this.document.setSyntax(Syntax.XWIKI_2_0);
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
@@ -1022,7 +1022,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testRename10() throws XWikiException
     {
-        DocumentReference sourceReference = new DocumentReference(this.document.getDocumentReference());
         this.document.setContent("[pageinsamespace]");
         this.document.setSyntax(Syntax.XWIKI_1_0);
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
@@ -1257,7 +1256,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests that objects are not copied again when {@link XWikiDocument#mergeXObjects(XWikiDocument)} is called twice.
      */
-    public void testMergeObjectsTwice() throws XWikiException
+    public void testMergeObjectsTwice()
     {
         // Make sure the target document and the template document are from different wikis.
         XWikiDocument targetDoc = new XWikiDocument(new DocumentReference("someWiki", "someSpace", "somePage"));
@@ -1473,6 +1472,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockVelocityManager.stubs().method("getVelocityContext")
             .will(new CustomStub("Implements VelocityManager.getVelocityContext")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     VelocityContext velocityContext =

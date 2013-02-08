@@ -199,6 +199,8 @@ public class PdfExportImpl implements PdfExport
                 fopFactory.setUserConfig(new DefaultConfigurationBuilder().build(fopConfigurationFile));
             } catch (Exception ex) {
                 LOGGER.warn("Wrong FOP configuration: " + ex.getMessage());
+            } finally {
+                IOUtils.closeQuietly(fopConfigurationFile);
             }
         }
 
@@ -497,9 +499,8 @@ public class PdfExportImpl implements PdfExport
      * @param html the valid XHTML document to style
      * @param context the current request context
      * @return the document with inlined style
-     * @throws XWikiException if any exception occurs
      */
-    private String applyCSS(String html, XWikiContext context) throws XWikiException
+    private String applyCSS(String html, XWikiContext context)
     {
         String css =
             (context == null || context.getWiki() == null) ? "" : context.getWiki().parseTemplate("pdf.css", context);

@@ -78,6 +78,7 @@ public class EditPropDialog extends CustomDialog {
           return "";
      }-*/;
 
+    @Override
     protected void endDialog() {
         String result = getFormFieldValue(formname, fieldname);
         setCurrentResult(result);

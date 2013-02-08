@@ -51,9 +51,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.LocaleUtils;
@@ -136,6 +133,7 @@ import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
@@ -158,7 +156,6 @@ import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -3296,7 +3293,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param document the document containing the new identity
      * @throws XWikiException in case of error
      */
-    private void clone(XWikiDocument document) throws XWikiException
+    private void clone(XWikiDocument document)
     {
         setDocumentReference(document.getDocumentReference());
         setRCSVersion(document.getRCSVersion());
@@ -5777,7 +5774,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param toDoc
      * @param context
      * @return
-     * @throws XWikiException
      */
     public List<AttachmentDiff> getAttachmentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
     {
@@ -6345,6 +6341,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the syntax of the document
      * @since 2.3M1
      */
+    @Override
     public Syntax getSyntax()
     {
         // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
@@ -6364,6 +6361,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @see org.xwiki.bridge.DocumentModelBridge#getSyntaxId()
      * @deprecated since 2.3M1, use {link #getSyntax()} instead
      */
+    @Override
     @Deprecated
     public String getSyntaxId()
     {
@@ -6481,7 +6479,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         // Read info in object
         ObjectAddForm form = new ObjectAddForm();
-        form.setRequest((HttpServletRequest) context.getRequest());
+        form.setRequest(context.getRequest());
         form.readRequest();
 
         EntityReference classReference =
@@ -7666,6 +7664,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @return the XDOM corresponding to the document's string content.
      */
+    @Override
     public XDOM getXDOM()
     {
         if (this.xdom == null) {
@@ -7726,7 +7725,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // field. Thus getOriginalDocument() may return null.
     }
 
-    private boolean executeValidationScript(XWikiContext context, String validationScript) throws XWikiException
+    private boolean executeValidationScript(XWikiContext context, String validationScript)
     {
         try {
             XWikiValidationInterface validObject =
@@ -7736,29 +7735,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         } catch (Throwable e) {
             XWikiValidationStatus.addExceptionToContext(getFullName(), "", e, context);
             return false;
-        }
-    }
-
-    /**
-     * Convert the passed content from the passed syntax to the passed new syntax.
-     * 
-     * @param content the content to convert
-     * @param source the reference to where the content comes from (eg document reference)
-     * @param targetSyntax the new syntax after the conversion
-     * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
-     * @return the converted content in the new syntax
-     * @throws XWikiException if an exception occurred during the conversion process
-     * @since 2.4M2
-     */
-    private static String performSyntaxConversion(String content, String source, Syntax targetSyntax,
-        TransformationContext txContext) throws XWikiException
-    {
-        try {
-            XDOM dom = parseContent(txContext.getSyntax().toIdString(), content, source);
-            return performSyntaxConversion(dom, targetSyntax, txContext);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to convert document to syntax [" + targetSyntax + "]", e);
         }
     }
 

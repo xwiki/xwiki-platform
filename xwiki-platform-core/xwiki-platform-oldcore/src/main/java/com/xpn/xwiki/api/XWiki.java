@@ -50,7 +50,6 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWiki extends Api
@@ -2354,7 +2353,6 @@ public class XWiki extends Api
      * 
      * @param doc page to rename
      * @param newFullName target page name to move the information to
-     * @throws XWikiException exception if the rename fails
      */
     public boolean renamePage(Document doc, String newFullName)
     {

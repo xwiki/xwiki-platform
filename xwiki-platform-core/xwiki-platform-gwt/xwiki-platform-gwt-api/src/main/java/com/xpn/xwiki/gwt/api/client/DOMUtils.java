@@ -19,12 +19,11 @@
  */
 package com.xpn.xwiki.gwt.api.client;
 
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 
 
 public class DOMUtils {

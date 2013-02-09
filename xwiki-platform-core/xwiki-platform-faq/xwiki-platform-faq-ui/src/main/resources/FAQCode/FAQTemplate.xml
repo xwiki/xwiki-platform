@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1319793992000</creationDate>
-  <date>1319797799000</date>
-  <contentUpdateDate>1319797799000</contentUpdateDate>
+  <creationDate>1360434145000</creationDate>
+  <date>1360434235000</date>
+  <contentUpdateDate>1360434235000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -57,5 +57,5 @@
       <answer/>
     </property>
   </object>
-  <content>{{include document="FAQCode.FAQSheet"/}}</content>
+  <content/>
 </xwikidoc>

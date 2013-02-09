@@ -79,6 +79,6 @@ public class FAQTest extends AbstractTest
         // - verify that the Translation has been applied by checking the Translated livetable column name
         // - verify that the Livetable contains our new FAQ entry
         LiveTableElement lt = homePage.getFAQLiveTable();
-        Assert.assertTrue(lt.hasRow("Question", FAQ_TEST_PAGE));
+        Assert.assertTrue(lt.hasRow("Question", FAQ_TEST_PAGE + "?"));
     }
 }

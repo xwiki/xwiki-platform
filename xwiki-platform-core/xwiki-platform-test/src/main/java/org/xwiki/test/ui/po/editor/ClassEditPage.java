@@ -116,38 +116,22 @@ public class ClassEditPage extends BasePage
      */
     public ClassPropertyEditPane getPropertyEditPane(String propertyName)
     {
-        // Make the element visible before returning it
-        By locator = By.id("xproperty_" + propertyName + "_title");
-        waitUntilElementIsVisible(locator);
-        getDriver().findElement(locator).click();
-        return new ClassPropertyEditPane(getForm(), propertyName);
+        return new ClassPropertyEditPane(getForm(), propertyName).expand();
     }
 
     public DatabaseListClassEditElement getDatabaseListClassEditElement(String propertyName)
     {
-        // Make the element visible before returning it
-        By locator = By.id("xproperty_" + propertyName + "_title");
-        waitUntilElementIsVisible(locator);
-        getDriver().findElement(locator).click();
-        return new DatabaseListClassEditElement(getForm(), propertyName);
+        return (DatabaseListClassEditElement) new DatabaseListClassEditElement(getForm(), propertyName).expand();
     }
 
     public StaticListClassEditElement getStaticListClassEditElement(String propertyName)
     {
-        // Make the element visible before returning it
-        By locator = By.id("xproperty_" + propertyName + "_title");
-        waitUntilElementIsVisible(locator);
-        getDriver().findElement(locator).click();
-        return new StaticListClassEditElement(getForm(), propertyName);
+        return (StaticListClassEditElement) new StaticListClassEditElement(getForm(), propertyName).expand();
     }
 
     public NumberClassEditElement getNumberClassEditElement(String propertyName)
     {
-        // Make the element visible before returning it
-        By locator = By.id("xproperty_" + propertyName + "_title");
-        waitUntilElementIsVisible(locator);
-        getDriver().findElement(locator).click();
-        return new NumberClassEditElement(getForm(), propertyName);
+        return (NumberClassEditElement) new NumberClassEditElement(getForm(), propertyName).expand();
     }
 
     public void clickSaveAndContinue()

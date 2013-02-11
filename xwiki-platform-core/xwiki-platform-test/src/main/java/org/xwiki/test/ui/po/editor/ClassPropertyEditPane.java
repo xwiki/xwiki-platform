@@ -54,6 +54,23 @@ public class ClassPropertyEditPane extends BaseElement
     }
 
     /**
+     * Expands this property pane so that the meta-properties are visible and thus editable.
+     * 
+     * @return this
+     */
+    public ClassPropertyEditPane expand()
+    {
+        By containerLocator = By.id("xproperty_" + propertyName);
+        By titleLocator = By.id("xproperty_" + propertyName + "_title");
+        waitUntilElementIsVisible(containerLocator);
+        if (getUtil().findElementWithoutWaiting(getDriver(), containerLocator).getAttribute("class")
+            .contains("collapsed")) {
+            getUtil().findElementWithoutWaiting(getDriver(), titleLocator).click();
+        }
+        return this;
+    }
+
+    /**
      * Sets a meta property of the edited XClass property.
      * 
      * @param metaPropertyName the name of the meta-property

@@ -67,7 +67,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 {
-    public static final EntityReference GROUPCLASS_REFERENCE = new EntityReference("XWikiGroups", EntityType.SPACE,
+    public static final EntityReference GROUPCLASS_REFERENCE = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
         new EntityReference("XWiki", EntityType.SPACE));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);

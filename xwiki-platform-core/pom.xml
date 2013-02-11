@@ -318,7 +318,18 @@
               <className>com/xpn/xwiki/XWiki</className>
               <method>com.xpn.xwiki.XWikiContext ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext()</method>
               <differenceType>7002</differenceType>
-              <justification>AspectJ hacks or some weird CLIRR/AspectJ bug.</justification>
+              <justification>
+                * The XWikiCompatibilityAspect aspect class had a method (flushCache()) calling the private getXWikiContext() method from XWiki.java
+                * This private method has been removed from XWiki.java
+                * AspectJ needs to add a public proxy method in XWiki.java (it names it: public XWikiContext ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext())
+                  so that it can call it from XWikiCompatiblityAspect.class with:
+
+                  public static void ajc$interMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$flushCache(XWiki ajc$this_)
+                  {
+                    ajc$this_.flushCache(ajc$this_.ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext());
+                  }
+                * Thus we need to exclude it now that we've removed this getXWikiContext() ;)
+              </justification>
             </difference>
           </ignored>
           <excludes>

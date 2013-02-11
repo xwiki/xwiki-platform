@@ -318,7 +318,7 @@
               <className>com/xpn/xwiki/XWiki</className>
               <method>com.xpn.xwiki.XWikiContext ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext()</method>
               <differenceType>7002</differenceType>
-              <justification>AspectJ hacks. See http://www.eclipse.org/aspectj/doc/released/README-169.html for more details.</justification>
+              <justification>AspectJ hacks or some weird CLIRR/AspectJ bug.</justification>
             </difference>
           </ignored>
           <excludes>

@@ -4181,7 +4181,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         String parent = getElement(docel, "parent");
         if (StringUtils.isNotEmpty(parent)) {
-            setParentReference(this.currentMixedDocumentReferenceResolver.resolve(parent));
+            setParentReference(this.relativeEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT));
         }
 
         setCreator(getElement(docel, "creator"));

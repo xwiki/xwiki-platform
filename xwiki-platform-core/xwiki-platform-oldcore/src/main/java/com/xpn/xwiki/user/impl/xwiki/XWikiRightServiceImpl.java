@@ -58,16 +58,16 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiRightServiceImpl implements XWikiRightService
 {
-    public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.SPACE,
+    public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.DOCUMENT,
         new EntityReference("XWiki", EntityType.SPACE));
 
     public static final EntityReference GLOBALRIGHTCLASS_REFERENCE = new EntityReference("XWikiGlobalRights",
-        EntityType.SPACE, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRightServiceImpl.class);
 
     private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
-        EntityType.SPACE, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     private static final List<String> ALLLEVELS = Arrays.asList("admin", "view", "edit", "comment", "delete",
         "undelete", "register", "programming");

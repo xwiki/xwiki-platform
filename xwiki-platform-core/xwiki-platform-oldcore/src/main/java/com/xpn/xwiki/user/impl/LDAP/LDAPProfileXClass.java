@@ -54,7 +54,7 @@ public class LDAPProfileXClass
     public static final String LDAP_XFIELDPN_UID = "LDAP user unique identifier";
 
     public static final EntityReference LDAPPROFILECLASS_REFERENCE = new EntityReference("LDAPProfileClass",
-        EntityType.SPACE, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     /**
      * The XWiki space where users are stored.

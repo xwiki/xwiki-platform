@@ -177,9 +177,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
 
     public static final EntityReference COMMENTSCLASS_REFERENCE = new EntityReference("XWikiComments",
-        EntityType.SPACE, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
-    public static final EntityReference SHEETCLASS_REFERENCE = new EntityReference("SheetClass", EntityType.SPACE,
+    public static final EntityReference SHEETCLASS_REFERENCE = new EntityReference("SheetClass", EntityType.DOCUMENT,
         new EntityReference("XWiki", EntityType.SPACE));
 
     private String title;

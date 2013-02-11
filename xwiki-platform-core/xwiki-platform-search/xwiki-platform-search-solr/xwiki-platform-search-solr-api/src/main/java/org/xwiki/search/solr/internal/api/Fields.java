@@ -57,9 +57,19 @@ public interface Fields
     String SPACE = "space";
 
     /**
+     * Unanalyzed and not stored version of the document's space.
+     */
+    String SPACE_EXACT = "space_exact";
+
+    /**
      * Name of the document.
      */
     String NAME = "name";
+
+    /**
+     * Unanalyzed and not stored version of the document's name.
+     */
+    String NAME_EXACT = "name_exact";
 
     /**
      * FullName of the document (example : Main.WebHome).
@@ -72,6 +82,11 @@ public interface Fields
      * Note: Multilingual and virtual field.
      */
     String TITLE = "title";
+
+    /**
+     * Unanalyzed and not stored version of the document's title.
+     */
+    String TITLE_EXACT = "title_exact";
 
     /**
      * Version of the document.
@@ -103,9 +118,29 @@ public interface Fields
     String AUTHOR = "author";
 
     /**
+     * Last modifier, in its display version (i.e., "first_name last_name"), useful when for sorting.
+     */
+    String AUTHOR_DISPLAY = "author_display";
+
+    /**
+     * Unanalyzed and not stored version of the document's last author display version.
+     */
+    String AUTHOR_DISPLAY_EXACT = "author_display_exact";
+
+    /**
      * Creator of the document.
      */
     String CREATOR = "creator";
+
+    /**
+     * Creator of the document, in its display version (i.e., "first_name last_name"), useful when for sorting.
+     */
+    String CREATOR_DISPLAY = "creator_display";
+
+    /**
+     * Unanalyzed and not stored version of the document's creator display version.
+     */
+    String CREATOR_DISPLAY_EXACT = "creator_display_exact";
 
     /**
      * Date of last modification.
@@ -152,6 +187,11 @@ public interface Fields
     String FILENAME = "filename";
 
     /**
+     * Unanalyzed and not stored version of the attachment's file name.
+     */
+    String FILENAME_EXACT = "filename_exact";
+
+    /**
      * For storing the comments.
      * <p/>
      * Note: Multilingual and virtual field.
@@ -162,6 +202,11 @@ public interface Fields
      * For storing property name.
      */
     String PROPERTY_NAME = "propertyname";
+
+    /**
+     * Unanalyzed and not stored version of the property's name.
+     */
+    String PROPERTY_NAME_EXACT = "propertyname_exact";
 
     /**
      * For storing property value.

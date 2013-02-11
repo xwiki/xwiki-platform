@@ -26,7 +26,9 @@ import java.util.HashMap;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +48,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTestCase
 {
+    private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
     private XWikiRightServiceImpl rightService;
 
     private Mock mockGroupService;
@@ -195,7 +200,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         preferences.addXObject(preferencesObject);
         preferences.setNew(false);
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
                 @Override
@@ -217,8 +222,6 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                     this.rightService.hasAccessLevel("admin", this.user.getPrefixedFullName(),
                                                      doc.getPrefixedFullName(), true,
                                                      getContext()));
-                    
-
     }
 
     public void testHasAccessLevelWhithUserFromAnotherWiki() throws XWikiException
@@ -233,7 +236,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         preferences.addXObject(preferencesObject);
         preferences.setNew(false);
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
                 @Override
@@ -366,7 +369,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         this.mockXWiki.stubs().method("getDocument").with(eq(preferences.getSpaceName()),
             eq(preferences.getPageName()), ANYTHING).will(returnValue(preferences));
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             returnValue(new XWikiDocument(
                 new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"))));
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
@@ -394,7 +397,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         mockGlobalRightObj.stubs().method("setDocumentReference");
         mockGlobalRightObj.stubs().method("setOwnerDocument");
         prefs.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(getContext()))
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), eq(getContext()))
             .will(returnValue(prefs));
         this.mockGroupService.stubs().method("getAllGroupsReferencesForMember")
             .with(eq(new DocumentReference(getContext().getMainXWiki(), "XWiki", "Programmer")), eq(0), eq(0), same(getContext()))
@@ -435,7 +438,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         preferencesObject.setIntValue("allow", 1);
         preferences.addXObject(preferencesObject);
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
                 @Override
@@ -600,7 +603,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getFullName()), ANYTHING)
             .will(returnValue(doc));
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             returnValue(xwikiPreferences));
 
         this.mockXWiki.stubs().method("getXWikiPreference").with(ANYTHING, ANYTHING, ANYTHING).will(
@@ -655,7 +658,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING)
             .will(returnValue(doc));
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             returnValue(xwikiPreferences));
 
         this.mockXWiki.stubs().method("getXWikiPreference").with(ANYTHING, ANYTHING, ANYTHING).will(
@@ -735,7 +738,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                  new XWikiDocument(new DocumentReference("wiki",
                      "Space", "XWikiPreferences"))));
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
                 @Override

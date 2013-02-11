@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.LevelTree;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -77,16 +79,6 @@ public final class RightsManager
      * Name of the space preferences document.
      */
     private static final String SPACE_PREFERENCES = "WebPreferences";
-
-    /**
-     * Full name of the class containing document rights informations.
-     */
-    private static final String RIGHTS_CLASS = "XWiki.XWikiRights";
-
-    /**
-     * Full name of the class containing global rights informations.
-     */
-    private static final String GLOBAL_RIGHTS_CLASS = "XWiki.XWikiGlobalRights";
 
     /**
      * Name of the "levels" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
@@ -681,10 +673,12 @@ public final class RightsManager
         }
 
         if (!preferences.isNew()) {
-            String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
-            List<BaseObject> vobj = preferences.getObjects(rightsClass);
-            if (vobj != null) {
-                for (BaseObject bobj : vobj) {
+            EntityReference rightClassReference =
+                global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE
+                    : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
+            List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
+            if (rightObjects != null) {
+                for (BaseObject bobj : rightObjects) {
                     fillLevelTreeMap(rightsMap, levelInherited, bobj, levelsToMatch, direct, context);
                 }
             }
@@ -850,13 +844,14 @@ public final class RightsManager
 
         boolean global = isGlobal(preferences, spaceOrPage);
 
-        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+        EntityReference rightClassReference =
+            global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
 
         boolean needUpdate = false;
 
-        List<BaseObject> vobj = preferences.getObjects(rightsClass);
-        if (vobj != null) {
-            for (BaseObject bobj : vobj) {
+        List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
+        if (rightObjects != null) {
+            for (BaseObject bobj : rightObjects) {
                 List<String> levels =
                     ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS), RIGHTSLISTFIELD_SEP, false);
 
@@ -928,11 +923,12 @@ public final class RightsManager
     {
         boolean needUpdate = false;
 
-        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+        EntityReference rightClassReference =
+            global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
 
-        List<BaseObject> vobj = rightsDocument.getObjects(rightsClass);
-        if (vobj != null) {
-            for (BaseObject bobj : vobj) {
+        List<BaseObject> rightObjects = rightsDocument.getXObjects(rightClassReference);
+        if (rightObjects != null) {
+            for (BaseObject bobj : rightObjects) {
                 if (bobj == null) {
                     continue;
                 }
@@ -941,7 +937,7 @@ public final class RightsManager
 
                 if (needUpdate && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0
                     && bobj.getStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
-                    rightsDocument.removeObject(bobj);
+                    rightsDocument.removeXObject(bobj);
                 }
             }
         }
@@ -1048,11 +1044,12 @@ public final class RightsManager
 
         boolean global = isGlobal(preferences, spaceOrPage);
 
-        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+        EntityReference rightClassReference =
+            global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
 
-        List<BaseObject> vobj = preferences.getObjects(rightsClass);
-        if (vobj != null && !vobj.isEmpty()) {
-            preferences.removeObjects(rightsClass);
+        List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
+        if (rightObjects != null && !rightObjects.isEmpty()) {
+            preferences.removeXObjects(rightClassReference);
             context.getWiki().saveDocument(preferences, comment, context);
         }
     }

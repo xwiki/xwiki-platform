@@ -176,6 +176,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
 
+    public static final EntityReference COMMENTSCLASS_REFERENCE = new EntityReference("XWikiComments",
+        EntityType.SPACE, new EntityReference("XWiki", EntityType.SPACE));
+
+    public static final EntityReference SHEETCLASS_REFERENCE = new EntityReference("SheetClass", EntityType.SPACE,
+        new EntityReference("XWiki", EntityType.SPACE));
+
     private String title;
 
     /**
@@ -6250,7 +6256,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         // is not found
                         editModeObject = includedDocument.getXObject(editModeClass);
                         if (editModeObject == null) {
-                            editModeObject = includedDocument.getObject("XWiki.SheetClass");
+                            editModeObject = includedDocument.getXObject(SHEETCLASS_REFERENCE);
                         }
                         if (editModeObject != null) {
                             // Use the user-defined default edit mode if set.
@@ -6417,13 +6423,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public Vector<BaseObject> getComments(boolean asc)
     {
-        Vector<BaseObject> list = getObjects("XWiki.XWikiComments");
-        if (asc) {
-            return list;
+        List<BaseObject> list = getXObjects(COMMENTSCLASS_REFERENCE);
+        if (list == null) {
+            return null;
+        } else if (asc) {
+            return new Vector<BaseObject>(list);
         } else {
-            if (list == null) {
-                return list;
-            }
             Vector<BaseObject> newlist = new Vector<BaseObject>();
             for (int i = list.size() - 1; i >= 0; i--) {
                 newlist.add(list.get(i));
@@ -6434,9 +6439,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public boolean isCurrentUserCreator(XWikiContext context)
     {
-        return isCreator(context.getUser());
+        return isCreator(context.getUserReference());
     }
 
+    /**
+     * @deprecated use {@link #isCreator(DocumentReference)} instead
+     */
+    @Deprecated
     public boolean isCreator(String username)
     {
         if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
@@ -6444,6 +6453,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return username.equals(getCreator());
+    }
+
+    public boolean isCreator(DocumentReference username)
+    {
+        if (username.getName().equals(XWikiRightService.GUEST_USER)) {
+            return false;
+        }
+
+        return username.equals(getCreatorReference());
     }
 
     public boolean isCurrentUserPage(XWikiContext context)
@@ -6895,7 +6913,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Schedule the object for removal from the storage
         for (BaseObject object : objects) {
             if (object != null) {
-                addObjectsToRemove(object);
+                addXObjectToRemove(object);
             }
         }
         // Empty the vector, retaining its size
@@ -6906,6 +6924,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return true;
+    }
+
+    /**
+     * Remove all the objects of a given type (XClass) from the document. The object counter is left unchanged, so that
+     * future objects will have new (different) numbers. However, on some storage engines the counter will be reset if
+     * the document is removed from the cache and reloaded from the persistent storage.
+     * 
+     * @param classReference The XClass reference of the XObjects to be removed.
+     * @return {@code true} if the objects were successfully removed, {@code false} if no object from the target class
+     *         was in the current document.
+     * @since 5.0M1
+     */
+    public boolean removeXObjects(EntityReference reference)
+    {
+        return removeXObjects(this.currentReferenceDocumentReferenceResolver.resolve(reference, getDocumentReference()));
     }
 
     /**

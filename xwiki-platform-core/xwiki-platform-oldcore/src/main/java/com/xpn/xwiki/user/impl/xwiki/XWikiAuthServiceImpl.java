@@ -63,7 +63,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAuthServiceImpl.class);
 
     private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.WIKI));
+        new EntityReference("XWiki", EntityType.SPACE));
 
     /**
      * Used to convert a string into a proper Document Name.

@@ -1407,6 +1407,14 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * @since 5.0M1
+     */
+    public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
+    {
+        return getDocument(this.currentReferenceDocumentReferenceResolver.resolve(reference), context);
+    }
+
     public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();

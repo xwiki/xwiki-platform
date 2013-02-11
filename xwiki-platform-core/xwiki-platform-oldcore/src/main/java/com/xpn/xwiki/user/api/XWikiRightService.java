@@ -30,32 +30,32 @@ public interface XWikiRightService
     /**
      * The Superadmin username.
      */
-    public static final String SUPERADMIN_USER = "superadmin";
+    String SUPERADMIN_USER = "superadmin";
 
     /**
      * The Superadmin full name.
      */
-    public static final String SUPERADMIN_USER_FULLNAME = "XWiki." + SUPERADMIN_USER;
+    String SUPERADMIN_USER_FULLNAME = "XWiki." + SUPERADMIN_USER;
 
     /**
      * The Guest username.
      */
-    public static final String GUEST_USER = "XWikiGuest";
+    String GUEST_USER = "XWikiGuest";
 
     /**
      * The Guest full name.
      */
-    public static final String GUEST_USER_FULLNAME = "XWiki." + GUEST_USER;
+    String GUEST_USER_FULLNAME = "XWiki." + GUEST_USER;
 
     /**
      * The AllGroup username.
      */
-    public static final String ALLGROUP_GROUP = "XWikiAllGroup";
+    String ALLGROUP_GROUP = "XWikiAllGroup";
 
     /**
      * The AllGroup full name.
      */
-    public static final String ALLGROUP_GROUP_FULLNAME = "XWiki." + ALLGROUP_GROUP;
+    String ALLGROUP_GROUP_FULLNAME = "XWiki." + ALLGROUP_GROUP;
 
     /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with

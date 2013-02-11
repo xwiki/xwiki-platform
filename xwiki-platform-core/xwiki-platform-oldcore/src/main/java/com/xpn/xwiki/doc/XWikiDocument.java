@@ -6457,10 +6457,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public boolean isCreator(DocumentReference username)
     {
-        if (username.getName().equals(XWikiRightService.GUEST_USER)) {
-            return false;
-        }
-
         return username.equals(getCreatorReference());
     }
 

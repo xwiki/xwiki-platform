@@ -934,7 +934,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   #end
 
   #if ($space_f != '' &amp;&amp; !$blacklistedSpaces.contains($space_f))
-    #set ($filterQuery = "$filterQuery space:""$space_f""")
+    #set ($filterQuery = "$filterQuery space_exact:""$space_f""")
   #end
 
   #if ($type != '')

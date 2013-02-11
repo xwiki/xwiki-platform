@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,8 +37,10 @@ import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
@@ -60,6 +61,9 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAuthServiceImpl.class);
+
+    private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.WIKI));
 
     /**
      * Used to convert a string into a proper Document Name.
@@ -501,7 +505,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             boolean result = false;
 
             final XWikiDocument doc = context.getWiki().getDocument(username, context);
-            final BaseObject userObject = doc.getObject("XWiki.XWikiUsers");
+            final BaseObject userObject = doc.getXObject(USERCLASS_REFERENCE);
             // We only allow empty password from users having a XWikiUsers object.
             if (userObject != null) {
                 final String stored = userObject.getStringValue("password");

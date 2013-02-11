@@ -61,20 +61,6 @@ public privileged aspect XWikiCompatibilityAspect
     private XWikiNotificationManager XWiki.notificationManager;
 
     /**
-     * Get XWiki context from execution context.
-     * 
-     * @return the XWiki context for the current thread
-     */
-    private XWikiContext XWiki.getXWikiContext()
-    {
-        Execution execution = Utils.getComponent(Execution.class);
-
-        ExecutionContext ec = execution.getContext();
-
-        return ec != null ? (XWikiContext) ec.getProperty("xwikicontext") : null;
-    }
-
-    /**
      * Transform a text in a URL compatible text
      *
      * @param content text to transform
@@ -447,7 +433,11 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public void XWiki.flushCache()
     {
-        flushCache(getXWikiContext());
+        Execution execution = Utils.getComponent(Execution.class);
+
+        ExecutionContext ec = execution.getContext();
+
+        flushCache(ec != null ? (XWikiContext) ec.getProperty("xwikicontext") : null);
     }
 
     /**

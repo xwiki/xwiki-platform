@@ -44,6 +44,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-ui</artifactId>
+      <type>xar</type>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

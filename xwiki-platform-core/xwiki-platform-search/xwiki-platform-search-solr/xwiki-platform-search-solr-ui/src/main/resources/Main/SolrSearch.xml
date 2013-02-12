@@ -1145,9 +1145,9 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;li&gt;Sort:&lt;/li&gt;
       #set ($sortOptions = {
         'score' : 'Relevance',
-        'title_exact' : 'Title',
+        'title_sort' : 'Title',
         'date' : 'Date',
-        'author_display_exact' : 'Last Author'
+        'author_display_sort' : 'Last Author'
       })
       #foreach ($sortOption in $sortOptions.entrySet())
       &lt;li id="s_${sortOption.key}" class="#if($sort == $sortOption.key)active #{end}sort-item" onclick='handleSortElement(this);'&gt;

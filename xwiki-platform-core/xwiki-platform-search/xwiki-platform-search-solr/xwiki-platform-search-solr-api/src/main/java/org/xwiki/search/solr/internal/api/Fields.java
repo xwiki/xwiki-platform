@@ -67,11 +67,6 @@ public interface Fields
     String NAME = "name";
 
     /**
-     * Unanalyzed and not stored version of the document's name.
-     */
-    String NAME_EXACT = "name_exact";
-
-    /**
      * FullName of the document (example : Main.WebHome).
      */
     String FULLNAME = "fullname";
@@ -84,9 +79,9 @@ public interface Fields
     String TITLE = "title";
 
     /**
-     * Unanalyzed and not stored version of the document's title.
+     * Lowercased, unanalyzed and not stored version of the document's title, used for sorting.
      */
-    String TITLE_EXACT = "title_exact";
+    String TITLE_SORT = "title_sort";
 
     /**
      * Version of the document.
@@ -118,14 +113,14 @@ public interface Fields
     String AUTHOR = "author";
 
     /**
-     * Last modifier, in its display version (i.e., "first_name last_name"), useful when for sorting.
+     * Last modifier, in its display version (i.e., "first_name last_name").
      */
     String AUTHOR_DISPLAY = "author_display";
 
     /**
-     * Unanalyzed and not stored version of the document's last author display version.
+     * Lowercased, unanalyzed and not stored version of the document's last author display version, used for sorting.
      */
-    String AUTHOR_DISPLAY_EXACT = "author_display_exact";
+    String AUTHOR_DISPLAY_SORT = "author_display_sort";
 
     /**
      * Creator of the document.
@@ -133,14 +128,9 @@ public interface Fields
     String CREATOR = "creator";
 
     /**
-     * Creator of the document, in its display version (i.e., "first_name last_name"), useful when for sorting.
+     * Creator of the document, in its display version (i.e., "first_name last_name").
      */
     String CREATOR_DISPLAY = "creator_display";
-
-    /**
-     * Unanalyzed and not stored version of the document's creator display version.
-     */
-    String CREATOR_DISPLAY_EXACT = "creator_display_exact";
 
     /**
      * Date of last modification.
@@ -187,11 +177,6 @@ public interface Fields
     String FILENAME = "filename";
 
     /**
-     * Unanalyzed and not stored version of the attachment's file name.
-     */
-    String FILENAME_EXACT = "filename_exact";
-
-    /**
      * For storing the comments.
      * <p/>
      * Note: Multilingual and virtual field.
@@ -202,11 +187,6 @@ public interface Fields
      * For storing property name.
      */
     String PROPERTY_NAME = "propertyname";
-
-    /**
-     * Unanalyzed and not stored version of the property's name.
-     */
-    String PROPERTY_NAME_EXACT = "propertyname_exact";
 
     /**
      * For storing property value.

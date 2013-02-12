@@ -402,15 +402,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
-     * Remove a tagToRemove from a document. The document is saved (minor edit) after this operation.
+     * Remove a tag from a document. The document is saved (minor edit) after this operation.
      * 
-     * @param tagToRemove tagToRemove to remove.
+     * @param tag tag to remove.
      * @param document the document.
      * @param context XWiki context.
      * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
      */
-    public TagOperationResult removeTagFromDocument(String tagToRemove, XWikiDocument document, XWikiContext context)
+    public TagOperationResult removeTagFromDocument(String tag, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
         List<String> tags = getTagsFromDocument(document);
@@ -418,7 +418,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         ListIterator<String> it = tags.listIterator();
         while (it.hasNext()) {
-            if (tagToRemove.equalsIgnoreCase(it.next())) {
+            if (tag.equalsIgnoreCase(it.next())) {
                 needsUpdate = true;
                 it.remove();
             }
@@ -427,8 +427,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (needsUpdate) {
             setDocumentTags(document, tags, context);
             List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tagToRemove);
-            String comment = context.getMessageTool().get("plugin.tagToRemove.editcomment.removed", commentArgs);
+            commentArgs.add(tag);
+            String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -437,7 +437,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
             return TagOperationResult.OK;
         } else {
-            // Document doesn't contain this tagToRemove.
+            // Document doesn't contain this tag.
             return TagOperationResult.NO_EFFECT;
         }
     }

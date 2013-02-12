@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-search-solr-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Search - Solr - UI</name>
-  <description>Allows searching on the wiki using Apache Solr.</description>
+  <description>Allows searching on the wiki using Apache Solr</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search Application</xwiki.extension.name>

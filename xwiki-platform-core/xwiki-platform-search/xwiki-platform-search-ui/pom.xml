@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-search-ui</artifactId>
   <name>XWiki Platform - Search - UI</name>
   <packaging>xar</packaging>
-  <description>Allows searching on the full wiki using wildcards, searching by space, getting search result RSS feeds and more. Includes database search as the default search engine.</description>
+  <description>Allows searching on the full wiki using wildcards, searching by space, getting search result RSS feeds and more. By default provides a Database-backed search but allows pluging other engines (such as Lucene, Solr and more)</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Search Application</xwiki.extension.name>

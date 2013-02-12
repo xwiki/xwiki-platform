@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-search-lucene-api</artifactId>
   <name>XWiki Platform - Search - Lucene - API</name>
-  <description>Lucene index management and query.</description>
+  <description>Lucene index management and query</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Lucene Search API</xwiki.extension.name>

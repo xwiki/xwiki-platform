@@ -31,8 +31,10 @@
   </parent>
   <artifactId>xwiki-platform-search-lucene-api</artifactId>
   <name>XWiki Platform - Search - Lucene - API</name>
-  <description>XWiki Platform - Search - Lucene - API</description>
+  <description>Lucene index management and query.</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Lucene Search API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>xwiki-platform-search-lucene</xwiki.extension.features>
     <lucene.version>4.0.0</lucene.version>

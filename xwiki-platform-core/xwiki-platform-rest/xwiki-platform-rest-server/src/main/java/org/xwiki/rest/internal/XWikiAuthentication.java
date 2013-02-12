@@ -25,9 +25,9 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Form;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.security.ChallengeAuthenticator;
-import org.restlet.util.Series;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
@@ -82,9 +82,9 @@ public class XWikiAuthentication extends ChallengeAuthenticator
         /* By default set XWiki.Guest as the user that is sending the request. */
         xwikiContext.setUser("XWiki.XWikiGuest");
 
-        Series series = (Series) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        Form headers = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
 
-        if (series.getValues(HeaderConstants.HEADER_AUTHORIZATION) == null) {
+        if (headers.getValues(HeaderConstants.HEADER_AUTHORIZATION) == null) {
             /*
              * If there isn't an authorization header, check if the context contains an already authenticated session.
              * If it's the case use the previously authenticated user.

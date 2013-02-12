@@ -35,6 +35,8 @@
   <description>Make it possible to implement a component in a wiki page, using wiki objects</description>
   <properties>
     <xwiki.jacoco.instructionRatio>40.80</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Component API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

@@ -19,35 +19,35 @@
  */
 package org.xwiki.security.authorization.testwikibuilding;
 
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.jmock.lib.action.CustomAction;
-import org.jmock.api.Invocation;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.CustomAction;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.AbstractCollection;
-import java.util.HashSet;
-import java.util.Formatter;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Vector;
-import java.util.Iterator;
 
 /**
  * Utility class for mocking the objects as needed to test both the old and the caching right service implementations.
@@ -62,8 +62,6 @@ public class LegacyTestWiki extends AbstractTestWiki {
     private final XWiki xwiki;
 
     private final Mockery mockery;
-
-    private final ComponentManager componentManager;
 
     /** State variable for supporting XWikiContext.set/getDatabase. */
     private String currentDatabase;
@@ -92,7 +90,6 @@ public class LegacyTestWiki extends AbstractTestWiki {
         throws Exception 
     {
         this.mockery = mockery;
-        this.componentManager = componentManager;
         this.documentReferenceResolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
 
         mockery.setImposteriser(ClassImposteriser.INSTANCE);
@@ -210,6 +207,14 @@ public class LegacyTestWiki extends AbstractTestWiki {
                     public Object invoke(Invocation invocation) {
                         DocumentReference documentReference = (DocumentReference) invocation.getParameter(0);
                         return getDocument(documentReference);
+                    }
+            });
+            allowing(xwiki).getDocument(with(any(EntityReference.class)), with(any(XWikiContext.class)));
+            will(new CustomAction("return a mocked document") {
+                    @Override
+                    public Object invoke(Invocation invocation) {
+                        EntityReference documentReference = (EntityReference) invocation.getParameter(0);
+                        return getDocument(documentReference, (XWikiContext) invocation.getParameter(1));
                     }
             });
             allowing(xwiki).getWikiOwner(with(aNonNull(String.class)), with(any(XWikiContext.class)));
@@ -353,6 +358,10 @@ public class LegacyTestWiki extends AbstractTestWiki {
         return wiki.getDocument(documentReference);
     }
 
+    private XWikiDocument getDocument(EntityReference entityReference, XWikiContext context) {
+        return getDocument(new DocumentReference(entityReference.appendParent(new WikiReference(context.getDatabase()))));
+    }
+    
     private XWikiDocument getDocument(String name) {
         DocumentReference documentReference;
 
@@ -591,6 +600,19 @@ public class LegacyTestWiki extends AbstractTestWiki {
                         @Override
                         public Object invoke(Invocation invocation) {
                             DocumentReference classReference = (DocumentReference) invocation.getParameter(0);
+                            if (classReference.getName().equals("XWikiRights")) {
+                                return getLegacyDocumentRights();
+                            } else if (classReference.getName().equals("XWikiGlobalRights")) {
+                                return getLegacyGlobalRights();
+                            }
+                            return null;
+                        }
+                });
+                allowing(mockedDocument).getXObjects(with(any(EntityReference.class)));
+                will (new CustomAction("return a vector of rights") {
+                        @Override
+                        public Object invoke(Invocation invocation) {
+                            EntityReference classReference = (EntityReference) invocation.getParameter(0);
                             if (classReference.getName().equals("XWikiRights")) {
                                 return getLegacyDocumentRights();
                             } else if (classReference.getName().equals("XWikiGlobalRights")) {

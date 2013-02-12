@@ -22,11 +22,9 @@ package com.xpn.xwiki.plugin.tag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -70,7 +68,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public static final String TAG_PROPERTY = "tags";
 
-    /** L10N key for the "tag added" document edit comment. */
+    /**
+     * L10N key for the "tag added" document edit comment.
+     */
     public static final String DOC_COMMENT_TAG_ADDED = "plugin.tag.editcomment.added";
 
     /**
@@ -155,23 +155,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     /**
      * Get all tags within the wiki.
-     * 
+     *
      * @param context XWiki context.
      * @return list of tags (alphabetical order).
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
     public List<String> getAllTags(XWikiContext context) throws XWikiException
     {
-        List<String> results;
-
-        String hql =
-            "select distinct elements(prop.list) from BaseObject as obj, "
-            + "DBStringListProperty as prop where obj.className='XWiki.TagClass' "
-            + "and obj.id=prop.id.id and prop.id.name='tags'";
-        results = context.getWiki().search(hql, context);
-        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-
-        return results;
+        return TagQueryUtils.getAllTags(context);
     }
 
     /**
@@ -222,7 +213,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     /**
      * Get cardinality map of tags matching a parameterized hql query.
-     * 
+     *
      * @param fromHql the <code>from</code> fragment of the hql query
      * @param whereHql the <code>where</code> fragment of the hql query
      * @param parameterValues list of parameter values for the query
@@ -235,53 +226,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
             XWikiContext context) throws XWikiException
     {
-        List<String> results = null;
-        Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
-
-        String from = "select elements(prop.list) from BaseObject as tagobject, DBStringListProperty as prop";
-        String where =
-            " where tagobject.className='XWiki.TagClass' and tagobject.id=prop.id.id and prop.id.name='tags'";
-
-        // If at least one of the fragments is passed, the query should be matching XWiki documents
-        if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {
-            from += ", XWikiDocument as doc" + fromHql;
-        }
-        if (!StringUtils.isBlank(whereHql)) {
-            where += " and doc.fullName=tagobject.name and " + whereHql;
-        }
-
-        List<?> params = parameterValues;
-        if (params == null) {
-            params = new ArrayList<String>();
-        }
-        results = context.getWiki().getStore().search(from + where, 0, 0, params, context);
-        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-        Map<String, String> processedTags = new HashMap<String, String>();
-
-        // We have to manually build a cardinality map since we have to ignore tags case.
-        for (String result : results) {
-            // This key allows to keep track of the case variants we've encountered.
-            String lowerTag = result.toLowerCase();
-
-            // We store the first case variant to reuse it in the final result set.
-            if (!processedTags.containsKey(lowerTag)) {
-                processedTags.put(lowerTag, result);
-            }
-
-            String tagCountKey = processedTags.get(lowerTag);
-            int tagCountForTag = 0;
-            if (tagCount.get(tagCountKey) != null) {
-                tagCountForTag = tagCount.get(tagCountKey);
-            }
-            tagCount.put(tagCountKey, tagCountForTag + 1);
-        }
-
-        return tagCount;
+        return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameterValues, context);
     }
 
     /**
      * Get documents with the given tags.
-     * 
+     *
      * @param tag a list of tags to match.
      * @param context XWiki context.
      * @return list of docNames.
@@ -289,14 +239,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
-        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item "
-            + "where obj.className=? and obj.name=doc.fullName and obj.id=prop.id.id "
-            + "and prop.id.name='tags' and lower(item)=lower(?) order by doc.fullName";
-        List<Object> parameters = new ArrayList<Object>();
-        parameters.add(TAG_CLASS);
-        parameters.add(tag);
-
-        return context.getWiki().getStore().searchDocumentsNames(hql, parameters, context);
+        return TagQueryUtils.getDocumentsWithTag(tag, context);
     }
 
     /**
@@ -459,15 +402,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
-     * Remove a tag from a document. The document is saved (minor edit) after this operation.
+     * Remove a tagToRemove from a document. The document is saved (minor edit) after this operation.
      * 
-     * @param tag tag to remove.
+     * @param tagToRemove tagToRemove to remove.
      * @param document the document.
      * @param context XWiki context.
      * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
      */
-    public TagOperationResult removeTagFromDocument(String tag, XWikiDocument document, XWikiContext context)
+    public TagOperationResult removeTagFromDocument(String tagToRemove, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
         List<String> tags = getTagsFromDocument(document);
@@ -475,7 +418,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         ListIterator<String> it = tags.listIterator();
         while (it.hasNext()) {
-            if (tag.equalsIgnoreCase(it.next())) {
+            if (tagToRemove.equalsIgnoreCase(it.next())) {
                 needsUpdate = true;
                 it.remove();
             }
@@ -484,8 +427,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (needsUpdate) {
             setDocumentTags(document, tags, context);
             List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tag);
-            String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
+            commentArgs.add(tagToRemove);
+            String comment = context.getMessageTool().get("plugin.tagToRemove.editcomment.removed", commentArgs);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -494,7 +437,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
             return TagOperationResult.OK;
         } else {
-            // Document doesn't contain this tag.
+            // Document doesn't contain this tagToRemove.
             return TagOperationResult.NO_EFFECT;
         }
     }

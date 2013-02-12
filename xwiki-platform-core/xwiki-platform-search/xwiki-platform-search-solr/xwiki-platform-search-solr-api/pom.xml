@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
-  <description>Solr engine management: configuration, indexing, listeners, script service, etc. This module does not handle the search queries.</description>
+  <description>Solr engine management: configuration, indexing, listeners, script service, etc. This module does not handle the search queries</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>

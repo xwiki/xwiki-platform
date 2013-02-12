@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * TagQueryManager handles queries allowing to search and count tags within the wiki.
+ * TagQueryUtils handles queries allowing to search and count tags within the wiki.
  *
  * @version $Id$
  * @since 5.0M1

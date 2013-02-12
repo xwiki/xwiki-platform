@@ -109,10 +109,10 @@ public final class TagQueryUtils
 
         // If at least one of the fragments is passed, the query should be matching XWiki documents
         if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {
-            from += ", XWikiDocument as doc" + fromHql;
+            from += fromHql;
         }
         if (!StringUtils.isBlank(whereHql)) {
-            where += " and doc.fullName=tagobject.name and " + whereHql;
+            where += " and " + whereHql;
         }
 
         List<?> params = parameterValues;

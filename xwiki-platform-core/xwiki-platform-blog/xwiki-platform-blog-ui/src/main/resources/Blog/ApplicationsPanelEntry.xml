@@ -71,6 +71,22 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
     </class>
     <name>Blog.ApplicationsPanelEntry</name>
     <number>0</number>
@@ -89,6 +105,9 @@ icon=icon:transmit</parameters>
     </property>
     <property>
       <name>platform.panels.blogApplication</name>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
   <content>{{include document="XWiki.UIExtensionSheet" /}}</content>

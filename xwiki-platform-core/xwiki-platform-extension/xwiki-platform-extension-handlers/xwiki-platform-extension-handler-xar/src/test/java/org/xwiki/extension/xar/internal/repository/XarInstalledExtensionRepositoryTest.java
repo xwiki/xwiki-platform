@@ -22,7 +22,6 @@ public class XarInstalledExtensionRepositoryTest extends AbstractComponentTestCa
         super.setUp();
 
         this.repositoryUtil = new RepositoryUtil(getComponentManager(), getMockery());
-        this.repositoryUtil.getExtensionPackager().setDefaultDirectory(this.repositoryUtil.getLocalRepository());
         this.repositoryUtil.setup();
 
         // lookup

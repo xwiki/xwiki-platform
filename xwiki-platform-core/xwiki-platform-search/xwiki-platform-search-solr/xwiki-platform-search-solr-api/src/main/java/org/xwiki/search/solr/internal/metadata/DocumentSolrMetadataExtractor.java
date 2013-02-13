@@ -95,7 +95,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             String authorString = serializer.serialize(translatedDocument.getAuthorReference());
             String authorDisplayString = context.getWiki().getUserName(authorString, null, false, context);
             String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
-            String creatorDisplayString = context.getWiki().getUserName(authorString, null, false, context);
+            String creatorDisplayString = context.getWiki().getUserName(creatorString, null, false, context);
 
             solrDocument.addField(Fields.AUTHOR, authorString);
             solrDocument.addField(Fields.AUTHOR_DISPLAY, authorDisplayString);

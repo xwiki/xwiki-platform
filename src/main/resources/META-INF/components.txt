@@ -1,0 +1,4 @@
+org.xwiki.mailSender.internal.DefaultMailSender
+org.xwiki.mailSender.internal.MailSenderScriptService
+org.xwiki.mailSender.internal.DefaultMailSenderUtils
+org.xwiki.mailSender.internal.MailSenderUtilsScriptService

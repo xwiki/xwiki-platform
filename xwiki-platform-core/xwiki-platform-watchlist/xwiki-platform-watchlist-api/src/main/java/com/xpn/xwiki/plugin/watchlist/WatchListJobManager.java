@@ -26,6 +26,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -36,6 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Manager for WatchList jobs.
@@ -83,6 +87,11 @@ public class WatchListJobManager
      * XWiki Rights class name.
      */
     private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
+
+    /**
+     * Name of the space where default Scheduler jobs are located.
+     */
+    private static final String SCHEDULER_SPACE = "Scheduler";
 
     /**
      * Set watchlist common documents fields.
@@ -252,7 +261,8 @@ public class WatchListJobManager
     /**
      * Creates a WatchList job in the XWiki Scheduler application (XWiki Object).
      * 
-     * @param docName Name of the document storing the job (example: Scheduler.WatchListDailyNotifier)
+     * @param jobDocReference the reference to the document storing the job. For example
+     *        {@code XWiki:Scheduler.WatchListDailyNotifier}
      * @param name Job name (example: Watchlist daily notifier)
      * @param nameResource (example: platform.plugin.watchlist.job.daily)
      * @param emailTemplate email template to use for this job (example: XWiki.WatchListMessage)
@@ -260,15 +270,15 @@ public class WatchListJobManager
      * @param context Context of the request
      * @throws XWikiException if the jobs creation fails.
      */
-    private void initWatchListJob(String docName, String name, String nameResource, String emailTemplate, String cron,
-        XWikiContext context) throws XWikiException
+    private void initWatchListJob(DocumentReference jobDocReference, String name, String nameResource,
+        String emailTemplate, String cron, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
         boolean needsUpdate = false;
         BaseObject job;
 
         try {
-            doc = context.getWiki().getDocument(docName, context);
+            doc = context.getWiki().getDocument(jobDocReference, context);
 
             job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             if (job == null) {
@@ -346,11 +356,23 @@ public class WatchListJobManager
     public void init(XWikiContext context) throws XWikiException
     {
         initWatchListJobClass(context);
-        initWatchListJob("Scheduler.WatchListHourlyNotifier", "WatchList hourly notifier", "watchlist.job.hourly",
+
+        String currentWiki = Utils.getComponent(EntityReferenceValueProvider.class, "current").getDefaultValue(
+            EntityType.WIKI);
+
+        DocumentReference hourlyJobReference =
+            new DocumentReference(currentWiki, SCHEDULER_SPACE, "WatchListHourlyNotifier");
+        initWatchListJob(hourlyJobReference, "WatchList hourly notifier", "watchlist.job.hourly",
             WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 * * * ?", context);
-        initWatchListJob("Scheduler.WatchListDailyNotifier", "WatchList daily notifier", "watchlist.job.daily",
+
+        DocumentReference dailyJobReference =
+            new DocumentReference(currentWiki, SCHEDULER_SPACE, "WatchListDailyNotifier");
+        initWatchListJob(dailyJobReference, "WatchList daily notifier", "watchlist.job.daily",
             WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 * * ?", context);
-        initWatchListJob("Scheduler.WatchListWeeklyNotifier", "WatchList weekly notifier", "watchlist.job.weekly",
+
+        DocumentReference weeklyJobReference =
+            new DocumentReference(currentWiki, SCHEDULER_SPACE, "WatchListWeeklyNotifier");
+        initWatchListJob(weeklyJobReference, "WatchList weekly notifier", "watchlist.job.weekly",
             WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 ? * MON", context);
     }
 }

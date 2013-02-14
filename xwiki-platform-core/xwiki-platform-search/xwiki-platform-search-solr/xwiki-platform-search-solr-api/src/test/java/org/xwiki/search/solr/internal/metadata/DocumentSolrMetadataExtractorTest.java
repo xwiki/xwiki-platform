@@ -309,6 +309,7 @@ public class DocumentSolrMetadataExtractorTest
         Date commentDate = new Date();
         // Adding a fake password field to the comments class just to test the branch in the code.
         String commentPassword = "password";
+        List<String> commentList = Arrays.asList("a", "list");
 
         List<BaseProperty<EntityReference>> commentFields = new ArrayList<BaseProperty<EntityReference>>();
 
@@ -333,6 +334,11 @@ public class DocumentSolrMetadataExtractorTest
         when(mockPasswordField.getName()).thenReturn("password");
         when(mockPasswordField.getValue()).thenReturn(commentPassword);
         commentFields.add(mockPasswordField);
+
+        BaseProperty<EntityReference> mockListField = mock(BaseProperty.class);
+        when(mockListField.getName()).thenReturn("list");
+        when(mockListField.getValue()).thenReturn(commentList);
+        commentFields.add(mockListField);
 
         BaseClass mockXClass = mock(BaseClass.class);
 
@@ -372,7 +378,8 @@ public class DocumentSolrMetadataExtractorTest
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, language));
         MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment:" + commentContent),
-            (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString())));
-        Assert.assertEquals(3, objectProperties.size());
+            (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString()),
+            (Object) ("list:" + commentList.get(0)), (Object) ("list:" + commentList.get(1))));
+        Assert.assertEquals(5, objectProperties.size());
     }
 }

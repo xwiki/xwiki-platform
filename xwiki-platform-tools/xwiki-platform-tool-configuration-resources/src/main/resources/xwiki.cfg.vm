@@ -306,15 +306,9 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 
 #-# The group management class.
 # xwiki.authentication.groupclass=com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl
-#-# Default value for exo:
-# xwiki.authentication.groupclass=com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl
 
 #-# The authentication management class.
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl
-#-# Default value for exo:
-# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl
-#-# Default value for LDAP:
-# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl
 
 #-# The authorization management class.
 # xwiki.authentication.rightsclass=com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl

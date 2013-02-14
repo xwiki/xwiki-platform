@@ -34,6 +34,9 @@
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.applications:xwiki-application-application-manager</xwiki.extension.features>
+
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->

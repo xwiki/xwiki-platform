@@ -33,6 +33,9 @@
   <name>XWiki Platform - Application Manager - API</name>
   <description>API to manage application descriptors</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.plugins:xwiki-plugin-application-manager</xwiki.extension.features>
+
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Application Manager API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>28.16</xwiki.jacoco.instructionRatio>

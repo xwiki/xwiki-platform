@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -53,6 +54,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtractor
 {
+    /**
+     * The format used when indexing the objcontent field: "&lt;propertyName&gt;:&lt;propertyValue&gt;".
+     */
+    private static final String OBJCONTENT_FORMAT = "%s:%s";
+
     /**
      * Logging framework.
      */
@@ -228,11 +234,23 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;
 
             // Avoid indexing empty properties.
-            if (property.getValue() != null) {
+            Object propertyValue = property.getValue();
+            if (propertyValue != null) {
                 // Avoid indexing password.
                 PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
-                if (!(propertyClass instanceof PasswordClass)) {
-                    solrDocument.addField(fieldName, String.format("%s:%s", property.getName(), property.getValue()));
+                if (propertyClass instanceof PasswordClass) {
+                    continue;
+                } else if (propertyValue instanceof List) {
+                    // Handle list property values, by adding each list entry.
+                    List propertyListValues = (List) propertyValue;
+                    for (Object propertyListValue : propertyListValues) {
+                        solrDocument.addField(fieldName,
+                            String.format(OBJCONTENT_FORMAT, property.getName(), propertyListValue));
+                    }
+                } else {
+                    // Generic toString on the property value
+                    solrDocument.addField(fieldName,
+                        String.format(OBJCONTENT_FORMAT, property.getName(), propertyValue));
                 }
             }
         }

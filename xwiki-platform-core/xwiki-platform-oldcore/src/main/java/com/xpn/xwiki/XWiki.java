@@ -5234,25 +5234,7 @@ public class XWiki implements EventListener
     @Deprecated
     public boolean exists(String fullname, XWikiContext context)
     {
-        String server = null, database = null;
-        try {
-            XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(fullname, context);
-            server = doc.getDatabase();
-
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
-
-            return getStore().exists(doc, context);
-        } catch (XWikiException e) {
-            return false;
-        } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
-        }
+        return exists(this.currentMixedDocumentReferenceResolver.resolve(fullname), context);
     }
 
     public boolean exists(DocumentReference documentReference, XWikiContext context)
@@ -5260,7 +5242,7 @@ public class XWiki implements EventListener
         String server = null, database = null;
         try {
             XWikiDocument doc = new XWikiDocument(documentReference);
-            server = doc.getDatabase();
+            server = doc.getDocumentReference().getWikiReference().getName();
 
             if (server != null) {
                 database = context.getDatabase();

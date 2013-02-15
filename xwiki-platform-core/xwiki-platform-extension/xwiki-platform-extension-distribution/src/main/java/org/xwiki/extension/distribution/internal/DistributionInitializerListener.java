@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.DistributionRequest;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
@@ -78,7 +79,7 @@ public class DistributionInitializerListener implements EventListener
 
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
-            DistributionJobStatus status = this.distributionManager.getPreviousJobStatus();
+            DistributionJobStatus<DistributionRequest> status = this.distributionManager.getPreviousJobStatus();
 
             for (DistributionStepStatus step : status.getSteps()) {
                 if (step.getUpdateState() == null) {

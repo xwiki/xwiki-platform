@@ -33,7 +33,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.job.AbstractJob;
+import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.AbstractJobStatus;
 
 /**
@@ -42,7 +42,8 @@ import org.xwiki.job.internal.AbstractJobStatus;
  */
 @Component
 @Named("distribution")
-public class DistributionJob extends AbstractJob<DistributionRequest>
+public class DistributionJob<R extends DistributionRequest, S extends AbstractJobStatus<R>, DS extends DistributionJobStatus<R>>
+    extends AbstractJob<R, S>
 {
     /**
      * The component used to get information about the current distribution.
@@ -60,7 +61,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     }
 
     @Override
-    protected AbstractJobStatus<DistributionRequest> createNewStatus(DistributionRequest request)
+    protected S createNewStatus(R request)
     {
         // TODO: make steps components automatically discovered so that any module can add custom steps
 
@@ -117,11 +118,10 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
 
         // Create status
 
-        DistributionJobStatus status =
-            new DistributionJobStatus(request, this.observationManager, this.loggerManager, steps);
+        DS status = createNewDistributionStatus(request, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
-            DistributionJobStatus previousStatus = this.distributionManager.getPreviousJobStatus();
+            DistributionJobStatus<R> previousStatus = this.distributionManager.getPreviousJobStatus();
 
             if (previousStatus != null
                 && previousStatus.getDistributionExtension() != null
@@ -135,15 +135,17 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
             status.setDistributionExtensionUi(extensionUI);
         }
 
-        return status;
+        return (S) status;
     }
 
-    /**
-     * @return the distribution job status
-     */
-    protected DistributionJobStatus getDistributionJobStatus()
+    protected DS getDistributionJobStatus()
     {
-        return (DistributionJobStatus) getStatus();
+        return (DS) getStatus();
+    }
+
+    protected DS createNewDistributionStatus(R request, List<DistributionStepStatus> steps)
+    {
+        return (DS) new DistributionJobStatus<R>(request, this.observationManager, this.loggerManager, steps);
     }
 
     @Override

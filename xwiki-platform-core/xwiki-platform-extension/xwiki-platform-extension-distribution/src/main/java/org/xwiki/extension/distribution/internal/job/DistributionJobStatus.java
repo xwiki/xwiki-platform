@@ -30,7 +30,7 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 4.2M3
  */
-public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
+public class DistributionJobStatus<R extends DistributionRequest> extends DefaultJobStatus<DistributionRequest>
 {
     /**
      * Serialization identifier.
@@ -49,8 +49,8 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     private int currentStateIndex;
 
-    public DistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
-        LoggerManager loggerManager, List<DistributionStepStatus> steps)
+    public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
+        List<DistributionStepStatus> steps)
     {
         super(request, observationManager, loggerManager, false);
 

@@ -1954,8 +1954,8 @@ public class XWiki implements EventListener
     {
         XWikiURLFactory urlf = context.getURLFactory();
         try {
-            DocumentReference fileNameReference = this.currentMixedDocumentReferenceResolver.resolve(filename);
-            XWikiDocument doc = getDocument(fileNameReference, context);
+            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+            XWikiDocument doc = getDocument(skinReference, context);
             if (!doc.isNew()) {
                 // Look for an object property
                 BaseObject object =

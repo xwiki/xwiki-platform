@@ -33,8 +33,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.job.AbstractJob;
-import org.xwiki.job.internal.AbstractJobStatus;
+import org.xwiki.job.internal.AbstractJob;
 
 /**
  * @version $Id$
@@ -42,7 +41,7 @@ import org.xwiki.job.internal.AbstractJobStatus;
  */
 @Component
 @Named("distribution")
-public class DistributionJob extends AbstractJob<DistributionRequest>
+public class DistributionJob extends AbstractJob<DistributionRequest, DistributionJobStatus>
 {
     /**
      * The component used to get information about the current distribution.
@@ -60,7 +59,7 @@ public class DistributionJob extends AbstractJob<DistributionRequest>
     }
 
     @Override
-    protected AbstractJobStatus<DistributionRequest> createNewStatus(DistributionRequest request)
+    protected DistributionJobStatus createNewStatus(DistributionRequest request)
     {
         // TODO: make steps components automatically discovered so that any module can add custom steps
 

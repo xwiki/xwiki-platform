@@ -252,7 +252,8 @@ dl.extension-metadata > dd > ul {
   display: none;
 }
 #extension-search-advanced-body:target ~ div.hidden {
-  display: block;
+  /* The 'hidden' class forces display:none using !important so we have to use it too in order to overwrite it.  */
+  display: block !important;
 }
 .extension-search-advanced-popup {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);

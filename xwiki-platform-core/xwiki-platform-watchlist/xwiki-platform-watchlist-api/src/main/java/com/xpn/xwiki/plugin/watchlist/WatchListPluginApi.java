@@ -59,8 +59,13 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean isDocInWatchedSpaces() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.SPACE, context)
-            .contains(context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + context.getDoc().getSpace());
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.SPACE,
+                this.context).contains(
+                this.context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + this.context.getDoc().getSpace());
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -71,8 +76,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean isDocumentWatched() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.DOCUMENT, context)
-            .contains(context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + context.getDoc().getFullName());
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.DOCUMENT,
+                this.context).contains(this.context.getDoc().getPrefixedFullName());
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -84,8 +93,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addDocument(String wDoc) throws XWikiException
     {
-        return getWatchListPlugin().getStore()
-            .addWatchedElement(context.getUser(), wDoc, ElementType.DOCUMENT, context);
+        try {
+            return getWatchListPlugin().getStore().addWatchedElement(this.context.getUser(), wDoc,
+                ElementType.DOCUMENT, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -98,8 +111,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addDocumentForUser(String user, String wDoc) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().addWatchedElement(user, wDoc, ElementType.DOCUMENT, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().addWatchedElement(user, wDoc, ElementType.DOCUMENT, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -111,8 +128,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeDocument(String wDoc) throws XWikiException
     {
-        return getWatchListPlugin().getStore().removeWatchedElement(context.getUser(), wDoc, ElementType.DOCUMENT,
-            context);
+        try {
+            return getWatchListPlugin().getStore().removeWatchedElement(this.context.getUser(), wDoc,
+                ElementType.DOCUMENT, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -125,10 +146,13 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeDocumentForUser(String user, String wDoc) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().removeWatchedElement(user, wDoc, ElementType.DOCUMENT, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().removeWatchedElement(user, wDoc, ElementType.DOCUMENT, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
-
 
     /**
      * Is the current space watched by the current user.
@@ -138,8 +162,13 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean isSpaceWatched() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.SPACE, context)
-            .contains(context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + context.getDoc().getSpace());
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.SPACE,
+                this.context).contains(
+                this.context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + this.context.getDoc().getSpace());
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -151,7 +180,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addSpace(String wSpace) throws XWikiException
     {
-        return getWatchListPlugin().getStore().addWatchedElement(context.getUser(), wSpace, ElementType.SPACE, context);
+        try {
+            return getWatchListPlugin().getStore().addWatchedElement(this.context.getUser(), wSpace, ElementType.SPACE,
+                this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -164,8 +198,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addSpaceForUser(String user, String wSpace) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().addWatchedElement(user, wSpace, ElementType.SPACE, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().addWatchedElement(user, wSpace, ElementType.SPACE, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -177,8 +215,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeSpace(String wSpace) throws XWikiException
     {
-        return getWatchListPlugin().getStore().removeWatchedElement(context.getUser(), wSpace, ElementType.SPACE,
-            context);
+        try {
+            return getWatchListPlugin().getStore().removeWatchedElement(this.context.getUser(), wSpace,
+                ElementType.SPACE, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -191,9 +233,13 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeSpaceForUser(String user, String wSpace) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().removeWatchedElement(user, wSpace, ElementType.SPACE, context);
-    }    
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().removeWatchedElement(user, wSpace, ElementType.SPACE, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
+    }
 
     /**
      * Is the current wiki watched by the current user.
@@ -203,8 +249,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean isWikiWatched() throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.WIKI, context)
-            .contains(context.getDatabase());
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.WIKI,
+                this.context).contains(this.context.getDatabase());
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -216,7 +266,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addWiki(String wWiki) throws XWikiException
     {
-        return getWatchListPlugin().getStore().addWatchedElement(context.getUser(), wWiki, ElementType.WIKI, context);
+        try {
+            return getWatchListPlugin().getStore().addWatchedElement(this.context.getUser(), wWiki, ElementType.WIKI,
+                this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -229,8 +284,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addWikiForUser(String user, String wWiki) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().addWatchedElement(user, wWiki, ElementType.WIKI, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().addWatchedElement(user, wWiki, ElementType.WIKI, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -242,8 +301,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeWiki(String wWiki) throws XWikiException
     {
-        return getWatchListPlugin().getStore().removeWatchedElement(context.getUser(), wWiki, ElementType.WIKI,
-            context);
+        try {
+            return getWatchListPlugin().getStore().removeWatchedElement(this.context.getUser(), wWiki,
+                ElementType.WIKI, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -256,10 +319,14 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeWikiForUser(String user, String wWiki) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().removeWatchedElement(user, wWiki, ElementType.WIKI, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().removeWatchedElement(user, wWiki, ElementType.WIKI, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
-    
+
     /**
      * Is the given user watched by the current user.
      * 
@@ -269,8 +336,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean isUserWatched(String user) throws XWikiException
     {
-        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.USER, context)
-            .contains(user);
+        try {
+            return getWatchListPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.USER,
+                this.context).contains(user);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -282,8 +353,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addUser(String user) throws XWikiException
     {
-        return getWatchListPlugin().getStore()
-            .addWatchedElement(context.getUser(), user, ElementType.USER, context);
+        try {
+            return getWatchListPlugin().getStore().addWatchedElement(this.context.getUser(), user, ElementType.USER,
+                this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -296,8 +371,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean addUserForUser(String user, String userToWatch) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().addWatchedElement(user, userToWatch, ElementType.USER, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().addWatchedElement(user, userToWatch, ElementType.USER, this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -309,7 +388,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeUser(String user) throws XWikiException
     {
-        return getWatchListPlugin().getStore().removeWatchedElement(context.getUser(), user, ElementType.USER, context);
+        try {
+            return getWatchListPlugin().getStore().removeWatchedElement(this.context.getUser(), user, ElementType.USER,
+                this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -322,8 +406,13 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public boolean removeUserForUser(String user, String userToRemove) throws XWikiException
     {
-        return context.getWiki().getUser(context).hasAdminRights()
-            && getWatchListPlugin().getStore().removeWatchedElement(user, userToRemove, ElementType.USER, context);
+        try {
+            return this.context.getWiki().getUser(this.context).hasAdminRights()
+                && getWatchListPlugin().getStore().removeWatchedElement(user, userToRemove, ElementType.USER,
+                    this.context);
+        } catch (XWikiException ex) {
+            return false;
+        }
     }
 
     /**
@@ -403,20 +492,20 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
         wEls.addAll(getWatchedSpaces());
         wEls.addAll(getWatchedWikis());
         wEls.addAll(getWatchedUsers());
-        
+
         return wEls;
     }
-    
-    /** 
+
+    /**
      * @param entryNumber number of entries to retrieve
      * @return the watchlist RSS feed for the current user
      * @throws XWikiException if the retrieval of RSS entries fails
      */
     public SyndFeed getFeed(int entryNumber) throws XWikiException
     {
-        return getFeed(context.getUser(), entryNumber);
+        return getFeed(this.context.getUser(), entryNumber);
     }
-    
+
     /**
      * @param user the user to retreive the RSS for
      * @param entryNumber number of entries to retrieve
@@ -425,9 +514,13 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public SyndFeed getFeed(String user, int entryNumber) throws XWikiException
     {
-        return getWatchListPlugin().getFeedManager().getFeed(user, entryNumber, context);        
+        try {
+            return getWatchListPlugin().getFeedManager().getFeed(user, entryNumber, this.context);
+        } catch (XWikiException ex) {
+            return null;
+        }
     }
-    
+
     /**
      * Get the list of available notifiers (list of document full names, example: "Scheduler.WatchListHourlyNotifier").
      *
@@ -435,7 +528,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     public List<Document> getNotifiers()
     {
-        return getWatchListPlugin().getJobManager().getJobs(context);
+        return getWatchListPlugin().getJobManager().getJobs(this.context);
     }
 
     /**
@@ -445,6 +538,6 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      */
     private WatchListPlugin getWatchListPlugin()
     {
-        return (WatchListPlugin) getProtectedPlugin();
+        return getProtectedPlugin();
     }
 }

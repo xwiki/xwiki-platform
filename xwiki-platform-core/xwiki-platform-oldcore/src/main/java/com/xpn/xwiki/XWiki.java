@@ -2209,7 +2209,7 @@ public class XWiki implements EventListener
                 try {
                     result = object.getStringValue(prefname);
                 } catch (Exception e) {
-                    LOGGER.warn("Exception while getting wiki preference [" + prefname + "]", e);
+                    LOGGER.warn("Exception while getting wiki preference [{}]", prefname, e);
                 }
             }
             // If empty we take it from the default pref object
@@ -2224,7 +2224,7 @@ public class XWiki implements EventListener
                 return result;
             }
         } catch (Exception e) {
-            LOGGER.debug("Exception while getting wiki preference [" + prefname + "]", e);
+            LOGGER.debug("Exception while getting wiki preference [{}]", prefname, e);
         }
         return Param(fallback_param, default_value);
     }
@@ -2276,8 +2276,7 @@ public class XWiki implements EventListener
     public String getUserPreference(String prefname, XWikiContext context)
     {
         try {
-            String user = context.getUser();
-            XWikiDocument userdoc = getDocument(user, context);
+            XWikiDocument userdoc = getDocument(context.getUserReference(), context);
             if (userdoc != null) {
                 String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
                 if ((!result.equals("")) && (!result.equals("---"))) {

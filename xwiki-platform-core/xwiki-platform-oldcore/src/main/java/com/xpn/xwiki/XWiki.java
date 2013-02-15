@@ -1953,7 +1953,8 @@ public class XWiki implements EventListener
     {
         XWikiURLFactory urlf = context.getURLFactory();
         try {
-            XWikiDocument doc = getDocument(skin, context);
+            DocumentReference fileNameReference = this.currentMixedDocumentReferenceResolver.resolve(filename);
+            XWikiDocument doc = getDocument(fileNameReference, context);
             if (!doc.isNew()) {
                 // Look for an object property
                 BaseObject object =
@@ -2161,9 +2162,10 @@ public class XWiki implements EventListener
      */
     public String getBaseSkin(String skin, XWikiContext context)
     {
-        if (context.getWiki().exists(skin, context)) {
+        DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+        if (context.getWiki().exists(skinReference, context)) {
             try {
-                return getDocument(skin, context).getStringValue("XWiki.XWikiSkins", "baseskin");
+                return getDocument(skinReference, context).getStringValue("XWiki.XWikiSkins", "baseskin");
             } catch (XWikiException e) {
                 // Do nothing and let return the empty string.
             }

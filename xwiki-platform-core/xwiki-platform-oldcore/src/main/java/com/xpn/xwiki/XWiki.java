@@ -107,6 +107,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -2251,7 +2252,7 @@ public class XWiki implements EventListener
         // doc is not set).
         if (space != null) {
             try {
-                XWikiDocument doc = getDocument(space + ".WebPreferences", context);
+                XWikiDocument doc = getDocument(new LocalDocumentReference(space, "WebPreferences"), context);
 
                 // First we try to get a translated preference object
                 DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);

@@ -1791,7 +1791,8 @@ public class XWiki implements EventListener
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            XWikiDocument doc = getDocument(skin, context);
+            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+            XWikiDocument doc = getDocument(skinReference, context);
             if (!doc.isNew()) {
                 // Try parsing the object property
                 BaseObject object =
@@ -5071,7 +5072,8 @@ public class XWiki implements EventListener
         }
         XWikiDocument userdoc = null;
         try {
-            userdoc = getDocument(user, context);
+            DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
+            userdoc = getDocument(userReference, context);
             if (userdoc == null) {
                 return XMLUtils.escape(user);
             }

@@ -20,13 +20,12 @@
 package com.xpn.xwiki.plugin.watchlist;
 
 /**
- * Possibles way of automatically watch documents.
+ * Possible ways of automatically watching documents.
  * 
  * @version $Id$
  */
 public enum AutomaticWatchMode
 {
-
     /**
      * Disabled.
      */

@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -131,8 +130,7 @@ public class AutomaticWatchModeListener implements EventListener
                     this.store.addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
                 }
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to watch document [" + currentDoc.getPrefixedFullName() + "] for user [" + user
-                    + "]", e);
+                LOGGER.warn("Failed to watch document [{}] for user [{}]", currentDoc.getPrefixedFullName(), user, e);
             }
         }
     }
@@ -147,8 +145,9 @@ public class AutomaticWatchModeListener implements EventListener
 
         ObservationContext observationContext = Utils.getComponent(ObservationContext.class);
 
-        // Does not auto-watch imported document, that's not the goal of this feature
-        if (!(event instanceof DocumentDeletedEvent) && !observationContext.isIn(SKIPPED_EVENTS)) {
+        // Does not auto-watch updated or created documents when they are in the context of a XAR import or a Wiki
+        // creation.
+        if (!observationContext.isIn(SKIPPED_EVENTS)) {
             documentModifiedHandler(event, currentDoc, context);
         }
     }

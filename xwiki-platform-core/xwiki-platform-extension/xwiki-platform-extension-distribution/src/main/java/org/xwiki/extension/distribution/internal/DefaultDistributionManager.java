@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.inject.Inject;
 
 import org.apache.maven.model.Model;
@@ -91,7 +94,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
     private DistributionState distributionState;
 
-    private DistributionJob distributionJob;
+    private DistributionJob farmDistributionJob;
+
+    private Map<String, DistributionJob> wikiDistributionJobs = new ConcurrentHashMap<String, DistributionJob>();
 
     @Override
     public void initialize() throws InitializationException
@@ -139,10 +144,10 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public DistributionJob startJob()
+    public DistributionJob startFarmJob()
     {
         try {
-            this.distributionJob = this.componentManager.getInstance(Job.class, "distribution");
+            this.farmDistributionJob = this.componentManager.getInstance(Job.class, "distribution");
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to create distribution job", e);
         }
@@ -164,7 +169,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                     throw new RuntimeException("Failed to initialize IRC Bot's execution context", e);
                 }
 
-                distributionJob.start(request);
+                farmDistributionJob.start(request);
             }
         });
 
@@ -172,11 +177,18 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         distributionJobThread.setName("Distribution initialization");
         distributionJobThread.start();
 
-        return this.distributionJob;
+        return this.farmDistributionJob;
     }
 
     @Override
-    public DistributionState getDistributionState()
+    public DistributionJob startWikiJob(String wiki)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public DistributionState getFarmDistributionState()
     {
         return this.distributionState;
     }
@@ -202,6 +214,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public DistributionJob getJob()
     {
-        return this.distributionJob;
+        return this.farmDistributionJob;
     }
 }

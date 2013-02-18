@@ -81,7 +81,7 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionState getState()
     {
-        return this.distributionManager.getDistributionState();
+        return this.distributionManager.getFarmDistributionState();
     }
 
     /**

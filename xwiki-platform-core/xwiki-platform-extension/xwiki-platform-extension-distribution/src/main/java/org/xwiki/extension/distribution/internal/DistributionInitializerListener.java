@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.DistributionRequest;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
@@ -46,7 +46,8 @@ public class DistributionInitializerListener implements EventListener
     /**
      * The list of events to listen to.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent());
+    private static final List<Event> EVENTS = Arrays
+        .<Event> asList(new ApplicationStartedEvent(), new WikiReadyEvent());
 
     /**
      * The component used to get information about the current distribution.
@@ -75,15 +76,15 @@ public class DistributionInitializerListener implements EventListener
     @Override
     public void onEvent(Event arg0, Object arg1, Object arg2)
     {
-        DistributionState distributionState = this.distributionManager.getDistributionState();
+        DistributionState distributionState = this.distributionManager.getFarmDistributionState();
 
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
-            DistributionJobStatus<DistributionRequest> status = this.distributionManager.getPreviousJobStatus();
+            DistributionJobStatus< ? > status = this.distributionManager.getPreviousJobStatus();
 
             for (DistributionStepStatus step : status.getSteps()) {
                 if (step.getUpdateState() == null) {
-                    this.distributionManager.startJob();
+                    this.distributionManager.startFarmJob();
                     break;
                 }
             }
@@ -95,7 +96,7 @@ public class DistributionInitializerListener implements EventListener
             }
         } else {
             this.logger.info("Distribution state: {}", distributionState);
-            this.distributionManager.startJob();
+            this.distributionManager.startFarmJob();
         }
     }
 }

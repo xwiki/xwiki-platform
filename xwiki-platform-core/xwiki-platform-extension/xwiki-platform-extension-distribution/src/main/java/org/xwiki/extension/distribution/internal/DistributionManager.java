@@ -44,13 +44,16 @@ public interface DistributionManager
         NONE,
 
         /** Probably something to do. */
-        NEW, UPGRADE, DOWNGRADE, DIFFERENT
+        NEW,
+        UPGRADE,
+        DOWNGRADE,
+        DIFFERENT
     }
 
     /**
      * @return the current distribution state
      */
-    DistributionState getDistributionState();
+    DistributionState getFarmDistributionState();
 
     /**
      * @return the extension that defines the current distribution
@@ -65,17 +68,25 @@ public interface DistributionManager
     /**
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
      */
-    DistributionJobStatus getPreviousJobStatus();
+    DistributionJobStatus< ? > getPreviousJobStatus();
 
     /**
      * Starts the distribution job.
      * 
      * @return the distribution job object that can be used to get information like the job status
      */
-    DistributionJob startJob();
+    DistributionJob startFarmJob();
+
+    /**
+     * Starts the distribution job.
+     * 
+     * @param wiki the wiki associated to the distribution wyzard
+     * @return the distribution job object that can be used to get information like the job status
+     */
+    DistributionJob startWikiJob(String wiki);
 
     /**
      * @return the distribution job object that can be used to get information like the job status
      */
-    DistributionJob getJob();
+    DistributionJob< ? , ? , ? > getJob();
 }

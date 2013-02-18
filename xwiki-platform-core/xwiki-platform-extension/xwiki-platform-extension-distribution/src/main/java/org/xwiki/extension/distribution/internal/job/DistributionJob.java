@@ -121,7 +121,7 @@ public class DistributionJob<R extends DistributionRequest, S extends AbstractJo
         DS status = createNewDistributionStatus(request, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
-            DistributionJobStatus<R> previousStatus = this.distributionManager.getPreviousJobStatus();
+            DistributionJobStatus< ? > previousStatus = this.distributionManager.getPreviousJobStatus();
 
             if (previousStatus != null
                 && previousStatus.getDistributionExtension() != null

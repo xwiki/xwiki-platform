@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.macro.include;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -89,9 +88,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     @Named("configured")
     private DocumentDisplayer documentDisplayer;
 
-    /** A stack of all currently executing include macros for catching recurcive inclusion. */
-    private ThreadLocal<Stack<Object>> inclusionsBeingExecuted = new ThreadLocal<Stack<Object>>();
-
     /**
      * Default constructor.
      */
@@ -133,39 +129,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
 
-        Stack<Object> references = this.inclusionsBeingExecuted.get();
-        if (references == null) {
-            references = new Stack<Object>();
-            this.inclusionsBeingExecuted.set(references);
-        }
+        checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
 
-        if (references.contains(includedReference)) {
-            throw new MacroExecutionException(
-                "Found recursive inclusion of document [" + includedReference + "]");
-        }
-
-        references.push(includedReference);
-        try {
-            return executeRecursiveChecked(parameters, content, context, includedReference);
-        } finally {
-            references.pop();
-        }
-    }
-
-    /**
-     * Do the actual execution of the include macro assuming that recursive includes are checked.
-     *
-     * @param parameters the macro parameters passed through from execute().
-     * @param content the content passed through from execute().
-     * @param context the transformation context passed through from execute().
-     * @param includedReference the reference to the document which is included.
-     */
-    public List<Block> executeRecursiveChecked(IncludeMacroParameters parameters,
-                                               String content,
-                                               MacroTransformationContext context,
-                                               DocumentReference includedReference)
-        throws MacroExecutionException
-    {
         if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
             throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUser()
                 + "] doesn't have view rights on document ["
@@ -214,6 +179,54 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
 
         return Arrays.<Block> asList(metadata);
+    }
+
+    /**
+     * Protect form recursive inclusion.
+     * 
+     * @param currrentBlock the child block to check
+     * @param documentReference the reference of the document being included
+     * @throws MacroExecutionException recursive inclusion has been found
+     */
+    private void checkRecursiveInclusion(Block currrentBlock, DocumentReference documentReference)
+        throws MacroExecutionException
+    {
+        Block parentBlock = currrentBlock.getParent();
+
+        if (parentBlock != null) {
+            if (parentBlock instanceof MacroMarkerBlock) {
+                MacroMarkerBlock parentMacro = (MacroMarkerBlock) parentBlock;
+
+                if (isRecursive(parentMacro, documentReference)) {
+                    throw new MacroExecutionException("Found recursive inclusion of document [" + documentReference
+                        + "]");
+                }
+            }
+
+            checkRecursiveInclusion(parentBlock, documentReference);
+        }
+    }
+
+    /**
+     * Indicate if the provided macro is an include macro wit the provided included document.
+     * 
+     * @param parentMacro the macro block to check
+     * @param documentReference the document reference to compare to
+     * @return true if the documents are the same
+     */
+    // TODO: Add support for any kind of macro including content linked to a reference
+    private boolean isRecursive(MacroMarkerBlock parentMacro, DocumentReference documentReference)
+    {
+        if (parentMacro.getId().equals("include")) {
+            String reference = parentMacro.getParameter("reference");
+            if (reference == null) {
+                reference = parentMacro.getParameter("document");
+            }
+
+            return documentReference.equals(this.macroDocumentReferenceResolver.resolve(reference, parentMacro));
+        }
+
+        return false;
     }
 
     private DocumentReference resolve(MacroBlock block, IncludeMacroParameters parameters)

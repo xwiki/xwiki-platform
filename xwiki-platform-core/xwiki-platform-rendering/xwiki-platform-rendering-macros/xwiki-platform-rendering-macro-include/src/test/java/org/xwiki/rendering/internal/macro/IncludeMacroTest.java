@@ -28,9 +28,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.jmock.api.Invocation;
 import org.jmock.Expectations;
-import org.jmock.lib.action.CustomAction;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
@@ -200,48 +198,37 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
-
-    private static class ExpectedRecursiveInclusionException extends RuntimeException { }
     
-    @Test(expected=ExpectedRecursiveInclusionException.class)
+    @Test
     public void testIncludeMacroWithRecursiveInclude() throws Exception
     {
-        final IncludeMacro includeMacro = this.includeMacro;
-        includeMacro.setDocumentAccessBridge(mockSetup.bridge);
-
-        final MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
-        // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
-        // happened if an Include macro is included in another Include macro.
-        new MacroMarkerBlock("include", Collections.singletonMap("reference", "space.page"),
-            Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()), false);
-
-        final IncludeMacroParameters parameters = new IncludeMacroParameters();
-        parameters.setReference("wiki:space.page");
-        parameters.setContext(Context.CURRENT);
-
         getMockery().checking(new Expectations() {{
             allowing(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
             allowing(mockSetup.documentReferenceResolver).resolve("space.page");
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
-
-            allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
-                will(new CustomAction("recursively call the include macro again") {
-                    public Object invoke(Invocation invocation) throws Throwable {
-                        try {
-                            includeMacro.execute(parameters, null, macroContext);
-                        } catch (Exception expected) {
-                            if (expected.getMessage().contains("Found recursive inclusion")) {
-                                throw new ExpectedRecursiveInclusionException();
-                            }
-                        }
-                        return true;
-                    }
-                });
         }});
 
-        includeMacro.execute(parameters, null, macroContext);
-        Assert.fail("The include macro hasn't checked the recursive inclusion");
+        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
+
+        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
+        // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
+        // happened if an Include macro is included in another Include macro.
+        new MacroMarkerBlock("include", Collections.singletonMap("reference", "space.page"),
+            Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()), false);
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("wiki:space.page");
+        parameters.setContext(Context.CURRENT);
+        
+        try {
+            this.includeMacro.execute(parameters, null, macroContext);
+            Assert.fail("The include macro hasn't checked the recursive inclusion");
+        } catch (MacroExecutionException expected) {
+            if (!expected.getMessage().startsWith("Found recursive inclusion")) {
+                throw expected;
+            }
+        }
     }
 
     @Test

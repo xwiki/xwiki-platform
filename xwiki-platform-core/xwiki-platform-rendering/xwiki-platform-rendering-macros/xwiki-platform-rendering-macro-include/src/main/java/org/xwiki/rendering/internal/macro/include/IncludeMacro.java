@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.include;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -89,6 +90,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private DocumentDisplayer documentDisplayer;
 
     /**
+     * A stack of all currently executing include macros with context=new for catching recursive inclusion.
+     */
+    private ThreadLocal<Stack<Object>> inclusionsBeingExecuted = new ThreadLocal<Stack<Object>>();
+
+    /**
      * Default constructor.
      */
     public IncludeMacro()
@@ -115,6 +121,16 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     public void setDocumentAccessBridge(DocumentAccessBridge documentAccessBridge)
     {
         this.documentAccessBridge = documentAccessBridge;
+    }
+
+    /**
+     * Allows overriding the Document Displayer used (useful for unit tests).
+     * 
+     * @param documentDisplayer the new Document Displayer to use
+     */
+    public void setDocumentDisplayer(DocumentDisplayer documentDisplayer)
+    {
+        this.documentDisplayer = documentDisplayer;
     }
 
     @Override
@@ -162,11 +178,25 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
+
+        Stack<Object> references = this.inclusionsBeingExecuted.get();
+        if (parametersContext == Context.NEW) {
+            if (references == null) {
+                references = new Stack<Object>();
+                this.inclusionsBeingExecuted.set(references);
+            }
+            references.push(includedReference);
+        }
+
         XDOM result;
         try {
             result = this.documentDisplayer.display(documentBridge, displayParameters);
         } catch (Exception e) {
             throw new MacroExecutionException(e.getMessage(), e);
+        } finally {
+            if (parametersContext == Context.NEW) {
+                references.pop();
+            }
         }
 
         // Step 4: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
@@ -191,6 +221,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private void checkRecursiveInclusion(Block currrentBlock, DocumentReference documentReference)
         throws MacroExecutionException
     {
+        // Check for parent context=new macros
+        Stack<Object> references = this.inclusionsBeingExecuted.get();
+        if (references != null && references.contains(documentReference)) {
+            throw new MacroExecutionException("Found recursive inclusion of document [" + documentReference + "]");
+        }
+
+        // Check for parent context=current macros
         Block parentBlock = currrentBlock.getParent();
 
         if (parentBlock != null) {

@@ -119,7 +119,37 @@ ${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}colu
 {{/velocity}}##
 }}}
 #end
+
+#**
+ * We keep this macro only to preserve backwards compatibility with applications created on versions older than 4.5M1.
+ * New applications don't use this document as a custom live table results page any more. A dedicated live table results
+ * page is now generated for each application.
+ *
+ * @deprecated since 4.5M1
+ *#
+#macro (outputLiveTableResults)
+  #set ($output = "#gridresult($!request.classname $request.collist.split(','))")
+  ## We have to escape the translation key because it appears as JSON value in the output.
+  #set ($escapedEmptyValueTranslationKey = $escapetool.javascript("${request.transprefix}emptyvalue"))
+  $output.replace($escapedEmptyValueTranslationKey, '-')
+#end
 {{/velocity}}{{velocity}}
-#maybeGenerateLiveTable()
+## We keep the following code only to preserve backwards compatibility with old applications (&lt;4.5M1) that use this
+## document as a live table results page. For these applications we need to distinguish between a request for generating
+## a live table and a request for live table data.
+#set ($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
+## We do the include separately because the wiki syntax is evaluated after the Velocity code.
+#if ($isLiveTableResultsRequest)
+  {{include document="XWiki.LiveTableResultsMacros" /}}
+#end
+{{/velocity}}{{velocity wiki="false"}}
+## Old applications need custom live table results just because they don't have a document translation bundle generated.
+#if ($isLiveTableResultsRequest)
+  #outputLiveTableResults()
+#end
+{{/velocity}}{{velocity}}
+#if (!$isLiveTableResultsRequest)
+  #maybeGenerateLiveTable()
+#end
 {{/velocity}}</content>
 </xwikidoc>

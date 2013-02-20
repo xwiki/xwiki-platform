@@ -31,9 +31,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
+import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * @version $Id$
@@ -74,25 +77,34 @@ public class DistributionInitializerListener implements EventListener
     }
 
     @Override
-    public void onEvent(Event arg0, Object arg1, Object arg2)
+    public void onEvent(Event event, Object arg1, Object arg2)
     {
-        DistributionState distributionState = this.distributionManager.getFarmDistributionState();
+        DistributionState distributionState = this.distributionManager.getDistributionState();
 
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
-            DistributionJobStatus< ? > status = this.distributionManager.getPreviousJobStatus();
+            if (event instanceof ApplicationStartedEvent) {
+                DistributionJobStatus< ? > status = this.distributionManager.getPreviousFarmJobStatus();
 
-            for (DistributionStepStatus step : status.getSteps()) {
-                if (step.getUpdateState() == null) {
-                    this.distributionManager.startFarmJob();
-                    break;
+                for (DistributionStepStatus step : status.getSteps()) {
+                    if (step.getUpdateState() == null) {
+                        this.distributionManager.startFarmJob();
+                        break;
+                    }
                 }
-            }
-
-            if (this.distributionManager.getJob() != null) {
-                this.logger.info("Distribution up to date");
             } else {
-                this.logger.info("Distribution partially up to date");
+                String wiki = ((WikiReadyEvent) event).getWikiId();
+
+                if (!((XWikiContext) arg2).isMainWiki()) {
+                    WikiDistributionJobStatus status = this.distributionManager.getPreviousWikiJobStatus(wiki);
+
+                    for (DistributionStepStatus step : status.getSteps()) {
+                        if (step.getUpdateState() == null) {
+                            this.distributionManager.startWikiJob(wiki);
+                            break;
+                        }
+                    }
+                }
             }
         } else {
             this.logger.info("Distribution state: {}", distributionState);

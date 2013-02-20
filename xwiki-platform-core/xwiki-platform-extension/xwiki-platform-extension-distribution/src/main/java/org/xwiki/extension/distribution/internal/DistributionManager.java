@@ -22,8 +22,10 @@ package org.xwiki.extension.distribution.internal;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.distribution.internal.job.DistributionJob;
-import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
+import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
+import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 
 /**
  * @version $Id$
@@ -53,7 +55,7 @@ public interface DistributionManager
     /**
      * @return the current distribution state
      */
-    DistributionState getFarmDistributionState();
+    DistributionState getDistributionState();
 
     /**
      * @return the extension that defines the current distribution
@@ -61,32 +63,56 @@ public interface DistributionManager
     CoreExtension getDistributionExtension();
 
     /**
-     * @return the recommended user interface for {@link #getDistributionExtension()}
+     * @return the recommended user interface for main wikis
+     * @since 5.0M1
      */
-    ExtensionId getUIExtensionId();
+    ExtensionId getMainUIExtensionId();
+
+    /**
+     * @return the recommended user interface for sub wikis
+     * @since 5.0M1
+     */
+    ExtensionId getWikiUIExtensionId();
 
     /**
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @since 5.0M1
      */
-    DistributionJobStatus< ? > getPreviousJobStatus();
+    FarmDistributionJobStatus getPreviousFarmJobStatus();
+
+    /**
+     * @param wiki the wiki form which to get the distribution status
+     * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @since 5.0M1
+     */
+    WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki);
 
     /**
      * Starts the distribution job.
      * 
      * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
      */
-    DistributionJob startFarmJob();
+    FarmDistributionJob startFarmJob();
 
     /**
      * Starts the distribution job.
      * 
      * @param wiki the wiki associated to the distribution wyzard
      * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
      */
-    DistributionJob startWikiJob(String wiki);
+    WikiDistributionJob startWikiJob(String wiki);
 
     /**
      * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
      */
-    DistributionJob< ? , ? , ? > getJob();
+    FarmDistributionJob getFarmJob();
+
+    /**
+     * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
+     */
+    WikiDistributionJob getWikiJob(String wiki);
 }

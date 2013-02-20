@@ -19,40 +19,27 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.job.internal.AbstractJob;
-import org.xwiki.job.internal.AbstractJobStatus;
 
 /**
  * @version $Id$
- * @since 4.2M3
+ * @since 5.0M1
  */
-@Component
-@Named("distribution")
-public class DistributionJob<R extends DistributionRequest, S extends AbstractJobStatus<R>, DS extends DistributionJobStatus<R>>
+public abstract class AbstractDistributionJob<R extends DistributionRequest, S extends DistributionJobStatus<R>>
     extends AbstractJob<R, S>
 {
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
-    private DistributionManager distributionManager;
-
-    @Inject
-    private InstalledExtensionRepository installedRepository;
+    protected DistributionManager distributionManager;
 
     @Override
     public String getType()
@@ -60,53 +47,14 @@ public class DistributionJob<R extends DistributionRequest, S extends AbstractJo
         return "distribution";
     }
 
+    protected abstract S createNewDistributionStatus(R request, List<DistributionStepStatus> steps);
+
+    protected abstract List<DistributionStepStatus> createSteps();
+
     @Override
     protected S createNewStatus(R request)
     {
-        // TODO: make steps components automatically discovered so that any module can add custom steps
-
-        List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(3);
-
-        ExtensionId extensionUI = this.distributionManager.getUIExtensionId();
-
-        // Step 1: Install/upgrade main wiki UI
-
-        DistributionStepStatus step1 = new DistributionStepStatus("extension.mainui");
-        steps.add(step1);
-        // Only if the UI is not already installed
-        step1.setUpdateState(UpdateState.COMPLETED);
-        if (extensionUI != null) {
-            // FIXME: using "xwiki" directly is cheating but there is no way to get the official main wiki at this
-            // level yet. Using "xwiki" since in pratice there is no way to change the main wiki
-            InstalledExtension installedExtension =
-                this.installedRepository.getInstalledExtension(extensionUI.getId(), "wiki:xwiki");
-            if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-                step1.setUpdateState(null);
-            }
-        }
-
-        // Step 2: Upgrade outdated extensions
-
-        DistributionStepStatus step2 = new DistributionStepStatus("extension.outdatedextensions");
-        steps.add(step2);
-        step2.setUpdateState(UpdateState.COMPLETED);
-        // Upgrade outdated extensions only when there is outdated extensions
-        for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
-            Collection<String> namespaces = extension.getNamespaces();
-            if (namespaces == null) {
-                if (!extension.isValid(null)) {
-                    step2.setUpdateState(null);
-                    break;
-                }
-            } else {
-                for (String namespace : namespaces) {
-                    if (!extension.isValid(namespace)) {
-                        step2.setUpdateState(null);
-                        break;
-                    }
-                }
-            }
-        }
+        List<DistributionStepStatus> steps = createSteps();
 
         // Step 0: A welcome message. Only if there is actually something to do
         for (DistributionStepStatus step : steps) {
@@ -118,10 +66,10 @@ public class DistributionJob<R extends DistributionRequest, S extends AbstractJo
 
         // Create status
 
-        DS status = createNewDistributionStatus(request, steps);
+        S status = createNewDistributionStatus(request, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
-            DistributionJobStatus< ? > previousStatus = this.distributionManager.getPreviousJobStatus();
+            DistributionJobStatus< ? > previousStatus = this.distributionManager.getPreviousFarmJobStatus();
 
             if (previousStatus != null
                 && previousStatus.getDistributionExtension() != null
@@ -132,20 +80,15 @@ public class DistributionJob<R extends DistributionRequest, S extends AbstractJo
             }
 
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
-            status.setDistributionExtensionUi(extensionUI);
+            status.setDistributionExtensionUi(this.distributionManager.getMainUIExtensionId());
         }
 
-        return (S) status;
+        return status;
     }
 
-    protected DS getDistributionJobStatus()
+    protected S getDistributionJobStatus()
     {
-        return (DS) getStatus();
-    }
-
-    protected DS createNewDistributionStatus(R request, List<DistributionStepStatus> steps)
-    {
-        return (DS) new DistributionJobStatus<R>(request, this.observationManager, this.loggerManager, steps);
+        return getStatus();
     }
 
     @Override

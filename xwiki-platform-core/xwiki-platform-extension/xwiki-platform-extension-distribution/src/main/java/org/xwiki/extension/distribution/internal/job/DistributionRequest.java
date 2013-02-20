@@ -19,12 +19,13 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
-import org.xwiki.job.DefaultRequest;
+import org.xwiki.job.AbstractRequest;
 
 /**
  * @version $Id$
  * @since 4.2M3
  */
-public class DistributionRequest extends DefaultRequest
+public class DistributionRequest extends AbstractRequest
 {
+    private static final long serialVersionUID = 1L;
 }

@@ -21,16 +21,19 @@ package org.xwiki.extension.distribution.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
-import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.job.Job;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Provide helpers to manage running distribution.
@@ -63,6 +66,9 @@ public class DistributionScriptService implements ScriptService
     @Inject
     private DistributionManager distributionManager;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     /**
      * @param <T> the type of the object
      * @param unsafe the unsafe object
@@ -81,7 +87,7 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionState getState()
     {
-        return this.distributionManager.getFarmDistributionState();
+        return this.distributionManager.getDistributionState();
     }
 
     /**
@@ -97,24 +103,31 @@ public class DistributionScriptService implements ScriptService
      */
     public ExtensionId getUIExtensionId()
     {
-        return this.distributionManager.getUIExtensionId();
+        return this.distributionManager.getMainUIExtensionId();
     }
 
     /**
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
      */
-    public DistributionJobStatus getPreviousJobStatus()
+    public DistributionJobStatus< ? > getPreviousJobStatus()
     {
-        return this.distributionManager.getPreviousJobStatus();
+        return this.distributionManager.getPreviousFarmJobStatus();
     }
 
     /**
      * @return the status of the current distribution job
      */
-    public DistributionJobStatus getJobStatus()
+    public DistributionJobStatus< ? > getJobStatus()
     {
-        DistributionJob job = this.distributionManager.getJob();
+        XWikiContext xcontext = xcontextProvider.get();
 
-        return job != null ? (DistributionJobStatus) job.getStatus() : null;
+        Job job;
+        if (xcontext.isMainWiki()) {
+            job = this.distributionManager.getFarmJob();
+        } else {
+            job = this.distributionManager.getWikiJob(xcontext.getDatabase());
+        }
+
+        return job != null ? (DistributionJobStatus< ? >) job.getStatus() : null;
     }
 }

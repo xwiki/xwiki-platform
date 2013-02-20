@@ -25,15 +25,20 @@ package org.xwiki.extension.distribution.internal.job;
  */
 public class WikiDistributionRequest extends DistributionRequest
 {
-    private String wiki;
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * @see #getExtensions()
+     */
+    public static final String PROPERTY_WIKI = "wiki";
 
     public void setWiki(String wiki)
     {
-        this.wiki = wiki;
+        setProperty(PROPERTY_WIKI, wiki);
     }
 
     public String getWiki()
     {
-        return this.wiki;
+        return getProperty(PROPERTY_WIKI);
     }
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Release</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1342185615000</creationDate>
+  <date>1360753036000</date>
+  <contentUpdateDate>1360753036000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Releases</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
+#if ("$!request.version" != "")
+  #set ($shortVersion = $stringtool.replaceChars($request.version, ".-", ""))
+  #set ($shortVersion = $stringtool.upperCase($shortVersion))
+  #set ($shortVersion = $shortVersion.replace('MILESTONE', 'M'))
+  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "inline", "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
+#end
+{{/velocity}}
+
+= Create Release =
+
+{{html}}
+&lt;form action="" id="newrelease"&gt;
+  &lt;input type="hidden" name="parent" value="Release.WebHome" /&gt;
+  &lt;input type="hidden" name="template" value="ReleaseCode.ReleaseTemplate" /&gt;
+  &lt;input type="hidden" name="sheet" value="1" /&gt;
+  &lt;label for="versionid"&gt;Version:&lt;/label&gt;
+  &lt;input id="versionid" class="withTip" type="text" name="version" value="" size="30"/&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" value="Create this release" /&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+
+= Existing Releases =
+
+{{velocity}}
+#set($columns = ["version", "releaseManager", "releaseDate", "releaseNotes"])
+#set($columnsProperties = {
+    "version" : { "type" : "text" , "link" : "view"},
+    "releaseManager" : { "type" : "text" },
+    "releaseDate" : { "type" : "text" }
+})
+#set($options = { 
+   "className":"ReleaseCode.ReleaseClass",
+   "selectedColumn" : "releaseDate",
+   "defaultOrder" : "desc",
+   "rowCount": 15,
+   "translationPrefix":"release.livetable."
+})
+#livetable("releases" $columns $columnsProperties $options)
+{{/velocity}}</content>
+</xwikidoc>

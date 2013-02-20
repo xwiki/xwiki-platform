@@ -1367,6 +1367,6 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     protected boolean isInSchemaMode()
     {
-        return getConfiguration().getProperty("xwiki.virtual_mode").equals("schema");
+        return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
     }
 }

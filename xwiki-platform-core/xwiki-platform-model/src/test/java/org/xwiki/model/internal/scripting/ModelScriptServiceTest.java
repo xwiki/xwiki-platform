@@ -92,7 +92,7 @@ public class ModelScriptServiceTest
         {
             {
                 allowing(ModelScriptServiceTest.this.mockComponentManager).getInstance(
-                    DocumentReferenceResolver.TYPE_REFERENCE, "currentmixed");
+                    DocumentReferenceResolver.TYPE_REFERENCE, "current");
                 will(returnValue(ModelScriptServiceTest.this.mockResolver));
 
                 allowing(ModelScriptServiceTest.this.mockResolver).resolve(

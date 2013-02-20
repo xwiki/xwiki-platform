@@ -54,7 +54,12 @@ public class ModelScriptService implements ScriptService
     /**
      * The default hint used when resolving references.
      */
-    private static final String DEFAULT_RESOLVER_HINT = "currentmixed";
+    private static final String DEFAULT_RESOLVER_HINT = "current";
+
+    /**
+     * The default hint used when serializing references.
+     */
+    private static final String DEFAULT_SERIALIZER_HINT = "compact";
 
     /**
      * The object used to log messages.
@@ -245,7 +250,7 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
-     * @param stringRepresentation an object property reference specified as {@link String} (using the 
+     * @param stringRepresentation an object property reference specified as {@link String} (using the
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
      *            property reference relative to another entity reference
@@ -284,19 +289,19 @@ public class ModelScriptService implements ScriptService
      * @param reference the entity reference to transform into a String representation
      * @return the string representation of the passed entity reference (using the "compact" serializer)
      * @param parameters the optional extra parameters to pass to the Serializer; they are passed directly to
-     *        {@link EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)}
+     *            {@link EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)}
      * @since 2.3M2
      */
     public String serialize(EntityReference reference, Object... parameters)
     {
-        return serialize(reference, "compact", parameters);
+        return serialize(reference, DEFAULT_SERIALIZER_HINT, parameters);
     }
 
     /**
      * @param reference the entity reference to transform into a String representation
      * @param hint the hint of the Serializer to use (valid hints are for example "default", "compact", "local")
      * @param parameters the optional extra parameters to pass to the Serializer; they are passed directly to
-     *        {@link EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)}
+     *            {@link EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...)}
      * @return the string representation of the passed entity reference
      */
     public String serialize(EntityReference reference, String hint, Object... parameters)
@@ -315,25 +320,25 @@ public class ModelScriptService implements ScriptService
     /**
      * Get the current value for a specific entity type, like the current space or wiki name. This doesn't return a
      * proper entity reference, but just the string value that should be used for that type of entity.
-     *
+     * 
      * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
-     *        entity, like {@code 'SPACE'}
+     *            entity, like {@code 'SPACE'}
      * @return the current value for the requested entity type
      * @since 4.3M1
      */
     public String getEntityReferenceValue(EntityType type)
     {
-        return getEntityReferenceValue(type, "current");
+        return getEntityReferenceValue(type, DEFAULT_RESOLVER_HINT);
     }
 
     /**
      * Get the value configured for a specific entity type, like the space name or wiki name. This doesn't return a
      * proper entity reference, but just the string value that should be used for that type of entity.
-     *
+     * 
      * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
-     *        entity, like {@code 'SPACE'}
+     *            entity, like {@code 'SPACE'}
      * @param hint the hint of the value provider to use (valid hints are for example "default", "current" and
-     *        "currentmixed")
+     *            "currentmixed")
      * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
      *         for the default space homepage
      * @since 4.3M1

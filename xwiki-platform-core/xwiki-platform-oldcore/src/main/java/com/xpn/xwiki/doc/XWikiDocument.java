@@ -7695,7 +7695,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @return the XDOM corresponding to the document's string content.
+     * NOTE: This method caches the XDOM and returns a clone that can be safely modified.
+     * 
+     * @return the XDOM corresponding to the document's string content
      */
     @Override
     public XDOM getXDOM()

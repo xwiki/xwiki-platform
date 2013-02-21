@@ -25,7 +25,8 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.extension.distribution.internal.DistributionManager;
-import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.internal.AbstractJob;
 
 /**
@@ -47,19 +48,19 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         return "distribution";
     }
 
-    protected abstract S createNewDistributionStatus(R request, List<DistributionStepStatus> steps);
+    protected abstract S createNewDistributionStatus(R request, List<DistributionStep> steps);
 
-    protected abstract List<DistributionStepStatus> createSteps();
+    protected abstract List<DistributionStep> createSteps();
 
     @Override
     protected S createNewStatus(R request)
     {
-        List<DistributionStepStatus> steps = createSteps();
+        List<DistributionStep> steps = createSteps();
 
         // Step 0: A welcome message. Only if there is actually something to do
-        for (DistributionStepStatus step : steps) {
-            if (step.getUpdateState() == null) {
-                steps.add(0, new DistributionStepStatus("welcome"));
+        for (DistributionStep step : steps) {
+            if (step.getState() == null) {
+                steps.add(0, new WelcomeDistributionStep());
                 break;
             }
         }
@@ -94,7 +95,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     @Override
     protected void start() throws Exception
     {
-        List<DistributionStepStatus> steps = getDistributionJobStatus().getSteps();
+        List<DistributionStep> steps = getDistributionJobStatus().getSteps();
 
         notifyPushLevelProgress(steps.size());
 
@@ -102,32 +103,24 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
             for (int index = 0; index < steps.size(); ++index) {
                 getDistributionJobStatus().setCurrentStateIndex(index);
 
-                DistributionStepStatus step = steps.get(index);
+                DistributionStep step = steps.get(index);
 
-                if (step.getUpdateState() == null) {
-                    DistributionQuestion question = new DistributionQuestion(step.getStepId());
+                if (step.getState() == null) {
+                    DistributionQuestion question = new DistributionQuestion(step);
 
                     // Waiting to start
                     getStatus().ask(question);
 
-                    if (question.isSave()) {
-                        switch (question.getAction()) {
-                            case CANCEL_STEP:
-                                step.setUpdateState(UpdateState.CANCELED);
-                                break;
-                            case COMPLETE_STEP:
-                                step.setUpdateState(UpdateState.COMPLETED);
-                                break;
-                            case CANCEL:
-                                for (; index < steps.size(); ++index) {
-                                    steps.get(index).setUpdateState(UpdateState.CANCELED);
-                                }
-                            case SKIP:
-                                index = steps.size() - 1;
-                                break;
-                            default:
-                                break;
-                        }
+                    switch (question.getAction()) {
+                        case CANCEL:
+                            for (; index < steps.size(); ++index) {
+                                steps.get(index).setState(DistributionStep.State.CANCELED);
+                            }
+                        case SKIP:
+                            index = steps.size() - 1;
+                            break;
+                        default:
+                            break;
                     }
                 }
 

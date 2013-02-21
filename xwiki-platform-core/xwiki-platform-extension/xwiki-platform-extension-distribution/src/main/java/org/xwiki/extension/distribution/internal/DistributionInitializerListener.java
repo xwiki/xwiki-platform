@@ -30,8 +30,8 @@ import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
@@ -86,8 +86,8 @@ public class DistributionInitializerListener implements EventListener
             if (event instanceof ApplicationStartedEvent) {
                 DistributionJobStatus< ? > status = this.distributionManager.getPreviousFarmJobStatus();
 
-                for (DistributionStepStatus step : status.getSteps()) {
-                    if (step.getUpdateState() == null) {
+                for (DistributionStep step : status.getSteps()) {
+                    if (step.getState() == null) {
                         this.distributionManager.startFarmJob();
                         break;
                     }
@@ -98,8 +98,8 @@ public class DistributionInitializerListener implements EventListener
                 if (!((XWikiContext) arg2).isMainWiki()) {
                     WikiDistributionJobStatus status = this.distributionManager.getPreviousWikiJobStatus(wiki);
 
-                    for (DistributionStepStatus step : status.getSteps()) {
-                        if (step.getUpdateState() == null) {
+                    for (DistributionStep step : status.getSteps()) {
+                        if (step.getState() == null) {
                             this.distributionManager.startWikiJob(wiki);
                             break;
                         }

@@ -17,50 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.distribution.internal.job;
+package org.xwiki.extension.distribution.internal.job.step;
 
-import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import javax.inject.Named;
 
-/**
- * @version $Id$
- * @since 5.0M1
- */
-public class DistributionQuestion
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+
+@Component
+@Named("upgrademode")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class UpgradeModeDistributionStep extends AbstractDistributionStep
 {
-    public enum Action
+    public enum UpgradeMode
     {
-        /**
-         * Skip the step.
-         */
-        SKIP,
-
-        /**
-         * Cancel the step.
-         */
-        CANCEL
+        WIKI,
+        ALLINONE
     }
 
-    private Action action;
+    private UpgradeMode upgradeMode = UpgradeMode.WIKI;
 
-    private DistributionStep step;
-
-    public DistributionQuestion(DistributionStep step)
+    public UpgradeModeDistributionStep()
     {
-        this.step = step;
+        super("upgrademode");
     }
 
-    public String getStepId()
+    public UpgradeMode getUpgradeMode()
     {
-        return this.step.getId();
+        return this.upgradeMode;
     }
 
-    public Action getAction()
+    @Override
+    public void prepare()
     {
-        return this.action;
+
     }
 
-    public void setAction(Action action)
+    public void setUpgradeMode(UpgradeMode upgradeMode)
     {
-        this.action = action;
+        this.upgradeMode = upgradeMode;
     }
 }

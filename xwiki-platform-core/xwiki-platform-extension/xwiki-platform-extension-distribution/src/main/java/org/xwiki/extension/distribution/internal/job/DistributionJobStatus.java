@@ -22,6 +22,7 @@ package org.xwiki.extension.distribution.internal.job;
 import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
@@ -45,19 +46,19 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     private ExtensionId distributionExtensionUi;
 
-    private List<DistributionStepStatus> steps;
+    private List<DistributionStep> steps;
 
     private int currentStateIndex;
 
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
-        List<DistributionStepStatus> steps)
+        List<DistributionStep> steps)
     {
         super(request, observationManager, loggerManager, false);
 
         this.steps = steps;
     }
 
-    public List<DistributionStepStatus> getSteps()
+    public List<DistributionStep> getSteps()
     {
         return this.steps;
     }
@@ -67,7 +68,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         return this.currentStateIndex;
     }
 
-    public DistributionStepStatus getCurrentStateStatus()
+    public DistributionStep getCurrentState()
     {
         return getCurrentStateIndex() < getSteps().size() ? getSteps().get(getCurrentStateIndex()) : null;
     }

@@ -17,41 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.distribution.internal.job;
+package org.xwiki.extension.distribution.internal.job.step;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.rendering.block.Block;
 
 /**
  * @version $Id$
- * @since 4.2M3
+ * @since 5.0M1
  */
-public class DistributionStepStatus
+@Role
+public interface DistributionStep
 {
-    public enum UpdateState
+    public enum State
     {
         CANCELED,
         COMPLETED
     }
 
-    private String stepId;
+    void initialize(DistributionStep step);
 
-    private UpdateState updateState;
+    void prepare();
 
-    public DistributionStepStatus(String stepId)
-    {
-        this.stepId = stepId;
-    }
+    String getId();
 
-    public String getStepId()
-    {
-        return this.stepId;
-    }
+    State getState();
 
-    public UpdateState getUpdateState()
-    {
-        return this.updateState;
-    }
+    void setState(State stepState);
 
-    public void setUpdateState(UpdateState updateState)
-    {
-        this.updateState = updateState;
-    }
+    Block render();
 }

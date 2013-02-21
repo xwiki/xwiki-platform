@@ -17,25 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.distribution.internal.job;
+package org.xwiki.extension.distribution.internal.job.step;
 
-import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus.UpgradeMode;
+import javax.inject.Named;
 
-/**
- * @version $Id$
- * @since 5.0M1
- */
-public class UpgradeModeDistributionQuestion extends DistributionQuestion
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+
+@Component
+@Named("welcome")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class WelcomeDistributionStep extends AbstractDistributionStep
 {
-    private FarmDistributionJobStatus status;
-
-    public UpgradeModeDistributionQuestion(String stepId)
+    public WelcomeDistributionStep()
     {
-        super(stepId);
+        super("welcome");
     }
 
-    public void setUpgradeMode(UpgradeMode upgradeMode)
+    @Override
+    public void prepare()
     {
-        this.status.setUpgradeMode(upgradeMode);
+        // Nothing to prepare here
     }
 }

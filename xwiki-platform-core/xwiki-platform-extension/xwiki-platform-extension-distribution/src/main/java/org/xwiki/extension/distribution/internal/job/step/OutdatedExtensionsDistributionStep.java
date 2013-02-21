@@ -17,50 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.distribution.internal.job;
+package org.xwiki.extension.distribution.internal.job.step;
 
-import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import javax.inject.Named;
 
-/**
- * @version $Id$
- * @since 5.0M1
- */
-public class DistributionQuestion
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+
+@Component
+@Named("extension.outdatedextensions")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
 {
-    public enum Action
+    public OutdatedExtensionsDistributionStep()
     {
-        /**
-         * Skip the step.
-         */
-        SKIP,
-
-        /**
-         * Cancel the step.
-         */
-        CANCEL
+        super("extension.outdatedextensions");
     }
 
-    private Action action;
-
-    private DistributionStep step;
-
-    public DistributionQuestion(DistributionStep step)
+    @Override
+    public void prepare()
     {
-        this.step = step;
-    }
 
-    public String getStepId()
-    {
-        return this.step.getId();
-    }
-
-    public Action getAction()
-    {
-        return this.action;
-    }
-
-    public void setAction(Action action)
-    {
-        this.action = action;
     }
 }

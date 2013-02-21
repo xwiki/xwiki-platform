@@ -30,7 +30,9 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.DistributionStepStatus.UpdateState;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**
@@ -46,9 +48,9 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
     private InstalledExtensionRepository installedRepository;
 
     @Override
-    protected List<DistributionStepStatus> createSteps()
+    protected List<DistributionStep> createSteps()
     {
-        List<DistributionStepStatus> steps = new ArrayList<DistributionStepStatus>(3);
+        List<DistributionStep> steps = new ArrayList<DistributionStep>(3);
 
         ExtensionId extensionUI = this.distributionManager.getMainUIExtensionId();
 
@@ -56,27 +58,27 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
 
         // Step 1: Install/upgrade main wiki UI
 
-        DistributionStepStatus step1 = new DistributionStepStatus("extension.mainui");
+        DistributionStep step1 = new DefaultUIDistributionStep();
         steps.add(step1);
         // Only if the UI is not already installed
-        step1.setUpdateState(UpdateState.COMPLETED);
+        step1.setState(DistributionStep.State.COMPLETED);
         if (extensionUI != null) {
             InstalledExtension installedExtension =
                 this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
             if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-                step1.setUpdateState(null);
+                step1.setState(null);
             }
         }
 
         // Step 2: Upgrade outdated extensions
 
-        DistributionStepStatus step2 = new DistributionStepStatus("extension.outdatedextensions");
+        DistributionStep step2 = new OutdatedExtensionsDistributionStep();
         steps.add(step2);
-        step2.setUpdateState(UpdateState.COMPLETED);
+        step2.setState(DistributionStep.State.COMPLETED);
         // Upgrade outdated extensions only when there is outdated extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions(namespace)) {
             if (!extension.isValid(namespace)) {
-                step2.setUpdateState(null);
+                step2.setState(null);
                 break;
             }
         }
@@ -86,7 +88,7 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
 
     @Override
     protected WikiDistributionJobStatus createNewDistributionStatus(WikiDistributionRequest request,
-        List<DistributionStepStatus> steps)
+        List<DistributionStep> steps)
     {
         return new WikiDistributionJobStatus(request, this.observationManager, this.loggerManager, steps);
     }

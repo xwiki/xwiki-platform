@@ -21,6 +21,7 @@ package org.xwiki.extension.distribution.internal.job;
 
 import java.util.List;
 
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -36,7 +37,7 @@ public class WikiDistributionJobStatus extends DistributionJobStatus<WikiDistrib
     private static final long serialVersionUID = 1L;
 
     public WikiDistributionJobStatus(WikiDistributionRequest request, ObservationManager observationManager,
-        LoggerManager loggerManager, List<DistributionStepStatus> steps)
+        LoggerManager loggerManager, List<DistributionStep> steps)
     {
         super(request, observationManager, loggerManager, steps);
     }

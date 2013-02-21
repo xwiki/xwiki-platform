@@ -1274,13 +1274,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         DocumentReference classReference =
             CLASS_REFERENCE.replaceParent(CLASS_REFERENCE.getWikiReference(), targetDoc.getDocumentReference()
                 .getWikiReference());
-        assertEquals(1, targetDoc.getXObjectSize(classReference));
+        assertEquals(2, targetDoc.getXObjectSize(classReference));
 
         // Try to merge the objects again.
         targetDoc.mergeXObjects(this.document);
 
         // Check that the object from the template document was not copied again.
-        assertEquals(1, targetDoc.getXObjectSize(classReference));
+        assertEquals(2, targetDoc.getXObjectSize(classReference));
     }
 
     /** Check that a new empty document has empty content (used to have a new line before 2.5). */

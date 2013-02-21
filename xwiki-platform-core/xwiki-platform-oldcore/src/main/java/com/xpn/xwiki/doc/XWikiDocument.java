@@ -2188,8 +2188,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(EntityReference classReference, int nb)
     {
-        return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(classReference,
-            getDocumentReference(), nb));
+        return getXObject(
+            this.currentReferenceDocumentReferenceResolver.resolve(classReference, getDocumentReference()), nb);
     }
 
     /**

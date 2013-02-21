@@ -293,6 +293,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     }
 
     /**
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M1.
      * @return true if running in virtual mode
      */
     protected boolean isVirtualMode()
@@ -603,43 +604,34 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         XWikiContext context = getXWikiContext();
 
-        if (isVirtualMode()) {
-            // Save context values so that we can restore them as they were before the migration.
-            String currentDatabase = context.getDatabase();
-            String currentOriginalDatabase = context.getOriginalDatabase();
+        // Save context values so that we can restore them as they were before the migration.
+        String currentDatabase = context.getDatabase();
+        String currentOriginalDatabase = context.getOriginalDatabase();
 
-            int errorCount = 0;
-            try {
-                for (String database : getDatabasesToMigrate()) {
-                    // Set up the context so that it points to the virtual wiki corresponding to the
-                    // database.
-                    context.setDatabase(database);
-                    context.setOriginalDatabase(database);
-                    try {
-                        startMigrationsForDatabase();
-                    } catch (DataMigrationException e) {
-                        errorCount++;
-                    }
+        int errorCount = 0;
+        try {
+            for (String database : getDatabasesToMigrate()) {
+                // Set up the context so that it points to the virtual wiki corresponding to the
+                // database.
+                context.setDatabase(database);
+                context.setOriginalDatabase(database);
+                try {
+                    startMigrationsForDatabase();
+                } catch (DataMigrationException e) {
+                    // Log each failure for better troubleshooting.
+                    logger.error("Failed to migrate database [{}]", database, e);
+                    errorCount++;
                 }
-                if (errorCount > 0) {
-                    String message = String.format(
-                        "%s database migration(s) failed, it is not safe to continue!", errorCount);
-                    logger.error(message);
-                    throw new DataMigrationException(message);
-                }
-            } finally {
-                context.setDatabase(currentDatabase);
-                context.setOriginalDatabase(currentOriginalDatabase);
             }
-        } else {
-            // Just update schema and migrate the main wiki
-            try {
-                startMigrationsForDatabase();
-            } catch (DataMigrationException ex) {
-                String message = "Main database migration failed, it is not safe to continue!";
-                logger.error(message, ex);
-                throw new DataMigrationException(message, ex);
+            if (errorCount > 0) {
+                String message =
+                    String.format("%s database migration(s) failed, it is not safe to continue!", errorCount);
+                logger.error(message);
+                throw new DataMigrationException(message);
             }
+        } finally {
+            context.setDatabase(currentDatabase);
+            context.setOriginalDatabase(currentOriginalDatabase);
         }
     }
 
@@ -657,20 +649,19 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         Set<String> databasesToMigrate = new LinkedHashSet<String>();
 
         // Always migrate the main database. We also want this to be the first database migrated so
-        // it has to be the
-        // first returned in the list.
+        // it has to be the first returned in the list.
+        // FIXME: this is wrong. The order of addition is irrelevant in a Set.
         databasesToMigrate.add(getMainXWiki());
 
         // Add the databases listed by the user (if any). If there's no database name or
         // a single database named and if it's "all" or "ALL" then automatically add all the registered databases.
-        if (isVirtualMode()) {
-            String[] databases =
-                getXWikiConfig().getPropertyAsList("xwiki.store.migration.databases");
-            if ((databases.length == 0) || ((databases.length == 1) && databases[0].equalsIgnoreCase("all"))) {
-                databasesToMigrate.addAll(getVirtualWikisDatabaseNames());
-            } else {
-                Collections.addAll(databasesToMigrate, databases);
-            }
+        String[] databases = getXWikiConfig().getPropertyAsList("xwiki.store.migration.databases");
+        if ((databases.length == 0) || ((databases.length == 1) && databases[0].equalsIgnoreCase("all"))) {
+            // The main wiki will also be included, but, since we are using a Set, it should not be a problem.
+            List<String> allwikis = getVirtualWikisDatabaseNames();
+            databasesToMigrate.addAll(allwikis);
+        } else {
+            Collections.addAll(databasesToMigrate, databases);
         }
 
         return databasesToMigrate;

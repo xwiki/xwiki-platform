@@ -1039,10 +1039,10 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;dl id='filteredSearch' class="xform#if ($filter == '') hidden#end"&gt;
-      &lt;dt #if (!$xwiki.isVirtualMode())class='hidden'#end&gt;
+      &lt;dt&gt;
         &lt;label for='wiki'&gt;Wiki&lt;/label&gt;
       &lt;/dt&gt;
-      &lt;dd #if (!$xwiki.isVirtualMode())class='hidden'#end&gt;
+      &lt;dd&gt;
         &lt;select id='wiki' name='wiki'&gt;
           ## The main wiki searches by default in all wikis.
           &lt;option value=''&gt;All wikis&lt;/option&gt;

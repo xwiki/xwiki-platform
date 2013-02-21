@@ -309,10 +309,6 @@ function prettyNameChanged()
   {{error}}$msg.get('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
 
 #end
-#if(!$xwiki.isVirtualMode())
-  {{error}}$msg.get('workspacemanager.error.notinvirtualmode'){{/error}}
-
-#end
 ############################################################################################
 ## WORKSPACE INSTALLATION STATUS CHECK
 #set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))

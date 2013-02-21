@@ -153,8 +153,7 @@ public final class WikiManager
     {
         XWikiRightService rightService = context.getWiki().getRightService();
 
-        return context.getWiki().isVirtualMode() && rightService.hasAdminRights(context)
-            && rightService.hasProgrammingRights(context);
+        return rightService.hasAdminRights(context) && rightService.hasProgrammingRights(context);
     }
 
     /**
@@ -176,8 +175,7 @@ public final class WikiManager
     {
         XWikiRightService rightService = context.getWiki().getRightService();
 
-        return context.getWiki().isVirtualMode() && rightService.hasAdminRights(context)
-            && rightService.hasProgrammingRights(context);
+        return rightService.hasAdminRights(context) && rightService.hasProgrammingRights(context);
     }
 
     /**
@@ -418,11 +416,6 @@ public final class WikiManager
 
         XWiki xwiki = context.getWiki();
 
-        if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
-                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
-        }
-
         String newWikiName = userWikiSuperDoc.getWikiName();
 
         String database = context.getDatabase();
@@ -561,11 +554,6 @@ public final class WikiManager
         XWikiPluginMessageTool msg = getMessageTool(context);
 
         XWiki xwiki = context.getWiki();
-
-        if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
-                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
-        }
 
         // Create database/schema
         try {

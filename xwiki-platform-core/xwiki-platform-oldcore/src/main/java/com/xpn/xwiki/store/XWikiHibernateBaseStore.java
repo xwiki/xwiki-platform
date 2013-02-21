@@ -211,6 +211,8 @@ public class XWikiHibernateBaseStore implements Initializable
         getConfiguration().configure(getPath());
 
         XWiki wiki = context.getWiki();
+        /* FIXME: Does this piece of code have any purpose? It was not used in XEM anyway, so why keep it now when
+         * we have virtual by default?
         if (wiki != null && wiki.Param("xwiki.db") != null && !wiki.isVirtualMode()) {
             // substitute default db name to configured.
             // note, that we can't call getSchemaFromWikiName() here,
@@ -226,6 +228,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 getConfiguration().setProperty(Environment.DEFAULT_SCHEMA, schemaName);
             }
         }
+        */
         if (this.sessionFactory == null) {
             this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);
         }
@@ -611,6 +614,7 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the same database pool
      * 
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M1.
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */
@@ -633,33 +637,30 @@ public class XWikiHibernateBaseStore implements Initializable
     public void setDatabase(Session session, XWikiContext context) throws XWikiException
     {
         try {
-            if (isVirtual(context)) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Switch database to [{}]", context.getDatabase());
-                }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Switch database to [{}]", context.getDatabase());
+            }
 
-                if (context.getDatabase() != null) {
-                    String schemaName = getSchemaFromWikiName(context);
-                    String escapedSchemaName = escapeSchema(schemaName, context);
+            if (context.getDatabase() != null) {
+                String schemaName = getSchemaFromWikiName(context);
+                String escapedSchemaName = escapeSchema(schemaName, context);
 
-                    DatabaseProduct databaseProduct = getDatabaseProductName();
-                    if (DatabaseProduct.ORACLE == databaseProduct) {
-                        executeSQL("alter session set current_schema = " + escapedSchemaName, session);
-                    } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
-                        || DatabaseProduct.DB2 == databaseProduct)
-                    {
-                        executeSQL("SET SCHEMA " + escapedSchemaName, session);
-                    } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
-                        executeSQL("SET search_path TO " + escapedSchemaName, session);
-                    } else {
-                        String catalog = session.connection().getCatalog();
-                        catalog = (catalog == null) ? null : catalog.replace('_', '-');
-                        if (!schemaName.equals(catalog)) {
-                            session.connection().setCatalog(schemaName);
-                        }
+                DatabaseProduct databaseProduct = getDatabaseProductName();
+                if (DatabaseProduct.ORACLE == databaseProduct) {
+                    executeSQL("alter session set current_schema = " + escapedSchemaName, session);
+                } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
+                    || DatabaseProduct.DB2 == databaseProduct) {
+                    executeSQL("SET SCHEMA " + escapedSchemaName, session);
+                } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
+                    executeSQL("SET search_path TO " + escapedSchemaName, session);
+                } else {
+                    String catalog = session.connection().getCatalog();
+                    catalog = (catalog == null) ? null : catalog.replace('_', '-');
+                    if (!schemaName.equals(catalog)) {
+                        session.connection().setCatalog(schemaName);
                     }
-                    setCurrentDatabase(context, context.getDatabase());
                 }
+                setCurrentDatabase(context, context.getDatabase());
             }
 
             this.dataMigrationManager.checkDatabase();

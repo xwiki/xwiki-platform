@@ -116,7 +116,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   #end
 #end
 ##
-#if($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+#if($xcontext.isMainWiki())
   #if(!$allwikinamelist)
     #set($currentwikiname = $xcontext.database)
     #set($allwikinamelist = $xwiki.wikiNames)
@@ -161,7 +161,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   &lt;div class="centered"&gt;
     &lt;label for="text" class="hidden"&gt;$msg.get('search.page.query.label')&lt;/label&gt;
     &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
-    #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+    #if ($xcontext.isMainWiki())
       #wikisselect($request.wikinames $allwikinamelist)
     #end
     #spaceselect($selectedSpace $spaces)

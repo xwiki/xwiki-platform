@@ -42,14 +42,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        getContext().setWiki(new XWiki()
-        {
-            @Override
-            public boolean isVirtualMode()
-            {
-                return true;
-            }
-        });
+        getContext().setWiki(new XWiki());
     }
 
     @Test

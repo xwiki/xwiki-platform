@@ -1906,8 +1906,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed for the first name and last name of the user The link will
-     * link to the page on the wiki where the user is registered (in virtual wiki mode)
+     * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
+     * will link to the page on the wiki where the user is registered
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1919,9 +1919,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * wiki where the user is registered (in virtual wiki mode) The formating is done using the format parameter which
-     * can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city)
+     * wiki where the user is registered. The formating is done using the format parameter which can contain velocity
+     * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1933,8 +1932,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed for the first name and last name of the user The link will
-     * link to the page on the local wiki even if the user is registered on a different wiki (in virtual wiki mode)
+     * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
+     * will link to the page on the local wiki even if the user is registered on a different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1949,10 +1948,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed with a custom view The link will link to the page on the
-     * local wiki even if the user is registered on a different wiki (in virtual wiki mode) The formating is done using
-     * the format parameter which can contain velocity scripting and access all properties of the User profile using
-     * variables ($first_name $last_name $email $city)
+     * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
+     * local wiki even if the user is registered on a different wiki. The formating is done using the format parameter
+     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
+     * $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1968,9 +1967,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with the first name and last name of the user With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
-     * the wiki where the user was registered (in virtual wiki mode)
+     * API to retrieve a text representing the user with the first name and last name of the user. With the link param
+     * set to false it will not link to the user page With the link param set to true, the link will link to the page
+     * on the wiki where the user was registered.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
@@ -1982,10 +1981,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
-     * to the user page With the link param set to true, the link will link to the page on the wiki where the user was
-     * registered (in virtual wiki mode) The formating is done using the format parameter which can contain velocity
-     * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
+     * API to retrieve a text representing the user with a custom view With the link param set to false it will not
+     * link to the user page. With the link param set to true, the link will link to the page on the wiki where the
+     * user was registered. The formating is done using the format parameter which can contain velocity scripting
+     * and access all properties of the User profile using variables ($first_name $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1998,9 +1997,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with the first name and last name of the user With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
-     * the local wiki even if the user is registered on a different wiki (in virtual wiki mode)
+     * API to retrieve a text representing the user with the first name and last name of the user. With the link param
+     * set to false it will not link to the user page. With the link param set to true, the link will link to the page
+     * on the local wiki even if the user is registered on a different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
@@ -2016,11 +2015,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city) With the link param set to false it will not link to the user page With the link param
-     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki
-     * (in virtual wiki mode)
+     * API to retrieve a text representing the user with a custom view. The formating is done using the format
+     * parameter which can contain velocity scripting and access all properties of the User profile using variables
+     * ($first_name $last_name $email $city). With the link param set to false it will not link to the user page. With
+     * the link param set to true, the link will link to the page on the local wiki even if the user is registered on a
+     * different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")

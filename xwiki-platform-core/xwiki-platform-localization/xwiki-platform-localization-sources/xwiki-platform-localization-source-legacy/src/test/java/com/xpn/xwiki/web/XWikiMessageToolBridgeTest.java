@@ -202,9 +202,6 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                     }
                 });
 
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
-
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));
 

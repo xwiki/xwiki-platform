@@ -234,10 +234,8 @@
         #set ($workspace = $WorkspaceManager.getWorkspace($itemWikiName))
         #set($itemUrl = $xwiki.getURL($item))
         #set($spaceUrl = $xwiki.getURL("${itemDoc.wiki}:${itemDoc.space}.WebHome"))
-        #if($xwiki.isVirtualMode())
-          #set($wiki = $itemDoc.wiki)
-          #set($wikiUrl = $xwiki.getURL("${itemDoc.wiki}:Main.WebHome"))
-        #end
+        #set($wiki = $itemDoc.wiki)
+        #set($wikiUrl = $xwiki.getURL("${itemDoc.wiki}:Main.WebHome"))
         #set($editUrl = $itemDoc.getURL($itemDoc.defaultEditMode))
         #set($copyUrl = $itemDoc.getURL('view', 'xpage=copy'))
         #set ($deleteUrl = $xwiki.getURL($deleteWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiName}&amp;workspaceName=${itemWikiDescriptor.wikiPrettyName}"))
@@ -307,10 +305,8 @@
         "doc_space" : "$escapetool.javascript(${itemDoc.space})",
         "doc_url" : "$escapetool.javascript(${itemUrl})",
         "doc_space_url" : "$escapetool.javascript(${spaceUrl})",
-        #if($xwiki.isVirtualMode())
-          "doc_wiki" : "$escapetool.javascript($wiki)",
-          "doc_wiki_url" : "$escapetool.javascript($wikiUrl)",
-        #end
+        "doc_wiki" : "$escapetool.javascript($wiki)",
+        "doc_wiki_url" : "$escapetool.javascript($wikiUrl)",
         ## If actions are not explicitly set to false, they will show up in the livetable.
         "doc_hasadmin"  : $xwiki.hasAdminRights(),
         "doc_hasedit" : $xwiki.hasAccessLevel('edit', $context.user, $fullname),

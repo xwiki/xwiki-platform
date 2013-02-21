@@ -82,9 +82,6 @@
 #if (!$services.applicationmanager)
   #error($msg.get("xapp.pluginnotenabled"))
 #end
-#if(!$xwiki.isVirtualMode())
-  #error($msg.get("wikimanager.notinvirtualmode"))
-#end
 ############################################################################################
 ## MACROS
 #macro(getRequestList $paramlist $paramname)
@@ -101,13 +98,13 @@
 #macro(printUsersAndGroups $users $groups $rightlevel $userlist $grouplist $hidden)
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
     #foreach ($user in $users)
-      #if ($xcontext.database == $xcontext.mainWikiName) #set ($user = "${xcontext.mainWikiName}:${user}") #end
+      #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
       &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
     #end
   &lt;/select&gt;
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;
     #foreach ($group in $groups)
-      #if ($xcontext.database == $xcontext.mainWikiName) #set ($group = "${xcontext.mainWikiName}:${group}") #end
+      #if ($xcontext.isMainWiki()) #set ($group = "${xcontext.mainWikiName}:${group}") #end
       #set ($pointindex = $group.indexOf(".") + 1)
       &lt;option value="$group" #if ($grouplist &amp;&amp; $grouplist.contains($group)) selected="selected" #end&gt;$group.substring($pointindex)&lt;/option&gt;
     #end

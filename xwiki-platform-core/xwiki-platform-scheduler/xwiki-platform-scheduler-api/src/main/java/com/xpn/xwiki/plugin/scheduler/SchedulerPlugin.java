@@ -103,20 +103,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         try {
             String initialDb = !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
 
-            List<String> wikiServers;
-            if (context.getWiki().isVirtualMode()) {
-                try {
-                    wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
-                } catch (Exception e) {
-                    LOGGER.error("error getting list of wiki servers!", e);
-                    wikiServers = new ArrayList<String>();
-                }
-            } else {
-                wikiServers = new ArrayList<String>();
-            }
-
-            if (!wikiServers.contains(context.getMainXWiki())) {
-                wikiServers.add(context.getMainXWiki());
+            List<String> wikiServers = new ArrayList<String>();
+            try {
+                wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
+            } catch (Exception e) {
+                LOGGER.error("error getting list of wiki servers!", e);
             }
 
             // Init class

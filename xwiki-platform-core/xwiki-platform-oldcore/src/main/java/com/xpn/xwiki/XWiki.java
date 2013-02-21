@@ -484,9 +484,6 @@ public class XWiki implements EventListener
     public static XWiki getXWiki(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = getMainXWiki(context);
-        if (!xwiki.isVirtualMode()) {
-            return xwiki;
-        }
 
         // Host is full.host.name in DNS-based multiwiki, and wikiname in path-based multiwiki.
         String host = "";
@@ -5274,13 +5271,9 @@ public class XWiki implements EventListener
     public String getAdType(XWikiContext context)
     {
         String adtype = "";
-        if (isVirtualMode()) {
-            XWikiDocument wikiServer = context.getWikiServer();
-            if (wikiServer != null) {
-                adtype = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "adtype");
-            }
-        } else {
-            adtype = getXWikiPreference("adtype", "", context);
+        XWikiDocument wikiServer = context.getWikiServer();
+        if (wikiServer != null) {
+            adtype = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "adtype");
         }
 
         if (adtype.equals("")) {
@@ -5294,13 +5287,9 @@ public class XWiki implements EventListener
     {
         final String defaultadclientid = "pub-2778691407285481";
         String adclientid = "";
-        if (isVirtualMode()) {
-            XWikiDocument wikiServer = context.getWikiServer();
-            if (wikiServer != null) {
-                adclientid = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "adclientid");
-            }
-        } else {
-            adclientid = getXWikiPreference("adclientid", "", context);
+        XWikiDocument wikiServer = context.getWikiServer();
+        if (wikiServer != null) {
+            adclientid = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "adclientid");
         }
 
         if (adclientid.equals("")) {
@@ -6532,10 +6521,12 @@ public class XWiki implements EventListener
 
     private void onPluginPreferenceEvent(Event event, XWikiDocument doc, XWikiContext context)
     {
+        /* FIXME: This does not make sense anymore. Discard it?
         if (!isVirtualMode()) {
             // If the XWikiPreferences plugin propery is modified, reload all plugins.
             preparePlugins(context);
         }
+        */
     }
 
     /**

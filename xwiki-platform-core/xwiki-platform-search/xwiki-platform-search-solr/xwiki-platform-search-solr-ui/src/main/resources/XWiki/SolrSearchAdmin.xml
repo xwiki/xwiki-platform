@@ -205,7 +205,7 @@ search=Main.SolrSearch</parameters>
 &lt;/dt&gt;
 &lt;dd&gt;
   &lt;select name='wiki' size='1'&gt;
-    #if ($xwiki.isVirtualMode() &amp;&amp; ($xcontext.database == $xcontext.mainWikiName))
+    #if ($xcontext.isMainWiki())
     &lt;option value=''&gt;Entire farm&lt;/option&gt;
     #end
     #foreach ($wiki in $allWikis)

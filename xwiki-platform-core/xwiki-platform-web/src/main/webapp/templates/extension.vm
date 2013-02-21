@@ -226,7 +226,7 @@
       #if ($extension.features.size() > 0)
         <li>$msg.get('extensions.info.features') $escapetool.xml($extension.features)</li>
       #end
-      #if ($xwiki.isVirtualMode() && $extension.isInstalled("wiki:${xcontext.database}"))
+      #if ($extension.isInstalled("wiki:${xcontext.database}"))
         <li>#displayExtensionDetails_description_wikis($extension)</li>
       #end
     </ul>
@@ -293,7 +293,7 @@
   #end
   <div class="dependency-item extension-item-$dependencyStatus">
     <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
-    #if ($xwiki.isVirtualMode() && $namespace.startsWith('wiki:'))
+    #if ($namespace.startsWith('wiki:'))
       <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', [$namespace.substring(5)])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
@@ -497,7 +497,7 @@
 #end
 
 #macro (uninstallExtension $extensionId $extensionVersion $extensionNamespace)
-  #if ($extensionNamespace && $xwiki.isVirtualMode())
+  #if ($extensionNamespace)
     ## Uninstall only from the specified wiki.
     #set ($discard = $extensionManager.uninstall($extensionId, $extensionNamespace))
   #else
@@ -511,7 +511,7 @@
 #end
 
 #macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #if ($extensionNamespace && $xwiki.isVirtualMode())
+  #if ($extensionNamespace)
     ## Create the uninstall plan only for the specified wiki.
     #set ($discard = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
   #else
@@ -968,11 +968,11 @@ $status##
   #if ($action == 'uninstall')
     #set ($actionName = 'Uninstall')
   #end
-  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace) && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
+  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace) && !$installedExtension.isInstalled($NULL)))
     ## Button that targets only the current wiki.
     #em_submitButton("extensions.actions.$action" "action$actionName" $secondary)
   #end
-  #if ($xwiki.isVirtualMode() && $xcontext.isMainWiki())
+  #if ($xcontext.isMainWiki())
     ## Button that targets the entire farm.
     #em_submitButton("extensions.actions.${action}Globally" "action${actionName}Globally" true)
   #end

@@ -1213,6 +1213,25 @@ public class XWiki extends Api
     }
 
     /**
+     * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
+     *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
+     *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.
+     * @see com.xpn.xwiki.XWiki#getVirtualWikisDatabaseNames(XWikiContext)
+     */
+    public List<String> getWikiNames()
+    {
+        List<String> result = new ArrayList<String>();
+
+        try {
+            result = this.xwiki.getVirtualWikisDatabaseNames(getXWikiContext());
+        } catch (Exception e) {
+            LOGGER.error("Failed to get the list of all wiki names", e);
+        }
+
+        return result;
+    }
+
+    /**
      * API to check is wiki is multi-lingual
      * 
      * @return true for multi-lingual/false for mono-lingual

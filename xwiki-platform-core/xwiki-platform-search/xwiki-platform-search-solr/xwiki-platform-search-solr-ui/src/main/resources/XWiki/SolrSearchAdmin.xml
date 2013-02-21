@@ -113,10 +113,7 @@ search=Main.SolrSearch</parameters>
   <content>{{velocity output='false'}}
 ## TODO: CSRF protection
 
-#set ($allWikis = $sorttool.sort($xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context)))
-#if (!$allWikis.contains($xcontext.database))
-  #set ($discard = $allWikis.add($xcontext.database))
-#end
+#set ($allWikis = $sorttool.sort($xwiki.wikiNames))
 
 ## Handle request
 #if ("$!request.action" != '')

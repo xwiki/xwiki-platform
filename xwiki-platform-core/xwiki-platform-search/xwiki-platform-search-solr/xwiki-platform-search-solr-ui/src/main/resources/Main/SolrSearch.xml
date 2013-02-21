@@ -1006,10 +1006,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 ##
 ## Get the sorted list of existing wikis
 ##
-#set ($wikis = $xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context))
-#if (!$wikis.contains($xcontext.database))
-  #set ($discard = $wikis.add($xcontext.database))
-#end
+#set ($wikis = $xwiki.wikiNames)
 #set ($wikis = $sorttool.sort($wikis))
 {{/velocity}}
 

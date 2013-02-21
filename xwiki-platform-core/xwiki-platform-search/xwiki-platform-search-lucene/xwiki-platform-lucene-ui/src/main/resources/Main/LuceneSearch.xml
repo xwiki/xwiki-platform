@@ -119,17 +119,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 #if($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
   #if(!$allwikinamelist)
     #set($currentwikiname = $xcontext.database)
-    ## TODO: add and use a public API method to get the list of wikis instead of doing it "by hand"
-    #set($allwikilist = $xwiki.searchDocuments(", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and doc.fullName&lt;&gt;'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' and prop.id.id=obj.id and prop.id.name='server'"))
-    ##
-    #set($allwikinamelist = [])
-    #foreach($wiki in $allwikilist)
-      #set($ok = $allwikinamelist.add($wiki.substring(17).toLowerCase()))
-    #end
-    ## Make sure the main wiki is part of the list
-    #if(!$allwikinamelist.contains($xcontext.mainWikiName))
-      #set($ok = $allwikinamelist.add($xcontext.mainWikiName))
-    #end
+    #set($allwikinamelist = $xwiki.wikiNames)
   #end
   ## ---------------
   ## Wikis macros

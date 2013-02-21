@@ -170,9 +170,8 @@ xwiki.store.migration=1
 
 #-# Starting with XWiki 5.0, virtual mode is enabled by default.
 
-#-# URL to redirect to when a requested wiki does not exist. By default, the client is redirected to the main wiki.
-#-# Note: If enabled, this should be changed to a real (existing) page.
-# xwiki.virtual.redirect=http://127.0.0.1:8080/xwiki/bin/Main/ThisWikiDoesNotExist
+#-# URL to redirect to when a requested wiki does not exist. This should be changed to a real page.
+xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=

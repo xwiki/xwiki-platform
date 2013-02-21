@@ -20,9 +20,7 @@
 package org.xwiki.uiextension.internal;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,11 +33,10 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentScope;
-import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.XDOM;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -77,38 +74,17 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private EntityReferenceSerializer<String> compactWikiSerializer;
 
     /**
+     * Used to generate a role hint for UI extensions based on their object reference.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    /**
      * Used to get the parser to transform the extension content to a XDOM.
      */
     @Inject
     @Named("wiki")
-    private ComponentManager componentManager;
-
-    /**
-     * Allow to parse wiki syntax.
-     */
-    @Inject
-    private ContentParser contentParser;
-
-    /**
-     * Parse the parameters provided by the extension.
-     * The parameters are provided in a LargeString property of the extension object. In the future it would be better
-     * to have a Map<String, String> XClass property.
-     *
-     * @param rawParameters the string to parse
-     * @return a map of parameters
-     */
-    private Map<String, String> parseParameters(String rawParameters)
-    {
-        Map<String, String> parameters = new HashMap<String, String>();
-        for (String line : rawParameters.split("[\\r\\n]+")) {
-            String[] pair = line.split("=", 2);
-            if (pair.length == 2 && !"".equals(pair[0]) && !"".equals(pair[1])) {
-                parameters.put(pair[0], pair[1]);
-            }
-        }
-
-        return parameters;
-    }
+    private ComponentManager cm;
 
     /**
      * Checks if the last author of the document holding the extension(s) has the rights required to register extensions
@@ -173,20 +149,25 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
             String id = extensionDefinition.getStringValue(ID_PROPERTY);
             String extensionPointId = extensionDefinition.getStringValue(EXTENSION_POINT_ID_PROPERTY);
             String content = extensionDefinition.getStringValue(CONTENT_PROPERTY);
-            Map<String, String> parameters = parseParameters(extensionDefinition.getStringValue(PARAMETERS_PROPERTY));
+            String rawParameters = extensionDefinition.getStringValue(PARAMETERS_PROPERTY);
             WikiComponentScope scope =
                 WikiComponentScope.fromString(extensionDefinition.getStringValue(SCOPE_PROPERTY));
 
             // Before going further we need to check the document author is authorized to register the extension
             this.checkRights(doc, scope);
 
-            XDOM xdom = contentParser.parse(content, doc.getSyntax());
-            WikiUIExtension extension =
-                new WikiUIExtension(id, extensionPointId, extensionDefinition.getReference(),
-                    doc.getAuthorReference(),  componentManager);
-            extension.setXDOM(xdom);
-            extension.setSyntax(doc.getSyntax());
+            String roleHint = serializer.serialize(extensionDefinition.getReference());
+
+            WikiUIExtension extension = new WikiUIExtension(roleHint, id, extensionPointId,
+                extensionDefinition.getReference(), doc.getAuthorReference());
+            // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
+            // safer to use a POJO and pass him the Component Manager.
+            WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(rawParameters, cm);
             extension.setParameters(parameters);
+            // It would be nice to have PER_LOOKUP components for UIX renderers but without constructor injection it's
+            // safer to use a POJO and pass him the Component Manager.
+            WikiUIExtensionRenderer renderer = new WikiUIExtensionRenderer(roleHint, content, doc.getSyntax(), cm);
+            extension.setRenderer(renderer);
             extension.setScope(scope);
             extensions.add(extension);
         }

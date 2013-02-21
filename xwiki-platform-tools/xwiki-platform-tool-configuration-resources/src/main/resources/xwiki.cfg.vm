@@ -168,9 +168,7 @@ xwiki.store.migration=1
 # Virtual wikis (farm)
 #
 
-#-# This parameter allows XWiki to operate in Hosting mode allowing to create multiple wikis having their own database
-#-# and responding to different URLs
-xwiki.virtual=$xwikiCfgVirtual
+#-# Starting with XWiki 5.0, virtual mode is enabled by default.
 
 #-# URL to redirect to when a requested wiki does not exist. This should be changed to a real page.
 xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist

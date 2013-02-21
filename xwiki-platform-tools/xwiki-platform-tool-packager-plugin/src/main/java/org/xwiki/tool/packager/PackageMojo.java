@@ -772,8 +772,7 @@ public class PackageMojo extends AbstractMojo
             + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
-        props.setProperty("xwikiCfgVirtual", "0");
-        props.setProperty("xwikiCfgVirtualUsepath", "0");
+        props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");
         props.setProperty("xwikiCfgDefaultSkin", "colibri");
         props.setProperty("xwikiCfgDefaultBaseSkin", "colibri");

@@ -119,6 +119,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     private BaseObject baseObject;
 
+    private BaseObject baseObject2;
+
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     @Override
@@ -195,6 +197,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
+
+        this.baseObject2 = this.baseObject.clone();
+        this.document.addXObject(this.baseObject2);
 
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
@@ -1293,6 +1298,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Assert.assertSame(this.baseObject, this.document.getXObject(new ObjectReference(
             this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()), this.document
                 .getDocumentReference())));
+    }
+
+    public void testGetXObjectWithNumber()
+    {
+        Assert.assertSame(this.baseObject, this.document.getXObject(CLASS_REFERENCE, this.baseObject.getNumber()));
+        Assert.assertSame(this.baseObject2, this.document.getXObject(CLASS_REFERENCE, this.baseObject2.getNumber()));
+        Assert.assertSame(this.baseObject, this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject.getNumber()));
+        Assert.assertSame(this.baseObject2, this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject2.getNumber()));
     }
 
     public void testSetXObjectswithPreviousObject()

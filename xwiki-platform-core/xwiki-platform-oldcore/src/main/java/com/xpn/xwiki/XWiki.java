@@ -920,14 +920,19 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @return the full list of all database names of all defined virtual wikis. The database names are computed from
-     *         the names of documents having a XWiki.XWikiServerClass object attached to them by removing the
-     *         "XWiki.XWikiServer" prefix and making it lower case. For example a page named
-     *         "XWiki.XWikiServerMyDatabase" would return "mydatabase" as the database name.
+     * @return the full list of all wiki names of all defined wikis. The wiki names are computed from the names of
+     *         documents having a XWiki.XWikiServerClass object attached to them by removing the "XWiki.XWikiServer"
+     *         prefix and making it lower case. For example a page named "XWiki.XWikiServerMyDatabase" would return
+     *         "mydatabase" as the wiki name. This list will also contain the main wiki.
+     *         <p/>
+     *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However,
+     *         if configured accordingly, the database can be diferent from the wiki name, like for example when
+     *         setting a wiki database prefix.
      */
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
+        List<String> databaseNames = new ArrayList<String>();
         try {
             context.setDatabase(context.getMainXWiki());
 
@@ -935,7 +940,7 @@ public class XWiki implements EventListener
                 ", BaseObject as obj where doc.space = 'XWiki' and obj.name=doc.fullName"
                     + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' ";
             List<DocumentReference> documents = getStore().searchDocumentReferences(query, context);
-            List<String> databaseNames = new ArrayList<String>(documents.size());
+            ((ArrayList<String>) databaseNames).ensureCapacity(documents.size());
 
             int prefixLength = "XWikiServer".length();
             for (DocumentReference document : documents) {
@@ -943,11 +948,16 @@ public class XWiki implements EventListener
                     databaseNames.add(document.getName().substring(prefixLength).toLowerCase());
                 }
             }
-
-            return databaseNames;
         } finally {
             context.setDatabase(database);
         }
+
+        // Make sure to include the main wiki in the result.
+        if (!databaseNames.contains(context.getMainXWiki())) {
+            databaseNames.add(context.getMainXWiki());
+        }
+
+        return databaseNames;
     }
 
     /**

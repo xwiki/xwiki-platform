@@ -46,18 +46,15 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public void setValue(Object value)
     {
-        // Don't change the value if the passed value is null
-        if (value != null) {
-            // Make sure to store a Date and not some extended Date or it's going to be a nightmare to compare between
-            // them
-            Date date = (Date) value;
-            if (date.getClass() != Date.class) {
-                date = new Date(((Date) value).getTime());
-            }
-
-            setValueDirty(date);
-            this.value = date;
+        // Make sure to store a Date and not some extended Date or it's going to be a nightmare to compare between
+        // them
+        Date date = (Date) value;
+        if (date != null && date.getClass() != Date.class) {
+            date = new Date(((Date) value).getTime());
         }
+
+        setValueDirty(date);
+        this.value = date;
     }
 
     @Override

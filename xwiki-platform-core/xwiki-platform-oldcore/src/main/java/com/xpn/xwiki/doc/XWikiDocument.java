@@ -3597,10 +3597,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return false;
         }
 
-        if (ObjectUtils.notEqual(getTemplateDocumentReference(), doc.getTemplateDocumentReference())) {
-            return false;
-        }
-
         if (!getDefaultTemplate().equals(doc.getDefaultTemplate())) {
             return false;
         }
@@ -3943,15 +3939,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         el = new DOMElement("title");
         el.addText(getTitle());
-        wr.write(el);
-
-        el = new DOMElement("template");
-        if (getTemplateDocumentReference() == null) {
-            // No template doc have been specified
-            el.addText("");
-        } else {
-            el.addText(this.localEntityReferenceSerializer.serialize(getTemplateDocumentReference()));
-        }
         wr.write(el);
 
         el = new DOMElement("defaultTemplate");
@@ -8211,10 +8198,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         if (!StringUtils.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
             setDefaultTemplate(document.getDefaultTemplate());
-            modified = true;
-        }
-        if (ObjectUtils.notEqual(getTemplateDocumentReference(), document.getTemplateDocumentReference())) {
-            setTemplateDocumentReference(document.getTemplateDocumentReference());
             modified = true;
         }
         if (ObjectUtils.notEqual(getRelativeParentReference(), document.getRelativeParentReference())) {

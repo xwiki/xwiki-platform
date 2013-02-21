@@ -1563,7 +1563,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @param action the action
+     * @param action the action, see the {@code struts-config.xml} file for a list of all existing action names
      * @param params the URL query string
      * @param redirect true if the URL is going to be used in {@link HttpServletResponse#sendRedirect(String)}
      * @param context the XWiki context

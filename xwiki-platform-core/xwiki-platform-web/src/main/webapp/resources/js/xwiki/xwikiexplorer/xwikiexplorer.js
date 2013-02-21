@@ -1133,10 +1133,16 @@ isc.XWETreeGrid.addMethods({
     getSelectedResourceProperty : function(propertyName) {
         var value = this.getValue();
         var selectedRecord = this.getSelectedRecord();
-        if (value.length > 0) {
-            return XWiki.resource.get(value)[propertyName];
-        } else if (selectedRecord != null) {
+        // The selected tree node matches the input value most of the time:
+        // (1) when you select a tree node the input value is updated with its reference
+        // (2) when you type something in the text input the tree selects the corresponding node, if any.
+        if (selectedRecord && (selectedRecord.reference || value == '')) {
+            // The selected tree node either corresponds to a server side entity or it's a "New Entity" node.
             return selectedRecord.isNewPage && propertyName == 'name' ? null : this.getResourceProperty(selectedRecord, propertyName);
+        } else if (value.length > 0) {
+            // The input value is parsed without knowing the type of entity it refers to (page, attachment, etc.).
+            // If the value is a relative reference then the result is not always expected.
+            return XWiki.resource.get(value)[propertyName];
         }
         return null;
     },
@@ -1152,7 +1158,7 @@ isc.XWETreeGrid.addMethods({
                 attachment: XWiki.EntityType.ATTACHMENT
             };
             var entityType = propertyNameToEntityType[propertyName];
-            if (entityType) {
+            if (typeof entityType != 'undefined') {
                 return this.getEntityName(node, entityType);
             }
         }

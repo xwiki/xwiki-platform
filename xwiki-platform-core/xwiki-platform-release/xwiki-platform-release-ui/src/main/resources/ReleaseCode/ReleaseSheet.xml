@@ -42,7 +42,7 @@
   ## Note: We use the include macro below to circumvent the "nested script" execution issue...
   {{include reference="ReleaseCode.ReleaseSheetHeader"/}}
 
-  {{include reference="$services.model.serialize($doc.documentReference)"/}}
+  {{include reference=""/}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

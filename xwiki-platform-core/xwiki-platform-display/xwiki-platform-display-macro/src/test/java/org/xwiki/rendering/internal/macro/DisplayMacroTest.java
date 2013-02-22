@@ -92,14 +92,14 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     public void testDisplayMacroShowsVelocityMacrosAreIsolated() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.DisplayedPage][base]=[wiki:Space.DisplayedPage]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
             + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
             + "beginParagraph\n"
             + "onSpecialSymbol [#]\n"
             + "onWord [testmacro]\n"
             + "endParagraph\n"
             + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.DisplayedPage][base]=[wiki:Space.DisplayedPage]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is not seen in the displayed page.
@@ -130,7 +130,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     public void testDisplayMacroWhenDisplayingDocumentWithRelativeReferences() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[displayedWiki:displayedSpace.displayedPage][base]=[displayedWiki:displayedSpace.displayedPage]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[displayedWiki:displayedSpace.displayedPage][source]=[displayedWiki:displayedSpace.displayedPage]]\n"
             + "beginParagraph\n"
             + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
             + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
@@ -140,17 +140,21 @@ public class DisplayMacroTest extends AbstractComponentTestCase
             + "onSpace\n"
             + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[displayedWiki:displayedSpace.displayedPage][base]=[displayedWiki:displayedSpace.displayedPage]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][base]=[displayedWiki:displayedSpace.displayedPage][source]=[displayedWiki:displayedSpace.displayedPage]]\n"
             + "endDocument";
 
-        setUpDocumentMock("displayedWiki:displayedSpace.displayedPage", new DocumentReference("displayedWiki",
-            "displayedSpace", "displayedPage"), "[[page]] [[attach:test.png]] image:test.png");
+        final DocumentReference displayedDocumentReference =
+            new DocumentReference("displayedWiki", "displayedSpace", "displayedPage");
+        setUpDocumentMock("displayedWiki:displayedSpace.displayedPage", displayedDocumentReference,
+            "[[page]] [[attach:test.png]] image:test.png");
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
+                oneOf(mockSetup.bridge).getCurrentDocumentReference();
+                will(returnValue(displayedDocumentReference));
                 oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
             }
         });
@@ -203,11 +207,11 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.relativePage][base]=[wiki:space.relativePage]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:space.relativePage][source]=[wiki:space.relativePage]]\n"
             + "beginParagraph\n"
             + "onWord [content]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.relativePage][base]=[wiki:space.relativePage]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:space.relativePage][source]=[wiki:space.relativePage]]\n"
             + "endDocument";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
@@ -230,6 +234,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(resolvedReference)));
+                oneOf(mockSetup.bridge).getCurrentDocumentReference();
+                will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
             }
         });
@@ -245,14 +251,14 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     public void testDisplayMacroWhenSectionSpecified() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.DisplayedPage][base]=[wiki:Space.DisplayedPage]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
             + "beginHeader [1, Hsection]\n"
             + "onWord [section]\n"
             + "endHeader [1, Hsection]\n"
             + "beginParagraph\n"
             + "onWord [content2]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.DisplayedPage][base]=[wiki:Space.DisplayedPage]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
             + "endDocument";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
@@ -341,6 +347,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 will(returnValue(true));
                 oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)),
                     with(same(displayedDocumentReference)));
+                atMost(1).of(mockSetup.bridge).getCurrentDocumentReference();
+                will(returnValue(displayedDocumentReference));
                 oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
             }
         });

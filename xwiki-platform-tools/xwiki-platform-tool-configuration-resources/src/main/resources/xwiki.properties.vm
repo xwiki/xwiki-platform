@@ -445,6 +445,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Here's an example to add your local Maven Repository
 # extension.repositories=local:maven:file://${sys:user.home}/.m2/repository
 #-#
+#-# And an example to add the XWiki Maven Snapshot Repository
+# extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
+#-#
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/

@@ -40,7 +40,7 @@
   Release Date: $doc.display("releaseDate")
 #else
   ## Note: We use the include macro below to circumvent the "nested script" execution issue...
-  {{include reference="ReleaseSheetHeader"/}}
+  {{include reference="ReleaseCode.ReleaseSheetHeader"/}}
 
   {{include reference="$services.model.serialize($doc.documentReference)"/}}
 #end

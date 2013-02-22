@@ -59,7 +59,7 @@
     </property>
   </object>
   <content>release.livetable.version=Version
-release.livetable.releaseManager=Release Managers
+release.livetable.releaseManagers=Release Managers
 release.livetable.releaseDate=Released on
 release.livetable.releaseNotes=Release Notes
 release.applicationsPanelEntryLabel=Release

@@ -31,6 +31,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -202,5 +204,34 @@ public class ModelScriptServiceTest
     public void getEntityReferenceValueWithNullType() throws Exception
     {
         Assert.assertNull(this.service.getEntityReferenceValue(null));
+    }
+
+    @Test
+    public void createWikiReference()
+    {
+        Assert.assertEquals(new WikiReference("wiki"), this.service.createWikiReference("wiki"));
+    }
+
+    @Test
+    public void createSpaceReference()
+    {
+        Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")),
+            this.service.createSpaceReference("space", this.service.createWikiReference("wiki")));
+    }
+
+    @Test
+    public void createEntityReferenceWithoutParent()
+    {
+        Assert.assertEquals(new EntityReference("page", EntityType.DOCUMENT),
+            this.service.createEntityReference("page", EntityType.DOCUMENT));
+    }
+
+    @Test
+    public void createEntityReferenceWithParent()
+    {
+        Assert.assertEquals(new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE)),
+            this.service.createEntityReference("page", EntityType.DOCUMENT,
+                this.service.createEntityReference("space", EntityType.SPACE)));
     }
 }

@@ -38,6 +38,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -144,6 +146,58 @@ public class ModelScriptService implements ScriptService
     public AttachmentReference createAttachmentReference(DocumentReference documentReference, String fileName)
     {
         return new AttachmentReference(fileName, documentReference);
+    }
+
+    /**
+     * Creates a {@link WikiReference} from a string representing the wiki name.
+     *
+     * @param wikiName the wiki name (eg "xwiki")
+     * @return the reference to the wiki
+     * @since 5.0M1
+     */
+    public WikiReference createWikiReference(String wikiName)
+    {
+        return new WikiReference(wikiName);
+    }
+
+    /**
+     * Creates a {@link SpaceReference} from a string representing the space name.
+     *
+     * @param spaceName the space name (eg "Main")
+     * @param parent the wiki reference in which the space is located
+     * @return the reference to the space
+     * @since 5.0M1
+     */
+    public SpaceReference createSpaceReference(String spaceName, WikiReference parent)
+    {
+        return new SpaceReference(spaceName, parent);
+    }
+
+    /**
+     * Creates any {@link EntityReference} from a string.
+     *
+     * @param name the entity reference name (eg "page")
+     * @param type the entity type (eg "wiki", "space", "document", etc)
+     * @return the created reference
+     * @since 5.0M1
+     */
+    public EntityReference createEntityReference(String name, EntityType type)
+    {
+        return new EntityReference(name, type);
+    }
+
+    /**
+     * Creates any {@link EntityReference} from a string.
+     *
+     * @param name the entity reference name (eg "page")
+     * @param type the entity type (eg "wiki", "space", "document", etc)
+     * @param parent the entity parent
+     * @return the created reference
+     * @since 5.0M1
+     */
+    public EntityReference createEntityReference(String name, EntityType type, EntityReference parent)
+    {
+        return new EntityReference(name, type, parent);
     }
 
     /**

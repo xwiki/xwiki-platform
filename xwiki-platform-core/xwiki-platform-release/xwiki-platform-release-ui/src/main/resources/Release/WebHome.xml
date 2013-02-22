@@ -50,10 +50,10 @@
 = Existing Releases =
 
 {{velocity}}
-#set($columns = ["version", "releaseManager", "releaseDate", "releaseNotes"])
+#set($columns = ["version", "releaseManagers", "releaseDate", "releaseNotes"])
 #set($columnsProperties = {
     "version" : { "type" : "text" , "link" : "view"},
-    "releaseManager" : { "type" : "text" },
+    "releaseManagers" : { "type" : "text" },
     "releaseDate" : { "type" : "text" }
 })
 #set($options = { 

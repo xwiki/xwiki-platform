@@ -41,6 +41,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Model-specific Scripting APIs.
@@ -155,6 +156,7 @@ public class ModelScriptService implements ScriptService
      * @return the reference to the wiki
      * @since 5.0M1
      */
+    @Unstable
     public WikiReference createWikiReference(String wikiName)
     {
         return new WikiReference(wikiName);
@@ -168,6 +170,7 @@ public class ModelScriptService implements ScriptService
      * @return the reference to the space
      * @since 5.0M1
      */
+    @Unstable
     public SpaceReference createSpaceReference(String spaceName, WikiReference parent)
     {
         return new SpaceReference(spaceName, parent);
@@ -181,6 +184,7 @@ public class ModelScriptService implements ScriptService
      * @return the created reference
      * @since 5.0M1
      */
+    @Unstable
     public EntityReference createEntityReference(String name, EntityType type)
     {
         return new EntityReference(name, type);
@@ -195,6 +199,7 @@ public class ModelScriptService implements ScriptService
      * @return the created reference
      * @since 5.0M1
      */
+    @Unstable
     public EntityReference createEntityReference(String name, EntityType type, EntityReference parent)
     {
         return new EntityReference(name, type, parent);

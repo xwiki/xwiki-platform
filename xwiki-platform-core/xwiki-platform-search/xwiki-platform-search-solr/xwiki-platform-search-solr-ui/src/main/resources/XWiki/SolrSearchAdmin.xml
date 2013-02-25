@@ -208,11 +208,14 @@ search=Main.SolrSearch</parameters>
 &lt;/dt&gt;
 &lt;dd&gt;
   &lt;select name='wiki' size='1'&gt;
-    #if ($xwiki.isVirtualMode() &amp;&amp; ($xcontext.database == $xcontext.mainWikiName))
-    &lt;option value=''&gt;Entire farm&lt;/option&gt;
-    #end
-    #foreach ($wiki in $allWikis)
-    &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;
+    ## Indexing on the entire farm or on various wikis is done only on the main wiki.
+    #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+      &lt;option value=''&gt;Entire farm&lt;/option&gt;
+      #foreach ($wiki in $allWikis)
+        &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;
+      #end
+    #else
+      &lt;option value='$xcontext.database'&gt;$xcontext.database&lt;/option&gt;
     #end
   &lt;/select&gt;
 &lt;/dd&gt;

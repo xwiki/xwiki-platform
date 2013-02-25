@@ -120,6 +120,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.stability.Unstable;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
 import org.xwiki.xml.XMLUtils;
@@ -1411,6 +1412,7 @@ public class XWiki implements EventListener
     /**
      * @since 5.0M1
      */
+    @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
         return getDocument(this.currentReferenceDocumentReferenceResolver.resolve(reference), context);

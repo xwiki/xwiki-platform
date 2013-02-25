@@ -21,7 +21,7 @@ REM -------------------------------------------------------------------------
 
 set JETTY_HOME=jetty
 set JETTY_PORT=8080
-set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=128m
+set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
 
 REM For enabling YourKit Profiling.

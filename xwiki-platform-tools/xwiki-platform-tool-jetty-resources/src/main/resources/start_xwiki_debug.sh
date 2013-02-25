@@ -46,7 +46,7 @@ JETTY_HOME=jetty
 
 # If no XWIKI_OPTS env variable has been defined use default values.
 if [ -z "$XWIKI_OPTS" ] ; then
-  XWIKI_OPTS="-Xmx512m -XX:MaxPermSize=128m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+  XWIKI_OPTS="-Xmx512m -XX:MaxPermSize=196m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
 fi
 
 # The port on which to start Jetty can be passed to this script as the first argument

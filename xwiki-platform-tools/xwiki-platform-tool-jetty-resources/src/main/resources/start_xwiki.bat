@@ -22,7 +22,7 @@ REM -------------------------------------------------------------------------
 set JETTY_HOME=jetty
 set JETTY_PORT=8080
 set JETTY_STOP_PORT=8079
-set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=128m
+set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}

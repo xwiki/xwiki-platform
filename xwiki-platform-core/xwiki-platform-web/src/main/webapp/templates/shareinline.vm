@@ -74,7 +74,7 @@
       <label for="shareTarget">$msg.get('core.viewers.share.target')</label>
       <span class="xHint">$msg.get('core.viewers.share.target.hint')</span>
     </dt>
-    <dd><input type="text" name="target" id="shareTarget" value="" /></dd>
+    <dd><input type="text" name="target" id="shareTarget" value="$!escapetool.xml($stringtool.join($request.getParameterValues('target'), ','))" /></dd>
     #set ($ownEmail = "$!{xwiki.getDocument($context.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
     #if ($ownEmail != '')
       <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($context.user, false)} $escapetool.xml("<${ownEmail}>")" /> $msg.get('core.viewers.share.target.ccMe')</label></dd>

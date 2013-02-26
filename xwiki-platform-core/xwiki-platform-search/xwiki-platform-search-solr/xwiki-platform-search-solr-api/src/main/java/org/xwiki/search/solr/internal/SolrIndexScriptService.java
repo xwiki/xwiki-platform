@@ -36,7 +36,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndex;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -228,9 +227,9 @@ public class SolrIndexScriptService implements ScriptService
      * Check the current user's access to alter the index of the wiki owning the given referenced entity.
      * 
      * @param reference the reference whose owning wiki to check.
-     * @throws Exception if the user is not allowed or if problems occur.
+     * @throws IllegalAccessException if the user is not allowed or if problems occur.
      */
-    protected void checkAccessToWikiIndex(EntityReference reference) throws Exception
+    private void checkAccessToWikiIndex(EntityReference reference) throws IllegalAccessException
     {
         EntityReference wikiReference = (WikiReference) reference.extractReference(EntityType.WIKI);
         String wikiName = wikiReference.getName();
@@ -243,7 +242,7 @@ public class SolrIndexScriptService implements ScriptService
             // RightService works only on the current wiki, so we need to change the context wiki.
             context.setDatabase(wikiName);
             if (!rightService.hasWikiAdminRights(context) || !rightService.hasProgrammingRights(context)) {
-                throw new SolrIndexException(String.format(
+                throw new IllegalAccessException(String.format(
                     "The user '%s' is not allowed to alter the index for the entity '%s'", getXWikiContext()
                         .getUserReference(), reference));
             }
@@ -258,9 +257,10 @@ public class SolrIndexScriptService implements ScriptService
      * optimized method that only checks one reference for each distinct wiki.
      * 
      * @param references the references whose owning wikis to check.
-     * @throws Exception if the user is not allowed for at least one of the passed references or if problems occur.
+     * @throws IllegalAccessException if the user is not allowed for at least one of the passed references or if
+     *             problems occur.
      */
-    protected void checkAccessToWikiIndex(List<EntityReference> references) throws Exception
+    private void checkAccessToWikiIndex(List<EntityReference> references) throws IllegalAccessException
     {
         // Build a map of representatives for each wiki to avoid checking every reference.
         Map<EntityReference, EntityReference> representatives = new HashMap<EntityReference, EntityReference>();

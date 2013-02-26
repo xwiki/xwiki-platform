@@ -19,23 +19,29 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndex;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
@@ -61,9 +67,19 @@ public class SolrIndexScriptServiceTest
 
     private DocumentReference userReference;
 
+    private Object mockSolrIndex;
+
+    private SolrIndexScriptService service;
+
+    private Logger logger;
+
     @Before
     public void setUp() throws Exception
     {
+        service = mocker.getComponentUnderTest();
+
+        logger = mocker.getMockedLogger();
+        mockSolrIndex = mocker.getInstance(SolrIndex.class);
         userReference = new DocumentReference("wiki", "space", "userName");
 
         // Context
@@ -82,109 +98,193 @@ public class SolrIndexScriptServiceTest
         // RightService
         mockRightsService = mock(XWikiRightService.class);
         when(mockXWiki.getRightService()).thenReturn(mockRightsService);
+        // By default, we have the rights.
         when(mockRightsService.hasWikiAdminRights(mockContext)).thenReturn(true);
         when(mockRightsService.hasProgrammingRights(mockContext)).thenReturn(true);
+
+        // Rights check success. By default we are allowed (no error is thrown)
+        verify(logger, never()).error(anyString(), any(IllegalAccessException.class));
     }
 
     @Test
-    public void checkAccessToWikiIndexHasWikiAdminAndProgramming() throws Exception
+    public void indexSingleReferenceChecksRights() throws Exception
     {
-        SolrIndexScriptService service = mocker.getComponentUnderTest();
-
         EntityReference entityReference = new WikiReference("someWiki");
 
         // Call
-        service.checkAccessToWikiIndex(entityReference);
+        service.index(entityReference);
 
         // Assert and verify
-        Mockito.verify(mockContext, Mockito.times(2)).setDatabase(Mockito.anyString());
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
     }
 
     @Test
-    public void checkAccessToWikiIndexOnDocument() throws Exception
+    public void indexMultipleReferencesChecksRights() throws Exception
     {
-        SolrIndexScriptService service = mocker.getComponentUnderTest();
+        EntityReference entityReference = new WikiReference("someWiki");
 
+        // Call
+
+        // Note: Faking it. just using one reference but still calling the multiple references method (which is what we
+        // wanted anyway)
+        service.index(Arrays.asList(entityReference));
+
+        // Assert and verify
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database.
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
+    }
+
+    @Test
+    public void deleteSingleReferenceChecksRights() throws Exception
+    {
+        EntityReference entityReference = new WikiReference("someWiki");
+
+        // Call
+        service.delete(entityReference);
+
+        // Assert and verify
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
+    }
+
+    @Test
+    public void deleteMultipleReferencesChecksRights() throws Exception
+    {
+        EntityReference entityReference = new WikiReference("someWiki");
+
+        // Call
+
+        // Note: Faking it. just using one reference but still calling the multiple references method (which is what we
+        // wanted anyway)
+        service.delete(Arrays.asList(entityReference));
+
+        // Assert and verify
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
+    }
+
+    @Test
+    public void operationsChecksRightsWithOtherReferences() throws Exception
+    {
         EntityReference entityReference = new DocumentReference("someWiki", "space", "document");
 
         // Call
-        service.checkAccessToWikiIndex(entityReference);
+        service.index(entityReference);
 
         // Assert and verify
-        Mockito.verify(mockContext, Mockito.times(2)).setDatabase(Mockito.anyString());
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
     }
 
     @Test
-    public void checkAccessToWikiIndexHasWikiAdminButNoProgramming() throws Exception
+    public void hasWikiAdminButNoProgrammingCausesRightsCheckFailure() throws Exception
     {
-        SolrIndexScriptService service = mocker.getComponentUnderTest();
-
         EntityReference entityReference = new WikiReference("someWiki");
 
         // Mock
         when(mockRightsService.hasProgrammingRights(mockContext)).thenReturn(false);
 
         // Call
-        try {
-            service.checkAccessToWikiIndex(entityReference);
-            Assert.fail("Not having PR should fail the operation.");
-        } catch (SolrIndexException e) {
-            Assert.assertEquals(String.format("The user '%s' is not allowed to alter the index for the entity '%s'",
-                userReference, entityReference), e.getMessage());
-        }
+        service.index(entityReference);
 
         // Assert and verify
-        Mockito.verify(mockContext, Mockito.times(2)).setDatabase(Mockito.anyString());
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
+
+        // Rights check failure
+        String errorMessage =
+            String.format("The user '%s' is not allowed to alter the index for the entity '%s'", userReference,
+                entityReference);
+        verify(logger).error(eq(errorMessage), any(IllegalAccessException.class));
+        verify(mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION), any(IllegalAccessException.class));
     }
 
     @Test
-    public void checkAccessToWikiIndexNoWikiAdminButHasProgramming() throws Exception
+    public void hasProgrammingButNoWikiAdminCausesRightsCheckFailure() throws Exception
     {
-        SolrIndexScriptService service = mocker.getComponentUnderTest();
-
         EntityReference entityReference = new WikiReference("someWiki");
 
         // Mock
         when(mockRightsService.hasWikiAdminRights(mockContext)).thenReturn(false);
 
         // Call
-        try {
-            service.checkAccessToWikiIndex(entityReference);
-            Assert.fail("Not having admin rights should fail the operation.");
-        } catch (SolrIndexException e) {
-            Assert.assertEquals(String.format("The user '%s' is not allowed to alter the index for the entity '%s'",
-                userReference, entityReference), e.getMessage());
-        }
+        service.index(entityReference);
 
         // Assert and verify
-        Mockito.verify(mockContext, Mockito.times(2)).setDatabase(Mockito.anyString());
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        // hasProgrammingRights does not really get to be called, since hasWikiAdminRights already failed at this point
+        verify(mockRightsService, atMost(1)).hasProgrammingRights(mockContext);
+
+        // Rights check failure.
+        String errorMessage =
+            String.format("The user '%s' is not allowed to alter the index for the entity '%s'", userReference,
+                entityReference);
+        verify(logger).error(eq(errorMessage), any(IllegalAccessException.class));
+        verify(mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION), any(IllegalAccessException.class));
     }
 
     @Test
-    public void checkAccessToWikiIndexMultipleReferencesOneWiki() throws Exception
+    public void openrationsOnMultipleReferencesOnTheSameWikiChecksRightsOnlyOnceForThatWiki() throws Exception
     {
-        // Use a spy to be able to verify invocations of methods.
-        SolrIndexScriptService spyService = Mockito.spy(mocker.getComponentUnderTest());
-
+        // References from the same wiki
         WikiReference wikiReference = new WikiReference("wiki");
         SpaceReference spaceReference = new SpaceReference("space", wikiReference);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "name");
         DocumentReference documentReference2 = new DocumentReference("wiki", "space", "name2");
 
         // Call
-        spyService.checkAccessToWikiIndex(Arrays.asList(wikiReference, spaceReference, documentReference,
-            documentReference2));
+        service.index(Arrays.asList(wikiReference, spaceReference, documentReference, documentReference2));
 
         // Assert and verify
-        Mockito.verify(spyService, Mockito.times(1)).checkAccessToWikiIndex(Mockito.any(EntityReference.class));
+
+        // setDatabase once to check rights on the target wiki and once more to set back the current database
+        verify(mockContext, times(2)).setDatabase(anyString());
+
+        // Actual rights check
+        verify(mockRightsService).hasWikiAdminRights(mockContext);
+        verify(mockRightsService).hasProgrammingRights(mockContext);
     }
 
     @Test
-    public void checkAccessToWikiIndexMultipleReferencesMultipleWikis() throws Exception
+    public void openrationsOnMultipleReferencesOnDifferentWikisChecksRightsOnEachWiki() throws Exception
     {
-        // Use a spy to be able to verify invocations of methods.
-        SolrIndexScriptService spyService = Mockito.spy(mocker.getComponentUnderTest());
-
+        // References from 3 different wikis
         WikiReference wikiReference = new WikiReference("wiki");
         SpaceReference spaceReference = new SpaceReference("space", wikiReference);
         WikiReference wikiReference2 = new WikiReference("wiki2");
@@ -192,10 +292,17 @@ public class SolrIndexScriptServiceTest
         DocumentReference documentReference2 = new DocumentReference("wiki3", "space", "name2");
 
         // Call
-        spyService.checkAccessToWikiIndex(Arrays.asList(wikiReference, spaceReference, wikiReference2,
-            documentReference, documentReference2));
+        service.index(Arrays.asList(wikiReference, spaceReference, wikiReference2, documentReference,
+            documentReference2));
 
         // Assert and verify
-        Mockito.verify(spyService, Mockito.times(3)).checkAccessToWikiIndex(Mockito.any(EntityReference.class));
+
+        // setDatabase 3 times for each wiki to check rights on the target wiki and 3 times more to set back the current
+        // database each time
+        verify(mockContext, times(6)).setDatabase(anyString());
+
+        // Actual rights check, once for each wiki.
+        verify(mockRightsService, times(3)).hasWikiAdminRights(mockContext);
+        verify(mockRightsService, times(3)).hasProgrammingRights(mockContext);
     }
 }

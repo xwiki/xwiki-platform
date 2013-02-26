@@ -294,14 +294,20 @@
     <dt>$msg.get('extensions.info.namespaces.list')</dt>
     <dd><ul>
       #foreach ($namespace in $extension.namespaces)
-        #if ($namespace.startsWith('wiki:'))
-          <li>#wikiHomePageLink($namespace)</li>
-        #else
-          <li>$namespace</li>
-        #end
+        <li>#displayExtensionNamespace($namespace)</li>
       #end
     </ul></dd>
   #end
+#end
+
+#macro (displayExtensionNamespace $namespace)
+#if ("$!namespace" == '' && $namespace != '')
+$msg.get('extensions.info.globalNamespace')##
+#elseif ($namespace.startsWith('wiki:'))
+#wikiHomePageLink($namespace)##
+#else
+$namespace##
+#end
 #end
 
 #macro (displayExtensionDetails_description_versions $extension)

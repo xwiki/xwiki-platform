@@ -1126,14 +1126,19 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro(extensionActionButtons $installedExtension $action $secondary)
+  #set ($isGlobalActionSecondary = $secondary)
+  #set ($globalActionExtraClassName = $NULL)
   #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace)
     && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
     ## Button that targets only the current wiki.
     #extensionActionButton($action $secondary)
+    #set ($isGlobalActionSecondary = true)
+    ## Indicate that the local action is available.
+    #set ($globalActionExtraClassName = 'alternative-action')
   #end
   #if ($xwiki.isVirtualMode() && $xcontext.isMainWiki())
     ## Button that targets the entire farm.
-    #extensionActionButton("${action}Globally" true)
+    #extensionActionButton("${action}Globally" $isGlobalActionSecondary $globalActionExtraClassName)
   #end
 #end
 

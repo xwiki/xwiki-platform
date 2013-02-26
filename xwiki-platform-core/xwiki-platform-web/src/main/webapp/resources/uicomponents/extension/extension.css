@@ -103,12 +103,8 @@
   display: block;
 }
 
-ul.extension-metadata {
-  list-style-type: none;
+dl.extension-metadata > dd > ul {
   margin: 0;
-}
-ul.extension-metadata li {
-  padding-top: 0.5em;
 }
 
 .extension-body-dependencies ul, .extension-body-progress > ul {

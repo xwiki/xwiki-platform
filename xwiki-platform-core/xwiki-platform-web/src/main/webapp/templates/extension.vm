@@ -201,54 +201,87 @@
 #macro (displayExtensionDetails_description $extension)
   <div id="extension-body-description-${extension.id.id}-${extension.id.version}"></div>
   <div class="extension-body-description extension-body-section">
-    <ul class="extension-metadata">
-      <li>$msg.get('extensions.info.license', [$extension.licenses.size()]) ##
-        #foreach ($license in $extension.licenses)
-          ${license.name}##
-          #if ($foreach.hasNext), #end
-        #end
-      </li>
-      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
-        <li>
-          $msg.get('extensions.info.repository')
-          <a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a>
-        </li>
-      #end
-      #if ($extension.dependency)
-        <li>$msg.get('extensions.info.dependency')</li>
-      #end
-      #if ("$!{extension.webSite}" != '')
-        <li>
-          $msg.get('extensions.info.website')
-          <a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a>
-        </li>
-      #end
+    <dl class="extension-metadata">
+      <dt>$msg.get('extensions.info.id')</dt>
+      <dd>$extension.id.id</dd>
+
       #if ($extension.features.size() > 0)
-        <li>$msg.get('extensions.info.features') $escapetool.xml($extension.features)</li>
+        <dt>$msg.get('extensions.info.features', [$extension.features.size()])</dt>
+        <dd>
+        #if ($extension.features.size() == 1)
+          $escapetool.xml($extension.features.iterator().next())
+        #else
+          <ul>
+            #foreach ($feature in $extension.features)
+              <li>$escapetool.xml($feature)</li>
+            #end
+          </ul>
+        #end
+        </dd>
       #end
-      #if ($xwiki.isVirtualMode() && $extension.isInstalled("wiki:${xcontext.database}"))
-        <li>#displayExtensionDetails_description_wikis($extension)</li>
+
+      <dt>$msg.get('extensions.info.type')</dt>
+      <dd>$extension.type</dd>
+
+      <dt>$msg.get('extensions.info.license', [$extension.licenses.size()])</dt>
+      #if ($extension.licenses.size() > 0)
+        <dd>
+          #if ($extension.licenses.size() == 1)
+            $extension.licenses.iterator().next().name
+          #else
+            <ul>
+              #foreach ($license in $extension.licenses)
+                <li>$license.name</li>
+              #end
+            </ul>
+          #end
+        </dd>
       #end
-    </ul>
-    ##
-    ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax, server side generated HTML, etc)
-    ## $!extension.description
+
+      #if ("$!{extension.webSite}" != '')
+        <dt>$msg.get('extensions.info.website')</dt>
+        <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+      #end
+
+      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
+        <dt>$msg.get('extensions.info.repository')</dt>
+        <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
+      #end
+
+      #if ($extension.isInstalled())
+        #displayExtensionDetails_description_wikis($extension)
+      #end
+
+      ##
+      ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax, server side generated HTML, etc)
+      ## <dt>Description</dt>
+      ## <dd>$!extension.description</dd>
+    </dl>
   </div>
 #end
 
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    $msg.get('extensions.info.namespaces.global')
-  #else
-    #set ($wikis = [])
-    #foreach ($namespace in $extension.namespaces)
-      #if ($namespace.startsWith('wiki:'))
-        #set ($discard = $wikis.add($namespace.substring(5)))
+    <dt>$msg.get('extensions.info.namespaces.global')</dt>
+  #elseif ($xwiki.isVirtualMode() && $xcontext.isMainWiki())
+    ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
+    <dt>$msg.get('extensions.info.namespaces.list')</dt>
+    <dd><ul>
+      #foreach ($namespace in $extension.namespaces)
+        #if ($namespace.startsWith('wiki:'))
+          #set ($wikiReference = $services.model.createDocumentReference($namespace.substring(5), '', '').wikiReference)
+          #set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
+          #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiReference.name).wikiPrettyName)
+          #if ("$!wikiPrettyName.trim()" == '')
+            #set ($wikiPrettyName = $wikiReference.name)
+          #end
+          <li><a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a></li>
+        #else
+          <li>$namespace</li>
+        #end
       #end
-    #end
-    ## List the wikis where the given extension was installed.
-    $msg.get('extensions.info.namespaces.list') $escapetool.xml($stringtool.join($wikis, ', '))
+    </ul></dd>
   #end
 #end
 

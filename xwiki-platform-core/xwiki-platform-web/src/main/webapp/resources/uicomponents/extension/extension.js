@@ -21,6 +21,9 @@ XWiki.ExtensionBehaviour = Class.create({
     // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
     this._enhanceMenuBehaviour();
 
+    // Enhances the behaviour of the Description section.
+    this._enhanceDescriptionBehaviour();
+
     // Enhances the behaviour of the Dependencies section.
     this._enhanceDependenciesBehaviour();
 
@@ -335,10 +338,13 @@ XWiki.ExtensionBehaviour = Class.create({
 
   /**
    * Redisplays the extension using updated information from the server.
+   *
+   * @param extraParams additional submit parameters
    */
-  _refresh : function() {
+  _refresh : function(extraParams) {
     // Prepare the data for the AJAX call.
     var formData = new Hash(this.container.serialize({submit: false}));
+    extraParams && formData.update(extraParams);
 
     // Preserve the menu selection while the extension display is refreshed.
     this._preserveMenuSelection = true;
@@ -507,6 +513,19 @@ XWiki.ExtensionBehaviour = Class.create({
         response.request.options.onFailure(response);
       }
     });
+  },
+
+  /**
+   * Enhances the behaviour of the Description section within the extension details.
+   */
+  _enhanceDescriptionBehaviour : function() {
+    var extensionVersionsLink = this.container.down('.extension-versions-link');
+    extensionVersionsLink && extensionVersionsLink.observe('click', function(event) {
+      event.stop();
+      // Hide the link and show the loading annimation.
+      event.element().hide().up().addClassName('loading').setStyle({'height': '16px', 'width': '16px'});
+      this._refresh({'listVersions': true});
+    }.bindAsEventListener(this));
   }
 });
 

@@ -242,7 +242,7 @@ dl.extension-metadata > dd > ul {
   text-align: right;
 }
 
-#extension-search-advanced legend a:after {
+#extension-search-advanced legend a:after, a.extension-versions-link:after {
   content: " \bb";
 }
 #extension-search-advanced legend a.expanded:after {

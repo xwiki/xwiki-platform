@@ -47,8 +47,8 @@
 #welcome .steps.vertical .description {
   font-size: smaller;
 }
-/* The extension actions available on the Main UI step should target only the main wiki. */
-#extension\.mainui .extension-actions button[value$="Globally"] {
+/* The extension actions available on the Distribution Wizard steps should target a single wiki whenever posible. */
+#distributionWizard .extension-actions button[class~="alternative-action"][value$="Globally"] {
   display: none;
 }
 #previousUi dt label {

@@ -258,6 +258,10 @@
         #displayExtensionDetails_description_wikis($extension)
       #end
 
+      #if ($extensionStatus != 'loading')
+        #displayExtensionDetails_description_versions($extension)
+      #end
+
       ##
       ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax,
       ## server side generated HTML, etc.)
@@ -283,6 +287,39 @@
         #end
       #end
     </ul></dd>
+  #end
+#end
+
+#macro (displayExtensionDetails_description_versions $extension)
+  #if (!$request.listVersions)
+    <dt></dt>
+    <dd>
+      <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
+        class="extension-versions-link">
+        $msg.get('extensions.info.stableVersions.linkLabel')
+      </a>
+    </dd>
+  #else
+    <dt>$msg.get('extensions.info.stableVersions.label')</dt>
+    <dd>
+      #set ($stableVersions = [])
+      #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
+        #if ($version.type == 'STABLE')
+          #set ($discard = $stableVersions.add($version.value))
+        #end
+      #end
+      #if ($stableVersions.size() > 0)
+        <ul>
+        ## Latest version first.
+        #foreach ($i in [$mathtool.sub($stableVersions.size(), 1)..0])
+          #set ($version = $stableVersions.get($i))
+          <li><a href="#getExtensionURL($extension.id.id $version)" class="extension-link">$version</a></li>
+        #end
+        </ul>
+      #else
+        $msg.get('extensions.info.stableVersions.noResults')
+      #end
+    </dd>
   #end
 #end
 

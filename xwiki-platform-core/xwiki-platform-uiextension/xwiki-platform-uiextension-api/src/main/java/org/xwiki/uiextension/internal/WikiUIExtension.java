@@ -41,6 +41,16 @@ import org.xwiki.uiextension.UIExtension;
 public class WikiUIExtension implements UIExtension, WikiComponent
 {
     /**
+     * The key used for the UIX context in the script context.
+     */
+    public static final String CONTEXT_UIX_KEY = "uix";
+
+    /**
+     * The key used for the UIX document in the UIX context.
+     */
+    public static final String CONTEXT_UIX_DOC_KEY = "doc";
+
+    /**
      * @see #WikiUIExtension
      */
     private final DocumentReference documentReference;

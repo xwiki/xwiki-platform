@@ -283,6 +283,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(componentDoc).getDocumentReference();
+                will(returnValue(DOC_REF));
                 oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(extensionObjects));
                 oneOf(componentDoc).getAuthorReference();
@@ -317,6 +319,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue(new WikiReference("xwiki")));
                 oneOf(componentManager).getInstance(ContentParser.class);
                 will(returnValue(contentParser));
+                oneOf(componentManager).getInstance(Execution.class);
+                will(returnValue(execution));
                 oneOf(componentManager).getInstance(VelocityManager.class);
                 will(returnValue(velocityManager));
                 allowing(velocityManager).getVelocityEngine();

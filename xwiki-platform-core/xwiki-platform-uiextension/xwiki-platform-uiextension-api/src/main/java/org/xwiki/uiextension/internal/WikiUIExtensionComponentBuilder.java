@@ -166,7 +166,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
             extension.setParameters(parameters);
             // It would be nice to have PER_LOOKUP components for UIX renderers but without constructor injection it's
             // safer to use a POJO and pass him the Component Manager.
-            WikiUIExtensionRenderer renderer = new WikiUIExtensionRenderer(roleHint, content, doc.getSyntax(), cm);
+            WikiUIExtensionRenderer renderer =
+                new WikiUIExtensionRenderer(roleHint, content, doc.getDocumentReference(), cm);
             extension.setRenderer(renderer);
             extension.setScope(scope);
             extensions.add(extension);

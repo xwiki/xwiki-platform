@@ -19,28 +19,28 @@
  */
 package org.xwiki.uiextension;
 
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.test.LogRule;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.uiextension.internal.WikiUIExtensionRenderer;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 import junit.framework.Assert;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class WikiUIExtensionRendererTest
@@ -52,6 +52,8 @@ public class WikiUIExtensionRendererTest
     private ContentParser contentParser;
 
     private XDOM xdom;
+
+    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
 
     @Rule
     public MockitoComponentManagerRule cm = new MockitoComponentManagerRule();
@@ -70,10 +72,19 @@ public class WikiUIExtensionRendererTest
     @Test
     public void executeWithEmptyContent() throws Exception
     {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        XWiki xwiki = mock(XWiki.class);
+
         when(contentParser.parse(eq(""), eq(Syntax.XWIKI_2_1))).thenReturn(xdom);
         when(xdom.clone()).thenReturn(xdom);
+        when(execution.getContext().getProperty("xwikicontext")).thenReturn(xcontext);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(xwiki.getDocument(DOC_REF, xcontext)).thenReturn(xdoc);
+        when(xcontext.getWiki().getDocument(DOC_REF, xcontext)).thenReturn(xdoc);
+        when(xdoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
-        WikiUIExtensionRenderer renderer = new WikiUIExtensionRenderer("roleHint", "", Syntax.XWIKI_2_1, cm);
+        WikiUIExtensionRenderer renderer = new WikiUIExtensionRenderer("roleHint", "", DOC_REF, cm);
 
         Block block = renderer.execute();
         Assert.assertEquals(0, block.getChildren().size());

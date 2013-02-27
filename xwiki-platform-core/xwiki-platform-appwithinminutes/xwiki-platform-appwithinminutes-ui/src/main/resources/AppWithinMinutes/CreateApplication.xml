@@ -170,7 +170,7 @@ XWiki.AppNameValidator = Class.create({
   onUpdate : function() {
     if (this.input.value == '') {
       this._onValidate({
-        responseText: '&lt;span class="xErrorMsg"&gt;$msg.get('platform.appwithinminutes.appNameEmptyError')&lt;/span&gt;'
+        responseText: '&lt;span class="xErrorMsg"&gt;$escapetool.javascript($msg.get('platform.appwithinminutes.appNameEmptyError'))&lt;/span&gt;'
       });
     } else {
       this.preview.addClassName('loading');

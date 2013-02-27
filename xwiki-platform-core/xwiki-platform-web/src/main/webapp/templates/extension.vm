@@ -72,7 +72,10 @@
 #macro (displayExtensionActionButtons $extension)
   <div class="extension-actions">
     #displayExtensionActionButtons_detailsToggle($extension)
-    #displayExtensionActionButtons_jobTriggers($extension)
+    ## Group the buttons that trigger an extension job.
+    <span class="dynamic-button-group">
+      #displayExtensionActionButtons_jobTriggers($extension)
+    </span>
   </div>
 #end
 
@@ -99,6 +102,7 @@
   #if(!$extensionStatus)
     #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   #end
+  ## Determine if there is an extension job waiting to be resumed or a previously created job plan that can be executed.
   #set ($showContinueButton = $jobState == 'WAITING')
   #if (!$showContinueButton)
     #isExtensionPlan($jobStatus $showContinueButton)
@@ -109,11 +113,19 @@
     ## * an extension job plan was previously computed and the user needs a button to execute the plan.
     #extensionActionButton('continue')
     <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
-  #elseif ($xcontext.action == 'distribution' && $showRepairXARButton)
+    #if ($jobState == 'WAITING')
+      ## Only the Continue button should be available when a job is waiting.
+      #break
+    #end
+  #end
+  ## Note that the Continue button doesn't exclude the following buttons, unless a job is waiting. The user should be
+  ## able for instance to recompute the install plan.
+  #if ($xcontext.action == 'distribution' && $showRepairXARButton)
+    ## NOTE: This code is normally reached only when JavaScript is disabled since otherwise the button is added from JavaScript.
     ## TODO: Find a better way to 'force' the repair XAR extension button.
     #set ($showRepairXARButton = $NULL)
     #extensionActionButton('repairXAR')
-    ## The repair job is executed without confirmation.
+    ## The repair job is executed without confirmation (i.e. without a plan).
     <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
   #elseif ($extensionStatus.startsWith('installed'))
     ## This extension can be uninstalled.
@@ -1096,7 +1108,6 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro(extensionActionButtons $installedExtension $action $secondary)
-  <span class="dynamic-button-group">
   #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace)
     && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
     ## Button that targets only the current wiki.
@@ -1106,7 +1117,6 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     ## Button that targets the entire farm.
     #extensionActionButton("${action}Globally" true)
   #end
-  </span>
 #end
 
 #macro (extensionActionButton $action $secondary $extraClassName)

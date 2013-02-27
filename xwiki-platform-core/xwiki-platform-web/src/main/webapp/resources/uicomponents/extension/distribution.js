@@ -272,10 +272,6 @@ XWiki.OutdatedExtensionsStep = Class.create({
       $('stepButtons').up().disable();
       this._refresh.bind(this).delay(timeout || 1);
     } else if (afterUpdate) {
-      // Enhance the behaviour of the extensions.
-      this.container.select('.extension-item').each(function(extension) {
-        new XWiki.ExtensionBehaviour(extension);
-      });
       this._updateStepButtons();
     }
   },

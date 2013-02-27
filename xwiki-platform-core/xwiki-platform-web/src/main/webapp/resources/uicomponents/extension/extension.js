@@ -170,6 +170,8 @@ XWiki.ExtensionBehaviour = Class.create({
     if (oldStatus != this.getStatus()) {
       document.fire('xwiki:extension:statusChanged', {extension: this});
     }
+    // Notify the others that the DOM has been updated.
+    document.fire('xwiki:dom:updated', {elements: [this.container]});
   },
 
   /**

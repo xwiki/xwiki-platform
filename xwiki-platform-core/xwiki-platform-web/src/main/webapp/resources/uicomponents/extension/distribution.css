@@ -48,7 +48,7 @@
   font-size: smaller;
 }
 /* The extension actions available on the Main UI step should target only the main wiki. */
-#extension\.mainui .extension-actions .button[name$="Globally"] {
+#extension\.mainui .extension-actions button[value$="Globally"] {
   display: none;
 }
 #previousUi dt label {

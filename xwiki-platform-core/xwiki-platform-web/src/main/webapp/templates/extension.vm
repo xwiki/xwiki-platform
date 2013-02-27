@@ -1,6 +1,8 @@
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set ($extensionManager = $services.extension)
 #set ($extensionNamespace = "wiki:$xcontext.database")
@@ -1094,6 +1096,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro(extensionActionButtons $installedExtension $action $secondary)
+  <span class="dynamic-button-group">
   #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace)
     && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
     ## Button that targets only the current wiki.
@@ -1103,6 +1106,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     ## Button that targets the entire farm.
     #extensionActionButton("${action}Globally" true)
   #end
+  </span>
 #end
 
 #macro (extensionActionButton $action $secondary $extraClassName)

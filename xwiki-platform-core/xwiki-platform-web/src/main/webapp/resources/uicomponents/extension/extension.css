@@ -44,6 +44,11 @@
   float: right;
   text-align: right;
 }
+/* Display the drop-down menu of a button group on top of the extension to make sure it is visible. */
+.extension-actions .button-group > .dropdown-menu {
+  left: auto;
+  right: 0;
+}
 
 .extension-status {
   font-size: 0.8em;

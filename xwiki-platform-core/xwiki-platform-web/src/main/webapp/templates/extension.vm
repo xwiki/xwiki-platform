@@ -400,7 +400,7 @@ $namespace##
     <p>$msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
     <ul>
       #foreach ($dependency in $extension.dependencies)
-        <li>#displayDependency($dependency $NULL)</li>
+        <li>#displayDependency($dependency $extensionNamespace)</li>
       #end
     </ul>
   #end

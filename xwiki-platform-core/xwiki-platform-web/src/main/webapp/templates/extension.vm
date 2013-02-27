@@ -5,7 +5,12 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set ($extensionManager = $services.extension)
-#set ($extensionNamespace = "wiki:$xcontext.database")
+## From the main wiki we can manage other namespaces.
+#if ($xcontext.isMainWiki() && "$!request.extensionNamespace" != '')
+  #set ($extensionNamespace = $request.extensionNamespace)
+#else
+  #set ($extensionNamespace = "wiki:$xcontext.database")
+#end
 #set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 
 #macro (displayExtensionSearchBar)
@@ -707,6 +712,7 @@ Caused by: #printThrowable($throwable.cause true)
     <div class="hidden">
       <input name="extensionId" value="$!escapetool.xml($extension.id.id)" type="hidden" />
       <input name="extensionVersion" value="$!escapetool.xml($extension.id.version.value)" type="hidden" />
+      <input name="extensionNamespace" value="$!escapetool.xml($extensionNamespace)" type="hidden" />
       #if ($request.section)
         <input name="section" value="$escapetool.xml($request.section)" type="hidden" />
       #end
@@ -1061,6 +1067,10 @@ $status##
 #set ($discard = $parameters.put('extensionVersion', $extensionVersion))
 #elseif ($request.extensionVersion)
 #set ($discard = $parameters.put('extensionVersion', $request.extensionVersion))
+#end
+##
+#if ($request.extensionNamespace)
+#set ($discard = $parameters.put('extensionNamespace', $request.extensionNamespace))
 #end
 ##
 #if ($xback)

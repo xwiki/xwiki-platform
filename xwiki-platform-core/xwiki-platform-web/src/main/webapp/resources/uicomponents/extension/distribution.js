@@ -71,9 +71,10 @@ XWiki.MainUIStep = Class.create({
     question.down('.button.secondary').observe('click', hidePreviousUiForm);
     // Hide the form.
     form.hide()
-    // Hide the recommended UI.
+    // Hide the recommended UI (everything up to the step buttons).
+    var stop = $('stepButtons').up('form');
     var next = form.next();
-    while (next && next.tagName.toLowerCase() != 'form') {
+    while (next && next != stop) {
       next = next.hide().next();
     }
   },
@@ -161,10 +162,7 @@ XWiki.MainUIStep = Class.create({
     event && event.stop();
     var form = $('previousUi');
     form.hide().previous().hide();
-    var next = form.next();
-    while (next && next.tagName.toLowerCase() != 'form') {
-      next = next.show().next();
-    }
+    for (var next = form.next(); next; next = next.show().next());
   },
 
   _resolvePreviousUiExtension : function(event) {
@@ -186,7 +184,7 @@ XWiki.MainUIStep = Class.create({
         var container = new Element('div').update(response.responseText);
         var previousUiExtension = container.down('.extension-item');
         if (previousUiExtension) {
-          if (previousUiExtension.down('input[name="actionInstall"]')) {
+          if (previousUiExtension.down('button[name="extensionAction"][value="install"]')) {
             // The specified previous UI is not installed. We have to update the extension index.
             this._previousUiExtensionId = {
               id: formData.previousUiId,
@@ -220,23 +218,16 @@ XWiki.MainUIStep = Class.create({
     // Enhance the extension display.
     document.fire('xwiki:dom:updated', {elements: [container]});
     // Hack the install button to perform a fake install (only mark the extension as installed).
-    var installButton = previousUiExtension.down('input[name="actionInstall"]');
-    installButton.value = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairLabel"))';
+    var installButton = previousUiExtension.down('button[name="extensionAction"][value="install"]');
+    installButton.update('$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairLabel"))'.escapeHTML());
     installButton.title = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairHint"))';
-    installButton.name = 'actionRepairXAR';
+    installButton.value = 'repairXAR';
     installButton.activate();
-    // Add the form token (for CSRF protection) and the confirm hidden input (to execute the job without confirmation,
-    // since the repair job doesn't have a plan job).
-    var fieldSet = installButton.up('fieldset');
-    fieldSet.insert({top: new Element('input', {
+    // Add the form token (for CSRF protection) to execute the job without confirmation (without a job plan).
+    installButton.insert({after: new Element('input', {
       type: 'hidden',
       name: 'form_token',
       value: document.head.down('meta[name="form_token"]').readAttribute('content')
-    })});
-    fieldSet.insert({top: new Element('input', {
-      type: 'hidden',
-      name: 'confirm',
-      value: '1'
     })});
   },
 
@@ -246,10 +237,7 @@ XWiki.MainUIStep = Class.create({
       // Remove the previous UI extension display.
       form.next().remove();
       // Display the recommended UI extension.
-      var next = form.next();
-      while (next && next.tagName.toLowerCase() != 'form') {
-        next = next.show().next();
-      }
+      for (var next = form.next(); next; next = next.show().next());
     }
   }
 });

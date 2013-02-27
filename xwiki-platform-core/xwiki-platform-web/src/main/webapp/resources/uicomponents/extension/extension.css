@@ -109,6 +109,7 @@
 }
 
 dl.extension-metadata > dd > ul {
+  list-style-position: inside;
   margin: 0;
 }
 

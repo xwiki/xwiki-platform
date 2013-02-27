@@ -55,7 +55,7 @@ public class MergeConflictPane extends BaseElement
     /**
      * The button used to compare the selected versions.
      */
-    @FindBy(name = "diff")
+    @FindBy(xpath = "//button[@name = 'extensionAction' and @value = 'diff']")
     private WebElement diffButton;
 
     /**
@@ -91,7 +91,8 @@ public class MergeConflictPane extends BaseElement
     {
         diffButton.click();
         // Wait as long as the button remains disabled.
-        waitUntilElementIsVisible(By.xpath("//input[@name = 'diff' and not(@disabled)]"));
+        waitUntilElementIsVisible(By
+            .xpath("//button[@name = 'extensionAction' and @value = 'diff' and not(@disabled)]"));
         return new MergeConflictPane();
     }
 

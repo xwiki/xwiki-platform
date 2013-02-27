@@ -199,7 +199,7 @@
 #end
 
 #macro (displayExtensionDetails_menuLink $detail $selected)
-  <a href="#extension-body-${detail}-${extension.id.id}-${extension.id.version}"#if ($selected) class="current"#end>
+  <a href="#extension-body-${detail}-$extensionIdHashCode"#if ($selected) class="current"#end>
     $msg.get("extensions.info.category.$detail")
   </a>
 #end
@@ -224,7 +224,7 @@
 #end
 
 #macro (displayExtensionDetails_description $extension)
-  <div id="extension-body-description-${extension.id.id}-${extension.id.version}"></div>
+  <div id="extension-body-description-$extensionIdHashCode"></div>
   <div class="extension-body-description extension-body-section">
     <dl class="extension-metadata">
       <dt>$msg.get('extensions.info.id')</dt>
@@ -421,7 +421,7 @@ $namespace##
 
 #macro (displayExtensionDetails_dependencies $extension $backwardDependencies)
   #if ($extension.dependencies.size() > 0 || $backwardDependencies.size() > 0)
-    <div id="extension-body-dependencies-${extension.id.id}-${extension.id.version}"></div>
+    <div id="extension-body-dependencies-$extensionIdHashCode"></div>
     #computeXBack()
     <div class="extension-body-dependencies extension-body-section">
       #displayExtensionDetails_dependencies_upstream($extension)
@@ -436,7 +436,7 @@ $namespace##
     #set ($jobState = $jobStatus.state)
   #end
   #if ($jobStatus)
-    <div id="extension-body-progress-${extension.id.id}-${extension.id.version}"></div>
+    <div id="extension-body-progress-$extensionIdHashCode"></div>
     <div class="extension-body-progress extension-body-section">
       #displayExtensionJobStatus($jobStatus)
       #if ($jobState == 'WAITING')
@@ -696,6 +696,8 @@ Caused by: #printThrowable($throwable.cause true)
     #set ($backwardDependencies = {})
   #end
   <div class="extension-body">
+    #set ($extensionIdHashCode = "$extensionNamespace/$extension.id.id/$extension.id.version.value")
+    #set ($extensionIdHashCode = $extensionIdHashCode.hashCode())
     #displayExtensionDetails_menu($extension)
 
     #displayExtensionDetails_description($extension)

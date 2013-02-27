@@ -105,29 +105,35 @@ widgets.ButtonGroup = Class.create({
  */
 widgets.DynamicButtonGroup = Class.create({
   initialize : function(container) {
-    var buttons = container.select('button, input.button, a');
+    // Collect the visible buttons.
+    var buttons = container.select('button, input.button, a').filter(function(button) {
+      return button.offsetWidth > 0;
+    });
     if (buttons.length < 2) return;
 
-    // Create the button group container.
-    var buttonGroup = new Element('span', {'class': 'buttonwrapper button-group initialized'});
-    // Insert the main button.
-    buttonGroup.insert(buttons[0]);
+    // Unwrap the buttons.
+    buttons.each(function(button) {
+      button.up().hasClassName('buttonwrapper') && button.up().insert({before: button}).remove();
+    });
+
+    // Initialize the container.
+    container.className = 'buttonwrapper button-group initialized';
+
     // Insert the drop down menu toggle.
-    buttonGroup.insert(new Element('a', {
+    buttons[0].insert({after: new Element('a', {
       href: '#dropDownMenu',
       'class': 'dropdown-toggle' + (buttons[0].hasClassName('secondary') ? ' secondary' : ''),
       tabindex: 0
-    }).insert(new Element('span')));
+    }).insert(new Element('span'))});
+
     // Insert the drop down menu.
     var dropDownMenu = new Element('span', {'class': 'dropdown-menu'});
     for (var i = 1; i < buttons.length; i++) {
       dropDownMenu.insert(buttons[i].removeClassName('secondary'));
     }
-    buttonGroup.insert(dropDownMenu);
+    buttons[0].next().insert({after: dropDownMenu});
 
-    // Replace the dynamic button group marker.
-    container.insert({before: buttonGroup}).remove();
-    new widgets.ButtonGroup(buttonGroup);
+    new widgets.ButtonGroup(container);
   }
 });
 

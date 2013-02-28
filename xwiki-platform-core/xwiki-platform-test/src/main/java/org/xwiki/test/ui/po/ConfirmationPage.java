@@ -34,7 +34,8 @@ public class ConfirmationPage extends ViewPage
     @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//input[@value = 'yes']")
     private WebElement yesButton;
 
-    @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//input[@value = 'no']")
+    @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//*[contains(@class, 'button')"
+        + " and (@value = 'no' or . = 'no')]")
     private WebElement noButton;
 
     /**

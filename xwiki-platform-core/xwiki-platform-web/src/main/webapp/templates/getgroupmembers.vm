@@ -34,7 +34,7 @@ $response.setContentType('application/x-json')
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",
-    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
+    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) ($m)#end",
     "wikiname"     : "$wikiname",
     "memberurl"    : "$xwiki.getURL($m)",
     "docurl"       : "$doc.getURL()",
@@ -44,7 +44,7 @@ $response.setContentType('application/x-json')
     "doc_hasadmin" : ${xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName)},
     "doc_hasedit" : ${xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName)},
     "doc_hasdelete" : ${xwiki.hasAccessLevel('delete', $xcontext.user, $doc.fullName)},
-    "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
+    "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) ($m)#end",
     "member_url" : "$xwiki.getURL($m)",
     "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true&form_token=$!{services.csrf.getToken()}")",
     "_avatar" : "$escapetool.javascript("#mediumUserAvatar($m)").trim()",

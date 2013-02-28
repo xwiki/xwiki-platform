@@ -117,6 +117,11 @@
                 <input type="hidden" name="name" value="$!{escapetool.xml($request.file)}" />
                 <div id="package">
                   <ul class="xlist package">
+                    <li>
+                      ## This hidden input ensures that if no page is selected, the 'pages' parameter is still passsed, thus skipping all the documents in the xar
+                      <input type='hidden' name='pages' value=''/>
+                    </li>
+                    ## List each page in the package
                     #foreach($space in $sorttool.sort($json.get('files').keySet()))
                     <li class="xitem xunderline">
                       <div class="xitemcontainer">
@@ -124,23 +129,25 @@
                       <div class="clearfloats"></div>
                       <div class="pages">
                       <ul class="xlist pages">
-                       #foreach($document in $sorttool.sort($json.get('files').get($space).keySet()))
+                      ## List each document in the current space
+                      #foreach($document in $sorttool.sort($json.get('files').get($space).keySet()))
+                        ## List each version of the current document
                         #foreach($version in $json.get('files').get($space).get($document))
                         <li class="xitem xhighlight">
                           <div class="xitemcontainer xpagecontainer">
                             <span class="checkbox">
-                            <input type="checkbox" name="pages"
-                                   value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
+                              <input type="checkbox" name="pages"
+                                    value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
                             </span>
                             <span class="documentName">
-                            <input type="hidden" name="$!{escapetool.xml($version.fullName)}:$!{escapetool.xml($version.language)}" value="$!{escapetool.xml($version.language)}" />
-                            $document #if("$!version.language" != '') - $version.language #end
+                              <input type="hidden" name="$!{escapetool.xml($version.fullName)}:$!{escapetool.xml($version.language)}" value="$!{escapetool.xml($version.language)}" />
+                              $document #if("$!version.language" != '') - $version.language #end
                             </span>
                             <div class="clearfloats"></div>
                           </div>
                         </li>
                         #end
-                       #end
+                      #end
                       </ul>
                       </div>
                       </div>

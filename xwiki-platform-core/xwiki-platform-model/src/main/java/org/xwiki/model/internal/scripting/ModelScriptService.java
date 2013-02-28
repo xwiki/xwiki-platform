@@ -206,6 +206,42 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * @param stringRepresentation the space reference specified as a String (using the "wiki:space" format and with
+     *            special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a space
+     *            reference relative to another entity reference
+     * @return the typed Space Reference object (resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 5.0M1
+     */
+    @Unstable
+    public SpaceReference resolveSpace(String stringRepresentation, Object... parameters)
+    {
+        return resolveSpace(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation the space reference specified as a String (using the "wiki:space" format and with
+     *            special characters escaped where required)
+     * @param hint the hint of the Resolver to use in case any part of the reference is missing (no wiki or no space
+     *            specified)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a space
+     *            reference relative to another entity reference
+     * @return the typed Space Reference object or null if no Resolver with the passed hint could be found
+     * @since 5.0M1
+     */
+    @Unstable
+    public SpaceReference resolveSpace(String stringRepresentation, String hint, Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new SpaceReference(resolver.resolve(stringRepresentation, EntityType.SPACE, parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
      * @param stringRepresentation the document reference specified as a String (using the "wiki:space.page" format and
      *            with special characters escaped where required)
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a document

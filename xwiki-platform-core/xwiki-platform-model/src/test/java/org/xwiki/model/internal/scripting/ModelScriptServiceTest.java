@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.internal.scripting;
 
+import static org.mockito.Mockito.*;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,13 +32,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.scripting.ModelScriptService}.
@@ -52,6 +51,8 @@ public class ModelScriptServiceTest
 
     private DocumentReferenceResolver<EntityReference> resolver;
 
+    private EntityReferenceResolver<String> stringEntityReferenceResolver;
+
     private EntityReferenceValueProvider valueProvider;
 
     private Logger logger;
@@ -66,6 +67,7 @@ public class ModelScriptServiceTest
         this.logger = mock(Logger.class);
         ReflectionUtils.setFieldValue(this.service, "logger", this.logger);
         this.resolver = mock(DocumentReferenceResolver.class);
+        this.stringEntityReferenceResolver = mock(EntityReferenceResolver.class);
         this.valueProvider = mock(EntityReferenceValueProvider.class);
     }
 
@@ -233,5 +235,29 @@ public class ModelScriptServiceTest
             new EntityReference("space", EntityType.SPACE)),
             this.service.createEntityReference("page", EntityType.DOCUMENT,
                 this.service.createEntityReference("space", EntityType.SPACE)));
+    }
+
+    @Test
+    public void resolveSpace() throws Exception
+    {
+        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "current")).thenReturn(
+            this.stringEntityReferenceResolver);
+        SpaceReference reference = new SpaceReference("Space", new WikiReference("wiki"));
+        when(this.stringEntityReferenceResolver.resolve("x", EntityType.SPACE, new Object[] {})).thenReturn(reference);
+
+        Assert.assertEquals(reference, this.service.resolveSpace("x"));
+    }
+
+    @Test
+    public void resolveSpaceWithHintAndParameters() throws Exception
+    {
+        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom")).thenReturn(
+            this.stringEntityReferenceResolver);
+        SpaceReference reference = new SpaceReference("Foo", new WikiReference("bar"));
+        Object[] parameters = new Object[] {new DocumentReference("wiki", "Space", "Page"), "extra"};
+        when(this.stringEntityReferenceResolver.resolve("reference", EntityType.SPACE, parameters)).thenReturn(
+            reference);
+
+        Assert.assertEquals(reference, this.service.resolveSpace("reference", "custom", parameters[0], parameters[1]));
     }
 }

@@ -273,7 +273,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         String workspaceOwner = newWikiXObjectDocument.getOwner();
 
         try {
-            initializeOwner(workspaceName, workspaceOwner, comment, deprecatedContext);
+            initializeOwner(workspaceName, workspaceOwner, comment);
         } catch (Exception e) {
             logger.error("Failed to add owner to workspace group for workspace [{}].", workspaceName, e);
         }
@@ -282,7 +282,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         XWikiDocument wikiDocument = newWikiXObjectDocument.getDocument();
 
         try {
-            initializeMarker(wikiDocument, comment, deprecatedContext);
+            initializeMarker(wikiDocument, comment);
         } catch (Exception e) {
             logger.error("Failed to add workspace marker for workspace [{}].", workspaceName, e);
         }
@@ -294,45 +294,56 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
     /**
      * Initialize a newly created workspace by explicitly adding its owner in the XWikiAllGroup and XWikiAdminGroup
-     * local groups.
+     * local groups, only if he's not already a member.
      * 
      * @param workspaceName the workspace to initialize
      * @param workspaceOwner the owner user name to be used in the process
      * @param comment the comment used when saving the group documents
-     * @param deprecatedContext the XWikiContext instance to use
      * @throws Exception if problems occur
      */
-    private static void initializeOwner(String workspaceName, String workspaceOwner, String comment,
-        XWikiContext deprecatedContext) throws Exception
+    private void initializeOwner(String workspaceName, String workspaceOwner, String comment) throws Exception
     {
+        /* Add user as workspace member. */
+        DocumentReference workspaceGroupReference =
+            new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
+        addUserToGroupIfNotAlreadyMember(workspaceOwner, workspaceGroupReference, comment);
+
+        /* Add user as workspace admin. */
+        DocumentReference workspaceAdminGroupReference =
+            new DocumentReference(workspaceName, XWIKI_SPACE, "XWikiAdminGroup");
+        addUserToGroupIfNotAlreadyMember(workspaceOwner, workspaceAdminGroupReference, comment);
+    }
+
+    /**
+     * Adds a user to a group if the user is not already a member
+     * 
+     * @param userStringReference serialized reference of the user to add
+     * @param workspaceGroupReference the group document where to add the user
+     * @param comment optional comment used when saving the group documents
+     * @throws Exception if problems occur
+     */
+    private void addUserToGroupIfNotAlreadyMember(String userStringReference,
+        DocumentReference workspaceGroupReference, String comment) throws Exception
+    {
+        XWikiContext deprecatedContext = getXWikiContext();
+        XWiki xwiki = deprecatedContext.getWiki();
+
         String currentWikiName = deprecatedContext.getDatabase();
         try {
-            deprecatedContext.setDatabase(workspaceName);
+            deprecatedContext.setDatabase(workspaceGroupReference.getWikiReference().getName());
 
-            XWiki wiki = deprecatedContext.getWiki();
-            DocumentReference groupClassReference = wiki.getGroupClass(deprecatedContext).getDocumentReference();
+            DocumentReference groupClassReference = xwiki.getGroupClass(deprecatedContext).getDocumentReference();
+            XWikiDocument workspaceGroupDocument = xwiki.getDocument(workspaceGroupReference, deprecatedContext);
 
-            /* Add user as workspace member. */
-            DocumentReference workspaceGroupReference =
-                new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
-            XWikiDocument workspaceGroupDocument = wiki.getDocument(workspaceGroupReference, deprecatedContext);
+            BaseObject workspaceGroupObject =
+                workspaceGroupDocument
+                    .getXObject(groupClassReference, GROUP_CLASS_MEMBER_PROPERTY, userStringReference);
+            if (workspaceGroupObject == null) {
+                workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
+                workspaceGroupObject.setStringValue(GROUP_CLASS_MEMBER_PROPERTY, userStringReference);
 
-            BaseObject workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
-            workspaceGroupObject.setStringValue(GROUP_CLASS_MEMBER_PROPERTY, workspaceOwner);
-
-            wiki.saveDocument(workspaceGroupDocument, comment, deprecatedContext);
-
-            /* Add user as workspace admin. */
-            DocumentReference workspaceAdminGroupReference =
-                new DocumentReference(workspaceName, XWIKI_SPACE, "XWikiAdminGroup");
-            XWikiDocument workspaceAdminGroupDocument =
-                wiki.getDocument(workspaceAdminGroupReference, deprecatedContext);
-
-            BaseObject workspaceAdminGroupObject =
-                workspaceAdminGroupDocument.newXObject(groupClassReference, deprecatedContext);
-            workspaceAdminGroupObject.setStringValue(GROUP_CLASS_MEMBER_PROPERTY, workspaceOwner);
-
-            wiki.saveDocument(workspaceAdminGroupDocument, comment, deprecatedContext);
+                xwiki.saveDocument(workspaceGroupDocument, comment, deprecatedContext);
+            }
 
             // FIXME: See if we need to update the group service cache.
             // try {
@@ -349,12 +360,12 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     /**
      * @param wikiDocument the wiki descriptor document to initialize
      * @param comment the comment used when saving the wiki descriptor document
-     * @param deprecatedContext the XWikiContext instance to use
      * @throws Exception if problems occur
      */
-    private static void initializeMarker(XWikiDocument wikiDocument, String comment, XWikiContext deprecatedContext)
-        throws Exception
+    private void initializeMarker(XWikiDocument wikiDocument, String comment) throws Exception
     {
+        XWikiContext deprecatedContext = getXWikiContext();
+
         String mainWikiName = deprecatedContext.getMainXWiki();
         DocumentReference workspaceClassReference =
             new DocumentReference(mainWikiName, WORKSPACE_MANAGER_SPACE, WORKSPACE_CLASS);
@@ -447,6 +458,13 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             xwiki.saveDocument(coreWikiDocument, "Workspace edited", true, deprecatedContext);
         } catch (Exception e) {
             throw new WorkspaceException("Failed to save modifications.", e);
+        }
+
+        // Re-initialize the owner of the workspace, since it could have changed
+        try {
+            this.initializeOwner(workspaceName, modifiedWikiXObjectDocument.getOwner(), "New owner");
+        } catch (Exception e) {
+            throw new WorkspaceException("Failed to add the new owner to the workspace all and admin groups.", e);
         }
     }
 

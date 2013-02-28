@@ -754,23 +754,25 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (handleExtensionRequest)
-  ## Extension actions that are available when the CSRF token is present but which have only temporary display effects.
-  #set ($displayActions = ['diff'])
-  #if ($request.form_token && !$displayActions.contains($request.extensionAction))
+  #if ($request.form_token)
     #if ($services.csrf.isTokenValid($request.form_token))
-      #if ($request.extensionAction == 'continue')
-        #continueExtensionJob($request.extensionId $request.extensionVersion)
-      #elseif ($request.extensionAction == 'repairXAR')
-        #repairXarExtension($request.extensionId $request.extensionVersion)
-      #else
-        $response.sendRedirect("#getExtensionURL()")
-      #end
+      #handleExtensionAction(true)
     #elseif ($isAjaxRequest)
       ## The CSRF token expired. We only redisplay the extension because the resubmission confirmation doesn't fit nicely in-line.
       $response.sendRedirect("#getExtensionURL()")
     #else
       $response.sendRedirect($services.csrf.getResubmissionURL())
     #end
+  #else
+    #handleExtensionAction(false)
+  #end
+#end
+
+#macro (handleExtensionAction $withValidToken)
+  #if ($request.extensionAction == 'continue' && $withValidToken)
+    #continueExtensionJob($request.extensionId $request.extensionVersion)
+  #elseif ($request.extensionAction == 'repairXAR' && $withValidToken)
+    #repairXarExtension($request.extensionId $request.extensionVersion)
   #elseif ($request.extensionAction == 'install' || $request.extensionAction == 'upgrade'
     || $request.extensionAction == 'downgrade')
     #computeInstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)

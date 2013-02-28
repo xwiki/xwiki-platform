@@ -2718,13 +2718,19 @@ public class Document extends Api
     /**
      * Allow to easily access any revision of a document
      * 
-     * @param revision version to access
-     * @return Document object
-     * @throws XWikiException
+     * @param revision the version to access
+     * @return the document coresponding to the requested revision or {@code null} if the revision does not exist.
      */
-    public Document getDocumentRevision(String revision) throws XWikiException
+    public Document getDocumentRevision(String revision)
     {
-        return new Document(this.context.getWiki().getDocument(this.doc, revision, this.context), this.context);
+        try {
+            XWikiDocument documentRevision = this.context.getWiki().getDocument(this.doc, revision, this.context);
+            Document result = new Document(documentRevision, this.context);
+
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

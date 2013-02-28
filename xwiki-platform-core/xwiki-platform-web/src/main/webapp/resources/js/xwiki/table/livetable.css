@@ -193,7 +193,7 @@ tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-
   padding-right: 16px;
   cursor: pointer;
 }
-tbody.xwiki-livetable-display-body td:hover.linkeditor {  
+tbody.xwiki-livetable-display-body td:hover.linkeditor {
   background: $theme.highlightColor url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
   cursor: pointer;
 }
@@ -345,7 +345,7 @@ div.tipfilters div.splitted {
   vertical-align:bottom;
   width:49%;
 }
-.xwiki-livetable-topfilters-tip .tippointer div, 
+.xwiki-livetable-topfilters-tip .tippointer div,
 .xwiki-livetable-tagcloud-tip .tippointer div {
   position: absolute;
   width: 0;

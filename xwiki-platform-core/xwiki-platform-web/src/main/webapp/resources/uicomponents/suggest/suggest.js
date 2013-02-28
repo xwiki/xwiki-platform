@@ -95,7 +95,7 @@ var XWiki = (function(XWiki){
 
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
-    if (typeof this.options.sources == 'object' && this.options.sources.length > 1) {
+    if (typeof this.options.sources == 'object') {
       // We are in multi-sources mode
       this.sources = this.options.sources;
     } else {

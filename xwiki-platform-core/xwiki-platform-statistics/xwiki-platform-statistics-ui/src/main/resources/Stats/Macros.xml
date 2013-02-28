@@ -112,7 +112,7 @@ $!xwiki.ssx.use('Stats.Style')
 #info($msg.get('xe.statistics.notrecorded'))
 #end
 #macro(printStatisticsDisabled)
-#set($statsHome = "[$msg.get('xe.statistics.homepage')&gt;Stats.WebHome].")
+#set($statsHome = "[[$msg.get('xe.statistics.homepage')&gt;&gt;Stats.WebHome]].")
 #warning($msg.get('xe.statistics.disabled', [$statsHome]))
 #end
 {{/velocity}}</content>

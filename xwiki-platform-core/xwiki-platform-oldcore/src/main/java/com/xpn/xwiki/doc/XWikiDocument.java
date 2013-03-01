@@ -7013,7 +7013,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             sectionDepth = (int) context.getWiki().getSectionEditingDepth();
         }
 
-        // Get the headers
+        // Get the headers.
+        //
+        // Note that we need to only take into account SectionBlock that are children of other SectionBlocks so that
+        // we are in sync with the section editing buttons added in xwiki.js. Being able to section edit any heading is
+        // too complex. For example if you have (in XWiki Syntax 2.0):
+        //   = Heading1 =
+        //   para1
+        //   == Heading2 ==
+        //   para2
+        //   (((
+        //   == Heading3 ==
+        //   para3
+        //   (((
+        //   == Heading4 ==
+        //   para4
+        //   )))
+        //   )))
+        //   == Heading5 ==
+        //   para5
+        //
+        // Then if we were to support editing "Heading4", its content would be:
+        //   para4
+        //   )))
+        //   )))
+        //
+        // Which obviously is not correct...
+
         final XDOM xdom = getXDOM();
         if (!xdom.getChildren().isEmpty()) {
             Block currentBlock = xdom.getChildren().get(0);

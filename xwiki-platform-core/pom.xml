@@ -352,6 +352,8 @@
             <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
             <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</exclude>
             <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
+            <!-- Added new translation keys. This interface is not meant to be implemented. -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
           </excludes>
         </configuration>
       </plugin>

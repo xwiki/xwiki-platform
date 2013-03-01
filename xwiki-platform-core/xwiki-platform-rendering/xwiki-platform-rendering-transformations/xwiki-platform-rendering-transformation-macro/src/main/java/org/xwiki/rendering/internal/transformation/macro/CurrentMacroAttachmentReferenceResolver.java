@@ -25,21 +25,21 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * A {@link CurrentMacroEntityReferenceResolver} specialized for {@link DocumentReference}s.
+ * A {@link CurrentMacroEntityReferenceResolver} specialized for {@link AttachmentReference}s.
  * 
  * @version $Id$
- * @since 4.3M1
+ * @since 5.0M1
  * @see CurrentMacroEntityReferenceResolver
  */
 @Component
 @Named("macro")
 @Singleton
-public class CurrentMacroDocumentReferenceResolver implements DocumentReferenceResolver<String>
+public class CurrentMacroAttachmentReferenceResolver implements AttachmentReferenceResolver<String>
 {
     /**
      * The generic resolver.
@@ -49,9 +49,9 @@ public class CurrentMacroDocumentReferenceResolver implements DocumentReferenceR
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     @Override
-    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
+    public AttachmentReference resolve(String attachmentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(macroEntityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT, parameters));
+        return new AttachmentReference(macroEntityReferenceResolver.resolve(attachmentReferenceRepresentation,
+            EntityType.ATTACHMENT, parameters));
     }
 }

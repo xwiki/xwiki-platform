@@ -7006,21 +7006,43 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         List<HeaderBlock> filteredHeaders = new ArrayList<HeaderBlock>();
 
-        // get the headers
-        List<HeaderBlock> headers =
-            getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
-
-        // get the maximum header level
+        // Get the maximum header level
         int sectionDepth = 2;
         XWikiContext context = getXWikiContext();
         if (context != null) {
             sectionDepth = (int) context.getWiki().getSectionEditingDepth();
         }
 
-        // filter the headers
-        for (HeaderBlock header : headers) {
-            if (header.getLevel().getAsInt() <= sectionDepth) {
-                filteredHeaders.add(header);
+        // Get the headers
+        final XDOM xdom = getXDOM();
+        if (!xdom.getChildren().isEmpty()) {
+            Block currentBlock = xdom.getChildren().get(0);
+            while (currentBlock != null) {
+                if (currentBlock instanceof SectionBlock) {
+                    // The next children block is a HeaderBlock but we check to be on the safe side...
+                    Block nextChildrenBlock = currentBlock.getChildren().get(0);
+                    if (nextChildrenBlock instanceof  HeaderBlock) {
+                        HeaderBlock headerBlock = (HeaderBlock) nextChildrenBlock;
+                        if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
+                            filteredHeaders.add(headerBlock);
+                        }
+                    }
+                    currentBlock = nextChildrenBlock;
+                } else {
+                    Block nextSibling = currentBlock.getNextSibling();
+                    if (nextSibling == null) {
+                        currentBlock = currentBlock.getParent();
+                        while (currentBlock != null) {
+                            if (currentBlock.getNextSibling() != null) {
+                                currentBlock = currentBlock.getNextSibling();
+                                break;
+                            }
+                            currentBlock = currentBlock.getParent();
+                        }
+                    } else {
+                        currentBlock = nextSibling;
+                    }
+                }
             }
         }
 

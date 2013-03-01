@@ -650,6 +650,34 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("1.1", header2.getSectionLevel());
     }
 
+    /**
+     * Verify that if we have sections nested in groups, they are not taken into account when computing document
+     * sections by number. See <a href="http://jira.xwiki.org/browse/XWIKI-6195">XWIKI-6195</a>.
+     *
+     * @since 5.0M1
+     */
+    public void testGetDocumentSectionWhenSectionInGroups() throws XWikiException
+    {
+        this.document.setContent("= Heading1 =\n"
+            + "para1\n"
+            + "== Heading2 ==\n"
+            + "para2\n"
+            + "(((\n"
+            + "== Heading3 ==\n"
+            + "para3\n"
+            + "(((\n"
+            + "== Heading4 ==\n"
+            + "para4\n"
+            + ")))\n"
+            + ")))\n"
+            + "== Heading5 ==\n"
+            + "para5\n");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        DocumentSection section = this.document.getDocumentSection(3);
+        assertEquals("Heading5", section.getSectionTitle());
+    }
+
     public void testGetContentOfSection10() throws XWikiException
     {
         this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
@@ -664,8 +692,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetContentOfSection() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content\n" + "=== header 3===\nheader 3 content\n"
+        this.document.setContent("content not in section\n"
+            + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content\n"
+            + "=== header 3===\nheader 3 content\n"
             + "== header 4==\nheader 4 content");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 

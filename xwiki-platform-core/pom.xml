@@ -314,28 +314,11 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <className>org/xwiki/localization/LocalizationManager</className>
-              <method>org.xwiki.localization.TranslationBundle getTranslationBundle(java.lang.String, java.lang.String)</method>
-              <differenceType>7012</differenceType>
-              <justification>New method to access bundle</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Excluding the whole WorkspaceManager component since I could not succeed in expressing individual differences of type 7004 (Method Argument Count Changed),
-                 it fails with java.util.Arrays$ArrayList cannot be cast to org.codehaus.mojo.clirr.Difference even though I declare the "method". It also finds 2 new inexistent
-                 7005 (Method Argument Type changed) differences for my single 7004 change.
-                 There are 2 affected methods for which the first String parameter was removed:
-                   public com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer createWorkspace(java.lang.String, com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer) ->
-                     public com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer createWorkspace(com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer)
-                   public com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer createWorkspace(java.lang.String, com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer, java.lang.String) ->
-                     public com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer createWorkspace(com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer, java.lang.String)
-                 Justification: Removed the workspaceName parameter to properly fix XWIKI-8394. The actual workspace name should be passed to the XWikiServer parameter instead.
-                 -->
-            <exclude>org/xwiki/workspace/WorkspaceManager</exclude>
           </excludes>
         </configuration>
       </plugin>

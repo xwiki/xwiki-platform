@@ -39,7 +39,7 @@
   #set ($description = $doc.getValue("description"))
   #if ("$!description" != "")
     {{box cssClass="faqAbout"}}
-      $description
+      $doc.display("description")
     {{/box}}
   #end
 

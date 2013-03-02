@@ -54,7 +54,7 @@
     <className>FAQCode.FAQHomeClass</className>
     <guid>49e446f2-6582-4dba-8769-2ce3930d7cd2</guid>
     <property>
-      <description>**Frequently Asked Questions (FAQ) are an easy way to find answers to most of your questions.**</description>
+      <description>**{{velocity}}$msg.get('platform.faq.about'){{/velocity}}**</description>
     </property>
   </object>
   <content/>

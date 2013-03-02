@@ -19,8 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro;
 
-import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
-import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
+import static org.xwiki.rendering.test.BlockAssert.*;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -31,6 +30,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.hamcrest.collection.IsArray;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -40,6 +40,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -75,6 +76,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
     private PrintRendererFactory rendererFactory;
 
+    /**
+     * Mocks the component that is used to resolve the 'reference' parameter.
+     */
+    private DocumentReferenceResolver<String> mockDocumentReferenceResolver;
+
     @Override
     public void setUp() throws Exception
     {
@@ -91,6 +97,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
+        this.mockDocumentReferenceResolver =
+            registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
         this.includeMacro = (IncludeMacro) getComponentManager().getInstance(Macro.class, "include");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
@@ -217,23 +225,24 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWithRecursiveIncludeContextCurrent() throws Exception
     {
+        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
+
+        final MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
+        // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
+        // happened if an Include macro is included in another Include macro.
+        final MacroMarkerBlock includeMacroMarker =
+            new MacroMarkerBlock("include", Collections.singletonMap("reference", "space.page"),
+                Collections.<Block> singletonList(macroContext.getCurrentMacroBlock()), false);
+
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
+                allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
-                allowing(mockSetup.documentReferenceResolver).resolve("space.page");
+                allowing(mockDocumentReferenceResolver).resolve("space.page", includeMacroMarker);
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
             }
         });
-
-        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
-
-        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
-        // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
-        // happened if an Include macro is included in another Include macro.
-        new MacroMarkerBlock("include", Collections.singletonMap("reference", "space.page"),
-            Collections.<Block> singletonList(macroContext.getCurrentMacroBlock()), false);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("wiki:space.page");
@@ -270,9 +279,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
-                allowing(mockSetup.documentReferenceResolver).resolve("space.page");
+                allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
 
                 allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
@@ -321,7 +328,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("relativePage");
 
-        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         // Add a Source MetaData Block as a parent of the include Macro block.
         new MetaDataBlock(Collections.<Block> singletonList(macroContext.getCurrentMacroBlock()), new MetaData(
             Collections.<String, Object> singletonMap(MetaData.BASE, "wiki:space.page")));
@@ -332,9 +339,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
-                will(returnValue(sourceReference));
-                oneOf(mockSetup.documentReferenceResolver).resolve("relativePage", sourceReference);
+                oneOf(mockDocumentReferenceResolver).resolve("relativePage", macroContext.getCurrentMacroBlock());
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
@@ -367,12 +372,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         parameters.setReference("document");
         parameters.setSection("Hsection");
 
+        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
         final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockSetup.documentReferenceResolver).resolve("document");
+                oneOf(mockDocumentReferenceResolver).resolve("document", macroContext.getCurrentMacroBlock());
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
@@ -387,8 +393,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             }
         });
 
-        List<Block> blocks =
-            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
@@ -400,12 +405,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         parameters.setReference("document");
         parameters.setSection("unknown");
 
+        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
         final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockSetup.documentReferenceResolver).resolve("document");
+                oneOf(mockDocumentReferenceResolver).resolve("document", macroContext.getCurrentMacroBlock());
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
@@ -423,7 +429,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         });
 
         try {
-            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+            this.includeMacro.execute(parameters, null, macroContext);
             Assert.fail("Should have raised an exception");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("Cannot find section [unknown] in document [wiki:space.document]",
@@ -447,7 +453,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.documentReferenceResolver).resolve(resolve);
+                allowing(mockDocumentReferenceResolver).resolve(with(resolve),
+                    with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
                 allowing(mockSetup.bridge).getDocument(reference);
                 will(returnValue(mockDocument));

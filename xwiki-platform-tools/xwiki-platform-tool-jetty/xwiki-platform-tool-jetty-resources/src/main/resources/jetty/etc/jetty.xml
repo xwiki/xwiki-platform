@@ -106,7 +106,7 @@
   <!-- =============================================================== -->
   <!-- Create the deployment manager                                   -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!-- The deplyment manager handles the lifecycle of deploying web    -->
+  <!-- The deployment manager handles the lifecycle of deploying web   -->
   <!-- applications. Apps are provided by instances of the             -->
   <!-- AppProvider interface.  Typically these are provided by         -->
   <!-- one or more of:                                                 -->
@@ -120,28 +120,20 @@
         <Set name="contexts">
           <Ref id="Contexts"/>
         </Set>
-        <Call name="setContextAttribute">
-          <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
-          <Arg>.*/jsp-api-[^/]*\.jar$|.*/jsp-[^/]*\.jar$</Arg>
-        </Call>
+        <!-- Note: We don't need to define a "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern" attribute
+             since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
+             tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
+        <!-- Note: Once we start using Servlet 3.0 we'll need to set the attribute named
+             "org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern" to not incur too heavy startup times.
+             See http://wiki.eclipse.org/Jetty/Howto/Avoid_slow_deployment.
 
+             Example:
 
-        <!-- Add a customize step to the deployment lifecycle -->
-        <!-- uncomment and replace DebugBinding with your extended AppLifeCycle.Binding class
-        <Call name="insertLifeCycleNode">
-          <Arg>deployed</Arg>
-          <Arg>starting</Arg>
-          <Arg>customise</Arg>
-        </Call>
-        <Call name="addLifeCycleBinding">
-          <Arg>
-            <New class="org.eclipse.jetty.deploy.bindings.DebugBinding">
-              <Arg>customise</Arg>
-            </New>
-          </Arg>
-        </Call>
-        -->
-
+               <Call name="setContextAttribute">
+                 <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
+                 <Arg>.*/.*myPrefixedJarToScan1-[^/]\.jar$|.*/.*myPrefixedJarToScan2-[^/]\.jar$</Arg>
+               </Call>
+             -->
       </New>
     </Arg>
   </Call>
@@ -160,7 +152,6 @@
         <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
           <Set name="monitoredDirName"><Property name="jetty.home" default="."/>/contexts
           </Set>
-          <Set name="scanInterval">1</Set>
         </New>
       </Arg>
     </Call>

@@ -23,9 +23,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}$msg.get('platform.faq.technical')
+  <content>{{translation key='platform.faq.technical'/}}
 
-= $msg.get('platform.faq.list') ={{/velocity}}
+= {{translation key='platform.faq.list'/}} =
 
 {{spaceindex/}}
 

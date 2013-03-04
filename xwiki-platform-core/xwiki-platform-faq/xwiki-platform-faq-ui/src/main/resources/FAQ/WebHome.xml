@@ -54,7 +54,7 @@
     <className>FAQCode.FAQHomeClass</className>
     <guid>49e446f2-6582-4dba-8769-2ce3930d7cd2</guid>
     <property>
-      <description>**{{velocity}}$msg.get('platform.faq.about'){{/velocity}}**</description>
+      <description>**{{translation key='platform.faq.about'/}}**</description>
     </property>
   </object>
   <content/>

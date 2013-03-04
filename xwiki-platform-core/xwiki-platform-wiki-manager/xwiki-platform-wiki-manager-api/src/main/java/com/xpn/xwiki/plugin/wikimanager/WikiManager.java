@@ -220,9 +220,12 @@ public final class WikiManager
 
     /**
      * Get all {@link Wiki}.
+     * <p/>
+     * <b>Note</b>: In case the main wiki does not have a descriptor created for it, the main wiki will not be included
+     * in the result.
      * 
      * @param context the XWiki context.
-     * @return the list of all {@link Wiki}.
+     * @return the list of all {@link Wiki}
      * @throws XWikiException error when getting wikis documents descriptors.
      */
     public List<Wiki> getAllWikis(XWikiContext context) throws XWikiException

@@ -55,6 +55,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Provider;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -3607,7 +3608,7 @@ public class XWiki implements EventListener
             }
             XWikiMessageTool msg =
                 new XWikiMessageTool(Utils.getComponent(LocalizationManager.class), Utils.getComponentManager(),
-                    context);
+                    Utils.<Provider<XWikiContext>> getComponent(XWikiContext.TYPE_PROVIDER));
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {

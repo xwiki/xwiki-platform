@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki;
 
+import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,10 +28,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,6 +59,13 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWikiContext extends Hashtable<Object, Object>
 {
+    /**
+     * Type instance for Provider<XWikiContext>.
+     * 
+     * @since 5.0M1
+     */
+    public static ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class, XWikiContext.class);
+
     public static final int MODE_SERVLET = 0;
 
     public static final int MODE_PORTLET = 1;

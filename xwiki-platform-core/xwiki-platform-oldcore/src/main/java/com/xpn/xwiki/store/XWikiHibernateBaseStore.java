@@ -210,25 +210,6 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         getConfiguration().configure(getPath());
 
-        XWiki wiki = context.getWiki();
-        /* FIXME: Does this piece of code have any purpose? It was not used in XEM anyway, so why keep it now when
-         * we have virtual by default?
-        if (wiki != null && wiki.Param("xwiki.db") != null && !wiki.isVirtualMode()) {
-            // substitute default db name to configured.
-            // note, that we can't call getSchemaFromWikiName() here,
-            // because it ask getDatabaseProduct() which use connection
-            // which must be opened. But here (before connection init)
-            // we have no opened connections yet.
-            String schemaName = getSchemaFromWikiName(context.getDatabase(), null, context);
-
-            String dialect = getConfiguration().getProperty(Environment.DIALECT);
-            if ("org.hibernate.dialect.MySQLDialect".equals(dialect)) {
-                getConfiguration().setProperty(Environment.DEFAULT_CATALOG, schemaName);
-            } else {
-                getConfiguration().setProperty(Environment.DEFAULT_SCHEMA, schemaName);
-            }
-        }
-        */
         if (this.sessionFactory == null) {
             this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);
         }

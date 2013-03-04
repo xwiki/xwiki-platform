@@ -22,6 +22,7 @@ package org.xwiki.localization;
 import java.util.Locale;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Internationalization service based on key/property values. The key is the id of the message being looked for, and the
@@ -35,6 +36,7 @@ import org.xwiki.component.annotation.Role;
  * @since 4.3M2
  */
 @Role
+@Unstable
 public interface LocalizationManager
 {
     /**

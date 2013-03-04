@@ -22,6 +22,7 @@ package org.xwiki.localization;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * The Bundles applying to the current context ordered by priority.
@@ -30,6 +31,7 @@ import org.xwiki.component.annotation.Role;
  * @since 4.3M2
  */
 @Role
+@Unstable
 public interface TranslationBundleContext
 {
     /**

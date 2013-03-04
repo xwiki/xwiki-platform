@@ -22,6 +22,7 @@ package org.xwiki.localization;
 import java.util.Locale;
 
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * A translation is a specific {@link Locale} and {@link TranslationBundle}.
@@ -29,6 +30,7 @@ import org.xwiki.rendering.block.Block;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 public interface Translation
 {
     /**

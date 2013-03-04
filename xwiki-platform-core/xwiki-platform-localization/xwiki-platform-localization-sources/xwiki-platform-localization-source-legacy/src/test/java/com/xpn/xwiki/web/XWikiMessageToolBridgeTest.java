@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Provider;
 import javax.servlet.ServletContext;
 
 import junit.framework.Assert;
@@ -247,7 +248,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         this.tool =
             new XWikiMessageTool(getComponentManager().<LocalizationManager> getInstance(LocalizationManager.class),
-                getComponentManager(), getContext());
+                getComponentManager(), (Provider<XWikiContext>) getComponentManager().getInstance(
+                    XWikiContext.TYPE_PROVIDER));
     }
 
     private void setBundles(String bundles)

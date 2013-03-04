@@ -50,8 +50,9 @@ public interface Translation
 
     /**
      * @return the raw source of the translation as it is stored
+     * @since 5.0M1
      */
-    String getRawSource();
+    Object getRawSource();
 
     /**
      * Execute the transformation (resolve any variable or parameter in its content) and produce a Block to insert in an

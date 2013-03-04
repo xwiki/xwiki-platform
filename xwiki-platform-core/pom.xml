@@ -331,6 +331,13 @@
                 * Thus we need to exclude it now that we've removed this getXWikiContext() ;)
               </justification>
             </difference>
+             <difference>
+               <differenceType>7006</differenceType>
+               <className>org/xwiki/localization/Translation</className>
+               <method>java.lang.String getRawSource()</method>
+               <to>java.lang.Object</to>
+               <justification>YOUNG API. There is no reason to limit it to String</justification>
+             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -99,7 +99,7 @@ public class XWikiMessageTool
     /**
      * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading documents.
      */
-    protected XWikiContext deprecatedContext;
+    protected XWikiContext context;
 
     /**
      * Used to access the current XWikiContext.
@@ -158,7 +158,7 @@ public class XWikiMessageTool
     {
         this.localization = localization;
         this.componentManager = componentManager;
-        this.deprecatedContext = context;
+        this.context = context;
     }
 
     /**
@@ -169,12 +169,12 @@ public class XWikiMessageTool
     public XWikiMessageTool(ResourceBundle bundle, XWikiContext context)
     {
         this.bundle = bundle;
-        this.deprecatedContext = context;
+        this.context = context;
     }
 
     protected XWikiContext getXWikiContext()
     {
-        return this.xcontextProvider != null ? this.xcontextProvider.get() : this.deprecatedContext;
+        return this.xcontextProvider != null ? this.xcontextProvider.get() : this.context;
     }
 
     /**

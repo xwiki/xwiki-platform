@@ -70,7 +70,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * modified, its content is cached again next time a key is asked.
  * 
  * @version $Id$
+ * @deprecated since 4.3M2 use {@link LocalizationManager} component instead
  */
+@Deprecated
 public class XWikiMessageTool
 {
     /**

@@ -1232,6 +1232,17 @@ public class XWiki extends Api
     }
 
     /**
+     * Convenience method to ask if the current XWiki instance contains subwikis (in addition to the main wiki)
+     * 
+     * @return true if at least 1 subwiki exists; false otherwise
+     * @see #getWikiNames()
+     */
+    public boolean hasVirtualWikis()
+    {
+        return getWikiNames().size() > 1;
+    }
+
+    /**
      * API to check is wiki is multi-lingual
      * 
      * @return true for multi-lingual/false for mono-lingual

@@ -47,11 +47,25 @@ public class ModelRuntimeException extends RuntimeException
      * Constructs a new exception with the specified detail message and cause.
      *
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param parameters the parameter to use to resolve the message
+     *        (using {@link String#format(String, java.lang.Object...)})
+     */
+    public ModelRuntimeException(String message, java.lang.Object... parameters)
+    {
+        super(String.format(message, parameters));
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param parameters the parameter to use to resolve the message
+     *        (using {@link String#format(String, java.lang.Object...)})
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
      *        permitted, and indicates that the cause is nonexistent or unknown
      */
-    public ModelRuntimeException(String message, Throwable cause)
+    public ModelRuntimeException(String message, Throwable cause, java.lang.Object... parameters)
     {
-        super(message, cause);
+        super(String.format(message, parameters), cause);
     }
 }

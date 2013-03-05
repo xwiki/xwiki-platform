@@ -30,8 +30,11 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface EntityManager
 {
-    <T extends Entity> T getEntity(UniqueReference reference) throws ModelException;
-    boolean hasEntity(UniqueReference reference) throws ModelException;
+    /**
+     * @return the entity pointed to by the passed reference or null if not found
+     */
+    <T extends Entity> T getEntity(UniqueReference reference);
+    boolean hasEntity(UniqueReference reference);
     void removeEntity(UniqueReference reference);
     <T extends Entity> T addEntity(UniqueReference reference);
 }

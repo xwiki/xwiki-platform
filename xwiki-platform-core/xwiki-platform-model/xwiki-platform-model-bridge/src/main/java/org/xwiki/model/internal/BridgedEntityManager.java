@@ -37,7 +37,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.Entity;
 import org.xwiki.model.EntityManager;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelException;
 import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.UniqueReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -87,15 +86,18 @@ public class BridgedEntityManager implements EntityManager, Initializable
     }
 
     @Override
-    public <T extends Entity> T getEntity(UniqueReference uniqueReference) throws ModelException
+    public <T extends Entity> T getEntity(UniqueReference uniqueReference)
     {
         T result = null;
 
         EntityReference reference = uniqueReference.getReference();
         switch (reference.getType()) {
             case DOCUMENT:
-                result = (T) new BridgedDocumentEntity(getXWikiDocument(reference), getXWikiContext());
-                // Note: We don't need to set isNew since this is supported by the old model directly.
+                XWikiDocument document = getXWikiDocument(reference);
+                if (!document.isNew()) {
+                    result = (T) new BridgedDocumentEntity(document, getXWikiContext());
+                    // Note: We don't need to set isNew since this is supported by the old model directly.
+                }
                 break;
             case SPACE:
                 // A space exists if there's at least one document in it.
@@ -109,7 +111,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
                         result = (T) bs;
                     }
                 } catch (XWikiException e) {
-                    throw new ModelException("Error verifying existence of space [%s]", e, reference);
+                    throw new ModelRuntimeException("Error verifying existence of space [%s]", e, reference);
                 }
                 break;
             case WIKI:
@@ -137,7 +139,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
                         bop.setNew(false);
                         result = (T) bop;
                     } catch (XWikiException e) {
-                        throw new ModelException("Failed to retrieve object property [%s]", e, reference);
+                        throw new ModelRuntimeException("Failed to retrieve object property [%s]", e, reference);
                     }
                 }
                 break;
@@ -148,18 +150,24 @@ public class BridgedEntityManager implements EntityManager, Initializable
         return result;
     }
 
-    private BaseObject getXWikiObject(EntityReference reference) throws ModelException
+    private BaseObject getXWikiObject(EntityReference reference)
     {
+        BaseObject result = null;
+
         // Find the reference to the document containing the object (it's the parent of the passed
         // reference) and Load the parent document since objects are loaded at the same time in the old model.
         XWikiDocument xdoc = getXWikiDocument(reference.getParent());
-        // Get the requested object if the document isn't new. If the document is new or the document exists but
-        // doesn't have that XObject then we return null. Note that we cannot create an empty XObject since we don't
-        // have a reference to the XClass at this moment.
-        return xdoc.getXObject(new ObjectReference(reference));
+        if (!xdoc.isNew()) {
+            // Get the requested object if the document isn't new. If the document is new or the document exists but
+            // doesn't have that XObject then we return null. Note that we cannot create an empty XObject since we don't
+            // have a reference to the XClass at this moment.
+            result = xdoc.getXObject(new ObjectReference(reference));
+        }
+
+        return result;
     }
 
-    private XWikiDocument getXWikiDocument(EntityReference reference) throws ModelException
+    private XWikiDocument getXWikiDocument(EntityReference reference)
     {
         XWikiDocument result;
 
@@ -168,7 +176,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
             // if the document is new or not.
             result = getXWiki().getDocument(new DocumentReference(reference), getXWikiContext());
         } catch (XWikiException e) {
-            throw new ModelException("Error loading document [%s]", e, reference);
+            throw new ModelRuntimeException("Error loading document [%s]", e, reference);
         }
 
         return result;

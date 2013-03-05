@@ -35,7 +35,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.DocumentEntity;
 import org.xwiki.model.EntityManager;
-import org.xwiki.model.ModelException;
+import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.ObjectEntity;
 import org.xwiki.model.ObjectPropertyEntity;
 import org.xwiki.model.SpaceEntity;
@@ -113,7 +113,7 @@ public class BridgedEntityManagerTest
         try {
             this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(documentReference));
             Assert.fail("Should have thrown an exception");
-        } catch (ModelException expected) {
+        } catch (ModelRuntimeException expected) {
             Assert.assertEquals("Error loading document [wiki:space.page]", expected.getMessage());
         }
     }
@@ -125,7 +125,8 @@ public class BridgedEntityManagerTest
         when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(
             new URL("http://whatever/not/null"));
 
-        WikiEntity wikiEntity = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(wikiReference));
+        WikiEntity wikiEntity = this.componentManager.getComponentUnderTest().getEntity(
+            new UniqueReference(wikiReference));
         Assert.assertNotNull(wikiEntity);
         Assert.assertFalse(wikiEntity.isNew());
     }
@@ -136,7 +137,8 @@ public class BridgedEntityManagerTest
         WikiReference wikiReference = new WikiReference("wiki");
         when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(null);
 
-        WikiEntity wikiEntity = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(wikiReference));
+        WikiEntity wikiEntity = this.componentManager.getComponentUnderTest().getEntity(
+            new UniqueReference(wikiReference));
         Assert.assertNull(wikiEntity);
     }
 
@@ -223,7 +225,8 @@ public class BridgedEntityManagerTest
         SpaceReference spaceReference = new SpaceReference("space", new WikiReference("wiki"));
         when(this.xwiki.getSpaces(any(XWikiContext.class))).thenReturn(Arrays.asList("space", "otherspace"));
 
-        SpaceEntity spaceEntity = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(spaceReference));
+        SpaceEntity spaceEntity = this.componentManager.getComponentUnderTest().getEntity(
+            new UniqueReference(spaceReference));
         Assert.assertNotNull(spaceEntity);
         Assert.assertFalse(spaceEntity.isNew());
     }

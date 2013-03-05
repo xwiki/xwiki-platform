@@ -67,6 +67,11 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     TranslationBundle, DisposableCacheValue, Disposable, EventListener
 {
     /**
+     * Make default wiki document based translation priority a bit higher than the default one.
+     */
+    public static int DEFAULTPRIORITY_WIKI = DEFAULTPRIORITY - 100;
+
+    /**
      * The prefix to use in all wiki document based translations.
      */
     public static final String ID_PREFIX = "document:";
@@ -98,6 +103,8 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         this.translationMessageParser = translationMessageParser;
 
         this.logger = LoggerFactory.getLogger(getClass());
+
+        setPriority(DEFAULTPRIORITY_WIKI);
 
         setReference(reference);
 

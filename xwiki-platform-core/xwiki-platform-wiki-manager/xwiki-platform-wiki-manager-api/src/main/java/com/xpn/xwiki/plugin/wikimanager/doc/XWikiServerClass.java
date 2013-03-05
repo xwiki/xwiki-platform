@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.wikimanager.doc;
 
 import java.util.List;
 
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -30,6 +32,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.Abstract
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocumentDoesNotExistException;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
@@ -103,8 +106,8 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     /**
      * List of possible values for <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDL_VISIBILITY =
-        FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS;
+    public static final String FIELDL_VISIBILITY = FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS
+        + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS;
 
     /**
      * Pretty name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
@@ -134,8 +137,8 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     /**
      * List of possible values for <code>state</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDL_STATE =
-        FIELDL_STATE_ACTIVE + DEFAULT_FIELDS + FIELDL_STATE_INACTIVE + DEFAULT_FIELDS + FIELDL_STATE_LOCKED;
+    public static final String FIELDL_STATE = FIELDL_STATE_ACTIVE + DEFAULT_FIELDS + FIELDL_STATE_INACTIVE
+        + DEFAULT_FIELDS + FIELDL_STATE_LOCKED;
 
     /**
      * Pretty name of field <code>state</code> for the XWiki class XWiki.XWikiServerClass.
@@ -242,11 +245,18 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     private static XWikiServerClass instance;
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Default constructor for XWikiServerClass.
      */
     protected XWikiServerClass()
     {
         super(CLASS_SPACE, CLASS_PREFIX, false);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -372,7 +382,7 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
             return getXObjectDocument(wikiName, objectId, validate, context);
         } catch (XObjectDocumentDoesNotExistException e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                WikiManagerMessageTool.getDefault(context).get(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
                     wikiName), e);
         }
     }
@@ -395,7 +405,7 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
 
         if (validate && !wiki.isWikiTemplate()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                WikiManagerMessageTool.getDefault(context).get(
+                this.localizationManager.getTranslationPlain(
                     WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
         }
 

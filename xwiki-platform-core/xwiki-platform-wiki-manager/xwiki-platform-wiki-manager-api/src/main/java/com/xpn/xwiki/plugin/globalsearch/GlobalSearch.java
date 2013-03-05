@@ -111,18 +111,18 @@ final class GlobalSearch
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The plugin internationalization service.
-     */
-    private XWikiPluginMessageTool messageTool;
-
-    /**
      * Hidden constructor of GlobalSearch only access via getInstance().
      * 
      * @param messageTool the plugin internationalization service.
      */
+    @Deprecated
     public GlobalSearch(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
+        this();
+    }
+
+    public GlobalSearch()
+    {
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -425,9 +425,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -452,9 +452,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -500,9 +500,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a

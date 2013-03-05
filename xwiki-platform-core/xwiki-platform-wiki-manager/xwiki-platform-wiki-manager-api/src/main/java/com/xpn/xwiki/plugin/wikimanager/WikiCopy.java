@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Utility classe used to fill a newly created wiki.
@@ -57,18 +59,24 @@ public final class WikiCopy
     protected static final Logger LOGGER = LoggerFactory.getLogger(WikiManager.class);
 
     /**
-     * The message tool to use to generate error or comments.
+     * Used to access translations.
      */
-    private XWikiPluginMessageTool messageTool;
+    private ContextualLocalizationManager localizationManager;
 
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
      * @param messageTool the message tool
      */
+    @Deprecated
     public WikiCopy(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
+        this();
+    }
+
+    public WikiCopy()
+    {
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -77,9 +85,10 @@ public final class WikiCopy
      * @param context the XWiki context.
      * @return a translated strings manager.
      */
+    @Deprecated
     public XWikiPluginMessageTool getMessageTool(XWikiContext context)
     {
-        return this.messageTool != null ? this.messageTool : WikiManagerMessageTool.getDefault(context);
+        return WikiManagerMessageTool.getDefault(context);
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -210,13 +219,11 @@ public final class WikiCopy
      */
     public void importPackage(String packageName, String targetWiki, XWikiContext context) throws XWikiException
     {
-        XWikiPluginMessageTool msg = getMessageTool(context);
-
         XWiki xwiki = context.getWiki();
 
         if (!xwiki.isVirtualMode()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
-                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }
 
         // Prepare to import
@@ -225,8 +232,9 @@ public final class WikiCopy
         XWikiAttachment packFile = doc.getAttachment(packageName);
 
         if (packFile == null) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEDOESNOTEXISTS, msg.get(
-                WikiManagerMessageTool.ERROR_PACKAGEDOESNOTEXISTS, packageName));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEDOESNOTEXISTS,
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_PACKAGEDOESNOTEXISTS,
+                    packageName));
         }
 
         // Get packager plugin
@@ -241,14 +249,16 @@ public final class WikiCopy
             try {
                 importer.Import(packFile.getContent(context));
             } catch (IOException e) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg.get(
-                    WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT,
+                    this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_PACKAGEIMPORT,
+                        packageName), e);
             }
 
             // Install imported documents
             if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEINSTALL, msg.get(
-                    WikiManagerMessageTool.ERROR_PACKAGEINSTALL, packageName));
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEINSTALL,
+                    this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_PACKAGEINSTALL,
+                        packageName));
             }
         } finally {
             context.setDatabase(database);

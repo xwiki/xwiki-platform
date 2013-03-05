@@ -21,11 +21,14 @@
 package com.xpn.xwiki.plugin.wikimanager;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -33,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
@@ -86,7 +90,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
             return document;
         }
     }
-    
+
     private XWikiDocument getDocument(String documentFullName) throws XWikiException
     {
         XWikiDocument document = new XWikiDocument();
@@ -117,31 +121,36 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         this.databases.put(MAIN_WIKI_NAME, new HashMap<String, XWikiDocument>());
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+
         Mock mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         mockXWiki.stubs().method("Param").will(returnValue(""));
 
         Mock mockXWikiStore =
-            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
-            mockXWiki.proxy(), getContext()});
+            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
+                new Object[] {mockXWiki.proxy(), getContext()});
 
         Mock mockXWikiRightService = mock(XWikiRightServiceImpl.class, new Class[] {}, new Object[] {});
 
-        mockXWiki.stubs().method("getDocument").with(isA(DocumentReference.class), ANYTHING).will(new CustomStub("Implements XWiki.getDocument")
-        {
-            @Override
-            public Object invoke(Invocation invocation) throws Throwable
+        mockXWiki.stubs().method("getDocument").with(isA(DocumentReference.class), ANYTHING)
+            .will(new CustomStub("Implements XWiki.getDocument")
             {
-                return getDocument((DocumentReference) invocation.parameterValues.get(0));
-            }
-        });
-        mockXWiki.stubs().method("getDocument").with(isA(String.class), ANYTHING).will(new CustomStub("Implements XWiki.getDocument")
-        {
-            @Override
-            public Object invoke(Invocation invocation) throws Throwable
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return getDocument((DocumentReference) invocation.parameterValues.get(0));
+                }
+            });
+        mockXWiki.stubs().method("getDocument").with(isA(String.class), ANYTHING)
+            .will(new CustomStub("Implements XWiki.getDocument")
             {
-                return getDocument((String) invocation.parameterValues.get(0));
-            }
-        });
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return getDocument((String) invocation.parameterValues.get(0));
+                }
+            });
         mockXWiki.stubs().method("saveDocument").will(new CustomStub("Implements XWiki.saveDocument")
         {
             @Override
@@ -198,7 +207,16 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
-        this.wikiManager = new WikiManager(null);
+        this.wikiManager = new WikiManager();
+    }
+
+    @Override
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+
+        // Reset static fields
+        FieldUtils.writeDeclaredStaticField(XWikiServerClass.class, "instance", null, true);
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:
@@ -234,7 +252,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         assertSame(doc, wiki.getDocument());
     }
 
-    public void testGetWikiAliasWhenDocumentDoesNorExists() throws XWikiException
+    public void testGetWikiAliasWhenDocumentDoesNotExists() throws XWikiException
     {
         try {
             this.wikiManager.getWikiAlias("WikInamE", 0, true, getContext());

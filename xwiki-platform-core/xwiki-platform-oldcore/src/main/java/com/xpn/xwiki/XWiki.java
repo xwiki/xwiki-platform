@@ -55,7 +55,6 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
-import javax.inject.Provider;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -100,7 +99,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
-import org.xwiki.localization.LocalizationManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -3611,13 +3610,7 @@ public class XWiki implements EventListener
             if (context.getResponse() != null) {
                 context.getResponse().setLocale(locale);
             }
-            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", locale);
-            if (bundle == null) {
-                bundle = ResourceBundle.getBundle("ApplicationResources");
-            }
-            XWikiMessageTool msg =
-                new XWikiMessageTool(Utils.getComponent(LocalizationManager.class), Utils.getComponentManager(),
-                    Utils.<Provider<XWikiContext>> getComponent(XWikiContext.TYPE_PROVIDER));
+            XWikiMessageTool msg = new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class));
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {

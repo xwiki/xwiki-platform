@@ -22,7 +22,8 @@ package org.xwiki.localization;
 import org.xwiki.component.annotation.Role;
 
 /**
- * A helper for {@link LocalizationManager} which get the {@link java.util.Locale} from {@link LocalizationContext}.
+ * A helper for {@link LocalizationManager} which get the {@link java.util.Locale} from {@link LocalizationContext} and
+ * provide various common use cases methods.
  * 
  * @see LocalizationManager
  * @version $Id$
@@ -40,4 +41,14 @@ public interface ContextualLocalizationManager
      * @see LocalizationContext#getCurrentLocale()
      */
     Translation getTranslation(String key);
+
+    /**
+     * Find a translation in the current language.
+     * 
+     * @param key the key identifying the message to look for
+     * @param parameters the parameters
+     * @return the translation in the current language rendered as plain text
+     * @see getTranslation(String)
+     */
+    String getTranslationPlain(String key, Object...parameters);
 }

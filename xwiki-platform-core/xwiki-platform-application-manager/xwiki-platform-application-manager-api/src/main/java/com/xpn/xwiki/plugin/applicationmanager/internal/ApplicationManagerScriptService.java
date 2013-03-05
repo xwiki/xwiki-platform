@@ -60,8 +60,9 @@ public class ApplicationManagerScriptService implements ScriptService
     private Execution execution;
 
     /**
-     * USed to access current {@link XWikiContext}.
+     * Used to access current {@link XWikiContext}.
      */
+    @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     /**

@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
@@ -40,6 +41,7 @@ import org.xwiki.workspace.Workspace;
 import org.xwiki.workspace.WorkspaceException;
 import org.xwiki.workspace.WorkspaceManager;
 import org.xwiki.workspace.WorkspaceManagerMessageTool;
+import org.xwiki.workspace.WorkspaceWikiManagerMessageTool;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,7 +51,6 @@ import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.wikimanager.WikiManager;
-import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.internal.WikiManagerScriptService;
@@ -111,6 +112,12 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     @Named("wikimanager")
     private ScriptService wikiManagerService;
 
+    /**
+     * The {@link XWikiContext} provider.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     /** Internal wiki manager tookit required to overcome the rights checking of the API. */
     private WikiManager wikiManagerInternal;
 
@@ -120,14 +127,11 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        XWikiContext deprecatedContext = getXWikiContext();
-
-        /* Should be ok if we initialize and cache message tools with the current context. */
-
-        WikiManagerMessageTool wikiManagerMessageTool = WikiManagerMessageTool.getDefault(deprecatedContext);
+        WorkspaceWikiManagerMessageTool wikiManagerMessageTool =
+            new WorkspaceWikiManagerMessageTool(this.xcontextProvider);
         this.wikiManagerInternal = new WikiManager(wikiManagerMessageTool);
 
-        this.messageTool = new WorkspaceManagerMessageTool(deprecatedContext);
+        this.messageTool = new WorkspaceManagerMessageTool(this.xcontextProvider);
     }
 
     /**

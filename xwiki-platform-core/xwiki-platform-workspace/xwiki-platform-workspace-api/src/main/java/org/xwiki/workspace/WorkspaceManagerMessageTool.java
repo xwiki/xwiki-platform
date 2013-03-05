@@ -21,6 +21,8 @@ package org.xwiki.workspace;
 
 import java.util.ResourceBundle;
 
+import javax.inject.Provider;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
@@ -56,11 +58,26 @@ public class WorkspaceManagerMessageTool extends XWikiMessageTool
     public static final String LOG_WORKSPACEINVALID = "workspacemanager.log.workspaceinvalid";
 
     /**
+     * The name of the resource where to find default translations for Workspace Manager.
+     */
+    private static final String TRANSLATIONRESOURCE = "workspacemanager/ApplicationResources";
+
+    /**
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
      *            documents
      */
     public WorkspaceManagerMessageTool(XWikiContext context)
     {
-        super(ResourceBundle.getBundle("workspacemanager" + "/ApplicationResources"), context);
+        super(ResourceBundle.getBundle(TRANSLATIONRESOURCE), context);
+    }
+
+    /**
+     * @param xcontextProvider the {@link XWikiContext} provider
+     */
+    public WorkspaceManagerMessageTool(Provider<XWikiContext> xcontextProvider)
+    {
+        super(ResourceBundle.getBundle(TRANSLATIONRESOURCE), null);
+
+        this.xcontextProvider = xcontextProvider;
     }
 }

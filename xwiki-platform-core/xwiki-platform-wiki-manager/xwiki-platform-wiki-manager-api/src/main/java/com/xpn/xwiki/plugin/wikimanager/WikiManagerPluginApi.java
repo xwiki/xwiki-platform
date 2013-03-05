@@ -400,7 +400,8 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = this.wikiManager.getWikiFromDocumentName(documentFullName, this.context);
         } catch (WikiManagerException e) {
-            error(this.localizationManager.getTranslationPlain(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
+            error(
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
         }
 
         return doc;
@@ -711,7 +712,8 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = this.wikiManager.getWikiTemplateAlias(wikiName, objectId, this.context, true);
         } catch (WikiManagerException e) {
-            error(this.localizationManager.getTranslationPlain(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
+            error(
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
         }
 
         return doc;

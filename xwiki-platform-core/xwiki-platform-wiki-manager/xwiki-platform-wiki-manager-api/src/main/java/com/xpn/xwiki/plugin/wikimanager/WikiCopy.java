@@ -74,6 +74,9 @@ public final class WikiCopy
         this();
     }
 
+    /**
+     * Default constructor.
+     */
     public WikiCopy()
     {
         this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);

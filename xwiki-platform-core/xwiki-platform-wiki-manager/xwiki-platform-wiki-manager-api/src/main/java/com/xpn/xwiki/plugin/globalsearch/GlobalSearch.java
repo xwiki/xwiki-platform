@@ -121,6 +121,9 @@ final class GlobalSearch
         this();
     }
 
+    /**
+     * Default constructor.
+     */
     public GlobalSearch()
     {
     }

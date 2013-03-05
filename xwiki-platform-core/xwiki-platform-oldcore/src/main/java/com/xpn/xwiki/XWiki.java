@@ -532,13 +532,22 @@ public class XWiki implements EventListener
             // name as the wiki name
             String servername = StringUtils.substringBefore(host, ".");
 
-            // As a convenience, allow sites starting with www, localhost or using an
-            // IP address not to have to create a XWikiServerXwiki page since we consider
-            // in that case that they're pointing to the main wiki.
-            if (!"0".equals(xwiki.Param("xwiki.virtual.autowww"))
-                && (servername.equals("www") || host.equals("localhost") || host
-                    .matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}"))) {
-                return xwiki;
+            // Note: Starting 5.0M1, the autowww behavior is default and the ability to disable it is now deprecated.
+            if (!"0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
+                // As a convenience, allow sites starting with www, localhost or using an
+                // IP address not to have to create a XWikiServerXwiki page since we consider
+                // in that case that they're pointing to the main wiki.
+                if ("www".equals(servername)) {
+                    // Check that "www" is not actually the name of an existing subwiki.
+                    wikiDefinition = xwiki.findWikiServer(servername, context);
+                    if (wikiDefinition == null) {
+                        // Not the case, use the main wiki.
+                        return xwiki;
+                    }
+                } else if ("localhost".equals(host) || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}")) {
+                    // Direct access to the main wiki.
+                    return xwiki;
+                }
             }
 
             wikiDefinition =

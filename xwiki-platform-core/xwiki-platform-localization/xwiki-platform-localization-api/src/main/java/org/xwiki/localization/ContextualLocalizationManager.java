@@ -19,23 +19,25 @@
  */
 package org.xwiki.localization;
 
-import java.util.Locale;
-
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
- * Provide various localization related contextual informations (current Locale, etc.).
+ * A helper for {@link LocalizationManager} which get the {@link java.util.Locale} from {@link LocalizationContext}.
  * 
+ * @see LocalizationManager
  * @version $Id$
- * @since 4.3M2
+ * @since 5.0M1
  */
 @Role
-@Unstable
-public interface LocalizationContext
+public interface ContextualLocalizationManager
 {
     /**
-     * @return the {@link Locale} to use by default in the current context
+     * Find a translation in the current language.
+     * 
+     * @param key the key identifying the message to look for
+     * @return the translation in the current language
+     * @see LocalizationManager#getTranslation(String, java.util.Locale)
+     * @see LocalizationContext#getCurrentLocale()
      */
-    Locale getCurrentLocale();
+    Translation getTranslation(String key);
 }

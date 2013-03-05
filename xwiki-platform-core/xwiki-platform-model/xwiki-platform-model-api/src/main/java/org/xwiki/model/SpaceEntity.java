@@ -22,38 +22,38 @@ package org.xwiki.model;
 /**
  * @since 5.0M1
  */
-public interface Space extends Entity, Extensible
+public interface SpaceEntity extends Entity, Extensible
 {
     /**
      * @return the list of top level Space objects in this Space (excluding nested spaces)
      */
-    EntityIterator<Space> getSpaces() throws ModelException;
+    EntityIterator<SpaceEntity> getSpaceEntities() throws ModelException;
 
     /**
      * @param spaceName the name of the nested space to look for
      * @return the nested space whose name is passed as parameter
      */
-    Space getSpace(String spaceName) throws ModelException;
+    SpaceEntity getSpaceEntity(String spaceName) throws ModelException;
 
     /**
      * Add a nested space.
      */
-    Space addSpace(String spaceName);
+    SpaceEntity addSpaceEntity(String spaceName);
 
     /**
      * Remove a nested space.
      */
-    void removeSpace(String spaceName);
+    void removeSpaceEntity(String spaceName);
 
-    boolean hasSpace(String spaceName) throws ModelException;
+    boolean hasSpaceEntity(String spaceName) throws ModelException;
 
-    EntityIterator<Document> getDocuments() throws ModelException;
+    EntityIterator<DocumentEntity> getDocumentEntities() throws ModelException;
 
-    boolean hasDocument(String documentName) throws ModelException;
+    boolean hasDocumentEntity(String documentName) throws ModelException;
 
-    Document getDocument(String documentName) throws ModelException;
+    DocumentEntity getDocumentEntity(String documentName) throws ModelException;
 
-    Document addDocument(String documentName);
+    DocumentEntity addDocumentEntity(String documentName);
 
-    void removeDocument(String documentName);
+    void removeDocumentEntity(String documentName);
 }

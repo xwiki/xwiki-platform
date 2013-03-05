@@ -80,24 +80,24 @@
           <excludes>
             <!-- New Model is not yet stabilized, exclude from Checkstyle for now -->
             org/xwiki/model/Content.java,
-            org/xwiki/model/Document.java,
+            org/xwiki/model/DocumentEntity.java,
             org/xwiki/model/Entity.java,
             org/xwiki/model/EntityManager.java,
             org/xwiki/model/Extensible.java,
             org/xwiki/model/Linkable.java,
-            org/xwiki/model/Wiki.java,
+            org/xwiki/model/WikiEntity.java,
             org/xwiki/model/UniqueReference.java,
-            org/xwiki/model/Space.java,
+            org/xwiki/model/SpaceEntity.java,
             org/xwiki/model/Server.java,
             org/xwiki/model/Referenceable.java,
             org/xwiki/model/Persistable.java,
-            org/xwiki/model/Object.java,
-            org/xwiki/model/ObjectDefinition.java,
-            org/xwiki/model/ObjectDefinitionProperty.java,
+            org/xwiki/model/ObjectEntity.java,
+            org/xwiki/model/ClassEntity.java,
+            org/xwiki/model/ClassPropertyEntity.java,
             org/xwiki/model/EntityIterator.java,
             org/xwiki/model/Version.java,
             org/xwiki/model/Session.java,
-            org/xwiki/model/ObjectProperty.java
+            org/xwiki/model/ObjectPropertyEntity.java
           </excludes>
         </configuration>
       </plugin>

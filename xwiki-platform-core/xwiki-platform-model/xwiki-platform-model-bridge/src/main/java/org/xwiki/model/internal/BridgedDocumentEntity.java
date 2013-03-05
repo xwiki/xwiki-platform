@@ -19,111 +19,121 @@
  */
 package org.xwiki.model.internal;
 
+import org.xwiki.model.*;
+import org.xwiki.model.ObjectEntity;
+import org.xwiki.model.reference.EntityReference;
+
 import java.util.Locale;
 import java.util.Map;
 
-import org.xwiki.model.*;
-import org.xwiki.model.Object;
-import org.xwiki.model.reference.EntityReference;
-
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @since 5.0M1
  */
-public class BridgedSpace extends AbstractBridgedEntity implements Space
+public class BridgedDocumentEntity extends AbstractBridgedEntity implements DocumentEntity
 {
-    public BridgedSpace(XWikiContext xcontext)
+    private XWikiDocument document;
+
+    public BridgedDocumentEntity(XWikiDocument document, XWikiContext xcontext)
     {
         super(xcontext);
+        this.document = document;
     }
 
-    @Override public Document addDocument(String documentName)
+    @Override
+    public Version getVersion()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public Space addSpace(String spaceName)
+    @Override
+    public EntityIterator<Entity> getChildren(EntityType type)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public Document getDocument(String documentName)
+    @Override
+    public ObjectEntity addObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityIterator<Document> getDocuments()
+    @Override
+    public ClassEntity addClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public Space getSpace(String spaceName)
+    @Override
+    public Content getContent()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityIterator<Space> getSpaces()
+    @Override
+    public Locale getLocale()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public boolean hasDocument(String documentName)
+    @Override
+    public ObjectEntity getObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public boolean hasSpace(String spaceName)
+    @Override
+    public ClassEntity getClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public void removeDocument(String documentName)
+    @Override
+    public EntityIterator<ClassEntity> getClassEntities()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public void removeSpace(String spaceName)
+    @Override
+    public EntityIterator<ObjectEntity> getObjectEntities()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public org.xwiki.model.Object addObject(String objectName)
+    @Override
+    public boolean hasObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public ObjectDefinition addObjectDefinition(String objectDefinitionName)
+    @Override
+    public boolean hasClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityIterator<Entity> getChildren(EntityType type)
+    @Override
+    public void removeObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public String getIdentifier()
+    @Override
+    public void removeClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public Object getObject(String objectName)
+    @Override
+    public void setContent(Content content)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public ObjectDefinition getObjectDefinition(String objectDefinitionName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public EntityIterator<ObjectDefinition> getObjectDefinitions()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public EntityIterator<Object> getObjects()
+    @Override
+    public String getIdentifier()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -134,7 +144,8 @@ public class BridgedSpace extends AbstractBridgedEntity implements Space
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityReference getReference()
+    @Override
+    public EntityReference getReference()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -151,32 +162,14 @@ public class BridgedSpace extends AbstractBridgedEntity implements Space
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityType getType()
+    @Override
+    public EntityType getType()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public boolean hasObject(String objectName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public boolean hasObjectDefinition(String objectDefinitionName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public void removeObject(String objectName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public void removeObjectDefinition(String objectDefinitionName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
+    @Override
+    public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -194,19 +187,19 @@ public class BridgedSpace extends AbstractBridgedEntity implements Space
     }
 
     @Override
+    public boolean isNew()
+    {
+        return this.document.isNew();
+    }
+
+    @Override
+    public void setNew(boolean isNew)
+    {
+        this.document.setNew(isNew);
+    }
+
+    @Override
     public boolean isRemoved()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override
-    public Locale getLocale()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override
-    public Version getVersion()
     {
         throw new ModelRuntimeException("Not supported");
     }

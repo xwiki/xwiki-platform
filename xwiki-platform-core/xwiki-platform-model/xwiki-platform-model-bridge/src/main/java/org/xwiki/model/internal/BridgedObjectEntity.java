@@ -27,32 +27,33 @@ import org.xwiki.model.EntityIterator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelException;
 import org.xwiki.model.ModelRuntimeException;
-import org.xwiki.model.ObjectProperty;
+import org.xwiki.model.ObjectEntity;
+import org.xwiki.model.ObjectPropertyEntity;
 import org.xwiki.model.Version;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * @since 5.0M1
  */
-public class BridgedObjectProperty extends AbstractBridgedEntity implements ObjectProperty
+public class BridgedObjectEntity extends AbstractBridgedEntity implements ObjectEntity
 {
-    private BaseProperty baseProperty;
+    private BaseObject baseObject;
 
-    public BridgedObjectProperty(BaseProperty baseProperty, XWikiContext xcontext)
+    public BridgedObjectEntity(BaseObject baseObject, XWikiContext xcontext)
     {
         super(xcontext);
-        this.baseProperty = baseProperty;
+        this.baseObject = baseObject;
     }
 
-    @Override public String getIdentifier()
+    @Override public EntityIterator<Entity> getChildren(EntityType type)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityType getType()
+    @Override public String getIdentifier()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -62,17 +63,17 @@ public class BridgedObjectProperty extends AbstractBridgedEntity implements Obje
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public Version getVersion()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
     @Override public Entity getParent()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityIterator<Entity> getChildren(EntityType type) throws ModelException
+    @Override public EntityType getType()
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public Version getVersion()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -82,7 +83,8 @@ public class BridgedObjectProperty extends AbstractBridgedEntity implements Obje
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public boolean isRemoved()
+    @Override
+    public boolean isRemoved()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -98,12 +100,12 @@ public class BridgedObjectProperty extends AbstractBridgedEntity implements Obje
     }
 
     @Override public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
-        throws ModelException
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public void discard()
+    @Override
+    public void discard()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -113,9 +115,28 @@ public class BridgedObjectProperty extends AbstractBridgedEntity implements Obje
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override
-    public Object getValue()
+    @Override public EntityIterator<ObjectPropertyEntity> getObjectPropertyEntities() throws ModelException
     {
-        return this.baseProperty.getValue();
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public ObjectPropertyEntity getObjectPropertyEntity(String objectPropertyName) throws ModelException
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public ObjectPropertyEntity addObjectPropertyEntity(String objectPropertyName)
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public void removeObjectPropertyEntity(String objectPropertyName)
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public boolean hasObjectPropertyEntity(String objectPropertyName) throws ModelException
+    {
+        throw new ModelRuntimeException("Not supported");
     }
 }

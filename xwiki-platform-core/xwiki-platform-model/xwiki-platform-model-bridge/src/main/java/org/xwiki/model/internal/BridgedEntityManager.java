@@ -94,7 +94,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
         EntityReference reference = uniqueReference.getReference();
         switch (reference.getType()) {
             case DOCUMENT:
-                result = (T) new BridgedDocument(getXWikiDocument(reference), getXWikiContext());
+                result = (T) new BridgedDocumentEntity(getXWikiDocument(reference), getXWikiContext());
                 // Note: We don't need to set isNew since this is supported by the old model directly.
                 break;
             case SPACE:
@@ -104,7 +104,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
                     // space instead of all docs in all spaces...
                     List<String> spaces = getXWiki().getSpaces(getXWikiContext());
                     if (spaces.contains(reference.getName())) {
-                        BridgedSpace bs = new BridgedSpace(getXWikiContext());
+                        BridgedSpaceEntity bs = new BridgedSpaceEntity(getXWikiContext());
                         bs.setNew(false);
                         result = (T) bs;
                     }
@@ -115,15 +115,15 @@ public class BridgedEntityManager implements EntityManager, Initializable
             case WIKI:
                 // TODO: Need to load the wiki details. FTM only checking if it exists
                 if (hasEntity(uniqueReference)) {
-                    BridgedWiki bw = new BridgedWiki(getXWikiContext());
-                    bw.setNew(false);
-                    result = (T) bw;
+                    BridgedWikiEntity bwe = new BridgedWikiEntity(getXWikiContext());
+                    bwe.setNew(false);
+                    result = (T) bwe;
                 }
                 break;
             case OBJECT:
                 BaseObject xObject = getXWikiObject(reference);
                 if (xObject != null) {
-                    BridgedObject bo = new BridgedObject(xObject, getXWikiContext());
+                    BridgedObjectEntity bo = new BridgedObjectEntity(xObject, getXWikiContext());
                     bo.setNew(false);
                     result = (T) bo;
                 }
@@ -132,7 +132,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
                 BaseObject xobject = getXWikiObject(reference.getParent());
                 if (xobject != null) {
                     try {
-                        BridgedObjectProperty bop = new BridgedObjectProperty(
+                        BridgedObjectPropertyEntity bop = new BridgedObjectPropertyEntity(
                             (BaseProperty) xobject.get(reference.getName()), getXWikiContext());
                         bop.setNew(false);
                         result = (T) bop;
@@ -206,7 +206,7 @@ public class BridgedEntityManager implements EntityManager, Initializable
 
         EntityReference reference = uniqueReference.getReference();
         if (reference.getType().equals(EntityType.WIKI)) {
-            result = (T) new BridgedWiki(getXWikiContext());
+            result = (T) new BridgedWikiEntity(getXWikiContext());
         } else {
             throw new ModelRuntimeException("Not supported");
         }

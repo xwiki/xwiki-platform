@@ -33,13 +33,14 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.Document;
+import org.xwiki.model.DocumentEntity;
 import org.xwiki.model.EntityManager;
 import org.xwiki.model.ModelException;
-import org.xwiki.model.ObjectProperty;
-import org.xwiki.model.Space;
+import org.xwiki.model.ObjectEntity;
+import org.xwiki.model.ObjectPropertyEntity;
+import org.xwiki.model.SpaceEntity;
 import org.xwiki.model.UniqueReference;
-import org.xwiki.model.Wiki;
+import org.xwiki.model.WikiEntity;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -98,7 +99,7 @@ public class BridgedEntityManagerTest
         when(xdoc.isNew()).thenReturn(false);
         when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
 
-        Document doc = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(documentReference));
+        DocumentEntity doc = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(documentReference));
         Assert.assertNotNull(doc);
         Assert.assertFalse(doc.isNew());
     }
@@ -124,9 +125,9 @@ public class BridgedEntityManagerTest
         when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(
             new URL("http://whatever/not/null"));
 
-        Wiki wiki = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(wikiReference));
-        Assert.assertNotNull(wiki);
-        Assert.assertFalse(wiki.isNew());
+        WikiEntity wikiEntity = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(wikiReference));
+        Assert.assertNotNull(wikiEntity);
+        Assert.assertFalse(wikiEntity.isNew());
     }
 
     @Test
@@ -135,8 +136,8 @@ public class BridgedEntityManagerTest
         WikiReference wikiReference = new WikiReference("wiki");
         when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(null);
 
-        Wiki wiki = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(wikiReference));
-        Assert.assertNull(wiki);
+        WikiEntity wikiEntity = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(wikiReference));
+        Assert.assertNull(wikiEntity);
     }
 
     @Test
@@ -179,10 +180,10 @@ public class BridgedEntityManagerTest
         BaseObject baseObject = mock(BaseObject.class);
         when(xdoc.getXObject(objectReference)).thenReturn(baseObject);
 
-        org.xwiki.model.Object object = this.componentManager.getComponentUnderTest().getEntity(
+        ObjectEntity objectEntity = this.componentManager.getComponentUnderTest().getEntity(
             new UniqueReference(objectReference));
-        Assert.assertNotNull(object);
-        Assert.assertFalse(object.isNew());
+        Assert.assertNotNull(objectEntity);
+        Assert.assertFalse(objectEntity.isNew());
     }
 
     @Test
@@ -195,9 +196,9 @@ public class BridgedEntityManagerTest
         when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
         when(xdoc.getXObject(objectReference)).thenReturn(null);
 
-        org.xwiki.model.Object object = this.componentManager.getComponentUnderTest().getEntity(
+        ObjectEntity objectEntity = this.componentManager.getComponentUnderTest().getEntity(
             new UniqueReference(objectReference));
-        Assert.assertNull(object);
+        Assert.assertNull(objectEntity);
     }
 
     @Test
@@ -211,9 +212,9 @@ public class BridgedEntityManagerTest
         // This means the doc doesn't exist in the old model
         when(xdoc.isNew()).thenReturn(true);
 
-        org.xwiki.model.Object object = this.componentManager.getComponentUnderTest().getEntity(
+        ObjectEntity objectEntity = this.componentManager.getComponentUnderTest().getEntity(
             new UniqueReference(objectReference));
-        Assert.assertNull(object);
+        Assert.assertNull(objectEntity);
     }
 
     @Test
@@ -222,9 +223,9 @@ public class BridgedEntityManagerTest
         SpaceReference spaceReference = new SpaceReference("space", new WikiReference("wiki"));
         when(this.xwiki.getSpaces(any(XWikiContext.class))).thenReturn(Arrays.asList("space", "otherspace"));
 
-        Space space = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(spaceReference));
-        Assert.assertNotNull(space);
-        Assert.assertFalse(space.isNew());
+        SpaceEntity spaceEntity = this.componentManager.getComponentUnderTest().getEntity(new UniqueReference(spaceReference));
+        Assert.assertNotNull(spaceEntity);
+        Assert.assertFalse(spaceEntity.isNew());
     }
 
     @Test
@@ -241,9 +242,9 @@ public class BridgedEntityManagerTest
         BaseProperty baseProperty = mock(BaseProperty.class);
         when(baseObject.get("property")).thenReturn(baseProperty);
 
-        ObjectProperty objectProperty = this.componentManager.getComponentUnderTest().getEntity(
+        ObjectPropertyEntity objectPropertyEntity = this.componentManager.getComponentUnderTest().getEntity(
             new UniqueReference(propertyReference));
-        Assert.assertNotNull(objectProperty);
-        Assert.assertFalse(objectProperty.isNew());
+        Assert.assertNotNull(objectPropertyEntity);
+        Assert.assertFalse(objectPropertyEntity.isNew());
     }
 }

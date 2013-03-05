@@ -22,7 +22,8 @@ package org.xwiki.model;
 /**
  * @since 5.0M1
  */
-public interface ObjectDefinition extends Entity
+public interface DocumentEntity extends Entity, Extensible
 {
-
+    Content getContent();
+    void setContent(Content content);
 }

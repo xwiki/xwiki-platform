@@ -22,7 +22,15 @@ package org.xwiki.model;
 /**
  * @since 5.0M1
  */
-public interface ObjectDefinitionProperty extends Entity
+public interface ObjectEntity extends Entity
 {
+    EntityIterator<ObjectPropertyEntity> getObjectPropertyEntities() throws ModelException;
 
+    ObjectPropertyEntity getObjectPropertyEntity(String objectPropertyName) throws ModelException;
+
+    ObjectPropertyEntity addObjectPropertyEntity(String objectPropertyName);
+
+    void removeObjectPropertyEntity(String objectPropertyName);
+
+    boolean hasObjectPropertyEntity(String objectPropertyName) throws ModelException;
 }

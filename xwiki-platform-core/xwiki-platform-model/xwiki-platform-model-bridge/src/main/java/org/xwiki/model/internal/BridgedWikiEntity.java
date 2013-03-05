@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.model.*;
-import org.xwiki.model.Object;
+import org.xwiki.model.ObjectEntity;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWiki;
@@ -32,39 +32,39 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * @since 5.0M1
  */
-public class BridgedWiki extends AbstractBridgedEntity implements Wiki
+public class BridgedWikiEntity extends AbstractBridgedEntity implements WikiEntity
 {
-    public BridgedWiki(XWikiContext xcontext)
+    public BridgedWikiEntity(XWikiContext xcontext)
     {
         super(xcontext);
     }
 
     @Override
-    public Space addSpace(String spaceName)
+    public SpaceEntity addSpaceEntity(String spaceName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public Space getSpace(String spaceName)
+    public SpaceEntity getSpaceEntity(String spaceName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public EntityIterator<Space> getSpaces()
+    public EntityIterator<SpaceEntity> getSpaceEntities()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public boolean hasSpace(String spaceName)
+    public boolean hasSpaceEntity(String spaceName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public void removeSpace(String spaceName)
+    public void removeSpaceEntity(String spaceName)
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -75,13 +75,13 @@ public class BridgedWiki extends AbstractBridgedEntity implements Wiki
     }
 
     @Override
-    public org.xwiki.model.Object addObject(String objectName)
+    public ObjectEntity addObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public ObjectDefinition addObjectDefinition(String objectDefinitionName)
+    public ClassEntity addClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -99,25 +99,25 @@ public class BridgedWiki extends AbstractBridgedEntity implements Wiki
     }
 
     @Override
-    public Object getObject(String objectName)
+    public ObjectEntity getObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public ObjectDefinition getObjectDefinition(String objectDefinitionName)
+    public ClassEntity getClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public EntityIterator<ObjectDefinition> getObjectDefinitions()
+    public EntityIterator<ClassEntity> getClassEntities()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public EntityIterator<Object> getObjects()
+    public EntityIterator<ObjectEntity> getObjectEntities()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -160,25 +160,25 @@ public class BridgedWiki extends AbstractBridgedEntity implements Wiki
     }
 
     @Override
-    public boolean hasObject(String objectName)
+    public boolean hasObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public boolean hasObjectDefinition(String objectDefinitionName)
+    public boolean hasClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public void removeObject(String objectName)
+    public void removeObjectEntity(String objectName)
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public void removeObjectDefinition(String objectDefinitionName)
+    public void removeClassEntity(String objectDefinitionName)
     {
         throw new ModelRuntimeException("Not supported");
     }

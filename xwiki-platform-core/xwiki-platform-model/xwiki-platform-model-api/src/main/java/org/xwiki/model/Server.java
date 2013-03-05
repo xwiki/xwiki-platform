@@ -20,7 +20,7 @@
 package org.xwiki.model;
 
 /**
- * An XWiki Server is made of one or several {@link org.xwiki.model.Wiki}s. This is the top most
+ * An XWiki Server is made of one or several {@link WikiEntity}s. This is the top most
  * concept of the XWiki Model.
  *
  * @since 5.0M1
@@ -30,13 +30,13 @@ public interface Server extends Persistable
     /**
      * @return the list of all Wiki objects inside this Server
      */
-    EntityIterator<Wiki> getWikis() throws ModelException;
+    EntityIterator<WikiEntity> getWikiEntities() throws ModelException;
 
-    Wiki getWiki(String wikiName) throws ModelException;
+    WikiEntity getWikiEntity(String wikiName) throws ModelException;
 
-    Wiki addWiki(String wikiName);
+    WikiEntity addWikiEntity(String wikiName);
 
-    void removeWiki(String wikiName);
+    void removeWikiEntity(String wikiName);
 
-    boolean hasWiki(String wikiName) throws ModelException;
+    boolean hasWikiEntity(String wikiName) throws ModelException;
 }

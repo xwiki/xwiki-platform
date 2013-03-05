@@ -27,7 +27,7 @@ import org.xwiki.model.ModelException;
 import org.xwiki.model.ModelRuntimeException;
 import org.xwiki.model.Server;
 import org.xwiki.model.UniqueReference;
-import org.xwiki.model.Wiki;
+import org.xwiki.model.WikiEntity;
 import org.xwiki.model.reference.WikiReference;
 
 import java.util.Map;
@@ -51,34 +51,34 @@ public class BridgedServer implements Server
      * Note: We'll create a wiki descriptor document when we save the Wiki Entity.
      */
     @Override
-    public Wiki addWiki(String wikiName)
+    public WikiEntity addWikiEntity(String wikiName)
     {
         UniqueReference uniqueReference = new UniqueReference(new WikiReference(wikiName));
         return this.entityManager.addEntity(uniqueReference);
     }
 
     @Override
-    public Wiki getWiki(String wikiName) throws ModelException
+    public WikiEntity getWikiEntity(String wikiName) throws ModelException
     {
         UniqueReference uniqueReference = new UniqueReference(new WikiReference(wikiName));
         return this.entityManager.getEntity(uniqueReference);
     }
 
     @Override
-    public EntityIterator<Wiki> getWikis()
+    public EntityIterator<WikiEntity> getWikiEntities()
     {
         throw new ModelRuntimeException("Not supported");
     }
 
     @Override
-    public boolean hasWiki(String wikiName) throws ModelException
+    public boolean hasWikiEntity(String wikiName) throws ModelException
     {
         UniqueReference uniqueReference = new UniqueReference(new WikiReference(wikiName));
         return this.entityManager.hasEntity(uniqueReference);
     }
 
     @Override
-    public void removeWiki(String wikiName)
+    public void removeWikiEntity(String wikiName)
     {
         throw new ModelRuntimeException("Not supported");
     }

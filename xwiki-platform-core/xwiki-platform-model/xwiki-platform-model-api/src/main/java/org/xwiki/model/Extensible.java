@@ -25,25 +25,25 @@ package org.xwiki.model;
 public interface Extensible
 {
     /**
-     * @return the list of object definitions defined inside this entity
+     * @return the list of class entities defined inside this entity
      */
-    EntityIterator<ObjectDefinition> getObjectDefinitions() throws ModelException;
+    EntityIterator<ClassEntity> getClassEntities() throws ModelException;
 
-    ObjectDefinition getObjectDefinition(String objectDefinitionName) throws ModelException;
+    ClassEntity getClassEntity(String objectDefinitionName) throws ModelException;
 
-    ObjectDefinition addObjectDefinition(String objectDefinitionName);
+    ClassEntity addClassEntity(String objectDefinitionName);
 
-    void removeObjectDefinition(String objectDefinitionName);
+    void removeClassEntity(String objectDefinitionName);
 
-    boolean hasObjectDefinition(String objectDefinitionName) throws ModelException;
+    boolean hasClassEntity(String objectDefinitionName) throws ModelException;
 
-    EntityIterator<Object> getObjects() throws ModelException;
+    EntityIterator<ObjectEntity> getObjectEntities() throws ModelException;
 
-    Object getObject(String objectName) throws ModelException;
+    ObjectEntity getObjectEntity(String objectName) throws ModelException;
 
-    Object addObject(String objectName);
+    ObjectEntity addObjectEntity(String objectName);
 
-    void removeObject(String objectName);
+    void removeObjectEntity(String objectName);
 
-    boolean hasObject(String objectName) throws ModelException;
+    boolean hasObjectEntity(String objectName) throws ModelException;
 }

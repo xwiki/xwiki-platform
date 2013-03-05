@@ -27,43 +27,27 @@ import org.xwiki.model.EntityIterator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelException;
 import org.xwiki.model.ModelRuntimeException;
-import org.xwiki.model.Object;
-import org.xwiki.model.ObjectProperty;
+import org.xwiki.model.ObjectPropertyEntity;
 import org.xwiki.model.Version;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * @since 5.0M1
  */
-public class BridgedObject extends AbstractBridgedEntity implements Object
+public class BridgedObjectPropertyEntity extends AbstractBridgedEntity implements ObjectPropertyEntity
 {
-    private BaseObject baseObject;
+    private BaseProperty baseProperty;
 
-    public BridgedObject(BaseObject baseObject, XWikiContext xcontext)
+    public BridgedObjectPropertyEntity(BaseProperty baseProperty, XWikiContext xcontext)
     {
         super(xcontext);
-        this.baseObject = baseObject;
-    }
-
-    @Override public EntityIterator<Entity> getChildren(EntityType type)
-    {
-        throw new ModelRuntimeException("Not supported");
+        this.baseProperty = baseProperty;
     }
 
     @Override public String getIdentifier()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public Locale getLocale()
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public Entity getParent()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -73,7 +57,22 @@ public class BridgedObject extends AbstractBridgedEntity implements Object
         throw new ModelRuntimeException("Not supported");
     }
 
+    @Override public Locale getLocale()
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
     @Override public Version getVersion()
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public Entity getParent()
+    {
+        throw new ModelRuntimeException("Not supported");
+    }
+
+    @Override public EntityIterator<Entity> getChildren(EntityType type) throws ModelException
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -83,8 +82,7 @@ public class BridgedObject extends AbstractBridgedEntity implements Object
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override
-    public boolean isRemoved()
+    @Override public boolean isRemoved()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -100,12 +98,12 @@ public class BridgedObject extends AbstractBridgedEntity implements Object
     }
 
     @Override public void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters)
+        throws ModelException
     {
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override
-    public void discard()
+    @Override public void discard()
     {
         throw new ModelRuntimeException("Not supported");
     }
@@ -115,28 +113,9 @@ public class BridgedObject extends AbstractBridgedEntity implements Object
         throw new ModelRuntimeException("Not supported");
     }
 
-    @Override public EntityIterator<ObjectProperty> getObjectProperties() throws ModelException
+    @Override
+    public Object getValue()
     {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public ObjectProperty getObjectProperty(String objectPropertyName) throws ModelException
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public ObjectProperty addObjectProperty(String objectPropertyName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public void removeObjectProperty(String objectPropertyName)
-    {
-        throw new ModelRuntimeException("Not supported");
-    }
-
-    @Override public boolean hasObjectProperty(String objectPropertyName) throws ModelException
-    {
-        throw new ModelRuntimeException("Not supported");
+        return this.baseProperty.getValue();
     }
 }

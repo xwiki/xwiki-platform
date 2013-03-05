@@ -20,12 +20,24 @@
 package org.xwiki.model;
 
 /**
- * Represents an Object Property, i.e. a generic field in an Object which can contain any type of metadata.
- *
- * @version $Id$
  * @since 5.0M1
  */
-public interface ObjectProperty<T> extends Entity
+public interface WikiEntity extends Entity, Extensible
 {
-    T getValue();
+    /**
+     * @return the list of top level Space objects in this wiki (excluding nested spaces)
+     */
+    EntityIterator<SpaceEntity> getSpaceEntities() throws ModelException;
+
+    /**
+     * @param spaceName the name of the space
+     * @return the object representing the space whose  name is passed in parameter
+     */
+    SpaceEntity getSpaceEntity(String spaceName) throws ModelException;
+
+    SpaceEntity addSpaceEntity(String spaceName);
+
+    void removeSpaceEntity(String spaceName);
+
+    boolean hasSpaceEntity(String spaceName) throws ModelException;
 }

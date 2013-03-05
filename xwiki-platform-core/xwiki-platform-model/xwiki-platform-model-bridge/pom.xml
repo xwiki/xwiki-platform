@@ -80,13 +80,13 @@
           <excludes>
             <!-- New Model is not yet stabilized, exclude from Checkstyle for now -->
             org/xwiki/model/internal/AbstractBridgedEntity.java,
-            org/xwiki/model/internal/BridgedDocument.java,
+            org/xwiki/model/internal/BridgedDocumentEntity.java,
             org/xwiki/model/internal/BridgedEntityManager.java,
-            org/xwiki/model/internal/BridgedObject.java,
+            org/xwiki/model/internal/BridgedObjectEntity.java,
             org/xwiki/model/internal/BridgedServer.java,
-            org/xwiki/model/internal/BridgedSpace.java,
-            org/xwiki/model/internal/BridgedWiki.java,
-            org/xwiki/model/internal/BridgedObjectProperty.java
+            org/xwiki/model/internal/BridgedSpaceEntity.java,
+            org/xwiki/model/internal/BridgedWikiEntity.java,
+            org/xwiki/model/internal/BridgedObjectPropertyEntity.java
           </excludes>
         </configuration>
       </plugin>

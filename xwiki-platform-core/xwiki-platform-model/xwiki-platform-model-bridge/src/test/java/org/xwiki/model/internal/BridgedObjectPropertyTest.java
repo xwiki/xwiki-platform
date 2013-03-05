@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import junit.framework.Assert;
 
 /**
- * Unit tests for {@link BridgedObjectProperty}.
+ * Unit tests for {@link BridgedObjectPropertyEntity}.
  *
  * @version $Id$
  * @since 5.0M1
@@ -42,7 +42,7 @@ public class BridgedObjectPropertyTest
         BaseProperty property = mock(BaseProperty.class);
         when(property.getValue()).thenReturn("test");
 
-        BridgedObjectProperty bop = new BridgedObjectProperty(property, mock(XWikiContext.class));
+        BridgedObjectPropertyEntity bop = new BridgedObjectPropertyEntity(property, mock(XWikiContext.class));
         Assert.assertEquals("test", bop.getValue());
     }
 }

@@ -49,12 +49,13 @@ public class BridgedServerTest
     @Test
     public void addWiki() throws Exception
     {
-        Wiki expectedWiki = mock(Wiki.class);
-        when(this.entityManager.addEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(expectedWiki);
+        WikiEntity expectedWikiEntity = mock(WikiEntity.class);
+        when(this.entityManager.addEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(
+            expectedWikiEntity);
 
-        Wiki wiki = this.server.addWiki("wiki");
+        WikiEntity wikiEntity = this.server.addWikiEntity("wiki");
 
-        Assert.assertNotNull(wiki);
+        Assert.assertNotNull(wikiEntity);
     }
 
     @Test
@@ -62,17 +63,18 @@ public class BridgedServerTest
     {
         when(this.entityManager.hasEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(true);
 
-        Assert.assertTrue(this.server.hasWiki("wiki"));
+        Assert.assertTrue(this.server.hasWikiEntity("wiki"));
     }
 
     @Test
     public void getWiki() throws Exception
     {
-        Wiki expectedWiki = mock(Wiki.class);
-        when(this.entityManager.getEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(expectedWiki);
+        WikiEntity expectedWikiEntity = mock(WikiEntity.class);
+        when(this.entityManager.getEntity(new UniqueReference(new WikiReference("wiki")))).thenReturn(
+            expectedWikiEntity);
 
-        Wiki wiki = this.server.getWiki("wiki");
+        WikiEntity wikiEntity = this.server.getWikiEntity("wiki");
 
-        Assert.assertNotNull(wiki);
+        Assert.assertNotNull(wikiEntity);
     }
 }

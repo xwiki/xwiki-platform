@@ -1370,13 +1370,4 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
     }
-
-    /**
-     * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
-     * @since 4.5M1
-     */
-    protected boolean isInSchemaMode()
-    {
-        return getConfiguration().getProperty("xwiki.virtual_mode").equals("schema");
-    }
 }
